@@ -3,7 +3,10 @@ extends CharacterBody2D
 ## The player champion. Holds one standing order (move / attack / attack-move)
 ## and carries it out every physics frame. Attack windups pause the order.
 
-enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE }
+## Lucian walked into range of the merchant he was sent to.
+signal merchant_reached(merchant: Merchant)
+
+enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE, VISIT }
 
 ## Share of the attack period spent winding up before the shot leaves the gun.
 const WINDUP_RATIO := 0.15
@@ -41,6 +44,7 @@ var queue_casts := true
 var _order := Order.NONE
 var _move_point := Vector2.ZERO
 var _target: Enemy
+var _visit: Merchant
 var _attack_cooldown := 0.0
 var _windup_left := 0.0
 var _show_range_ring := false
@@ -86,6 +90,18 @@ func command_attack_move(point: Vector2) -> void:
 	_order = Order.ATTACK_MOVE
 	_move_point = point
 	_target = null
+
+
+## Walks to `merchant`; merchant_reached fires once he is in range (right
+## away if he already is).
+func command_visit(merchant: Merchant) -> void:
+	_cancel_windup()
+	if global_position.distance_to(merchant.global_position) <= Merchant.INTERACT_RANGE:
+		_order = Order.NONE
+		merchant_reached.emit(merchant)
+		return
+	_order = Order.VISIT
+	_visit = merchant
 
 
 func try_rank_up(slot: ChampionProgress.Slot) -> bool:
@@ -306,6 +322,14 @@ func _physics_process(delta: float) -> void:
 				_pursue(_target, delta)
 			elif _step_toward(_move_point, delta):
 				_order = Order.NONE
+		Order.VISIT:
+			if not is_instance_valid(_visit):
+				_order = Order.NONE
+			elif global_position.distance_to(_visit.global_position) <= Merchant.INTERACT_RANGE:
+				_order = Order.NONE
+				merchant_reached.emit(_visit)
+			else:
+				_step_toward(_visit.global_position, delta)
 
 
 ## Recomputes stats from the level and the equipped items. Leveling up grants

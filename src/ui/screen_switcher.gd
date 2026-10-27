@@ -1,9 +1,12 @@
 class_name ScreenSwitcher
 extends Node
-## Opens and closes the pause screens: the backpack on P and the menu on ESC.
-## The only place that pauses the game. Keys are read in _input, so a focused
-## text field can never swallow them.
+## Opens and closes the pause screens: the backpack on P, the merchant's shop
+## (the backpack in shop mode, opened by walking to the merchant) and the menu
+## on ESC. The only place that pauses the game. Keys are read in _input, so a
+## focused text field can never swallow them.
 
+## The plain backpack opened or closed. The shop never docks the debug table
+## right, since the shop panel takes that side.
 signal backpack_toggled(open: bool)
 
 @onready var menu: GameMenu = $Menu
@@ -17,7 +20,7 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"open_menu"):
-		# ESC closes the backpack first; the menu only opens over the game.
+		# ESC closes the backpack or shop first; the menu only opens over the game.
 		if backpack.visible:
 			set_backpack_open(false)
 		else:
@@ -40,6 +43,19 @@ func set_backpack_open(open: bool) -> void:
 		backpack.close()
 	_update_pause()
 	backpack_toggled.emit(open)
+
+
+## Opens the merchant's shop beside the backpack. Not over the menu.
+func open_shop(shop: Shop) -> void:
+	if menu.visible:
+		return
+	backpack.open_shop(shop)
+	_update_pause()
+	backpack_toggled.emit(false)
+
+
+func is_shopping() -> bool:
+	return backpack.visible and backpack.is_shopping()
 
 
 func _update_pause() -> void:

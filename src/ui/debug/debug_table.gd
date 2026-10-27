@@ -195,6 +195,14 @@ func _build() -> void:
 	for amount in [100, 1000, 10000]:
 		_button(row, "+%d" % amount, func() -> void: stage.wallet.add(amount))
 	_button(row, "Reset", func() -> void: stage.wallet.reset())
+	_section(box, "Merchant")
+	row = _row(box)
+	_button(row, "Add merchant", func() -> void: stage.add_merchant())
+	_button(row, "Remove merchant", func() -> void: stage.remove_merchant())
+	row = _row(box)
+	_label(row, "Shop item slots")
+	var slots := _spin(row, 1, MerchantStock.SLOTS, 2)
+	slots.value_changed.connect(func(value: float) -> void: stage.set_shop_slots(int(value)))
 
 	box = _tab(tabs, "Dummy")
 	_section(box, "Training dummy")

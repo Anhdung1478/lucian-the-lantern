@@ -42,8 +42,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 	if event.is_action_pressed(&"move"):
 		_set_attack_move_armed(false)
-		_move_held = true
-		_issue_move()
+		var merchant := _merchant_under_cursor()
+		if merchant:
+			lucian.command_visit(merchant)
+		else:
+			_move_held = true
+			_issue_move()
 	elif event.is_action_pressed(&"attack_move"):
 		_set_attack_move_armed(true)
 	elif event.is_action_pressed(&"attack"):
@@ -97,6 +101,13 @@ func _enemy_under_cursor() -> Enemy:
 			best = enemy
 			best_distance = distance
 	return best
+
+
+func _merchant_under_cursor() -> Merchant:
+	for merchant: Merchant in get_tree().get_nodes_in_group(&"merchants"):
+		if merchant.is_under(_cursor()):
+			return merchant
+	return null
 
 
 func _cursor() -> Vector2:

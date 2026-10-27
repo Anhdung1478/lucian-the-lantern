@@ -62,6 +62,8 @@ func _run(scenario: String) -> void:
 			await scenario_gold()
 		"potions":
 			await scenario_potions()
+		"shop":
+			await scenario_shop()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -548,3 +550,57 @@ func scenario_potions() -> void:
 	await wait(2.0)
 	print("hp after 2 s (expect ~230+): ", roundi(lucian.hp), "  mana (expect ~100+): ", roundi(lucian.mana))
 	await shot("potions_1_drinking")
+
+
+func world_to_canvas(world_pos: Vector2) -> Vector2:
+	return root.get_canvas_transform() * world_pos
+
+
+func scenario_shop() -> void:
+	var game := stage as Stage
+	var inventory := lucian.inventory
+	game.wallet.add(4000)
+	game.set_shop_slots(3)
+	inventory.add(lucian.item_catalog.find(&"bf_sword"))
+	inventory.add(lucian.item_catalog.find(&"guardian_angel"))
+	inventory.add(lucian.item_catalog.find(&"hp_potion"), 3)
+	await wait(0.2)
+	await mouse_move(world_to_canvas(game.merchant.global_position))
+	await wait(0.2)
+	await shot("shop_0_hover_merchant")
+	await mouse_right_click(world_to_canvas(game.merchant.global_position))
+	await wait(3.0)
+	print("shop open after walking (expect true true): ", game.screens.is_shopping(), " ", paused)
+	print("distance to merchant <= 250: ", roundi(lucian.global_position.distance_to(game.merchant.global_position)))
+	var backpack := game.screens.backpack
+	var panel := backpack.shop_panel()
+	await wait(0.2)
+	await shot("shop_1_items")
+	await mouse_move(control_center(panel.slots(0)[0]))
+	await wait_for_tooltip(panel.slots(0)[0])
+	await shot("shop_2_tooltip")
+	var bought := panel.slots(0)[0].item()
+	await mouse_right_click(control_center(panel.slots(0)[0]))
+	print("bought %s (gold now %d)" % [bought.display_name, game.wallet.gold])
+	var gold := game.wallet.gold
+	await mouse_move(control_center(panel._refresh))
+	await mouse_button(control_center(panel._refresh), true)
+	await mouse_button(control_center(panel._refresh), false)
+	print("refresh cost (expect 100): ", gold - game.wallet.gold, "  slot 0 sold (expect true): ", game.merchant.stock.is_sold(0))
+	# Drag the Guardian Angel onto the sell slot, shot while over it.
+	var sell_cell: ItemCell = backpack._cells[backpack._cells.size() - 1]
+	await mouse_move(control_center(backpack._cells[1]))
+	await mouse_button(control_center(backpack._cells[1]), true)
+	for step in 5:
+		await mouse_move(lerp(control_center(backpack._cells[1]), control_center(sell_cell), (step + 1) / 5.0), true)
+	await wait(0.1)
+	print("sell preview (expect 1280): ", backpack.sell_preview())
+	await shot("shop_3_sell_preview")
+	await mouse_button(control_center(sell_cell), false)
+	panel.show_tab(1)
+	await wait(0.2)
+	await mouse_move(Vector2(960, 1000))
+	await shot("shop_4_potions")
+	await press_key(KEY_ESCAPE, true)
+	await press_key(KEY_ESCAPE, false)
+	print("ESC closes the shop (expect false false): ", game.screens.is_shopping(), " ", paused)

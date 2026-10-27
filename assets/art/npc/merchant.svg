@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="176" height="176" viewBox="0 0 176 176">
+  <!-- Merchant, top-down: a hooded trader sitting behind a patterned rug with his wares,
+       a big pack on his back. Center of the image = center of his body. -->
+  <defs>
+    <linearGradient id="rug" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8c2a22"/><stop offset="1" stop-color="#5a1714"/></linearGradient>
+    <radialGradient id="cloak" cx="0.45" cy="0.4"><stop offset="0" stop-color="#5f4a8a"/><stop offset="1" stop-color="#2c2244"/></radialGradient>
+    <radialGradient id="hood" cx="0.4" cy="0.35"><stop offset="0" stop-color="#8a6a46"/><stop offset="1" stop-color="#4a3420"/></radialGradient>
+    <linearGradient id="pack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a87a44"/><stop offset="1" stop-color="#6a4622"/></linearGradient>
+  </defs>
+  <ellipse cx="88" cy="96" rx="78" ry="70" fill="#000" opacity="0.25"/>
+  <!-- rug in front (below) of him -->
+  <rect x="22" y="92" width="132" height="70" rx="8" fill="url(#rug)" stroke="#2a0c0a" stroke-width="3"/>
+  <rect x="30" y="99" width="116" height="56" rx="5" fill="none" stroke="#e0b04a" stroke-width="2.2"/>
+  <path d="M 88 104 L 110 127 L 88 150 L 66 127 Z" fill="none" stroke="#e0b04a" stroke-width="2"/>
+  <path d="M 88 114 L 100 127 L 88 140 L 76 127 Z" fill="#c8902e" opacity="0.7"/>
+  <path d="M 26 162 l 0 6 M 36 162 l 0 6 M 46 162 l 0 6 M 130 162 l 0 6 M 140 162 l 0 6 M 150 162 l 0 6" stroke="#e0b04a" stroke-width="2"/>
+  <!-- pack behind him -->
+  <rect x="58" y="10" width="60" height="40" rx="9" fill="url(#pack)" stroke="#2e1c0a" stroke-width="3"/>
+  <path d="M 64 22 L 112 22" stroke="#4a2e12" stroke-width="3"/>
+  <rect x="82" y="16" width="12" height="12" rx="2" fill="#d8b050" stroke="#2e1c0a" stroke-width="2"/>
+  <!-- body: cloak and shoulders -->
+  <ellipse cx="88" cy="70" rx="40" ry="28" fill="url(#cloak)" stroke="#140f22" stroke-width="3"/>
+  <path d="M 60 82 C 70 92 106 92 116 82" fill="none" stroke="#8a74c0" stroke-width="2" opacity="0.6"/>
+  <!-- arms resting forward -->
+  <ellipse cx="56" cy="86" rx="11" ry="9" fill="#3c2e5c" stroke="#140f22" stroke-width="2.5"/>
+  <ellipse cx="120" cy="86" rx="11" ry="9" fill="#3c2e5c" stroke="#140f22" stroke-width="2.5"/>
+  <circle cx="58" cy="93" r="5" fill="#c89870" stroke="#3a2410" stroke-width="1.8"/>
+  <circle cx="118" cy="93" r="5" fill="#c89870" stroke="#3a2410" stroke-width="1.8"/>
+  <!-- hood, opening toward the rug -->
+  <circle cx="88" cy="64" r="22" fill="url(#hood)" stroke="#24160a" stroke-width="3"/>
+  <ellipse cx="88" cy="74" rx="12" ry="9" fill="#1a1008"/>
+  <circle cx="83" cy="73" r="1.8" fill="#ffcf5a"/>
+  <circle cx="93" cy="73" r="1.8" fill="#ffcf5a"/>
+  <path d="M 72 52 C 78 46 92 44 100 50" fill="none" stroke="#b08a5a" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+  <!-- wares on the rug -->
+  <circle cx="48" cy="128" r="9" fill="#d4182a" stroke="#2a0608" stroke-width="2.4"/>
+  <rect x="45" y="114" width="6" height="6" rx="1" fill="#b07a44" stroke="#2a0608" stroke-width="1.4"/>
+  <circle cx="45" cy="125" r="2.4" fill="#ffd0c8"/>
+  <rect x="117" y="118" width="16" height="22" rx="3" fill="#2a7ae8" stroke="#08101e" stroke-width="2.4"/>
+  <rect x="121" y="112" width="8" height="7" rx="1" fill="#c8d2e0" stroke="#08101e" stroke-width="1.4"/>
+  <path d="M 121 123 L 121 135" stroke="#bfe4ff" stroke-width="2" stroke-linecap="round"/>
+  <rect x="74" y="132" width="28" height="18" rx="3" fill="#c8902e" stroke="#3a2406" stroke-width="2.4"/>
+  <path d="M 74 139 L 102 139" stroke="#3a2406" stroke-width="2"/>
+  <rect x="85" y="136" width="6" height="7" rx="1" fill="#fff1c2" stroke="#3a2406" stroke-width="1.2"/>
+  <circle cx="64" cy="146" r="4.5" fill="#f2b938" stroke="#5a3a06" stroke-width="1.6"/>
+  <circle cx="70" cy="150" r="4.5" fill="#f2b938" stroke="#5a3a06" stroke-width="1.6"/>
+  <circle cx="110" cy="148" r="4.5" fill="#f2b938" stroke="#5a3a06" stroke-width="1.6"/>
+</svg>

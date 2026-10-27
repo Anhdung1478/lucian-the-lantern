@@ -84,17 +84,19 @@ func add(item: ItemData, amount := 1) -> bool:
 	return true
 
 
-## Puts one `item` into cell `index`: an empty unlocked cell, or a stack of the
-## same item with room. False otherwise.
+## True when one `item` fits in cell `index`: an empty unlocked cell, or a
+## stack of the same item with room.
+func can_put(index: int, item: ItemData) -> bool:
+	if index < 0 or index >= SIZE or is_locked(index):
+		return false
+	return items[index] == null or (items[index] == item and counts[index] < item.max_stack)
+
+
+## Puts one `item` into cell `index` when it fits there (see can_put).
 func put(index: int, item: ItemData) -> bool:
-	if is_locked(index):
+	if not can_put(index, item):
 		return false
-	if items[index] == null:
-		_set_cell(index, item, 1)
-	elif items[index] == item and counts[index] < item.max_stack:
-		counts[index] += 1
-	else:
-		return false
+	_set_cell(index, item, counts[index] + 1)
 	changed.emit()
 	return true
 

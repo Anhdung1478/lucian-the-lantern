@@ -23,7 +23,7 @@ script = ExtResource("2_arena")
 y_sort_enabled = true
 
 [node name="TrainingDummy" parent="World" instance=ExtResource("5_dummy")]
-position = Vector2(2400, 1350)
+position = Vector2(2400, 950)
 
 [node name="Lucian" parent="World" instance=ExtResource("3_lucian")]
 position = Vector2(1700, 1350)
