@@ -176,7 +176,15 @@ func crit_chance() -> float:
 func roll_attack(ad_ratio: float, source: StringName) -> DamageInfo:
 	var crit := DamageCalc.is_crit(crit_chance(), randf())
 	var amount := stats.ad * ad_ratio * (stats.crit_damage if crit else 1.0)
-	return DamageInfo.create(amount, DamageInfo.Type.PHYSICAL, source, self, crit)
+	return make_damage(amount, DamageInfo.Type.PHYSICAL, source, crit)
+
+
+## Every hit Lucian deals is made here, so it carries his penetration.
+func make_damage(amount: float, type: DamageInfo.Type, source: StringName, crit := false) -> DamageInfo:
+	var info := DamageInfo.create(amount, type, source, self, crit)
+	info.armor_pen = stats.armor_pen
+	info.magic_pen = stats.magic_pen
+	return info
 
 
 func fire_attack_projectile(gun: LucianVisuals.Gun, target: Enemy, info: DamageInfo) -> void:

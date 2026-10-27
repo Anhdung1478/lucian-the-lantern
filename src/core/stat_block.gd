@@ -16,6 +16,13 @@ var mr := 0.0
 var move_speed := 0.0
 var ability_haste := 0.0
 var attack_range := 0.0
+## Fractions (0.15 = 15%).
+var lifesteal := 0.0
+var omnivamp := 0.0
+var armor_pen := 0.0
+var magic_pen := 0.0
+var heal_shield_power := 0.0
+var tenacity := 0.0
 
 
 func attack_period() -> float:

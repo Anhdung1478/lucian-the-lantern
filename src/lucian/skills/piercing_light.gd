@@ -37,7 +37,7 @@ func _fire() -> void:
 	var xform := Transform2D(_direction.angle(), origin + _direction * beam_length * 0.5)
 	var damage := data.damage_at(rank(), lucian.stats)
 	for enemy in lucian.query_enemies(box, xform):
-		enemy.take_damage(DamageInfo.create(damage, data.damage_type, data.id, lucian))
+		enemy.take_damage(lucian.make_damage(damage, data.damage_type, data.id))
 	var beam := LaserBeam.new()
 	beam.setup(origin + _direction * Lucian.GUN_REACH, _direction, beam_length - Lucian.GUN_REACH, beam_width)
 	lucian.spawn(beam)

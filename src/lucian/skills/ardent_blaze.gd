@@ -62,7 +62,7 @@ func _explode(at: Vector2) -> void:
 			enemies.append(enemy)
 	var damage := data.damage_at(rank(), lucian.stats)
 	for enemy in enemies:
-		enemy.take_damage(DamageInfo.create(damage, data.damage_type, data.id, lucian))
+		enemy.take_damage(lucian.make_damage(damage, data.damage_type, data.id))
 		enemy.add_mark(MARK, mark_duration)
 	var blast := CrossBlast.new()
 	blast.setup(at, _direction, bar.size)

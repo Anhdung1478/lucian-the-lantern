@@ -34,18 +34,26 @@ static func growth_factor(level: int) -> float:
 	return n * (0.7025 + 0.0175 * n)
 
 
-func at_level(level: int) -> StatBlock:
+## `bonus` holds item stats keyed like ItemStats. Bonus attack speed goes
+## through the AS ratio like level growth does.
+func at_level(level: int, bonus: Dictionary = {}) -> StatBlock:
 	var g := growth_factor(level)
 	var block := StatBlock.new()
-	block.max_hp = max_hp + max_hp_growth * g
+	block.max_hp = max_hp + max_hp_growth * g + bonus.get(&"max_hp", 0.0)
 	block.hp_regen = (hp_regen_per_5 + hp_regen_per_5_growth * g) / 5.0
-	block.max_mana = max_mana + max_mana_growth * g
+	block.max_mana = max_mana + max_mana_growth * g + bonus.get(&"max_mana", 0.0)
 	block.mana_regen = (mana_regen_per_5 + mana_regen_per_5_growth * g) / 5.0
-	block.ad = ad + ad_growth * g
-	block.attack_speed = minf(attack_speed + attack_speed_ratio * attack_speed_growth * g, MAX_ATTACK_SPEED)
-	block.armor = armor + armor_growth * g
-	block.mr = mr + mr_growth * g
-	block.move_speed = move_speed
+	block.ad = ad + ad_growth * g + bonus.get(&"ad", 0.0)
+	block.ap = bonus.get(&"ap", 0.0)
+	var bonus_attack_speed: float = attack_speed_growth * g + bonus.get(&"attack_speed", 0.0)
+	block.attack_speed = minf(attack_speed + attack_speed_ratio * bonus_attack_speed, MAX_ATTACK_SPEED)
+	block.crit_chance = minf(bonus.get(&"crit_chance", 0.0), 1.0)
+	block.armor = armor + armor_growth * g + bonus.get(&"armor", 0.0)
+	block.mr = mr + mr_growth * g + bonus.get(&"mr", 0.0)
+	block.move_speed = (move_speed + bonus.get(&"move_speed", 0.0)) * (1.0 + bonus.get(&"move_speed_pct", 0.0))
+	block.ability_haste = bonus.get(&"ability_haste", 0.0)
 	block.attack_range = attack_range
 	block.crit_damage = crit_damage
+	for key in [&"lifesteal", &"omnivamp", &"armor_pen", &"magic_pen", &"heal_shield_power", &"tenacity"]:
+		block.set(key, bonus.get(key, 0.0))
 	return block

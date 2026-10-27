@@ -51,3 +51,23 @@ func test_damage_info_create() -> void:
 	assert_eq(info.type, Type.MAGIC)
 	assert_eq(info.source, &"w")
 	assert_true(info.is_crit)
+
+
+func test_armor_pen_lowers_positive_armor() -> void:
+	# 100 armor with 50% pen counts as 50 armor.
+	assert_almost_eq(DamageCalc.mitigate(200.0, Type.PHYSICAL, 100.0, 0.0, 0.5, 0.0), 200.0 * 100.0 / 150.0, 0.001)
+
+
+func test_magic_pen_lowers_positive_mr() -> void:
+	assert_almost_eq(DamageCalc.mitigate(200.0, Type.MAGIC, 0.0, 100.0, 0.0, 0.5), 200.0 * 100.0 / 150.0, 0.001)
+
+
+func test_pen_leaves_negative_resist_alone() -> void:
+	assert_almost_eq(
+		DamageCalc.mitigate(200.0, Type.PHYSICAL, -50.0, 0.0, 0.5, 0.0),
+		DamageCalc.mitigate(200.0, Type.PHYSICAL, -50.0, 0.0), 0.001)
+
+
+func test_pen_only_matches_its_damage_type() -> void:
+	assert_almost_eq(DamageCalc.mitigate(200.0, Type.PHYSICAL, 100.0, 100.0, 0.0, 0.9), 100.0, 0.001)
+	assert_almost_eq(DamageCalc.mitigate(200.0, Type.MAGIC, 100.0, 100.0, 0.9, 0.0), 100.0, 0.001)

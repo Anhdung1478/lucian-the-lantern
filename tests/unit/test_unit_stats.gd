@@ -76,3 +76,62 @@ func test_attack_speed_caps_at_2_5() -> void:
 func test_attack_period_is_inverse_of_attack_speed() -> void:
 	var block := stats.at_level(1)
 	assert_almost_eq(block.attack_period(), 1.0 / 0.65, 0.0001)
+
+
+func test_bonus_adds_flat_stats() -> void:
+	var block := stats.at_level(1, {
+		&"ad": 35.0, &"ap": 60.0, &"armor": 40.0, &"mr": 40.0,
+		&"max_hp": 350.0, &"max_mana": 300.0, &"ability_haste": 20.0,
+	})
+	assert_almost_eq(block.ad, 95.0, 0.001)
+	assert_almost_eq(block.ap, 60.0, 0.001)
+	assert_almost_eq(block.armor, 68.0, 0.001)
+	assert_almost_eq(block.mr, 70.0, 0.001)
+	assert_almost_eq(block.max_hp, 950.0, 0.001)
+	assert_almost_eq(block.max_mana, 620.0, 0.001)
+	assert_almost_eq(block.ability_haste, 20.0, 0.001)
+
+
+func test_bonus_attack_speed_scales_with_ratio() -> void:
+	var block := stats.at_level(1, {&"attack_speed": 0.25})
+	assert_almost_eq(block.attack_speed, 0.65 + 0.65 * 0.25, 0.0001)
+
+
+func test_bonus_attack_speed_adds_to_level_growth() -> void:
+	var block := stats.at_level(18, {&"attack_speed": 0.5})
+	assert_almost_eq(block.attack_speed, 0.65 + 0.65 * (0.03 * 17 + 0.5), 0.0001)
+
+
+func test_bonus_attack_speed_respects_cap() -> void:
+	assert_almost_eq(stats.at_level(1, {&"attack_speed": 5.0}).attack_speed, 2.5, 0.0001)
+
+
+func test_crit_chance_caps_at_100_percent() -> void:
+	assert_almost_eq(stats.at_level(1, {&"crit_chance": 0.6}).crit_chance, 0.6, 0.0001)
+	assert_almost_eq(stats.at_level(1, {&"crit_chance": 1.35}).crit_chance, 1.0, 0.0001)
+
+
+func test_move_speed_percent_applies_after_flat() -> void:
+	var block := stats.at_level(1, {&"move_speed": 20.0, &"move_speed_pct": 0.1})
+	assert_almost_eq(block.move_speed, (335.0 + 20.0) * 1.1, 0.001)
+
+
+func test_combat_stats_pass_through() -> void:
+	var block := stats.at_level(1, {
+		&"lifesteal": 0.15, &"omnivamp": 0.08, &"armor_pen": 0.3, &"magic_pen": 0.4,
+		&"heal_shield_power": 0.1, &"tenacity": 0.2,
+	})
+	assert_almost_eq(block.lifesteal, 0.15, 0.0001)
+	assert_almost_eq(block.omnivamp, 0.08, 0.0001)
+	assert_almost_eq(block.armor_pen, 0.3, 0.0001)
+	assert_almost_eq(block.magic_pen, 0.4, 0.0001)
+	assert_almost_eq(block.heal_shield_power, 0.1, 0.0001)
+	assert_almost_eq(block.tenacity, 0.2, 0.0001)
+
+
+func test_no_bonus_leaves_item_stats_at_zero() -> void:
+	var block := stats.at_level(1)
+	assert_eq(block.ap, 0.0)
+	assert_eq(block.crit_chance, 0.0)
+	assert_eq(block.lifesteal, 0.0)
+	assert_eq(block.armor_pen, 0.0)

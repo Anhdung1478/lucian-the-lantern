@@ -65,4 +65,4 @@ func _on_bullet_hit(enemy: Enemy, prior_hits: int) -> void:
 	var damage := data.damage_at(rank(), lucian.stats)
 	if is_max_rank():
 		damage *= DamageCalc.falloff_multiplier(prior_hits, pierce_falloff, pierce_minimum)
-	enemy.take_damage(DamageInfo.create(damage, data.damage_type, data.id, lucian))
+	enemy.take_damage(lucian.make_damage(damage, data.damage_type, data.id))
