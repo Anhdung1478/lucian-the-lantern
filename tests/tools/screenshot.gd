@@ -30,6 +30,8 @@ func _run(scenario: String) -> void:
 			await scenario_dummy()
 		"attack":
 			await scenario_attack()
+		"hud":
+			await scenario_hud()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -111,3 +113,12 @@ func scenario_attack() -> void:
 	await wait(3.0)
 	print("attack-move: x=", snappedf(lucian.global_position.x, 1), " hits=", hits.size())
 	await shot("attack_move")
+
+
+func scenario_hud() -> void:
+	lucian.progress.add_xp(280 + 380 + 200)
+	lucian.hp -= 250.0
+	lucian.mana -= 120.0
+	await wait(0.2)
+	print("level ", lucian.progress.level, " hp ", roundi(lucian.hp), "/", roundi(lucian.stats.max_hp))
+	await shot("hud_0")

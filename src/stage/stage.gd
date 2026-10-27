@@ -6,6 +6,7 @@ extends Node2D
 @onready var dummy: TrainingDummy = $World/TrainingDummy
 @onready var damage_numbers: DamageNumberSpawner = $DamageNumbers
 @onready var camera: StageCamera = $StageCamera
+@onready var hud: Hud = $Hud
 
 
 func _ready() -> void:
@@ -13,3 +14,4 @@ func _ready() -> void:
 	camera.setup(lucian, arena.get_bounds().grow(TestArena.WALL_THICKNESS))
 	lucian.projectile_parent = $Projectiles
 	dummy.damage_taken.connect(damage_numbers.spawn.bind(dummy))
+	hud.setup(lucian)

@@ -3,10 +3,6 @@ extends CharacterBody2D
 ## The player champion. Holds one standing order (move / attack / attack-move)
 ## and carries it out every physics frame. Attack windups pause the order.
 
-signal health_changed(current: float, maximum: float)
-signal mana_changed(current: float, maximum: float)
-signal stats_changed(stats: StatBlock)
-
 enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE }
 
 ## Share of the attack period spent winding up before the shot leaves the gun.
@@ -40,6 +36,7 @@ func _ready() -> void:
 	mana = stats.max_mana
 	if projectile_parent == null:
 		projectile_parent = get_parent()
+	progress.level_changed.connect(_on_level_changed)
 
 
 func command_move(point: Vector2) -> void:
@@ -88,6 +85,8 @@ func fire_attack_projectile(gun: LucianVisuals.Gun, target: Enemy, info: DamageI
 
 
 func _physics_process(delta: float) -> void:
+	hp = minf(hp + stats.hp_regen * delta, stats.max_hp)
+	mana = minf(mana + stats.mana_regen * delta, stats.max_mana)
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	velocity = Vector2.ZERO
 	if _windup_left > 0.0:
@@ -109,6 +108,15 @@ func _physics_process(delta: float) -> void:
 				_pursue(_target, delta)
 			elif _step_toward(_move_point, delta):
 				_order = Order.NONE
+
+
+## Leveling up grants the max HP / mana gained, like LoL.
+func _on_level_changed(_level: int) -> void:
+	var old := stats
+	stats = base_stats.at_level(progress.level)
+	hp = clampf(hp + stats.max_hp - old.max_hp, 1.0, stats.max_hp)
+	mana = clampf(mana + stats.max_mana - old.max_mana, 0.0, stats.max_mana)
+	queue_redraw()
 
 
 func _draw() -> void:
