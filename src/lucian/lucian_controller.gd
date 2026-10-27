@@ -7,6 +7,7 @@ extends Node
 const REISSUE_DISTANCE := 8.0
 ## Extra slack around an enemy's radius when clicking on it.
 const CLICK_SLACK := 10.0
+const ITEM_ACTIONS: Array[StringName] = [&"item_1", &"item_2", &"item_3", &"item_4", &"item_5", &"item_6"]
 const SKILL_ACTIONS := {
 	&"skill_q": ChampionProgress.Slot.Q,
 	&"skill_w": ChampionProgress.Slot.W,
@@ -32,6 +33,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				lucian.try_rank_up(SKILL_ACTIONS[action])
 			else:
 				lucian.try_cast(SKILL_ACTIONS[action], _cursor())
+			get_viewport().set_input_as_handled()
+			return
+	for slot in ITEM_ACTIONS.size():
+		if event.is_action_pressed(ITEM_ACTIONS[slot]):
+			lucian.use_equip_slot(slot, _cursor())
 			get_viewport().set_input_as_handled()
 			return
 	if event.is_action_pressed(&"move"):

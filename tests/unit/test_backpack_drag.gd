@@ -161,3 +161,32 @@ func test_empty_and_locked_cells_cannot_be_picked_up() -> void:
 	press(20)
 	screen._process(0.3)
 	assert_false(screen.is_dragging())
+
+
+func right_click(index: int) -> void:
+	var event := InputEventMouseButton.new()
+	event.button_index = MOUSE_BUTTON_RIGHT
+	event.pressed = true
+	send(index, event, center(index))
+
+
+func test_right_click_on_a_potion_offers_use() -> void:
+	inventory.put(6, inventory.catalog.find(&"red"))
+	watch_signals(screen)
+	right_click(6)
+	assert_eq(screen.use_index(), 6)
+	screen._press_use()
+	assert_signal_emitted_with_parameters(screen, "potion_used", [6])
+	assert_eq(screen.use_index(), -1)
+
+
+func test_right_click_on_other_items_offers_nothing() -> void:
+	right_click(0)
+	assert_eq(screen.use_index(), -1)
+
+
+func test_left_click_hides_the_use_button() -> void:
+	inventory.put(6, inventory.catalog.find(&"red"))
+	right_click(6)
+	press(0)
+	assert_eq(screen.use_index(), -1)

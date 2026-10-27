@@ -60,6 +60,8 @@ func _run(scenario: String) -> void:
 			await scenario_icons()
 		"gold":
 			await scenario_gold()
+		"potions":
+			await scenario_potions()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -499,3 +501,50 @@ func scenario_gold() -> void:
 	await wait(0.2)
 	print("gold (expect 1250): ", (stage as Stage).wallet.gold)
 	await shot("gold_0")
+
+
+func mouse_right_click(canvas_pos: Vector2) -> void:
+	var window_pos := root.get_final_transform() * canvas_pos
+	Input.warp_mouse(window_pos)
+	for pressed in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.button_index = MOUSE_BUTTON_RIGHT
+		event.pressed = pressed
+		event.position = window_pos
+		event.global_position = window_pos
+		event.button_mask = MOUSE_BUTTON_MASK_RIGHT if pressed else 0
+		Input.parse_input_event(event)
+		await process_frame
+
+
+func scenario_potions() -> void:
+	var inventory := lucian.inventory
+	inventory.add(lucian.item_catalog.find(&"hp_potion"), 12)
+	inventory.add(lucian.item_catalog.find(&"mp_potion"), 4)
+	inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"hp_potion"))
+	inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"hp_potion"))
+	lucian.hp = 150.0
+	lucian.mana = 40.0
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	await wait(0.3)
+	var backpack: BackpackScreen = stage.get_node("Screens/Backpack")
+	await mouse_right_click(control_center(backpack._cells[2]))
+	await wait(0.1)
+	print("use offered for cell (expect 2): ", backpack.use_index())
+	await shot("potions_0_use")
+	await mouse_move(control_center(backpack._use_button))
+	await mouse_button(control_center(backpack._use_button), true)
+	await mouse_button(control_center(backpack._use_button), false)
+	print("mana potions left (expect 3): ", inventory.count_at(2))
+	var mana := lucian.mana
+	await wait(0.5)
+	print("no mana while paused (expect true): ", is_equal_approx(mana, lucian.mana))
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	await press_key(KEY_1, true)
+	await press_key(KEY_1, false)
+	print("slot 1 potions left (expect 1): ", inventory.count_at(Inventory.EQUIP_START))
+	await wait(2.0)
+	print("hp after 2 s (expect ~230+): ", roundi(lucian.hp), "  mana (expect ~100+): ", roundi(lucian.mana))
+	await shot("potions_1_drinking")

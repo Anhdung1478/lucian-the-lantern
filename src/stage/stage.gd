@@ -22,4 +22,5 @@ func _ready() -> void:
 	hud.setup(lucian, wallet)
 	debug_table.setup(self)
 	screens.backpack.setup(lucian.inventory)
+	screens.backpack.potion_used.connect(lucian.use_item)
 	screens.backpack_toggled.connect(debug_table.set_docked_right)

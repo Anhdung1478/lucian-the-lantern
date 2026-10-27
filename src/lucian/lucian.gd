@@ -16,6 +16,8 @@ const GUN_REACH := 44.0
 
 var progress := ChampionProgress.new()
 var inventory := Inventory.new()
+## Potions being drunk.
+var restores := RestoreOverTime.new()
 var stats: StatBlock
 var hp := 0.0
 var mana := 0.0
@@ -129,12 +131,41 @@ func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> vo
 	if info.source == &"basic" or info.source == &"lightslinger":
 		vamp += stats.lifesteal
 	if vamp > 0.0:
-		hp = minf(hp + final_amount * vamp, stats.max_hp)
+		heal(final_amount * vamp)
 	if info.source == &"lightslinger":
 		skills[ChampionProgress.Slot.E].cooldown.reduce(passive.e_cooldown_reduction)
 	if info.source != &"w" and target.has_mark(ArdentBlaze.MARK):
 		var blaze := skills[ChampionProgress.Slot.W] as ArdentBlaze
 		add_move_speed_bonus(blaze.current_move_speed_bonus(), blaze.move_speed_duration)
+
+
+## Heals, made stronger by heal and shield power. Returns the HP gained.
+func heal(amount: float) -> float:
+	var before := hp
+	hp = minf(hp + amount * (1.0 + stats.heal_shield_power), stats.max_hp)
+	return hp - before
+
+
+func restore_mana(amount: float) -> void:
+	mana = minf(mana + amount, stats.max_mana)
+
+
+## Drinks the potion in inventory cell `index`. False when there is none.
+func use_item(index: int) -> bool:
+	var item := inventory.item_at(index)
+	if item == null or not item.is_potion():
+		return false
+	inventory.take_one(index)
+	restores.start(item)
+	return true
+
+
+## Keys 1-6: drinks the potion in equip slot `slot` (0-5).
+func use_equip_slot(slot: int, _aim: Vector2) -> bool:
+	var index := Inventory.EQUIP_START + slot
+	if inventory.is_locked(index):
+		return false
+	return use_item(index)
 
 
 ## Every enemy whose hurtbox overlaps `shape` placed at `xform`, found instantly.
@@ -239,6 +270,10 @@ func aim_direction(aim: Vector2) -> Vector2:
 func _physics_process(delta: float) -> void:
 	hp = minf(hp + stats.hp_regen * delta, stats.max_hp)
 	mana = stats.max_mana if cheat_infinite_mana else minf(mana + stats.mana_regen * delta, stats.max_mana)
+	if not restores.is_empty():
+		var restored := restores.tick(delta)
+		heal(restored.x)
+		restore_mana(restored.y)
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	_move_speed_bonus_left = maxf(_move_speed_bonus_left - delta, 0.0)
 	velocity = Vector2.ZERO

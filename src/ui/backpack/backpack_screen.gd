@@ -8,6 +8,11 @@ extends CanvasLayer
 ## picks it up; releasing drops it, decided by Inventory.drop_outcome. Held
 ## over its recipe partner, the craft pop-up's line runs around in CRAFT_HOLD
 ## seconds; releasing after that crafts, before that swaps.
+##
+## Right-clicking a potion shows a small Use button beside it.
+
+## The Use button was pressed for the potion in inventory cell `index`.
+signal potion_used(index: int)
 
 const COLUMNS := 7
 const CELL_GAP := 6
@@ -45,6 +50,9 @@ var _mouse := Vector2.ZERO
 var _top := CanvasLayer.new()
 var _ghost := ItemIcon.new()
 var _craft_popup := CraftPopup.new()
+var _use_button := Button.new()
+## The potion cell the Use button belongs to, or -1.
+var _use_index := -1
 
 
 func _ready() -> void:
@@ -66,7 +74,13 @@ func open() -> void:
 ## Closing mid-drag puts the item back.
 func close() -> void:
 	_end_drag()
+	_hide_use()
 	visible = false
+
+
+## The potion cell whose Use button is showing, or -1.
+func use_index() -> int:
+	return _use_index
 
 
 ## Index of the item being dragged, or -1.
@@ -89,7 +103,15 @@ func on_cell_input(cell: ItemCell, event: InputEvent) -> void:
 		return
 	_mouse = mouse_event.global_position
 	var button := event as InputEventMouseButton
-	if button and button.button_index == MOUSE_BUTTON_LEFT:
+	if button and button.pressed and button.button_index == MOUSE_BUTTON_RIGHT:
+		var potion := cell.item()
+		if potion and potion.is_potion() and not cell.is_locked() and _drag_index < 0:
+			_show_use(cell)
+		else:
+			_hide_use()
+	elif button and button.button_index == MOUSE_BUTTON_LEFT:
+		if button.pressed:
+			_hide_use()
 		if button.pressed and cell.item() and not cell.is_locked():
 			_press_index = cell.index
 			_press_position = _mouse
@@ -152,6 +174,26 @@ func _end_drag() -> void:
 	_redraw_cells()
 
 
+func _show_use(cell: ItemCell) -> void:
+	_use_index = cell.index
+	var rect := cell.get_global_rect()
+	_use_button.reset_size()
+	_use_button.position = Vector2(rect.end.x + 4.0, rect.position.y + (rect.size.y - _use_button.size.y) * 0.5)
+	_use_button.visible = true
+
+
+func _hide_use() -> void:
+	_use_index = -1
+	_use_button.visible = false
+
+
+func _press_use() -> void:
+	var index := _use_index
+	_hide_use()
+	if index >= 0:
+		potion_used.emit(index)
+
+
 func _update_craft_popup() -> void:
 	var result: ItemData = null
 	if _target >= 0 and not inventory.is_locked(_target):
@@ -180,6 +222,9 @@ func _build() -> void:
 	var backdrop := ColorRect.new()
 	backdrop.color = Color(0, 0, 0, 0.45)
 	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	backdrop.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed:
+			_hide_use())
 	add_child(backdrop)
 
 	var recipes := RecipeTable.new()
@@ -231,6 +276,11 @@ func _build() -> void:
 	_ghost.visible = false
 	_top.add_child(_ghost)
 	_top.add_child(_craft_popup)
+	_use_button.text = "Use"
+	UiStyle.style_button(_use_button, 16)
+	_use_button.visible = false
+	_use_button.pressed.connect(_press_use)
+	_top.add_child(_use_button)
 
 
 func _place_column() -> void:
