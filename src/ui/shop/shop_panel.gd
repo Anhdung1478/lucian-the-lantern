@@ -95,10 +95,6 @@ func show_tab(tab: int) -> void:
 	_refresh.visible = tab == 0
 
 
-func current_tab() -> int:
-	return _tab
-
-
 ## Shows why a purchase or refresh failed, and flashes the slot's price red.
 func refuse(result: Shop.Result, slot: ShopSlot = null) -> void:
 	_message.text = MESSAGES.get(result, "")

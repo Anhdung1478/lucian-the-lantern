@@ -63,3 +63,21 @@ func test_item_cards_build_for_every_item() -> void:
 		var card := TooltipCard.item(item, lucian.item_catalog)
 		assert_not_null(card, str(item.id))
 		card.free()
+
+
+func test_buff_cards_build_for_every_buff() -> void:
+	for id in [&"kraken_slayer", &"statikk_shiv", &"spear_of_shojin", &"archangels_staff", &"black_cleaver"]:
+		lucian.inventory.add(lucian.item_catalog.find(id))
+	for i in 5:
+		lucian.inventory.apply_drop(i, Inventory.EQUIP_START + i, false)
+	lucian.passives.shojin_stacks = 2
+	lucian.passives.mana_charge = 30.0
+	lucian.add_speed_buff(&"fervor", 20.0, 0.0, 2.0)
+	lucian.shield = 120.0
+	lucian.restores.start(lucian.item_catalog.find(&"hp_potion"))
+	var buffs := lucian.buffs()
+	assert_eq(buffs.size(), 7)
+	for buff in buffs:
+		var card := TooltipCard.buff(buff)
+		assert_not_null(card, str(buff.id))
+		card.free()

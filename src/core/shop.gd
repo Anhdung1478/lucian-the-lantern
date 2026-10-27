@@ -17,11 +17,6 @@ func _init(merchant_stock: MerchantStock, target_inventory: Inventory, stage_wal
 	wallet = stage_wallet
 
 
-## The potions tab: every potion in the catalog, never sold out.
-func potions() -> Array[ItemData]:
-	return inventory.catalog.potions()
-
-
 ## Buys what stock slot `slot` sells, into `cell` or (-1) the first cell
 ## it fits.
 func buy_slot(slot: int, cell := -1) -> Result:

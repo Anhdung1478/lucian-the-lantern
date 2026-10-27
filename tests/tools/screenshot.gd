@@ -76,6 +76,8 @@ func _run(scenario: String) -> void:
 			await scenario_buffs()
 		"actives":
 			await scenario_actives()
+		"energized":
+			await scenario_energized()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -144,7 +146,7 @@ func scenario_attack() -> void:
 	print("distance to dummy while attacking: ", lucian.global_position.distance_to(dummy.global_position))
 
 	# A move during the windup cancels the shot.
-	lucian.command_move(Vector2(1000, 1350))
+	lucian.command_move(Vector2(1000, dummy.global_position.y))
 	await wait(3.0)
 	hits.clear()
 	lucian.command_attack(dummy)
@@ -154,7 +156,7 @@ func scenario_attack() -> void:
 	print("hits after attack then instant move away (expect 0): ", hits.size())
 
 	# Attack-move toward a point past the dummy stops in range and attacks.
-	lucian.command_attack_move(Vector2(3400, 1350))
+	lucian.command_attack_move(Vector2(3400, dummy.global_position.y))
 	lucian.set_range_ring_visible(true)
 	await wait(3.0)
 	print("attack-move: x=", snappedf(lucian.global_position.x, 1), " hits=", hits.size())
@@ -726,3 +728,21 @@ func scenario_actives() -> void:
 	await wait(1.0)
 	await shot("actives_3_hatefog")
 	print("hatefog on the dummy (expect true): ", dummy.has_status(Enemy.HATEFOG), "  slow (expect true): ", dummy.has_status(Enemy.SLOW))
+
+
+func scenario_energized() -> void:
+	equip_all([&"rapid_firecannon", &"stormrazor"])
+	lucian.command_move(lucian.global_position + Vector2(0, 400))
+	await wait(1.0)
+	var walked := lucian.passives.energize.value
+	print("charge after 1 s walking (expect ~14): %.1f" % walked)
+	lucian.try_rank_up(ChampionProgress.Slot.E)
+	lucian.try_cast(ChampionProgress.Slot.E, lucian.global_position + Vector2(280, 0))
+	await wait(0.4)
+	print("charge gained from a 280 dash (expect ~23): %.1f" % (lucian.passives.energize.value - walked))
+	await shot("energized_0_building")
+	lucian.passives.energize.value = 100.0
+	lucian.set_range_ring_visible(true)
+	await wait(0.3)
+	print("range with RFC ready (expect 675): ", roundi(lucian.attack_range()))
+	await shot("energized_1_ready")
