@@ -21,7 +21,13 @@ var mana := 0.0
 var projectile_parent: Node
 ## Debug: values >= 0 replace Lucian's crit chance.
 var cheat_crit_chance := -1.0
-var cheat_no_cooldowns := false
+## Turning it on also refreshes every cooldown already running.
+var cheat_no_cooldowns := false:
+	set(value):
+		cheat_no_cooldowns = value
+		if value:
+			for skill in skills:
+				skill.cooldown.clear()
 var cheat_infinite_mana := false
 
 var _order := Order.NONE

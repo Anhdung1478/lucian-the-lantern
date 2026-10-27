@@ -44,6 +44,17 @@ func test_no_cooldowns_cheat() -> void:
 	assert_true(lucian.skills[Slot.Q].cooldown.is_ready())
 
 
+func test_turning_on_no_cooldowns_refreshes_running_cooldowns() -> void:
+	lucian.progress.set_level(3)
+	lucian.try_rank_up(Slot.Q)
+	lucian.try_rank_up(Slot.E)
+	lucian.try_cast(Slot.Q, Vector2.RIGHT)
+	lucian.skills[Slot.E].cooldown.start(10.0)
+	lucian.cheat_no_cooldowns = true
+	assert_true(lucian.skills[Slot.Q].cooldown.is_ready())
+	assert_true(lucian.skills[Slot.E].cooldown.is_ready())
+
+
 func test_cannot_cast_during_cast_lock() -> void:
 	lucian.progress.set_level(3)
 	lucian.try_rank_up(Slot.Q)
