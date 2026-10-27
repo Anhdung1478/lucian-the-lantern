@@ -28,6 +28,8 @@ func _run(scenario: String) -> void:
 			await scenario_move()
 		"dummy":
 			await scenario_dummy()
+		"attack":
+			await scenario_attack()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -78,3 +80,34 @@ func scenario_dummy() -> void:
 	print("hp after hits: ", dummy.hp)
 	await wait(4.5)
 	print("hp after 4.5 s idle: ", dummy.hp)
+
+
+func scenario_attack() -> void:
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	var hits: Array[DamageInfo] = []
+	dummy.damage_taken.connect(func(info: DamageInfo, _final: float) -> void: hits.append(info))
+	lucian.cheat_crit_chance = 0.5
+	lucian.command_attack(dummy)
+	for i in 6:
+		await wait(0.12)
+		await shot("attack_%d" % i)
+	await wait(3.5)
+	print("hits after ~4.2 s of attacking: ", hits.size(), " crits: ", hits.filter(func(h: DamageInfo) -> bool: return h.is_crit).size())
+	print("distance to dummy while attacking: ", lucian.global_position.distance_to(dummy.global_position))
+
+	# A move during the windup cancels the shot.
+	lucian.command_move(Vector2(1000, 1350))
+	await wait(3.0)
+	hits.clear()
+	lucian.command_attack(dummy)
+	await wait(0.05)
+	lucian.command_move(lucian.global_position + Vector2(0, -50))
+	await wait(1.0)
+	print("hits after attack then instant move away (expect 0): ", hits.size())
+
+	# Attack-move toward a point past the dummy stops in range and attacks.
+	lucian.command_attack_move(Vector2(3400, 1350))
+	lucian.set_range_ring_visible(true)
+	await wait(3.0)
+	print("attack-move: x=", snappedf(lucian.global_position.x, 1), " hits=", hits.size())
+	await shot("attack_move")

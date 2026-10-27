@@ -11,4 +11,5 @@ extends Node2D
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	camera.setup(lucian, arena.get_bounds().grow(TestArena.WALL_THICKNESS))
+	lucian.projectile_parent = $Projectiles
 	dummy.damage_taken.connect(damage_numbers.spawn.bind(dummy))
