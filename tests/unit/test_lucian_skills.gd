@@ -1,0 +1,72 @@
+extends GutTest
+## Skills cast by a real Lucian against a real training dummy.
+
+const Slot := ChampionProgress.Slot
+const DUMMY_ARMOR_MULTIPLIER := 100.0 / 130.0
+
+var lucian: Lucian
+var dummy: TrainingDummy
+## [DamageInfo, final_amount] per hit.
+var hits: Array[Array] = []
+
+
+func before_each() -> void:
+	hits.clear()
+	dummy = load("res://src/enemies/training_dummy.tscn").instantiate()
+	dummy.position = Vector2(600, 0)
+	add_child_autofree(dummy)
+	dummy.damage_taken.connect(func(info: DamageInfo, final_amount: float) -> void: hits.append([info, final_amount]))
+	lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	lucian.cheat_infinite_mana = true
+
+
+func _rank(slot: ChampionProgress.Slot, times: int) -> void:
+	for i in times:
+		assert_true(lucian.try_rank_up(slot), "rank up %s" % slot)
+
+
+func _sources() -> Array:
+	return hits.map(func(hit: Array) -> StringName: return hit[0].source)
+
+
+func test_q_fires_after_cast_time_and_hits_in_line() -> void:
+	_rank(Slot.Q, 1)
+	assert_true(lucian.try_cast(Slot.Q, dummy.position))
+	await wait_physics_frames(3)
+	assert_eq(hits.size(), 0, "no damage before the cast time ends")
+	await wait_seconds(0.4)
+	assert_eq(_sources(), [&"q"])
+	assert_almost_eq(hits[0][1], (80.0 + 0.6 * 60.0) * DUMMY_ARMOR_MULTIPLIER, 0.01)
+
+
+func test_q_misses_enemy_off_the_line() -> void:
+	_rank(Slot.Q, 1)
+	lucian.try_cast(Slot.Q, Vector2(0, 600))
+	await wait_seconds(0.45)
+	assert_eq(hits.size(), 0)
+
+
+func test_q_max_rank_laser_is_wider() -> void:
+	# 85 px off the line: outside half width 30 + hurtbox 44, inside 45 + 44.
+	dummy.position = Vector2(600, 85)
+	lucian.progress.set_level(9)
+	_rank(Slot.Q, 4)
+	lucian.try_cast(Slot.Q, Vector2(600, 0))
+	await wait_seconds(0.45)
+	assert_eq(hits.size(), 0, "rank 4 is too thin to reach")
+	_rank(Slot.Q, 1)
+	lucian.skills[Slot.Q].cooldown.clear()
+	lucian.try_cast(Slot.Q, Vector2(600, 0))
+	await wait_seconds(0.45)
+	assert_eq(hits.size(), 1, "rank 5 is wide enough")
+
+
+func test_q_roots_lucian_during_cast() -> void:
+	_rank(Slot.Q, 1)
+	lucian.command_move(Vector2(-500, 0))
+	lucian.try_cast(Slot.Q, dummy.position)
+	await wait_seconds(0.2)
+	assert_almost_eq(lucian.position.x, 0.0, 0.5)
+	await wait_seconds(0.4)
+	assert_lt(lucian.position.x, -10.0, "the move order resumes after the cast")

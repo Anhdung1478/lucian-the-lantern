@@ -81,6 +81,22 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 	return true
 
 
+## Every enemy whose hurtbox overlaps `shape` placed at `xform`, found instantly.
+func query_enemies(shape: Shape2D, xform: Transform2D) -> Array[Enemy]:
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = shape
+	query.transform = xform
+	query.collision_mask = Layers.ENEMY_HURTBOX
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+	var found: Array[Enemy] = []
+	for hit in get_world_2d().direct_space_state.intersect_shape(query, 64):
+		var hurtbox := hit.collider as Hurtbox
+		if hurtbox and hurtbox.unit is Enemy and not found.has(hurtbox.unit):
+			found.append(hurtbox.unit)
+	return found
+
+
 ## Lucian stands still for `seconds` (a cast time); the standing order resumes after.
 func lock_cast(seconds: float) -> void:
 	_cast_lock_left = seconds
@@ -112,7 +128,18 @@ func roll_attack(ad_ratio: float, source: StringName) -> DamageInfo:
 func fire_attack_projectile(gun: LucianVisuals.Gun, target: Enemy, info: DamageInfo) -> void:
 	var shot := AttackProjectile.new()
 	shot.launch(visuals.muzzle_position(gun), target, info)
-	projectile_parent.add_child(shot)
+	spawn(shot)
+
+
+## Adds a projectile or effect to the stage.
+func spawn(node: Node) -> void:
+	projectile_parent.add_child(node)
+
+
+## Direction from Lucian to `aim`; his facing if the aim is right on top of him.
+func aim_direction(aim: Vector2) -> Vector2:
+	var offset := aim - global_position
+	return offset.normalized() if offset.length() > 1.0 else Vector2.from_angle(visuals.rotation)
 
 
 func _physics_process(delta: float) -> void:

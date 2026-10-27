@@ -10,6 +10,7 @@
 [ext_resource type="Resource" path="res://data/skills/w_ardent_blaze.tres" id="8_w"]
 [ext_resource type="Resource" path="res://data/skills/e_relentless_pursuit.tres" id="9_e"]
 [ext_resource type="Resource" path="res://data/skills/r_the_culling.tres" id="10_r"]
+[ext_resource type="Script" path="res://src/lucian/skills/piercing_light.gd" id="11_q"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 30.0
@@ -42,7 +43,7 @@ script = ExtResource("4_controller")
 [node name="Skills" type="Node" parent="."]
 
 [node name="Q" type="Node" parent="Skills"]
-script = ExtResource("6_skill")
+script = ExtResource("11_q")
 data = ExtResource("7_q")
 
 [node name="W" type="Node" parent="Skills"]

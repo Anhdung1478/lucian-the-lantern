@@ -34,6 +34,8 @@ func _run(scenario: String) -> void:
 			await scenario_debug()
 		"skills":
 			await scenario_skills()
+		"q":
+			await scenario_q()
 		"hud":
 			await scenario_hud()
 		_:
@@ -173,3 +175,13 @@ func scenario_skills() -> void:
 	lucian.mana = 60.0
 	print("points left: ", lucian.progress.skill_points(), " can rank Q: ", lucian.progress.can_rank_up(Slot.Q))
 	await shot("skills_0")
+
+
+func scenario_q() -> void:
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	lucian.progress.set_level(9)
+	for i in 5:
+		lucian.try_rank_up(ChampionProgress.Slot.Q)
+	lucian.try_cast(ChampionProgress.Slot.Q, dummy.global_position)
+	await wait(0.31)
+	await shot("q_0_beam")
