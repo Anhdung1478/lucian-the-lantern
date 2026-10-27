@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SkillData" format=3]
+
+[ext_resource type="Script" path="res://src/core/skill_data.gd" id="1_uuai4"]
+
+[resource]
+script = ExtResource("1_uuai4")
+id = &"e"
+display_name = "Relentless Pursuit"
+mana_cost = Array[float]([40.0, 30.0, 20.0, 10.0, 0.0])
+cooldown = Array[float]([19.0, 17.75, 16.5, 15.25, 14.0])

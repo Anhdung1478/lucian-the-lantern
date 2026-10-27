@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SkillData" format=3]
+
+[ext_resource type="Script" path="res://src/core/skill_data.gd" id="1_7lfuh"]
+
+[resource]
+script = ExtResource("1_7lfuh")
+id = &"w"
+display_name = "Ardent Blaze"
+damage_type = 1
+mana_cost = Array[float]([70.0])
+cooldown = Array[float]([14.0, 13.0, 12.0, 11.0, 10.0])
+base_damage = Array[float]([75.0, 110.0, 145.0, 180.0, 215.0])
+ap_ratio = Array[float]([0.9])
