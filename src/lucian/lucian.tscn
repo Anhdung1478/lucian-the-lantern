@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/lucian/lucian.gd" id="1_lucian"]
+[ext_resource type="Resource" path="res://data/lucian_stats.tres" id="2_stats"]
+[ext_resource type="Script" path="res://src/lucian/lucian_visuals.gd" id="3_visuals"]
+[ext_resource type="Script" path="res://src/lucian/lucian_controller.gd" id="4_controller"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 30.0
+
+[node name="Lucian" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 5
+motion_mode = 1
+script = ExtResource("1_lucian")
+base_stats = ExtResource("2_stats")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="Visuals" type="Node2D" parent="."]
+script = ExtResource("3_visuals")
+
+[node name="Controller" type="Node" parent="."]
+script = ExtResource("4_controller")
