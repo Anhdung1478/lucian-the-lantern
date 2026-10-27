@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://src/combat/damage_number_spawner.gd" id="6_numbers"]
 [ext_resource type="PackedScene" path="res://src/ui/hud/hud.tscn" id="7_hud"]
 [ext_resource type="Script" path="res://src/ui/debug/debug_table.gd" id="8_debug"]
+[ext_resource type="Script" path="res://src/ui/screen_switcher.gd" id="9_screens"]
+[ext_resource type="Script" path="res://src/ui/menu/game_menu.gd" id="10_menu"]
 
 [node name="Stage" type="Node2D"]
 script = ExtResource("1_stage")
@@ -38,3 +40,9 @@ script = ExtResource("4_camera")
 
 [node name="DebugTable" type="CanvasLayer" parent="."]
 script = ExtResource("8_debug")
+
+[node name="Screens" type="Node" parent="."]
+script = ExtResource("9_screens")
+
+[node name="Menu" type="CanvasLayer" parent="Screens"]
+script = ExtResource("10_menu")

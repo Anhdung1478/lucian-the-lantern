@@ -82,7 +82,8 @@ func _process(_delta: float) -> void:
 	var cost := skill.mana_cost()
 	var remaining := skill.cooldown.remaining
 	_lock.visible = progress.bought[skill.slot] == 0
-	_plus.visible = progress.can_rank_up(skill.slot)
+	# No rank-ups while paused, same as Ctrl + key.
+	_plus.visible = progress.can_rank_up(skill.slot) and not get_tree().paused
 	_cost_label.text = str(roundi(cost)) if cost > 0.0 else ""
 	if remaining <= 0.0:
 		_cooldown_label.text = ""

@@ -1,6 +1,7 @@
 class_name Hud
 extends CanvasLayer
-## Lucian's bottom panel and the stats panel. Reads Lucian every frame.
+## Lucian's bottom panel and the stats panel. Reads Lucian every frame, also
+## while the game is paused, so equipping items shows up right away.
 
 ## Space between the stats panel and the bottom panel.
 const STATS_GAP := 10.0
@@ -35,6 +36,7 @@ func setup(target: Lucian) -> void:
 
 
 func _ready() -> void:
+	process_mode = PROCESS_MODE_ALWAYS
 	bottom_panel.resized.connect(_place_stats_panel)
 	_place_stats_panel()
 

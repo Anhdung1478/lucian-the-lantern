@@ -53,6 +53,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 
+## A pause screen opening drops the held move and the armed attack-move.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PAUSED:
+		_move_held = false
+		_set_attack_move_armed(false)
+
+
 func _physics_process(_delta: float) -> void:
 	if not _move_held:
 		return

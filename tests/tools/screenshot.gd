@@ -46,6 +46,8 @@ func _run(scenario: String) -> void:
 			await scenario_combo()
 		"hud":
 			await scenario_hud()
+		"menu":
+			await scenario_menu()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -248,3 +250,18 @@ func scenario_combo() -> void:
 	await shot("combo_0")
 	await wait(2.5)
 	await shot("combo_1")
+
+
+func scenario_menu() -> void:
+	lucian.command_move(lucian.global_position + Vector2(600, 0))
+	await wait(0.3)
+	await press_key(KEY_ESCAPE, true)
+	await press_key(KEY_ESCAPE, false)
+	var x := lucian.global_position.x
+	await wait(0.5)
+	print("paused after ESC (expect true): ", paused, "  Lucian frozen (expect true): ", is_equal_approx(x, lucian.global_position.x))
+	await shot("menu_0")
+	await press_key(KEY_ESCAPE, true)
+	await press_key(KEY_ESCAPE, false)
+	await wait(0.3)
+	print("paused after 2nd ESC (expect false): ", paused, "  Lucian moving (expect true): ", lucian.global_position.x > x)
