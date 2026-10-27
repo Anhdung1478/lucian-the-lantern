@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_fevpo"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_h4ktj"]
+
+[resource]
+script = ExtResource("2_h4ktj")
+id = &"tear_of_the_goddess"
+display_name = "Tear of the Goddess"
+code = "MP"
+cost = 400
+stats = Dictionary[StringName, float]({
+&"max_mana": 300.0
+})

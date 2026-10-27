@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_y87j4"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_e8nos"]
+
+[sub_resource type="Resource" id="Resource_q16nb"]
+script = ExtResource("1_y87j4")
+effect_name = "Awe"
+description = "Gain [hp]bonus health equal to 8% of max mana[/hp]."
+
+[sub_resource type="Resource" id="Resource_xwcma"]
+script = ExtResource("1_y87j4")
+effect_name = "Everlasting"
+description = "Slowing or stunning an enemy grants a [hp]shield of 100 (+5% max mana)[/hp] for 3 s. 8 s cooldown."
+
+[resource]
+script = ExtResource("2_e8nos")
+id = &"fimbulwinter"
+display_name = "Fimbulwinter"
+kind = 1
+code = "Fim"
+cost = 2800
+stats = Dictionary[StringName, float]({
+&"ability_haste": 15.0,
+&"armor": 40.0,
+&"max_mana": 450.0
+})
+components = Array[StringName]([&"chain_vest", &"tear_of_the_goddess"])
+effects = Array[ExtResource("1_y87j4")]([SubResource("Resource_q16nb"), SubResource("Resource_xwcma")])

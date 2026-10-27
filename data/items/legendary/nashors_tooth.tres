@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_tra5n"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_teryr"]
+
+[sub_resource type="Resource" id="Resource_6lkvp"]
+script = ExtResource("1_tra5n")
+effect_name = "Icathian Bite"
+description = "Basic attacks deal [magic]15 (+20% AP) bonus magic damage[/magic] on hit."
+
+[resource]
+script = ExtResource("2_teryr")
+id = &"nashors_tooth"
+display_name = "Nashor's Tooth"
+kind = 1
+code = "NT"
+cost = 3000
+stats = Dictionary[StringName, float]({
+&"ap": 60.0,
+&"attack_speed": 0.4,
+&"max_hp": 200.0
+})
+components = Array[StringName]([&"recurve_bow", &"giants_belt"])
+effects = Array[ExtResource("1_tra5n")]([SubResource("Resource_6lkvp")])

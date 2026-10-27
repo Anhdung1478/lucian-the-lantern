@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_2bsh4"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_jpc4p"]
+
+[sub_resource type="Resource" id="Resource_lu5f5"]
+script = ExtResource("1_2bsh4")
+effect_name = "Electroshock"
+description = "[kw]Energized[/kw] attacks release chain lightning that hits up to 5 enemies for [magic]90 (+20% AP) magic damage[/magic]."
+
+[resource]
+script = ExtResource("2_jpc4p")
+id = &"statikk_shiv"
+display_name = "Statikk Shiv"
+kind = 1
+code = "SS"
+cost = 3000
+stats = Dictionary[StringName, float]({
+&"ap": 45.0,
+&"attack_speed": 0.3,
+&"move_speed_pct": 0.04
+})
+components = Array[StringName]([&"recurve_bow", &"needlessly_large_rod"])
+effects = Array[ExtResource("1_2bsh4")]([SubResource("Resource_lu5f5")])

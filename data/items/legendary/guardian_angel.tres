@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_f66q4"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_tn05x"]
+
+[sub_resource type="Resource" id="Resource_weqpe"]
+script = ExtResource("1_f66q4")
+effect_name = "Rebirth"
+description = "When Lucian would die, he is held in stasis for 4 s and revives with [hp]50% base health[/hp] and [mana]30% max mana[/mana]. 300 s cooldown."
+
+[resource]
+script = ExtResource("2_tn05x")
+id = &"guardian_angel"
+display_name = "Guardian Angel"
+kind = 1
+code = "GA"
+cost = 3200
+stats = Dictionary[StringName, float]({
+&"ad": 40.0,
+&"armor": 40.0,
+&"mr": 30.0
+})
+components = Array[StringName]([&"chain_vest", &"negatron_cloak"])
+effects = Array[ExtResource("1_f66q4")]([SubResource("Resource_weqpe")])

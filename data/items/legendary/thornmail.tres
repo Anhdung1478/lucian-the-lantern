@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_rnpn1"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_hk5eh"]
+
+[sub_resource type="Resource" id="Resource_p5fr4"]
+script = ExtResource("1_rnpn1")
+effect_name = "Thorns"
+description = "When hit by a basic attack, deal [magic]20 (+10% bonus armor) magic damage[/magic] to the attacker and apply [kw]Grievous Wounds[/kw] for 3 s."
+
+[resource]
+script = ExtResource("2_hk5eh")
+id = &"thornmail"
+display_name = "Thornmail"
+kind = 1
+code = "TM"
+cost = 2700
+stats = Dictionary[StringName, float]({
+&"armor": 80.0,
+&"max_hp": 200.0
+})
+components = Array[StringName]([&"chain_vest", &"chain_vest"])
+effects = Array[ExtResource("1_rnpn1")]([SubResource("Resource_p5fr4")])

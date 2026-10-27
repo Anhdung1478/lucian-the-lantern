@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_foemj"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_jv4jn"]
+
+[sub_resource type="Resource" id="Resource_c17q0"]
+script = ExtResource("1_foemj")
+effect_name = "Sharpshooter"
+description = "[kw]Energized[/kw] attacks deal [magic]60 bonus magic damage[/magic] and reach 35% further."
+
+[resource]
+script = ExtResource("2_jv4jn")
+id = &"rapid_firecannon"
+display_name = "Rapid Firecannon"
+kind = 1
+code = "RFC"
+cost = 2650
+stats = Dictionary[StringName, float]({
+&"attack_speed": 0.25,
+&"crit_chance": 0.25,
+&"move_speed_pct": 0.04
+})
+components = Array[StringName]([&"cloak_of_agility", &"cloak_of_agility"])
+effects = Array[ExtResource("1_foemj")]([SubResource("Resource_c17q0")])

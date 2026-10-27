@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_dheyx"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_3uc7g"]
+
+[resource]
+script = ExtResource("2_3uc7g")
+id = &"cloak_of_agility"
+display_name = "Cloak of Agility"
+code = "CR"
+cost = 600
+stats = Dictionary[StringName, float]({
+&"crit_chance": 0.15
+})

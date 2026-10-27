@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_68q5w"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_sa8rf"]
+
+[sub_resource type="Resource" id="Resource_x76dy"]
+script = ExtResource("1_68q5w")
+effect_name = "Wind's Fury"
+description = "Basic attacks also fire bolts at up to 2 other enemies near the target, each dealing [phys]55% AD physical damage[/phys]. The bolts can crit."
+
+[resource]
+script = ExtResource("2_sa8rf")
+id = &"runaans_hurricane"
+display_name = "Runaan's Hurricane"
+kind = 1
+code = "RH"
+cost = 2800
+stats = Dictionary[StringName, float]({
+&"attack_speed": 0.45,
+&"crit_chance": 0.2,
+&"move_speed_pct": 0.04
+})
+components = Array[StringName]([&"recurve_bow", &"recurve_bow"])
+effects = Array[ExtResource("1_68q5w")]([SubResource("Resource_x76dy")])

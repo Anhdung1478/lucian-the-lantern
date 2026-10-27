@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_u43tk"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_n63bf"]
+
+[resource]
+script = ExtResource("2_n63bf")
+id = &"bf_sword"
+display_name = "B.F. Sword"
+code = "AD"
+cost = 1300
+stats = Dictionary[StringName, float]({
+&"ad": 35.0
+})

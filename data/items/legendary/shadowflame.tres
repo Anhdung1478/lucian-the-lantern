@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_2wj85"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_5ew07"]
+
+[sub_resource type="Resource" id="Resource_muu73"]
+script = ExtResource("1_2wj85")
+effect_name = "Cinderbloom"
+description = "Magic damage against enemies below 40% health deals [magic]20% more damage[/magic]."
+
+[resource]
+script = ExtResource("2_5ew07")
+id = &"shadowflame"
+display_name = "Shadowflame"
+kind = 1
+code = "SF"
+cost = 3200
+stats = Dictionary[StringName, float]({
+&"ap": 90.0,
+&"crit_chance": 0.15,
+&"magic_pen": 0.1
+})
+components = Array[StringName]([&"needlessly_large_rod", &"cloak_of_agility"])
+effects = Array[ExtResource("1_2wj85")]([SubResource("Resource_muu73")])

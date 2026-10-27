@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_jirqx"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_kxbyh"]
+
+[sub_resource type="Resource" id="Resource_7c46g"]
+script = ExtResource("1_jirqx")
+effect_name = "Sepsis"
+description = "Dealing physical damage applies [kw]Grievous Wounds[/kw] (40% less healing) for 3 s."
+
+[resource]
+script = ExtResource("2_kxbyh")
+id = &"mortal_reminder"
+display_name = "Mortal Reminder"
+kind = 1
+code = "MtR"
+cost = 3200
+stats = Dictionary[StringName, float]({
+&"ad": 35.0,
+&"armor_pen": 0.3,
+&"crit_chance": 0.2
+})
+components = Array[StringName]([&"bf_sword", &"chain_vest"])
+effects = Array[ExtResource("1_jirqx")]([SubResource("Resource_7c46g")])

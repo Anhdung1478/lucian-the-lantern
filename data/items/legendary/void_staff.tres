@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_0cg3c"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_ogfty"]
+
+[resource]
+script = ExtResource("2_ogfty")
+id = &"void_staff"
+display_name = "Void Staff"
+kind = 1
+code = "VS"
+cost = 3000
+stats = Dictionary[StringName, float]({
+&"ap": 70.0,
+&"attack_speed": 0.2,
+&"magic_pen": 0.35
+})
+components = Array[StringName]([&"recurve_bow", &"tear_of_the_goddess"])

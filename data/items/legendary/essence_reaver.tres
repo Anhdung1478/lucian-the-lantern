@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_4hup6"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_btj1a"]
+
+[sub_resource type="Resource" id="Resource_emo0s"]
+script = ExtResource("1_4hup6")
+effect_name = "Spellblade"
+description = "After a skill, the next basic attack deals [phys]bonus physical damage equal to 100% base AD (+40% bonus AD)[/phys] and restores [mana]mana equal to 40% of that damage[/mana]. 1.5 s cooldown."
+
+[resource]
+script = ExtResource("2_btj1a")
+id = &"essence_reaver"
+display_name = "Essence Reaver"
+kind = 1
+code = "ER"
+cost = 3000
+stats = Dictionary[StringName, float]({
+&"ability_haste": 20.0,
+&"ad": 45.0,
+&"crit_chance": 0.2
+})
+components = Array[StringName]([&"cloak_of_agility", &"tear_of_the_goddess"])
+effects = Array[ExtResource("1_4hup6")]([SubResource("Resource_emo0s")])

@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_fcuvc"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_3at4b"]
+
+[sub_resource type="Resource" id="Resource_ghbo2"]
+script = ExtResource("1_fcuvc")
+effect_name = "Ignore Pain"
+description = "30% of damage taken is delayed and taken over 3 s instead."
+
+[sub_resource type="Resource" id="Resource_vtnf5"]
+script = ExtResource("1_fcuvc")
+effect_name = "Defy"
+description = "Killing an enemy clears the delayed damage and restores [hp]15% max health[/hp] over 2 s."
+
+[resource]
+script = ExtResource("2_3at4b")
+id = &"deaths_dance"
+display_name = "Death's Dance"
+kind = 1
+code = "DD"
+cost = 3200
+stats = Dictionary[StringName, float]({
+&"ad": 40.0,
+&"armor": 40.0,
+&"max_hp": 250.0
+})
+components = Array[StringName]([&"chain_vest", &"giants_belt"])
+effects = Array[ExtResource("1_fcuvc")]([SubResource("Resource_ghbo2"), SubResource("Resource_vtnf5")])

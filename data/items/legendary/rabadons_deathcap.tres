@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_oorme"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_ku3f5"]
+
+[sub_resource type="Resource" id="Resource_0pua3"]
+script = ExtResource("1_oorme")
+effect_name = "Magical Opus"
+description = "Increases Lucian's total [ap]Ability Power by 30%[/ap]."
+
+[resource]
+script = ExtResource("2_ku3f5")
+id = &"rabadons_deathcap"
+display_name = "Rabadon's Deathcap"
+kind = 1
+code = "RD"
+cost = 3600
+stats = Dictionary[StringName, float]({
+&"ap": 110.0
+})
+components = Array[StringName]([&"needlessly_large_rod", &"needlessly_large_rod"])
+effects = Array[ExtResource("1_oorme")]([SubResource("Resource_0pua3")])

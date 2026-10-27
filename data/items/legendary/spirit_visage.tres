@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_kkr7u"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_7uqq4"]
+
+[sub_resource type="Resource" id="Resource_x13j3"]
+script = ExtResource("1_kkr7u")
+effect_name = "Boundless Vitality"
+description = "Healing and shields Lucian receives are [hp]25% stronger[/hp]."
+
+[resource]
+script = ExtResource("2_7uqq4")
+id = &"spirit_visage"
+display_name = "Spirit Visage"
+kind = 1
+code = "SV"
+cost = 2900
+stats = Dictionary[StringName, float]({
+&"ability_haste": 10.0,
+&"max_hp": 350.0,
+&"mr": 45.0
+})
+components = Array[StringName]([&"giants_belt", &"negatron_cloak"])
+effects = Array[ExtResource("1_kkr7u")]([SubResource("Resource_x13j3")])

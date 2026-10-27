@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_v31hw"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_kn738"]
+
+[resource]
+script = ExtResource("2_kn738")
+id = &"giants_belt"
+display_name = "Giant's Belt"
+code = "HP"
+cost = 900
+stats = Dictionary[StringName, float]({
+&"max_hp": 350.0
+})

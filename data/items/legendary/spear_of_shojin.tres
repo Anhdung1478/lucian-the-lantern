@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_7q5rr"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_xa01r"]
+
+[sub_resource type="Resource" id="Resource_ijnov"]
+script = ExtResource("1_7q5rr")
+effect_name = "Focused Will"
+description = "Hitting an enemy with a skill grants a stack for 6 s, up to 4. Each stack makes skills deal 3% more damage."
+
+[resource]
+script = ExtResource("2_xa01r")
+id = &"spear_of_shojin"
+display_name = "Spear of Shojin"
+kind = 1
+code = "SoS"
+cost = 3100
+stats = Dictionary[StringName, float]({
+&"ability_haste": 20.0,
+&"ad": 45.0,
+&"max_mana": 300.0
+})
+components = Array[StringName]([&"bf_sword", &"tear_of_the_goddess"])
+effects = Array[ExtResource("1_7q5rr")]([SubResource("Resource_ijnov")])

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_tua2u"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_cqrok"]
+
+[sub_resource type="Resource" id="Resource_l3guf"]
+script = ExtResource("1_tua2u")
+effect_name = "Giant Slayer"
+description = "Deal up to [phys]15% more damage[/phys] to enemies with more max health than Lucian."
+
+[resource]
+script = ExtResource("2_cqrok")
+id = &"lord_dominiks_regards"
+display_name = "Lord Dominik's Regards"
+kind = 1
+code = "LDR"
+cost = 3200
+stats = Dictionary[StringName, float]({
+&"ad": 30.0,
+&"armor_pen": 0.3,
+&"attack_speed": 0.25
+})
+components = Array[StringName]([&"recurve_bow", &"chain_vest"])
+effects = Array[ExtResource("1_tua2u")]([SubResource("Resource_l3guf")])

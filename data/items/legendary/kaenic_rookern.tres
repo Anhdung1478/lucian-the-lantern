@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_h0yw2"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_dorc8"]
+
+[sub_resource type="Resource" id="Resource_hgc7j"]
+script = ExtResource("1_h0yw2")
+effect_name = "Magebane"
+description = "After 15 s without taking magic damage, gain a [magic]shield against magic damage[/magic] equal to [hp]15% max health[/hp]."
+
+[resource]
+script = ExtResource("2_dorc8")
+id = &"kaenic_rookern"
+display_name = "Kaenic Rookern"
+kind = 1
+code = "KR"
+cost = 2900
+stats = Dictionary[StringName, float]({
+&"max_hp": 250.0,
+&"mr": 80.0
+})
+components = Array[StringName]([&"negatron_cloak", &"negatron_cloak"])
+effects = Array[ExtResource("1_h0yw2")]([SubResource("Resource_hgc7j")])

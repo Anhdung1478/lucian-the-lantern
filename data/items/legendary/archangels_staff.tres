@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_xg8wg"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_lhm2w"]
+
+[sub_resource type="Resource" id="Resource_t5u7g"]
+script = ExtResource("1_xg8wg")
+effect_name = "Awe"
+description = "Gain [ap]Ability Power equal to 2% of max mana[/ap]."
+
+[sub_resource type="Resource" id="Resource_2g8gl"]
+script = ExtResource("1_xg8wg")
+effect_name = "Mana Charge"
+description = "Hitting an enemy with a skill grants [mana]3 max mana[/mana], up to [mana]360[/mana]."
+
+[resource]
+script = ExtResource("2_lhm2w")
+id = &"archangels_staff"
+display_name = "Archangel's Staff"
+kind = 1
+code = "AA"
+cost = 3000
+stats = Dictionary[StringName, float]({
+&"ability_haste": 20.0,
+&"ap": 60.0,
+&"max_mana": 450.0
+})
+components = Array[StringName]([&"needlessly_large_rod", &"tear_of_the_goddess"])
+effects = Array[ExtResource("1_xg8wg")]([SubResource("Resource_t5u7g"), SubResource("Resource_2g8gl")])

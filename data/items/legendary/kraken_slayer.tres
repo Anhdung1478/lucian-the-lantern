@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_4h3iu"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_d84h3"]
+
+[sub_resource type="Resource" id="Resource_gc43f"]
+script = ExtResource("1_4h3iu")
+effect_name = "Bring It Down"
+description = "Every third basic attack deals [phys]140 bonus physical damage[/phys], up to 50% more against enemies with low health."
+
+[resource]
+script = ExtResource("2_d84h3")
+id = &"kraken_slayer"
+display_name = "Kraken Slayer"
+kind = 1
+code = "KS"
+cost = 3100
+stats = Dictionary[StringName, float]({
+&"ad": 40.0,
+&"attack_speed": 0.35,
+&"move_speed_pct": 0.04
+})
+components = Array[StringName]([&"bf_sword", &"recurve_bow"])
+effects = Array[ExtResource("1_4h3iu")]([SubResource("Resource_gc43f")])
