@@ -58,6 +58,8 @@ func _run(scenario: String) -> void:
 			await scenario_hud_items()
 		"icons":
 			await scenario_icons()
+		"gold":
+			await scenario_gold()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -486,3 +488,14 @@ func scenario_icons() -> void:
 	print("items with icons: ", items.filter(func(item: ItemData) -> bool: return item.icon != null).size(), " / ", items.size())
 	await wait(0.3)
 	await shot("icons_0_sheet")
+
+
+func scenario_gold() -> void:
+	var table: DebugTable = stage.get_node("DebugTable")
+	table.visible = true
+	(stage as Stage).wallet.add(1250)
+	var tabs: TabContainer = table.find_children("*", "TabContainer", true, false)[0]
+	tabs.current_tab = 2
+	await wait(0.2)
+	print("gold (expect 1250): ", (stage as Stage).wallet.gold)
+	await shot("gold_0")

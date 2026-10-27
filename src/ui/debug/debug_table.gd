@@ -1,12 +1,14 @@
 class_name DebugTable
 extends CanvasLayer
-## Testing panel, toggled with F3 + Q (hidden by default): level controls,
-## cheats, items, training dummy settings, DPS meter and a hit log. Keeps
-## working while the game is paused, so items can be given into an open backpack.
+## Testing panel, toggled with F3 + Q (hidden by default), in tabs: Lucian
+## (level, cheats), Items, Shop (gold) and Dummy (settings, DPS meter, hit
+## log). Keeps working while the game is paused, so items can be given into an
+## open backpack.
 
 const LOG_SIZE := 10
 const PANEL_WIDTH := 400.0
 
+var stage: Stage
 var lucian: Lucian
 var dummy: TrainingDummy
 
@@ -28,6 +30,7 @@ var _mr: SpinBox
 var _max_hp: SpinBox
 var _dps_label: Label
 var _log_label: RichTextLabel
+var _gold_label: Label
 var _panel: PanelContainer
 
 
@@ -38,9 +41,10 @@ func _ready() -> void:
 	_build()
 
 
-func setup(target: Lucian, training_dummy: TrainingDummy) -> void:
-	lucian = target
-	dummy = training_dummy
+func setup(owner_stage: Stage) -> void:
+	stage = owner_stage
+	lucian = stage.lucian
+	dummy = stage.dummy
 	dummy.damage_taken.connect(_on_damage_taken)
 	_armor.set_value_no_signal(dummy.armor)
 	_mr.set_value_no_signal(dummy.mr)
@@ -73,6 +77,7 @@ func _process(_delta: float) -> void:
 	_level_info.text = "Level %d   XP %d / %d   Skill points %d" % [
 		progress.level, progress.xp, progress.xp_for_next(), progress.skill_points()]
 	_dps_label.text = "DPS %.1f   Total %d   %.1f s" % [_meter.dps(), roundi(_meter.total), _meter.elapsed()]
+	_gold_label.text = "Gold %d" % stage.wallet.gold
 	var stats := lucian.stats
 	_item_stats.text = "AH %d   Life steal %d%%   Omnivamp %d%%   Pen %d%% / %d%%" % [
 		roundi(stats.ability_haste), roundi(stats.lifesteal * 100.0), roundi(stats.omnivamp * 100.0),
@@ -127,12 +132,17 @@ func _build() -> void:
 	panel.add_theme_stylebox_override(&"panel", style)
 	add_child(panel)
 
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override(&"separation", 6)
-	panel.add_child(box)
-	var title := _label(box, "DEBUG   (F3 + Q)")
+	var outer := VBoxContainer.new()
+	outer.add_theme_constant_override(&"separation", 6)
+	panel.add_child(outer)
+	var title := _label(outer, "DEBUG   (F3 + Q)")
 	title.add_theme_color_override(&"font_color", Color(0.95, 0.45, 0.4))
+	var tabs := TabContainer.new()
+	tabs.focus_mode = Control.FOCUS_NONE
+	tabs.get_tab_bar().focus_mode = Control.FOCUS_NONE
+	outer.add_child(tabs)
 
+	var box := _tab(tabs, "Lucian")
 	_section(box, "Level")
 	_level_info = _label(box, "")
 	var row := _row(box)
@@ -159,6 +169,7 @@ func _build() -> void:
 	_crit_value = _spin(row, 0, 100, 100)
 	_crit_value.value_changed.connect(_apply_crit)
 
+	box = _tab(tabs, "Items")
 	_section(box, "Items")
 	row = _row(box)
 	_item_picker = OptionButton.new()
@@ -174,6 +185,15 @@ func _build() -> void:
 	_equip_slots.value_changed.connect(func(value: float) -> void: lucian.inventory.unlocked_equip = int(value))
 	_item_stats = _label(box, "")
 
+	box = _tab(tabs, "Shop")
+	_section(box, "Stage gold")
+	_gold_label = _label(box, "")
+	row = _row(box)
+	for amount in [100, 1000, 10000]:
+		_button(row, "+%d" % amount, func() -> void: stage.wallet.add(amount))
+	_button(row, "Reset", func() -> void: stage.wallet.reset())
+
+	box = _tab(tabs, "Dummy")
 	_section(box, "Training dummy")
 	var grid := GridContainer.new()
 	grid.columns = 6
@@ -186,7 +206,10 @@ func _build() -> void:
 	_max_hp = _spin(grid, 1, 100000, 2000)
 	for spin in [_armor, _mr, _max_hp]:
 		spin.value_changed.connect(_apply_dummy)
-	row = _row(box)
+
+	# The DPS meter and hit log stay under the tabs, always in view.
+	_section(outer, "Damage")
+	row = _row(outer)
 	_dps_label = _label(row, "")
 	_dps_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_button(row, "Reset DPS", func() -> void: _meter.reset())
@@ -196,7 +219,15 @@ func _build() -> void:
 	_log_label.scroll_active = false
 	_log_label.custom_minimum_size.x = PANEL_WIDTH - 24.0
 	_log_label.add_theme_font_size_override(&"normal_font_size", 14)
-	box.add_child(_log_label)
+	outer.add_child(_log_label)
+
+
+func _tab(tabs: TabContainer, tab_name: String) -> VBoxContainer:
+	var box := VBoxContainer.new()
+	box.name = tab_name
+	box.add_theme_constant_override(&"separation", 6)
+	tabs.add_child(box)
+	return box
 
 
 func _section(parent: Control, text: String) -> void:
