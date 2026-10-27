@@ -4,6 +4,8 @@
 [ext_resource type="Script" path="res://src/stage/test_arena.gd" id="2_arena"]
 [ext_resource type="PackedScene" path="res://src/lucian/lucian.tscn" id="3_lucian"]
 [ext_resource type="Script" path="res://src/stage/stage_camera.gd" id="4_camera"]
+[ext_resource type="PackedScene" path="res://src/enemies/training_dummy.tscn" id="5_dummy"]
+[ext_resource type="Script" path="res://src/combat/damage_number_spawner.gd" id="6_numbers"]
 
 [node name="Stage" type="Node2D"]
 script = ExtResource("1_stage")
@@ -14,10 +16,18 @@ script = ExtResource("2_arena")
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
 
+[node name="TrainingDummy" parent="World" instance=ExtResource("5_dummy")]
+position = Vector2(2400, 1350)
+
 [node name="Lucian" parent="World" instance=ExtResource("3_lucian")]
 position = Vector2(1700, 1350)
 
 [node name="Projectiles" type="Node2D" parent="."]
+z_index = 20
+
+[node name="DamageNumbers" type="Node2D" parent="."]
+z_index = 100
+script = ExtResource("6_numbers")
 
 [node name="StageCamera" type="Camera2D" parent="."]
 script = ExtResource("4_camera")

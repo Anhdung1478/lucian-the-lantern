@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112">
+  <!-- LoL-style practice dummy, seen from above at a slight angle. -->
+  <g transform="translate(56 60)">
+    <!-- shadow -->
+    <ellipse cx="2" cy="10" rx="34" ry="22" fill="#000000" opacity="0.3"/>
+    <!-- wooden cross-beam arms -->
+    <rect x="-50" y="-14" width="100" height="11" rx="3" fill="#7a5230" stroke="#4e331d" stroke-width="2"/>
+    <path d="M -50 -14 l -6 -5 M -50 -3 l -6 5 M 50 -14 l 6 -5 M 50 -3 l 6 5" stroke="#c9a45c" stroke-width="3" stroke-linecap="round"/>
+    <!-- straw body -->
+    <ellipse cx="0" cy="4" rx="27" ry="29" fill="#c9a45c" stroke="#94722f" stroke-width="3"/>
+    <path d="M -19 -14 L -13 -6 M 17 -16 L 12 -8 M -21 14 L -14 20 M 20 12 L 13 20 M -4 26 L 0 31 M 6 -22 L 3 -16" stroke="#a8843f" stroke-width="2" stroke-linecap="round"/>
+    <!-- rope belt -->
+    <path d="M -26 13 Q 0 21 26 13" fill="none" stroke="#5e4a2a" stroke-width="3"/>
+    <!-- target on the chest -->
+    <circle cx="0" cy="2" r="15" fill="#f2efe6"/>
+    <circle cx="0" cy="2" r="11" fill="#c8312b"/>
+    <circle cx="0" cy="2" r="6.5" fill="#f2efe6"/>
+    <circle cx="0" cy="2" r="2.8" fill="#c8312b"/>
+    <!-- burlap sack head -->
+    <circle cx="0" cy="-30" r="14" fill="#d8c9a3" stroke="#a8946a" stroke-width="2"/>
+    <path d="M -7 -34 l 5 5 M -2 -34 l -5 5 M 2 -34 l 5 5 M 7 -34 l -5 5" stroke="#4e3b22" stroke-width="2" stroke-linecap="round"/>
+    <path d="M -6 -23 Q 0 -20 6 -23" fill="none" stroke="#4e3b22" stroke-width="1.5" stroke-dasharray="2 1.5"/>
+    <path d="M -12 -38 Q -4 -46 6 -42" fill="none" stroke="#a8946a" stroke-width="2"/>
+  </g>
+</svg>

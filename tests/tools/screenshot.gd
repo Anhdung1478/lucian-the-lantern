@@ -26,6 +26,8 @@ func _run(scenario: String) -> void:
 	match scenario:
 		"move":
 			await scenario_move()
+		"dummy":
+			await scenario_dummy()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -52,3 +54,27 @@ func scenario_move() -> void:
 	await wait(6.0)
 	print("x after walking into the wall: ", lucian.global_position.x)
 	await shot("move_2_wall")
+
+
+func scenario_dummy() -> void:
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	var camera: StageCamera = stage.get_node("StageCamera")
+	lucian.visuals.face(dummy.global_position - lucian.global_position)
+	camera.zoom = Vector2(2.2, 2.2)
+	camera.mode = StageCamera.Mode.FREE
+	camera.global_position = (lucian.global_position + dummy.global_position) * 0.5
+	await wait(0.2)
+	var Type := DamageInfo.Type
+	print("physical 100 vs 30 armor -> ", dummy.take_damage(DamageInfo.create(100, Type.PHYSICAL, &"test")))
+	await wait(0.12)
+	dummy.take_damage(DamageInfo.create(100, Type.MAGIC, &"test"))
+	await wait(0.12)
+	dummy.take_damage(DamageInfo.create(100, Type.TRUE, &"test"))
+	await wait(0.12)
+	dummy.take_damage(DamageInfo.create(175, Type.PHYSICAL, &"test", null, true))
+	dummy.add_mark(&"ardent_blaze", 6.0)
+	await wait(0.15)
+	await shot("dummy_0_hits")
+	print("hp after hits: ", dummy.hp)
+	await wait(4.5)
+	print("hp after 4.5 s idle: ", dummy.hp)

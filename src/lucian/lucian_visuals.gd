@@ -3,12 +3,15 @@ extends Node2D
 ## Everything Lucian looks like. Rotated to face his aim; swap the art here
 ## without touching gameplay code.
 
+enum Gun { LEFT, RIGHT }
+
+@onready var _muzzles: Array[Marker2D] = [$MuzzleLeft, $MuzzleRight]
+
 
 func face(direction: Vector2) -> void:
 	if direction != Vector2.ZERO:
 		rotation = direction.angle()
 
 
-func _draw() -> void:
-	draw_circle(Vector2.ZERO, 30.0, Color("2a3142"))
-	draw_line(Vector2.ZERO, Vector2(40, 0), Color("ffe9a8"), 6.0)
+func muzzle_position(gun: Gun) -> Vector2:
+	return _muzzles[gun].global_position
