@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://src/lucian/lucian.gd" id="1_lucian"]
 [ext_resource type="Resource" path="res://data/lucian_stats.tres" id="2_stats"]
+[ext_resource type="Resource" path="res://data/items/catalog.tres" id="16_items"]
 [ext_resource type="Script" path="res://src/lucian/lucian_visuals.gd" id="3_visuals"]
 [ext_resource type="Script" path="res://src/lucian/lucian_controller.gd" id="4_controller"]
 [ext_resource type="Texture2D" path="res://assets/art/lucian/lucian_body.svg" id="5_body"]
@@ -24,6 +25,7 @@ collision_mask = 5
 motion_mode = 1
 script = ExtResource("1_lucian")
 base_stats = ExtResource("2_stats")
+item_catalog = ExtResource("16_items")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_body")

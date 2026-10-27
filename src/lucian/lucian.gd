@@ -12,8 +12,10 @@ const RANGE_RING_COLOR := Color(1.0, 0.91, 0.66, 0.35)
 const GUN_REACH := 44.0
 
 @export var base_stats: UnitStats
+@export var item_catalog: ItemCatalog
 
 var progress := ChampionProgress.new()
+var inventory := Inventory.new()
 var stats: StatBlock
 var hp := 0.0
 var mana := 0.0
@@ -53,7 +55,9 @@ func _ready() -> void:
 	mana = stats.max_mana
 	if projectile_parent == null:
 		projectile_parent = get_parent()
-	progress.level_changed.connect(_on_level_changed)
+	inventory.catalog = item_catalog
+	progress.level_changed.connect(func(_level: int) -> void: _refresh_stats(false))
+	inventory.changed.connect(_refresh_stats.bind(true))
 
 
 func command_move(point: Vector2) -> void:
@@ -103,8 +107,14 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 	return true
 
 
-## Called by an enemy after it takes damage from Lucian.
-func on_damage_dealt(target: Enemy, info: DamageInfo, _final_amount: float) -> void:
+## Called by an enemy after it takes damage from Lucian. Life steal works on
+## basic attacks (and the passive's second shot); omnivamp on every hit.
+func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> void:
+	var vamp := stats.omnivamp
+	if info.source == &"basic" or info.source == &"lightslinger":
+		vamp += stats.lifesteal
+	if vamp > 0.0:
+		hp = minf(hp + final_amount * vamp, stats.max_hp)
 	if info.source == &"lightslinger":
 		skills[ChampionProgress.Slot.E].cooldown.reduce(passive.e_cooldown_reduction)
 	if info.source != &"w" and target.has_mark(ArdentBlaze.MARK):
@@ -244,12 +254,18 @@ func _physics_process(delta: float) -> void:
 				_order = Order.NONE
 
 
-## Leveling up grants the max HP / mana gained, like LoL.
-func _on_level_changed(_level: int) -> void:
+## Recomputes stats from the level and the equipped items. Leveling up grants
+## the max HP / mana gained, like LoL. Item changes keep the current share of
+## HP and mana instead, so swapping items can never refill them.
+func _refresh_stats(keep_share: bool) -> void:
 	var old := stats
-	stats = base_stats.at_level(progress.level)
-	hp = clampf(hp + stats.max_hp - old.max_hp, 1.0, stats.max_hp)
-	mana = clampf(mana + stats.max_mana - old.max_mana, 0.0, stats.max_mana)
+	stats = base_stats.at_level(progress.level, inventory.equipped_bonus())
+	if keep_share:
+		hp = clampf(hp / old.max_hp * stats.max_hp, 1.0, stats.max_hp)
+		mana = mana / old.max_mana * stats.max_mana if old.max_mana > 0.0 else 0.0
+	else:
+		hp = clampf(hp + stats.max_hp - old.max_hp, 1.0, stats.max_hp)
+		mana = clampf(mana + stats.max_mana - old.max_mana, 0.0, stats.max_mana)
 	queue_redraw()
 
 

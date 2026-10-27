@@ -1,7 +1,8 @@
 class_name DebugTable
 extends CanvasLayer
 ## Testing panel, toggled with F3 + Q (hidden by default): level controls,
-## cheats, training dummy settings, DPS meter and a hit log.
+## cheats, items, training dummy settings, DPS meter and a hit log. Keeps
+## working while the game is paused, so items can be given into an open backpack.
 
 const LOG_SIZE := 10
 const PANEL_WIDTH := 400.0
@@ -10,6 +11,8 @@ var lucian: Lucian
 var dummy: TrainingDummy
 
 var _meter := DpsMeter.new()
+## Seconds of unpaused play, so pauses never split a DPS session.
+var _game_time := 0.0
 ## Newest first: [source, raw, final, is_crit].
 var _hits: Array[Array] = []
 
@@ -17,6 +20,9 @@ var _level_info: Label
 var _level_value: SpinBox
 var _crit_toggle: CheckBox
 var _crit_value: SpinBox
+var _item_picker: OptionButton
+var _equip_slots: SpinBox
+var _item_stats: Label
 var _armor: SpinBox
 var _mr: SpinBox
 var _max_hp: SpinBox
@@ -25,7 +31,8 @@ var _log_label: RichTextLabel
 
 
 func _ready() -> void:
-	layer = 20
+	layer = 50
+	process_mode = PROCESS_MODE_ALWAYS
 	visible = false
 	_build()
 
@@ -37,6 +44,9 @@ func setup(target: Lucian, training_dummy: TrainingDummy) -> void:
 	_armor.set_value_no_signal(dummy.armor)
 	_mr.set_value_no_signal(dummy.mr)
 	_max_hp.set_value_no_signal(dummy.max_hp)
+	for item in lucian.item_catalog.items:
+		_item_picker.add_item(item.display_name)
+	_equip_slots.set_value_no_signal(lucian.inventory.unlocked_equip)
 
 
 ## _input runs before the controller's _unhandled_input, so Q never casts here.
@@ -55,10 +65,19 @@ func _process(_delta: float) -> void:
 	_level_info.text = "Level %d   XP %d / %d   Skill points %d" % [
 		progress.level, progress.xp, progress.xp_for_next(), progress.skill_points()]
 	_dps_label.text = "DPS %.1f   Total %d   %.1f s" % [_meter.dps(), roundi(_meter.total), _meter.elapsed()]
+	var stats := lucian.stats
+	_item_stats.text = "AH %d   Life steal %d%%   Omnivamp %d%%   Pen %d%% / %d%%" % [
+		roundi(stats.ability_haste), roundi(stats.lifesteal * 100.0), roundi(stats.omnivamp * 100.0),
+		roundi(stats.armor_pen * 100.0), roundi(stats.magic_pen * 100.0)]
+
+
+func _physics_process(delta: float) -> void:
+	if not get_tree().paused:
+		_game_time += delta
 
 
 func _on_damage_taken(info: DamageInfo, final_amount: float) -> void:
-	_meter.record(final_amount, Time.get_ticks_msec() / 1000.0)
+	_meter.record(final_amount, _game_time)
 	_hits.push_front([info.source, info.amount, final_amount, info.is_crit])
 	if _hits.size() > LOG_SIZE:
 		_hits.pop_back()
@@ -76,6 +95,14 @@ func _apply_crit(_value: Variant = null) -> void:
 
 func _apply_dummy(_value: float) -> void:
 	dummy.set_defenses(_armor.value, _mr.value, _max_hp.value)
+
+
+func _give_picked_item() -> void:
+	lucian.inventory.add(lucian.item_catalog.items[_item_picker.selected])
+
+
+func _give_random_fragment() -> void:
+	lucian.inventory.add(lucian.item_catalog.fragments().pick_random())
 
 
 func _build() -> void:
@@ -107,6 +134,8 @@ func _build() -> void:
 	_level_value = _spin(row, 1, 18, 1)
 	_button(row, "Set level", func() -> void: lucian.progress.set_level(int(_level_value.value)))
 	_button(row, "Reset skill ranks", func() -> void: lucian.progress.reset_ranks())
+	row = _row(box)
+	_button(row, "Lucian HP 50%", func() -> void: lucian.hp = lucian.stats.max_hp * 0.5)
 
 	_section(box, "Cheats")
 	_check(box, "No cooldowns").toggled.connect(func(on: bool) -> void: lucian.cheat_no_cooldowns = on)
@@ -116,6 +145,21 @@ func _build() -> void:
 	_crit_toggle.toggled.connect(_apply_crit)
 	_crit_value = _spin(row, 0, 100, 100)
 	_crit_value.value_changed.connect(_apply_crit)
+
+	_section(box, "Items")
+	row = _row(box)
+	_item_picker = OptionButton.new()
+	_item_picker.focus_mode = Control.FOCUS_NONE
+	_item_picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(_item_picker)
+	_button(row, "Give", _give_picked_item)
+	row = _row(box)
+	_button(row, "Random fragment", _give_random_fragment)
+	_button(row, "Clear items", func() -> void: lucian.inventory.clear())
+	_label(row, "Equip slots")
+	_equip_slots = _spin(row, 1, Inventory.EQUIP_SIZE, Inventory.EQUIP_SIZE)
+	_equip_slots.value_changed.connect(func(value: float) -> void: lucian.inventory.unlocked_equip = int(value))
+	_item_stats = _label(box, "")
 
 	_section(box, "Training dummy")
 	var grid := GridContainer.new()
