@@ -5,6 +5,9 @@ extends Control
 
 const ICON_SIZE := 64.0
 const PLUS_HEIGHT := 26.0
+const PLUS_RADIUS := 11.0
+const PLUS_FILL := Color(0.07, 0.08, 0.11, 0.92)
+const PLUS_HOVER := Color("fff1c2")
 const DOTS_HEIGHT := 12.0
 const SWEEP_COLOR := Color(0, 0, 0, 0.68)
 const FRAME_COLOR := Color(0.36, 0.4, 0.48)
@@ -32,15 +35,16 @@ func setup(target: Lucian, slot_skill: LucianSkill, icon: Texture2D, key: String
 	custom_minimum_size = Vector2(ICON_SIZE, PLUS_HEIGHT + ICON_SIZE + DOTS_HEIGHT)
 	var icon_rect := Rect2(0, PLUS_HEIGHT, ICON_SIZE, ICON_SIZE)
 
+	# A flat, text-less button: _draw_plus paints the ringed circle and the "+".
 	_plus = Button.new()
-	_plus.text = "+"
+	_plus.flat = true
 	_plus.focus_mode = FOCUS_NONE
-	_plus.position = Vector2(ICON_SIZE * 0.5 - 14.0, 0)
-	_plus.size = Vector2(28, 22)
+	for style in [&"normal", &"hover", &"pressed", &"hover_pressed", &"disabled"]:
+		_plus.add_theme_stylebox_override(style, StyleBoxEmpty.new())
+	_plus.position = Vector2(ICON_SIZE * 0.5 - PLUS_RADIUS - 1.0, 0)
+	_plus.size = Vector2.ONE * (PLUS_RADIUS + 1.0) * 2.0
 	_plus.visible = false
-	_plus.add_theme_color_override(&"font_color", DOT_ON)
-	_plus.add_theme_color_override(&"font_hover_color", Color.WHITE)
-	_plus.add_theme_font_size_override(&"font_size", 18)
+	_plus.draw.connect(_draw_plus)
 	if skill:
 		_plus.pressed.connect(func() -> void: lucian.try_rank_up(skill.slot))
 	add_child(_plus)
@@ -118,6 +122,21 @@ func _draw_overlay() -> void:
 		_overlay.draw_rect(rect.grow(-2.0), DOT_ON, false, 4.0)
 		return
 	_overlay.draw_rect(rect, FRAME_COLOR, false, 2.0)
+
+
+## The rank-up button: a gold "+" in a gold ring. Brighter on hover; pressing
+## fills the circle gold.
+func _draw_plus() -> void:
+	var center := _plus.size * 0.5
+	var mode := _plus.get_draw_mode()
+	var pressed := mode == BaseButton.DRAW_PRESSED or mode == BaseButton.DRAW_HOVER_PRESSED
+	var accent := PLUS_HOVER if mode == BaseButton.DRAW_HOVER else DOT_ON
+	_plus.draw_circle(center, PLUS_RADIUS, accent if pressed else PLUS_FILL)
+	_plus.draw_arc(center, PLUS_RADIUS, 0.0, TAU, 32, accent, 2.0, true)
+	var mark := PLUS_FILL if pressed else accent
+	var arm := PLUS_RADIUS * 0.55
+	_plus.draw_line(center - Vector2(arm, 0), center + Vector2(arm, 0), mark, 3.0, true)
+	_plus.draw_line(center - Vector2(0, arm), center + Vector2(0, arm), mark, 3.0, true)
 
 
 ## Dark area of a square cooldown sweep: the last `fraction` of a clockwise
