@@ -49,3 +49,18 @@ static func draw_item(canvas: CanvasItem, shown: ItemData, rect: Rect2) -> void:
 	var text_color := Color.BLACK if fill.get_luminance() > 0.6 else Color.WHITE
 	canvas.draw_string(font, Vector2(rect.position.x, rect.get_center().y + font_size * 0.35), shown.code,
 		HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, font_size, text_color)
+
+
+## A stack count (only above 1), in the top-left or bottom-right of `rect`.
+static func draw_count(canvas: CanvasItem, count: int, rect: Rect2, top_left := false) -> void:
+	if count <= 1:
+		return
+	var font := ThemeDB.fallback_font
+	var font_size := int(clampf(rect.size.y * 0.32, 11.0, 18.0))
+	var at := Vector2(rect.position.x, rect.end.y - 3.0)
+	if top_left:
+		at = Vector2(rect.position.x + 3.0, rect.position.y + font_size)
+	var align := HORIZONTAL_ALIGNMENT_LEFT if top_left else HORIZONTAL_ALIGNMENT_RIGHT
+	var width := rect.size.x - 3.0
+	canvas.draw_string_outline(font, at, str(count), align, width, font_size, 5, Color.BLACK)
+	canvas.draw_string(font, at, str(count), align, width, font_size, Color.WHITE)

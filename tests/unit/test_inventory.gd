@@ -165,3 +165,119 @@ func test_is_equip() -> void:
 	assert_false(Inventory.is_equip(48))
 	assert_true(Inventory.is_equip(49))
 	assert_true(Inventory.is_equip(54))
+
+
+func test_items_count_one_and_empty_cells_zero() -> void:
+	inventory.add(item(&"sword"))
+	assert_eq(inventory.count_at(0), 1)
+	assert_eq(inventory.count_at(1), 0)
+
+
+func test_potions_stack_into_the_first_cell_with_room() -> void:
+	inventory.add(item(&"sword"))
+	inventory.add(item(&"red"))
+	inventory.add(item(&"red"), 3)
+	assert_eq(inventory.item_at(1), item(&"red"))
+	assert_eq(inventory.count_at(1), 4)
+	assert_null(inventory.item_at(2))
+
+
+func test_a_full_stack_spills_into_a_new_cell() -> void:
+	inventory.add(item(&"red"), 8)
+	inventory.add(item(&"red"), 3)
+	assert_eq(inventory.count_at(0), 9)
+	assert_eq(inventory.count_at(1), 2)
+
+
+func test_space_for_counts_room_in_stacks_and_empty_cells() -> void:
+	for i in Inventory.BACKPACK_SIZE - 1:
+		inventory.add(item(&"sword"))
+	inventory.add(item(&"red"), 5)
+	assert_eq(inventory.space_for(item(&"red")), 4)
+	assert_eq(inventory.space_for(item(&"blue")), 0)
+	assert_eq(inventory.space_for(item(&"sword")), 0)
+
+
+func test_add_is_all_or_nothing() -> void:
+	for i in Inventory.BACKPACK_SIZE - 1:
+		inventory.add(item(&"sword"))
+	inventory.add(item(&"red"), 7)
+	assert_false(inventory.add(item(&"red"), 3))
+	assert_eq(inventory.count_at(Inventory.BACKPACK_SIZE - 1), 7)
+
+
+func test_take_one_lowers_the_stack_and_empties_the_last() -> void:
+	inventory.add(item(&"red"), 2)
+	assert_eq(inventory.take_one(0), item(&"red"))
+	assert_eq(inventory.count_at(0), 1)
+	inventory.take_one(0)
+	assert_null(inventory.item_at(0))
+	assert_eq(inventory.count_at(0), 0)
+
+
+func test_drop_on_same_potion_stacks() -> void:
+	for i in 6:
+		inventory.put(5, item(&"red"))
+	for i in 5:
+		inventory.put(0, item(&"red"))
+	assert_eq(inventory.count_at(0), 5)
+	assert_eq(inventory.drop_outcome(0, 5, false), Drop.STACK)
+	assert_eq(inventory.apply_drop(0, 5, false), Drop.STACK)
+	assert_eq(inventory.count_at(5), 9)
+	assert_eq(inventory.count_at(0), 2, "the rest stays in the original cell")
+
+
+func test_drop_on_a_full_stack_swaps() -> void:
+	inventory.add(item(&"red"), 9)
+	inventory.add(item(&"red"), 2)
+	assert_eq(inventory.drop_outcome(1, 0, false), Drop.SWAP)
+
+
+func test_drop_on_other_potion_swaps_counts_too() -> void:
+	inventory.add(item(&"red"), 3)
+	inventory.add(item(&"blue"), 7)
+	inventory.apply_drop(0, 1, false)
+	assert_eq(inventory.item_at(0), item(&"blue"))
+	assert_eq(inventory.count_at(0), 7)
+	assert_eq(inventory.count_at(1), 3)
+
+
+func test_moving_a_stack_keeps_its_count() -> void:
+	inventory.add(item(&"red"), 4)
+	inventory.apply_drop(0, EQUIP, false)
+	assert_eq(inventory.count_at(EQUIP), 4)
+	assert_eq(inventory.count_at(0), 0)
+
+
+func test_put_into_a_chosen_cell() -> void:
+	inventory.add(item(&"sword"))
+	assert_false(inventory.put(0, item(&"rod")), "occupied by another item")
+	assert_true(inventory.put(3, item(&"rod")))
+	assert_eq(inventory.item_at(3), item(&"rod"))
+	assert_true(inventory.put(EQUIP, item(&"red")))
+	assert_true(inventory.put(EQUIP, item(&"red")))
+	assert_eq(inventory.count_at(EQUIP), 2)
+	inventory.unlocked_equip = 1
+	assert_false(inventory.put(EQUIP + 1, item(&"red")), "locked slot")
+
+
+func test_clear_resets_counts() -> void:
+	inventory.add(item(&"red"), 4)
+	inventory.clear()
+	assert_eq(inventory.count_at(0), 0)
+
+
+func test_locking_a_slot_moves_its_stack() -> void:
+	inventory.add(item(&"red"), 4)
+	inventory.apply_drop(0, EQUIP + 5, false)
+	inventory.unlocked_equip = 5
+	assert_eq(inventory.item_at(0), item(&"red"))
+	assert_eq(inventory.count_at(0), 4)
+
+
+func test_sell_price_uses_the_ratio() -> void:
+	var sword := item(&"sword")
+	sword.cost = 1300
+	assert_eq(sword.sell_price(), 910)
+	sword.sell_ratio = 0.4
+	assert_eq(sword.sell_price(), 520)

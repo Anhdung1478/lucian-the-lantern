@@ -31,6 +31,31 @@ func test_catalog_has_8_fragments_and_33_legendaries() -> void:
 	assert_eq(catalog.legendaries().size(), 33)
 
 
+func test_catalog_has_the_two_potions() -> void:
+	var ids := catalog.potions().map(func(item: ItemData) -> StringName: return item.id)
+	assert_eq(ids, [&"hp_potion", &"mp_potion"])
+
+
+func test_potions_stack_to_9_and_restore_over_time() -> void:
+	for potion in catalog.potions():
+		assert_eq(potion.max_stack, 9, str(potion.id))
+		assert_gt(potion.restore_hp + potion.restore_mana, 0.0, str(potion.id))
+		assert_gt(potion.restore_time, 0.0, str(potion.id))
+		assert_eq(potion.stats.size(), 0, "%s should give no stats" % potion.id)
+
+
+func test_only_potions_stack() -> void:
+	for item in catalog.items:
+		if not item.is_potion():
+			assert_eq(item.max_stack, 1, str(item.id))
+
+
+func test_sell_ratios() -> void:
+	for item in catalog.items:
+		var expected := 0.4 if item.id == &"guardian_angel" else 0.7
+		assert_almost_eq(item.sell_ratio, expected, 0.0001, str(item.id))
+
+
 func test_ids_are_unique() -> void:
 	var seen := {}
 	for item in catalog.items:
@@ -71,7 +96,8 @@ func test_every_item_has_a_name_cost_and_known_stats() -> void:
 		assert_ne(item.display_name, "", str(item.id))
 		assert_ne(item.code, "", str(item.id))
 		assert_gt(item.cost, 0, str(item.id))
-		assert_gt(item.stats.size(), 0, "%s gives no stats" % item.id)
+		if not item.is_potion():
+			assert_gt(item.stats.size(), 0, "%s gives no stats" % item.id)
 		for key in item.stats:
 			assert_true(ItemStats.is_known(key), "%s has unknown stat %s" % [item.id, key])
 			assert_gt(item.stats[key], 0.0, "%s %s" % [item.id, key])

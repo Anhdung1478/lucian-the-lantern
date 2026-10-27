@@ -37,6 +37,7 @@ func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, size)
 	draw_rect(rect, FILL)
 	ItemIcon.draw_item(self, inventory.item_at(index), rect.grow(-3.0))
+	ItemIcon.draw_count(self, inventory.count_at(index), rect, true)
 	draw_rect(rect, FRAME_COLOR, false, 2.0)
 	var key := str(index - Inventory.EQUIP_START + 1)
 	var font := ThemeDB.fallback_font

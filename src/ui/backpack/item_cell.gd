@@ -57,6 +57,8 @@ func _draw() -> void:
 		return
 	if index != screen.dragged_index():
 		ItemIcon.draw_item(self, item(), rect.grow(-ICON_INSET))
+		if index >= 0:
+			ItemIcon.draw_count(self, screen.inventory.count_at(index), rect.grow(-2.0))
 	if style == Style.EQUIP:
 		var font := ThemeDB.fallback_font
 		draw_string_outline(font, Vector2(5, 15), str(index - Inventory.EQUIP_START + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 4, Color.BLACK)

@@ -1,7 +1,8 @@
 class_name ItemCatalog
 extends Resource
-## Every item in the game, listed by hand so exports never need to scan
-## folders. Recipes come from the legendaries' components.
+## Every item in the game (fragments, legendaries, potions), listed by hand so
+## exports never need to scan folders. Recipes come from the legendaries'
+## components.
 
 @export var items: Array[ItemData] = []
 
@@ -19,6 +20,10 @@ func fragments() -> Array[ItemData]:
 
 func legendaries() -> Array[ItemData]:
 	return _of_kind(ItemData.Kind.LEGENDARY)
+
+
+func potions() -> Array[ItemData]:
+	return _of_kind(ItemData.Kind.POTION)
 
 
 ## The legendary crafted from fragments `a` and `b` in either order, or null.

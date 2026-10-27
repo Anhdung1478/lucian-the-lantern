@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Health Potion: a round glass flask of glowing red liquid with a cork and a white cross label -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a1a1e"/><stop offset="1" stop-color="#120a0c"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ff6a5a" stop-opacity="0.55"/><stop offset="1" stop-color="#ff2a2a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="liquid" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a4a"/><stop offset="0.6" stop-color="#d4182a"/><stop offset="1" stop-color="#8a0c1a"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="40" r="26" fill="url(#glow)"/>
+  <rect x="25" y="6" width="14" height="9" rx="2" fill="#b07a44" stroke="#4a2c12" stroke-width="1.8"/>
+  <path d="M 27 8.5 L 37 8.5" stroke="#d8a46a" stroke-width="1.4"/>
+  <path d="M 26 15 L 38 15 L 38 22 C 47 25 52 32 52 40 A 20 20 0 0 1 12 40 C 12 32 17 25 26 22 Z" fill="#cfe6ee" fill-opacity="0.35" stroke="#1a0a0c" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M 14.11 38 L 49.89 38 A 18 18 0 1 1 14.11 38 Z" fill="url(#liquid)"/>
+  <ellipse cx="32" cy="37" rx="17.5" ry="2.6" fill="#ff8a7a" opacity="0.8"/>
+  <rect x="28.5" y="40" width="7" height="14" rx="1" fill="#fff4f0"/>
+  <rect x="25" y="43.5" width="14" height="7" rx="1" fill="#fff4f0"/>
+  <path d="M 19 28 C 17 31 16 34 16 37" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity="0.85"/>
+  <circle cx="44" cy="46" r="1.6" fill="#ffd0c8" opacity="0.9"/>
+  <circle cx="40" cy="52" r="1" fill="#ffd0c8" opacity="0.8"/>
+</svg>

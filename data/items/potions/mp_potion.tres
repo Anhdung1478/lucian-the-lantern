@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/items/mp_potion.svg" id="1_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_data"]
+
+[resource]
+script = ExtResource("2_data")
+id = &"mp_potion"
+display_name = "Mana Potion"
+kind = 2
+code = "MP+"
+icon = ExtResource("1_icon")
+cost = 50
+max_stack = 9
+restore_mana = 150.0
+restore_time = 5.0

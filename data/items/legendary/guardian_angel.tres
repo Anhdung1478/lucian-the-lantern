@@ -17,6 +17,7 @@ kind = 1
 code = "GA"
 icon = ExtResource("2_weqpe")
 cost = 3200
+sell_ratio = 0.4
 stats = Dictionary[StringName, float]({
 &"ad": 40.0,
 &"armor": 40.0,

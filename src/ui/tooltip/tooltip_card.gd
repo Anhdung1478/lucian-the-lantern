@@ -10,7 +10,7 @@ const BG_COLOR := Color(0.04, 0.05, 0.07, 0.97)
 const BORDER_COLOR := Color(0.79, 0.64, 0.36)
 const NAME_COLOR := Color("ffe9a8")
 const SUB_COLOR := Color("9aa3b2")
-const KIND_NAMES := {ItemData.Kind.FRAGMENT: "Fragment", ItemData.Kind.LEGENDARY: "Legendary"}
+const KIND_NAMES := {ItemData.Kind.FRAGMENT: "Fragment", ItemData.Kind.LEGENDARY: "Legendary", ItemData.Kind.POTION: "Potion"}
 
 
 static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
@@ -22,6 +22,8 @@ static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 	for key: StringName in shown.stats:
 		stats.append(ItemStats.line(key, shown.stats[key]))
 	_body(card, "\n".join(stats))
+	if shown.is_potion():
+		_body(card, potion_text(shown))
 	var effects: PackedStringArray = []
 	for effect in shown.effects:
 		var label := "Active — %s (%s s)" % [effect.effect_name, TooltipText.number(effect.cooldown)] \
@@ -33,6 +35,8 @@ static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 	var footer := ""
 	if shown.is_fragment():
 		footer = "Drag onto another fragment to craft a legendary."
+	elif shown.is_potion():
+		footer = "Right-click it in the backpack to drink, or put it in slot 1-6 and press its key. Stacks up to %d." % shown.max_stack
 	elif catalog and shown.components.size() == 2:
 		footer = "Recipe: %s + %s" % [
 			catalog.find(shown.components[0]).display_name, catalog.find(shown.components[1]).display_name]
@@ -40,6 +44,16 @@ static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 		_separator(card)
 		_body(card, TooltipText.color(footer, TooltipText.DIM))
 	return card
+
+
+## "Restores 200 HP over 5 s." with the HP / mana colored.
+static func potion_text(shown: ItemData) -> String:
+	var parts: PackedStringArray = []
+	if shown.restore_hp > 0.0:
+		parts.append("[hp]%s HP[/hp]" % TooltipText.number(shown.restore_hp))
+	if shown.restore_mana > 0.0:
+		parts.append("[mana]%s mana[/mana]" % TooltipText.number(shown.restore_mana))
+	return TooltipText.colorize("Restores %s over [kw]%s s[/kw]." % [" and ".join(parts), TooltipText.number(shown.restore_time)])
 
 
 ## A skill's card. `skill` is null for the passive.
