@@ -34,12 +34,20 @@
   - Unbought skills show a **lock icon**.
 - **Hover a skill or the passive** for about **1 second** to see its card, like LoL: name, key, rank, mana cost and cooldown per rank, and a description where per-rank values show the current rank lit up and scalings in their stat color (AD orange, AP purple). The max rank bonus is listed last and lights up once reached.
 - **Summoner spells** (D / F) with cooldowns.
-- **Item slots 1–6:** in a 3 × 2 grid right of the HP / mana bars. Only unlocked slots are shown, with cooldowns for active items. Hovering one shows the item's card.
+- **Item slots 1–6:** in a 3 × 2 grid right of the HP / mana bars. Only unlocked slots are shown, with cooldowns for active items (sweep and seconds) and a potion stack's count. Hovering one shows the item's card.
+- **Key labels** (skills and item slots) follow the bindings in Settings.
 
 ### Buff icons (above the skill bar)
-- **Very small icons** just above the skill bar, like LoL.
+- **Very small icons** (36 px) in a row just above the HUD panel, starting over the portrait, like LoL.
 - Shows: Blue / Red buff (with timer), current Endless modifier, status effects (slow, stun, burn, etc.).
+- **Phase 3 shows:** potions being drunk, move speed buffs (W, Fervor, Stormrazor, Rocketbelt), the Bloodthirster shield, and item passive states:
+  - **Energized** (only while an Energized item is equipped): the charge 0–100; glows gold at 100.
+  - **Kraken Slayer**: the hit count; glows before the 3rd hit.
+  - Spellblade ready, Spear of Shojin stacks, Jak'Sho stacks, Archangel's mana charge.
+- A dark sweep shows the time that has run out; a number shows stacks, charge or shield.
 - **Hover** the cursor over an icon to see its effect.
+- **Enemy statuses** (Carve stacks, Grievous Wounds, slow, Hatefog) show as tiny icons above the enemy's HP bar.
+- A shield shows as a white segment after the HP on Lucian's HP bar, and as "(+N)" in its text.
 
 ### Stats panel (left of the portrait)
 - Shows AD, AP, Attack Speed, Armor, MR, Crit, Move Speed.
@@ -52,8 +60,11 @@
   - Thresh's bar also shows **Phase 1 / 2**.
 
 ### Top right – Loot
-- Stage gold.
+- Stage gold: a coin and the amount, in the HUD panel style (Phase 3).
 - Essences collected in this stage (blue, orange, purple).
+
+### Top center – FPS
+- "FPS N", only when **Show FPS** is on in Settings.
 
 ### Bottom right – Radar (minimap)
 - Shows only dots, no terrain.
@@ -116,7 +127,7 @@
 | **Left-click (press and release quickly)** | Does nothing, for all items |
 | **Hold left-click** | Picks up the item to drag it (the only left-click action): after 0.2 s, or as soon as the mouse moves |
 | **Release the hold** | Drops the item |
-| **Right-click a potion** | Shows a small pop-up **Use** button; click it to use the potion |
+| **Right-click a potion** | Shows a small pop-up **Use** button beside the cell; click it to use the potion. Any other click hides it |
 
 ### Drag and drop
 | Drop target | Result |
@@ -190,6 +201,15 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Items tab:** always shows **4 slots** in a row. Slots not yet unlocked (Evolution Tree) are covered by a **chain lock**.
 - **Refresh** button in the **bottom-right corner** of the shop (costs stage gold).
 
+### Built in Phase 3
+- **Opening:** right-click the merchant. Lucian walks over; the shop opens once he is within 250 units (right away if he already is). Hovering the merchant shows a gold ring.
+- **Header:** "MERCHANT" and the stage gold. The recipe table is hidden; the backpack and the shop are centered side by side.
+- **Slots:** 64 px, the price with a coin under each (red when it can't be afforded). A bought slot shows **SOLD** for the rest of the visit, even after a refresh.
+- **Buying:** right-click a shop item to buy it into the first cell it fits, or **hold-drag** it onto a backpack or equip cell. Dropping it on an occupied cell (other than a stack of the same potion with room) buys nothing.
+- **Refused purchase** (not enough gold, no room): a red message in the bottom row and the price flashes red, with an error sound.
+- **Selling:** the 7th equip-row cell turns red and reads **SELL**. Dragging an item over it shows "+N" and "Sells for N gold"; releasing sells it (a whole potion stack at once).
+- **Closing:** ESC or P. The game stays paused while the shop is open.
+
 ---
 
 ## 4. Menu (ESC)
@@ -202,16 +222,32 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
   - **Leave this stage** (keeps all essences collected)
   - **Exit the game** (progress is saved first)
 
+## 5. Settings (from the ESC menu)
+
+- Replaces the menu while open; **Back** or ESC returns to it. The game stays paused.
+- Every change applies right away and is saved to `user://settings.json`.
+- **Tabs:**
+
+| Tab | Contents |
+|---|---|
+| Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. No music yet. |
+| Controls | Every rebindable action with its key or mouse button. Click one, then press a key or mouse button; ESC cancels. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound; Ctrl + a skill key still ranks the skill up. |
+| Graphics | Window mode (windowed, borderless fullscreen, fullscreen), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails or muzzle flashes; Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
+| Gameplay | Skill queue (on by default; see the game design doc §2). |
+
+- **Not yet:** cast modes (normal / quick / quick with indicator) and camera options.
+
 ---
 
-## 5. Screens to design
+## 6. Screens to design
 
 - [x] Backpack layout
 - [x] Crafting (drag and drop)
 - [x] Recipe table
 - [x] Item info pop-up
-- [x] Merchant's shop layout
+- [x] Merchant's shop layout (built in Phase 3)
 - [x] ESC menu
+- [x] Settings
 - [ ] Evolution Tree screen
 - [ ] Skin shop
 - [ ] Main menu and save slot selection

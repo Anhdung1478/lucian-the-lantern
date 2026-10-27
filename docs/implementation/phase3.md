@@ -123,3 +123,30 @@ godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
 **Screenshots** (`godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <dir>`): new `merchant`, `shop`, `shop_potions`, `settings`, `buffs`, `energized`, `potions`; existing ones rerun.
 
 **Manual playtest checklist** (written into the report for the user): gold from debug shows top-right; right-click merchant → walk → shop pauses; buy by right-click and drag; sell for 70%; refresh re-rolls only unsold; potions stack to 9, Use pop-up, keys 1–6, heal only while unpaused; settings persist across restarts, rebinding updates HUD labels; volume sliders change SFX; buff icons show and tooltips explain them; energized fills faster while running/dashing.
+
+## Implementation notes (Phase 3 done)
+
+Everything in the build order is in place. Changes and details settled while building:
+
+- **Commits:** steps 4 and 5 (merchant, shop) landed in one commit, so did 6–8 (settings core, screen, sounds: the Settings screen plays a test sound) and 9–14 (the passive framework, every passive, Energize, Hatefog and the actives share the same hooks).
+- **Debug table in tabs** (Lucian / Items / Shop / Dummy), with the DPS meter and hit log always under them; it had grown past the screen height. New: gold +100 / +1000 / +10000 / reset, add / remove merchant, shop item slots (1–4), +HP / +MP potion, Energize now, dummy count (1–5, extras in a ring above and beside the first). The skill-queue checkbox moved to Settings → Gameplay.
+- **`Inventory`** keeps a `counts` array next to `items`. `add(item, amount)` is all or nothing; `put(cell, item)` / `can_put` place one item in a chosen cell (the shop's drag-buy); `take_one` drinks; `Drop.STACK` merges same potions and leaves the rest. `ItemData.sell_ratio` (0.7, Guardian Angel 0.4) drives `sell_price()`.
+- **Shop mode is the backpack screen**: `BackpackScreen.open_shop(Shop)` shows `ShopPanel` beside it and hides the recipe table, so dragging from the shop reuses the backpack's drag. `Shop` (pure, tested) owns the rules; nothing is paid when an item doesn't fit. The sell slot is a drop target (`BackpackScreen.SELL`) only while shopping.
+- **Merchant** (`src/stage/merchant.gd`) is a `StaticBody2D` on the WORLD layer with its own `MerchantStock`. `Lucian.command_visit()` walks him into range and emits `merchant_reached`; the stage opens the shop. The dummy moved to (2400, 950) so the merchant can take the center.
+- **`GameSettings`** is a `class_name` with a lazy `instance()`, not an autoload, so GUT and the screenshot tool (`-s` scripts) work without it. The screenshot tool uses `user://screenshot_settings.json`, so it never touches the player's settings. Default bindings come from `ProjectSettings` (`input/<action>`), so they don't depend on the live InputMap. Bindings drop modifiers, so Ctrl + skill still ranks up.
+- **Sounds** (`src/audio/sfx.gd`) are synthesized into `AudioStreamWAV`s at first use: shot, hit, coin, error, potion, craft, refresh, zap. `Sfx.play()` is a no-op without the stage's Sfx node (tests). `default_bus_layout.tres` adds Music and SFX buses.
+- **Passives** (`src/lucian/items/item_passives.gd`) read only the unique equipped ids. Hooks: `adjust_stats` after `at_level`; `on_cast`; `on_moved` (per-frame position change, dashes count double); `on_basic_attack` when the main shot leaves the gun (procs ride on `DamageInfo.procs`); `before_damage`, a new hook `Enemy.take_damage` calls on the attacker before mitigation; `on_damage_dealt`. Item damage uses the item id as its source and never triggers on-hit effects again, so there is no recursion.
+- **Move speed buffs** are named (`Lucian.add_speed_buff(id, flat, pct, duration, fade)`): W, Fervor, Stormrazor and Rocketbelt stack; the same id replaces itself. Speed = (base + flat) × (1 + pct).
+- **Enemy statuses** (`Enemy.add_status`): Carve lowers effective armor, Hatefog effective MR; Grievous Wounds cuts `Enemy.heal()` (nothing heals yet, so it shows as an icon). `EnemyHealthBar` draws them.
+- **Item cooldowns** live on `Lucian.item_cooldowns` (id → Cooldown) and are shared by copies and kept after selling. Essence Reaver's 1.5 s Spellblade uses the same table. `cheat_no_cooldowns` also skips item cooldowns.
+- **Quality Low** skips dash trails and muzzle flashes (and MSAA); the shot sound still plays.
+
+### Running the checks
+
+```
+godot_console --headless --path . --import
+godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
+godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+```
+
+New scenarios: `gold`, `potions`, `shop`, `settings`, `buffs`, `actives`, `energized`. One test file can run alone with `-gconfig= -gtest=res://tests/unit/<file>.gd -gexit`.

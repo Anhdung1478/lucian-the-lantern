@@ -4,10 +4,16 @@
 > `data/items/**/*.tres`; keep this list in sync when tuning.
 
 Each legendary's stats follow its LoL item, adjusted so it usually carries the stat types
-of the two fragments it is crafted from. In Phase 2 items give **stats only**: passives and
-actives are shown in tooltips and get implemented together with real enemies.
+of the two fragments it is crafted from. Only items in **equip slots 1–6** give stats and
+passives; the backpack is storage. Each item's passive counts **once**, however many copies
+are equipped. Since Phase 3 most passives and all three actives work in combat; see
+*What works in combat* at the end.
 
 **Energized** attacks work like LoL: moving and attacking build stacks; at 100 the next attack is Energized.
+In this game: +10 per basic attack, +1 per 24 units walked, and dashes count double. The charge
+only builds while an Energized item is equipped.
+
+The merchant buys items back for **70%** of their cost (**Guardian Angel: 40%**).
 
 ## Fragments
 
@@ -21,6 +27,17 @@ actives are shown in tooltips and get implemented together with real enemies.
 | HP | Giant's Belt | +350 Health | 900 |
 | MP | Tear of the Goddess | +300 Mana | 400 |
 | MR | Negatron Cloak | +40 Magic Resist | 900 |
+
+## Potions
+
+| Potion | Effect | Cost | Stack |
+|---|---|---|---|
+| Health Potion | Restores 200 HP over 5 s | 50 | 9 per cell |
+| Mana Potion | Restores 150 mana over 5 s | 50 | 9 per cell |
+
+- Drink: right-click it in the backpack → **Use**, or put it in equip slot 1–6 and press its key.
+- Several drinks run at the same time. Healing is raised by heal & shield power (Spirit Visage).
+- Nothing is restored while the game is paused, so a potion drunk from the backpack starts on close.
 
 ## Legendaries
 
@@ -320,3 +337,44 @@ actives are shown in tooltips and get implemented together with real enemies.
 - +80 Magic Resist
 - +250 Health
 - *Passive — Magebane:* After 15 s without taking magic damage, gain a shield against magic damage equal to 15% max health.
+
+
+## What works in combat (Phase 3)
+
+Numbers not given above were picked during Phase 3 (`docs/implementation/phase3.md`).
+
+| Item | Works as |
+|---|---|
+| Infinity Edge | Crit damage +40% (175% → 215%). |
+| Kraken Slayer | Every 3rd basic attack (the main shot) adds 140 physical, up to +50% as the target's health drops. The count never resets. Buff icon shows the count and glows before the 3rd. |
+| Mortal Reminder, Morellonomicon | Physical / magic damage applies Grievous Wounds (3 s) to the enemy: 40% less healing. |
+| Stormrazor | Energized: +90 magic and +35% move speed for 1.5 s. |
+| Black Cleaver | Physical damage: Carve, −5% armor per stack for 6 s, up to 6. Any damage: Fervor, +20 move speed for 2 s. |
+| Spear of Shojin | The first skill hit of each cast adds a stack (6 s, up to 4); each makes Q/W/R hits deal 3% more. |
+| Bloodthirster | Life steal healing past full HP becomes a shield, up to 300. It fades out of combat. |
+| Statikk Shiv | Energized: chain lightning on the target, then each nearest enemy within 500, up to 5; 90 (+20% AP) magic each. |
+| Lord Dominik's Regards | Up to 15% more damage, at 1500+ more max HP than Lucian (linear). |
+| Runaan's Hurricane | Each basic attack also shoots up to 2 other enemies within 450 of the target for 55% AD (can crit, no on-hit). |
+| Navori Flickerblade | Each basic attack cuts the remaining Q/W/E cooldowns by 12%. |
+| Nashor's Tooth | Basic attacks and Lightslinger shots: +15 (+20% AP) magic on hit. |
+| Rabadon's Deathcap | AP ×1.3 (after Awe). |
+| Malignance | R gets +20 ability haste. R hits leave Hatefog (once per 3 s): radius 150, 60 (+5% AP) magic per second for 3 s, −10 MR inside. |
+| Shadowflame | Magic damage to enemies below 40% HP: +20%. |
+| Archangel's Staff | AP from 2% max mana. The first skill hit of each cast adds 3 max mana, up to 360 (kept for the stage). |
+| Fimbulwinter | Max HP from 8% max mana. *Everlasting* (shield) waits for enemies that hit back. |
+| Rapid Firecannon | Energized: +60 magic, and the attack reaches 35% further. |
+| Essence Reaver | After a skill, the next basic attack adds 100% base AD + 40% bonus AD physical and restores 40% of it as mana. 1.5 s cooldown. |
+| Spirit Visage | +25% heal & shield power (life steal, omnivamp, potions). |
+| Muramana | AD from 2.5% max mana. Skill hits add 3% max mana physical; attacks 1.5%. |
+| Jak'Sho | Each second in combat (dealt damage in the last 3 s): +5% armor and MR, up to 30%. |
+| Hextech Gunblade | Active (key 1–6): the enemy nearest the cursor within 700 takes 175 (+30% AP) magic and is slowed for 2 s. Refused with no enemy in range. |
+| Galeforce | Active: 200-unit dash toward the cursor, then 3 missiles at the lowest-health enemy within 750, 60 (+15% bonus AD) magic each. |
+| Hextech Rocketbelt | Active: 275-unit dash, an arc of 7 bolts forward (each enemy hit once) for 100 (+10% AP) magic, then +75% move speed fading over 2 s. |
+
+Actives share one cooldown per item (every copy), which keeps running after selling.
+"On hit" effects use basic attacks and Lightslinger shots; counters and "next attack"
+effects (Kraken Slayer, Energized, Spellblade, Navori, Runaan's) use the main shot only.
+
+**Still tooltip text** (they need enemies that hit Lucian): Banshee's Veil, Thornmail,
+Immortal Shieldbow, Death's Dance, Fimbulwinter's Everlasting, Guardian Angel and
+Kaenic Rookern. Void Staff has no passive.

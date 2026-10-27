@@ -32,13 +32,15 @@
 | A + left-click | Attack-move |
 | Q / W / E / R | Skills |
 | D / F | Summoner spells *(proposed)* |
-| 1–6 | Item actives *(proposed)* |
+| 1–6 | Item actives and potions in equip slots 1–6 |
 | P | Open backpack (pauses the game) |
 | ESC | Open menu: resume, settings, leave stage, exit (pauses the game) |
 | C | Toggle stats panel |
 | Y | Toggle camera between free-cam and Lucian cam (follows Lucian). Default: free-cam |
 
-**Cast modes (chosen in settings):** normal cast, quick cast, or quick cast with indicator.
+**Cast modes (chosen in settings):** normal cast, quick cast, or quick cast with indicator. *(Not built yet: skills are quick cast.)*
+
+**Key bindings** can be changed in Settings → Controls (all but ESC and the debug F3 + Q).
 
 **Skill queueing (setting, on by default):** a skill pressed during another skill's cast time or the E dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept. Q / W pressed during R are still refused.
 
@@ -219,7 +221,8 @@ Only these pairs combine. **Stats and unique passives/actives are based on LoL**
 
 ### Potions
 - **HP potion** restores HP, **MP potion** restores mana, **gradually** over a few seconds (not instantly).
-- Use: left-click in the backpack, or put it in an equip slot (1–6) and press its key.
+  - Placeholders: Health Potion 200 HP over 5 s, Mana Potion 150 mana over 5 s, 50 gold each.
+- Use: right-click it in the backpack and press **Use**, or put it in an equip slot (1–6) and press its key.
 - Works during waves and during the break.
 - Does **not** heal while the game is paused (backpack, shop or menu open).
 - Like all items, potions are lost when the stage ends.
@@ -378,7 +381,7 @@ Detailed enemy, elite, mini boss and boss designs for each act live in separate 
 - **Spawn points:** fixed places that fit the theme (lane end, jungle camps, mist).
 - **Cover:** every map has walls or pillars to dodge behind.
 - **No brush** (no bushes to hide in).
-- **Merchant:** appears near the center of the map between waves.
+- **Merchant:** appears near the center of the map between waves. *(Phase 3: on the training map he stands at the center from the start; the debug table adds or removes him.)*
 
 ### Maps by act
 | Act | Map | Layout |
@@ -461,8 +464,8 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - [x] Full Endless modifier list
 - [x] Unspent skill points: wasted
 - [x] Wave count per stage across the 22 stages
-- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`)
+- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`)
 - [x] Item stats and effects (`items.md`)
-- [ ] UI (see `ui_design.md`): HUD, backpack, crafting, recipe table and ESC menu done; other screens to design
+- [ ] UI (see `ui_design.md`): HUD, backpack, crafting, recipe table, ESC menu, merchant's shop and Settings done; other screens to design
 - [x] Save system
-- [ ] Art style, sound
+- [ ] Art style, sound (Phase 3 has generated placeholder sound effects and audio buses; no music yet)
