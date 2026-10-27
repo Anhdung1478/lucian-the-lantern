@@ -1,7 +1,8 @@
 class_name Hud
 extends CanvasLayer
-## Lucian's bottom panel and the stats panel. Reads Lucian every frame, also
-## while the game is paused, so equipping items shows up right away.
+## Lucian's bottom panel (portrait, skills, bars, equipped items) and the stats
+## panel. Reads Lucian every frame, also while the game is paused, so equipping
+## items shows up right away.
 
 ## Space between the stats panel and the bottom panel.
 const STATS_GAP := 10.0
@@ -19,6 +20,7 @@ var lucian: Lucian
 @onready var bottom_panel: PanelContainer = %BottomPanel
 @onready var stats_panel: StatsPanel = %StatsPanel
 @onready var skill_row: HBoxContainer = %SkillRow
+@onready var item_grid: GridContainer = %ItemGrid
 @onready var level_label: Label = %LevelLabel
 @onready var xp_bar: ProgressBar = %XpBar
 @onready var hp_bar: ProgressBar = %HpBar
@@ -33,6 +35,8 @@ func setup(target: Lucian) -> void:
 	_add_skill_slot(null, PASSIVE_ICON, "")
 	for i in SKILL_ICONS.size():
 		_add_skill_slot(target.skills[i], SKILL_ICONS[i], SKILL_KEYS[i])
+	for i in Inventory.EQUIP_SIZE:
+		item_grid.add_child(HudItemSlot.new(target.inventory, i))
 
 
 func _ready() -> void:

@@ -54,6 +54,8 @@ func _run(scenario: String) -> void:
 			await scenario_backpack()
 		"craft":
 			await scenario_craft()
+		"hud_items":
+			await scenario_hud_items()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -420,3 +422,22 @@ func scenario_craft() -> void:
 	print("dropped outside, still there (expect giants_belt): ", inventory.item_at(2).id)
 	await wait(0.2)
 	await shot("craft_3_equipped")
+
+
+func scenario_hud_items() -> void:
+	give([&"infinity_edge", &"kraken_slayer", &"bf_sword", &"guardian_angel"])
+	var inventory := lucian.inventory
+	inventory.apply_drop(0, Inventory.EQUIP_START, false)
+	inventory.apply_drop(1, Inventory.EQUIP_START + 1, false)
+	inventory.apply_drop(2, Inventory.EQUIP_START + 3, false)
+	await wait(0.2)
+	await shot("hud_items_0")
+	var grid: GridContainer = stage.get_node("Hud").item_grid
+	await mouse_move(control_center(grid.get_child(1)))
+	await wait_for_tooltip(grid.get_child(1))
+	await shot("hud_items_1_tooltip")
+	inventory.unlocked_equip = 4
+	await mouse_move(Vector2(960, 300))
+	await wait(0.2)
+	print("visible HUD slots with 4 unlocked (expect 4): ", grid.get_children().filter(func(c: Control) -> bool: return c.visible).size())
+	await shot("hud_items_2_four_slots")
