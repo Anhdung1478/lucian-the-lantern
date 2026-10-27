@@ -86,6 +86,11 @@ func test_craft_result() -> void:
 	assert_null(inventory.craft_result(0, 5), "empty target")
 
 
+func test_an_item_cannot_craft_with_itself() -> void:
+	inventory.add(item(&"sword"))
+	assert_null(inventory.craft_result(0, 0), "sword + sword is a recipe, but it is one sword")
+
+
 func test_drop_returns_for_same_cell_outside_or_empty_source() -> void:
 	inventory.add(item(&"sword"))
 	assert_eq(inventory.drop_outcome(0, 0, true), Drop.RETURN)

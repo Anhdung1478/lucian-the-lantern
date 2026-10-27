@@ -105,6 +105,13 @@ func test_craft_popup_follows_the_hold() -> void:
 	assert_almost_eq(screen._craft_popup.progress, 0.5, 0.001)
 
 
+func test_no_popup_back_over_the_source_cell() -> void:
+	press(0)
+	move(0, center(5))
+	move(0, center(0))
+	assert_false(screen._craft_popup.visible, "a sword is not its own recipe partner")
+
+
 func test_no_popup_without_a_recipe() -> void:
 	press(2)
 	move(2, center(3))

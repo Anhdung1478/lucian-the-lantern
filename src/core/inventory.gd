@@ -68,9 +68,10 @@ func clear() -> void:
 	changed.emit()
 
 
-## The legendary that the items in `from` and `to` craft into, or null.
+## The legendary that the items in `from` and `to` craft into, or null. One
+## item never crafts with itself, even when its recipe uses two of it.
 func craft_result(from: int, to: int) -> ItemData:
-	if catalog == null:
+	if catalog == null or from == to:
 		return null
 	return catalog.combine(items[from], items[to])
 
