@@ -40,6 +40,8 @@ func _run(scenario: String) -> void:
 			await scenario_e()
 		"w":
 			await scenario_w()
+		"r":
+			await scenario_r()
 		"hud":
 			await scenario_hud()
 		_:
@@ -209,3 +211,13 @@ func scenario_w() -> void:
 	await shot("w_1_cross")
 	await wait(0.06)
 	await shot("w_2_cross")
+
+
+func scenario_r() -> void:
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	lucian.progress.set_level(6)
+	lucian.try_rank_up(ChampionProgress.Slot.R)
+	lucian.try_cast(ChampionProgress.Slot.R, dummy.global_position)
+	lucian.command_move(lucian.global_position + Vector2(0, -400))
+	await wait(1.0)
+	await shot("r_0_stream")

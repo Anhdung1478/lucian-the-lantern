@@ -219,3 +219,72 @@ func test_w_itself_does_not_trigger_move_speed() -> void:
 	dummy.add_mark(ArdentBlaze.MARK, 6.0)
 	lucian.on_damage_dealt(dummy, DamageInfo.create(10.0, DamageInfo.Type.MAGIC, &"w", lucian), 8.0)
 	assert_eq(lucian.current_move_speed(), base_speed)
+
+
+func test_r_fires_22_shots_over_3_seconds() -> void:
+	lucian.progress.set_level(6)
+	_rank(Slot.R, 1)
+	assert_true(lucian.try_cast(Slot.R, dummy.position))
+	await wait_seconds(1.5)
+	assert_between(hits.size(), 8, 14, "about half the shots after half the time")
+	await wait_seconds(2.0)
+	assert_eq(hits.size(), 22)
+	assert_eq(_sources().filter(func(source: StringName) -> bool: return source != &"r"), [])
+	assert_almost_eq(hits[0][1], (15.0 + 0.25 * lucian.stats.ad) * DUMMY_ARMOR_MULTIPLIER, 0.01)
+
+
+func test_r_lets_lucian_move_and_e_but_blocks_q_w_and_attacks() -> void:
+	lucian.progress.set_level(6)
+	for slot in [Slot.Q, Slot.W, Slot.E, Slot.R]:
+		_rank(slot, 1)
+	lucian.try_cast(Slot.R, dummy.position)
+	lucian.command_move(Vector2(0, 300))
+	await wait_seconds(0.5)
+	assert_gt(lucian.position.y, 100.0, "moves while firing")
+	assert_false(lucian.try_cast(Slot.Q, dummy.position))
+	assert_false(lucian.try_cast(Slot.W, dummy.position))
+	lucian.command_attack(dummy)
+	await wait_seconds(1.0)
+	assert_does_not_have(_sources(), &"basic")
+	assert_true(lucian.try_cast(Slot.E, Vector2(0, -400)))
+	assert_true(lucian.skills[Slot.R].is_channeling(), "E does not stop R")
+
+
+func test_pressing_r_again_stops_it() -> void:
+	lucian.progress.set_level(6)
+	_rank(Slot.R, 1)
+	lucian.try_cast(Slot.R, dummy.position)
+	await wait_seconds(0.5)
+	assert_true(lucian.try_cast(Slot.R, dummy.position))
+	assert_false(lucian.skills[Slot.R].is_channeling())
+	var shots_so_far := hits.size()
+	await wait_seconds(1.0)
+	assert_lte(hits.size(), shots_so_far + 1, "at most one bullet was still in the air")
+	assert_lt(hits.size(), 10)
+
+
+func test_r_max_rank_pierces_with_falloff() -> void:
+	var second := load("res://src/enemies/training_dummy.tscn").instantiate() as TrainingDummy
+	second.position = Vector2(900, 0)
+	add_child_autofree(second)
+	var second_hits: Array[float] = []
+	second.damage_taken.connect(func(_info: DamageInfo, final_amount: float) -> void: second_hits.append(final_amount))
+	lucian.progress.set_level(16)
+	_rank(Slot.R, 3)
+	lucian.try_cast(Slot.R, dummy.position)
+	await wait_seconds(0.6)
+	assert_gt(second_hits.size(), 0, "bullets pierce through the first dummy")
+	assert_almost_eq(second_hits[0], hits[0][1] * 0.85, 0.01)
+
+
+func test_r_below_max_rank_stops_at_first_enemy() -> void:
+	var second := load("res://src/enemies/training_dummy.tscn").instantiate() as TrainingDummy
+	second.position = Vector2(900, 0)
+	add_child_autofree(second)
+	var second_hits: Array[float] = []
+	second.damage_taken.connect(func(_info: DamageInfo, final_amount: float) -> void: second_hits.append(final_amount))
+	lucian.progress.set_level(11)
+	_rank(Slot.R, 2)
+	lucian.try_cast(Slot.R, dummy.position)
+	await wait_seconds(0.6)
+	assert_eq(second_hits.size(), 0)

@@ -75,7 +75,15 @@ func try_rank_up(slot: ChampionProgress.Slot) -> bool:
 
 
 ## The cast gate: rank, cooldown, state and mana, then pay and cast.
+## During R only E can be cast, and pressing R again stops R.
 func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
+	var culling := skills[ChampionProgress.Slot.R] as TheCulling
+	if culling.is_channeling():
+		if slot == ChampionProgress.Slot.R:
+			culling.stop()
+			return true
+		if slot != ChampionProgress.Slot.E:
+			return false
 	var skill := skills[slot]
 	if skill.rank() == 0 or not skill.cooldown.is_ready() or is_cast_locked() or is_dashing():
 		return false
@@ -252,12 +260,13 @@ func _process_windup(delta: float) -> void:
 
 
 ## Walks into range of `target`, then attacks whenever the attack is ready.
+## No attacks while R is firing.
 func _pursue(target: Enemy, delta: float) -> void:
 	if not _in_range(target):
 		_step_toward(target.global_position, delta)
 		return
 	visuals.face(target.global_position - global_position)
-	if _attack_cooldown <= 0.0:
+	if _attack_cooldown <= 0.0 and not (skills[ChampionProgress.Slot.R] as TheCulling).is_channeling():
 		var period := stats.attack_period()
 		_attack_cooldown = period
 		_windup_left = period * WINDUP_RATIO
