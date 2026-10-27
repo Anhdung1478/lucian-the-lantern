@@ -1,0 +1,215 @@
+# UI Design
+
+> Part of the Lucian game design. Layout is based on LoL so it feels familiar, but only about **70–80% similar**.
+
+## Screen layout overview
+
+```
++--------------------------------------------------------------+
+|        [Stage name]  Wave 2/4  Enemies: 12  [Skip 0:20] [Gold]|
+|              [========= Boss HP bar =========]   [B][O][P]   |
+|                                                              |
+|                                                              |
+|                       (battlefield)                         |
+|                                                              |
+|                                                              |
+|                 . . . buff icons . . .                      |
+|  [Stats]  [Portrait][Lv]  [P][Q][W][E][R]  [D][F]   +------+ |
+|  (C key)  [HP bar ][MP bar]  [1][2][3][4][5][6]     |radar | |
+|           [XP bar ]                                  +------+ |
++--------------------------------------------------------------+
+```
+
+---
+
+## 1. HUD
+
+### Bottom center – Lucian's panel
+- **Portrait** showing the current skin, with the **level number** and an **XP bar**.
+- **HP bar** and **mana bar**.
+- **Skill icons:** Passive, Q, W, E, R.
+  - Cooldown timer and rank dots on each.
+  - **Mana cost** shown as a number in the **top-left corner** of each skill icon.
+  - A **"+" button** appears when there is a skill point and a bought rank to spend it on.
+  - Unbought skills show a **lock icon**.
+- **Summoner spells** (D / F) with cooldowns.
+- **Item slots 1–6:** only unlocked slots are shown, with cooldowns for active items.
+
+### Buff icons (above the skill bar)
+- **Very small icons** just above the skill bar, like LoL.
+- Shows: Blue / Red buff (with timer), current Endless modifier, status effects (slow, stun, burn, etc.).
+- **Hover** the cursor over an icon to see its effect.
+
+### Stats panel (left of the portrait)
+- Shows AD, AP, Attack Speed, Armor, MR, Crit, Move Speed.
+- Press **C** to toggle it on or off.
+
+### Top center – Stage info
+- Stage name, **wave counter** (e.g. Wave 2/4) and **enemies remaining**.
+- **Break timer** between waves: a 20-second countdown with a **Skip** button to start the next wave right away.
+- **Boss HP bar** during the boss wave, with the boss name.
+  - Thresh's bar also shows **Phase 1 / 2**.
+
+### Top right – Loot
+- Stage gold.
+- Essences collected in this stage (blue, orange, purple).
+
+### Bottom right – Radar (minimap)
+- Shows only dots, no terrain.
+
+| Marker | Look |
+|---|---|
+| Lucian | Blue dot |
+| Normal enemy | Red dot |
+| Elite | Bigger red dot |
+| Mini boss / Boss | Red skull icon (same size as the elite dot) |
+
+### On the battlefield
+- **HP bars** above enemies, with a special icon for elites.
+- **Damage numbers:**
+
+| Damage type | Color |
+|---|---|
+| Physical | Orange |
+| Magic | Blue |
+| True | White |
+| Critical hit | Bigger text |
+
+- **Skill warnings:** line and circle indicators for enemy attacks.
+
+---
+
+## 2. Backpack (P)
+
+- Press **P** to open. The game **pauses immediately**.
+- Can be opened at any time, including during a wave.
+- While open, the player **cannot use skills or item actives**.
+- Title at the top: **BACKPACK**.
+
+```
++-----------------------------+
+|          BACKPACK           |
++-----------------------------+
+| [ ][ ][ ][ ][ ][ ][ ]       |
+| [ ][ ][ ][ ][ ][ ][ ]       |
+| [ ][ ][ ][ ][ ][ ][ ]       |
+| [ ][ ][ ][ ][ ][ ][ ]   7x7 |
+| [ ][ ][ ][ ][ ][ ][ ]   =49 |
+| [ ][ ][ ][ ][ ][ ][ ]       |
+| [ ][ ][ ][ ][ ][ ][ ]       |
++-----------------------------+
+
+  [1][2][3][4][5][6][S]   <- equip row, outside the backpack
+```
+
+### Layout
+- **Rows 1–7:** 49 backpack slots (7 per row), in a light tan style like the reference image.
+- **Row 8 – equip row:**
+  - Placed **further away** from the other rows, so it looks like it sits **outside the backpack** (like the darker bottom row in the reference image), with its own darker style.
+  - Slots **1–6:** equipped items. Locked slots show a chain.
+  - **7th slot:** **empty** when only the backpack is open. Becomes the **sell slot** when the merchant's shop is open: the **only cell filled red**.
+
+### Mouse controls
+| Action | Result |
+|---|---|
+| **Left-click (press and release quickly)** | Does nothing, for all items |
+| **Hold left-click** | Picks up the item to drag it (the only left-click action) |
+| **Release the hold** | Drops the item |
+| **Right-click a potion** | Shows a small pop-up **Use** button; click it to use the potion |
+
+### Drag and drop
+| Drop target | Result |
+|---|---|
+| Empty cell | Item moves there |
+| Outside the backpack | Item returns to its original cell |
+| Same type of potion | Stacks into the target cell (max **9** per cell); the rest returns to the original cell |
+| An item it can **craft** with | See *Crafting* below |
+| Any other item | The two items **swap** places |
+| Sell slot (shop open) | Item is **sold immediately** |
+
+### Crafting
+1. Drag an item onto another item that forms a valid recipe.
+2. While hovering, a **small pop-up table** shows the legendary item that would be crafted, so the player can read it and decide.
+3. A **line runs around the pop-up's border**, starting at the top-left, going all the way around and back to the top-left. This is the **minimum hold time** to craft: **1 second**.
+4. **Release after the line completes** → the two items are combined. The legendary appears in the target cell, and the original cell becomes empty.
+5. **Release before the line completes** → the two items just **swap**.
+
+If the two items are not a valid recipe, no pop-up appears and they swap.
+
+### Potions
+- Up to **9 potions** stack in one cell.
+- **Right-click → Use.** The game is paused, so healing **starts when the backpack is closed**.
+- Or place it in an equip slot and press **1–6** during play.
+
+### Recipe table
+- Shown automatically when the backpack is open, in the **top-left of the screen**. The backpack sits in the **center**.
+- **Hidden** while the merchant's shop is open.
+- Each line shows only: **item + item = item** (e.g. `[B.F. Sword] + [B.F. Sword] = [Infinity Edge]`).
+- Scrollable, since there are 33 recipes.
+
+```
++------------------------+
+| RECIPES                |
+| [AD] + [AD] = [IE]     |        +---------------+
+| [AD] + [AP] = [Gunbl.] |        |   BACKPACK    |
+| [AD] + [AS] = [Kraken] |        |   (center)    |
+| ...          (scroll)  |        |               |
++------------------------+        +---------------+
+```
+
+### Item info pop-up
+- **Hover** the cursor over a cell with an item for about **1 second** → a pop-up shows that item's stats and effect.
+- Works in the **backpack**, the **merchant's shop** and the **recipe table**.
+
+---
+
+## 3. Merchant's shop
+
+- Opens when Lucian walks to the merchant during the break between waves.
+- The game **pauses** while it is open (including the break timer).
+- While open, the player **cannot use skills or item actives**.
+
+```
++---------------------+   +-----------------------------+
+|      BACKPACK       |   |  [ Items ]  [ Potions ]     |
+|  (same as section 2)|   +-----------------------------+
+|                     |   |  [item][item][lock][lock]   |
+|                     |   |                             |
+|                     |   |                   [Refresh] |
++---------------------+   +-----------------------------+
+```
+
+- **Left:** the player's backpack (the 7th equip-row slot becomes the red **sell slot**). **Right:** the merchant's shop.
+- **Selling:** drag an item into the sell slot to sell it immediately.
+- **Tabs at the top of the shop:**
+  - **Items:** fragments and legendary items.
+  - **Potions:** HP and MP potions.
+- **Items tab:** always shows **4 slots** in a row. Slots not yet unlocked (Evolution Tree) are covered by a **chain lock**.
+- **Refresh** button in the **bottom-right corner** of the shop (costs stage gold).
+
+---
+
+## 4. Menu (ESC)
+
+- Press **ESC** to open. The game **pauses**.
+- Can only be opened when the backpack or merchant's shop is **not** open.
+- Options:
+  - **Resume**
+  - **Settings** (cast mode, camera, volume, etc.)
+  - **Leave this stage** (keeps all essences collected)
+  - **Exit the game** (progress is saved first)
+
+---
+
+## 5. Screens to design
+
+- [x] Backpack layout
+- [x] Crafting (drag and drop)
+- [x] Recipe table
+- [x] Item info pop-up
+- [x] Merchant's shop layout
+- [x] ESC menu
+- [ ] Evolution Tree screen
+- [ ] Skin shop
+- [ ] Main menu and save slot selection
+- [ ] Stage select
