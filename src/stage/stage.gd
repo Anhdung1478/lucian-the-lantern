@@ -8,6 +8,7 @@ extends Node2D
 @onready var camera: StageCamera = $StageCamera
 @onready var hud: Hud = $Hud
 @onready var debug_table: DebugTable = $DebugTable
+@onready var screens: ScreenSwitcher = $Screens
 
 
 func _ready() -> void:
@@ -17,3 +18,5 @@ func _ready() -> void:
 	dummy.damage_taken.connect(damage_numbers.spawn.bind(dummy))
 	hud.setup(lucian)
 	debug_table.setup(lucian, dummy)
+	screens.backpack.setup(lucian.inventory)
+	screens.backpack_toggled.connect(debug_table.set_docked_right)

@@ -28,6 +28,7 @@ var _mr: SpinBox
 var _max_hp: SpinBox
 var _dps_label: Label
 var _log_label: RichTextLabel
+var _panel: PanelContainer
 
 
 func _ready() -> void:
@@ -56,6 +57,13 @@ func _input(event: InputEvent) -> void:
 			and Input.is_physical_key_pressed(KEY_F3):
 		visible = not visible
 		get_viewport().set_input_as_handled()
+
+
+## Moves the table to the top-right while the backpack's recipe table needs
+## the top-left. Top-left otherwise, where it never covers the dummy.
+func set_docked_right(right: bool) -> void:
+	var width := get_viewport().get_visible_rect().size.x
+	_panel.position.x = width - _panel.size.x - 12.0 if right else 12.0
 
 
 func _process(_delta: float) -> void:
@@ -107,6 +115,7 @@ func _give_random_fragment() -> void:
 
 func _build() -> void:
 	var panel := PanelContainer.new()
+	_panel = panel
 	panel.custom_minimum_size.x = PANEL_WIDTH
 	panel.position = Vector2(12, 12)
 	var style := StyleBoxFlat.new()

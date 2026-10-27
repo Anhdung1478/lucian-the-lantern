@@ -50,6 +50,8 @@ func _run(scenario: String) -> void:
 			await scenario_menu()
 		"tooltip":
 			await scenario_tooltip()
+		"backpack":
+			await scenario_backpack()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -269,10 +271,12 @@ func scenario_menu() -> void:
 	print("paused after 2nd ESC (expect false): ", paused, "  Lucian moving (expect true): ", lucian.global_position.x > x)
 
 
-## Moves the real mouse to `canvas_pos` (1920x1080 canvas units), as if the
-## player did it. `held` keeps the left button down during the motion.
+## Moves the mouse to `canvas_pos` (1920x1080 canvas units), as if the player
+## did it. `held` keeps the left button down during the motion. The OS cursor
+## is warped there too, so its own motion events agree with ours.
 func mouse_move(canvas_pos: Vector2, held := false) -> void:
 	var window_pos := root.get_final_transform() * canvas_pos
+	Input.warp_mouse(window_pos)
 	var event := InputEventMouseMotion.new()
 	event.position = window_pos
 	event.global_position = window_pos
@@ -303,13 +307,12 @@ func scenario_tooltip() -> void:
 	lucian.try_rank_up(ChampionProgress.Slot.Q)
 	var skill_row: HBoxContainer = stage.get_node("Hud").skill_row
 	await mouse_move(control_center(skill_row.get_child(1)))
-	await wait(0.6)
+	await wait(0.5)
 	await mouse_move(control_center(skill_row.get_child(1)) + Vector2(5, 3))
-	await wait(0.6)
-	print("Q tooltip after 1.2 s with a small move (expect true): ", stage.get_node("HoverTip").is_showing())
+	await wait_for_tooltip(skill_row.get_child(1))
 	await shot("tooltip_0_q")
 	await mouse_move(control_center(skill_row.get_child(0)))
-	await wait(1.2)
+	await wait_for_tooltip(skill_row.get_child(0))
 	await shot("tooltip_1_passive")
 	await mouse_move(Vector2(960, 300))
 	await wait(0.2)
@@ -319,5 +322,52 @@ func scenario_tooltip() -> void:
 	var menu: GameMenu = stage.get_node("Screens/Menu")
 	var settings: Button = menu.find_children("*", "Button", true, false)[1]
 	await mouse_move(control_center(settings))
-	await wait(1.2)
+	await wait_for_tooltip(settings)
 	await shot("tooltip_2_disabled_button")
+
+
+func give(ids: Array[StringName]) -> void:
+	for id in ids:
+		lucian.inventory.add(lucian.item_catalog.find(id))
+
+
+func scenario_backpack() -> void:
+	give([&"bf_sword", &"bf_sword", &"recurve_bow", &"needlessly_large_rod", &"cloak_of_agility",
+		&"giants_belt", &"tear_of_the_goddess", &"negatron_cloak", &"chain_vest", &"infinity_edge",
+		&"kraken_slayer", &"guardian_angel"])
+	var inventory := lucian.inventory
+	inventory.apply_drop(9, Inventory.EQUIP_START, false)
+	inventory.apply_drop(10, Inventory.EQUIP_START + 1, false)
+	inventory.unlocked_equip = 4
+	(stage.get_node("DebugTable") as DebugTable).visible = true
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	print("paused with backpack (expect true): ", paused)
+	await wait(0.3)
+	await shot("backpack_0")
+	var backpack: BackpackScreen = stage.get_node("Screens/Backpack")
+	await mouse_move(backpack._cells[0].get_global_rect().get_center())
+	await wait_for_tooltip(backpack._cells[0])
+	await shot("backpack_1_item_tooltip")
+	await press_key(KEY_ESCAPE, true)
+	await press_key(KEY_ESCAPE, false)
+	print("ESC closes backpack, not menu (expect false false): ", backpack.visible, " ", (stage.get_node("Screens/Menu") as GameMenu).visible)
+
+
+## Waits for the hover card of `source`, printing how long that took. A
+## stray OS motion event can move the hover off `source`; then it is hovered
+## again, and the retry is counted.
+func wait_for_tooltip(source: Control, timeout := 4.0) -> void:
+	var tip: HoverTip = stage.get_node("HoverTip")
+	var start := Time.get_ticks_msec()
+	var since := start
+	var retries := 0
+	while not (tip.is_showing() and tip._source == source) and Time.get_ticks_msec() - start < timeout * 1000.0:
+		if HoverTip._find_source(root.gui_get_hovered_control()) != source:
+			retries += 1
+			since = Time.get_ticks_msec()
+			await mouse_move(control_center(source))
+		await process_frame
+	print("tooltip for %s shown: " % source.get_class(), tip.is_showing() and tip._source == source,
+		" after %.2f s of resting, %d re-hovers" % [(Time.get_ticks_msec() - since) / 1000.0, retries])
+	await wait(0.1)
