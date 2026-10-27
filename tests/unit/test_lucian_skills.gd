@@ -70,3 +70,35 @@ func test_q_roots_lucian_during_cast() -> void:
 	assert_almost_eq(lucian.position.x, 0.0, 0.5)
 	await wait_seconds(0.4)
 	assert_lt(lucian.position.x, -10.0, "the move order resumes after the cast")
+
+
+func test_attack_without_cast_fires_one_shot() -> void:
+	lucian.command_attack(dummy)
+	await wait_seconds(1.2)
+	assert_eq(_sources(), [&"basic"])
+
+
+func test_cast_charges_passive_for_a_double_shot() -> void:
+	_rank(Slot.Q, 1)
+	lucian.try_cast(Slot.Q, dummy.position)
+	assert_true(lucian.passive.charged)
+	lucian.command_attack(dummy)
+	await wait_seconds(1.6)
+	assert_eq(_sources(), [&"q", &"basic", &"lightslinger"])
+	assert_false(lucian.passive.charged)
+	var ad := lucian.stats.ad
+	assert_almost_eq(hits[2][1], 0.6 * ad * DUMMY_ARMOR_MULTIPLIER, 0.01)
+
+
+func test_failed_cast_does_not_charge_passive() -> void:
+	lucian.try_cast(Slot.Q, dummy.position)
+	assert_false(lucian.passive.charged)
+
+
+func test_passive_hit_lowers_e_cooldown() -> void:
+	var e_cooldown := lucian.skills[Slot.E].cooldown
+	e_cooldown.start(10.0)
+	lucian.on_damage_dealt(dummy, DamageInfo.create(10.0, DamageInfo.Type.PHYSICAL, &"lightslinger", lucian), 8.0)
+	assert_almost_eq(e_cooldown.remaining, 9.0, 0.001)
+	lucian.on_damage_dealt(dummy, DamageInfo.create(10.0, DamageInfo.Type.PHYSICAL, &"basic", lucian), 8.0)
+	assert_almost_eq(e_cooldown.remaining, 9.0, 0.001)

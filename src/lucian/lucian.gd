@@ -32,6 +32,7 @@ var _cast_lock_left := 0.0
 
 @onready var visuals: LucianVisuals = $Visuals
 @onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
+@onready var passive: Lightslinger = $Skills/Passive
 
 
 func _ready() -> void:
@@ -78,7 +79,14 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 	skill.cooldown.start(0.0 if cheat_no_cooldowns else skill.cooldown_seconds(), stats.ability_haste)
 	_cancel_windup()
 	skill.execute(aim)
+	passive.charge()
 	return true
+
+
+## Called by an enemy after it takes damage from Lucian.
+func on_damage_dealt(_target: Enemy, info: DamageInfo, _final_amount: float) -> void:
+	if info.source == &"lightslinger":
+		skills[ChampionProgress.Slot.E].cooldown.reduce(passive.e_cooldown_reduction)
 
 
 ## Every enemy whose hurtbox overlaps `shape` placed at `xform`, found instantly.
@@ -193,7 +201,7 @@ func _process_windup(delta: float) -> void:
 	_windup_left -= delta
 	if _windup_left <= 0.0:
 		_windup_left = 0.0
-		fire_attack_projectile(LucianVisuals.Gun.RIGHT, _target, roll_attack(1.0, &"basic"))
+		passive.fire_basic_attack(_target)
 
 
 ## Walks into range of `target`, then attacks whenever the attack is ready.

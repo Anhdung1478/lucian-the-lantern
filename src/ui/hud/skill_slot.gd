@@ -69,7 +69,10 @@ func setup(target: Lucian, slot_skill: LucianSkill, icon: Texture2D, key: String
 
 
 func _process(_delta: float) -> void:
-	if lucian == null or skill == null:
+	if lucian == null:
+		return
+	_overlay.queue_redraw()
+	if skill == null:
 		return
 	var progress := lucian.progress
 	var cost := skill.mana_cost()
@@ -89,7 +92,6 @@ func _process(_delta: float) -> void:
 		_icon.modulate = NO_MANA_TINT
 	else:
 		_icon.modulate = Color.WHITE
-	_overlay.queue_redraw()
 	queue_redraw()
 
 
@@ -107,11 +109,15 @@ func _draw() -> void:
 
 
 func _draw_overlay() -> void:
+	var rect := Rect2(Vector2.ZERO, Vector2(ICON_SIZE, ICON_SIZE))
 	if skill:
 		var fraction := skill.cooldown.fraction_remaining()
 		if fraction > 0.005:
 			_overlay.draw_colored_polygon(sweep_polygon(fraction, ICON_SIZE), SWEEP_COLOR)
-	_overlay.draw_rect(Rect2(Vector2.ZERO, Vector2(ICON_SIZE, ICON_SIZE)), FRAME_COLOR, false, 2.0)
+	elif lucian.passive.charged:
+		_overlay.draw_rect(rect.grow(-2.0), DOT_ON, false, 4.0)
+		return
+	_overlay.draw_rect(rect, FRAME_COLOR, false, 2.0)
 
 
 ## Dark area of a square cooldown sweep: the last `fraction` of a clockwise
