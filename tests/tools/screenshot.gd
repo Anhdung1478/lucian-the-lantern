@@ -52,6 +52,8 @@ func _run(scenario: String) -> void:
 			await scenario_tooltip()
 		"backpack":
 			await scenario_backpack()
+		"craft":
+			await scenario_craft()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -287,6 +289,7 @@ func mouse_move(canvas_pos: Vector2, held := false) -> void:
 
 func mouse_button(canvas_pos: Vector2, pressed: bool) -> void:
 	var window_pos := root.get_final_transform() * canvas_pos
+	Input.warp_mouse(window_pos)
 	var event := InputEventMouseButton.new()
 	event.button_index = MOUSE_BUTTON_LEFT
 	event.pressed = pressed
@@ -371,3 +374,49 @@ func wait_for_tooltip(source: Control, timeout := 4.0) -> void:
 	print("tooltip for %s shown: " % source.get_class(), tip.is_showing() and tip._source == source,
 		" after %.2f s of resting, %d re-hovers" % [(Time.get_ticks_msec() - since) / 1000.0, retries])
 	await wait(0.1)
+
+
+func scenario_craft() -> void:
+	give([&"bf_sword", &"needlessly_large_rod", &"bf_sword", &"giants_belt"])
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	await wait(0.3)
+	var backpack: BackpackScreen = stage.get_node("Screens/Backpack")
+	var inventory := lucian.inventory
+	var cell := func(index: int) -> Vector2: return backpack._cells[index].get_global_rect().get_center()
+	# Pick up the sword at 0, carry it over the rod at 1 and hold.
+	await mouse_move(cell.call(0))
+	await mouse_button(cell.call(0), true)
+	for step in 6:
+		await mouse_move(lerp(cell.call(0), cell.call(1), (step + 1) / 6.0), true)
+	await wait(0.5)
+	print("popup visible (expect true): ", backpack._craft_popup.visible, "  progress ~0.5: %.2f" % backpack._craft_popup.progress)
+	await shot("craft_0_half")
+	await wait(0.6)
+	await shot("craft_1_full")
+	await mouse_button(cell.call(1), false)
+	await wait(0.1)
+	print("crafted (expect hextech_gunblade, empty): ", inventory.item_at(1).id, ", ", inventory.item_at(0))
+	await shot("craft_2_done")
+	# Early release swaps: sword at 2 onto the belt at 3 is no recipe, so try
+	# the gunblade's partner-free swap with a quick drop instead.
+	await mouse_move(cell.call(2))
+	await mouse_button(cell.call(2), true)
+	await mouse_move(cell.call(3), true)
+	await wait(0.3)
+	await mouse_button(cell.call(3), false)
+	print("swapped (expect giants_belt, bf_sword): ", inventory.item_at(2).id, ", ", inventory.item_at(3).id)
+	# Equip the gunblade into slot 1, then drop the belt outside the backpack.
+	var ad := lucian.stats.ad
+	await mouse_move(cell.call(1))
+	await mouse_button(cell.call(1), true)
+	await mouse_move(cell.call(Inventory.EQUIP_START), true)
+	await mouse_button(cell.call(Inventory.EQUIP_START), false)
+	print("equipped (expect hextech_gunblade, AD +40): ", inventory.item_at(Inventory.EQUIP_START).id, ", +", lucian.stats.ad - ad)
+	await mouse_move(cell.call(2))
+	await mouse_button(cell.call(2), true)
+	await mouse_move(Vector2(1700, 1000), true)
+	await mouse_button(Vector2(1700, 1000), false)
+	print("dropped outside, still there (expect giants_belt): ", inventory.item_at(2).id)
+	await wait(0.2)
+	await shot("craft_3_equipped")
