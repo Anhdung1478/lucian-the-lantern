@@ -343,6 +343,9 @@ Everything in the build order above is in place. Changes and details settled whi
 - **Cells, the recipe table, HUD slots and cards share `ItemIcon.draw_item()`**, which falls back to a colored tile with the item's code if an icon is missing.
 - **The debug table's "Clear items"** empties the equip slots too, not just the backpack.
 - **The E rank-5 bonus** is described in E's tooltip but still waits for killable enemies, as in Phase 1.
+- **Fixes from the first playtest:**
+  - A dragged fragment held back over its own cell showed the craft pop-up for its double recipe (B.F. Sword → Infinity Edge). `Inventory.craft_result` now refuses `from == to`.
+  - **Skill queueing** (new): a skill pressed during a cast time or the E dash used to be dropped. It is now queued and cast when the lock ends, aimed where the key was pressed (`Lucian.queue_casts`, on by default; toggled in the debug table until the Settings screen exists).
 - **Screenshot harness:** `mouse_move` / `mouse_button` send real mouse events and warp the OS cursor to the same spot, so stray OS motion events agree with the script. `wait_for_tooltip()` re-hovers if a stray event still moves the hover, and prints how long the card took.
 
 ### Running the checks

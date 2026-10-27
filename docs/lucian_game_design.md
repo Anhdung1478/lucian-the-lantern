@@ -40,6 +40,8 @@
 
 **Cast modes (chosen in settings):** normal cast, quick cast, or quick cast with indicator.
 
+**Skill queueing (setting, on by default):** a skill pressed during another skill's cast time or the E dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept. Q / W pressed during R are still refused.
+
 ---
 
 ## 3. Stage Rules

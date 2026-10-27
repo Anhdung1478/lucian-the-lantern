@@ -31,6 +31,10 @@ var cheat_no_cooldowns := false:
 			for skill in skills:
 				skill.cooldown.clear()
 var cheat_infinite_mana := false
+## Setting: a skill pressed during a cast time or a dash is cast as soon as it
+## ends, aimed where the key was pressed, like LoL's spell buffering. Only the
+## latest press is kept.
+var queue_casts := true
 
 var _order := Order.NONE
 var _move_point := Vector2.ZERO
@@ -43,6 +47,8 @@ var _dash_velocity := Vector2.ZERO
 var _dash_left := 0.0
 var _move_speed_bonus := 0.0
 var _move_speed_bonus_left := 0.0
+var _queued_slot := -1
+var _queued_aim := Vector2.ZERO
 
 @onready var visuals: LucianVisuals = $Visuals
 @onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
@@ -84,8 +90,9 @@ func try_rank_up(slot: ChampionProgress.Slot) -> bool:
 	return progress.rank_up(slot)
 
 
-## The cast gate: rank, cooldown, state and mana, then pay and cast.
-## During R only E can be cast, and pressing R again stops R.
+## The cast gate: rank, cooldown, mana and state, then pay and cast.
+## During R only E can be cast, and pressing R again stops R. A cast blocked
+## only by a cast time or a dash is queued when queue_casts is on.
 func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 	var culling := skills[ChampionProgress.Slot.R] as TheCulling
 	if culling.is_channeling():
@@ -95,9 +102,12 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 		if slot != ChampionProgress.Slot.E:
 			return false
 	var skill := skills[slot]
-	if skill.rank() == 0 or not skill.cooldown.is_ready() or is_cast_locked() or is_dashing():
+	if skill.rank() == 0 or not skill.cooldown.is_ready() or mana < skill.mana_cost():
 		return false
-	if mana < skill.mana_cost():
+	if is_cast_locked() or is_dashing():
+		if queue_casts:
+			_queued_slot = slot
+			_queued_aim = aim
 		return false
 	mana -= skill.mana_cost()
 	skill.cooldown.start(0.0 if cheat_no_cooldowns else skill.cooldown_seconds(), stats.ability_haste)
@@ -105,6 +115,11 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 	skill.execute(aim)
 	passive.charge()
 	return true
+
+
+## The slot waiting for the current cast time or dash to end, or -1.
+func queued_cast() -> int:
+	return _queued_slot
 
 
 ## Called by an enemy after it takes damage from Lucian. Life steal works on
@@ -227,6 +242,10 @@ func _physics_process(delta: float) -> void:
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	_move_speed_bonus_left = maxf(_move_speed_bonus_left - delta, 0.0)
 	velocity = Vector2.ZERO
+	if _queued_slot >= 0 and not is_cast_locked() and not is_dashing():
+		var queued := _queued_slot as ChampionProgress.Slot
+		_queued_slot = -1
+		try_cast(queued, _queued_aim)
 	if _dash_left > 0.0:
 		_dash_step(delta)
 		return

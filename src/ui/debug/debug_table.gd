@@ -149,6 +149,10 @@ func _build() -> void:
 	_section(box, "Cheats")
 	_check(box, "No cooldowns").toggled.connect(func(on: bool) -> void: lucian.cheat_no_cooldowns = on)
 	_check(box, "Infinite mana").toggled.connect(func(on: bool) -> void: lucian.cheat_infinite_mana = on)
+	# A setting, kept here until the Settings screen exists.
+	var queue := _check(box, "Queue skill casts (setting)")
+	queue.set_pressed_no_signal(true)
+	queue.toggled.connect(func(on: bool) -> void: lucian.queue_casts = on)
 	row = _row(box)
 	_crit_toggle = _check(row, "Crit chance override (%)")
 	_crit_toggle.toggled.connect(_apply_crit)
