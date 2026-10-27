@@ -4,6 +4,9 @@ extends CanvasLayer
 ## Graphics (window, VSync, FPS cap, quality, FPS counter) and Gameplay
 ## (skill queue). Every change applies at once and is saved. ESC or Back
 ## returns to the menu; while waiting for a new key, ESC cancels instead.
+##
+## Rebinding: click a binding, then press a key, or click the same binding
+## again with the mouse button to bind. A click anywhere else cancels.
 
 signal back_requested
 
@@ -11,6 +14,9 @@ const PANEL_SIZE := Vector2(760, 640)
 const TAB_NAMES := ["Audio", "Controls", "Graphics", "Gameplay"]
 const ROW_HEIGHT := 40.0
 const BIND_WIDTH := 170.0
+## Pressed alone, these never become a binding.
+const MODIFIER_KEYS := [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META]
+const WHEEL_BUTTONS := [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN, MOUSE_BUTTON_WHEEL_LEFT, MOUSE_BUTTON_WHEEL_RIGHT]
 
 var settings: GameSettings
 
@@ -19,6 +25,7 @@ var _pages: Array[Control] = []
 var _bind_buttons := {}
 ## The action waiting for a new key, or &"".
 var _listening: StringName = &""
+var _listen_frame := -1
 
 
 func _ready() -> void:
@@ -58,6 +65,8 @@ func listen(action: StringName) -> void:
 	_stop_listening()
 	_listening = action
 	_bind_buttons[action].text = "Press a key..."
+	# The click that started listening must not bind itself.
+	_listen_frame = Engine.get_process_frames()
 
 
 func _input(event: InputEvent) -> void:
@@ -69,12 +78,17 @@ func _input(event: InputEvent) -> void:
 		if key and key.pressed and not key.echo:
 			if key.physical_keycode == KEY_ESCAPE:
 				_stop_listening()
-			else:
+			elif not MODIFIER_KEYS.has(key.physical_keycode):
 				_bind(key)
 			get_viewport().set_input_as_handled()
-		elif mouse and mouse.pressed:
-			_bind(mouse)
-			get_viewport().set_input_as_handled()
+		elif mouse and mouse.pressed and not WHEEL_BUTTONS.has(mouse.button_index) \
+				and Engine.get_process_frames() != _listen_frame:
+			var button: Button = _bind_buttons[_listening]
+			if button.get_global_rect().has_point(button.get_global_mouse_position()):
+				_bind(mouse)
+				get_viewport().set_input_as_handled()
+			else:
+				_stop_listening()
 	elif event.is_action_pressed(&"open_menu"):
 		back_requested.emit()
 		get_viewport().set_input_as_handled()
@@ -205,7 +219,7 @@ func _build_controls() -> Control:
 	_refresh_bindings()
 	var bottom := HBoxContainer.new()
 	outer.add_child(bottom)
-	var hint := UiStyle.label("Click a binding, then press a key or mouse button. ESC cancels.\nCtrl + a skill key still ranks the skill up.", 14, UiStyle.DIM_COLOR)
+	var hint := UiStyle.label("Click a binding, then press a key (or click it again with a mouse\nbutton). ESC or a click elsewhere cancels. Ctrl + a skill key ranks it up.", 14, UiStyle.DIM_COLOR)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(hint)
 	var reset := Button.new()

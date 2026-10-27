@@ -304,3 +304,20 @@ func test_buffs_list_the_passive_states() -> void:
 	lucian.inventory.clear()
 	ids = lucian.buffs().map(func(buff: Dictionary) -> StringName: return buff.id)
 	assert_does_not_have(ids, &"energized")
+
+
+func test_hatefog_ticks_three_times() -> void:
+	var zone := HatefogZone.new()
+	zone.setup(lucian, dummy.global_position, null)
+	add_child_autofree(zone)
+	await wait_seconds(3.6)
+	assert_eq(sources().count(&"malignance"), 3)
+
+
+func test_unequipping_mid_cast_ends_the_shojin_arming() -> void:
+	equip(&"spear_of_shojin")
+	lucian.try_rank_up(Slot.Q)
+	lucian.try_cast(Slot.Q, dummy.position)
+	lucian.inventory.clear()
+	skill_hit(&"q")
+	assert_eq(lucian.passives.shojin_stacks, 0)

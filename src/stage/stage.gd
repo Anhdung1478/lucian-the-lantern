@@ -42,6 +42,7 @@ func _ready() -> void:
 	debug_table.setup(self)
 	screens.backpack.setup(lucian.inventory)
 	screens.backpack.potion_used.connect(lucian.use_item)
+	screens.backpack_toggled.connect(debug_table.set_docked_right)
 	lucian.merchant_reached.connect(_open_shop)
 	screens.backpack.traded.connect(func(ok: bool) -> void: Sfx.play(&"coin" if ok else &"error"))
 	add_merchant()
@@ -95,4 +96,3 @@ func _on_setting_changed(key: StringName) -> void:
 
 func _open_shop(visited: Merchant) -> void:
 	screens.open_shop(Shop.new(visited.stock, lucian.inventory, wallet))
-	screens.backpack_toggled.connect(debug_table.set_docked_right)

@@ -167,7 +167,9 @@ func apply_display() -> void:
 		"borderless":
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		_:
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+			# A maximized window counts as windowed and stays as it is.
+			if DisplayServer.window_get_mode() not in [DisplayServer.WINDOW_MODE_WINDOWED, DisplayServer.WINDOW_MODE_MAXIMIZED]:
+				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 	DisplayServer.window_set_vsync_mode(
 		DisplayServer.VSYNC_ENABLED if _values[&"vsync"] else DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = int(_values[&"max_fps"])

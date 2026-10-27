@@ -17,6 +17,7 @@ var icon: Texture2D
 
 var _left := DURATION
 var _next_tick := 0.0
+var _ticks_left := roundi(DURATION / TICK)
 
 
 func setup(owner_lucian: Lucian, at: Vector2, status_icon: Texture2D) -> void:
@@ -29,8 +30,9 @@ func setup(owner_lucian: Lucian, at: Vector2, status_icon: Texture2D) -> void:
 func _physics_process(delta: float) -> void:
 	_left -= delta
 	_next_tick -= delta
-	if _next_tick <= 0.0 and is_instance_valid(lucian):
+	if _next_tick <= 0.0 and _ticks_left > 0 and is_instance_valid(lucian):
 		_next_tick += TICK
+		_ticks_left -= 1
 		for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
 			if enemy.global_position.distance_to(global_position) <= RADIUS + enemy.radius:
 				enemy.add_status(Enemy.HATEFOG, TICK + 0.1, 1, icon)

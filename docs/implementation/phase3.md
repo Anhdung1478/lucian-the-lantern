@@ -150,3 +150,12 @@ godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
 ```
 
 New scenarios: `gold`, `potions`, `shop`, `settings`, `buffs`, `actives`, `energized`. One test file can run alone with `-gconfig= -gtest=res://tests/unit/<file>.gd -gexit`.
+
+### Fixes from the code review
+- The debug table's dock-right signal had slipped into `Stage._open_shop`, so it only connected on the first shop visit (and warned on every later one). It is back in `_ready`.
+- Rebinding: a lone Shift / Ctrl / Alt or the mouse wheel never binds, and a mouse button only binds when pressed on the waiting binding itself. A click anywhere else (a tab, Back) cancels instead of binding LMB.
+- Hatefog ticked a 4th time on its last frame (float rounding); it now counts exactly 3 ticks.
+- Unequipping Spear of Shojin or Archangel's Staff mid-cast ends their "first skill hit" arming.
+- Dropping a shop item on a taken cell says "That cell is taken" (new `Shop.Result.CELL_TAKEN`), not "No room".
+- A maximized window stays maximized when the graphics settings apply.
+- GUT runs `tests/pre_run.gd` first, which points `GameSettings.instance()` at a scratch file, so the player's own settings never change test results.

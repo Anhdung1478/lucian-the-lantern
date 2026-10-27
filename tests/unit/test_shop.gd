@@ -57,7 +57,7 @@ func test_full_backpack_is_refused_without_paying() -> void:
 func test_buying_into_a_chosen_cell() -> void:
 	wallet.add(5000)
 	inventory.add(catalog.find(&"belt"))
-	assert_eq(shop.buy_slot(0, 0), Result.NO_ROOM, "occupied")
+	assert_eq(shop.buy_slot(0, 0), Result.CELL_TAKEN, "occupied")
 	assert_eq(shop.buy_slot(0, EQUIP), Result.OK)
 	assert_eq(inventory.item_at(EQUIP), stock.items[0])
 

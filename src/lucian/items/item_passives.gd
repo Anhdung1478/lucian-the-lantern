@@ -126,6 +126,9 @@ func refresh() -> void:
 		spellblade_ready = false
 	if not has(&"spear_of_shojin"):
 		shojin_stacks = 0
+		_shojin_armed = false
+	if not has(&"archangels_staff"):
+		_mana_charge_armed = false
 	if not has(&"jaksho_the_protean"):
 		jaksho_stacks = 0
 

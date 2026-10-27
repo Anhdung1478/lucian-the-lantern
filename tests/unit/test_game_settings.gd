@@ -117,3 +117,8 @@ func test_apply_input_sets_the_input_map() -> void:
 	settings.reset_bindings()
 	settings.apply_input()
 	assert_eq((InputMap.action_get_events(&"toggle_stats")[0] as InputEventKey).physical_keycode, KEY_C)
+
+
+func test_the_test_run_uses_a_scratch_settings_file() -> void:
+	# Set by tests/pre_run.gd, so the player's settings never change the tests.
+	assert_eq(GameSettings.instance().path, "user://test_run_settings.json")
