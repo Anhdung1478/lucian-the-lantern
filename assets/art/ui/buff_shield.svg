@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Shield: a white heater shield with a red drop (Bloodthirster's Ichorshield) -->
+  <rect width="64" height="64" fill="#1e1416"/>
+  <path d="M 32 6 L 54 14 L 52 34 C 50 46 42 54 32 59 C 22 54 14 46 12 34 L 10 14 Z" fill="#e8ecf2" stroke="#3a3a46" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M 32 12 L 48 18 L 46 34 C 45 43 39 50 32 53 Z" fill="#c2c8d4"/>
+  <path d="M 32 22 C 36 30 40 34 40 39 A 8 8 0 0 1 24 39 C 24 34 28 30 32 22 Z" fill="#c8202e" stroke="#4a0a10" stroke-width="1.6"/>
+</svg>

@@ -45,13 +45,18 @@ func setup(owner_stage: Stage) -> void:
 	stage = owner_stage
 	lucian = stage.lucian
 	dummy = stage.dummy
-	dummy.damage_taken.connect(_on_damage_taken)
+	watch(dummy)
 	_armor.set_value_no_signal(dummy.armor)
 	_mr.set_value_no_signal(dummy.mr)
 	_max_hp.set_value_no_signal(dummy.max_hp)
 	for item in lucian.item_catalog.items:
 		_item_picker.add_item(item.display_name)
 	_equip_slots.set_value_no_signal(lucian.inventory.unlocked_equip)
+
+
+## Adds a dummy's hits to the DPS meter and the hit log.
+func watch(target: Enemy) -> void:
+	target.damage_taken.connect(_on_damage_taken)
 
 
 ## _input runs before the controller's _unhandled_input, so Q never casts here.
@@ -178,6 +183,7 @@ func _build() -> void:
 	_button(row, "Clear items", func() -> void: lucian.inventory.clear())
 	_button(row, "+HP potion", func() -> void: lucian.inventory.add(lucian.item_catalog.find(&"hp_potion")))
 	_button(row, "+MP potion", func() -> void: lucian.inventory.add(lucian.item_catalog.find(&"mp_potion")))
+	_button(row, "Energize now", func() -> void: lucian.passives.energize.value = EnergizeCharge.MAX)
 	row = _row(box)
 	_label(row, "Equip slots")
 	_equip_slots = _spin(row, 1, Inventory.EQUIP_SIZE, Inventory.EQUIP_SIZE)
@@ -213,6 +219,10 @@ func _build() -> void:
 	_max_hp = _spin(grid, 1, 100000, 2000)
 	for spin in [_armor, _mr, _max_hp]:
 		spin.value_changed.connect(_apply_dummy)
+	row = _row(box)
+	_label(row, "Dummies (for Runaan's / Statikk)")
+	var count := _spin(row, 1, 5, 1)
+	count.value_changed.connect(func(value: float) -> void: stage.set_dummy_count(int(value)))
 
 	# The DPS meter and hit log stay under the tabs, always in view.
 	_section(outer, "Damage")

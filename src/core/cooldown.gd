@@ -19,6 +19,11 @@ func reduce(seconds: float) -> void:
 	remaining = maxf(remaining - seconds, 0.0)
 
 
+## Cuts the time left by a share of itself (0.12 = 12%).
+func reduce_fraction(fraction: float) -> void:
+	remaining *= 1.0 - fraction
+
+
 func clear() -> void:
 	remaining = 0.0
 

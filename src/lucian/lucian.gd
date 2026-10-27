@@ -1,7 +1,9 @@
 class_name Lucian
 extends CharacterBody2D
-## The player champion. Holds one standing order (move / attack / attack-move)
-## and carries it out every physics frame. Attack windups pause the order.
+## The player champion. Holds one standing order (move / attack / attack-move
+## / visit the merchant) and carries it out every physics frame. Attack
+## windups pause the order. Item passives and actives live in the
+## ItemPassives and ItemActives children.
 
 ## Lucian walked into range of the merchant he was sent to.
 signal merchant_reached(merchant: Merchant)
@@ -13,6 +15,15 @@ const WINDUP_RATIO := 0.15
 const RANGE_RING_COLOR := Color(1.0, 0.91, 0.66, 0.35)
 ## Distance from Lucian's center to his gun muzzles.
 const GUN_REACH := 44.0
+const MOVE_SPEED_ICON := preload("res://assets/art/ui/buff_move_speed.svg")
+const SHIELD_ICON := preload("res://assets/art/ui/buff_shield.svg")
+const SPEED_BUFF_NAMES := {
+	&"ardent_blaze": "Ardent Blaze", &"fervor": "Fervor", &"stormrazor": "Bolt", &"rocketbelt": "Supersonic",
+}
+## Bloodthirster's Ichorshield: the most it holds, and how fast it fades out
+## of combat (per second).
+const ICHORSHIELD_MAX := 300.0
+const ICHORSHIELD_DECAY := 100.0
 
 @export var base_stats: UnitStats
 @export var item_catalog: ItemCatalog
@@ -21,9 +32,15 @@ var progress := ChampionProgress.new()
 var inventory := Inventory.new()
 ## Potions being drunk.
 var restores := RestoreOverTime.new()
+var passives := ItemPassives.new()
+var actives := ItemActives.new()
+## Item id -> Cooldown, shared by every copy of the item.
+var item_cooldowns := {}
 var stats: StatBlock
 var hp := 0.0
 var mana := 0.0
+## Absorbs damage before HP (Bloodthirster).
+var shield := 0.0
 ## Where spawned shots go. Set by the stage.
 var projectile_parent: Node
 ## Debug: values >= 0 replace Lucian's crit chance.
@@ -51,8 +68,10 @@ var _show_range_ring := false
 var _cast_lock_left := 0.0
 var _dash_velocity := Vector2.ZERO
 var _dash_left := 0.0
-var _move_speed_bonus := 0.0
-var _move_speed_bonus_left := 0.0
+## Id -> {flat, pct, left, duration, fade}. A fading buff's percent shrinks
+## to 0 over its duration.
+var _speed_buffs := {}
+var _last_position := Vector2.ZERO
 var _queued_slot := -1
 var _queued_aim := Vector2.ZERO
 
@@ -62,14 +81,22 @@ var _queued_aim := Vector2.ZERO
 
 
 func _ready() -> void:
+	passives.name = "ItemPassives"
+	passives.setup(self)
+	add_child(passives)
+	actives.name = "ItemActives"
+	actives.setup(self)
+	add_child(actives)
 	stats = base_stats.at_level(progress.level)
+	passives.adjust_stats(stats)
 	hp = stats.max_hp
 	mana = stats.max_mana
+	_last_position = global_position
 	if projectile_parent == null:
 		projectile_parent = get_parent()
 	inventory.catalog = item_catalog
 	progress.level_changed.connect(func(_level: int) -> void: _refresh_stats(false))
-	inventory.changed.connect(_refresh_stats.bind(true))
+	inventory.changed.connect(_on_inventory_changed)
 
 
 func command_move(point: Vector2) -> void:
@@ -128,10 +155,11 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 			_queued_aim = aim
 		return false
 	mana -= skill.mana_cost()
-	skill.cooldown.start(0.0 if cheat_no_cooldowns else skill.cooldown_seconds(), stats.ability_haste)
+	skill.cooldown.start(0.0 if cheat_no_cooldowns else skill.cooldown_seconds(), stats.ability_haste + passives.skill_haste(slot))
 	_cancel_windup()
 	skill.execute(aim)
 	passive.charge()
+	passives.on_cast(slot)
 	return true
 
 
@@ -140,14 +168,24 @@ func queued_cast() -> int:
 	return _queued_slot
 
 
+## Called by an enemy just before Lucian's hit is mitigated: item damage
+## multipliers.
+func before_damage(target: Enemy, info: DamageInfo) -> void:
+	passives.before_damage(target, info)
+
+
 ## Called by an enemy after it takes damage from Lucian. Life steal works on
-## basic attacks (and the passive's second shot); omnivamp on every hit.
+## basic attacks (and the passive's second shot); omnivamp on every hit. With
+## Bloodthirster, life steal healing past full HP becomes a shield.
 func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> void:
-	var vamp := stats.omnivamp
-	if info.source == &"basic" or info.source == &"lightslinger":
-		vamp += stats.lifesteal
-	if vamp > 0.0:
-		heal(final_amount * vamp)
+	if stats.omnivamp > 0.0:
+		heal(final_amount * stats.omnivamp)
+	if stats.lifesteal > 0.0 and (info.source == &"basic" or info.source == &"lightslinger"):
+		var healing := final_amount * stats.lifesteal
+		var overheal := healing * (1.0 + stats.heal_shield_power) - heal(healing)
+		if passives.has(&"bloodthirster") and overheal > 0.0:
+			shield = minf(shield + overheal, ICHORSHIELD_MAX)
+	passives.on_damage_dealt(target, info, final_amount)
 	if info.source == &"lightslinger":
 		skills[ChampionProgress.Slot.E].cooldown.reduce(passive.e_cooldown_reduction)
 	if info.source != &"w" and target.has_mark(ArdentBlaze.MARK):
@@ -177,12 +215,76 @@ func use_item(index: int) -> bool:
 	return true
 
 
-## Keys 1-6: drinks the potion in equip slot `slot` (0-5).
-func use_equip_slot(slot: int, _aim: Vector2) -> bool:
+## Keys 1-6: drinks the potion, or uses the item active, in equip slot `slot`
+## (0-5).
+func use_equip_slot(slot: int, aim: Vector2) -> bool:
 	var index := Inventory.EQUIP_START + slot
 	if inventory.is_locked(index):
 		return false
+	var item := inventory.item_at(index)
+	if ItemActives.has_active(item):
+		return actives.use(item, aim)
 	return use_item(index)
+
+
+## The cooldown every copy of item `id` shares.
+func item_cooldown(id: StringName) -> Cooldown:
+	if not item_cooldowns.has(id):
+		item_cooldowns[id] = Cooldown.new()
+	return item_cooldowns[id]
+
+
+## Recomputes the stats, keeping the HP and mana share (stat passives call it).
+func refresh_stats() -> void:
+	_refresh_stats(true)
+
+
+## AD from the level alone, and the rest (items and passives).
+func base_ad() -> float:
+	return base_stats.at_level(progress.level).ad
+
+
+func bonus_ad() -> float:
+	return maxf(stats.ad - base_ad(), 0.0)
+
+
+## Attack range, longer for a Rapid Firecannon Energized attack.
+func attack_range() -> float:
+	return stats.attack_range * (1.0 + passives.attack_range_bonus())
+
+
+## The main shot of a basic attack, with the item procs it carries.
+func basic_attack(target: Enemy) -> DamageInfo:
+	var info := roll_attack(1.0, &"basic")
+	passives.on_basic_attack(target, info)
+	return info
+
+
+## HUD buff icons: potions, move speed, the shield and item passives. Each is
+## {id, name, icon, text, count, left, duration, ready}.
+func buffs() -> Array[Dictionary]:
+	var found: Array[Dictionary] = []
+	if item_catalog:
+		for potion in item_catalog.potions():
+			var drinks := restores.count(potion.id)
+			if drinks > 0:
+				found.append({"id": potion.id, "name": potion.display_name, "icon": potion.icon,
+					"text": TooltipCard.potion_text(potion), "count": str(drinks) if drinks > 1 else "",
+					"left": restores.time_left(potion.id), "duration": restores.duration(potion.id), "ready": false})
+	for id: StringName in _speed_buffs:
+		var buff: Dictionary = _speed_buffs[id]
+		var text := "+%d move speed" % roundi(buff.flat) if buff.flat > 0.0 else "+%d%% move speed" % roundi(buff.pct * 100.0)
+		if buff.fade:
+			text += ", fading"
+		found.append({"id": id, "name": SPEED_BUFF_NAMES.get(id, "Move speed"), "icon": MOVE_SPEED_ICON,
+			"text": TooltipText.colorize("[ms]%s[/ms]." % text), "count": "", "left": buff.left,
+			"duration": buff.duration, "ready": false})
+	if shield > 0.0:
+		found.append({"id": &"ichorshield", "name": "Ichorshield", "icon": SHIELD_ICON,
+			"text": "A shield from Bloodthirster's life steal past full health. Absorbs %d damage." % roundi(shield),
+			"count": str(roundi(shield)), "left": 0.0, "duration": 0.0, "ready": false})
+	found.append_array(passives.buffs())
+	return found
 
 
 ## Every enemy whose hurtbox overlaps `shape` placed at `xform`, found instantly.
@@ -232,14 +334,26 @@ func set_range_ring_visible(value: bool) -> void:
 	queue_redraw()
 
 
+## Base move speed plus every flat bonus, then times every percent bonus.
 func current_move_speed() -> float:
-	return stats.move_speed + (_move_speed_bonus if _move_speed_bonus_left > 0.0 else 0.0)
+	var flat := 0.0
+	var pct := 0.0
+	for buff: Dictionary in _speed_buffs.values():
+		flat += buff.flat
+		pct += buff.pct * (buff.left / buff.duration if buff.fade else 1.0)
+	return (stats.move_speed + flat) * (1.0 + pct)
 
 
-## A flat move speed bonus for `duration` seconds; a new one replaces the old.
+## A flat move speed bonus for `duration` seconds (W's); a new one replaces
+## the old.
 func add_move_speed_bonus(amount: float, duration: float) -> void:
-	_move_speed_bonus = amount
-	_move_speed_bonus_left = duration
+	add_speed_buff(&"ardent_blaze", amount, 0.0, duration)
+
+
+## A named move speed buff, flat and/or percent. The same id replaces the
+## old one; different ids stack. `fade` shrinks the percent to 0 over time.
+func add_speed_buff(id: StringName, flat: float, pct: float, duration: float, fade := false) -> void:
+	_speed_buffs[id] = {"flat": flat, "pct": pct, "left": duration, "duration": maxf(duration, 0.01), "fade": fade}
 
 
 func crit_chance() -> float:
@@ -296,7 +410,8 @@ func _physics_process(delta: float) -> void:
 		heal(restored.x)
 		restore_mana(restored.y)
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
-	_move_speed_bonus_left = maxf(_move_speed_bonus_left - delta, 0.0)
+	_tick_buffs(delta)
+	var was_dashing := is_dashing()
 	velocity = Vector2.ZERO
 	if _queued_slot >= 0 and not is_cast_locked() and not is_dashing():
 		var queued := _queued_slot as ChampionProgress.Slot
@@ -304,6 +419,7 @@ func _physics_process(delta: float) -> void:
 		try_cast(queued, _queued_aim)
 	if _dash_left > 0.0:
 		_dash_step(delta)
+		_track_movement(was_dashing)
 		return
 	if _cast_lock_left > 0.0:
 		_cast_lock_left -= delta
@@ -335,6 +451,31 @@ func _physics_process(delta: float) -> void:
 				merchant_reached.emit(_visit)
 			else:
 				_step_toward(_visit.global_position, delta)
+	_track_movement(was_dashing)
+
+
+func _on_inventory_changed() -> void:
+	passives.refresh()
+	_refresh_stats(true)
+
+
+func _tick_buffs(delta: float) -> void:
+	for id in _speed_buffs.keys():
+		_speed_buffs[id].left -= delta
+		if _speed_buffs[id].left <= 0.0:
+			_speed_buffs.erase(id)
+	for cooldown: Cooldown in item_cooldowns.values():
+		cooldown.reduce(delta)
+	if shield > 0.0 and not passives.in_combat():
+		shield = maxf(shield - ICHORSHIELD_DECAY * delta, 0.0)
+
+
+## Walking, dashing and moving during R all build Energize.
+func _track_movement(dashing: bool) -> void:
+	var moved := global_position.distance_to(_last_position)
+	_last_position = global_position
+	if moved > 0.0:
+		passives.on_moved(moved, dashing)
 
 
 ## Recomputes stats from the level and the equipped items. Leveling up grants
@@ -343,6 +484,7 @@ func _physics_process(delta: float) -> void:
 func _refresh_stats(keep_share: bool) -> void:
 	var old := stats
 	stats = base_stats.at_level(progress.level, inventory.equipped_bonus())
+	passives.adjust_stats(stats)
 	if keep_share:
 		hp = clampf(hp / old.max_hp * stats.max_hp, 1.0, stats.max_hp)
 		mana = mana / old.max_mana * stats.max_mana if old.max_mana > 0.0 else 0.0
@@ -354,7 +496,7 @@ func _refresh_stats(keep_share: bool) -> void:
 
 func _draw() -> void:
 	if _show_range_ring:
-		draw_arc(Vector2.ZERO, stats.attack_range, 0.0, TAU, 96, RANGE_RING_COLOR, 3.0, true)
+		draw_arc(Vector2.ZERO, attack_range(), 0.0, TAU, 96, RANGE_RING_COLOR, 3.0, true)
 
 
 func _dash_step(delta: float) -> void:
@@ -400,7 +542,7 @@ func _cancel_windup() -> void:
 
 
 func _in_range(target: Enemy) -> bool:
-	return global_position.distance_to(target.global_position) <= stats.attack_range + target.radius
+	return global_position.distance_to(target.global_position) <= attack_range() + target.radius
 
 
 func _nearest_enemy_in_range() -> Enemy:

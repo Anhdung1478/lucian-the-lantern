@@ -13,6 +13,9 @@ var is_crit := false
 ## The attacker's percent penetration, copied when the hit is made.
 var armor_pen := 0.0
 var magic_pen := 0.0
+## Item effects this basic attack carries to its target, e.g. &"energized",
+## &"kraken_slayer", &"spellblade".
+var procs: Array[StringName] = []
 
 
 static func create(amount: float, type: Type, source: StringName, attacker: Node = null, is_crit := false) -> DamageInfo:

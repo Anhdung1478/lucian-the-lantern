@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Move speed: a winged boot with speed lines -->
+  <rect width="64" height="64" fill="#13221a"/>
+  <path d="M 6 22 L 20 22 M 4 32 L 18 32 M 8 42 L 20 42" stroke="#8fe3a0" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 26 12 L 40 12 L 40 34 L 54 40 C 58 42 58 50 54 50 L 26 50 Z" fill="#c9a45c" stroke="#3a2a10" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M 26 44 L 58 44" stroke="#7a5a28" stroke-width="2"/>
+  <path d="M 40 18 C 48 10 56 10 60 12 C 54 16 50 20 46 24 Z" fill="#f4f8ff" stroke="#3a4a5a" stroke-width="1.6" stroke-linejoin="round"/>
+</svg>

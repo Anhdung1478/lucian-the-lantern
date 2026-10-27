@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Energized: a gold lightning bolt over a charged blue disc -->
+  <defs><radialGradient id="disc"><stop offset="0" stop-color="#3a7ae0"/><stop offset="1" stop-color="#0e1a36"/></radialGradient></defs>
+  <rect width="64" height="64" fill="#0b1222"/>
+  <circle cx="32" cy="32" r="27" fill="url(#disc)" stroke="#6ab8ff" stroke-width="2"/>
+  <path d="M 37 6 L 18 36 L 30 36 L 25 58 L 46 26 L 33 26 Z" fill="#ffd84a" stroke="#5a3a00" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 35 12 L 23 32" stroke="#fff6c8" stroke-width="2" stroke-linecap="round"/>
+</svg>

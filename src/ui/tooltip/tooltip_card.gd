@@ -85,6 +85,19 @@ static func skill(lucian: Lucian, shown: LucianSkill, icon_texture: Texture2D, k
 	return card
 
 
+## A HUD buff's card: icon, name, time left and what it does.
+static func buff(shown: Dictionary) -> Control:
+	var icon := TextureRect.new()
+	icon.texture = shown.icon
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	var subtitle := "Buff"
+	if shown.duration > 0.0:
+		subtitle = "%s s left" % TooltipText.number(snappedf(shown.left, 0.1))
+	var card := _card(icon, shown.name, subtitle, "")
+	_body(card, TooltipText.colorize(shown.text))
+	return card
+
+
 ## A small card with one line of text.
 static func note(text: String) -> Control:
 	var card := _panel()

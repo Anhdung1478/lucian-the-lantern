@@ -29,7 +29,7 @@ func charge() -> void:
 
 ## Lucian's basic attack: one shot, or two when charged.
 func fire_basic_attack(target: Enemy) -> void:
-	lucian.fire_attack_projectile(LucianVisuals.Gun.RIGHT, target, lucian.roll_attack(1.0, &"basic"))
+	lucian.fire_attack_projectile(LucianVisuals.Gun.RIGHT, target, lucian.basic_attack(target))
 	if charged:
 		charged = false
 		_second_shot_target = target

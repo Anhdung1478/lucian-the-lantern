@@ -72,6 +72,10 @@ func _run(scenario: String) -> void:
 			await scenario_shop()
 		"settings":
 			await scenario_settings()
+		"buffs":
+			await scenario_buffs()
+		"actives":
+			await scenario_actives()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -658,3 +662,67 @@ func scenario_settings() -> void:
 	await shot("settings_5_hud_keys")
 	var saved := GameSettings.new(SETTINGS_PATH)
 	print("saved binding reloads (expect W): ", saved.key_label(&"skill_q"))
+
+
+func equip_all(ids: Array[StringName]) -> void:
+	for i in ids.size():
+		lucian.inventory.put(Inventory.EQUIP_START + i, lucian.item_catalog.find(ids[i]))
+
+
+func scenario_buffs() -> void:
+	var game := stage as Stage
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	game.set_dummy_count(3)
+	equip_all([&"kraken_slayer", &"statikk_shiv", &"essence_reaver", &"black_cleaver", &"spear_of_shojin", &"hp_potion"])
+	lucian.inventory.put(Inventory.EQUIP_START + 5, lucian.item_catalog.find(&"hp_potion"))
+	lucian.progress.set_level(5)
+	lucian.try_rank_up(ChampionProgress.Slot.Q)
+	lucian.try_rank_up(ChampionProgress.Slot.W)
+	lucian.hp = 500.0
+	(stage.get_node("DebugTable") as DebugTable).visible = true
+	var hits := {}
+	for target in [dummy] + game.extra_dummies:
+		target.damage_taken.connect(func(info: DamageInfo, _final: float) -> void:
+			hits[info.source] = hits.get(info.source, 0) + 1)
+	lucian.command_attack(dummy)
+	await wait(1.0)
+	lucian.try_cast(ChampionProgress.Slot.Q, dummy.global_position)
+	await wait(1.5)
+	lucian.use_equip_slot(5, Vector2.ZERO)
+	lucian.passives.energize.value = 100.0
+	await wait(1.2)
+	print("hit sources: ", hits)
+	print("carve stacks on the dummy: ", dummy.status_stacks(Enemy.CARVE), "  shojin stacks: ", lucian.passives.shojin_stacks)
+	await shot("buffs_0_combat")
+	var bar: BuffBar = stage.get_node("Hud")._buff_bar
+	print("buff icons: ", bar.get_children().filter(func(c: Control) -> bool: return c.visible).map(func(c: BuffIcon) -> StringName: return c.buff.id))
+	lucian.command_move(lucian.global_position)
+	await wait(0.2)
+	var first := bar.get_child(0) as Control
+	await mouse_move(control_center(first))
+	await wait_for_tooltip(first)
+	await shot("buffs_1_tooltip")
+
+
+func scenario_actives() -> void:
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	equip_all([&"hextech_gunblade", &"galeforce", &"hextech_rocketbelt", &"malignance"])
+	lucian.global_position = dummy.global_position + Vector2(-450, 150)
+	await wait(0.2)
+	print("gunblade (expect true): ", lucian.use_equip_slot(0, dummy.global_position))
+	await wait(0.05)
+	await shot("actives_0_gunblade")
+	await wait(0.5)
+	print("galeforce (expect true): ", lucian.use_equip_slot(1, dummy.global_position))
+	await wait(0.3)
+	await shot("actives_1_galeforce")
+	await wait(0.6)
+	print("rocketbelt (expect true): ", lucian.use_equip_slot(2, dummy.global_position + Vector2(0, -100)))
+	await wait(0.15)
+	await shot("actives_2_rocketbelt")
+	lucian.progress.set_level(6)
+	lucian.try_rank_up(ChampionProgress.Slot.R)
+	lucian.try_cast(ChampionProgress.Slot.R, dummy.global_position)
+	await wait(1.0)
+	await shot("actives_3_hatefog")
+	print("hatefog on the dummy (expect true): ", dummy.has_status(Enemy.HATEFOG), "  slow (expect true): ", dummy.has_status(Enemy.SLOW))
