@@ -19,6 +19,8 @@ var mana := 0.0
 var projectile_parent: Node
 ## Debug: values >= 0 replace Lucian's crit chance.
 var cheat_crit_chance := -1.0
+var cheat_no_cooldowns := false
+var cheat_infinite_mana := false
 
 var _order := Order.NONE
 var _move_point := Vector2.ZERO
@@ -86,7 +88,7 @@ func fire_attack_projectile(gun: LucianVisuals.Gun, target: Enemy, info: DamageI
 
 func _physics_process(delta: float) -> void:
 	hp = minf(hp + stats.hp_regen * delta, stats.max_hp)
-	mana = minf(mana + stats.mana_regen * delta, stats.max_mana)
+	mana = stats.max_mana if cheat_infinite_mana else minf(mana + stats.mana_regen * delta, stats.max_mana)
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	velocity = Vector2.ZERO
 	if _windup_left > 0.0:

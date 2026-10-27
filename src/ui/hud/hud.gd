@@ -42,9 +42,9 @@ func _process(_delta: float) -> void:
 	xp_bar.value = float(progress.xp) / xp_needed if xp_needed > 0 else 1.0
 	var stats := lucian.stats
 	hp_bar.value = lucian.hp / stats.max_hp
-	hp_label.text = "%d / %d" % [ceili(lucian.hp), roundi(stats.max_hp)]
+	hp_label.text = "%d / %d" % [roundi(lucian.hp), roundi(stats.max_hp)]
 	mana_bar.value = lucian.mana / stats.max_mana
-	mana_label.text = "%d / %d" % [floori(lucian.mana), roundi(stats.max_mana)]
+	mana_label.text = "%d / %d" % [roundi(lucian.mana), roundi(stats.max_mana)]
 
 
 func _place_stats_panel() -> void:

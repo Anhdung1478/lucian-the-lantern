@@ -7,6 +7,7 @@ extends Node2D
 @onready var damage_numbers: DamageNumberSpawner = $DamageNumbers
 @onready var camera: StageCamera = $StageCamera
 @onready var hud: Hud = $Hud
+@onready var debug_table: DebugTable = $DebugTable
 
 
 func _ready() -> void:
@@ -15,3 +16,4 @@ func _ready() -> void:
 	lucian.projectile_parent = $Projectiles
 	dummy.damage_taken.connect(damage_numbers.spawn.bind(dummy))
 	hud.setup(lucian)
+	debug_table.setup(lucian, dummy)

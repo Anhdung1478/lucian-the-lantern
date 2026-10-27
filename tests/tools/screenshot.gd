@@ -30,6 +30,8 @@ func _run(scenario: String) -> void:
 			await scenario_dummy()
 		"attack":
 			await scenario_attack()
+		"debug":
+			await scenario_debug()
 		"hud":
 			await scenario_hud()
 		_:
@@ -122,3 +124,31 @@ func scenario_hud() -> void:
 	await wait(0.2)
 	print("level ", lucian.progress.level, " hp ", roundi(lucian.hp), "/", roundi(lucian.stats.max_hp))
 	await shot("hud_0")
+
+
+func press_key(code: Key, pressed: bool) -> void:
+	var event := InputEventKey.new()
+	event.physical_keycode = code
+	event.keycode = code
+	event.pressed = pressed
+	Input.parse_input_event(event)
+	await process_frame
+
+
+func scenario_debug() -> void:
+	var table: DebugTable = stage.get_node("DebugTable")
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	print("table visible at start (expect false): ", table.visible)
+	await press_key(KEY_F3, true)
+	await press_key(KEY_Q, true)
+	await press_key(KEY_Q, false)
+	await press_key(KEY_F3, false)
+	print("table visible after F3+Q (expect true): ", table.visible)
+	await press_key(KEY_Q, true)
+	await press_key(KEY_Q, false)
+	print("table visible after Q alone (expect true): ", table.visible)
+	lucian.progress.add_xp(500)
+	lucian.cheat_crit_chance = 0.5
+	lucian.command_attack(dummy)
+	await wait(5.0)
+	await shot("debug_0")
