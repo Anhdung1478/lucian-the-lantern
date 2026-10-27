@@ -331,3 +331,28 @@ godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
 - Fragment onto its partner: the pop-up appears with its line. An early release swaps; a late release crafts.
 - Equipping changes the stats panel and HP/mana, and AD items raise the damage numbers. Lifesteal heals after "HP 50%".
 - Tooltips show after about 1 s on skills, the passive, backpack cells, recipe icons and HUD items, and read like LoL.
+
+## Implementation notes (Phase 2 done)
+
+Everything in the build order above is in place. Changes and details settled while building:
+
+- **Legendary stats** follow their LoL item, adjusted so they usually carry the stat types of their two fragments (e.g. Bloodthirster = AD + MR, so it gets some MR). `docs/items.md` is generated from the same table as the `.tres` files; the `.tres` files hold the live values.
+- **`Lucian.make_damage()`** builds every hit Lucian deals (basic attacks, passive, Q, W, R), so each one carries his armor and magic pen.
+- **`HoverTip`** polls `Viewport.gui_get_hovered_control()` each frame and walks up to the nearest control with `tooltip_content()` (or a `hover_text` meta). Godot's built-in tooltips were not used: their timer restarts on every mouse motion, they always sit at the cursor, and scripts can't open them for screenshots.
+- **Backpack drag** is custom, not Godot's drag and drop. The pressed cell keeps getting mouse events until release, wherever the mouse goes, so a release outside the backpack still reaches it. Alt-tabbing away or closing the backpack mid-drag puts the item back.
+- **Cells, the recipe table, HUD slots and cards share `ItemIcon.draw_item()`**, which falls back to a colored tile with the item's code if an icon is missing.
+- **The debug table's "Clear items"** empties the equip slots too, not just the backpack.
+- **The E rank-5 bonus** is described in E's tooltip but still waits for killable enemies, as in Phase 1.
+- **Screenshot harness:** `mouse_move` / `mouse_button` send real mouse events and warp the OS cursor to the same spot, so stray OS motion events agree with the script. `wait_for_tooltip()` re-hovers if a stray event still moves the hover, and prints how long the card took.
+
+### Running the checks
+
+Godot 4.7.2 lives in `%LOCALAPPDATA%\Programs\Godot` (`godot.exe`, `godot_console.exe`).
+
+```
+godot_console --headless --path . --import
+godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
+godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+```
+
+New scenarios: `menu`, `tooltip`, `backpack`, `craft`, `hud_items`, `icons`. As in Phase 1, the window takes focus; moving the real mouse over it during a run can disturb the mouse-driven scenarios.

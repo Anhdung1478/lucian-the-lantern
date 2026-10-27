@@ -56,6 +56,8 @@ func _run(scenario: String) -> void:
 			await scenario_craft()
 		"hud_items":
 			await scenario_hud_items()
+		"icons":
+			await scenario_icons()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -441,3 +443,46 @@ func scenario_hud_items() -> void:
 	await wait(0.2)
 	print("visible HUD slots with 4 unlocked (expect 4): ", grid.get_children().filter(func(c: Control) -> bool: return c.visible).size())
 	await shot("hud_items_2_four_slots")
+
+
+## Every item icon at 64 px with its name, plus a row at HUD (40 px) and
+## recipe table (36 px) sizes, on a sheet that covers the stage.
+func scenario_icons() -> void:
+	var sheet := CanvasLayer.new()
+	sheet.layer = 200
+	root.add_child(sheet)
+	var background := ColorRect.new()
+	background.color = Color("0b0d12")
+	background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	sheet.add_child(background)
+	var grid := GridContainer.new()
+	grid.columns = 9
+	grid.position = Vector2(24, 20)
+	grid.add_theme_constant_override(&"h_separation", 18)
+	grid.add_theme_constant_override(&"v_separation", 10)
+	sheet.add_child(grid)
+	var items := lucian.item_catalog.items
+	for item in items:
+		var box := VBoxContainer.new()
+		box.custom_minimum_size.x = 190
+		var icon := ItemIcon.new(item)
+		icon.custom_minimum_size = Vector2(64, 64)
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		box.add_child(icon)
+		var label := Label.new()
+		label.text = item.display_name
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override(&"font_size", 14)
+		box.add_child(label)
+		grid.add_child(box)
+	var small := HBoxContainer.new()
+	small.position = Vector2(24, 1000)
+	small.add_theme_constant_override(&"separation", 4)
+	sheet.add_child(small)
+	for item in items:
+		var icon := ItemIcon.new(item)
+		icon.custom_minimum_size = Vector2(40, 40) if item.is_fragment() else Vector2(36, 36)
+		small.add_child(icon)
+	print("items with icons: ", items.filter(func(item: ItemData) -> bool: return item.icon != null).size(), " / ", items.size())
+	await wait(0.3)
+	await shot("icons_0_sheet")

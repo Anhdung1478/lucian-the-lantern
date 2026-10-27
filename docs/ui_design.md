@@ -32,8 +32,9 @@
   - **Mana cost** shown as a number in the **top-left corner** of each skill icon.
   - A **"+" button** appears when there is a skill point and a bought rank to spend it on.
   - Unbought skills show a **lock icon**.
+- **Hover a skill or the passive** for about **1 second** to see its card, like LoL: name, key, rank, mana cost and cooldown per rank, and a description where per-rank values show the current rank lit up and scalings in their stat color (AD orange, AP purple). The max rank bonus is listed last and lights up once reached.
 - **Summoner spells** (D / F) with cooldowns.
-- **Item slots 1–6:** only unlocked slots are shown, with cooldowns for active items.
+- **Item slots 1–6:** in a 3 × 2 grid right of the HP / mana bars. Only unlocked slots are shown, with cooldowns for active items. Hovering one shows the item's card.
 
 ### Buff icons (above the skill bar)
 - **Very small icons** just above the skill bar, like LoL.
@@ -113,7 +114,7 @@
 | Action | Result |
 |---|---|
 | **Left-click (press and release quickly)** | Does nothing, for all items |
-| **Hold left-click** | Picks up the item to drag it (the only left-click action) |
+| **Hold left-click** | Picks up the item to drag it (the only left-click action): after 0.2 s, or as soon as the mouse moves |
 | **Release the hold** | Drops the item |
 | **Right-click a potion** | Shows a small pop-up **Use** button; click it to use the potion |
 
@@ -122,6 +123,7 @@
 |---|---|
 | Empty cell | Item moves there |
 | Outside the backpack | Item returns to its original cell |
+| Locked equip slot | Item returns to its original cell |
 | Same type of potion | Stacks into the target cell (max **9** per cell); the rest returns to the original cell |
 | An item it can **craft** with | See *Crafting* below |
 | Any other item | The two items **swap** places |
@@ -159,7 +161,8 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 
 ### Item info pop-up
 - **Hover** the cursor over a cell with an item for about **1 second** → a pop-up shows that item's stats and effect.
-- Works in the **backpack**, the **merchant's shop** and the **recipe table**.
+- Works in the **backpack**, the **merchant's shop**, the **recipe table** and the **HUD item slots**.
+- Layout like LoL: icon, name and cost; stat lines; each passive / active with its name; for a legendary, its recipe.
 
 ---
 

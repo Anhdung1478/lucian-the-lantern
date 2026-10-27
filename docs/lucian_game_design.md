@@ -138,6 +138,7 @@
 - **Duplicates allowed.** Stats stack, but each **unique effect only counts once**.
 - **Energized attacks** work like LoL (moving and attacking build stacks; at 100 the next attack is energized).
 - A **crafting recipe table** is shown in game so players can plan builds.
+- Stats, costs and passive / active text of every item: `items.md`.
 
 ### Sources
 - Enemies drop **fragments**, and very rarely a **legendary item**.
@@ -458,7 +459,8 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - [x] Full Endless modifier list
 - [x] Unspent skill points: wasted
 - [x] Wave count per stage across the 22 stages
-- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`)
-- [ ] UI (see `ui_design.md`): HUD done; other screens to design
+- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`)
+- [x] Item stats and effects (`items.md`)
+- [ ] UI (see `ui_design.md`): HUD, backpack, crafting, recipe table and ESC menu done; other screens to design
 - [x] Save system
 - [ ] Art style, sound
