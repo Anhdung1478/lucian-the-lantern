@@ -3,9 +3,6 @@ extends LucianSkill
 ## Q: after a short cast, fires a laser toward the aim point that hits every
 ## enemy in a line. Max rank makes the laser wider.
 
-## The beam is drawn from the guns, not from Lucian's center.
-const GUN_REACH := 44.0
-
 @export var cast_time := 0.3
 @export var length := 1000.0
 @export var width := 60.0
@@ -40,5 +37,5 @@ func _fire() -> void:
 	for enemy in lucian.query_enemies(box, xform):
 		enemy.take_damage(DamageInfo.create(damage, data.damage_type, data.id, lucian))
 	var beam := LaserBeam.new()
-	beam.setup(origin + _direction * GUN_REACH, _direction, length - GUN_REACH, beam_width)
+	beam.setup(origin + _direction * Lucian.GUN_REACH, _direction, length - Lucian.GUN_REACH, beam_width)
 	lucian.spawn(beam)

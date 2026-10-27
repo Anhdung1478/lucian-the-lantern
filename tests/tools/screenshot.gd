@@ -38,6 +38,8 @@ func _run(scenario: String) -> void:
 			await scenario_q()
 		"e":
 			await scenario_e()
+		"w":
+			await scenario_w()
 		"hud":
 			await scenario_hud()
 		_:
@@ -195,3 +197,15 @@ func scenario_e() -> void:
 	lucian.try_cast(ChampionProgress.Slot.E, lucian.global_position + Vector2(400, -200))
 	await wait(0.4)
 	await shot("e_0_trail")
+
+
+func scenario_w() -> void:
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	lucian.try_rank_up(ChampionProgress.Slot.W)
+	lucian.try_cast(ChampionProgress.Slot.W, dummy.global_position)
+	await wait(0.42)
+	await shot("w_0_missile")
+	await wait(0.17)
+	await shot("w_1_cross")
+	await wait(0.06)
+	await shot("w_2_cross")

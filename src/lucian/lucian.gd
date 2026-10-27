@@ -8,6 +8,8 @@ enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE }
 ## Share of the attack period spent winding up before the shot leaves the gun.
 const WINDUP_RATIO := 0.15
 const RANGE_RING_COLOR := Color(1.0, 0.91, 0.66, 0.35)
+## Distance from Lucian's center to his gun muzzles.
+const GUN_REACH := 44.0
 
 @export var base_stats: UnitStats
 
@@ -31,6 +33,8 @@ var _show_range_ring := false
 var _cast_lock_left := 0.0
 var _dash_velocity := Vector2.ZERO
 var _dash_left := 0.0
+var _move_speed_bonus := 0.0
+var _move_speed_bonus_left := 0.0
 
 @onready var visuals: LucianVisuals = $Visuals
 @onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
@@ -86,9 +90,12 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 
 
 ## Called by an enemy after it takes damage from Lucian.
-func on_damage_dealt(_target: Enemy, info: DamageInfo, _final_amount: float) -> void:
+func on_damage_dealt(target: Enemy, info: DamageInfo, _final_amount: float) -> void:
 	if info.source == &"lightslinger":
 		skills[ChampionProgress.Slot.E].cooldown.reduce(passive.e_cooldown_reduction)
+	if info.source != &"w" and target.has_mark(ArdentBlaze.MARK):
+		var blaze := skills[ChampionProgress.Slot.W] as ArdentBlaze
+		add_move_speed_bonus(blaze.current_move_speed_bonus(), blaze.move_speed_duration)
 
 
 ## Every enemy whose hurtbox overlaps `shape` placed at `xform`, found instantly.
@@ -139,7 +146,13 @@ func set_range_ring_visible(value: bool) -> void:
 
 
 func current_move_speed() -> float:
-	return stats.move_speed
+	return stats.move_speed + (_move_speed_bonus if _move_speed_bonus_left > 0.0 else 0.0)
+
+
+## A flat move speed bonus for `duration` seconds; a new one replaces the old.
+func add_move_speed_bonus(amount: float, duration: float) -> void:
+	_move_speed_bonus = amount
+	_move_speed_bonus_left = duration
 
 
 func crit_chance() -> float:
@@ -173,6 +186,7 @@ func _physics_process(delta: float) -> void:
 	hp = minf(hp + stats.hp_regen * delta, stats.max_hp)
 	mana = stats.max_mana if cheat_infinite_mana else minf(mana + stats.mana_regen * delta, stats.max_mana)
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
+	_move_speed_bonus_left = maxf(_move_speed_bonus_left - delta, 0.0)
 	velocity = Vector2.ZERO
 	if _dash_left > 0.0:
 		_dash_step(delta)

@@ -164,3 +164,58 @@ func test_e_keeps_the_attack_order() -> void:
 	await wait_seconds(1.5)
 	assert_has(_sources(), &"basic")
 	assert_has(_sources(), &"lightslinger", "E charged the passive")
+
+
+const DUMMY_MR_MULTIPLIER := 100.0 / 130.0
+
+
+func test_w_bursts_on_first_enemy_and_marks_it() -> void:
+	_rank(Slot.W, 1)
+	lucian.try_cast(Slot.W, dummy.position)
+	await wait_seconds(0.8)
+	assert_eq(_sources(), [&"w"])
+	assert_eq(hits[0][0].type, DamageInfo.Type.MAGIC)
+	assert_almost_eq(hits[0][1], 75.0 * DUMMY_MR_MULTIPLIER, 0.01)
+	assert_true(dummy.has_mark(ArdentBlaze.MARK))
+
+
+func test_w_bursts_at_max_range_and_cross_catches_enemies_beside_it() -> void:
+	# The missile flies along y = 0 and misses; its cross ends 944 px out.
+	dummy.position = Vector2(944, 150)
+	_rank(Slot.W, 1)
+	lucian.try_cast(Slot.W, Vector2(1000, 0))
+	await wait_seconds(1.0)
+	assert_eq(_sources(), [&"w"])
+
+
+func test_w_max_rank_cross_is_bigger() -> void:
+	# 250 px off the missile path: outside 200 + 44, inside 280 + 44.
+	dummy.position = Vector2(944, 250)
+	lucian.progress.set_level(9)
+	_rank(Slot.W, 4)
+	lucian.try_cast(Slot.W, Vector2(1000, 0))
+	await wait_seconds(1.0)
+	assert_eq(hits.size(), 0, "rank 4 cross is too small")
+	_rank(Slot.W, 1)
+	lucian.skills[Slot.W].cooldown.clear()
+	lucian.try_cast(Slot.W, Vector2(1000, 0))
+	await wait_seconds(1.0)
+	assert_eq(hits.size(), 1, "rank 5 cross reaches")
+
+
+func test_hitting_a_marked_enemy_gives_move_speed() -> void:
+	_rank(Slot.W, 1)
+	var base_speed := lucian.current_move_speed()
+	dummy.add_mark(ArdentBlaze.MARK, 6.0)
+	lucian.on_damage_dealt(dummy, DamageInfo.create(10.0, DamageInfo.Type.PHYSICAL, &"basic", lucian), 8.0)
+	assert_almost_eq(lucian.current_move_speed(), base_speed + 60.0, 0.001)
+	await wait_seconds(1.1)
+	assert_almost_eq(lucian.current_move_speed(), base_speed, 0.001)
+
+
+func test_w_itself_does_not_trigger_move_speed() -> void:
+	_rank(Slot.W, 1)
+	var base_speed := lucian.current_move_speed()
+	dummy.add_mark(ArdentBlaze.MARK, 6.0)
+	lucian.on_damage_dealt(dummy, DamageInfo.create(10.0, DamageInfo.Type.MAGIC, &"w", lucian), 8.0)
+	assert_eq(lucian.current_move_speed(), base_speed)
