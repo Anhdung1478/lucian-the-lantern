@@ -32,6 +32,8 @@ func _run(scenario: String) -> void:
 			await scenario_attack()
 		"debug":
 			await scenario_debug()
+		"skills":
+			await scenario_skills()
 		"hud":
 			await scenario_hud()
 		_:
@@ -40,6 +42,8 @@ func _run(scenario: String) -> void:
 
 
 func shot(file_name: String) -> void:
+	# Let every node process once more so the HUD shows the latest values.
+	await process_frame
 	await RenderingServer.frame_post_draw
 	var path := out_dir.path_join(file_name + ".png")
 	root.get_texture().get_image().save_png(path)
@@ -152,3 +156,20 @@ func scenario_debug() -> void:
 	lucian.command_attack(dummy)
 	await wait(5.0)
 	await shot("debug_0")
+
+
+func scenario_skills() -> void:
+	var Slot := ChampionProgress.Slot
+	lucian.progress.set_level(7)
+	lucian.try_rank_up(Slot.Q)
+	lucian.try_rank_up(Slot.Q)
+	lucian.try_rank_up(Slot.W)
+	lucian.try_rank_up(Slot.E)
+	lucian.try_rank_up(Slot.R)
+	lucian.try_cast(Slot.Q, lucian.global_position + Vector2.RIGHT * 300)
+	await wait(2.0)
+	lucian.try_cast(Slot.W, lucian.global_position + Vector2.RIGHT * 300)
+	await wait(0.4)
+	lucian.mana = 60.0
+	print("points left: ", lucian.progress.skill_points(), " can rank Q: ", lucian.progress.can_rank_up(Slot.Q))
+	await shot("skills_0")

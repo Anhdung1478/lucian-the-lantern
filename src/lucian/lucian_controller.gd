@@ -7,6 +7,12 @@ extends Node
 const REISSUE_DISTANCE := 8.0
 ## Extra slack around an enemy's radius when clicking on it.
 const CLICK_SLACK := 10.0
+const SKILL_ACTIONS := {
+	&"skill_q": ChampionProgress.Slot.Q,
+	&"skill_w": ChampionProgress.Slot.W,
+	&"skill_e": ChampionProgress.Slot.E,
+	&"skill_r": ChampionProgress.Slot.R,
+}
 
 var _move_held := false
 var _last_move_point := Vector2.ZERO
@@ -19,6 +25,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		# A focused debug SpinBox would otherwise keep eating Q/W/E/R.
 		get_viewport().gui_release_focus()
+	for action: StringName in SKILL_ACTIONS:
+		if event.is_action_pressed(action):
+			# Ctrl+Q also matches skill_q, so the rank-up check comes first.
+			if (event as InputEventWithModifiers).ctrl_pressed:
+				lucian.try_rank_up(SKILL_ACTIONS[action])
+			else:
+				lucian.try_cast(SKILL_ACTIONS[action], _cursor())
+			get_viewport().set_input_as_handled()
+			return
 	if event.is_action_pressed(&"move"):
 		_set_attack_move_armed(false)
 		_move_held = true

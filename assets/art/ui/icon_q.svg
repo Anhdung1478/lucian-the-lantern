@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Piercing Light: a wide beam fired from a pistol -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#fffbe8"/><stop offset="0.5" stop-color="#ffe9a8" stop-opacity="0.8"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <path d="M 14 44 L 64 8 L 64 24 L 18 50 Z" fill="#ffcf5a" opacity="0.45"/>
+  <path d="M 16 47 L 64 14 L 64 19 L 17 49 Z" fill="#fffbe8"/>
+  <path d="M 4 50 L 16 42 L 20 47 L 9 56 Z" fill="#3a404d" stroke="#9aa3b2" stroke-width="1.5" stroke-linejoin="round"/>
+  <circle cx="17" cy="46" r="6" fill="url(#glow)"/>
+  <circle cx="44" cy="30" r="4" fill="#c8312b" opacity="0.8"/>
+</svg>

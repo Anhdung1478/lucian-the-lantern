@@ -5,6 +5,11 @@
 [ext_resource type="Script" path="res://src/lucian/lucian_visuals.gd" id="3_visuals"]
 [ext_resource type="Script" path="res://src/lucian/lucian_controller.gd" id="4_controller"]
 [ext_resource type="Texture2D" path="res://assets/art/lucian/lucian_body.svg" id="5_body"]
+[ext_resource type="Script" path="res://src/lucian/skills/lucian_skill.gd" id="6_skill"]
+[ext_resource type="Resource" path="res://data/skills/q_piercing_light.tres" id="7_q"]
+[ext_resource type="Resource" path="res://data/skills/w_ardent_blaze.tres" id="8_w"]
+[ext_resource type="Resource" path="res://data/skills/e_relentless_pursuit.tres" id="9_e"]
+[ext_resource type="Resource" path="res://data/skills/r_the_culling.tres" id="10_r"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 30.0
@@ -33,3 +38,24 @@ position = Vector2(46, 15)
 
 [node name="Controller" type="Node" parent="."]
 script = ExtResource("4_controller")
+
+[node name="Skills" type="Node" parent="."]
+
+[node name="Q" type="Node" parent="Skills"]
+script = ExtResource("6_skill")
+data = ExtResource("7_q")
+
+[node name="W" type="Node" parent="Skills"]
+script = ExtResource("6_skill")
+slot = 1
+data = ExtResource("8_w")
+
+[node name="E" type="Node" parent="Skills"]
+script = ExtResource("6_skill")
+slot = 2
+data = ExtResource("9_e")
+
+[node name="R" type="Node" parent="Skills"]
+script = ExtResource("6_skill")
+slot = 3
+data = ExtResource("10_r")

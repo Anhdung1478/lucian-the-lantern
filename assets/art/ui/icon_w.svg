@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Ardent Blaze: a burning cross-shaped burst -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#fffbe8"/><stop offset="0.5" stop-color="#ffe9a8" stop-opacity="0.8"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <path d="M 28 6 L 36 6 L 36 28 L 58 28 L 58 36 L 36 36 L 36 58 L 28 58 L 28 36 L 6 36 L 6 28 L 28 28 Z" fill="#ff7a1a" opacity="0.9"/>
+  <path d="M 30 12 L 34 12 L 34 30 L 52 30 L 52 34 L 34 34 L 34 52 L 30 52 L 30 34 L 12 34 L 12 30 L 30 30 Z" fill="#ffd27a"/>
+  <circle cx="32" cy="32" r="9" fill="#fff3d0"/>
+  <circle cx="32" cy="32" r="15" fill="none" stroke="#ff9a3c" stroke-width="2" stroke-dasharray="4 3"/>
+</svg>

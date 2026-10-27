@@ -4,11 +4,20 @@ extends CanvasLayer
 
 ## Space between the stats panel and the bottom panel.
 const STATS_GAP := 10.0
+const PASSIVE_ICON := preload("res://assets/art/ui/icon_passive.svg")
+const SKILL_ICONS := [
+	preload("res://assets/art/ui/icon_q.svg"),
+	preload("res://assets/art/ui/icon_w.svg"),
+	preload("res://assets/art/ui/icon_e.svg"),
+	preload("res://assets/art/ui/icon_r.svg"),
+]
+const SKILL_KEYS := ["Q", "W", "E", "R"]
 
 var lucian: Lucian
 
 @onready var bottom_panel: PanelContainer = %BottomPanel
 @onready var stats_panel: StatsPanel = %StatsPanel
+@onready var skill_row: HBoxContainer = %SkillRow
 @onready var level_label: Label = %LevelLabel
 @onready var xp_bar: ProgressBar = %XpBar
 @onready var hp_bar: ProgressBar = %HpBar
@@ -20,6 +29,9 @@ var lucian: Lucian
 func setup(target: Lucian) -> void:
 	lucian = target
 	stats_panel.lucian = target
+	_add_skill_slot(null, PASSIVE_ICON, "")
+	for i in SKILL_ICONS.size():
+		_add_skill_slot(target.skills[i], SKILL_ICONS[i], SKILL_KEYS[i])
 
 
 func _ready() -> void:
@@ -45,6 +57,12 @@ func _process(_delta: float) -> void:
 	hp_label.text = "%d / %d" % [roundi(lucian.hp), roundi(stats.max_hp)]
 	mana_bar.value = lucian.mana / stats.max_mana
 	mana_label.text = "%d / %d" % [roundi(lucian.mana), roundi(stats.max_mana)]
+
+
+func _add_skill_slot(skill: LucianSkill, icon: Texture2D, key: String) -> void:
+	var slot := SkillSlot.new()
+	slot.setup(lucian, skill, icon, key)
+	skill_row.add_child(slot)
 
 
 func _place_stats_panel() -> void:

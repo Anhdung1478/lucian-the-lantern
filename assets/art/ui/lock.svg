@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 32 32">
+  <!-- Lock shown on skills not bought in the Evolution Tree -->
+  <path d="M 10 14 L 10 10 Q 10 4 16 4 Q 22 4 22 10 L 22 14" fill="none" stroke="#c9d1dc" stroke-width="3"/>
+  <rect x="7" y="14" width="18" height="14" rx="2" fill="#c9a45c" stroke="#5e4a2a" stroke-width="1.5"/>
+  <circle cx="16" cy="20" r="2.2" fill="#3a2a14"/>
+  <path d="M 16 21 L 16 25" stroke="#3a2a14" stroke-width="2"/>
+</svg>

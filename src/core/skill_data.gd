@@ -4,7 +4,6 @@ extends Resource
 
 @export var id: StringName
 @export var display_name := ""
-@export var icon: Texture2D
 @export var max_rank := 5
 @export var damage_type := DamageInfo.Type.PHYSICAL
 @export var mana_cost: Array[float] = []

@@ -28,8 +28,10 @@ var _target: Enemy
 var _attack_cooldown := 0.0
 var _windup_left := 0.0
 var _show_range_ring := false
+var _cast_lock_left := 0.0
 
 @onready var visuals: LucianVisuals = $Visuals
+@onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
 
 
 func _ready() -> void:
@@ -59,6 +61,33 @@ func command_attack_move(point: Vector2) -> void:
 	_order = Order.ATTACK_MOVE
 	_move_point = point
 	_target = null
+
+
+func try_rank_up(slot: ChampionProgress.Slot) -> bool:
+	return progress.rank_up(slot)
+
+
+## The cast gate: rank, cooldown, state and mana, then pay and cast.
+func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
+	var skill := skills[slot]
+	if skill.rank() == 0 or not skill.cooldown.is_ready() or is_cast_locked():
+		return false
+	if mana < skill.mana_cost():
+		return false
+	mana -= skill.mana_cost()
+	skill.cooldown.start(0.0 if cheat_no_cooldowns else skill.cooldown_seconds(), stats.ability_haste)
+	_cancel_windup()
+	skill.execute(aim)
+	return true
+
+
+## Lucian stands still for `seconds` (a cast time); the standing order resumes after.
+func lock_cast(seconds: float) -> void:
+	_cast_lock_left = seconds
+
+
+func is_cast_locked() -> bool:
+	return _cast_lock_left > 0.0
 
 
 func set_range_ring_visible(value: bool) -> void:
@@ -91,6 +120,9 @@ func _physics_process(delta: float) -> void:
 	mana = stats.max_mana if cheat_infinite_mana else minf(mana + stats.mana_regen * delta, stats.max_mana)
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	velocity = Vector2.ZERO
+	if _cast_lock_left > 0.0:
+		_cast_lock_left -= delta
+		return
 	if _windup_left > 0.0:
 		_process_windup(delta)
 		return
