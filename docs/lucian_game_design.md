@@ -120,7 +120,7 @@
 
 | Skill | Bonus |
 |---|---|
-| Q (rank 5) | Laser becomes wider |
+| Q (rank 5) | Laser becomes wider and longer |
 | W (rank 5) | Bigger explosion area |
 | E (rank 5) | A kill lowers E cooldown by 1 second |
 | R (rank 3) | Bullets pierce; damage drops 15% per enemy hit, minimum 30% |

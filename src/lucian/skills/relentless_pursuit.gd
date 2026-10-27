@@ -5,8 +5,8 @@ extends LucianSkill
 ## The max rank bonus (a kill lowers the cooldown by 1 s) needs enemies that
 ## can die, so it arrives with them.
 
-@export var min_distance := 200.0
-@export var max_distance := 425.0
+@export var min_distance := 160.0
+@export var max_distance := 280.0
 @export var dash_speed := 1350.0
 
 var _dash_start := Vector2.ZERO

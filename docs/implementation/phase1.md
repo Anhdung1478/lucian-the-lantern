@@ -71,9 +71,9 @@ Phase 1 builds the first playable slice: one stage screen on a test map. Lucian 
 | Skill | Numbers per rank |
 |---|---|
 | Passive | After any successful cast, the next basic attack fires a 2nd shot (0.15 s later, other gun) for 60% AD; the shot can crit. Each passive shot that hits lowers E's cooldown by 1 s. |
-| Q | Physical 80/110/140/170/200 + 60/70/80/90/100% AD. Mana 50/55/60/65/70. CD 9/8/7/6/5 s. Lucian stands still for a 0.3 s cast. The laser is 1000 long and 60 wide, **90 wide at rank 5**. |
+| Q | Physical 80/110/140/170/200 + 60/70/80/90/100% AD. Mana 50/55/60/65/70. CD 9/8/7/6/5 s. Lucian stands still for a 0.3 s cast. The laser is 800 long and 60 wide, **900 long and 90 wide at rank 5**. |
 | W | Magic 75/110/145/180/215 + 90% AP. Mana 70. CD 14/13/12/11/10 s. 0.2 s cast. The missile (range 900, speed 1600) explodes on the first enemy or at max range in a cross of two 400×60 bars, **×1.4 at rank 5**. The mark lasts 6 s; Lucian's next hit (not W) on a marked enemy gives him +60/65/70/75/80 MS for 1 s. |
-| E | Dash toward the cursor: 425 max, 200 min, speed 1350. Mana 40/30/20/10/0. CD 19/17.75/16.5/15.25/14 s. Resets the attack timer. Usable during R. |
+| E | Dash toward the cursor: 280 max, 160 min, speed 1350. Mana 40/30/20/10/0. CD 19/17.75/16.5/15.25/14 s. Resets the attack timer. Usable during R. |
 | R | 3 s channel, 22 shots in the cast direction, alternating guns. Physical 15/30/45 + 25% AD + 15% AP per shot. Mana 100. CD 100/90/80 s. Lucian can move and E, but cannot attack, Q or W. **Rank 3: bullets pierce, −15% per enemy hit, minimum 30%.** |
 | Basic attack | Homing projectile, speed 2800. Windup 15% of attack time. Range 500 + target radius. |
 

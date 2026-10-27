@@ -62,6 +62,21 @@ func test_q_max_rank_laser_is_wider() -> void:
 	assert_eq(hits.size(), 1, "rank 5 is wide enough")
 
 
+func test_q_max_rank_laser_is_longer() -> void:
+	# Hurtbox edge at 870 - 44 = 826: past the 800 laser, inside the 900 one.
+	dummy.position = Vector2(870, 0)
+	lucian.progress.set_level(9)
+	_rank(Slot.Q, 4)
+	lucian.try_cast(Slot.Q, dummy.position)
+	await wait_seconds(0.45)
+	assert_eq(hits.size(), 0, "rank 4 is too short to reach")
+	_rank(Slot.Q, 1)
+	lucian.skills[Slot.Q].cooldown.clear()
+	lucian.try_cast(Slot.Q, dummy.position)
+	await wait_seconds(0.45)
+	assert_eq(hits.size(), 1, "rank 5 is long enough")
+
+
 func test_q_roots_lucian_during_cast() -> void:
 	_rank(Slot.Q, 1)
 	lucian.command_move(Vector2(-500, 0))
@@ -117,13 +132,13 @@ func _add_wall(x: float) -> void:
 
 
 func test_e_dashes_max_distance_through_enemies() -> void:
-	dummy.position = Vector2(250, 0)
+	dummy.position = Vector2(150, 0)
 	_rank(Slot.E, 1)
 	assert_true(lucian.try_cast(Slot.E, Vector2(2000, 0)))
 	assert_true(lucian.is_dashing())
 	await wait_seconds(0.5)
 	assert_false(lucian.is_dashing())
-	assert_almost_eq(lucian.position.x, 425.0, 2.0)
+	assert_almost_eq(lucian.position.x, 280.0, 2.0)
 	assert_almost_eq(lucian.position.y, 0.0, 0.5)
 
 
@@ -132,7 +147,7 @@ func test_e_has_minimum_distance() -> void:
 	_rank(Slot.E, 1)
 	lucian.try_cast(Slot.E, Vector2(50, 0))
 	await wait_seconds(0.4)
-	assert_almost_eq(lucian.position.x, 200.0, 2.0)
+	assert_almost_eq(lucian.position.x, 160.0, 2.0)
 
 
 func test_e_stops_at_walls() -> void:
