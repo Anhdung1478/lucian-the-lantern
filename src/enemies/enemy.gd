@@ -25,6 +25,7 @@ func _ready() -> void:
 func take_damage(info: DamageInfo) -> float:
 	var final_amount := DamageCalc.mitigate(info.amount, info.type, armor, mr, info.armor_pen, info.magic_pen)
 	_lose_hp(final_amount)
+	Sfx.play(&"hit", -12.0)
 	damage_taken.emit(info, final_amount)
 	if is_instance_valid(info.attacker) and info.attacker.has_method(&"on_damage_dealt"):
 		info.attacker.on_damage_dealt(self, info, final_amount)

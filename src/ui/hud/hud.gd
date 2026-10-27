@@ -13,7 +13,7 @@ const SKILL_ICONS := [
 	preload("res://assets/art/ui/icon_e.svg"),
 	preload("res://assets/art/ui/icon_r.svg"),
 ]
-const SKILL_KEYS := ["Q", "W", "E", "R"]
+const SKILL_ACTIONS: Array[StringName] = [&"skill_q", &"skill_w", &"skill_e", &"skill_r"]
 const GOLD_ICON := preload("res://assets/art/ui/gold.svg")
 const GOLD_COLOR := Color("ffcf5a")
 const MARGIN := 12.0
@@ -22,6 +22,8 @@ var lucian: Lucian
 var wallet: Wallet
 
 var _gold_label: Label
+var _fps_label: Label
+var _skill_slots: Array[SkillSlot] = []
 
 @onready var bottom_panel: PanelContainer = %BottomPanel
 @onready var stats_panel: StatsPanel = %StatsPanel
@@ -42,10 +44,12 @@ func setup(target: Lucian, stage_wallet: Wallet) -> void:
 	_show_gold(wallet.gold)
 	stats_panel.lucian = target
 	_add_skill_slot(null, PASSIVE_ICON, "")
+	var settings := GameSettings.instance()
 	for i in SKILL_ICONS.size():
-		_add_skill_slot(target.skills[i], SKILL_ICONS[i], SKILL_KEYS[i])
+		_add_skill_slot(target.skills[i], SKILL_ICONS[i], settings.key_label(SKILL_ACTIONS[i]))
 	for i in Inventory.EQUIP_SIZE:
 		item_grid.add_child(HudItemSlot.new(target.inventory, i))
+	settings.changed.connect(_on_setting_changed)
 
 
 func _ready() -> void:
@@ -53,6 +57,12 @@ func _ready() -> void:
 	bottom_panel.resized.connect(_place_stats_panel)
 	_place_stats_panel()
 	_build_gold()
+	_fps_label = UiStyle.label("", 16, UiStyle.DIM_COLOR)
+	_fps_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_fps_label.offset_top = 6.0
+	_fps_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_fps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$Root.add_child(_fps_label)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -73,12 +83,27 @@ func _process(_delta: float) -> void:
 	hp_label.text = "%d / %d" % [roundi(lucian.hp), roundi(stats.max_hp)]
 	mana_bar.value = lucian.mana / stats.max_mana
 	mana_label.text = "%d / %d" % [roundi(lucian.mana), roundi(stats.max_mana)]
+	_fps_label.visible = GameSettings.instance().get_value(&"show_fps")
+	if _fps_label.visible:
+		_fps_label.text = "FPS %d" % Engine.get_frames_per_second()
 
 
 func _add_skill_slot(skill: LucianSkill, icon: Texture2D, key: String) -> void:
 	var slot := SkillSlot.new()
 	slot.setup(lucian, skill, icon, key)
 	skill_row.add_child(slot)
+	if skill:
+		_skill_slots.append(slot)
+
+
+## Key labels follow the bindings.
+func _on_setting_changed(key: StringName) -> void:
+	if key != &"bindings":
+		return
+	for i in _skill_slots.size():
+		_skill_slots[i].set_key(GameSettings.instance().key_label(SKILL_ACTIONS[i]))
+	for slot in item_grid.get_children():
+		slot.queue_redraw()
 
 
 func _place_stats_panel() -> void:

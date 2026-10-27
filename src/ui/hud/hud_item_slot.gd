@@ -39,7 +39,7 @@ func _draw() -> void:
 	ItemIcon.draw_item(self, inventory.item_at(index), rect.grow(-3.0))
 	ItemIcon.draw_count(self, inventory.count_at(index), rect, true)
 	draw_rect(rect, FRAME_COLOR, false, 2.0)
-	var key := str(index - Inventory.EQUIP_START + 1)
+	var key := GameSettings.instance().key_label(StringName("item_%d" % (index - Inventory.EQUIP_START + 1)))
 	var font := ThemeDB.fallback_font
 	var at := Vector2(0, size.y - 3.0)
 	draw_string_outline(font, at, key, HORIZONTAL_ALIGNMENT_RIGHT, size.x - 3.0, 12, 4, Color.BLACK)

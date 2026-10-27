@@ -173,6 +173,7 @@ func use_item(index: int) -> bool:
 		return false
 	inventory.take_one(index)
 	restores.start(item)
+	Sfx.play(&"potion")
 	return true
 
 
@@ -266,7 +267,11 @@ func fire_attack_projectile(gun: LucianVisuals.Gun, target: Enemy, info: DamageI
 	flash_muzzle(gun)
 
 
+## The gunshot sound and, unless the quality is Low, a muzzle flash.
 func flash_muzzle(gun: LucianVisuals.Gun) -> void:
+	Sfx.play(&"shot", -6.0)
+	if GameSettings.instance().low_effects():
+		return
 	var flash := MuzzleFlash.new()
 	flash.position = visuals.muzzle_position(gun)
 	spawn(flash)

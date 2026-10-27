@@ -28,6 +28,7 @@ var _plus: Button
 var _cooldown_label: Label
 var _cost_label: Label
 var _lock: TextureRect
+var _key_label: Label
 var _key := ""
 
 
@@ -71,8 +72,14 @@ func setup(target: Lucian, slot_skill: LucianSkill, icon: Texture2D, key: String
 	_cooldown_label = _label(icon_rect, 24, HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
 	_cost_label = _label(icon_rect.grow(-3), 13, HORIZONTAL_ALIGNMENT_LEFT, VERTICAL_ALIGNMENT_TOP)
 	_cost_label.add_theme_color_override(&"font_color", Color("8fb8ff"))
-	var key_label := _label(icon_rect.grow(-3), 13, HORIZONTAL_ALIGNMENT_RIGHT, VERTICAL_ALIGNMENT_BOTTOM)
-	key_label.text = key
+	_key_label = _label(icon_rect.grow(-3), 13, HORIZONTAL_ALIGNMENT_RIGHT, VERTICAL_ALIGNMENT_BOTTOM)
+	_key_label.text = key
+
+
+## Shows a new key after rebinding.
+func set_key(key: String) -> void:
+	_key = key
+	_key_label.text = key
 
 
 func _process(_delta: float) -> void:

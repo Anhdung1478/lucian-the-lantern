@@ -255,7 +255,8 @@ func _release() -> void:
 			traded.emit(true)
 		else:
 			var craft_ready := _craft_popup.visible and _craft_time >= CRAFT_HOLD
-			inventory.apply_drop(_drag_index, _target, craft_ready)
+			if inventory.apply_drop(_drag_index, _target, craft_ready) == Inventory.Drop.CRAFT:
+				Sfx.play(&"craft")
 	_end_drag()
 
 

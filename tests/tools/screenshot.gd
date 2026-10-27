@@ -3,6 +3,8 @@ extends SceneTree
 ## directly, and saves viewport screenshots. Needs a real window (not --headless).
 ## Usage: godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
 
+const SETTINGS_PATH := "user://screenshot_settings.json"
+
 var stage: Node
 var lucian: Lucian
 var out_dir := ""
@@ -12,6 +14,10 @@ func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	var scenario: String = args[0] if args.size() > 0 else "move"
 	out_dir = args[1] if args.size() > 1 else OS.get_user_data_dir()
+	# A scratch settings file, so runs never touch the player's settings.
+	if FileAccess.file_exists(SETTINGS_PATH):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS_PATH))
+	GameSettings._instance = GameSettings.new(SETTINGS_PATH)
 	stage = load("res://src/stage/stage.tscn").instantiate()
 	root.add_child(stage)
 	# The stage confines the mouse; give it back during automated runs.
@@ -64,6 +70,8 @@ func _run(scenario: String) -> void:
 			await scenario_potions()
 		"shop":
 			await scenario_shop()
+		"settings":
+			await scenario_settings()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -333,7 +341,7 @@ func scenario_tooltip() -> void:
 	await press_key(KEY_ESCAPE, true)
 	await press_key(KEY_ESCAPE, false)
 	var menu: GameMenu = stage.get_node("Screens/Menu")
-	var settings: Button = menu.find_children("*", "Button", true, false)[1]
+	var settings: Button = menu.find_children("*", "Button", true, false)[2]
 	await mouse_move(control_center(settings))
 	await wait_for_tooltip(settings)
 	await shot("tooltip_2_disabled_button")
@@ -604,3 +612,49 @@ func scenario_shop() -> void:
 	await press_key(KEY_ESCAPE, true)
 	await press_key(KEY_ESCAPE, false)
 	print("ESC closes the shop (expect false false): ", game.screens.is_shopping(), " ", paused)
+
+
+func click(control: Control) -> void:
+	await mouse_move(control_center(control))
+	await mouse_button(control_center(control), true)
+	await mouse_button(control_center(control), false)
+
+
+func scenario_settings() -> void:
+	await press_key(KEY_ESCAPE, true)
+	await press_key(KEY_ESCAPE, false)
+	var menu: GameMenu = stage.get_node("Screens/Menu")
+	await click(menu.find_children("*", "Button", true, false)[1])
+	var screen: SettingsScreen = stage.get_node("Screens/Settings")
+	print("settings open and paused (expect true true): ", screen.visible, " ", paused)
+	await wait(0.2)
+	await shot("settings_0_audio")
+	await click(screen._tab_buttons[1])
+	await click(screen._bind_buttons[&"skill_q"])
+	print("listening (expect true): ", screen.is_listening())
+	await shot("settings_1_listening")
+	await press_key(KEY_Z, true)
+	await press_key(KEY_Z, false)
+	var settings := GameSettings.instance()
+	print("Q bound to (expect Z): ", settings.key_label(&"skill_q"))
+	await click(screen._bind_buttons[&"skill_w"])
+	await press_key(KEY_Z, true)
+	await press_key(KEY_Z, false)
+	print("W took Z, Q got W (expect Z W): ", settings.key_label(&"skill_w"), " ", settings.key_label(&"skill_q"))
+	await wait(0.1)
+	await shot("settings_2_controls")
+	await click(screen._tab_buttons[2])
+	await wait(0.1)
+	await shot("settings_3_graphics")
+	await click(screen._tab_buttons[3])
+	await wait(0.1)
+	await shot("settings_4_gameplay")
+	await press_key(KEY_ESCAPE, true)
+	await press_key(KEY_ESCAPE, false)
+	print("ESC back to the menu (expect false true): ", screen.visible, " ", menu.visible)
+	await press_key(KEY_ESCAPE, true)
+	await press_key(KEY_ESCAPE, false)
+	await wait(0.2)
+	await shot("settings_5_hud_keys")
+	var saved := GameSettings.new(SETTINGS_PATH)
+	print("saved binding reloads (expect W): ", saved.key_label(&"skill_q"))

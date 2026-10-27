@@ -70,8 +70,9 @@ func _draw() -> void:
 			ItemIcon.draw_count(self, screen.inventory.count_at(index), rect.grow(-2.0))
 	if style == Style.EQUIP:
 		var font := ThemeDB.fallback_font
-		draw_string_outline(font, Vector2(5, 15), str(index - Inventory.EQUIP_START + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 4, Color.BLACK)
-		draw_string(font, Vector2(5, 15), str(index - Inventory.EQUIP_START + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, KEY_COLOR)
+		var key := GameSettings.instance().key_label(StringName("item_%d" % (index - Inventory.EQUIP_START + 1)))
+		draw_string_outline(font, Vector2(5, 15), key, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 4, Color.BLACK)
+		draw_string(font, Vector2(5, 15), key, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, KEY_COLOR)
 
 
 ## The red sell slot: "SELL", or the gold the dragged item would bring.

@@ -21,6 +21,12 @@ var shop_slots := 2
 
 
 func _ready() -> void:
+	var settings := GameSettings.instance()
+	settings.apply()
+	settings.changed.connect(_on_setting_changed)
+	lucian.queue_casts = settings.get_value(&"queue_casts")
+	screens.settings.setup(settings)
+	add_child(Sfx.new())
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	camera.setup(lucian, arena.get_bounds().grow(TestArena.WALL_THICKNESS))
 	lucian.projectile_parent = $Projectiles
@@ -30,6 +36,7 @@ func _ready() -> void:
 	screens.backpack.setup(lucian.inventory)
 	screens.backpack.potion_used.connect(lucian.use_item)
 	lucian.merchant_reached.connect(_open_shop)
+	screens.backpack.traded.connect(func(ok: bool) -> void: Sfx.play(&"coin" if ok else &"error"))
 	add_merchant()
 
 
@@ -58,6 +65,11 @@ func set_shop_slots(count: int) -> void:
 	shop_slots = clampi(count, 1, MerchantStock.SLOTS)
 	if merchant:
 		merchant.stock.unlocked = shop_slots
+
+
+func _on_setting_changed(key: StringName) -> void:
+	if key == &"queue_casts":
+		lucian.queue_casts = GameSettings.instance().get_value(&"queue_casts")
 
 
 func _open_shop(visited: Merchant) -> void:

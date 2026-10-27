@@ -36,6 +36,8 @@ func _physics_process(delta: float) -> void:
 	# Draw the trail once the dash is over, so it matches where Lucian stopped.
 	if _was_dashing and not lucian.is_dashing():
 		_was_dashing = false
+		if GameSettings.instance().low_effects():
+			return
 		var trail := DashTrail.new()
 		trail.setup(_dash_start, lucian.global_position)
 		lucian.spawn(trail)
