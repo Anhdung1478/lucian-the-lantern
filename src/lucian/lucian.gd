@@ -177,6 +177,13 @@ func fire_attack_projectile(gun: LucianVisuals.Gun, target: Enemy, info: DamageI
 	var shot := AttackProjectile.new()
 	shot.launch(visuals.muzzle_position(gun), target, info)
 	spawn(shot)
+	flash_muzzle(gun)
+
+
+func flash_muzzle(gun: LucianVisuals.Gun) -> void:
+	var flash := MuzzleFlash.new()
+	flash.position = visuals.muzzle_position(gun)
+	spawn(flash)
 
 
 ## Adds a projectile or effect to the stage.

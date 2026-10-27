@@ -42,6 +42,8 @@ func _run(scenario: String) -> void:
 			await scenario_w()
 		"r":
 			await scenario_r()
+		"combo":
+			await scenario_combo()
 		"hud":
 			await scenario_hud()
 		_:
@@ -221,3 +223,28 @@ func scenario_r() -> void:
 	lucian.command_move(lucian.global_position + Vector2(0, -400))
 	await wait(1.0)
 	await shot("r_0_stream")
+
+
+func scenario_combo() -> void:
+	var Slot := ChampionProgress.Slot
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	(stage.get_node("DebugTable") as DebugTable).visible = true
+	lucian.progress.set_level(16)
+	for slot in [Slot.Q, Slot.W, Slot.E]:
+		for i in 4:
+			lucian.try_rank_up(slot)
+	for i in 3:
+		lucian.try_rank_up(Slot.R)
+	lucian.cheat_crit_chance = 0.3
+	lucian.try_cast(Slot.Q, dummy.global_position)
+	lucian.command_attack(dummy)
+	await wait(1.2)
+	lucian.try_cast(Slot.E, lucian.global_position + Vector2(0, 300))
+	await wait(0.5)
+	lucian.try_cast(Slot.W, dummy.global_position)
+	await wait(1.0)
+	lucian.try_cast(Slot.R, dummy.global_position)
+	await wait(1.2)
+	await shot("combo_0")
+	await wait(2.5)
+	await shot("combo_1")

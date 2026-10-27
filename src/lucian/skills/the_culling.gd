@@ -58,6 +58,7 @@ func _fire() -> void:
 	bullet.streak_width = 5.0
 	bullet.hit_enemy.connect(_on_bullet_hit)
 	lucian.spawn(bullet)
+	lucian.flash_muzzle(_gun)
 
 
 func _on_bullet_hit(enemy: Enemy, prior_hits: int) -> void:

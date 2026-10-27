@@ -198,7 +198,7 @@ They cover:
 - DPS sessions
 - `.tres` data integrity
 
-**Screenshots** (`tests/tools/screenshot.gd`). The game runs windowed, sends input with `Input.parse_input_event` (move, attack, cast Q/W/R, open the debug table), saves PNGs of the viewport, and Claude inspects them. This checks the art, HUD layout, damage numbers and skill effects.
+**Screenshots** (`tests/tools/screenshot.gd`). The game runs windowed, drives Lucian by calling his commands (key chords such as F3+Q go through `Input.parse_input_event`), and saves PNGs of the viewport for review. This checks the art, HUD layout, damage numbers and skill effects.
 
 **Manual playtest checklist** (for you, at the end):
 - edge pan and its clamp; Y toggles follow mode
@@ -213,3 +213,25 @@ They cover:
 - R works while moving and E is allowed during R
 - the no-cooldowns, infinite-mana and crit cheats
 - the dummy refills after 4 s
+
+## Implementation notes (Phase 1 done)
+
+Everything in the build order above is in place. Changes from the plan made while building:
+
+- **`Enemy` base class** (`src/enemies/enemy.gd`). Holds resists, damage intake and marks; `TrainingDummy` extends it. Lucian's code targets `Enemy`, so Phase 2 enemies plug in without touching Lucian.
+- **No `notify_kill()` hook yet.** Nothing can die in Phase 1, so the E rank-5 bonus is noted in `relentless_pursuit.gd` and gets added together with killable enemies.
+- **The HUD and stats panel read Lucian every frame** instead of listening to signals. It is one champion and a handful of labels, so polling is simpler.
+- **The debug table sits top-left**, so it never covers the dummy at the start position.
+- **Shots stopped by an enemy end on that enemy**, so W's cross is centered on the target like LoL.
+- **Skill icons are loaded by the HUD**; `SkillData` has no icon field.
+- Skill-specific numbers (Q width, W cross size and move speed, E distances, R shot count and pierce falloff) are `@export`s on the skill nodes in `lucian.tscn`. Per-rank damage, mana and cooldowns are in `data/skills/*.tres`.
+
+### Running the checks
+
+```
+godot_console --headless --path . --import
+godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
+godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+```
+
+Scenarios: `move`, `dummy`, `attack`, `hud`, `debug`, `skills`, `q`, `e`, `w`, `r`, `combo`. The screenshot run opens a real window that takes keyboard focus, so typing elsewhere during a run can reach the game.
