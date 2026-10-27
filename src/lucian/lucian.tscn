@@ -12,6 +12,7 @@
 [ext_resource type="Resource" path="res://data/skills/r_the_culling.tres" id="10_r"]
 [ext_resource type="Script" path="res://src/lucian/skills/piercing_light.gd" id="11_q"]
 [ext_resource type="Script" path="res://src/lucian/skills/lightslinger.gd" id="12_passive"]
+[ext_resource type="Script" path="res://src/lucian/skills/relentless_pursuit.gd" id="13_e"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 30.0
@@ -56,7 +57,7 @@ slot = 1
 data = ExtResource("8_w")
 
 [node name="E" type="Node" parent="Skills"]
-script = ExtResource("6_skill")
+script = ExtResource("13_e")
 slot = 2
 data = ExtResource("9_e")
 

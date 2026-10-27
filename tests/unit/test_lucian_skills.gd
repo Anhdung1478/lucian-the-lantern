@@ -102,3 +102,65 @@ func test_passive_hit_lowers_e_cooldown() -> void:
 	assert_almost_eq(e_cooldown.remaining, 9.0, 0.001)
 	lucian.on_damage_dealt(dummy, DamageInfo.create(10.0, DamageInfo.Type.PHYSICAL, &"basic", lucian), 8.0)
 	assert_almost_eq(e_cooldown.remaining, 9.0, 0.001)
+
+
+func _add_wall(x: float) -> void:
+	var wall := StaticBody2D.new()
+	wall.collision_layer = Layers.WORLD
+	var shape := CollisionShape2D.new()
+	var box := RectangleShape2D.new()
+	box.size = Vector2(20, 400)
+	shape.shape = box
+	wall.add_child(shape)
+	wall.position = Vector2(x, 0)
+	add_child_autofree(wall)
+
+
+func test_e_dashes_max_distance_through_enemies() -> void:
+	dummy.position = Vector2(250, 0)
+	_rank(Slot.E, 1)
+	assert_true(lucian.try_cast(Slot.E, Vector2(2000, 0)))
+	assert_true(lucian.is_dashing())
+	await wait_seconds(0.5)
+	assert_false(lucian.is_dashing())
+	assert_almost_eq(lucian.position.x, 425.0, 2.0)
+	assert_almost_eq(lucian.position.y, 0.0, 0.5)
+
+
+func test_e_has_minimum_distance() -> void:
+	dummy.position = Vector2(0, 600)
+	_rank(Slot.E, 1)
+	lucian.try_cast(Slot.E, Vector2(50, 0))
+	await wait_seconds(0.4)
+	assert_almost_eq(lucian.position.x, 200.0, 2.0)
+
+
+func test_e_stops_at_walls() -> void:
+	dummy.position = Vector2(0, 600)
+	_add_wall(300.0)
+	await wait_physics_frames(2)
+	_rank(Slot.E, 1)
+	lucian.try_cast(Slot.E, Vector2(1000, 0))
+	await wait_seconds(0.5)
+	# Wall face at 290, Lucian's radius is 30.
+	assert_almost_eq(lucian.position.x, 260.0, 2.0)
+	assert_false(lucian.is_dashing())
+
+
+func test_no_other_casts_while_dashing() -> void:
+	dummy.position = Vector2(0, 600)
+	lucian.progress.set_level(3)
+	_rank(Slot.E, 1)
+	_rank(Slot.Q, 1)
+	lucian.try_cast(Slot.E, Vector2(1000, 0))
+	assert_false(lucian.try_cast(Slot.Q, Vector2(1000, 0)))
+
+
+func test_e_keeps_the_attack_order() -> void:
+	_rank(Slot.E, 1)
+	lucian.command_attack(dummy)
+	await wait_seconds(0.1)
+	lucian.try_cast(Slot.E, Vector2(0, 400))
+	await wait_seconds(1.5)
+	assert_has(_sources(), &"basic")
+	assert_has(_sources(), &"lightslinger", "E charged the passive")

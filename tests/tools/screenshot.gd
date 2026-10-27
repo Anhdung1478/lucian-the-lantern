@@ -36,6 +36,8 @@ func _run(scenario: String) -> void:
 			await scenario_skills()
 		"q":
 			await scenario_q()
+		"e":
+			await scenario_e()
 		"hud":
 			await scenario_hud()
 		_:
@@ -185,3 +187,11 @@ func scenario_q() -> void:
 	lucian.try_cast(ChampionProgress.Slot.Q, dummy.global_position)
 	await wait(0.31)
 	await shot("q_0_beam")
+
+
+func scenario_e() -> void:
+	(stage.get_node("StageCamera") as StageCamera).mode = StageCamera.Mode.FREE
+	lucian.try_rank_up(ChampionProgress.Slot.E)
+	lucian.try_cast(ChampionProgress.Slot.E, lucian.global_position + Vector2(400, -200))
+	await wait(0.4)
+	await shot("e_0_trail")

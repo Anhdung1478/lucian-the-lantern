@@ -29,6 +29,8 @@ var _attack_cooldown := 0.0
 var _windup_left := 0.0
 var _show_range_ring := false
 var _cast_lock_left := 0.0
+var _dash_velocity := Vector2.ZERO
+var _dash_left := 0.0
 
 @onready var visuals: LucianVisuals = $Visuals
 @onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
@@ -71,7 +73,7 @@ func try_rank_up(slot: ChampionProgress.Slot) -> bool:
 ## The cast gate: rank, cooldown, state and mana, then pay and cast.
 func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 	var skill := skills[slot]
-	if skill.rank() == 0 or not skill.cooldown.is_ready() or is_cast_locked():
+	if skill.rank() == 0 or not skill.cooldown.is_ready() or is_cast_locked() or is_dashing():
 		return false
 	if mana < skill.mana_cost():
 		return false
@@ -112,6 +114,23 @@ func lock_cast(seconds: float) -> void:
 
 func is_cast_locked() -> bool:
 	return _cast_lock_left > 0.0
+
+
+## Dashes through enemies (walls still stop him). A move order ends here, but
+## attack orders carry on, and the attack timer resets.
+func start_dash(direction: Vector2, distance: float, speed: float) -> void:
+	_cancel_windup()
+	_dash_velocity = direction * speed
+	_dash_left = distance / speed
+	_attack_cooldown = 0.0
+	collision_mask = Layers.WORLD
+	if _order == Order.MOVE:
+		_order = Order.NONE
+	visuals.face(direction)
+
+
+func is_dashing() -> bool:
+	return _dash_left > 0.0
 
 
 func set_range_ring_visible(value: bool) -> void:
@@ -155,6 +174,9 @@ func _physics_process(delta: float) -> void:
 	mana = stats.max_mana if cheat_infinite_mana else minf(mana + stats.mana_regen * delta, stats.max_mana)
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	velocity = Vector2.ZERO
+	if _dash_left > 0.0:
+		_dash_step(delta)
+		return
 	if _cast_lock_left > 0.0:
 		_cast_lock_left -= delta
 		return
@@ -191,6 +213,17 @@ func _on_level_changed(_level: int) -> void:
 func _draw() -> void:
 	if _show_range_ring:
 		draw_arc(Vector2.ZERO, stats.attack_range, 0.0, TAU, 96, RANGE_RING_COLOR, 3.0, true)
+
+
+func _dash_step(delta: float) -> void:
+	# The last frame only covers the distance that is left.
+	velocity = _dash_velocity * minf(delta, _dash_left) / delta
+	move_and_slide()
+	velocity = Vector2.ZERO
+	_dash_left -= delta
+	if _dash_left <= 0.0 or get_slide_collision_count() > 0:
+		_dash_left = 0.0
+		collision_mask = Layers.WORLD | Layers.ENEMY_BODY
 
 
 func _process_windup(delta: float) -> void:
