@@ -1,19 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_2wj85"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_5ew07"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_5ew07"]
+[ext_resource type="Texture2D" path="res://assets/art/items/shadowflame.svg" id="2_muu73"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_dti5x"]
 
-[sub_resource type="Resource" id="Resource_muu73"]
-script = ExtResource("1_2wj85")
+[sub_resource type="Resource" id="Resource_mfrvh"]
+script = ExtResource("1_5ew07")
 effect_name = "Cinderbloom"
 description = "Magic damage against enemies below 40% health deals [magic]20% more damage[/magic]."
 
 [resource]
-script = ExtResource("2_5ew07")
+script = ExtResource("3_dti5x")
 id = &"shadowflame"
 display_name = "Shadowflame"
 kind = 1
 code = "SF"
+icon = ExtResource("2_muu73")
 cost = 3200
 stats = Dictionary[StringName, float]({
 &"ap": 90.0,
@@ -21,4 +23,4 @@ stats = Dictionary[StringName, float]({
 &"magic_pen": 0.1
 })
 components = Array[StringName]([&"needlessly_large_rod", &"cloak_of_agility"])
-effects = Array[ExtResource("1_2wj85")]([SubResource("Resource_muu73")])
+effects = Array[ExtResource("1_5ew07")]([SubResource("Resource_mfrvh")])

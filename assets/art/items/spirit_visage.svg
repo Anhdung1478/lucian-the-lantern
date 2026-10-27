@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Spirit Visage: a serene jade spirit mask with glowing eyes, framed by a wreath of leaves -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c4628"/><stop offset="1" stop-color="#06100a"/></linearGradient><linearGradient id="leaf" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#74d26e"/><stop offset="0.5" stop-color="#74d26e"/><stop offset="0.5" stop-color="#2f8a3e"/><stop offset="1" stop-color="#2f8a3e"/></linearGradient><linearGradient id="mask" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8f6d2"/><stop offset="1" stop-color="#5fae6a"/></linearGradient><radialGradient id="eye"><stop offset="0" stop-color="#eaffd8" stop-opacity="0.9"/><stop offset="0.5" stop-color="#7cff9a" stop-opacity="0.45"/><stop offset="1" stop-color="#7cff9a" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <g fill="url(#leaf)" stroke="#0c1810" stroke-width="1.2" stroke-linejoin="round">
+    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(25 15) rotate(-30)"/>
+    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(39 15) rotate(30)"/>
+    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(19 24) rotate(-60)"/>
+    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(45 24) rotate(60)"/>
+    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(18 35) rotate(-95)"/>
+    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(46 35) rotate(95)"/>
+    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(21 46) rotate(-125)"/>
+    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(43 46) rotate(125)"/>
+  </g>
+  <path d="M 32 12 C 41 12 46 20 46 31 C 46 44 40 54 32 57 C 24 54 18 44 18 31 C 18 20 23 12 32 12 Z" fill="url(#mask)" stroke="#0c1810" stroke-width="2"/>
+  <path d="M 32 12 C 41 12 46 20 46 31 C 46 44 40 54 32 57 Z" fill="#1e5a2c" opacity="0.28"/>
+  <path d="M 21 24 C 22 18 26 14.5 30 14" fill="none" stroke="#f4fff0" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 22 38 C 24 40 24 43 22.5 46 M 42 38 C 40 40 40 43 41.5 46" fill="none" stroke="#3a8a4a" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 21 26 C 24 24 28 24.5 30 26.5 M 43 26 C 40 24 36 24.5 34 26.5 M 28.5 47 C 30.5 48.3 33.5 48.3 35.5 47" fill="none" stroke="#2e6a3a" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M 32 34 C 32.5 37 33 40 31 42" fill="none" stroke="#3a7a46" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+  <circle cx="26" cy="30.5" r="6" fill="url(#eye)"/>
+  <circle cx="38" cy="30.5" r="6" fill="url(#eye)"/>
+  <path d="M 21.5 31 C 23.5 28 28 28 30 30.5 C 28 33 23.5 33 21.5 31 Z M 42.5 31 C 40.5 28 36 28 34 30.5 C 36 33 40.5 33 42.5 31 Z" fill="#f0ffe8" stroke="#0c1810" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M 32 16.5 C 34 18.5 34 21.5 32 23.5 C 30 21.5 30 18.5 32 16.5 Z" fill="#7dffa8" stroke="#0c1810" stroke-width="1"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

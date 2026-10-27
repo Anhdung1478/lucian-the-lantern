@@ -1,19 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_kkr7u"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_7uqq4"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_7uqq4"]
+[ext_resource type="Texture2D" path="res://assets/art/items/spirit_visage.svg" id="2_x13j3"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_rojrn"]
 
-[sub_resource type="Resource" id="Resource_x13j3"]
-script = ExtResource("1_kkr7u")
+[sub_resource type="Resource" id="Resource_dfi2s"]
+script = ExtResource("1_7uqq4")
 effect_name = "Boundless Vitality"
 description = "Healing and shields Lucian receives are [hp]25% stronger[/hp]."
 
 [resource]
-script = ExtResource("2_7uqq4")
+script = ExtResource("3_rojrn")
 id = &"spirit_visage"
 display_name = "Spirit Visage"
 kind = 1
 code = "SV"
+icon = ExtResource("2_x13j3")
 cost = 2900
 stats = Dictionary[StringName, float]({
 &"ability_haste": 10.0,
@@ -21,4 +23,4 @@ stats = Dictionary[StringName, float]({
 &"mr": 45.0
 })
 components = Array[StringName]([&"giants_belt", &"negatron_cloak"])
-effects = Array[ExtResource("1_kkr7u")]([SubResource("Resource_x13j3")])
+effects = Array[ExtResource("1_7uqq4")]([SubResource("Resource_dfi2s")])

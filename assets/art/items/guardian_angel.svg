@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Guardian Angel: a pair of golden feathered wings spread behind an upright short sword, a halo ringing its tip -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4e3a14"/><stop offset="1" stop-color="#130d04"/></linearGradient><linearGradient id="blade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#e8ecf4"/><stop offset="0.5" stop-color="#a4aec0"/><stop offset="1" stop-color="#7a8498"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#c08a2a"/></linearGradient><radialGradient id="aura"><stop offset="0" stop-color="#ffe9a8" stop-opacity="0.5"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="28" r="27" fill="url(#aura)"/>
+  <g stroke="#2a1a06" stroke-width="1.2" stroke-linejoin="round">
+    <path d="M 30 34 C 24 35 18 37 13 41 C 19 42 25 41 30 39 Z M 34 34 C 40 35 46 37 51 41 C 45 42 39 41 34 39 Z" fill="#c9862a"/>
+    <path d="M 30 29 C 22 28 14 29 8 32 C 13 35 21 36 30 35 Z M 34 29 C 42 28 50 29 56 32 C 51 35 43 36 34 35 Z" fill="#e0a332"/>
+    <path d="M 30 24 C 21 21 12 20 5 23 C 11 27 20 30 30 30 Z M 34 24 C 43 21 52 20 59 23 C 53 27 44 30 34 30 Z" fill="#f5c24e"/>
+    <path d="M 30 19 C 21 14 12 11 5 12 C 9 18 18 24 30 25 Z M 34 19 C 43 14 52 11 59 12 C 55 18 46 24 34 25 Z" fill="#ffe08a"/>
+    <path d="M 31 17 C 25 12 18 11 12 13 C 16 19 23 24 31 28 Z M 33 17 C 39 12 46 11 52 13 C 48 19 41 24 33 28 Z" fill="#fff0b8"/>
+  </g>
+  <ellipse cx="32" cy="9" rx="9" ry="2.8" fill="none" stroke="#fff3c4" stroke-width="1.6"/>
+  <polygon points="32,5 36,11 36,40 28,40 28,11" fill="url(#blade)" stroke="#1a1006" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 19 39 C 24 41 40 41 45 39 L 43 44 C 38 45 26 45 21 44 Z" fill="url(#gold)" stroke="#1a1006" stroke-width="1.5" stroke-linejoin="round"/>
+  <rect x="29.5" y="44" width="5" height="9.5" fill="#6a3c14" stroke="#1a1006" stroke-width="1.2"/>
+  <path d="M 29.5 47 L 34.5 48 M 29.5 50 L 34.5 51" stroke="#3a1e08" stroke-width="1"/>
+  <circle cx="32" cy="42" r="2.2" fill="#a8eaff" stroke="#1a1006" stroke-width="1"/>
+  <circle cx="32" cy="56" r="3" fill="url(#gold)" stroke="#1a1006" stroke-width="1.2"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

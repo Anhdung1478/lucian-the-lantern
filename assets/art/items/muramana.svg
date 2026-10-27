@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Muramana: a katana on the diagonal with a gold guard and blue-wrapped hilt, a blue mana glow running along its edge -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c2458"/><stop offset="1" stop-color="#060818"/></linearGradient><linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f8ff"/><stop offset="1" stop-color="#94a8cc"/></linearGradient><radialGradient id="aura"><stop offset="0" stop-color="#3a7aff" stop-opacity="0.35"/><stop offset="1" stop-color="#3a7aff" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="38" cy="26" r="24" fill="url(#aura)"/>
+  <path d="M 54 11 C 48 22 37 34 24 45" fill="none" stroke="#3a8cff" stroke-width="9" stroke-linecap="round" opacity="0.2"/>
+  <path d="M 54 11 C 48 22 37 34 24 45" fill="none" stroke="#5ab8ff" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
+  <line x1="18.9" y1="46.1" x2="8.5" y2="56.5" stroke="#0c1018" stroke-width="7"/>
+  <line x1="18.9" y1="46.1" x2="8.5" y2="56.5" stroke="#1c2a6e" stroke-width="5"/>
+  <line x1="18.9" y1="46.1" x2="8.5" y2="56.5" stroke="#4a6ad0" stroke-width="5" stroke-dasharray="1.6 2.4"/>
+  <circle cx="7.8" cy="57.2" r="2.4" fill="#c8962e" stroke="#0c1018" stroke-width="1"/>
+  <path d="M 20 41 C 33 31 45 20 56 6 L 54 11 C 48 22 37 34 24 45 Z" fill="url(#steel)" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 53.3 10.6 C 47.3 21.3 36.3 33.3 23.3 44.3" fill="none" stroke="#d8f2ff" stroke-width="1.4" stroke-linecap="round"/>
+  <polygon points="19.3,40.3 24.7,45.7 23.3,47.1 17.9,41.7" fill="#e8c060" stroke="#0c1018" stroke-width="1"/>
+  <ellipse cx="19.9" cy="45.1" rx="7.5" ry="2.4" transform="rotate(45 19.9 45.1)" fill="#c8962e" stroke="#0c1018" stroke-width="1.2"/>
+  <circle cx="44" cy="26" r="1.2" fill="#cfeaff"/>
+  <circle cx="33" cy="37.5" r="1" fill="#cfeaff" opacity="0.85"/>
+  <circle cx="51" cy="16.5" r="0.9" fill="#cfeaff" opacity="0.85"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

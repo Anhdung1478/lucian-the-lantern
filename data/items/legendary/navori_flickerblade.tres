@@ -1,19 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_6tyod"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_kny36"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_kny36"]
+[ext_resource type="Texture2D" path="res://assets/art/items/navori_flickerblade.svg" id="2_cup8m"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_yslx2"]
 
-[sub_resource type="Resource" id="Resource_cup8m"]
-script = ExtResource("1_6tyod")
+[sub_resource type="Resource" id="Resource_j58t5"]
+script = ExtResource("1_kny36")
 effect_name = "Transcendence"
 description = "Basic attacks lower the remaining cooldowns of Q, W and E by 12%."
 
 [resource]
-script = ExtResource("2_kny36")
+script = ExtResource("3_yslx2")
 id = &"navori_flickerblade"
 display_name = "Navori Flickerblade"
 kind = 1
 code = "NF"
+icon = ExtResource("2_cup8m")
 cost = 2650
 stats = Dictionary[StringName, float]({
 &"attack_speed": 0.35,
@@ -21,4 +23,4 @@ stats = Dictionary[StringName, float]({
 &"move_speed_pct": 0.04
 })
 components = Array[StringName]([&"recurve_bow", &"cloak_of_agility"])
-effects = Array[ExtResource("1_6tyod")]([SubResource("Resource_cup8m")])
+effects = Array[ExtResource("1_kny36")]([SubResource("Resource_j58t5")])

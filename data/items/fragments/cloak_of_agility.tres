@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_dheyx"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_3uc7g"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_3uc7g"]
+[ext_resource type="Texture2D" path="res://assets/art/items/cloak_of_agility.svg" id="2_frauy"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_ya36o"]
 
 [resource]
-script = ExtResource("2_3uc7g")
+script = ExtResource("3_ya36o")
 id = &"cloak_of_agility"
 display_name = "Cloak of Agility"
 code = "CR"
+icon = ExtResource("2_frauy")
 cost = 600
 stats = Dictionary[StringName, float]({
 &"crit_chance": 0.15

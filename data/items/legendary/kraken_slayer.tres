@@ -1,19 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_4h3iu"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_d84h3"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_d84h3"]
+[ext_resource type="Texture2D" path="res://assets/art/items/kraken_slayer.svg" id="2_gc43f"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_qb5tf"]
 
-[sub_resource type="Resource" id="Resource_gc43f"]
-script = ExtResource("1_4h3iu")
+[sub_resource type="Resource" id="Resource_j081c"]
+script = ExtResource("1_d84h3")
 effect_name = "Bring It Down"
 description = "Every third basic attack deals [phys]140 bonus physical damage[/phys], up to 50% more against enemies with low health."
 
 [resource]
-script = ExtResource("2_d84h3")
+script = ExtResource("3_qb5tf")
 id = &"kraken_slayer"
 display_name = "Kraken Slayer"
 kind = 1
 code = "KS"
+icon = ExtResource("2_gc43f")
 cost = 3100
 stats = Dictionary[StringName, float]({
 &"ad": 40.0,
@@ -21,4 +23,4 @@ stats = Dictionary[StringName, float]({
 &"move_speed_pct": 0.04
 })
 components = Array[StringName]([&"bf_sword", &"recurve_bow"])
-effects = Array[ExtResource("1_4h3iu")]([SubResource("Resource_gc43f")])
+effects = Array[ExtResource("1_d84h3")]([SubResource("Resource_j081c")])

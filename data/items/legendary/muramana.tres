@@ -1,24 +1,26 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_f2ckb"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_3x4hd"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_3x4hd"]
+[ext_resource type="Texture2D" path="res://assets/art/items/muramana.svg" id="2_i0y0e"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_gmric"]
 
-[sub_resource type="Resource" id="Resource_i0y0e"]
-script = ExtResource("1_f2ckb")
+[sub_resource type="Resource" id="Resource_ykm7y"]
+script = ExtResource("1_3x4hd")
 effect_name = "Awe"
 description = "Gain [ad]AD equal to 2.5% of max mana[/ad]."
 
-[sub_resource type="Resource" id="Resource_gmric"]
-script = ExtResource("1_f2ckb")
+[sub_resource type="Resource" id="Resource_isv0u"]
+script = ExtResource("1_3x4hd")
 effect_name = "Shock"
 description = "Skill hits deal [phys]bonus physical damage equal to 3% max mana[/phys]; basic attacks deal 1.5%."
 
 [resource]
-script = ExtResource("2_3x4hd")
+script = ExtResource("3_gmric")
 id = &"muramana"
 display_name = "Muramana"
 kind = 1
 code = "Mur"
+icon = ExtResource("2_i0y0e")
 cost = 2900
 stats = Dictionary[StringName, float]({
 &"ability_haste": 15.0,
@@ -26,4 +28,4 @@ stats = Dictionary[StringName, float]({
 &"max_mana": 600.0
 })
 components = Array[StringName]([&"tear_of_the_goddess", &"tear_of_the_goddess"])
-effects = Array[ExtResource("1_f2ckb")]([SubResource("Resource_i0y0e"), SubResource("Resource_gmric")])
+effects = Array[ExtResource("1_3x4hd")]([SubResource("Resource_ykm7y"), SubResource("Resource_isv0u")])

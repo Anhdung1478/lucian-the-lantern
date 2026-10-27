@@ -1,23 +1,25 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_bsnal"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_xq74f"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_xq74f"]
+[ext_resource type="Texture2D" path="res://assets/art/items/banshees_veil.svg" id="2_1pjuc"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_qks6w"]
 
-[sub_resource type="Resource" id="Resource_1pjuc"]
-script = ExtResource("1_bsnal")
+[sub_resource type="Resource" id="Resource_ytjdl"]
+script = ExtResource("1_xq74f")
 effect_name = "Annul"
 description = "Grants a spell shield that blocks the next enemy skill. It comes back 40 s after it breaks."
 
 [resource]
-script = ExtResource("2_xq74f")
+script = ExtResource("3_qks6w")
 id = &"banshees_veil"
 display_name = "Banshee's Veil"
 kind = 1
 code = "BV"
+icon = ExtResource("2_1pjuc")
 cost = 3000
 stats = Dictionary[StringName, float]({
 &"ap": 80.0,
 &"mr": 40.0
 })
 components = Array[StringName]([&"needlessly_large_rod", &"negatron_cloak"])
-effects = Array[ExtResource("1_bsnal")]([SubResource("Resource_1pjuc")])
+effects = Array[ExtResource("1_xq74f")]([SubResource("Resource_ytjdl")])

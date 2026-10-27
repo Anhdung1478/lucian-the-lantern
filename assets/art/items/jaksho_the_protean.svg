@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Jak'Sho, The Protean: a void-purple carapace of four shingled plates with a single glowing magenta eye at its heart -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3c1a5e"/><stop offset="1" stop-color="#0c0616"/></linearGradient><linearGradient id="pl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a074f2"/><stop offset="1" stop-color="#3a1a7a"/></linearGradient><linearGradient id="pd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7448c6"/><stop offset="1" stop-color="#24105a"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#ff5ae8" stop-opacity="0.55"/><stop offset="1" stop-color="#ff5ae8" stop-opacity="0"/></radialGradient><radialGradient id="iris"><stop offset="0" stop-color="#fff0ff"/><stop offset="0.5" stop-color="#ff5ae8"/><stop offset="1" stop-color="#9a1ab8"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <g stroke="#0c0818" stroke-width="2" stroke-linejoin="round">
+    <path d="M 17 50 C 26 46.5 38 46.5 47 50 L 32 60 Z" fill="url(#pd)"/>
+    <path d="M 9 38 C 20 33 44 33 55 38 L 47 50 C 40 53 24 53 17 50 Z" fill="url(#pd)"/>
+  </g>
+  <path d="M 24 41 L 25 51.5 M 40 41 L 39 51.5" stroke="#1a0a3a" stroke-width="1.6"/>
+  <path d="M 6 25 C 14 17 50 17 58 25 L 52 38 C 44 42 20 42 12 38 Z" fill="url(#pl)" stroke="#0c0818" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 18 21 L 20 39.5 M 46 21 L 44 39.5" stroke="#26104e" stroke-width="1.6"/>
+  <path d="M 9 24 C 11 22.5 13.5 21.3 16 20.6 M 55 24 C 53 22.5 50.5 21.3 48 20.6" fill="none" stroke="#e2c8ff" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 15 19 C 19 7 45 7 49 19 L 43 24 C 38 26 26 26 21 24 Z" fill="url(#pl)" stroke="#0c0818" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 18.5 17 C 22 10 42 10 45.5 17" fill="none" stroke="#e2c8ff" stroke-width="1.3" stroke-linecap="round" opacity="0.8"/>
+  <circle cx="32" cy="32" r="14" fill="url(#glow)"/>
+  <path d="M 21 32 C 25 25.5 39 25.5 43 32 C 39 38.5 25 38.5 21 32 Z" fill="#12061e" stroke="#0c0818" stroke-width="1.5" stroke-linejoin="round"/>
+  <circle cx="32" cy="32" r="4.3" fill="url(#iris)"/>
+  <ellipse cx="32" cy="32" rx="1.1" ry="3.4" fill="#1a0420"/>
+  <circle cx="30.3" cy="30.4" r="0.9" fill="#ffffff"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

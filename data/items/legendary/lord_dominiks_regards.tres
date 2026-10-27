@@ -1,19 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_tua2u"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_cqrok"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_cqrok"]
+[ext_resource type="Texture2D" path="res://assets/art/items/lord_dominiks_regards.svg" id="2_l3guf"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_u8wh6"]
 
-[sub_resource type="Resource" id="Resource_l3guf"]
-script = ExtResource("1_tua2u")
+[sub_resource type="Resource" id="Resource_s6ke6"]
+script = ExtResource("1_cqrok")
 effect_name = "Giant Slayer"
 description = "Deal up to [phys]15% more damage[/phys] to enemies with more max health than Lucian."
 
 [resource]
-script = ExtResource("2_cqrok")
+script = ExtResource("3_u8wh6")
 id = &"lord_dominiks_regards"
 display_name = "Lord Dominik's Regards"
 kind = 1
 code = "LDR"
+icon = ExtResource("2_l3guf")
 cost = 3200
 stats = Dictionary[StringName, float]({
 &"ad": 30.0,
@@ -21,4 +23,4 @@ stats = Dictionary[StringName, float]({
 &"attack_speed": 0.25
 })
 components = Array[StringName]([&"recurve_bow", &"chain_vest"])
-effects = Array[ExtResource("1_tua2u")]([SubResource("Resource_l3guf")])
+effects = Array[ExtResource("1_cqrok")]([SubResource("Resource_s6ke6")])

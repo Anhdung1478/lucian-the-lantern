@@ -1,19 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_vkcjn"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_dbiae"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_dbiae"]
+[ext_resource type="Texture2D" path="res://assets/art/items/morellonomicon.svg" id="2_ijnfl"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_375vi"]
 
-[sub_resource type="Resource" id="Resource_ijnfl"]
-script = ExtResource("1_vkcjn")
+[sub_resource type="Resource" id="Resource_brav5"]
+script = ExtResource("1_dbiae")
 effect_name = "Affliction"
 description = "Dealing magic damage applies [kw]Grievous Wounds[/kw] (40% less healing) for 3 s."
 
 [resource]
-script = ExtResource("2_dbiae")
+script = ExtResource("3_375vi")
 id = &"morellonomicon"
 display_name = "Morellonomicon"
 kind = 1
 code = "Mor"
+icon = ExtResource("2_ijnfl")
 cost = 2900
 stats = Dictionary[StringName, float]({
 &"ability_haste": 15.0,
@@ -21,4 +23,4 @@ stats = Dictionary[StringName, float]({
 &"max_hp": 300.0
 })
 components = Array[StringName]([&"needlessly_large_rod", &"giants_belt"])
-effects = Array[ExtResource("1_vkcjn")]([SubResource("Resource_ijnfl")])
+effects = Array[ExtResource("1_dbiae")]([SubResource("Resource_brav5")])

@@ -1,21 +1,23 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_2gqkq"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_opr52"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_opr52"]
+[ext_resource type="Texture2D" path="res://assets/art/items/hextech_gunblade.svg" id="2_h66ki"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_stpkp"]
 
-[sub_resource type="Resource" id="Resource_h66ki"]
-script = ExtResource("1_2gqkq")
+[sub_resource type="Resource" id="Resource_51nwe"]
+script = ExtResource("1_opr52")
 effect_name = "Lightning Bolt"
 active = true
 cooldown = 60.0
 description = "Blasts the target enemy for [magic]175 (+30% AP) magic damage[/magic] and slows it by 25% for 2 s."
 
 [resource]
-script = ExtResource("2_opr52")
+script = ExtResource("3_stpkp")
 id = &"hextech_gunblade"
 display_name = "Hextech Gunblade"
 kind = 1
 code = "HG"
+icon = ExtResource("2_h66ki")
 cost = 3300
 stats = Dictionary[StringName, float]({
 &"ad": 40.0,
@@ -23,4 +25,4 @@ stats = Dictionary[StringName, float]({
 &"omnivamp": 0.1
 })
 components = Array[StringName]([&"bf_sword", &"needlessly_large_rod"])
-effects = Array[ExtResource("1_2gqkq")]([SubResource("Resource_h66ki")])
+effects = Array[ExtResource("1_opr52")]([SubResource("Resource_51nwe")])

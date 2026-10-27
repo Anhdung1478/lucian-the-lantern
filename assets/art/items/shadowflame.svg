@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Shadowflame: a black-violet flame ball with an ember-orange rim around a dark faceted crystal core -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e0f2a"/><stop offset="1" stop-color="#050208"/></linearGradient><radialGradient id="ember"><stop offset="0" stop-color="#ff7a1a" stop-opacity="0.45"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient><radialGradient id="ball" cx="0.5" cy="0.62" r="0.6"><stop offset="0" stop-color="#6a2aa0"/><stop offset="0.6" stop-color="#2a0e40"/><stop offset="1" stop-color="#0e0414"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="38" r="27" fill="url(#ember)"/>
+  <path d="M 32 58.5 C 18.5 58.5 10.5 50 10.5 39.5 C 10.5 30 15.5 25 18 16.5 C 21 21.5 22.5 23.5 24.5 25 C 24.5 16.5 28 10.5 32 4.5 C 35.5 10.5 40 16.5 39.5 25 C 42 23 44 20 45.5 14.5 C 50.5 22.5 53.5 30 53.5 39.5 C 53.5 50 45.5 58.5 32 58.5 Z" fill="none" stroke="#0c1018" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 32 58.5 C 18.5 58.5 10.5 50 10.5 39.5 C 10.5 30 15.5 25 18 16.5 C 21 21.5 22.5 23.5 24.5 25 C 24.5 16.5 28 10.5 32 4.5 C 35.5 10.5 40 16.5 39.5 25 C 42 23 44 20 45.5 14.5 C 50.5 22.5 53.5 30 53.5 39.5 C 53.5 50 45.5 58.5 32 58.5 Z" fill="url(#ball)" stroke="#ff7a1a" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 32 54 C 23 54 17.5 48 17.5 41 C 17.5 34.5 21 31 23 26.5 C 25 30 27 31.5 28.5 32 C 28.5 26 30 21 32 16 C 34 21 36 26 35.5 32 C 37 31.5 39 29.5 40.5 26.5 C 44 32 46.5 36 46.5 41 C 46.5 48 41 54 32 54 Z" fill="#5a1f8a" opacity="0.85"/>
+  <polygon points="32,29 40.5,40 32,52 23.5,40" fill="#12061c"/>
+  <polygon points="32,29 23.5,40 32,40" fill="#4a2a6e"/>
+  <polygon points="32,29 40.5,40 32,40" fill="#2a1440"/>
+  <polygon points="23.5,40 32,52 32,40" fill="#1e0c2e"/>
+  <polygon points="32,29 40.5,40 32,52 23.5,40" fill="none" stroke="#0c1018" stroke-width="2.4" stroke-linejoin="round"/>
+  <polygon points="32,29 40.5,40 32,52 23.5,40" fill="none" stroke="#ff9a3c" stroke-width="1" stroke-linejoin="round"/>
+  <line x1="30.6" y1="32.2" x2="26" y2="39.2" stroke="#c9a0ff" stroke-width="0.9" stroke-linecap="round"/>
+  <circle cx="21" cy="31" r="1" fill="#ffb060"/>
+  <circle cx="44" cy="24" r="1.1" fill="#ffb060"/>
+  <circle cx="47" cy="47" r="0.9" fill="#ffb060"/>
+  <circle cx="8" cy="22" r="1.2" fill="#ff9a3c"/>
+  <circle cx="56" cy="17" r="1" fill="#ff9a3c"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

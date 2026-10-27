@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Tear of the Goddess: a large faceted sapphire teardrop with a white highlight and a soft blue glow behind it -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#7cc4ff" stop-opacity="0.6"/><stop offset="0.6" stop-color="#3a7fe0" stop-opacity="0.22"/><stop offset="1" stop-color="#2a5fc0" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="36" r="27" fill="url(#glow)"/>
+  <path d="M 32 5 C 36 16 48 26 48 40 A 16 16 0 0 1 16 40 C 16 26 28 16 32 5 Z" fill="#1f5fd0"/>
+  <path d="M 32 5 L 32 22 L 23 38 L 16 40 C 16 26 28 16 32 5 Z" fill="#3b7fea"/>
+  <path d="M 32 5 C 36 16 48 26 48 40 L 41 38 L 32 22 Z" fill="#1a4fb4"/>
+  <path d="M 41 38 L 48 40 A 16 16 0 0 1 32 56 L 32 50 Z" fill="#123d94"/>
+  <path d="M 23 38 L 16 40 A 16 16 0 0 0 32 56 L 32 50 Z" fill="#2a6ad8"/>
+  <path d="M 32 22 L 41 38 L 32 50 L 23 38 Z" fill="#5a9cf6"/>
+  <path d="M 32 22 L 41 38 L 32 50 L 23 38 Z M 32 5 L 32 22 M 23 38 L 16 40 M 41 38 L 48 40 M 32 50 L 32 56" fill="none" stroke="#9cc8ff" stroke-width="0.9" stroke-linejoin="round" opacity="0.8"/>
+  <path d="M 32 5 C 36 16 48 26 48 40 A 16 16 0 0 1 16 40 C 16 26 28 16 32 5 Z" fill="none" stroke="#0a1830" stroke-width="2.2" stroke-linejoin="round"/>
+  <ellipse cx="23" cy="31" rx="2.3" ry="5.5" fill="#ffffff" opacity="0.9" transform="rotate(28 23 31)"/>
+  <circle cx="27.5" cy="44" r="1.2" fill="#ffffff" opacity="0.8"/>
+  <path d="M 47 8 L 48.2 12.8 L 53 14 L 48.2 15.2 L 47 20 L 45.8 15.2 L 41 14 L 45.8 12.8 Z" fill="#e8f4ff"/>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Immortal Shieldbow: a gold-and-crimson bow whose grip is a small round shield with a glowing lifeline core -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c2a10"/><stop offset="1" stop-color="#120804"/></linearGradient><linearGradient id="limb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#c06a1a"/></linearGradient><radialGradient id="shield" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#ffe9a0"/><stop offset="1" stop-color="#b8701c"/></radialGradient><radialGradient id="core"><stop offset="0" stop-color="#fffbe8"/><stop offset="0.35" stop-color="#ffd27a"/><stop offset="0.7" stop-color="#ff7a2a" stop-opacity="0.6"/><stop offset="1" stop-color="#ff7a2a" stop-opacity="0"/></radialGradient><radialGradient id="aura"><stop offset="0" stop-color="#ff8a2a" stop-opacity="0.45"/><stop offset="1" stop-color="#ff8a2a" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="28" cy="32" r="24" fill="url(#aura)"/>
+  <line x1="49" y1="7" x2="49" y2="57" stroke="#ffe9c0" stroke-width="1.2"/>
+  <path d="M 22 25 C 21 14 31 7 48 5 L 50 9 C 37 12 30 18 30 25 Z" fill="url(#limb)" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 22 39 C 21 50 31 57 48 59 L 50 55 C 37 52 30 46 30 39 Z" fill="url(#limb)" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 25.5 25 C 25 16 33 10 47 7 M 25.5 39 C 25 48 33 54 47 57" fill="none" stroke="#c8312b" stroke-width="1.4" stroke-linecap="round"/>
+  <circle cx="49" cy="7" r="2.4" fill="#d8352a" stroke="#0c1018" stroke-width="1.2"/>
+  <circle cx="49" cy="57" r="2.4" fill="#d8352a" stroke="#0c1018" stroke-width="1.2"/>
+  <circle cx="26" cy="32" r="11.5" fill="url(#shield)" stroke="#0c1018" stroke-width="2"/>
+  <path d="M 17 28 C 18 24 21 22 24 21.3" fill="none" stroke="#fff4c8" stroke-width="1.5" stroke-linecap="round"/>
+  <g fill="#fff0b0" stroke="#5a2a08" stroke-width="0.6"><circle cx="26" cy="22.2" r="1.1"/><circle cx="35.8" cy="32" r="1.1"/><circle cx="26" cy="41.8" r="1.1"/><circle cx="16.2" cy="32" r="1.1"/></g>
+  <circle cx="26" cy="32" r="7.5" fill="#9a2418" stroke="#5a0e08" stroke-width="1"/>
+  <circle cx="26" cy="32" r="6.8" fill="url(#core)"/>
+  <circle cx="26" cy="32" r="2.6" fill="#fffbe8"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

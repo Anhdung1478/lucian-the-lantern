@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Archangel's Staff: a white-silver holy staff topped by a blue crystal in a gold collar with small white wings -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f4f86"/><stop offset="1" stop-color="#0b1424"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/><stop offset="1" stop-color="#9fd4ff" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="15" r="18" fill="url(#glow)"/>
+  <rect x="30" y="26" width="4" height="30" rx="1" fill="#e8eef8" stroke="#0c1018" stroke-width="1.5"/>
+  <rect x="32.4" y="27" width="1.1" height="28" fill="#a9b8d0"/>
+  <rect x="29" y="40" width="6" height="3" rx="0.8" fill="#e0bc5a" stroke="#0c1018" stroke-width="1"/>
+  <path d="M 29.5 55.5 L 34.5 55.5 L 32 59.5 Z" fill="#e0bc5a" stroke="#0c1018" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M 35 25 C 38 17 46 10 57 7 C 55.5 11 54 13 51.5 14.5 C 54.5 14.5 55.5 15 56.5 16 C 53.5 19 50.5 20.5 47.5 21 C 49.5 21.5 50.5 22.5 51 24 C 46 27 40 27.5 35 27.5 Z" fill="#f4f8ff" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 38 24.5 C 43 22 48 19 51.5 14.5 M 39 26.2 C 43 25.2 46.5 23.5 47.5 21" fill="none" stroke="#9fb8dc" stroke-width="1"/>
+  <g transform="matrix(-1 0 0 1 64 0)">
+    <path d="M 35 25 C 38 17 46 10 57 7 C 55.5 11 54 13 51.5 14.5 C 54.5 14.5 55.5 15 56.5 16 C 53.5 19 50.5 20.5 47.5 21 C 49.5 21.5 50.5 22.5 51 24 C 46 27 40 27.5 35 27.5 Z" fill="#f4f8ff" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 38 24.5 C 43 22 48 19 51.5 14.5 M 39 26.2 C 43 25.2 46.5 23.5 47.5 21" fill="none" stroke="#9fb8dc" stroke-width="1"/>
+  </g>
+  <polygon points="32,3.5 37.5,13 32,23 26.5,13" fill="#3a9cf0" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="32,5.1 27.8,13 32,13" fill="#c8ecff"/>
+  <polygon points="32,13 36.2,13 32,21.4" fill="#1f62b8"/>
+  <path d="M 25.5 20 L 38.5 20 L 36 27 L 28 27 Z" fill="#e0bc5a" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round"/>
+  <line x1="26.6" y1="21.3" x2="37.4" y2="21.3" stroke="#fff0b8" stroke-width="0.8"/>
+  <path d="M 42 4 L 42.7 6.3 L 45 7 L 42.7 7.7 L 42 10 L 41.3 7.7 L 39 7 L 41.3 6.3 Z" fill="#ffffff"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

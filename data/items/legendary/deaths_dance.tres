@@ -1,24 +1,26 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_fcuvc"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_3at4b"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_3at4b"]
+[ext_resource type="Texture2D" path="res://assets/art/items/deaths_dance.svg" id="2_ghbo2"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_vtnf5"]
 
-[sub_resource type="Resource" id="Resource_ghbo2"]
-script = ExtResource("1_fcuvc")
+[sub_resource type="Resource" id="Resource_i3w3d"]
+script = ExtResource("1_3at4b")
 effect_name = "Ignore Pain"
 description = "30% of damage taken is delayed and taken over 3 s instead."
 
-[sub_resource type="Resource" id="Resource_vtnf5"]
-script = ExtResource("1_fcuvc")
+[sub_resource type="Resource" id="Resource_ta385"]
+script = ExtResource("1_3at4b")
 effect_name = "Defy"
 description = "Killing an enemy clears the delayed damage and restores [hp]15% max health[/hp] over 2 s."
 
 [resource]
-script = ExtResource("2_3at4b")
+script = ExtResource("3_vtnf5")
 id = &"deaths_dance"
 display_name = "Death's Dance"
 kind = 1
 code = "DD"
+icon = ExtResource("2_ghbo2")
 cost = 3200
 stats = Dictionary[StringName, float]({
 &"ad": 40.0,
@@ -26,4 +28,4 @@ stats = Dictionary[StringName, float]({
 &"max_hp": 250.0
 })
 components = Array[StringName]([&"chain_vest", &"giants_belt"])
-effects = Array[ExtResource("1_fcuvc")]([SubResource("Resource_ghbo2"), SubResource("Resource_vtnf5")])
+effects = Array[ExtResource("1_3at4b")]([SubResource("Resource_i3w3d"), SubResource("Resource_ta385")])

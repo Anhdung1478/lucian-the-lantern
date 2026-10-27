@@ -1,19 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_n5h5h"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_3jb1e"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_3jb1e"]
+[ext_resource type="Texture2D" path="res://assets/art/items/stormrazor.svg" id="2_jtnjk"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_ny01p"]
 
-[sub_resource type="Resource" id="Resource_jtnjk"]
-script = ExtResource("1_n5h5h")
+[sub_resource type="Resource" id="Resource_js8r6"]
+script = ExtResource("1_3jb1e")
 effect_name = "Bolt"
 description = "[kw]Energized[/kw] attacks deal [magic]90 bonus magic damage[/magic] and grant [ms]35% move speed[/ms] for 1.5 s."
 
 [resource]
-script = ExtResource("2_3jb1e")
+script = ExtResource("3_ny01p")
 id = &"stormrazor"
 display_name = "Stormrazor"
 kind = 1
 code = "SR"
+icon = ExtResource("2_jtnjk")
 cost = 3100
 stats = Dictionary[StringName, float]({
 &"ad": 50.0,
@@ -21,4 +23,4 @@ stats = Dictionary[StringName, float]({
 &"crit_chance": 0.2
 })
 components = Array[StringName]([&"bf_sword", &"cloak_of_agility"])
-effects = Array[ExtResource("1_n5h5h")]([SubResource("Resource_jtnjk")])
+effects = Array[ExtResource("1_3jb1e")]([SubResource("Resource_js8r6")])

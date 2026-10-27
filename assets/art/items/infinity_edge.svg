@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Infinity Edge: an ornate golden greatsword pointing up, upswept winged crossguard set with a glowing blue gem -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c1a1c"/><stop offset="1" stop-color="#140806"/></linearGradient><radialGradient id="aura"><stop offset="0" stop-color="#ffcf5a" stop-opacity="0.38"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient><radialGradient id="gemglow"><stop offset="0" stop-color="#8fe0ff" stop-opacity="0.85"/><stop offset="1" stop-color="#4fc8ff" stop-opacity="0"/></radialGradient><radialGradient id="gem" cx="0.4" cy="0.35" r="0.65"><stop offset="0" stop-color="#eafaff"/><stop offset="0.45" stop-color="#4fc8ff"/><stop offset="1" stop-color="#1450b0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="24" r="26" fill="url(#aura)"/>
+  <path d="M 32 3.5 L 38 10.5 L 39.5 37 L 24.5 37 L 26 10.5 Z" fill="#f2d68a" stroke="#1a0a06" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 32 5.2 L 36.9 11 L 38.3 36 L 32 36 Z" fill="#c99a44"/>
+  <path d="M 32 12 L 32 34" stroke="#8a5e1c" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M 31.2 5.5 L 27.2 10.5 L 25.9 35.5" fill="none" stroke="#fffbe8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 32 36 C 26 36 19 34 13 29 C 13.5 36 17 41.5 23 43.5 L 41 43.5 C 47 41.5 50.5 36 51 29 C 45 34 38 36 32 36 Z" fill="#dca63c" stroke="#1a0a06" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 16.5 37.6 C 18.5 40.5 20.5 42 23.5 42.4 L 40.5 42.4 C 43.5 42 45.5 40.5 47.5 37.6 C 44 39.5 38.5 40.3 32 40.3 C 25.5 40.3 20 39.5 16.5 37.6 Z" fill="#a8721e"/>
+  <path d="M 15.5 31.8 C 20 35.1 25 37.1 31 37.6" fill="none" stroke="#fff0b0" stroke-width="1.1" stroke-linecap="round"/>
+  <circle cx="32" cy="39.5" r="8.5" fill="url(#gemglow)"/>
+  <circle cx="32" cy="39.5" r="4.6" fill="url(#gem)" stroke="#0a1a3a" stroke-width="1.5"/>
+  <circle cx="30.6" cy="38" r="1.2" fill="#ffffff"/>
+  <rect x="28.8" y="43.5" width="6.4" height="9.5" fill="#5a1e14" stroke="#1a0a06" stroke-width="1.8"/>
+  <path d="M 29.6 46.5 L 34.4 45.5 M 29.6 49.5 L 34.4 48.5" stroke="#2e0e08" stroke-width="1.1"/>
+  <circle cx="32" cy="56.5" r="3.5" fill="#dca63c" stroke="#1a0a06" stroke-width="1.8"/>
+  <circle cx="31" cy="55.5" r="1.1" fill="#fff0b0"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

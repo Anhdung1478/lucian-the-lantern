@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Morellonomicon: a thick closed green tome with gold corners and a glowing arcane eye rune on the cover -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#173d24"/><stop offset="1" stop-color="#06120a"/></linearGradient><linearGradient id="cover" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3fae62"/><stop offset="1" stop-color="#1d5c32"/></linearGradient><radialGradient id="rune"><stop offset="0" stop-color="#b6ffd0" stop-opacity="0.8"/><stop offset="1" stop-color="#4fe08a" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <rect x="15" y="10" width="36" height="48" rx="3" fill="#163e22" stroke="#0c1018" stroke-width="2"/>
+  <polygon points="12,5.5 44,5.5 49.5,10.5 49.5,56 15,56 10,51" fill="#eadfb4" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round"/>
+  <polyline points="45.8,7.2 45.8,52.7 11.8,52.7" fill="none" stroke="#b5a675" stroke-width="0.8"/>
+  <polyline points="47.7,8.8 47.7,54.3 13.7,54.3" fill="none" stroke="#b5a675" stroke-width="0.8"/>
+  <rect x="10" y="5" width="34" height="46" rx="2.5" fill="url(#cover)"/>
+  <rect x="10" y="5" width="6" height="46" rx="2.5" fill="#174a28"/>
+  <rect x="10.5" y="12" width="5.5" height="2" fill="#d9b25a"/>
+  <rect x="10.5" y="42" width="5.5" height="2" fill="#d9b25a"/>
+  <line x1="16" y1="5.5" x2="16" y2="50.5" stroke="#0c1018" stroke-width="1"/>
+  <rect x="10" y="5" width="34" height="46" rx="2.5" fill="none" stroke="#0c1018" stroke-width="2"/>
+  <polygon points="37,6.2 42.8,6.2 42.8,12" fill="#d9b25a" stroke="#0c1018" stroke-width="1" stroke-linejoin="round"/>
+  <polygon points="42.8,44 42.8,49.8 37,49.8" fill="#d9b25a" stroke="#0c1018" stroke-width="1" stroke-linejoin="round"/>
+  <circle cx="30" cy="28" r="13" fill="url(#rune)"/>
+  <circle cx="30" cy="28" r="10" fill="none" stroke="#7dffb0" stroke-width="1.5"/>
+  <path d="M 30 14.5 L 30 17 M 30 39 L 30 41.5 M 17.5 28 L 20 28 M 40 28 L 42.5 28" stroke="#7dffb0" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 22 28 C 25 23.5 35 23.5 38 28 C 35 32.5 25 32.5 22 28 Z" fill="#0f2a18" stroke="#b6ffd0" stroke-width="1.4" stroke-linejoin="round"/>
+  <circle cx="30" cy="28" r="3.6" fill="#7dffb0"/>
+  <ellipse cx="30" cy="28" rx="1.2" ry="2.9" fill="#0c1018"/>
+  <circle cx="31.2" cy="26.8" r="0.8" fill="#ffffff"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

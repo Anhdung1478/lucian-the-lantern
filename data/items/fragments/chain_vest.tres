@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_bxi1r"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_5rjp6"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_5rjp6"]
+[ext_resource type="Texture2D" path="res://assets/art/items/chain_vest.svg" id="2_kogcr"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_rnbsq"]
 
 [resource]
-script = ExtResource("2_5rjp6")
+script = ExtResource("3_rnbsq")
 id = &"chain_vest"
 display_name = "Chain Vest"
 code = "AR"
+icon = ExtResource("2_kogcr")
 cost = 800
 stats = Dictionary[StringName, float]({
 &"armor": 40.0

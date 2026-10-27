@@ -1,24 +1,26 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_u74cn"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_yi7va"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_yi7va"]
+[ext_resource type="Texture2D" path="res://assets/art/items/malignance.svg" id="2_kfbd5"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_hq4cd"]
 
-[sub_resource type="Resource" id="Resource_kfbd5"]
-script = ExtResource("1_u74cn")
+[sub_resource type="Resource" id="Resource_bw7um"]
+script = ExtResource("1_yi7va")
 effect_name = "Scorn"
 description = "R gains 20 extra ability haste."
 
-[sub_resource type="Resource" id="Resource_hq4cd"]
-script = ExtResource("1_u74cn")
+[sub_resource type="Resource" id="Resource_7d38d"]
+script = ExtResource("1_yi7va")
 effect_name = "Hatefog"
 description = "R hits scorch the ground under the enemy for 3 s, dealing [magic]60 (+5% AP) magic damage[/magic] per second and lowering its magic resist by 10."
 
 [resource]
-script = ExtResource("2_yi7va")
+script = ExtResource("3_hq4cd")
 id = &"malignance"
 display_name = "Malignance"
 kind = 1
 code = "Mal"
+icon = ExtResource("2_kfbd5")
 cost = 2900
 stats = Dictionary[StringName, float]({
 &"ability_haste": 20.0,
@@ -26,4 +28,4 @@ stats = Dictionary[StringName, float]({
 &"armor": 30.0
 })
 components = Array[StringName]([&"needlessly_large_rod", &"chain_vest"])
-effects = Array[ExtResource("1_u74cn")]([SubResource("Resource_kfbd5"), SubResource("Resource_hq4cd")])
+effects = Array[ExtResource("1_yi7va")]([SubResource("Resource_bw7um"), SubResource("Resource_7d38d")])

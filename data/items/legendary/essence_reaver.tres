@@ -1,19 +1,21 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_4hup6"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_btj1a"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_btj1a"]
+[ext_resource type="Texture2D" path="res://assets/art/items/essence_reaver.svg" id="2_emo0s"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_mpo0p"]
 
-[sub_resource type="Resource" id="Resource_emo0s"]
-script = ExtResource("1_4hup6")
+[sub_resource type="Resource" id="Resource_uyh6r"]
+script = ExtResource("1_btj1a")
 effect_name = "Spellblade"
 description = "After a skill, the next basic attack deals [phys]bonus physical damage equal to 100% base AD (+40% bonus AD)[/phys] and restores [mana]mana equal to 40% of that damage[/mana]. 1.5 s cooldown."
 
 [resource]
-script = ExtResource("2_btj1a")
+script = ExtResource("3_mpo0p")
 id = &"essence_reaver"
 display_name = "Essence Reaver"
 kind = 1
 code = "ER"
+icon = ExtResource("2_emo0s")
 cost = 3000
 stats = Dictionary[StringName, float]({
 &"ability_haste": 20.0,
@@ -21,4 +23,4 @@ stats = Dictionary[StringName, float]({
 &"crit_chance": 0.2
 })
 components = Array[StringName]([&"cloak_of_agility", &"tear_of_the_goddess"])
-effects = Array[ExtResource("1_4hup6")]([SubResource("Resource_emo0s")])
+effects = Array[ExtResource("1_btj1a")]([SubResource("Resource_uyh6r")])

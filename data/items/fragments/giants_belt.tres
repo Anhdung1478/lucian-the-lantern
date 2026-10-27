@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_v31hw"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_kn738"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_kn738"]
+[ext_resource type="Texture2D" path="res://assets/art/items/giants_belt.svg" id="2_c0fbk"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_n66k8"]
 
 [resource]
-script = ExtResource("2_kn738")
+script = ExtResource("3_n66k8")
 id = &"giants_belt"
 display_name = "Giant's Belt"
 code = "HP"
+icon = ExtResource("2_c0fbk")
 cost = 900
 stats = Dictionary[StringName, float]({
 &"max_hp": 350.0

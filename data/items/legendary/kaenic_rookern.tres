@@ -1,23 +1,25 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_h0yw2"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_dorc8"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_dorc8"]
+[ext_resource type="Texture2D" path="res://assets/art/items/kaenic_rookern.svg" id="2_hgc7j"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_uqao7"]
 
-[sub_resource type="Resource" id="Resource_hgc7j"]
-script = ExtResource("1_h0yw2")
+[sub_resource type="Resource" id="Resource_5mbwi"]
+script = ExtResource("1_dorc8")
 effect_name = "Magebane"
 description = "After 15 s without taking magic damage, gain a [magic]shield against magic damage[/magic] equal to [hp]15% max health[/hp]."
 
 [resource]
-script = ExtResource("2_dorc8")
+script = ExtResource("3_uqao7")
 id = &"kaenic_rookern"
 display_name = "Kaenic Rookern"
 kind = 1
 code = "KR"
+icon = ExtResource("2_hgc7j")
 cost = 2900
 stats = Dictionary[StringName, float]({
 &"max_hp": 250.0,
 &"mr": 80.0
 })
 components = Array[StringName]([&"negatron_cloak", &"negatron_cloak"])
-effects = Array[ExtResource("1_h0yw2")]([SubResource("Resource_hgc7j")])
+effects = Array[ExtResource("1_dorc8")]([SubResource("Resource_5mbwi")])

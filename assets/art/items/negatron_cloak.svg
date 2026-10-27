@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Negatron Cloak: a dark purple cloak seen from the back, its pointed hood lying down between the shoulders, magenta trim and a faint violet aura -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><radialGradient id="aura"><stop offset="0" stop-color="#b45cff" stop-opacity="0.5"/><stop offset="0.6" stop-color="#7a2ad0" stop-opacity="0.18"/><stop offset="1" stop-color="#5a1aa0" stop-opacity="0"/></radialGradient><linearGradient id="cloth" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5e2c92"/><stop offset="0.55" stop-color="#43206e"/><stop offset="1" stop-color="#2a1248"/></linearGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
+  <path d="M 18 12 Q 32 7 46 12 C 50 22 54 40 58 54 Q 52 58 46 55 Q 39 59 32 56 Q 25 59 18 55 Q 12 58 6 54 C 10 40 14 22 18 12 Z" fill="url(#cloth)" stroke="#0c0818" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 25 18 Q 21 36 18 54 M 39 18 Q 43 36 46 54 M 32 32 L 32 55" fill="none" stroke="#1c0a32" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 18.5 16 C 15.5 26 12.5 40 9.5 52" fill="none" stroke="#8a5ac8" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M 7.5 52.3 Q 12 56 18 53.3 Q 25 57 32 54.3 Q 39 57 46 53.3 Q 52 56 56.5 52.3" fill="none" stroke="#e040c0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 18 12 Q 32 7 46 12" fill="none" stroke="#e040c0" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 22 10.5 Q 32 14 42 10.5 Q 41 23 32 32 Q 23 23 22 10.5 Z" fill="#4c2480" stroke="#0c0818" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M 23.6 12.6 Q 32 15.6 40.4 12.6 Q 39.4 22.6 32 30 Q 24.6 22.6 23.6 12.6 Z" fill="none" stroke="#e040c0" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M 32 16 L 32 27.5" stroke="#2a1048" stroke-width="1.2" stroke-linecap="round"/>
+  <circle cx="32" cy="31" r="2.6" fill="#ff7ae6" stroke="#2a0a2a" stroke-width="1.1"/>
+  <circle cx="31.2" cy="30.3" r="0.8" fill="#ffffff"/>
+  <circle cx="9" cy="14" r="1.2" fill="#d9a0ff"/>
+  <circle cx="56" cy="22" r="1" fill="#d9a0ff"/>
+</svg>

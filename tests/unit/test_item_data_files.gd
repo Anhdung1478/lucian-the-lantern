@@ -77,6 +77,13 @@ func test_every_item_has_a_name_cost_and_known_stats() -> void:
 			assert_gt(item.stats[key], 0.0, "%s %s" % [item.id, key])
 
 
+func test_every_item_has_its_icon() -> void:
+	for item in catalog.items:
+		assert_not_null(item.icon, "%s has no icon" % item.id)
+		if item.icon:
+			assert_eq(item.icon.resource_path, "res://assets/art/items/%s.svg" % item.id)
+
+
 func test_effects_have_names_and_text() -> void:
 	for item in catalog.legendaries():
 		for effect in item.effects:

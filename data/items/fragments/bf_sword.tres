@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_u43tk"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_n63bf"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_n63bf"]
+[ext_resource type="Texture2D" path="res://assets/art/items/bf_sword.svg" id="2_2n2wv"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_4uv0s"]
 
 [resource]
-script = ExtResource("2_n63bf")
+script = ExtResource("3_4uv0s")
 id = &"bf_sword"
 display_name = "B.F. Sword"
 code = "AD"
+icon = ExtResource("2_2n2wv")
 cost = 1300
 stats = Dictionary[StringName, float]({
 &"ad": 35.0

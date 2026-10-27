@@ -1,21 +1,23 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_7df5d"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_ixxwp"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_ixxwp"]
+[ext_resource type="Texture2D" path="res://assets/art/items/hextech_rocketbelt.svg" id="2_qdl1g"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_fehd0"]
 
-[sub_resource type="Resource" id="Resource_qdl1g"]
-script = ExtResource("1_7df5d")
+[sub_resource type="Resource" id="Resource_4134y"]
+script = ExtResource("1_ixxwp")
 effect_name = "Supersonic"
 active = true
 cooldown = 40.0
 description = "Dash toward the cursor and fire an arc of bolts that deal [magic]100 (+10% AP) magic damage[/magic], then gain [ms]75% move speed[/ms] that fades over 2 s."
 
 [resource]
-script = ExtResource("2_ixxwp")
+script = ExtResource("3_fehd0")
 id = &"hextech_rocketbelt"
 display_name = "Hextech Rocketbelt"
 kind = 1
 code = "HRB"
+icon = ExtResource("2_qdl1g")
 cost = 2600
 stats = Dictionary[StringName, float]({
 &"ability_haste": 15.0,
@@ -23,4 +25,4 @@ stats = Dictionary[StringName, float]({
 &"max_hp": 300.0
 })
 components = Array[StringName]([&"giants_belt", &"tear_of_the_goddess"])
-effects = Array[ExtResource("1_7df5d")]([SubResource("Resource_qdl1g")])
+effects = Array[ExtResource("1_ixxwp")]([SubResource("Resource_4134y")])

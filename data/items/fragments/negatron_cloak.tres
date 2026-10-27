@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_l1a2u"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_2rxsc"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_2rxsc"]
+[ext_resource type="Texture2D" path="res://assets/art/items/negatron_cloak.svg" id="2_p1ykf"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_jyf4j"]
 
 [resource]
-script = ExtResource("2_2rxsc")
+script = ExtResource("3_jyf4j")
 id = &"negatron_cloak"
 display_name = "Negatron Cloak"
 code = "MR"
+icon = ExtResource("2_p1ykf")
 cost = 900
 stats = Dictionary[StringName, float]({
 &"mr": 40.0

@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_4k6b5"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_0neu1"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_0neu1"]
+[ext_resource type="Texture2D" path="res://assets/art/items/needlessly_large_rod.svg" id="2_bbmba"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_kbds1"]
 
 [resource]
-script = ExtResource("2_0neu1")
+script = ExtResource("3_kbds1")
 id = &"needlessly_large_rod"
 display_name = "Needlessly Large Rod"
 code = "AP"
+icon = ExtResource("2_bbmba")
 cost = 1200
 stats = Dictionary[StringName, float]({
 &"ap": 60.0

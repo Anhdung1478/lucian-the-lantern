@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_fevpo"]
-[ext_resource type="Script" path="res://src/core/item_data.gd" id="2_h4ktj"]
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_h4ktj"]
+[ext_resource type="Texture2D" path="res://assets/art/items/tear_of_the_goddess.svg" id="2_efxu7"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_obnjv"]
 
 [resource]
-script = ExtResource("2_h4ktj")
+script = ExtResource("3_obnjv")
 id = &"tear_of_the_goddess"
 display_name = "Tear of the Goddess"
 code = "MP"
+icon = ExtResource("2_efxu7")
 cost = 400
 stats = Dictionary[StringName, float]({
 &"max_mana": 300.0

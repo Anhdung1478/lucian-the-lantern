@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Hextech Rocketbelt: a curved brass belt with a cyan hextech crystal buckle, two rocket thrusters below blasting cyan flames -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#124541"/><stop offset="1" stop-color="#051210"/></linearGradient><linearGradient id="brass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset="0.45" stop-color="#d8a040"/><stop offset="1" stop-color="#7a4e16"/></linearGradient><linearGradient id="tube" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7a4e1a"/><stop offset="0.4" stop-color="#f0c060"/><stop offset="1" stop-color="#8a5a20"/></linearGradient><linearGradient id="flame" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eaffff"/><stop offset="0.4" stop-color="#4ff0ff"/><stop offset="1" stop-color="#0aa0c8" stop-opacity="0.25"/></linearGradient><linearGradient id="gem" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8ffff"/><stop offset="1" stop-color="#19c8d8"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#5ff6ff" stop-opacity="0.6"/><stop offset="1" stop-color="#5ff6ff" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <path d="M 11.5 41 L 24.5 41 C 24 47 21 52 18 58 C 15 52 12 47 11.5 41 Z M 39.5 41 L 52.5 41 C 52 47 49 52 46 58 C 43 52 40 47 39.5 41 Z" fill="url(#flame)"/>
+  <path d="M 14.5 41 L 21.5 41 C 21 45 19.5 48 18 52 C 16.5 48 15 45 14.5 41 Z M 42.5 41 L 49.5 41 C 49 45 47.5 48 46 52 C 44.5 48 43 45 42.5 41 Z" fill="#f0ffff"/>
+  <g stroke="#0c1018" stroke-width="1.8" stroke-linejoin="round">
+    <polygon points="13,36 23,36 25,41 11,41" fill="#4a4c58"/>
+    <polygon points="41,36 51,36 53,41 39,41" fill="#4a4c58"/>
+    <rect x="12" y="19" width="12" height="17" rx="2.5" fill="url(#tube)"/>
+    <rect x="40" y="19" width="12" height="17" rx="2.5" fill="url(#tube)"/>
+  </g>
+  <path d="M 12.5 29 L 23.5 29 M 40.5 29 L 51.5 29" stroke="#6a4410" stroke-width="2"/>
+  <path d="M 5 10 C 20 16 44 16 59 10 L 59 21 C 44 27 20 27 5 21 Z" fill="url(#brass)" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 7 12.2 C 20 17.5 44 17.5 57 12.2" fill="none" stroke="#fff4c4" stroke-width="1.2" stroke-linecap="round"/>
+  <g fill="#fff0b8" stroke="#5a3a0c" stroke-width="0.6"><circle cx="11" cy="17" r="1.2"/><circle cx="53" cy="17" r="1.2"/><circle cx="18" cy="19" r="1.2"/><circle cx="46" cy="19" r="1.2"/></g>
+  <circle cx="32" cy="20" r="13" fill="url(#glow)"/>
+  <polygon points="32,10.5 40.2,15.25 40.2,24.75 32,29.5 23.8,24.75 23.8,15.25" fill="url(#brass)" stroke="#0c1018" stroke-width="1.8" stroke-linejoin="round"/>
+  <polygon points="32,14.5 36.8,17.25 36.8,22.75 32,25.5 27.2,22.75 27.2,17.25" fill="url(#gem)" stroke="#0c1018" stroke-width="1.2" stroke-linejoin="round"/>
+  <polygon points="32,14.5 36.8,17.25 32,20 27.2,17.25" fill="#f0ffff" opacity="0.9"/>
+  <polygon points="32,20 36.8,22.75 32,25.5" fill="#0e8a9a" opacity="0.6"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>
