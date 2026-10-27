@@ -1,7 +1,8 @@
 class_name SkillSlot
 extends Control
 ## One skill icon on the HUD: cooldown sweep, rank dots, mana cost, "+" button
-## and lock icon. A slot without a skill is the passive.
+## and lock icon. A slot without a skill is the passive. Hovering shows the
+## skill's card above it.
 
 const ICON_SIZE := 64.0
 const PLUS_HEIGHT := 26.0
@@ -27,11 +28,13 @@ var _plus: Button
 var _cooldown_label: Label
 var _cost_label: Label
 var _lock: TextureRect
+var _key := ""
 
 
 func setup(target: Lucian, slot_skill: LucianSkill, icon: Texture2D, key: String) -> void:
 	lucian = target
 	skill = slot_skill
+	_key = key
 	custom_minimum_size = Vector2(ICON_SIZE, PLUS_HEIGHT + ICON_SIZE + DOTS_HEIGHT)
 	var icon_rect := Rect2(0, PLUS_HEIGHT, ICON_SIZE, ICON_SIZE)
 
@@ -98,6 +101,14 @@ func _process(_delta: float) -> void:
 	else:
 		_icon.modulate = Color.WHITE
 	queue_redraw()
+
+
+func tooltip_content() -> Control:
+	return TooltipCard.skill(lucian, skill, _icon.texture, _key)
+
+
+func tooltip_place() -> HoverTip.Place:
+	return HoverTip.Place.ABOVE
 
 
 ## Rank dots under the icon.

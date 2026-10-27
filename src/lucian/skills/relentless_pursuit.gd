@@ -20,6 +20,17 @@ func execute(aim: Vector2) -> void:
 	_was_dashing = true
 
 
+func describe() -> String:
+	return TooltipText.colorize(
+		"Lucian dashes up to [kw]%d[/kw] units toward the cursor (at least %d), passing through enemies, and resets his basic attack timer. "
+		+ "[kw]Lightslinger[/kw] hits lower this cooldown."
+	) % [max_distance, min_distance]
+
+
+func max_rank_bonus() -> String:
+	return "Killing an enemy lowers this cooldown by 1 s."
+
+
 func _physics_process(delta: float) -> void:
 	super(delta)
 	# Draw the trail once the dash is over, so it matches where Lucian stopped.

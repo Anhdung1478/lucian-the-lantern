@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://src/ui/debug/debug_table.gd" id="8_debug"]
 [ext_resource type="Script" path="res://src/ui/screen_switcher.gd" id="9_screens"]
 [ext_resource type="Script" path="res://src/ui/menu/game_menu.gd" id="10_menu"]
+[ext_resource type="Script" path="res://src/ui/tooltip/hover_tip.gd" id="11_hover"]
 
 [node name="Stage" type="Node2D"]
 script = ExtResource("1_stage")
@@ -46,3 +47,6 @@ script = ExtResource("9_screens")
 
 [node name="Menu" type="CanvasLayer" parent="Screens"]
 script = ExtResource("10_menu")
+
+[node name="HoverTip" type="CanvasLayer" parent="."]
+script = ExtResource("11_hover")

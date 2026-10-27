@@ -32,5 +32,32 @@ func execute(_aim: Vector2) -> void:
 	pass
 
 
+## LoL-style tooltip text (BBCode) at the current rank.
+func describe() -> String:
+	return ""
+
+
+## What reaching max rank adds, shown after "Rank N:". Empty when nothing.
+func max_rank_bonus() -> String:
+	return ""
+
+
+## "80/110/140 (+60/70/80% AD) physical damage", colored like LoL, with the
+## current rank lit up.
+func damage_text() -> String:
+	var r := rank()
+	var text := TooltipText.ranked(data.base_damage, r)
+	if not data.ad_ratio.is_empty():
+		text += " " + TooltipText.ratio(data.ad_ratio, r, "AD")
+	if not data.ap_ratio.is_empty():
+		text += " " + TooltipText.ratio(data.ap_ratio, r, "AP")
+	var words: String = {
+		DamageInfo.Type.PHYSICAL: "[phys]physical damage[/phys]",
+		DamageInfo.Type.MAGIC: "[magic]magic damage[/magic]",
+		DamageInfo.Type.TRUE: "[true]true damage[/true]",
+	}[data.damage_type]
+	return text + " " + TooltipText.colorize(words)
+
+
 func _physics_process(delta: float) -> void:
 	cooldown.reduce(delta)

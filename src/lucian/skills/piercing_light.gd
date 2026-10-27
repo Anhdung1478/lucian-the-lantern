@@ -20,6 +20,16 @@ func execute(aim: Vector2) -> void:
 	_fire_in = cast_time
 
 
+func describe() -> String:
+	return TooltipText.colorize(
+		"After a [kw]%s s[/kw] cast, Lucian fires a piercing beam of light toward the cursor, dealing %s to every enemy in a line."
+	) % [TooltipText.number(cast_time), damage_text()]
+
+
+func max_rank_bonus() -> String:
+	return "The beam grows from %d × %d to %d × %d units." % [length, width, max_rank_length, max_rank_width]
+
+
 func _physics_process(delta: float) -> void:
 	super(delta)
 	if _fire_in > 0.0:

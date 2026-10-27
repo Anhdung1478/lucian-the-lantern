@@ -48,6 +48,8 @@ func _run(scenario: String) -> void:
 			await scenario_hud()
 		"menu":
 			await scenario_menu()
+		"tooltip":
+			await scenario_tooltip()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -265,3 +267,57 @@ func scenario_menu() -> void:
 	await press_key(KEY_ESCAPE, false)
 	await wait(0.3)
 	print("paused after 2nd ESC (expect false): ", paused, "  Lucian moving (expect true): ", lucian.global_position.x > x)
+
+
+## Moves the real mouse to `canvas_pos` (1920x1080 canvas units), as if the
+## player did it. `held` keeps the left button down during the motion.
+func mouse_move(canvas_pos: Vector2, held := false) -> void:
+	var window_pos := root.get_final_transform() * canvas_pos
+	var event := InputEventMouseMotion.new()
+	event.position = window_pos
+	event.global_position = window_pos
+	event.button_mask = MOUSE_BUTTON_MASK_LEFT if held else 0
+	Input.parse_input_event(event)
+	await process_frame
+
+
+func mouse_button(canvas_pos: Vector2, pressed: bool) -> void:
+	var window_pos := root.get_final_transform() * canvas_pos
+	var event := InputEventMouseButton.new()
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.pressed = pressed
+	event.position = window_pos
+	event.global_position = window_pos
+	event.button_mask = MOUSE_BUTTON_MASK_LEFT if pressed else 0
+	Input.parse_input_event(event)
+	await process_frame
+
+
+func control_center(control: Control) -> Vector2:
+	return control.get_global_rect().get_center()
+
+
+func scenario_tooltip() -> void:
+	lucian.progress.set_level(3)
+	lucian.try_rank_up(ChampionProgress.Slot.Q)
+	lucian.try_rank_up(ChampionProgress.Slot.Q)
+	var skill_row: HBoxContainer = stage.get_node("Hud").skill_row
+	await mouse_move(control_center(skill_row.get_child(1)))
+	await wait(0.6)
+	await mouse_move(control_center(skill_row.get_child(1)) + Vector2(5, 3))
+	await wait(0.6)
+	print("Q tooltip after 1.2 s with a small move (expect true): ", stage.get_node("HoverTip").is_showing())
+	await shot("tooltip_0_q")
+	await mouse_move(control_center(skill_row.get_child(0)))
+	await wait(1.2)
+	await shot("tooltip_1_passive")
+	await mouse_move(Vector2(960, 300))
+	await wait(0.2)
+	print("hidden after leaving (expect false): ", stage.get_node("HoverTip").is_showing())
+	await press_key(KEY_ESCAPE, true)
+	await press_key(KEY_ESCAPE, false)
+	var menu: GameMenu = stage.get_node("Screens/Menu")
+	var settings: Button = menu.find_children("*", "Button", true, false)[1]
+	await mouse_move(control_center(settings))
+	await wait(1.2)
+	await shot("tooltip_2_disabled_button")
