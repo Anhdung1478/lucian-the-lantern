@@ -5,6 +5,8 @@ var lucian: Lucian
 
 func before_each() -> void:
 	lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	# Dash trails go here and are freed with it, so none outlives its test.
+	lucian.projectile_parent = add_child_autofree(Node2D.new())
 	add_child_autofree(lucian)
 
 
@@ -40,6 +42,15 @@ func test_death_fires_once_and_regen_stops() -> void:
 func test_stats_refresh_never_revives_him() -> void:
 	lucian.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
 	lucian.refresh_stats()
+	assert_eq(lucian.hp, 0.0)
+
+
+func test_a_dead_lucian_gains_no_hp() -> void:
+	lucian.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	lucian.progress.add_xp(100000)
+	assert_gt(lucian.progress.level, 1)
+	assert_eq(lucian.hp, 0.0, "a level up (Senna's kill) while dead")
+	assert_eq(lucian.heal(100.0), 0.0)
 	assert_eq(lucian.hp, 0.0)
 
 

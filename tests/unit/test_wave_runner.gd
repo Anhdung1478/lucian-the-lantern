@@ -88,3 +88,23 @@ func test_finish_ends_it_once() -> void:
 	runner.finish()
 	runner.finish()
 	assert_signal_emit_count(runner, "cleared", 1)
+
+
+func test_the_last_enemy_is_the_last_of_the_last_wave() -> void:
+	var runner := _runner(WavePlan.waves("2-1"))
+	runner.skip()
+	_spawn_all(runner)
+	for i in spawned.size() - 1:
+		runner.enemy_died()
+	assert_false(runner.is_last_enemy(), "wave 1 of 2")
+	runner.enemy_died()
+	spawned.clear()
+	runner.skip()
+	_spawn_all(runner)
+	for i in spawned.size() - 2:
+		runner.enemy_died()
+	assert_false(runner.is_last_enemy(), "two left")
+	runner.enemy_died()
+	assert_true(runner.is_last_enemy())
+	runner.enemy_died()
+	assert_false(runner.is_last_enemy(), "done")

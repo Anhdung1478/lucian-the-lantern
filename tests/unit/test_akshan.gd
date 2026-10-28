@@ -4,6 +4,9 @@ var lucian: Lucian
 
 
 func before_each() -> void:
+	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
+	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
+		SaveGame._instance = SaveGame.new("user://test_akshan_save_slot_")
 	lucian = load("res://src/lucian/lucian.tscn").instantiate()
 	add_child_autofree(lucian)
 

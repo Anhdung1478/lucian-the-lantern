@@ -17,6 +17,8 @@ func before_each() -> void:
 
 func after_each() -> void:
 	SaveGame.instance().prefix = _prefix
+	# A stage's result pauses the tree.
+	get_tree().paused = false
 
 
 func _stage() -> Stage:
@@ -87,3 +89,27 @@ func test_a_full_backpack_leaves_the_drop() -> void:
 	var drop := _drop_on_lucian(sword)
 	await wait_physics_frames(2)
 	assert_true(is_instance_valid(drop))
+
+
+func _drops() -> Array[Node]:
+	return stage.get_node("World").get_children().filter(func(node: Node) -> bool: return node is LootDrop)
+
+
+func test_the_kill_that_ends_the_stage_drops_nothing() -> void:
+	stage = load("res://src/stage/stage.tscn").instantiate()
+	stage.setup(StageSetup.for_stage(SaveGame.instance(), 2, 3))
+	add_child_autofree(stage)
+	await wait_physics_frames(2)
+	stage.jump_to_boss_wave()
+	stage.runner.tick(0.1)
+	stage.runner.tick(0.1)
+	stage.boss_unit.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_true(stage.result.visible)
+	assert_eq(_drops().size(), 0, "the result is up: nothing could pick it up")
+
+
+func test_a_boss_that_doesnt_end_the_stage_still_drops() -> void:
+	_stage()
+	var boss := stage.spawn_enemy(&"akshan", Vector2(1700, 600))
+	boss.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_gt(_drops().size(), 0)

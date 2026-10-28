@@ -1,8 +1,8 @@
 class_name EnemyProjectile
 extends Area2D
-## An enemy's shot: flies straight, hits Lucian once (by distance) and stops
-## on a wall or pillar. A boomerang flies `max_range` out, then back to its
-## thrower, and may hit once each way.
+## An enemy's shot: flies straight and ends on Lucian (by distance, taken or
+## blocked) or on a wall or pillar. A boomerang flies `max_range` out, then
+## back to its thrower, and may hit once each way.
 
 ## The shot hit Lucian and he took it (not blocked).
 signal hit_lucian
@@ -63,6 +63,9 @@ func _physics_process(delta: float) -> void:
 		_hit_this_pass = true
 		if target.take_damage(info):
 			hit_lucian.emit()
+		if not return_to:
+			queue_free()
+			return
 	if not _returning and _travelled >= max_range:
 		if return_to:
 			_returning = true

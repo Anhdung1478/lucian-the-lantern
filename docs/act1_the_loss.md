@@ -130,7 +130,7 @@ He rises from the river for the boss wave. Bosses don't scale with the wave.
 |---|---|
 | HP | 3000. His HP never goes under half: at 50% the fight stops and the cutscene plays. |
 | Armor / MR | 30 / 30 |
-| Basic attack | A 30 physical bolt, range 450, every 1.8 s. Speed 300. |
+| Basic attack | A 30 physical bolt (900 px/s), range 450, every 1.8 s. Walks at 300. |
 | **Death Sentence (Q)** | A line warning (1000 × 70) for 0.9 s, then the hook at 1400 px/s. On a hit: 80 magic, and Lucian is pulled to 120 in front of Thresh. Cooldown 9 s (first use after 2 s). |
 | **Flay (E)** | A cone warning (70°, 400 long) for 0.6 s, then 60 magic and a push of 250 away from Thresh. Cooldown 7 s (first use after 4 s). |
 | Rewards | 100 blue, 5 orange and 10 purple (first clear only). No gold, XP or item: he never dies. |

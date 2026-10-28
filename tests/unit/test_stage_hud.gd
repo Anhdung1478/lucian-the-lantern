@@ -1,6 +1,12 @@
 extends GutTest
 
 
+func before_each() -> void:
+	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
+	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
+		SaveGame._instance = SaveGame.new("user://test_stage_hud_save_slot_")
+
+
 func test_the_wave_text_follows_the_runner() -> void:
 	var runner := WaveRunner.new(WavePlan.waves("2-2"))
 	var info := StageInfo.new()

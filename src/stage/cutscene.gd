@@ -5,7 +5,8 @@ extends CanvasLayer
 ## Skip button that jumps to the end. Subclasses write _play() with the
 ## helpers; `done` fires once, skipped or not.
 ##
-## Every wait is a tween of this node, so nothing resumes on a freed scene.
+## Every wait is a tween of this node, so nothing resumes on a freed scene
+## and a paused game pauses the scene.
 ## A skip stops the scene's tweens, frees its props and ends the wait at
 ## once: _play() returns after any await when `skipped`.
 
@@ -36,7 +37,9 @@ var _finished := false
 
 func _ready() -> void:
 	layer = LAYER
-	process_mode = PROCESS_MODE_ALWAYS
+	# It pauses with the game (under "Save before leaving?"); the stage freezes
+	# its nodes rather than pausing the tree.
+	process_mode = PROCESS_MODE_INHERIT
 	for top in [true, false]:
 		var bar := ColorRect.new()
 		bar.color = Color.BLACK

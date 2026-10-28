@@ -122,6 +122,11 @@ func _ready() -> void:
 		_start_tutorial()
 
 
+## Frees the mouse _ready confined, for the main screen and the title.
+func _exit_tree() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+
 func _process(delta: float) -> void:
 	if result.visible:
 		return
@@ -413,6 +418,9 @@ func _on_enemy_died(enemy: Enemy) -> void:
 	wallet.add(reward.gold)
 	lucian.progress.add_xp(reward.xp)
 	add_essences(reward.blue, reward.orange, 0, unit.global_position)
-	for item in LootTable.roll(unit.data.kind, lucian.item_catalog, rng):
-		drop_loot(item, unit.global_position)
+	# The kill that ends the stage drops nothing: the result comes up at once,
+	# and items don't carry over.
+	if not (runner and runner.is_last_enemy()):
+		for item in LootTable.roll(unit.data.kind, lucian.item_catalog, rng):
+			drop_loot(item, unit.global_position)
 	enemy_died.emit(unit)

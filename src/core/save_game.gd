@@ -131,7 +131,10 @@ func any_slot_exists() -> bool:
 
 ## A boss was beaten: the purple due (`first` the first time, `repeat`
 ## after), and the boss is marked as paid. The caller adds the essence.
+## A boss missing from BOSS_IDS warns: loading drops it from `bosses`.
 func award_boss(id: String, first: int, repeat: int) -> int:
+	if not id in BOSS_IDS:
+		push_warning("Boss %s is not in SaveGame.BOSS_IDS: its first-time purple comes back after a reload" % id)
 	if id in bosses:
 		return repeat
 	bosses.append(id)

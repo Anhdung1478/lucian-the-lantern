@@ -1,6 +1,12 @@
 extends GutTest
 
 
+func before_each() -> void:
+	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
+	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
+		SaveGame._instance = SaveGame.new("user://test_stage_waves_save_slot_")
+
+
 func after_each() -> void:
 	get_tree().paused = false
 
@@ -10,7 +16,7 @@ func _stage(act: int, stage_number: int) -> Stage:
 	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
 	stage.setup(StageSetup.for_stage(SaveGame.instance(), act, stage_number))
 	add_child_autofree(stage)
-	await wait_frames(2)
+	await wait_process_frames(2)
 	stage.lucian.invulnerable = true
 	return stage
 
@@ -27,11 +33,11 @@ func test_the_merchant_comes_only_for_the_break() -> void:
 	assert_null(stage.merchant)
 	stage.skip_break()
 	_kill_wave(stage)
-	await wait_frames(1)
+	await wait_process_frames(1)
 	assert_eq(stage.runner.state, WaveRunner.State.BREAK)
 	assert_not_null(stage.merchant)
 	stage.skip_break()
-	await wait_frames(1)
+	await wait_process_frames(1)
 	assert_null(stage.merchant)
 
 
@@ -102,7 +108,7 @@ func test_clearing_every_wave_shows_stage_cleared() -> void:
 	for wave in 2:
 		stage.skip_break()
 		_kill_wave(stage)
-		await wait_frames(1)
+		await wait_process_frames(1)
 	assert_true(stage.result.visible)
 	assert_eq(stage.result.title.text, "STAGE CLEARED")
 	assert_true(get_tree().paused)
@@ -115,8 +121,10 @@ func test_dying_shows_defeated() -> void:
 	var stage: Stage = await _stage(2, 1)
 	stage.lucian.invulnerable = false
 	stage.lucian.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
-	# The result pauses the tree, which would freeze GUT's own wait timer.
-	await get_tree().create_timer(Lucian.DEATH_FADE + 0.2).timeout
+	# Frames, not seconds: the result pauses the tree, and GUT's timer with it.
+	var give_up := Time.get_ticks_msec() + int((Lucian.DEATH_FADE + 3.0) * 1000.0)
+	while not stage.result.visible and Time.get_ticks_msec() < give_up:
+		await wait_process_frames(1)
 	assert_eq(stage.result.title.text, "DEFEATED")
 	watch_signals(stage)
 	stage.result.continue_button.pressed.emit()

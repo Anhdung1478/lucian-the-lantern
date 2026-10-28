@@ -294,6 +294,12 @@ func test_award_boss_gives_the_first_amount_once_then_the_repeat() -> void:
 	assert_eq(save_game.award_boss("akshan", 10, 2), 10)
 	assert_eq(save_game.award_boss("akshan", 10, 2), 2)
 	assert_eq(save_game.bosses, ["akshan"] as Array[String])
+	assert_push_warning_count(0)
+
+
+func test_award_boss_warns_about_a_boss_missing_from_boss_ids() -> void:
+	assert_eq(save_game.award_boss("teemo", 10, 2), 10)
+	assert_push_warning("teemo")
 
 
 func test_bosses_round_trip_and_unknown_ids_are_dropped() -> void:

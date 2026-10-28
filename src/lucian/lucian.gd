@@ -324,8 +324,11 @@ static func is_target(enemy: Variant) -> bool:
 	return is_instance_valid(enemy) and enemy.is_alive()
 
 
-## Heals, made stronger by heal and shield power. Returns the HP gained.
+## Heals, made stronger by heal and shield power. Returns the HP gained
+## (none while dead).
 func heal(amount: float) -> float:
+	if dead:
+		return 0.0
 	var before := hp
 	hp = minf(hp + amount * (1.0 + stats.heal_shield_power), stats.max_hp)
 	return hp - before
@@ -963,9 +966,9 @@ func _scale_by_skin(block: StatBlock) -> void:
 
 
 ## Recomputes stats from the level, the equipped items, the tree and the
-## skin. Leveling up grants the max HP / mana gained, like LoL. Item and skin
-## changes keep the current share of HP and mana instead, so swapping items
-## can never refill them.
+## skin. Leveling up grants the max HP / mana gained, like LoL (not while
+## dead). Item and skin changes keep the current share of HP and mana
+## instead, so swapping items can never refill them.
 func _refresh_stats(keep_share: bool) -> void:
 	var old := stats
 	stats = base_stats.at_level(progress.level, _stat_bonus())
@@ -978,6 +981,8 @@ func _refresh_stats(keep_share: bool) -> void:
 	else:
 		hp = clampf(hp + stats.max_hp - old.max_hp, hp_floor, stats.max_hp)
 		mana = clampf(mana + stats.max_mana - old.max_mana, 0.0, stats.max_mana)
+	if dead:
+		hp = 0.0
 	queue_redraw()
 
 

@@ -5412,7 +5412,7 @@ Everything in the plan is in place, one commit per task (Tasks 0–14, plus a fi
   - Two Comeuppance tests set `akshan.move_speed = 0`, so he can't walk into range during their waits.
   - `Stage._on_thresh_phase_ended` and `_on_cleared` do nothing once Lucian is dead or the result shows: a death just before Thresh's half HP gives DEFEATED, with no cutscene and no purple (his repeat purple is 0, so it would be lost for good).
 - **Debug tables** (Task 14): `Stage.freeze(false)` restores the invulnerable value Lucian had before the freeze, so God mode survives a cutscene.
-- **Tests:** from Task 11 on, new waits use `wait_physics_frames` / `wait_process_frames` (`wait_frames` is deprecated). Task 15 converted `test_act1.gd` and `test_stage_hud.gd`, which brought GUT's Deprecated count from 39 to 15; other older files still use it.
+- **Tests:** from Task 11 on, new waits use `wait_physics_frames` / `wait_process_frames` (`wait_frames` is deprecated). Task 15 converted `test_act1.gd` and `test_stage_hud.gd`, which brought GUT's Deprecated count from 39 to 15; the final review's fixes converted the rest (0).
 - **Journey after Act 1:** it opens on Act 1, the act just played (the rule in *Defaults*). The Verification checklist's "the main screen on Act 2" was wrong; the report's checklist is corrected.
 
 ### Visual pass (Task 15)
@@ -5432,16 +5432,28 @@ Every scenario was run in a window and every PNG looked at. Eight fixes:
 - Helpers: `clear_wave()` (Skip, then the debug Kill all once the wave has spawned; earlier tips are flushed so the break's tip shows), `flush_tips()`, `blink()` (moves Lucian, and Senna to her place beside him), `wait_for_warning()`, `wait_for_boss()`, `surround()`.
 - `main_gear` no longer waits for a tooltip on Leave to main menu (it has none now). The doc comment of `scenario_training_setup` is back above it.
 
+### Fixes from the final review
+- **Saving on quit keeps a stage clear:** `Game._save()` (used by "Save before leaving?" on quit and on Leave) calls `finish_stage` while a stage's result panel shows, so closing the window on STAGE CLEARED, then Yes, keeps the clear. Test: `test_closing_the_window_on_stage_cleared_keeps_the_clear`.
+- **Flush-safe wave ends:** `break_started` and `break_ended` (both, to keep their order) and Thresh's `phase_ended` are connected deferred. A kill or hit inside a shot's `area_entered` added the merchant's body, or froze the world's bodies, mid physics flush (engine errors). `cleared` and `spawn_requested` stay direct: the result adds no bodies, and spawns come from `tick()`. Tests: `test_a_shot_that_ends_a_wave_brings_the_merchant_safely`, `..._ends_the_stage_shows_the_result_safely`, `..._halves_thresh_plays_the_cutscene_safely`.
+- **No loot from the kill that ends the stage:** `WaveRunner.is_last_enemy()`; `Stage._on_enemy_died` rolls no loot for it. Akshan's reward line lost its fragment; the boss row of `LootTable` stays for Endless.
+- **Enemy bolts** end on a hit, taken or blocked, unless they return (the boomerang).
+- **Dead Lucian:** `heal()` gives nothing, and a level up leaves HP at 0.
+- **Cutscene:** `PROCESS_MODE_INHERIT`, so it pauses under "Save before leaving?". Its tweens are bound to it.
+- **Mouse:** `Stage._exit_tree()` sets it back to visible (no headless test: the headless display ignores mouse modes).
+- **Bosses:** `award_boss` warns about an id missing from `BOSS_IDS`; a test checks every boss `.tres` with first-time purple is listed.
+- **Tests:** every Phase 6 test that uses the save swaps in a scratch `SaveGame` when run alone; no `wait_frames` left; the defeat and cutscene camera tests wait for the result or the step instead of a fixed time; `test_lucian_damage` gives Lucian an autofreed `projectile_parent`, so no dash trail outlives a test.
+- **Docs:** a table split in `items.md`; boss walk and bolt speeds; the clocks skip shopping; Act 1 may run short of its budget.
+
 ### Left as is (small, from the reviews)
 - **Untested:** HomingMissile and Lightslinger second-shot `is_alive` guards; stasis, `one_gun`, `can_act` gating of casts, `bonus_armor`, `size_scale`; Magebane absorbing magic, its reset and unequip; Thornmail on a dead attacker, buffs, Gunblade → Fimbulwinter; the "Backpack full" throttle, elite and boss stage kills, `enemy_died`, orange and purple `add_essences`; skips after the first pan, the siege and attack tips at stage level; Akshan's boomerang wiring and his skills after he dies mid-skill; `MainScreen._start_stage`; "Could not save. Leave anyway?", Leave → No, the Exit button and ESC with Settings open on the title; a Training spawn from the debug table.
 - **Logic:** `Enemy.last_attacker` is set by any attacker (check kill credit when other damage sources arrive). `Shields.add` accepts ids outside `ORDER`. `LucianController` keeps an aim up while Lucian can't act. Death's Dance bleeds run out during stasis and aren't cleared on death; `before_hp_loss` counts magic-only Magebane in the total.
 - **Stage:** `spawn_enemy` has no guard for a bad id; `_on_enemy_died` assumes a live Lucian; drops scatter ±30 px with no wall check. A stage id without waves would index out of range (only Acts 1–2 are reachable). `skip_break` isn't guarded while the result or a death shows. `EnemyUnit.warning_parent` defaults to the parent.
 - **Act 2:** Heroic Swing sets `global_position`, so Akshan can swing through pillars and the edge; the swing keeps firing if Lucian dies mid-swing (the burst is gated).
 - **HUD:** radar dots aren't clipped to the panel. `BossBar` rescans the enemies every frame while there is no boss. `TipBanner` counts down while the HUD is hidden. A damage number may show the unclamped amount while Thresh is stopped.
-- **Save:** `start_new` sets the slot before saving (a failed write leaves the new slot current); `play_time_text` uses int division; `award_boss` doesn't check `BOSS_IDS`; `BOSS_IDS` sits among the vars. Loading a broken slot gives a new game silently. `ask_to_leave` doesn't pause, so play time runs while its prompt is up.
+- **Save:** `start_new` sets the slot before saving (a failed write leaves the new slot current); `play_time_text` uses int division; `BOSS_IDS` sits among the vars. Loading a broken slot gives a new game silently. `ask_to_leave` doesn't pause, so play time runs while its prompt is up.
 - **Journey:** a picked card that becomes locked keeps its outline and "Start stage N" when nothing is open (debug or reset only); `open_on` computes `default_stage` twice. Act 1's card reads "+ boss wave" on replays too.
 - **Debug:** a nested `freeze(true)` overwrites the remembered invulnerable value; God mode toggled during a cutscene is overwritten when it ends; Kill all and Boss HP 51% aren't guarded during a cutscene or after Thresh stopped.
-- **Tests:** older files still use the deprecated `wait_frames`. The older `test_lucian_skills` leaves 4 shot nodes (GUT's one warning), and some full runs during the phase also warned about 2 unfreed nodes after `test_lucian_damage`. One early Task 4 run had a failure in `test_cast_modes` / `test_game` that never came back. Several tests use wall-clock waits.
+- **Tests:** the older `test_lucian_skills` leaves 4 shot nodes (GUT's one warning). One early Task 4 run had a failure in `test_cast_modes` / `test_game` that never came back. Several tests use wall-clock waits.
 
 ### Running the checks
 

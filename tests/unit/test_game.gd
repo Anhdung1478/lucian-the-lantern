@@ -49,16 +49,16 @@ func test_training_swaps_in_the_stage_with_its_setup() -> void:
 	var run := StageSetup.new()
 	run.equip_slots = 2
 	game.start_stage(run)
-	await wait_frames(2)
+	await wait_process_frames(2)
 	assert_is(game.screen, Stage)
 	assert_eq((game.screen as Stage).lucian.inventory.unlocked_equip, 2)
 
 
 func test_leaving_the_stage_saves_and_returns() -> void:
 	game.start_stage(StageSetup.new())
-	await wait_frames(2)
+	await wait_process_frames(2)
 	(game.screen as Stage).screens.menu.leave_requested.emit()
-	await wait_frames(2)
+	await wait_process_frames(2)
 	assert_true(FileAccess.file_exists(SaveGame.instance().path(1)))
 	assert_is(game.screen, MainScreen)
 	assert_false(get_tree().paused)
@@ -173,11 +173,11 @@ func test_leave_is_disabled_when_the_stage_runs_alone() -> void:
 func test_a_cleared_act_stage_is_saved_as_cleared() -> void:
 	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
 	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
-	await wait_frames(2)
+	await wait_process_frames(2)
 	var stage := game.screen as Stage
 	stage.show_result(true)
 	stage.result.continue_button.pressed.emit()
-	await wait_frames(2)
+	await wait_process_frames(2)
 	assert_true("2-1" in SaveGame.instance().cleared)
 	assert_is(game.screen, MainScreen)
 	var journey: JourneySection = game.screen.sections[MainScreen.SECTION_JOURNEY]

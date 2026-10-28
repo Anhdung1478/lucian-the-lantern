@@ -1,6 +1,12 @@
 extends GutTest
 
 
+func before_each() -> void:
+	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
+	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
+		SaveGame._instance = SaveGame.new("user://test_stage_debug_waves_save_slot_")
+
+
 func after_each() -> void:
 	get_tree().paused = false
 

@@ -54,6 +54,28 @@ func test_a_bolt_is_stopped_by_a_wall() -> void:
 	assert_false(is_instance_valid(bolt))
 
 
+func _bolt_at_lucian() -> EnemyProjectile:
+	var bolt := EnemyProjectile.new()
+	bolt.launch(Vector2(30, 0), Vector2.LEFT, DamageInfo.create(10.0, DamageInfo.Type.MAGIC, &"basic"), lucian)
+	add_child_autofree(bolt)
+	return bolt
+
+
+func test_a_bolt_ends_on_lucian() -> void:
+	var bolt := _bolt_at_lucian()
+	watch_signals(lucian)
+	await wait_physics_frames(3)
+	assert_signal_emit_count(lucian, "damage_received", 1)
+	assert_false(is_instance_valid(bolt), "it doesn't fly on past him")
+
+
+func test_a_blocked_bolt_ends_too() -> void:
+	lucian.invulnerable = true
+	var bolt := _bolt_at_lucian()
+	await wait_physics_frames(3)
+	assert_false(is_instance_valid(bolt))
+
+
 func test_the_shell_lands_after_its_warning_inside_the_circle() -> void:
 	var warning := GroundWarning.circle(Vector2.ZERO, 110.0, 1.0)
 	warning.strike(DamageInfo.create(40.0, DamageInfo.Type.TRUE, &"basic"), lucian)

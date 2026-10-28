@@ -40,7 +40,7 @@ Minutes for a skilled player's first clear of each act, counting a few deaths, s
 - A break is used, on average, for about 30 s of shopping.
 - About a third of each act's time is deaths and replays: farming essence for the tree (see the balance goal in §11).
 
-**Measuring it:** each stage's result panel shows its time, and the slot lists (title screen, Save as copy) show each slot's total play time. If Act 2 clears in under 25 minutes, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards.
+**Measuring it:** each stage's result panel shows its time, and the slot lists (title screen, Save as copy) show each slot's total play time. Both clocks skip paused time, so shopping (the shop pauses the game) isn't in them, while the budget counts about 30 s of shopping per break. If Act 2 clears in under 25 minutes, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards.
 
 ---
 
@@ -382,6 +382,7 @@ Every kill pays out at once, Senna's kills too:
 | Elite | 3% a legendary; else 25% a fragment |
 | Boss | A fragment for sure, plus 15% a legendary |
 
+- The kill that ends a stage (the boss, or the last enemy of the last wave) drops nothing: the result comes up at once, and items don't carry over. The boss row waits for Endless.
 - Loot stays until the stage ends. It shows as the item's icon over a bobbing glow (gold for a legendary).
 - Lucian picks it up by walking within 60 of it, into the backpack.
 - With no room it stays, and "Backpack full" shows at most once every 3 s.

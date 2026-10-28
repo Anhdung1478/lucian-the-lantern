@@ -4,6 +4,9 @@ var lucian: Lucian
 
 
 func before_each() -> void:
+	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
+	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
+		SaveGame._instance = SaveGame.new("user://test_act1_save_slot_")
 	SaveGame.instance().reset()
 	lucian = load("res://src/lucian/lucian.tscn").instantiate()
 	add_child_autofree(lucian)
@@ -176,6 +179,21 @@ func test_the_cutscene_freezes_the_stage() -> void:
 	assert_eq(stage.get_node("World").process_mode, Node.PROCESS_MODE_INHERIT)
 
 
+func test_the_cutscene_waits_while_the_game_is_paused() -> void:
+	var stage: Stage = await _start_cutscene()
+	assert_true(stage.cutscene.can_process(), "Space, clicks and Skip reach it")
+	# The "Save before leaving?" prompt pauses the tree.
+	get_tree().paused = true
+	var camera_at := stage.camera.global_position
+	# A SceneTreeTimer: GUT's own waits stop with the tree.
+	await get_tree().create_timer(1.0).timeout
+	assert_false(stage.cutscene.can_process())
+	assert_eq(stage.camera.global_position, camera_at, "the first pan waits")
+	assert_eq(stage.cutscene._caption.text, "", "no caption yet")
+	get_tree().paused = false
+	stage.cutscene.skip()
+
+
 func test_skip_takes_senna_and_thresh_away_with_the_rewards() -> void:
 	var stage: Stage = await _start_cutscene()
 	var thresh := stage.boss_unit
@@ -228,20 +246,26 @@ func test_the_cutscene_plays_to_its_end() -> void:
 
 func test_the_cutscene_frames_the_hook_then_thresh() -> void:
 	var stage: Stage = await _start_cutscene()
+	var cutscene := stage.cutscene
 	var thresh_at := stage.boss_unit.global_position
 	var senna_at := stage.senna.global_position
-	await wait_seconds(1.0)
+	var in_caption := func() -> bool: return cutscene._in_caption
+	# The first caption comes once the pan has ended.
+	assert_true(await wait_until(in_caption, 3.0))
 	assert_almost_eq(stage.camera.global_position, (thresh_at + senna_at) * 0.5, Vector2.ONE * 2.0, "both ends of the hook in view")
 	# Space moves the captions on: Thresh's line, then "SENNA!" after the hook.
 	var space := InputEventKey.new()
 	space.keycode = KEY_SPACE
 	space.pressed = true
-	stage.cutscene._unhandled_input(space)
-	await wait_seconds(ThreshTakesSenna.CHAIN_TIME + 0.2)
-	stage.cutscene._unhandled_input(space)
-	await wait_seconds(ThreshTakesSenna.PULL_TIME + 0.2)
+	get_viewport().push_input(space)
+	assert_true(await wait_until(in_caption, 3.0))
+	assert_eq(cutscene._caption.text, "SENNA!")
+	get_viewport().push_input(space)
+	# Her pull is the step after "SENNA!"; the soul's flight comes next.
+	var pull: Tween = cutscene._step
+	assert_true(await wait_until(func() -> bool: return cutscene._step != pull, 3.0))
 	assert_almost_eq(stage.camera.global_position, thresh_at, Vector2.ONE * 2.0, "on Thresh as she is pulled in")
-	stage.cutscene.skip()
+	cutscene.skip()
 
 
 func test_thresh_essences_rise_where_he_sank_and_the_purple_over_lucian() -> void:

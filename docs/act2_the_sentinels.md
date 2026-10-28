@@ -96,11 +96,11 @@ He enters from the top gate in stage 3's boss wave, alone.
 |---|---|
 | HP | 5000 |
 | Armor / MR | 35 / 30 |
-| Basic attack | A 28 physical bolt, range 550, every 1.4 s. Speed 320. |
+| Basic attack | A 28 physical bolt (1200 px/s), range 550, every 1.4 s. Walks at 320. |
 | **Avengerang (Q)** | A line warning (900 long) for 0.8 s. Then the boomerang flies out 900 at 1000 px/s and comes back to him: 70 physical, at most once each way. Cooldown 8 s (first use after 2 s). |
 | **Heroic Swing (E)** | When Lucian is within 800: a circle warning (r 300) on a point 150 from Lucian, toward Akshan, for 1.2 s. Then he swings once around it in 2.5 s, firing a gold bolt outward every 0.3 s (25 physical, reach 600). Cooldown 14 s (first use after 5 s). |
 | **Comeuppance (R)** | Only once he is down to 75% HP. A thin lock line follows Lucian for 2.0 s, then 6 shots 0.12 s apart at him (40 physical each, reach 1200). Walls and pillars stop them. Cooldown 20 s. |
-| Rewards | 300 gold, 100 blue, 5 orange, a fragment (15%: a legendary too), and 10 purple the first time, 2 on a replay |
+| Rewards | 300 gold, 100 blue, 5 orange, and 10 purple the first time, 2 on a replay. No item: his death ends the stage. |
 
 - He uses one skill at a time; while busy with one he neither walks nor attacks.
 - His skill hits count as skills, so Banshee's Veil blocks one.

@@ -68,6 +68,11 @@ func alive() -> int:
 	return _alive + _to_spawn.size()
 
 
+## One enemy is left, in the last wave: its death ends the stage.
+func is_last_enemy() -> bool:
+	return state == State.FIGHT and wave >= total_waves() and alive() == 1
+
+
 func tick(delta: float) -> void:
 	match state:
 		State.INTRO, State.BREAK:

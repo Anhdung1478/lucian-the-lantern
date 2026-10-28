@@ -31,3 +31,17 @@ func test_the_siege_minion_marks_a_circle_for_a_second() -> void:
 
 func test_the_super_minion_empowers_500_around_it() -> void:
 	assert_eq(_data("super_minion").empower_radius, 500.0)
+
+
+## A boss missing from SaveGame.BOSS_IDS is dropped from "bosses" on load,
+## so it would pay its first-time purple again after every reload.
+func test_every_boss_with_first_time_purple_is_in_boss_ids() -> void:
+	var bosses := 0
+	for file in DirAccess.get_files_at("res://data/enemies/"):
+		if not file.ends_with(".tres"):
+			continue
+		var data := load("res://data/enemies/" + file) as EnemyData
+		if data.kind == &"boss" and data.purple_first > 0:
+			bosses += 1
+			assert_has(SaveGame.BOSS_IDS, String(data.id), file)
+	assert_gt(bosses, 0)

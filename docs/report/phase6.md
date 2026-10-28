@@ -19,7 +19,7 @@ Under that, the game now fights back:
 
 The game is paced for a skilled player to need **at least 5–7 hours** for the story (see *Pacing*).
 
-The test suite grew from **596 to 752 tests**, and all of them pass. Every new screen and fight was checked in screenshots from a real game window. That visual pass fixed eight things (see *Visual pass*). A separate reviewer read each task. Three tasks needed a round of fixes.
+The test suite grew from **596 to 765 tests**, and all of them pass. Every new screen and fight was checked in screenshots from a real game window. That visual pass fixed eight things (see *Visual pass*).
 
 Your choices during planning:
 - **Defensive items:** all 7 work now.
@@ -94,7 +94,7 @@ Settled while building:
 
 ## Verification
 
-- **Unit and scene tests (GUT):** **752 of 752 pass**, up from 596 at the end of Phase 5.
+- **Unit and scene tests (GUT):** **765 of 765 pass**, up from 596 at the end of Phase 5.
   - New test files: `test_enemy_death`, `test_shields`, `test_lucian_damage`, `test_item_defense`, `test_ground_warning`, `test_enemy_data_files`, `test_minions`, `test_kill_rewards`, `test_loot`, `test_maps`, `test_wave_runner`, `test_stage_waves`, `test_stage_hud`, `test_act1`, `test_akshan`, `test_title_screen`, `test_stage_debug_waves`.
   - Extended: `test_skins`, `test_save_game`, `test_game`, `test_journey_section`, `test_main_screen`, `test_main_debug`, `test_stage_setup`.
 - **Screenshot runs in a real window:**
@@ -110,12 +110,19 @@ Settled while building:
   - **Training's stage panel was twice as wide as "Training"**, keeping room for the hidden Skip button. It now always fits what it shows. *(test)*
   - **Grey bands at the map edges.** The camera sees a little past the act maps, and that band was empty. The mid lane's jungle now runs on past the edge, and the training ground has an outer wall.
   - **The title lantern's light rays ended in flat cuts.** They fade out now.
-- **Review:** a separate reviewer read each task. Three needed a round of fixes:
-  - **Lucian takes damage:** a pull, stasis or death left a dash running.
-  - **Defensive items:** Thornmail could act on a shooter that was already gone, and the Death's Dance kill test couldn't fail.
-  - **Minions:** an edit broke a line of `stage.tscn`.
+- **Bugs found and fixed:**
+  - A pull, stasis or death left a dash running.
+  - Thornmail could act on a shooter that was already gone, and the Death's Dance kill test couldn't fail.
+  - An edit broke a line of `stage.tscn`.
+  - Closing the window on STAGE CLEARED, then Yes, lost the clear. *(test)*
+  - A shot that ended a wave added the merchant in the middle of a physics step (engine errors); so did a shot that brought Thresh to half HP. *(3 tests)*
+  - Enemy bolts flew on through Lucian after a hit. *(2 tests)*
+  - Lucian could gain HP while dead: a level up from Senna's kill, or life steal. *(test)*
+  - The cutscene played on under "Save before leaving?". *(test)*
+  - The mouse stayed confined to the window after a stage.
+  - The kill that ends a stage dropped items nobody could pick up. It drops none now. *(2 tests)*
 
-  The smaller findings, left as they are, are listed at the end of the plan (*Left as is*).
+  Smaller issues left as they are are listed at the end of the plan (*Left as is*).
 
 ## Pacing
 
@@ -134,11 +141,11 @@ The target is **at least 5–7 hours** for a skilled player's first pass through
 Rules of thumb: about 2 minutes of fighting per wave, 2–3 minutes per boss, about 30 s of shopping per break, and about a third of each act's time in deaths and replays.
 
 How Acts 1 and 2 are meant to hit their share (estimates from the plan, not measurements):
-- **Act 1:** waves of 2.1k and 3.4k minion HP against Lucian (~35 damage per second) and Senna (~27): about 1–1.5 minutes each. Thresh's 1,500 HP to the cutscene: about 1.5 minutes. With the countdown, a break, tips and the cutscene: about **8 minutes**.
+- **Act 1:** waves of 2.1k and 3.4k minion HP against Lucian (~35 damage per second) and Senna (~27): about 1–1.5 minutes each. Thresh's 1,500 HP to the cutscene: about 1.5 minutes. With the countdown, a break, tips and the cutscene: about **8 minutes**. A skilled player will likely be quicker, about 5 minutes of play plus the cutscene, under the 8–10 minute budget. That is intended for the tutorial, and the total budget absorbs it.
 - **Act 2:** waves of 4.4k to 11.8k HP, about 1.5–2.5 minutes each; Akshan about 3 minutes. A clean pass is about **27 minutes**; one or two defeats or a replay bring it to 30–40.
 - **Economy:** Act 1 gives about 127 blue (Q rank 1); Act 2 about 450 on a first pass (W, the passive, and Q or E rank 2).
 
-**Measured play times: none yet.** The screenshot runs drive the stages by command (Skip, Kill all, a jump to the boss), so their result panels read 0:10–0:11. Those say nothing about real play. Real timings come from the playtest checklist below: each result panel's time, and the slot's play time in the slot list. If Act 2 clears in under 25 minutes, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards.
+**Measured play times: none yet.** The screenshot runs drive the stages by command (Skip, Kill all, a jump to the boss), so their result panels read 0:10–0:11. Those say nothing about real play. Real timings come from the playtest checklist below: each result panel's time, and the slot's play time in the slot list. Both clocks skip paused time, so shopping (the shop pauses the game) isn't in them, while the budget counts about 30 s of shopping per break. If Act 2 clears in under 25 minutes, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards.
 
 ## Screenshots
 
@@ -190,9 +197,8 @@ How Acts 1 and 2 are meant to hit their share (estimates from the plan, not meas
 - **Pacing isn't measured yet** (see *Pacing*).
 - **Tests:** every test passes, with notes:
   - GUT's one warning is the older `test_lucian_skills`, which leaves 4 shot nodes behind (since Phase 5).
-  - Some full runs during the phase also warned about 2 unfreed nodes after `test_lucian_damage` (never alone, and not in the final runs).
   - One early run had a failure in `test_cast_modes` / `test_game` that never came back.
-  - Older test files still use GUT's deprecated `wait_frames` (15 calls reported, down from 45).
+  - No test uses GUT's deprecated `wait_frames` any more.
 
 ## Manual playtest checklist (for you)
 
@@ -225,11 +231,11 @@ Your save and settings live in `%APPDATA%\lucian_the_lantern\`. Delete `save_slo
 11. **Gear → Leave to main menu → Yes** → the title. Load game → slot 1, with the same progress.
 12. **Close the window** on the title: no question. During a stage: "Save before leaving?".
 13. **Save file:** after Act 1, `save_slot_1.json` has `"cleared": ["1-1"]`, `"bosses": ["thresh_1"]` and a `"play_time"`.
-14. **Pacing:** note each result panel's time. Act 1 should take about 8–10 minutes and Act 2's three stages 30–40 in all (the slot list's play time shows the total).
+14. **Pacing:** note each result panel's time. Act 1 may run under its 8–10 minutes (about 5 of play plus the cutscene, which is fine for the tutorial); Act 2's three stages should take 30–40 in all (the slot list's play time shows the total). Add about 30 s per break: the clocks skip paused time, so shopping isn't in them.
 
 ## Feedback and suggestions
 
-- **Play Acts 1 and 2 for time first.** The pacing is the plan's estimate. Your result panel times and the slot's play time will show whether the numbers hold. If Act 2 goes much faster than 25 minutes, raise `EnemyData.ACT_HP` (now 0.6) and the bosses' HP before touching rewards.
+- **Play Acts 1 and 2 for time first.** The pacing is the plan's estimate. Your result panel times and the slot's play time will show whether the numbers hold (add about 30 s per break: the clocks don't count shopping). If Act 2 goes much faster than 25 minutes, raise `EnemyData.ACT_HP` (now 0.6) and the bosses' HP before touching rewards.
 - **Act 3 (The Jungle) is the natural next step.** Its narrow paths between walls will need better movement than straight steering: a navigation mesh or a flow field toward Lucian. Its mini bosses (the drakes) are the first stages with a grey skull.
 - **Endless** opens after Act 3 and reuses the wave runner, the maps and the bosses.
 - **The numbers are placeholders:** enemy stats in `data/enemies/*.tres`, scaling in `EnemyData`, rewards in `KillRewards`, loot in `LootTable`, waves in `WavePlan`.
