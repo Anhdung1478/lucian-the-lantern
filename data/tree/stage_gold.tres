@@ -7,7 +7,7 @@
 script = ExtResource("1_data")
 id = &"stage_gold"
 display_name = "Stage Gold"
-description = "Bought and saved now; it starts working once enemies give gold, XP or essences."
+description = "Enemies give more stage gold."
 icon = ExtResource("2_icon")
 branch = &"economy"
 grid = Vector2(15, 0)

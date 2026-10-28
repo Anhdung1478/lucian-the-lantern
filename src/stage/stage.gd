@@ -12,6 +12,16 @@ const EXTRA_DUMMY_ANGLES := [-PI / 2.0, 0.0, PI, -PI / 4.0]
 signal finished(result: StringName)
 ## Exit the game was chosen in the menu.
 signal exit_requested
+## An enemy spawned by the stage died (after its rewards).
+signal enemy_died(enemy: EnemyUnit)
+
+const ENEMY_PATH := "res://data/enemies/%s.tres"
+const ESSENCE_ICONS := {
+	Essences.BLUE: preload("res://assets/art/ui/essence_blue.svg"),
+	Essences.ORANGE: preload("res://assets/art/ui/essence_orange.svg"),
+	Essences.PURPLE: preload("res://assets/art/ui/essence_purple.svg"),
+}
+const ESSENCE_COLORS := {Essences.BLUE: Color("5aa9ff"), Essences.ORANGE: Color("ffa040"), Essences.PURPLE: Color("b46cff")}
 
 var wallet := Wallet.new()
 ## The merchant on the map, or null.
@@ -23,6 +33,9 @@ var shop_slots := 2
 var run := StageSetup.new()
 ## Debug: more dummies around the first one, for Runaan's and Statikk Shiv.
 var extra_dummies: Array[TrainingDummy] = []
+## Essences collected in this stage, for the HUD and the result panel.
+var collected := {Essences.BLUE: 0, Essences.ORANGE: 0, Essences.PURPLE: 0}
+var rng := RandomNumberGenerator.new()
 
 @onready var arena: TestArena = $Arena
 @onready var lucian: Lucian = $World/Lucian
@@ -40,6 +53,7 @@ func setup(stage_run: StageSetup) -> void:
 
 
 func _ready() -> void:
+	rng.randomize()
 	var settings := GameSettings.instance()
 	settings.apply()
 	settings.changed.connect(_on_setting_changed)
@@ -111,6 +125,45 @@ func set_dummy_count(count: int) -> void:
 		extra_dummies.append(extra)
 
 
+## Puts an enemy of type `id` on the map at `at`, wired for damage numbers,
+## the debug meter and rewards.
+func spawn_enemy(id: StringName, at: Vector2, wave := 1) -> EnemyUnit:
+	var data: EnemyData = load(ENEMY_PATH % id)
+	var unit := _new_unit(data)
+	unit.setup(data, maxi(run.act, 1), wave, lucian)
+	unit.projectile_parent = $Projectiles
+	unit.warning_parent = $Warnings
+	unit.position = at
+	$World.add_child(unit)
+	unit.damage_taken.connect(damage_numbers.spawn.bind(unit))
+	unit.died.connect(_on_enemy_died)
+	debug_table.watch(unit)
+	return unit
+
+
+## Essences go into the save at once, so leaving or losing keeps them.
+func add_essences(blue: int, orange: int, purple: int, at: Vector2) -> void:
+	var amounts := {Essences.BLUE: blue, Essences.ORANGE: orange, Essences.PURPLE: purple}
+	var row := 0
+	for kind: StringName in Essences.KINDS:
+		if amounts[kind] <= 0:
+			continue
+		SaveGame.instance().essences.add(kind, amounts[kind])
+		collected[kind] += amounts[kind]
+		var popup := FloatingText.new("+%d" % amounts[kind], ESSENCE_COLORS[kind], ESSENCE_ICONS[kind])
+		popup.position = at + Vector2(0, -70 - 30 * row)
+		damage_numbers.add_child(popup)
+		row += 1
+
+
+func drop_loot(item: ItemData, at: Vector2) -> void:
+	var drop := LootDrop.new()
+	drop.item = item
+	drop.lucian = lucian
+	drop.position = at + Vector2(rng.randf_range(-30, 30), rng.randf_range(-30, 30))
+	$World.add_child(drop)
+
+
 func set_shop_slots(count: int) -> void:
 	shop_slots = clampi(count, 1, MerchantStock.SLOTS)
 	if merchant:
@@ -126,3 +179,19 @@ func _open_shop(visited: Merchant) -> void:
 	var shop := Shop.new(visited.stock, lucian.inventory, wallet)
 	shop.refresh_cost = run.refresh_cost
 	screens.open_shop(shop)
+
+
+## Minions for now; Tasks 10 and 11 add the bosses.
+func _new_unit(_data: EnemyData) -> EnemyUnit:
+	return Minion.new()
+
+
+func _on_enemy_died(enemy: Enemy) -> void:
+	var unit := enemy as EnemyUnit
+	var reward := KillRewards.roll(unit.data, maxi(run.act, 1), run, rng)
+	wallet.add(reward.gold)
+	lucian.progress.add_xp(reward.xp)
+	add_essences(reward.blue, reward.orange, 0, unit.global_position)
+	for item in LootTable.roll(unit.data.kind, lucian.item_catalog, rng):
+		drop_loot(item, unit.global_position)
+	enemy_died.emit(unit)

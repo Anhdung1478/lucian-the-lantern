@@ -67,3 +67,14 @@ func test_new_setup_is_the_phase_4_sandbox() -> void:
 	assert_eq(setup.summoner_slots, 2)
 	assert_true(setup.summoner_upgrades.is_empty())
 	assert_true(setup.stat_bonus.is_empty())
+
+
+func test_economy_nodes_reach_the_setup() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	save.essences.from_dict({"blue": 99999, "orange": 999, "purple": 0})
+	save.tree.buy(&"stage_gold", save.essences)
+	save.tree.buy(&"stage_gold", save.essences)
+	var setup := StageSetup.from_save(save)
+	assert_almost_eq(setup.gold_bonus, 0.2, 0.001)
+	assert_eq(setup.xp_bonus, 0.0)
+	assert_eq(setup.essence_bonus, 0.0)

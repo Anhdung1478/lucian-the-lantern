@@ -1,0 +1,89 @@
+extends GutTest
+## What kills drop (LootTable), and picking it up off the ground.
+
+var rng := RandomNumberGenerator.new()
+var stage: Stage
+var _prefix := ""
+
+
+func before_each() -> void:
+	rng.seed = 11
+	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
+	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
+		SaveGame._instance = SaveGame.new("user://test_loot_save_slot_")
+	_prefix = SaveGame.instance().prefix
+	SaveGame.instance().reset()
+
+
+func after_each() -> void:
+	SaveGame.instance().prefix = _prefix
+
+
+func _stage() -> Stage:
+	stage = load("res://src/stage/stage.tscn").instantiate()
+	stage.setup(StageSetup.new())
+	add_child_autofree(stage)
+	return stage
+
+
+func test_normal_drop_rates() -> void:
+	var catalog: ItemCatalog = load("res://data/items/catalog.tres")
+	var fragments := 0
+	var legendaries := 0
+	for i in 20000:
+		for item in LootTable.roll(&"normal", catalog, rng):
+			if item.kind == ItemData.Kind.LEGENDARY:
+				legendaries += 1
+			else:
+				fragments += 1
+	assert_between(fragments, 650, 950)
+	assert_between(legendaries, 20, 110)
+
+
+func test_a_boss_always_drops_a_fragment() -> void:
+	var catalog: ItemCatalog = load("res://data/items/catalog.tres")
+	for i in 200:
+		var has_fragment := false
+		for item in LootTable.roll(&"boss", catalog, rng):
+			has_fragment = has_fragment or item.kind == ItemData.Kind.FRAGMENT
+		assert_true(has_fragment)
+
+
+func test_a_kill_pays_out() -> void:
+	_stage()
+	var enemy := stage.spawn_enemy(&"melee_minion", Vector2(1700, 600))
+	enemy.take_damage(stage.lucian.make_damage(9999, DamageInfo.Type.TRUE, &"q"))
+	assert_eq(stage.wallet.gold, 60)
+	assert_eq(stage.lucian.progress.xp, 30)
+	assert_eq(stage.collected[Essences.BLUE], 1)
+	assert_eq(SaveGame.instance().essences.amount(Essences.BLUE), 1)
+
+
+func _drop_on_lucian(item: ItemData) -> LootDrop:
+	var drop := LootDrop.new()
+	drop.item = item
+	drop.lucian = stage.lucian
+	drop.position = stage.lucian.global_position
+	stage.get_node("World").add_child(drop)
+	return drop
+
+
+func test_walking_over_a_drop_picks_it_up() -> void:
+	_stage()
+	var sword := stage.lucian.item_catalog.find(&"bf_sword")
+	var room := stage.lucian.inventory.space_for(sword)
+	var drop := _drop_on_lucian(sword)
+	await wait_physics_frames(2)
+	assert_eq(stage.lucian.inventory.space_for(sword), room - 1)
+	assert_false(is_instance_valid(drop))
+
+
+func test_a_full_backpack_leaves_the_drop() -> void:
+	_stage()
+	var sword := stage.lucian.item_catalog.find(&"bf_sword")
+	for i in Inventory.BACKPACK_SIZE:
+		stage.lucian.inventory.add(sword)
+	assert_eq(stage.lucian.inventory.space_for(sword), 0)
+	var drop := _drop_on_lucian(sword)
+	await wait_physics_frames(2)
+	assert_true(is_instance_valid(drop))

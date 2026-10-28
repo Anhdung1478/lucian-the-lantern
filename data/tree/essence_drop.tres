@@ -7,7 +7,7 @@
 script = ExtResource("1_data")
 id = &"essence_drop"
 display_name = "Essence Drops"
-description = "Bought and saved now; it starts working once enemies give gold, XP or essences."
+description = "Enemies drop more essence."
 icon = ExtResource("2_icon")
 branch = &"economy"
 grid = Vector2(17, 0)

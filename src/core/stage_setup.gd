@@ -7,6 +7,8 @@ extends RefCounted
 
 const SPELL_IDS: Array[StringName] = [&"flash", &"ghost", &"barrier", &"heal", &"clarity", &"smite"]
 
+## The act being played (0 for the sandbox, which pays like act 1).
+var act := 0
 var bought: Array[int] = [5, 5, 5, 3]
 var passive := true
 var equip_slots := Inventory.EQUIP_SIZE
@@ -20,6 +22,10 @@ var summoner_slots := 2
 var summoner_upgrades := {}
 ## Flat stats from the tree's stat nodes, keyed like ItemStats.
 var stat_bonus := {}
+## Tree economy bonuses, as shares (0.1 = +10%).
+var gold_bonus := 0.0
+var xp_bonus := 0.0
+var essence_bonus := 0.0
 var skin: SkinData = Skins.ALL[0]
 
 
@@ -44,5 +50,8 @@ static func from_save(save: SaveGame) -> StageSetup:
 	for data in tree.nodes():
 		if data.stat_key != &"" and tree.level(data.id) > 0:
 			setup.stat_bonus[data.stat_key] = setup.stat_bonus.get(data.stat_key, 0.0) + tree.value(data.id)
+	setup.gold_bonus = tree.value(&"stage_gold")
+	setup.xp_bonus = tree.value(&"bonus_xp")
+	setup.essence_bonus = tree.value(&"essence_drop")
 	setup.skin = Skins.find(save.skin)
 	return setup
