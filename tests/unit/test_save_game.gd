@@ -127,3 +127,25 @@ func test_saved_at_reads_the_time_written() -> void:
 
 func test_instance_uses_the_test_prefix() -> void:
 	assert_eq(SaveGame.instance().prefix, "user://test_run_save_slot_")
+
+
+func test_tree_levels_round_trip() -> void:
+	save_game.tree.max_all()
+	save_game.save()
+	var loaded := SaveGame.new(PREFIX)
+	loaded.load_slot(1)
+	assert_true(loaded.tree.is_maxed(&"skill_r"))
+	assert_eq(loaded.tree.to_dict(), save_game.tree.to_dict())
+
+
+func test_unknown_cleared_id_is_dropped() -> void:
+	_write_text(save_game.path(1), JSON.stringify({"cleared": ["1-1", "9-9", "x"]}))
+	save_game.load_slot(1)
+	assert_eq(save_game.cleared, ["1-1"] as Array[String])
+
+
+func test_set_cleared_keeps_tree_acts_in_step() -> void:
+	save_game.set_cleared(Journey.all_stage_ids(1))
+	assert_eq(save_game.tree.acts_cleared, 1)
+	save_game.reset()
+	assert_eq(save_game.tree.acts_cleared, 0)

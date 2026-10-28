@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TreeNodeData" format=3]
+
+[ext_resource type="Script" path="res://src/core/tree_node_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/tree/essence_drop.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"essence_drop"
+display_name = "Essence Drops"
+description = "Bought and saved now; it starts working once enemies give gold, XP or essences."
+icon = ExtResource("2_icon")
+branch = &"economy"
+grid = Vector2(17, 0)
+max_level = 3
+blue = Array[int]([100, 250, 500])
+orange = Array[int]([0, 0, 5])
+per_level = 0.1
+percent = true
+format = "+{v}% essence drops"

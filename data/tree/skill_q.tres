@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TreeNodeData" format=3]
+
+[ext_resource type="Script" path="res://src/core/tree_node_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/tree/skill_q.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"skill_q"
+display_name = "Q – Piercing Light"
+description = "Buys ranks of Q. In a stage, skill points only go into bought ranks."
+icon = ExtResource("2_icon")
+branch = &"skills"
+grid = Vector2(1, 0)
+max_level = 5
+blue = Array[int]([100, 200, 350, 500, 800])
+orange = Array[int]([0, 0, 0, 5, 10])
+per_level = 1.0
+format = "Rank {v}"

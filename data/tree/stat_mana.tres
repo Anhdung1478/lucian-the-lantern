@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TreeNodeData" format=3]
+
+[ext_resource type="Script" path="res://src/core/tree_node_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/tree/stat_mana.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"stat_mana"
+display_name = "Mana"
+description = "Lucian starts every stage with more [mana]Mana[/mana]."
+icon = ExtResource("2_icon")
+branch = &"stats"
+grid = Vector2(11, 0)
+max_level = 5
+blue = Array[int]([50, 100, 200, 350, 500])
+orange = Array[int]([0, 0, 0, 3, 8])
+stat_key = &"max_mana"
+per_level = 40.0
+format = "+{v} Mana"

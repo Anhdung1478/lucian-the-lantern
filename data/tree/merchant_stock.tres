@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TreeNodeData" format=3]
+
+[ext_resource type="Script" path="res://src/core/tree_node_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/tree/merchant_stock.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"merchant_stock"
+display_name = "Merchant Stock"
+description = "The merchant offers more items."
+icon = ExtResource("2_icon")
+branch = &"economy"
+grid = Vector2(18, 0)
+max_level = 2
+blue = Array[int]([300, 800])
+orange = Array[int]([0, 10])
+base = 2.0
+per_level = 1.0
+format = "{v} shop items"

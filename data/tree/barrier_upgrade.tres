@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="TreeNodeData" format=3]
+
+[ext_resource type="Script" path="res://src/core/tree_node_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/tree/barrier_upgrade.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"barrier_upgrade"
+display_name = "Barrier Upgrade"
+description = "Barrier shields for more."
+icon = ExtResource("2_icon")
+branch = &"summoners"
+grid = Vector2(23, 1)
+max_level = 3
+blue = Array[int]([150, 300, 400])
+orange = Array[int]([0, 0, 5])
+requires = Array[StringName]([&"barrier"])
+per_level = 0.15
+percent = true
+format = "+{v}% shield"

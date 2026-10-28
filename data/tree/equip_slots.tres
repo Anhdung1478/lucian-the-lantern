@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TreeNodeData" format=3]
+
+[ext_resource type="Script" path="res://src/core/tree_node_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/tree/equip_slots.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"equip_slots"
+display_name = "Equip Slots"
+description = "Lucian can carry more items into a stage."
+icon = ExtResource("2_icon")
+branch = &"equipment"
+grid = Vector2(13, 0)
+max_level = 5
+blue = Array[int]([150, 300, 600, 1000, 1500])
+orange = Array[int]([0, 0, 5, 15, 30])
+base = 1.0
+per_level = 1.0
+format = "{v} equip slots"

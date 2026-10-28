@@ -19,6 +19,8 @@ var prefix := DEFAULT_PREFIX
 ## selection screen exists.
 var slot := 1
 var essences := Essences.new()
+## Evolution Tree levels.
+var tree := EvolutionTree.new()
 var owned_skins: Array[StringName] = [CLASSIC]
 var skin := CLASSIC
 ## Spell ids on D and F (&"" for none), picked in Journey.
@@ -77,6 +79,7 @@ func copy_to(of_slot: int) -> bool:
 func finish_stage(result: StringName, stage_id := "") -> bool:
 	if result == &"cleared" and stage_id != "" and not stage_id in cleared:
 		cleared.append(stage_id)
+		tree.acts_cleared = Journey.acts_cleared(cleared)
 		changed.emit()
 	return save()
 
@@ -93,11 +96,23 @@ func saved_at(of_slot: int) -> String:
 ## A new game, in memory only.
 func reset() -> void:
 	essences.from_dict({})
+	tree.clear()
 	owned_skins = [CLASSIC]
 	skin = CLASSIC
 	loadout = [&"", &""]
 	cleared = []
 	endless_best = 0
+	tree.acts_cleared = 0
+	changed.emit()
+
+
+## Debug: replaces the cleared stages (unknown ids are dropped).
+func set_cleared(ids: Array[String]) -> void:
+	cleared = []
+	for id in ids:
+		if Journey.is_stage_id(id) and not id in cleared:
+			cleared.append(id)
+	tree.acts_cleared = Journey.acts_cleared(cleared)
 	changed.emit()
 
 
@@ -114,6 +129,7 @@ func to_dict() -> Dictionary:
 		"version": VERSION,
 		"saved_at": Time.get_datetime_string_from_system(false, true),
 		"essences": essences.to_dict(),
+		"tree": tree.to_dict(),
 		"skins": {"owned": owned_skins.map(func(id: StringName) -> String: return String(id)), "equipped": String(skin)},
 		"loadout": loadout.map(func(id: StringName) -> String: return String(id)),
 		"cleared": cleared.duplicate(),
@@ -146,6 +162,8 @@ func _read(file_path: String) -> Dictionary:
 
 ## Each key is type-checked and falls back to the new-game value.
 func _apply(data: Dictionary) -> void:
+	var saved_tree: Variant = data.get("tree", {})
+	tree.from_dict(saved_tree if saved_tree is Dictionary else {})
 	var saved_essences: Variant = data.get("essences", {})
 	essences.from_dict(saved_essences if saved_essences is Dictionary else {})
 	var skins: Variant = data.get("skins", {})
@@ -167,8 +185,9 @@ func _apply(data: Dictionary) -> void:
 	var saved_cleared: Variant = data.get("cleared", [])
 	if saved_cleared is Array:
 		for id: Variant in saved_cleared:
-			if id is String and not id in cleared:
+			if id is String and Journey.is_stage_id(id) and not id in cleared:
 				cleared.append(id)
 	var best: Variant = data.get("endless_best", 0)
 	endless_best = maxi(int(best), 0) if (best is int or best is float) else 0
+	tree.acts_cleared = Journey.acts_cleared(cleared)
 	changed.emit()
