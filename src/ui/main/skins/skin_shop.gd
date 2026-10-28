@@ -26,6 +26,8 @@ func _ready() -> void:
 		row.add_child(card)
 		cards.append(card)
 	SaveGame.instance().changed.connect(refresh)
+	# Essences change on their own (rewards, debug): the Purchase buttons follow.
+	SaveGame.instance().essences.changed.connect(refresh)
 	refresh()
 
 

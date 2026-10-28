@@ -46,9 +46,21 @@ func test_new_save_shows_classic_equipped_and_others_to_buy() -> void:
 		assert_true(card.button.disabled, card.skin.id)
 
 
+func test_purchase_button_follows_essences_alone() -> void:
+	var noon := _card(&"high_noon")
+	assert_true(noon.button.disabled)
+	SaveGame.instance().essences.add(Essences.PURPLE, 25)
+	assert_false(noon.button.disabled)
+	SaveGame.instance().essences.set_amount(Essences.PURPLE, 0)
+	assert_true(noon.button.disabled)
+	SaveGame.instance().essences.add(Essences.PURPLE, 25)
+	assert_false(noon.button.disabled)
+	SaveGame.instance().essences.spend(0, 0, 25)
+	assert_true(noon.button.disabled)
+
+
 func test_purchase_then_equip() -> void:
 	SaveGame.instance().essences.add(Essences.PURPLE, 25)
-	SaveGame.instance().changed.emit()
 	var noon := _card(&"high_noon")
 	assert_false(noon.button.disabled)
 	noon.button.pressed.emit()
