@@ -291,8 +291,9 @@ func _start_waves() -> void:
 	remove_merchant()
 	runner = WaveRunner.new(WavePlan.waves(run.stage_id), run.boss)
 	runner.spawn_requested.connect(_spawn_wave_enemy)
-	runner.break_started.connect(func(_seconds: float) -> void: add_merchant())
-	runner.break_ended.connect(remove_merchant)
+	## Deferred, both to keep their order: a shot's physics callback can end a wave, and the merchant's body can't be added mid-flush.
+	runner.break_started.connect(func(_seconds: float) -> void: add_merchant(), CONNECT_DEFERRED)
+	runner.break_ended.connect(remove_merchant, CONNECT_DEFERRED)
 	runner.cleared.connect(_on_cleared)
 	enemy_died.connect(func(_enemy: EnemyUnit) -> void: runner.enemy_died())
 
@@ -301,7 +302,8 @@ func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 	if id == run.boss:
 		boss_unit = spawn_enemy(id, arena.boss_point)
 		if boss_unit is Thresh:
-			(boss_unit as Thresh).phase_ended.connect(_on_thresh_phase_ended)
+			## Deferred: a shot's physics callback can bring him to half HP, and the freeze can't disable bodies mid-flush.
+			(boss_unit as Thresh).phase_ended.connect(_on_thresh_phase_ended, CONNECT_DEFERRED)
 		return
 	var at := arena.spawn_points[_next_spawn % arena.spawn_points.size()]
 	_next_spawn += 1

@@ -1710,6 +1710,8 @@ func scenario_act1_cutscene() -> void:
 	var thresh := await to_thresh()
 	await wait(0.5)
 	thresh.take_damage(lucian.make_damage(thresh.max_hp, DamageInfo.Type.TRUE, &"debug"))
+	# The stage reacts to his half HP at the end of the frame.
+	await process_frame
 	print("Thresh stops at half (expect 1500): ", roundi(thresh.hp), "  cutscene (expect true): ", game.cutscene != null)
 	var scene := game.cutscene
 	await wait(1.6)

@@ -204,6 +204,8 @@ func test_after_the_cutscene_every_wave_counts_as_cleared() -> void:
 	stage.runner.tick(0.1)
 	await wait_physics_frames(1)
 	stage.boss_unit.take_damage(DamageInfo.create(5000.0, DamageInfo.Type.TRUE, &"test"))
+	# The stage reacts to his half HP after the frame's physics.
+	await wait_physics_frames(1)
 	stage.cutscene.skip()
 	assert_eq(stage.runner.waves_done(), 3)
 	assert_eq(stage.runner.alive(), 0)

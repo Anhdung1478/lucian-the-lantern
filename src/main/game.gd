@@ -62,7 +62,7 @@ func ask_to_leave() -> void:
 
 
 func _leave(save: bool) -> void:
-	if save and not SaveGame.instance().save():
+	if save and not _save():
 		prompt.ask("Could not save. Leave anyway?", show_title, Callable(), false)
 		return
 	show_title()
@@ -98,10 +98,19 @@ func ask_to_quit() -> void:
 
 
 func _quit(save: bool) -> void:
-	if save and not SaveGame.instance().save():
+	if save and not _save():
 		prompt.ask("Could not save. Quit anyway?", quit_game, _keep_playing, false)
 		return
 	quit_game.call()
+
+
+## Saves the current slot. On a stage's result panel the stage is done
+## first, as Continue would, so a clear is not lost.
+func _save() -> bool:
+	var stage := screen as Stage
+	if stage and stage.result.visible:
+		return SaveGame.instance().finish_stage(&"cleared" if stage.result.cleared else &"failed", _run.stage_id)
+	return SaveGame.instance().save()
 
 
 ## Unpauses, unless something else (the stage's ESC menu) had paused first.

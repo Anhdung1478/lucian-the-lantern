@@ -182,3 +182,16 @@ func test_a_cleared_act_stage_is_saved_as_cleared() -> void:
 	assert_is(game.screen, MainScreen)
 	var journey: JourneySection = game.screen.sections[MainScreen.SECTION_JOURNEY]
 	assert_eq(journey.current, 1)
+
+
+func test_closing_the_window_on_stage_cleared_keeps_the_clear() -> void:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_process_frames(2)
+	(game.screen as Stage).show_result(true)
+	game.notification(NOTIFICATION_WM_CLOSE_REQUEST)
+	game.prompt.answer(true)
+	assert_true(quit_called)
+	var saved := SaveGame.new(SaveGame.instance().prefix)
+	saved.load_slot(1)
+	assert_true("2-1" in saved.cleared, str(saved.cleared))
