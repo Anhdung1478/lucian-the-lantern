@@ -40,7 +40,14 @@
 | Y | Toggle camera between free-cam and Lucian cam (follows Lucian). Default: free-cam |
 | Space | Move the camera back over Lucian once (free-cam stays free) |
 
-**Cast modes (chosen in settings):** normal cast, quick cast, or quick cast with indicator. *(Not built yet: skills are quick cast.)*
+**Cast modes (Settings → Controls, one per key):** for Q / W / E / R, D / F and item keys 1–6.
+- **Quick cast** (default): casts toward the cursor on press.
+- **Quick cast with indicator:** holding the key shows the range toward the cursor; releasing it casts.
+- **Normal cast:** pressing the key shows the range; left-click casts. Right-click, ESC or the same key again cancels (right-click doesn't move Lucian). Pressing another cast key switches to it.
+
+Casts with no aim (potions, Ghost, Barrier, Heal, Clarity) and casts that aren't ready (cooldown, mana, Q / W during R) always go on press. Pressing R while it fires still stops it.
+
+**Range indicators:** a ray for Q, W (ending in the cross it bursts into), E and the item dashes (with a ring where Lucian lands), two dashed rays for R, a circle for Gunblade (700) and Smite (500), a ray for Flash (400). They show while aiming (toward the cursor), and while a learned skill, an item active or Flash / Smite is hovered on the HUD (where Lucian faces).
 
 **Key bindings** can be changed in Settings → Controls (all but ESC and the debug F3 + Q).
 

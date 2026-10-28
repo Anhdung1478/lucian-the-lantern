@@ -68,10 +68,12 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | Stats with a bonus in yellow; base + bonus on hover | A number turns yellow when items, passives, buffs or cheats add to what the level alone gives. Its hover card shows "60 base + 22 bonus" with the bonus in yellow. |
 | Redraw the Flash and Barrier icons | Flash: a burst of light where it lands and a ring of yellow sparks where it left. Barrier: a gold figure inside a golden bubble. |
 | Every dash shows a trail; Flash only marks where Lucian was | E (light blue), Galeforce (pale green) and Rocketbelt (violet) leave a trail that grows behind Lucian from the start of the dash and fades once it lands. Flash leaves none: yellow sparks ring the spot Lucian left, drift out and fade in 0.6 s. |
-| Effects for Clarity and Heal; a trail for Ghost | Heal: a green ring spreads out and green crosses rise around Lucian. Clarity: blue motes spiral into him, then a small flash. Both follow him for 0.9 s. Ghost: pale teal afterimages of Lucian trail behind him while he runs, each fading in 0.35 s. I read "a trail before Lucian" as behind him, where he has been. |
-| Lucian should fire his two guns in turn | Every shot takes the next gun: left, right, left… That covers basic attacks, Lightslinger's second shot (still from the other gun) and R. Basic attacks used to fire from the right gun only. |
-| An effect for Barrier; Flash ignores an earlier move too | Barrier: a golden bubble pops up around Lucian, shimmers while the shield lasts, and fades when it is gone. Flash now drops a move (or merchant visit) clicked before it, even with right-click held, like the dashes; right-click again to walk on. |
 | A move clicked before a dash should be ignored | It was already dropped for a quick click, but with right-click still held, Lucian kept following the cursor after the dash. Now any dash drops the move (and a merchant visit) from before it, even while the button is held. Right-click again, during the dash or after it, to walk on. Attacks still carry on. |
+| Effects for Clarity and Heal; a trail for Ghost | Heal: a green ring spreads out and green crosses rise around Lucian. Clarity: blue motes spiral into him, then a small flash. Both follow him for 0.9 s. Ghost: pale teal afterimages of Lucian trail behind him while he runs, each fading in 0.35 s. I read "a trail before Lucian" as behind him, where he has been. |
+| An effect for Barrier; Flash ignores an earlier move too | Barrier: a golden bubble pops up around Lucian, shimmers while the shield lasts, and fades when it is gone. Flash now drops a move (or merchant visit) clicked before it, even with right-click held, like the dashes; right-click again to walk on. |
+| Show a skill's range on hover: a ray, two dashed rays for R, the Galeforce and Rocketbelt dashes, a circle for Gunblade | Hovering a learned skill, an item with an aimed active or Flash / Smite shows its range around Lucian, pointing where he faces: rays for Q, W (with the cross it bursts into), E and the dashes (with a ring where Lucian lands), two dashed rays for R, circles for Gunblade (700) and Smite (500). |
+| Lucian should fire his two guns in turn | Every shot takes the next gun: left, right, left… That covers basic attacks, Lightslinger's second shot (still from the other gun) and R. Basic attacks used to fire from the right gun only. |
+| Normal cast and quick cast with indicator | A cast mode per key in Settings → Controls (your choice): Quick cast (default), Quick + indicator (hold to see the range toward the cursor, release to cast), Normal cast (press to aim, left-click to cast; right-click, ESC or the key again cancels without moving). It covers skills, item actives and Flash / Smite; spells with no aim still cast on press. |
 
 ## Choices I made where the request was open
 
@@ -119,6 +121,9 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | ![Galeforce](phase4/actives_1_galeforce.png) Follow-up: Galeforce's missiles curving onto the dummy, its green dash trail; Lucian's HP bar | ![Regen](phase4/stats_1_extra.png) Follow-up: one regen cell, "+0.8/s" on the HP bar |
 | ![Flash](phase4/summoners_1_flash.png) Follow-up: Flash's yellow sparks where Lucian stood, no trail | ![Ghost](phase4/summoners_2_barrier_ghost.png) Follow-up: Ghost's afterimages behind Lucian; Barrier's golden bubble |
 | ![Heal](phase4/summoners_4_heal.png) Follow-up: Heal's ring and rising crosses | ![Clarity](phase4/summoners_5_clarity.png) Follow-up: Clarity's motes spiralling in |
+| ![W range](phase4/indicators_1_w.png) Follow-up: hovering W shows its range and the cross it bursts into | ![R range](phase4/indicators_3_r.png) Follow-up: hovering R, two dashed rays |
+| ![Gunblade range](phase4/indicators_6_gunblade.png) Follow-up: hovering Gunblade, its 700 circle | ![E aimed](phase4/cast_modes_1_e_landing.png) Follow-up: normal cast, E aimed at the cursor with its landing ring |
+| ![Cast modes](phase4/settings_2_controls.png) Follow-up: a cast mode picker beside each skill, summoner and item key | |
 
 ## Known limits
 
