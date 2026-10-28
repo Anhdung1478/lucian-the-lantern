@@ -41,8 +41,8 @@ func _leave_button(stage: Stage) -> Button:
 	return null
 
 
-func test_starts_on_the_main_screen() -> void:
-	assert_is(game.screen, MainScreen)
+func test_starts_on_the_title_screen() -> void:
+	assert_is(game.screen, TitleScreen)
 
 
 func test_training_swaps_in_the_stage_with_its_setup() -> void:
@@ -80,11 +80,15 @@ func test_quit_no_leaves_without_saving() -> void:
 
 
 func test_window_close_asks() -> void:
+	game.show_main_screen()
+	await wait_process_frames(1)
 	game.notification(NOTIFICATION_WM_CLOSE_REQUEST)
 	assert_true(game.prompt.is_open())
 
 
 func test_the_save_prompt_is_above_the_main_screen_popup_and_answers_alone() -> void:
+	game.show_main_screen()
+	await wait_process_frames(1)
 	var main := game.screen as MainScreen
 	var overwrite: Array[bool] = []
 	main.confirm.ask("Overwrite slot 2?", func() -> void: overwrite.append(true), func() -> void: overwrite.append(false))

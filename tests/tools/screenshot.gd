@@ -7,7 +7,7 @@ extends SceneTree
 const SETTINGS_PATH := "user://screenshot_settings.json"
 const SAVE_PREFIX := "user://screenshot_save_slot_"
 ## Scenarios that start from the game's root scene (the main screen).
-const GAME_SCENARIOS := ["training_setup", "skins_stage"]
+const GAME_SCENARIOS := ["training_setup", "skins_stage", "title"]
 
 var stage: Node
 var lucian: Lucian
@@ -42,6 +42,8 @@ func _initialize() -> void:
 		# "Save before leaving?" must never close the run.
 		game_root.quit_game = func() -> void: print("quit_game called")
 		root.add_child(game_root)
+		if scenario != "title":
+			game_root.show_main_screen()
 		_run.call_deferred(scenario)
 		return
 	stage = load("res://src/stage/stage.tscn").instantiate()
@@ -136,6 +138,8 @@ func _run(scenario: String) -> void:
 			await scenario_main_gear()
 		"main_debug":
 			await scenario_main_debug()
+		"title":
+			await scenario_title()
 		"training_setup":
 			await scenario_training_setup()
 		"skins_stage":
@@ -1298,7 +1302,7 @@ func scenario_main_skins() -> void:
 	await shot("main_skins_1_vampire")
 
 
-## The gear menu (Leave to main menu disabled and hovered), Save and its
+## The gear menu (Leave to main menu), Save and its
 ## toast, the slot list, the overwrite question and "Save before leaving?".
 func scenario_main_gear() -> void:
 	var main := main_screen()
@@ -1306,7 +1310,7 @@ func scenario_main_gear() -> void:
 	main.gear.open()
 	await wait(0.2)
 	var leave := main.gear.find_button("Leave to main menu")
-	print("Leave to main menu disabled (expect true): ", leave.disabled)
+	print("Leave to main menu enabled (expect true): ", not leave.disabled)
 	await mouse_move(control_center(leave))
 	await wait_for_tooltip(leave)
 	await shot("main_gear_0_menu")
@@ -1324,9 +1328,9 @@ func scenario_main_gear() -> void:
 	main.gear.open()
 	main.gear.show_slots()
 	await wait(0.2)
-	print("slot list: ", main.gear._slot_buttons.map(func(button: Button) -> String: return button.text))
+	print("slot list: ", main.gear._slot_list.buttons.map(func(button: Button) -> String: return button.text))
 	await shot("main_gear_2_slots")
-	main.gear._slot_buttons[1].pressed.emit()
+	main.gear._slot_list.buttons[1].pressed.emit()
 	await wait(0.1)
 	print("slot 2 exists, so it asks (expect true): ", main.confirm.is_open())
 	await shot("main_gear_3_overwrite")
@@ -1372,6 +1376,19 @@ func scenario_main_debug() -> void:
 ## equip slot, an empty D and a chained F (with their cards), and the stage
 ## debug table. Then back, Max tree with Flash and Heal: everything open, the
 ## upgrade line on a spell card and the cheaper refresh in the shop.
+## The title screen, the new game slot list and the load list.
+func scenario_title() -> void:
+	var title := game_root.screen as TitleScreen
+	await wait(0.2)
+	await shot("title_0_menu")
+	title.show_slots(false)
+	await wait(0.1)
+	await shot("title_1_new_game")
+	title.show_slots(true)
+	await wait(0.1)
+	await shot("title_2_load")
+
+
 func scenario_training_setup() -> void:
 	await start_training()
 	var hud: Hud = stage.get_node("Hud")

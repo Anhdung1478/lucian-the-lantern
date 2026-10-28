@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Title lantern: Thresh's dark iron lantern on a ring handle, chains off both sides, a green soul glow inside and soft light rays. -->
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#d8ffe6" stop-opacity="1"/>
+      <stop offset="0.35" stop-color="#6ee6a0" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#2fbf74" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#6ee6a0" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#6ee6a0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="128" cy="150" r="118" fill="url(#halo)"/>
+  <g fill="#8fe3b0" opacity="0.16">
+    <polygon points="128,150 40,214 70,236"/>
+    <polygon points="128,150 216,214 186,236"/>
+    <polygon points="128,150 108,252 148,252"/>
+    <polygon points="128,150 8,170 8,140"/>
+    <polygon points="128,150 248,170 248,140"/>
+  </g>
+  <g fill="none" stroke-linecap="round">
+    <path d="M96 62 Q56 56 20 30" stroke="#1a1d24" stroke-width="9"/>
+    <path d="M160 62 Q200 56 236 30" stroke="#1a1d24" stroke-width="9"/>
+    <path d="M96 62 Q56 56 20 30" stroke="#6b7280" stroke-width="5" stroke-dasharray="9 6"/>
+    <path d="M160 62 Q200 56 236 30" stroke="#6b7280" stroke-width="5" stroke-dasharray="9 6"/>
+    <circle cx="128" cy="34" r="17" stroke="#1a1d24" stroke-width="10"/>
+    <circle cx="128" cy="34" r="17" stroke="#4b5260" stroke-width="5"/>
+  </g>
+  <!-- cap -->
+  <path d="M92 74 L128 52 L164 74 Z" fill="#2b2f3a" stroke="#1a1d24" stroke-width="5" stroke-linejoin="round"/>
+  <rect x="86" y="72" width="84" height="12" rx="4" fill="#3a3f4c" stroke="#1a1d24" stroke-width="5"/>
+  <!-- body -->
+  <path d="M96 84 L160 84 L172 148 L160 212 L96 212 L84 148 Z" fill="#0f1a16" stroke="#1a1d24" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="150" rx="46" ry="52" fill="url(#glow)"/>
+  <!-- soul -->
+  <path d="M128 122 Q146 146 128 176 Q110 146 128 122 Z" fill="#eafff2" opacity="0.9"/>
+  <!-- iron bars -->
+  <g stroke="#2b2f3a" stroke-width="6" stroke-linecap="round" fill="none">
+    <path d="M110 86 L104 210"/>
+    <path d="M146 86 L152 210"/>
+    <path d="M128 86 L128 210" stroke-width="4"/>
+  </g>
+  <!-- base -->
+  <rect x="88" y="208" width="80" height="14" rx="4" fill="#3a3f4c" stroke="#1a1d24" stroke-width="5"/>
+  <path d="M100 222 L156 222 L148 236 L108 236 Z" fill="#2b2f3a" stroke="#1a1d24" stroke-width="5" stroke-linejoin="round"/>
+</svg>

@@ -115,7 +115,7 @@ func test_copy_over_an_existing_slot_asks_first() -> void:
 	SaveGame.instance().copy_to(2)
 	var stamp := SaveGame.instance().saved_at(2).substr(0, 16)
 	main.gear.show_slots()
-	main.gear.find_button("Slot 2 · saved %s" % stamp).pressed.emit()
+	main.gear.find_button("Slot 2 · 0m · saved %s" % stamp).pressed.emit()
 	assert_true(main.confirm.is_open())
 	SaveGame.instance().essences.add(Essences.BLUE, 5)
 	main.confirm.answer(true)
@@ -126,14 +126,16 @@ func test_copy_over_an_existing_slot_asks_first() -> void:
 func test_answering_no_keeps_the_slot() -> void:
 	SaveGame.instance().copy_to(2)
 	main.gear.show_slots()
-	main.gear.find_button("Slot 2 · saved %s" % SaveGame.instance().saved_at(2).substr(0, 16)).pressed.emit()
+	main.gear.find_button("Slot 2 · 0m · saved %s" % SaveGame.instance().saved_at(2).substr(0, 16)).pressed.emit()
 	main.confirm.answer(false)
 	assert_ne(main.toast_text(), "Copied to slot 2")
 
 
-func test_leave_to_main_menu_is_disabled() -> void:
+func test_leave_to_main_menu_asks_the_game() -> void:
+	watch_signals(main)
 	main.gear.open()
-	assert_true(main.gear.find_button("Leave to main menu").disabled)
+	_press("Leave to main menu")
+	assert_signal_emitted(main, "leave_requested")
 
 
 func test_exit_emits_exit_requested() -> void:

@@ -1,6 +1,6 @@
 class_name MainScreen
 extends Control
-## The screen the game opens on: essences and the gear menu on top, the
+## The screen after a slot is picked: essences and the gear menu on top, the
 ## Evolution Tree / Skin Shop / Journey sections in the middle, their buttons
 ## at the bottom. Nothing here saves by itself; only the gear menu's Save and
 ## Save as copy write files.
@@ -11,6 +11,7 @@ extends Control
 
 signal start_requested(run: StageSetup)
 signal exit_requested
+signal leave_requested
 
 const SECTION_TREE := 0
 const SECTION_SKINS := 1
@@ -154,6 +155,7 @@ func _build() -> void:
 	gear.confirm = confirm
 	gear.settings_requested.connect(_open_settings)
 	gear.exit_requested.connect(exit_requested.emit)
+	gear.leave_requested.connect(leave_requested.emit)
 	gear.saved.connect(_on_saved)
 	gear.copied.connect(_on_copied)
 	add_child(gear)

@@ -1,15 +1,16 @@
 class_name Game
 extends Node
-## The root scene. Shows the main screen, swaps in a stage for Training and
-## comes back when it ends (the stage-done auto-save). Leaving the game,
-## from a menu or the window's close button, asks "Save before leaving?".
+## The root scene. Opens on the title screen; a slot leads to the main screen,
+## which swaps in a stage and comes back when it ends (the stage-done
+## auto-save). Leaving to the title or the game, from a menu or the window's
+## close button, asks "Save before leaving?" (the title itself has nothing to save).
 
 const STAGE_SCENE := preload("res://src/stage/stage.tscn")
 ## Above the screens' own pop-ups (ConfirmPopup.LAYER), which can be open
 ## when the window is closed: the prompt is drawn on top and gets clicks first.
 const PROMPT_LAYER := 90
 
-## The MainScreen or the Stage being played.
+## The TitleScreen, the MainScreen or the Stage being played.
 var screen: Node
 ## The stage being played, for its id when it ends.
 var _run := StageSetup.new()
@@ -26,12 +27,45 @@ func _ready() -> void:
 	get_tree().auto_accept_quit = false
 	add_child(Sfx.new())
 	add_child(prompt)
-	show_main_screen()
+	show_title()
 
 
+## Play time, for the slot lists: everywhere but the title screen. Game pauses
+## with the tree, so pauses don't count.
+func _process(delta: float) -> void:
+	if screen and not screen is TitleScreen:
+		SaveGame.instance().add_play_time(delta)
+
+
+## The title screen has nothing unsaved: its Exit and the window's X quit at once.
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		ask_to_quit()
+		if screen is TitleScreen:
+			quit_game.call()
+		else:
+			ask_to_quit()
+
+
+func show_title() -> void:
+	var title := TitleScreen.new()
+	title.new_game_started.connect(func() -> void: start_stage(StageSetup.for_stage(SaveGame.instance(), 1, 1)))
+	title.game_loaded.connect(show_main_screen)
+	title.exit_requested.connect(func() -> void: quit_game.call())
+	_swap(title)
+
+
+## Leave to main menu: "Save before leaving?", then the title screen.
+func ask_to_leave() -> void:
+	if prompt.is_open():
+		return
+	prompt.ask("Save before leaving?", _leave.bind(true), _leave.bind(false), false)
+
+
+func _leave(save: bool) -> void:
+	if save and not SaveGame.instance().save():
+		prompt.ask("Could not save. Leave anyway?", show_title, Callable(), false)
+		return
+	show_title()
 
 
 func show_main_screen(focus_act := 0) -> void:
@@ -39,6 +73,7 @@ func show_main_screen(focus_act := 0) -> void:
 	main.focus_act = focus_act
 	main.start_requested.connect(start_stage)
 	main.exit_requested.connect(ask_to_quit)
+	main.leave_requested.connect(ask_to_leave)
 	_swap(main)
 
 

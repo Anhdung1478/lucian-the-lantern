@@ -1,11 +1,12 @@
 class_name GearMenu
 extends CanvasLayer
 ## The gear button's menu: Close, Save, Save as copy, Settings, Leave to main
-## menu (not there yet) and Exit the game. Save as copy swaps the panel for a
+## menu and Exit the game. Save as copy swaps the panel for a
 ## slot list. Only Save and Save as copy write files.
 
 signal settings_requested
 signal exit_requested
+signal leave_requested
 signal saved(ok: bool)
 signal copied(slot: int, ok: bool)
 
@@ -16,7 +17,7 @@ var confirm: ConfirmPopup
 
 var _menu_page: VBoxContainer
 var _slot_page: VBoxContainer
-var _slot_buttons: Array[Button] = []
+var _slot_list := SlotList.new()
 var _title: Label
 var _showing_slots := false
 
@@ -48,29 +49,15 @@ func show_slots() -> void:
 	_title.text = "SAVE AS COPY"
 	_menu_page.visible = false
 	_slot_page.visible = true
-	var save := SaveGame.instance()
-	for i in _slot_buttons.size():
-		var n := i + 1
-		var button := _slot_buttons[i]
-		for connection in button.pressed.get_connections():
-			button.pressed.disconnect(connection["callable"])
-		button.disabled = n == save.slot
-		if n == save.slot:
-			button.text = "Slot %d (current)" % n
-		elif save.slot_exists(n):
-			button.text = "Slot %d · saved %s" % [n, save.saved_at(n).substr(0, 16)]
-			button.pressed.connect(_copy.bind(n, true))
-		else:
-			button.text = "Slot %d · empty" % n
-			button.pressed.connect(_copy.bind(n, false))
+	_slot_list.refresh(SaveGame.instance().slot)
 	visible = true
 
 
 ## The button with this text on the page shown, or null.
 func find_button(text: String) -> Button:
-	for child in (_slot_page if _slot_page.visible else _menu_page).get_children():
-		if child is Button and child.text == text:
-			return child
+	for button: Button in (_slot_page if _slot_page.visible else _menu_page).find_children("*", "Button", true, false):
+		if button.text == text:
+			return button
 	return null
 
 
@@ -99,12 +86,11 @@ func _build() -> void:
 	_button(_menu_page, "Save", _save)
 	_button(_menu_page, "Save as copy", show_slots)
 	_button(_menu_page, "Settings", settings_requested.emit)
-	var leave := _button(_menu_page, "Leave to main menu", Callable())
-	leave.set_meta(&"hover_text", "The title screen comes later")
+	_button(_menu_page, "Leave to main menu", leave_requested.emit)
 	_button(_menu_page, "Exit the game", exit_requested.emit)
 	_slot_page = _page(column)
-	for n in range(1, SaveGame.SLOTS + 1):
-		_slot_buttons.append(_button(_slot_page, "", Callable()))
+	_slot_list.picked.connect(_copy)
+	_slot_page.add_child(_slot_list)
 	_button(_slot_page, "Back", _show_menu)
 	_show_menu()
 
