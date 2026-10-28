@@ -9,4 +9,4 @@ id = &"barrier"
 display_name = "Barrier"
 icon = ExtResource("1_icon")
 cooldown = 60.0
-description = "Gain a shield of [kw]95 (+18 per level)[/kw] for [kw]2.5 s[/kw]."
+description = "Gain a shield of [kw]95 (+18 per level)[/kw] for [kw]2.5 s[/kw]. Heal and shield power makes it stronger."

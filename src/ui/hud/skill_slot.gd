@@ -121,7 +121,9 @@ func _process(_delta: float) -> void:
 	else:
 		_cooldown_label.text = str(ceili(remaining))
 	var blocked := skill.rank() > 0 and lucian.is_skill_blocked(skill.slot)
-	_icon.material = _grey if blocked else null
+	var material: Material = _grey if blocked else null
+	if _icon.material != material:
+		_icon.material = material
 	if skill.rank() == 0:
 		_icon.modulate = UNLEARNED_TINT
 	elif blocked:

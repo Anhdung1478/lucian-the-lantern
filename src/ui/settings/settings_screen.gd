@@ -242,9 +242,7 @@ func _build_controls() -> Control:
 func _build_graphics() -> Control:
 	var page := _page()
 	_option(page, "Window mode", &"window_mode", ["Windowed", "Borderless fullscreen", "Fullscreen"], GameSettings.WINDOW_MODES)
-	var sizes := _fitting_resolutions()
-	_resolution = _option(page, "Resolution", &"resolution", sizes.map(func(size: String) -> String: return size.replace("x", " × ")), sizes)
-	_resolution.disabled = settings.get_value(&"window_mode") != "windowed"
+	_resolution = _build_resolution(page)
 	page.add_child(UiStyle.label("Borderless and fullscreen use the screen's resolution.", 14, UiStyle.DIM_COLOR))
 	_toggle(page, "VSync", &"vsync")
 	_option(page, "FPS cap", &"max_fps", ["30", "60", "120", "144", "Unlimited"], GameSettings.FPS_CAPS)
@@ -254,14 +252,22 @@ func _build_graphics() -> Control:
 	return page
 
 
-## The resolutions that fit on the screen (all of them without a display).
-func _fitting_resolutions() -> Array:
-	if DisplayServer.get_name() == "headless":
-		return GameSettings.RESOLUTIONS
-	var screen := DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
-	return GameSettings.RESOLUTIONS.filter(func(size: String) -> bool:
+## Every resolution is listed, so the saved one always shows; sizes too big
+## for a window on this screen are greyed out (a saved one shrinks to fit).
+func _build_resolution(page: Control) -> OptionButton:
+	var headless := DisplayServer.get_name() == "headless"
+	var biggest := Vector2i.ZERO if headless else GameSettings.max_window_size()
+	var labels: Array = []
+	var too_big: Array[bool] = []
+	for size: String in GameSettings.RESOLUTIONS:
 		var parsed := GameSettings.parse_resolution(size)
-		return parsed.x <= screen.x and parsed.y <= screen.y)
+		too_big.append(not headless and (parsed.x > biggest.x or parsed.y > biggest.y))
+		labels.append(size.replace("x", " × ") + (" (too big)" if too_big.back() else ""))
+	var option := _option(page, "Resolution", &"resolution", labels, GameSettings.RESOLUTIONS)
+	for i in too_big.size():
+		option.set_item_disabled(i, too_big[i])
+	option.disabled = settings.get_value(&"window_mode") != "windowed"
+	return option
 
 
 func _build_gameplay() -> Control:

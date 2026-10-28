@@ -139,3 +139,28 @@ func test_resolution_round_trip_and_unknown_sizes_fall_back() -> void:
 	assert_eq(GameSettings.new(PATH).get_value(&"resolution"), "1920x1080")
 	settings.set_value(&"resolution", "123x45")
 	assert_eq(GameSettings.new(PATH).get_value(&"resolution"), "1600x900")
+
+
+func test_a_new_action_never_takes_a_key_an_older_file_already_uses() -> void:
+	# A Phase 3 file had no center_camera, and here Space is on the camera toggle.
+	var file := FileAccess.open(PATH, FileAccess.WRITE)
+	file.store_string(JSON.stringify({"version": 1, "values": {},
+		"bindings": {"toggle_camera": {"type": "key", "code": KEY_SPACE}}}))
+	file.close()
+	var loaded := GameSettings.new(PATH)
+	assert_eq(loaded.key_label(&"toggle_camera"), "Space")
+	assert_eq(loaded.key_label(&"center_camera"), "-")
+	loaded.apply_input()
+	assert_eq(InputMap.action_get_events(&"center_camera").size(), 0)
+	settings.apply_input()
+
+
+func test_binding_an_unbound_action_takes_the_key_from_its_owner() -> void:
+	var file := FileAccess.open(PATH, FileAccess.WRITE)
+	file.store_string(JSON.stringify({"version": 1, "values": {},
+		"bindings": {"toggle_camera": {"type": "key", "code": KEY_SPACE}}}))
+	file.close()
+	var loaded := GameSettings.new(PATH)
+	loaded.rebind(&"center_camera", key(KEY_SPACE))
+	assert_eq(loaded.key_label(&"center_camera"), "Space")
+	assert_eq(loaded.key_label(&"toggle_camera"), "-")

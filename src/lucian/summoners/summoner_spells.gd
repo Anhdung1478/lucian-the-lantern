@@ -109,7 +109,8 @@ func _physics_process(delta: float) -> void:
 
 
 ## Blinks toward the cursor, at most FLASH_RANGE, stepping back until
-## Lucian's body fits clear of walls and enemies.
+## Lucian's body fits clear of walls and enemies (enemies don't count under
+## Ghost). Only the landing spot is checked, so Flash can cross them.
 func _flash(aim: Vector2) -> void:
 	var from := lucian.global_position
 	var direction := lucian.aim_direction(aim)

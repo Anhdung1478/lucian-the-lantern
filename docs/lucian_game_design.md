@@ -244,22 +244,24 @@ Only these pairs combine. **Stats and unique passives/actives are based on LoL**
 | Clarity | Restore a large amount of mana |
 
 - Cooldowns: **30–90 seconds**. They do **not** reset between waves.
+- **1st slot is free**, the **2nd slot** is bought in the Evolution Tree.
+- **Every spell must be bought** in the Evolution Tree.
+- Upgrades: shorter cooldown, more heal, more mana, more damage, bigger shield.
 
-**Built in Phase 4** (placeholder numbers; no ability haste; each spell keeps its own cooldown, also when moved to the other key):
+### Built in Phase 4
+
+Placeholder numbers. Ability haste doesn't shorten them, and each spell keeps its own cooldown, also when moved to the other key.
 
 | Spell | Cooldown | Effect |
 |---|---|---|
-| Flash | 90 s | Blink up to 400 toward the cursor; walls and enemy bodies stop it short. |
+| Flash | 90 s | Blink up to 400 toward the cursor. If that spot is inside a wall or an enemy, land just short of it (so Flash can cross them). |
 | Ghost | 60 s | +40% move speed and pass through enemies for 6 s. |
-| Barrier | 60 s | Shield of 95 + 18 × level for 2.5 s. |
+| Barrier | 60 s | Shield of 95 + 18 × level for 2.5 s; heal and shield power makes it stronger. |
 | Heal | 60 s | Heal 80 + 15 × level, +30% move speed fading over 1 s. |
 | Clarity | 45 s | Restore 50% of max mana. |
 | Smite | 30 s | 450 true damage to the enemy nearest the cursor within 500, heal 10% of max HP. |
 
 Until the Evolution Tree exists, both slots are open and every spell is available: D and F are picked in the debug table (default Flash on D, Heal on F).
-- **1st slot is free**, the **2nd slot** is bought in the Evolution Tree.
-- **Every spell must be bought** in the Evolution Tree.
-- Upgrades: shorter cooldown, more heal, more mana, more damage, bigger shield.
 
 ---
 

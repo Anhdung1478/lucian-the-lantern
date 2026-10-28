@@ -299,9 +299,10 @@ func total_shield() -> float:
 	return shield + barrier
 
 
-## Barrier: a shield of `amount` for `seconds`, replacing an older one.
+## Barrier: a shield of `amount` (made stronger by heal and shield power) for
+## `seconds`, replacing an older one.
 func add_barrier(amount: float, seconds: float) -> void:
-	barrier = amount
+	barrier = amount * (1.0 + stats.heal_shield_power)
 	_barrier_left = seconds
 	_barrier_duration = seconds
 

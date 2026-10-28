@@ -108,12 +108,16 @@ func key_label(action: StringName) -> String:
 
 
 ## Binds `event` to `action`. An action that had the same input gets the
-## action's old one, so no two actions ever share an input.
+## action's old one (none if it had none), so no two actions ever share an
+## input.
 func rebind(action: StringName, event: InputEvent) -> void:
 	var clean := _clean(event)
-	for other: StringName in _bindings:
+	for other: StringName in _bindings.keys():
 		if other != action and _same_input(_bindings[other], clean):
-			_bindings[other] = _bindings[action]
+			if _bindings.has(action):
+				_bindings[other] = _bindings[action]
+			else:
+				_bindings.erase(other)
 	_bindings[action] = clean
 	save()
 	changed.emit(&"bindings")
@@ -157,10 +161,12 @@ func apply_audio() -> void:
 		AudioServer.set_bus_volume_db(bus, linear_to_db(maxf(volume, 0.0001)))
 
 
+## An action without a binding gets no input at all.
 func apply_input() -> void:
-	for action: StringName in _bindings:
+	for action in REBINDABLE:
 		InputMap.action_erase_events(action)
-		InputMap.action_add_event(action, _bindings[action])
+		if _bindings.has(action):
+			InputMap.action_add_event(action, _bindings[action])
 
 
 func apply_display() -> void:
@@ -184,17 +190,31 @@ func apply_display() -> void:
 
 
 ## Sizes and centers the window in windowed mode (a maximized window is
-## restored first), never past the screen. Fullscreen modes keep the
-## screen's own size.
+## restored first). A size too big for the screen shrinks to fit, title bar
+## included. Fullscreen modes keep the screen's own size.
 func apply_resolution() -> void:
 	if DisplayServer.get_name() == "headless" or _values[&"window_mode"] != "windowed":
 		return
-	var usable := DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen())
-	var size := parse_resolution(_values[&"resolution"]).min(usable.size)
 	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	var size := parse_resolution(_values[&"resolution"])
+	if size == Vector2i.ZERO:
+		size = parse_resolution(DEFAULTS[&"resolution"])
+	size = size.min(max_window_size())
+	# Sizes and positions are the inside of the window; center it with its frame.
+	var frame := DisplayServer.window_get_size_with_decorations() - DisplayServer.window_get_size()
+	var inset := DisplayServer.window_get_position() - DisplayServer.window_get_position_with_decorations()
+	var usable := DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen())
 	DisplayServer.window_set_size(size)
-	DisplayServer.window_set_position(usable.position + (usable.size - size) / 2)
+	DisplayServer.window_set_position(usable.position + (usable.size - size - frame) / 2 + inset)
+
+
+## The biggest window inside its frame (title bar, borders) that fits on the
+## screen it is on.
+static func max_window_size() -> Vector2i:
+	var usable := DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen())
+	var frame := DisplayServer.window_get_size_with_decorations() - DisplayServer.window_get_size()
+	return usable.size - frame
 
 
 ## "1920x1080" -> (1920, 1080); (0, 0) when it isn't a size.
@@ -274,6 +294,16 @@ func _load() -> void:
 			var event := dict_to_event(bindings[key])
 			if event:
 				_bindings[action] = event
+	# An action newer than the file keeps its default input only while no
+	# saved action uses it, so no two actions ever share one.
+	for action in REBINDABLE:
+		if bindings.has(String(action)) or not _bindings.has(action):
+			continue
+		for saved: String in bindings:
+			var other := StringName(saved)
+			if other != action and _bindings.has(other) and _same_input(_bindings[other], _bindings[action]):
+				_bindings.erase(action)
+				break
 
 
 ## A plain copy of the input: only the key or button, no modifiers, so a

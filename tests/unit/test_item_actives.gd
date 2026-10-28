@@ -15,6 +15,10 @@ func before_each() -> void:
 	add_child_autofree(dummy)
 	dummy.damage_taken.connect(func(info: DamageInfo, _final: float) -> void: sources.append(info.source))
 	lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	# Bolts and missiles go here, so they are freed with the test.
+	var effects := Node2D.new()
+	add_child_autofree(effects)
+	lucian.projectile_parent = effects
 	add_child_autofree(lucian)
 
 
@@ -78,6 +82,14 @@ func test_rocketbelt_bolts_reach_900_units() -> void:
 	assert_true(lucian.use_equip_slot(0, dummy.position))
 	await wait_seconds(0.8)
 	assert_has(sources, &"hextech_rocketbelt")
+
+
+func test_rocketbelt_bolts_stop_at_900_units() -> void:
+	dummy.position = Vector2(1000, 0)
+	equip(&"hextech_rocketbelt")
+	assert_true(lucian.use_equip_slot(0, dummy.position))
+	await wait_seconds(1.0)
+	assert_does_not_have(sources, &"hextech_rocketbelt")
 
 
 func test_turning_on_no_cooldowns_refreshes_item_cooldowns() -> void:

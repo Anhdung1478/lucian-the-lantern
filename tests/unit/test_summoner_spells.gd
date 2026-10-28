@@ -17,6 +17,10 @@ func before_each() -> void:
 		sources.append(info.source)
 		finals.append(final_amount))
 	lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	# Trails and bolts go here, so they are freed with the test.
+	var effects := Node2D.new()
+	add_child_autofree(effects)
+	lucian.projectile_parent = effects
 	add_child_autofree(lucian)
 	await wait_physics_frames(2)
 
@@ -50,7 +54,8 @@ func test_flash_stops_short_of_an_enemy_body() -> void:
 	dummy.position = Vector2(350, 0)
 	await wait_physics_frames(2)
 	lucian.use_summoner(0, Vector2(400, 0))
-	assert_lt(lucian.global_position.x, 350.0)
+	# Bodies touch at 64 (34 + 30); Flash steps back 10 at a time from 400.
+	assert_almost_eq(lucian.global_position.x, 280.0, 0.5)
 	assert_true(lucian.fits_at(lucian.global_position))
 
 
@@ -104,3 +109,20 @@ func test_no_cooldowns_refreshes_summoners() -> void:
 	lucian.use_summoner(0, Vector2(100, 0))
 	lucian.cheat_no_cooldowns = true
 	assert_true(lucian.summoners.cooldown(&"flash").is_ready())
+
+
+func test_no_summoner_while_dashing() -> void:
+	lucian.start_dash(Vector2.RIGHT, 200.0, 1000.0)
+	assert_false(lucian.use_summoner(0, Vector2(1000, 0)))
+	assert_true(lucian.summoners.cooldown(&"flash").is_ready())
+
+
+func test_barrier_shows_a_buff_and_grows_with_heal_and_shield_power() -> void:
+	lucian.stats.heal_shield_power = 0.25
+	lucian.add_barrier(100.0, 2.0)
+	assert_almost_eq(lucian.total_shield(), 125.0, 0.01)
+	var barrier: Array = lucian.buffs().filter(func(buff: Dictionary) -> bool: return buff.id == &"barrier")
+	assert_eq(barrier.size(), 1)
+	var card := TooltipCard.buff(barrier[0])
+	assert_not_null(card)
+	card.free()

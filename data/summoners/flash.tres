@@ -9,4 +9,4 @@ id = &"flash"
 display_name = "Flash"
 icon = ExtResource("1_icon")
 cooldown = 90.0
-description = "Blink up to [kw]400[/kw] units toward the cursor. Walls and enemies stop it short."
+description = "Blink up to [kw]400[/kw] units toward the cursor. If that spot is inside a wall or an enemy, land just short of it."

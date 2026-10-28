@@ -7,6 +7,10 @@ var lucian: Lucian
 
 func before_each() -> void:
 	lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	# Shots and beams go here, so they are freed with the test.
+	var effects := Node2D.new()
+	add_child_autofree(effects)
+	lucian.projectile_parent = effects
 	add_child_autofree(lucian)
 
 
