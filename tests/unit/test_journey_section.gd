@@ -151,6 +151,20 @@ func test_picking_flash_on_d_then_f_swaps() -> void:
 	assert_eq(_save().loadout, [&"", &"flash"] as Array[StringName])
 
 
+func test_a_spell_no_longer_bought_shows_as_empty() -> void:
+	var essences := _save().essences
+	essences.add(Essences.BLUE, 1000)
+	essences.add(Essences.PURPLE, EvolutionTree.RESET_COST)
+	_save().tree.buy(&"flash", essences)
+	_save().set_loadout(0, &"flash")
+	assert_not_null(section.loadout.picks[0].icon)
+	_save().tree.reset(essences)
+	assert_eq(_save().loadout[0], &"flash", "the save keeps the pick")
+	assert_null(section.loadout.picks[0].icon)
+	assert_eq(section.loadout.picks[0].text, "None")
+	assert_false(section.loadout.picks[0].has_meta(&"hover_text"))
+
+
 func test_escape_closes_the_menu_first() -> void:
 	assert_false(section.close_popup())
 	section.loadout.open_menu(0)

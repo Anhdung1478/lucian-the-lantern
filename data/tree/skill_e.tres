@@ -7,7 +7,7 @@
 script = ExtResource("1_data")
 id = &"skill_e"
 display_name = "E – Relentless Pursuit"
-description = "Buys ranks of E. In a stage, skill points only go into bought ranks. Needs Act 1 cleared."
+description = "Buys ranks of E. In a stage, skill points only go into bought ranks."
 icon = ExtResource("2_icon")
 branch = &"skills"
 grid = Vector2(3, 0)

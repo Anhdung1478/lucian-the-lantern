@@ -7,10 +7,10 @@
 script = ExtResource("1_data")
 id = &"passive"
 display_name = "Passive – Lightslinger"
-description = "Learns the passive. Needs any one of Q, W or E."
+description = "Learns the passive."
 icon = ExtResource("2_icon")
 branch = &"skills"
-grid = Vector2(0, 1)
+grid = Vector2(0, 1.5)
 max_level = 1
 blue = Array[int]([150])
 orange = Array[int]([0])

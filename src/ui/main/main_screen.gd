@@ -107,7 +107,10 @@ func _build() -> void:
 	area.offset_bottom = -BOTTOM_BAR
 	area.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(area)
-	sections.append(_placeholder(area, "Evolution Tree"))
+	var tree_section := TreeSection.new()
+	tree_section.confirm = confirm
+	area.add_child(tree_section)
+	sections.append(tree_section)
 	sections.append(_placeholder(area, "Skin Shop"))
 	var journey := JourneySection.new()
 	journey.start_training.connect(_start_training)

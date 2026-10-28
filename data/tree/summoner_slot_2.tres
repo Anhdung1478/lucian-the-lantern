@@ -7,10 +7,10 @@
 script = ExtResource("1_data")
 id = &"summoner_slot_2"
 display_name = "Second Summoner Slot"
-description = "Lucian can bring a second summoner spell. Needs any two spells."
+description = "Lucian can bring a second summoner spell."
 icon = ExtResource("2_icon")
 branch = &"summoners"
-grid = Vector2(24, 1)
+grid = Vector2(24, 1.25)
 max_level = 1
 blue = Array[int]([400])
 orange = Array[int]([5])

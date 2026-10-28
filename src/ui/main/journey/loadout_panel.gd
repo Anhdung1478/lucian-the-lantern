@@ -99,7 +99,8 @@ func refresh() -> void:
 	for i in 2:
 		_key_labels[i].text = GameSettings.instance().key_label(KEYS[i])
 		var id := save.loadout[i]
-		var data := SummonerSpells.find(id) if id != &"" else null
+		# A spell the tree no longer has (after a reset) shows as empty.
+		var data := SummonerSpells.find(id) if id != &"" and save.tree.level(id) > 0 else null
 		picks[i].icon = data.icon if data else null
 		var locked := i == 1 and not second_open
 		picks[i].text = "" if data or locked else "None"
