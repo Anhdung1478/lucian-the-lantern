@@ -464,7 +464,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - [x] Full Endless modifier list
 - [x] Unspent skill points: wasted
 - [x] Wave count per stage across the 22 stages
-- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`)
+- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`, Phase 4: `implementation/phase4.md`)
 - [x] Item stats and effects (`items.md`)
 - [ ] UI (see `ui_design.md`): HUD, backpack, crafting, recipe table, ESC menu, merchant's shop and Settings done; other screens to design
 - [x] Save system
