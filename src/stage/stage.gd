@@ -86,7 +86,6 @@ func _ready() -> void:
 		dummy.damage_taken.connect(damage_numbers.spawn.bind(dummy))
 	lucian.apply_setup(run)
 	shop_slots = run.shop_slots
-	hud.setup(lucian, wallet)
 	debug_table.setup(self)
 	add_child(result)
 	result.continue_pressed.connect(func() -> void: finished.emit(&"cleared" if result.cleared else &"failed"))
@@ -101,6 +100,7 @@ func _ready() -> void:
 		add_merchant()
 	else:
 		_start_waves()
+	hud.setup(lucian, wallet, self)
 
 
 func _process(delta: float) -> void:

@@ -32,7 +32,15 @@ var extra_stats := StatsPanel.new()
 var hp_regen_label: Label
 var mana_regen_label: Label
 
+## Task 10 fills the tips.
+var tips: Control
+var stage: Stage
+var stage_info := StageInfo.new()
+var boss_bar := BossBar.new()
+var radar := Radar.new()
+
 var _gold_label: Label
+var _essence_pairs := {}
 var _fps_label: Label
 var _buff_bar := BuffBar.new()
 var _shield_overlay := Control.new()
@@ -51,8 +59,13 @@ var _skill_slots: Array[SkillSlot] = []
 @onready var mana_label: Label = %ManaLabel
 
 
-func setup(target: Lucian, stage_wallet: Wallet) -> void:
+func setup(target: Lucian, stage_wallet: Wallet, stage_node: Stage = null) -> void:
 	lucian = target
+	stage = stage_node
+	stage_info.setup(stage.run.display_name if stage else "Training", stage.runner if stage else null)
+	if stage:
+		stage_info.skip_pressed.connect(stage.skip_break)
+	radar.setup(stage.arena.get_bounds() if stage else Rect2(0, 0, 4800, 2700), target)
 	wallet = stage_wallet
 	wallet.changed.connect(_show_gold)
 	_show_gold(wallet.gold)
@@ -100,11 +113,12 @@ func _ready() -> void:
 	mana_regen_label = _regen_label(mana_bar, 11)
 	_build_gold()
 	_fps_label = UiStyle.label("", 16, UiStyle.DIM_COLOR)
-	_fps_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	_fps_label.offset_top = 6.0
-	_fps_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_fps_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	_fps_label.offset_left = MARGIN
+	_fps_label.offset_top = 8.0
 	_fps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	$Root.add_child(_fps_label)
+	_build_stage_info()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -142,6 +156,12 @@ func _process(_delta: float) -> void:
 	_fps_label.visible = GameSettings.instance().get_value(&"show_fps")
 	if _fps_label.visible:
 		_fps_label.text = "FPS %d" % Engine.get_frames_per_second()
+	for kind: StringName in _essence_pairs:
+		var count: int = stage.collected[kind] if stage else 0
+		for node: Control in _essence_pairs[kind]:
+			node.visible = count > 0
+		if count > 0:
+			(_essence_pairs[kind][1] as Label).text = str(count)
 
 
 ## The range of the HUD slot `control` is in (a control opts in with
@@ -243,3 +263,37 @@ func _build_gold() -> void:
 	_gold_label.add_theme_color_override(&"font_color", GOLD_COLOR)
 	_gold_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(_gold_label)
+	for kind: StringName in Stage.ESSENCE_ICONS:
+		var gap := Control.new()
+		gap.custom_minimum_size.x = 8
+		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var icon := TextureRect.new()
+		icon.texture = Stage.ESSENCE_ICONS[kind]
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.custom_minimum_size = Vector2(26, 26)
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var amount := UiStyle.label("0", 22, Stage.ESSENCE_COLORS[kind])
+		amount.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		for node: Control in [gap, icon, amount]:
+			node.visible = false
+			row.add_child(node)
+		_essence_pairs[kind] = [icon, amount, gap]
+
+
+## Top center: the stage info with the boss bar under it; bottom right: the radar.
+func _build_stage_info() -> void:
+	stage_info.add_theme_stylebox_override(&"panel", bottom_panel.get_theme_stylebox(&"panel"))
+	$Root.add_child(stage_info)
+	stage_info.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	stage_info.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	stage_info.offset_top = MARGIN
+	$Root.add_child(boss_bar)
+	boss_bar.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	boss_bar.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	boss_bar.offset_top = 72.0
+	$Root.add_child(radar)
+	radar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	radar.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	radar.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	radar.offset_right = -MARGIN
+	radar.offset_bottom = -MARGIN
