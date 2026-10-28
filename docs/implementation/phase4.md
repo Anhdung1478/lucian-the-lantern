@@ -872,6 +872,7 @@ Everything in the plan is in place, one commit per task (Tasks 0–9), then the 
 - **Dash trails:** `Lucian.start_dash()` takes a trail color and spawns a `DashTrail` at the start of the dash (E's own trail code moved there). Each dash step stretches it up to Lucian (`reach()`), and it fades for 0.3 s once the dash ends (`finish()`). A first try drew it only when the dash ended; it now grows from the start. E keeps its light blue (`DashTrail.LIGHT`); Galeforce's is pale green (`GALEFORCE_TRAIL`), Rocketbelt's violet like its bolts (`ROCKETBELT_TRAIL`). None on low effects.
 - **Flash** no longer draws a trail. `BlinkSparks` (`src/combat/blink_sparks.gd`) rings the spot Lucian left with 16 yellow sparks that drift out and up and fade over 0.6 s, with a thin ring popping out.
 - **Icons redrawn:** Flash is a burst of light where it lands, with a ring of yellow sparks where it left; Barrier is a gold figure inside a golden bubble with faint hex lines.
+- **Moves before a dash are dropped.** `start_dash()` already ended a move order, but a held right-click kept re-issuing it whenever the world spot under the cursor changed (aiming the dash, or the follow camera scrolling), so Lucian walked on after landing. Lucian now emits `dash_started`, and `LucianController` drops the held move on it. A merchant visit ends with the dash too. A right-click during the dash is kept and walked after it; attack orders still carry on. Tests: `tests/unit/test_lucian_controller.gd`.
 
 ### Running the checks
 

@@ -27,7 +27,7 @@
 
 | Input | Action |
 |---|---|
-| Right-click | Move |
+| Right-click | Move (hold to keep following the cursor). A dash (E, Galeforce, Rocketbelt) drops a move or merchant visit ordered before it, even with the button still held: right-click again, during the dash or after it, to walk on. |
 | Left-click on enemy | Attack |
 | A + left-click | Attack-move |
 | Q / W / E / R | Skills |

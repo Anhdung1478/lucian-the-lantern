@@ -68,6 +68,7 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | Stats with a bonus in yellow; base + bonus on hover | A number turns yellow when items, passives, buffs or cheats add to what the level alone gives. Its hover card shows "60 base + 22 bonus" with the bonus in yellow. |
 | Redraw the Flash and Barrier icons | Flash: a burst of light where it lands and a ring of yellow sparks where it left. Barrier: a gold figure inside a golden bubble. |
 | Every dash shows a trail; Flash only marks where Lucian was | E (light blue), Galeforce (pale green) and Rocketbelt (violet) leave a trail that grows behind Lucian from the start of the dash and fades once it lands. Flash leaves none: yellow sparks ring the spot Lucian left, drift out and fade in 0.6 s. |
+| A move clicked before a dash should be ignored | It was already dropped for a quick click, but with right-click still held, Lucian kept following the cursor after the dash. Now any dash drops the move (and a merchant visit) from before it, even while the button is held. Right-click again, during the dash or after it, to walk on. Attacks still carry on. |
 
 ## Choices I made where the request was open
 

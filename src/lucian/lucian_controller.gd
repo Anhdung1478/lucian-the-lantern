@@ -23,6 +23,12 @@ var _attack_move_armed := false
 @onready var lucian: Lucian = get_parent()
 
 
+func _ready() -> void:
+	# A right-click held from before a dash stops steering Lucian; a new
+	# click (during the dash or after it) walks on.
+	lucian.dash_started.connect(func() -> void: _move_held = false)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		# A focused debug SpinBox would otherwise keep eating Q/W/E/R.

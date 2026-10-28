@@ -7,6 +7,8 @@ extends CharacterBody2D
 
 ## Lucian walked into range of the merchant he was sent to.
 signal merchant_reached(merchant: Merchant)
+## A dash started; the controller drops a held right-click with it.
+signal dash_started
 
 enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE, VISIT }
 
@@ -420,7 +422,8 @@ func is_cast_locked() -> bool:
 
 
 ## Dashes through enemies (walls still stop him), leaving a trail in
-## `trail_color`. A move order ends here, but attack orders carry on, and the
+## `trail_color`. A move or merchant visit ordered before the dash ends here
+## (the player clicks again to walk on), but attack orders carry on, and the
 ## attack timer resets.
 func start_dash(direction: Vector2, distance: float, speed: float, trail_color := DashTrail.LIGHT) -> void:
 	_cancel_windup()
@@ -429,9 +432,10 @@ func start_dash(direction: Vector2, distance: float, speed: float, trail_color :
 	_start_dash_trail(trail_color)
 	_attack_cooldown = 0.0
 	collision_mask = Layers.WORLD
-	if _order == Order.MOVE:
+	if _order == Order.MOVE or _order == Order.VISIT:
 		_order = Order.NONE
 	visuals.face(direction)
+	dash_started.emit()
 
 
 func is_dashing() -> bool:
