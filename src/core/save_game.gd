@@ -124,6 +124,26 @@ func set_loadout(index: int, id: StringName) -> void:
 	changed.emit()
 
 
+## Buys skin `id` with purple essence (it is not equipped). False when it is
+## unknown, already owned or too expensive.
+func buy_skin(id: StringName) -> bool:
+	var data := Skins.find(id)
+	if data.id != id or id in owned_skins or not essences.spend(0, 0, data.cost):
+		return false
+	owned_skins.append(id)
+	changed.emit()
+	return true
+
+
+## Equips an owned skin. False when it is not owned.
+func equip_skin(id: StringName) -> bool:
+	if not id in owned_skins:
+		return false
+	skin = id
+	changed.emit()
+	return true
+
+
 func to_dict() -> Dictionary:
 	return {
 		"version": VERSION,

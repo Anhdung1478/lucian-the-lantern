@@ -163,3 +163,44 @@ func test_set_cleared_keeps_tree_acts_in_step() -> void:
 	assert_eq(save_game.tree.acts_cleared, 1)
 	save_game.reset()
 	assert_eq(save_game.tree.acts_cleared, 0)
+
+
+func test_buy_skin_spends_purple_and_owns_it() -> void:
+	save_game.essences.add(Essences.PURPLE, 30)
+	watch_signals(save_game)
+	assert_true(save_game.buy_skin(&"high_noon"))
+	assert_eq(save_game.essences.amount(Essences.PURPLE), 5)
+	assert_true(&"high_noon" in save_game.owned_skins)
+	assert_eq(save_game.skin, SaveGame.CLASSIC, "buying does not equip")
+	assert_signal_emitted(save_game, "changed")
+
+
+func test_buy_skin_fails_when_short_owned_or_unknown() -> void:
+	save_game.essences.add(Essences.PURPLE, 24)
+	assert_false(save_game.buy_skin(&"high_noon"))
+	assert_eq(save_game.essences.amount(Essences.PURPLE), 24)
+	save_game.essences.add(Essences.PURPLE, 100)
+	assert_true(save_game.buy_skin(&"high_noon"))
+	var left := save_game.essences.amount(Essences.PURPLE)
+	assert_false(save_game.buy_skin(&"high_noon"), "already owned")
+	assert_eq(save_game.essences.amount(Essences.PURPLE), left)
+	assert_false(save_game.buy_skin(&"nope"))
+	assert_false(save_game.buy_skin(SaveGame.CLASSIC))
+
+
+func test_equip_skin_needs_ownership() -> void:
+	assert_false(save_game.equip_skin(&"vampire"))
+	assert_eq(save_game.skin, SaveGame.CLASSIC)
+	save_game.essences.add(Essences.PURPLE, 25)
+	save_game.buy_skin(&"vampire")
+	watch_signals(save_game)
+	assert_true(save_game.equip_skin(&"vampire"))
+	assert_eq(save_game.skin, &"vampire")
+	assert_signal_emitted(save_game, "changed")
+
+
+func test_buy_and_equip_write_no_file() -> void:
+	save_game.essences.add(Essences.PURPLE, 25)
+	save_game.buy_skin(&"vampire")
+	save_game.equip_skin(&"vampire")
+	assert_false(save_game.slot_exists(1))

@@ -111,7 +111,9 @@ func _build() -> void:
 	tree_section.confirm = confirm
 	area.add_child(tree_section)
 	sections.append(tree_section)
-	sections.append(_placeholder(area, "Skin Shop"))
+	var skin_shop := SkinShop.new()
+	area.add_child(skin_shop)
+	sections.append(skin_shop)
 	var journey := JourneySection.new()
 	journey.start_training.connect(_start_training)
 	area.add_child(journey)
@@ -156,16 +158,6 @@ func _build() -> void:
 	# The pop-up and the tooltip come last, so they read input first.
 	add_child(confirm)
 	add_child(HoverTip.new())
-
-
-## A stand-in page until the section is built.
-func _placeholder(parent: Control, text: String) -> Control:
-	var page := CenterContainer.new()
-	page.set_anchors_preset(Control.PRESET_FULL_RECT)
-	page.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	page.add_child(UiStyle.label(text, 36, UiStyle.DIM_COLOR))
-	parent.add_child(page)
-	return page
 
 
 func _start_training() -> void:
