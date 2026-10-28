@@ -91,6 +91,37 @@ func test_barrier_heal_and_clarity() -> void:
 	assert_almost_eq(lucian.mana, lucian.stats.max_mana * 0.5, 0.01)
 
 
+func test_heal_and_clarity_show_their_effect_on_lucian() -> void:
+	lucian.summoners.slots = [&"heal", &"clarity"]
+	assert_true(lucian.use_summoner(0, Vector2.ZERO))
+	assert_eq(lucian.get_children().filter(func(node: Node) -> bool: return node is HealBurst).size(), 1)
+	assert_true(lucian.use_summoner(1, Vector2.ZERO))
+	assert_eq(lucian.get_children().filter(func(node: Node) -> bool: return node is ClarityBurst).size(), 1)
+	await wait_seconds(1.0)
+	assert_eq(lucian.get_children().filter(func(node: Node) -> bool: return node is HealBurst or node is ClarityBurst).size(), 0, "gone after 0.9 s")
+
+
+func ghost_images() -> Array:
+	return lucian.get_parent().get_children().filter(func(node: Node) -> bool: return node is GhostImage)
+
+
+func test_ghost_leaves_afterimages_behind_lucian_while_he_moves() -> void:
+	lucian.summoners.set_spell(0, &"ghost")
+	assert_true(lucian.use_summoner(0, Vector2.ZERO))
+	await wait_physics_frames(5)
+	assert_eq(ghost_images().size(), 0, "none while standing")
+	lucian.command_move(Vector2(1000, 0))
+	await wait_seconds(0.3)
+	assert_gt(ghost_images().size(), 2)
+	for image: GhostImage in ghost_images():
+		assert_lt(image.position.x, lucian.global_position.x, "behind him")
+		assert_lt(image.get_index(), lucian.get_index(), "drawn under him")
+	lucian.set_ghosted(0.0)
+	# The last ones fade within 0.35 s, and no new ones come.
+	await wait_seconds(0.5)
+	assert_eq(ghost_images().size(), 0)
+
+
 func test_barrier_runs_out() -> void:
 	lucian.add_barrier(50.0, 0.1)
 	await wait_seconds(0.2)

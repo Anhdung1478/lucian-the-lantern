@@ -68,6 +68,7 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | Stats with a bonus in yellow; base + bonus on hover | A number turns yellow when items, passives, buffs or cheats add to what the level alone gives. Its hover card shows "60 base + 22 bonus" with the bonus in yellow. |
 | Redraw the Flash and Barrier icons | Flash: a burst of light where it lands and a ring of yellow sparks where it left. Barrier: a gold figure inside a golden bubble. |
 | Every dash shows a trail; Flash only marks where Lucian was | E (light blue), Galeforce (pale green) and Rocketbelt (violet) leave a trail that grows behind Lucian from the start of the dash and fades once it lands. Flash leaves none: yellow sparks ring the spot Lucian left, drift out and fade in 0.6 s. |
+| Effects for Clarity and Heal; a trail for Ghost | Heal: a green ring spreads out and green crosses rise around Lucian. Clarity: blue motes spiral into him, then a small flash. Both follow him for 0.9 s. Ghost: pale teal afterimages of Lucian trail behind him while he runs, each fading in 0.35 s. I read "a trail before Lucian" as behind him, where he has been. |
 | A move clicked before a dash should be ignored | It was already dropped for a quick click, but with right-click still held, Lucian kept following the cursor after the dash. Now any dash drops the move (and a merchant visit) from before it, even while the button is held. Right-click again, during the dash or after it, to walk on. Attacks still carry on. |
 
 ## Choices I made where the request was open
@@ -111,10 +112,11 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | ![Stat card](phase4/stats_2_hover.png) Hovering Attack Damage | ![Item card](phase4/stats_3_item_card.png) Item card: icon, amount, name |
 | ![RFC ring](phase4/rfc_ring_0_ready.png) RFC at full charge: the 675 range ring | ![Rocketbelt](phase4/actives_2_rocketbelt.png) Rocketbelt arc, flying ahead of Lucian; mid-dash, its violet trail grows behind him |
 | ![Summoners](phase4/summoners_0_hud_and_picker.png) D/F on the HUD, debug picker | ![Smite](phase4/summoners_3_smite.png) Smite: 450 true damage; Barrier on the HP bar, Ghost and Barrier buffs |
-| ![Summoner card](phase4/summoners_5_card.png) Heal's card; cooldowns on D and F | ![Resolution](phase4/settings_3_graphics.png) Graphics → Resolution |
+| ![Summoner card](phase4/summoners_6_card.png) Heal's card; cooldowns on D and F | ![Resolution](phase4/settings_3_graphics.png) Graphics → Resolution |
 | ![Camera away](phase4/camera_0_away.png) Free camera panned away | ![Camera back](phase4/camera_1_back.png) After Space |
 | ![Galeforce](phase4/actives_1_galeforce.png) Follow-up: Galeforce's missiles curving onto the dummy, its green dash trail; Lucian's HP bar | ![Regen](phase4/stats_1_extra.png) Follow-up: one regen cell, "+0.8/s" on the HP bar |
-| ![Flash](phase4/summoners_1_flash.png) Follow-up: Flash's yellow sparks where Lucian stood, no trail | |
+| ![Flash](phase4/summoners_1_flash.png) Follow-up: Flash's yellow sparks where Lucian stood, no trail | ![Ghost](phase4/summoners_2_barrier_ghost.png) Follow-up: Ghost's afterimages behind Lucian (Barrier on the HP bar) |
+| ![Heal](phase4/summoners_4_heal.png) Follow-up: Heal's ring and rising crosses | ![Clarity](phase4/summoners_5_clarity.png) Follow-up: Clarity's motes spiralling in |
 
 ## Known limits
 

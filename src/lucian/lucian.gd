@@ -509,6 +509,13 @@ func spawn(node: Node) -> void:
 	projectile_parent.add_child(node)
 
 
+## Adds an effect next to Lucian in the world, just before him, so it is
+## drawn under him but over the floor.
+func spawn_under(node: Node) -> void:
+	get_parent().add_child(node)
+	get_parent().move_child(node, get_index())
+
+
 ## Direction from Lucian to `aim`; his facing if the aim is right on top of him.
 func aim_direction(aim: Vector2) -> Vector2:
 	var offset := aim - global_position

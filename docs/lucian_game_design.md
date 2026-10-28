@@ -255,10 +255,10 @@ Placeholder numbers. Ability haste doesn't shorten them, and each spell keeps it
 | Spell | Cooldown | Effect |
 |---|---|---|
 | Flash | 90 s | Blink up to 400 toward the cursor. If that spot is inside a wall or an enemy, land just short of it (so Flash can cross them). A blink leaves no trail: yellow sparks ring the spot Lucian left. |
-| Ghost | 60 s | +40% move speed and pass through enemies for 6 s. |
+| Ghost | 60 s | +40% move speed and pass through enemies for 6 s. Pale afterimages trail behind Lucian as he runs. |
 | Barrier | 60 s | Shield of 95 + 18 × level for 2.5 s; heal and shield power makes it stronger. |
-| Heal | 60 s | Heal 80 + 15 × level, +30% move speed fading over 1 s. |
-| Clarity | 45 s | Restore 50% of max mana. |
+| Heal | 60 s | Heal 80 + 15 × level, +30% move speed fading over 1 s. A green ring spreads out and crosses rise around Lucian. |
+| Clarity | 45 s | Restore 50% of max mana. Blue motes spiral into Lucian. |
 | Smite | 30 s | 450 true damage to the enemy nearest the cursor within 500, heal 10% of max HP. |
 
 Until the Evolution Tree exists, both slots are open and every spell is available: D and F are picked in the debug table (default Flash on D, Heal on F).

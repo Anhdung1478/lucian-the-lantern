@@ -835,6 +835,8 @@ func scenario_summoners() -> void:
 	lucian.summoners.set_spell(1, &"ghost")
 	lucian.use_summoner(0, Vector2.ZERO)
 	lucian.use_summoner(1, Vector2.ZERO)
+	# Running under Ghost leaves afterimages behind him.
+	lucian.command_move(lucian.global_position + Vector2(-600, 0))
 	await wait(0.3)
 	print("shield (expect 113): ", roundi(lucian.total_shield()), "  ghosted (expect true): ", lucian.is_ghosted())
 	await shot("summoners_2_barrier_ghost")
@@ -848,16 +850,20 @@ func scenario_summoners() -> void:
 	await wait(0.1)
 	await shot("summoners_3_smite")
 	lucian.use_summoner(1, Vector2.ZERO)
+	print("hp after heal (expect 455): ", roundi(lucian.hp))
+	await wait(0.25)
+	await shot("summoners_4_heal")
+	await wait(0.8)
 	lucian.summoners.set_spell(0, &"clarity")
 	lucian.mana = 50.0
 	lucian.use_summoner(0, Vector2.ZERO)
-	print("hp after heal (expect 455): ", roundi(lucian.hp), "  mana after clarity (expect 210): ", roundi(lucian.mana))
-	await wait(0.2)
-	await shot("summoners_4_heal_clarity")
+	print("mana after clarity (expect 210): ", roundi(lucian.mana))
+	await wait(0.3)
+	await shot("summoners_5_clarity")
 	var slot: Control = hud.skill_row.get_child(hud.skill_row.get_child_count() - 1)
 	await mouse_move(control_center(slot))
 	await wait_for_tooltip(slot)
-	await shot("summoners_5_card")
+	await shot("summoners_6_card")
 
 
 func scenario_camera() -> void:

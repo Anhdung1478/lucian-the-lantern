@@ -15,3 +15,7 @@ func face(direction: Vector2) -> void:
 
 func muzzle_position(gun: Gun) -> Vector2:
 	return _muzzles[gun].global_position
+
+
+func body_texture() -> Texture2D:
+	return ($Body as Sprite2D).texture

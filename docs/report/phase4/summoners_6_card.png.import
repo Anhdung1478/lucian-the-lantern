@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cy2hagm0s7rvv"
-path="res://.godot/imported/summoners_5_card.png-3d4d0ac438756640b5fd51d243b05989.ctex"
+uid="uid://fsa4553swhya"
+path="res://.godot/imported/summoners_6_card.png-0764f93044b297404927fbef061271e4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/report/phase4/summoners_5_card.png"
-dest_files=["res://.godot/imported/summoners_5_card.png-3d4d0ac438756640b5fd51d243b05989.ctex"]
+source_file="res://docs/report/phase4/summoners_6_card.png"
+dest_files=["res://.godot/imported/summoners_6_card.png-0764f93044b297404927fbef061271e4.ctex"]
 
 [params]
 

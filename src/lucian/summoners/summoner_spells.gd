@@ -17,6 +17,8 @@ const FLASH_RANGE := 400.0
 const FLASH_STEP := 10.0
 const GHOST_SPEED := 0.4
 const GHOST_TIME := 6.0
+## Ghost leaves an afterimage each time Lucian has moved this far.
+const GHOST_IMAGE_SPACING := 28.0
 const BARRIER_BASE := 95.0
 const BARRIER_PER_LEVEL := 18.0
 const BARRIER_TIME := 2.5
@@ -37,6 +39,8 @@ var slots: Array[StringName] = [&"flash", &"heal"]
 
 ## Spell id -> Cooldown.
 var _cooldowns := {}
+## Where Ghost's last afterimage was left.
+var _ghost_image_at := Vector2.ZERO
 
 
 func setup(owner_lucian: Lucian) -> void:
@@ -85,6 +89,7 @@ func use(slot: int, aim: Vector2) -> bool:
 		&"ghost":
 			lucian.add_speed_buff(&"ghost", 0.0, GHOST_SPEED, GHOST_TIME)
 			lucian.set_ghosted(GHOST_TIME)
+			_ghost_image_at = lucian.global_position
 			Sfx.play(&"potion")
 		&"barrier":
 			lucian.add_barrier(BARRIER_BASE + BARRIER_PER_LEVEL * lucian.progress.level, BARRIER_TIME)
@@ -92,9 +97,11 @@ func use(slot: int, aim: Vector2) -> bool:
 		&"heal":
 			lucian.heal(HEAL_BASE + HEAL_PER_LEVEL * lucian.progress.level)
 			lucian.add_speed_buff(&"heal", 0.0, HEAL_SPEED, HEAL_SPEED_TIME, true)
+			_show_on_lucian(HealBurst.new())
 			Sfx.play(&"potion")
 		&"clarity":
 			lucian.restore_mana(lucian.stats.max_mana * CLARITY_MANA)
+			_show_on_lucian(ClarityBurst.new())
 			Sfx.play(&"potion")
 		&"smite":
 			if not _smite(aim):
@@ -106,6 +113,20 @@ func use(slot: int, aim: Vector2) -> bool:
 func _physics_process(delta: float) -> void:
 	for running: Cooldown in _cooldowns.values():
 		running.reduce(delta)
+	if lucian.is_ghosted() and lucian.global_position.distance_to(_ghost_image_at) >= GHOST_IMAGE_SPACING:
+		_ghost_image_at = lucian.global_position
+		if not GameSettings.instance().low_effects():
+			var image := GhostImage.new()
+			image.setup(lucian.visuals.body_texture(), lucian.global_position, lucian.visuals.rotation)
+			lucian.spawn_under(image)
+
+
+## Heal's and Clarity's effects follow Lucian. None on low effects.
+func _show_on_lucian(effect: Node2D) -> void:
+	if GameSettings.instance().low_effects():
+		effect.free()
+		return
+	lucian.add_child(effect)
 
 
 ## Blinks toward the cursor, at most FLASH_RANGE, stepping back until
