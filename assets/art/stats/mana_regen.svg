@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- Mana Regen: a droplet and an up arrow -->
-  <g transform="translate(-2 8) scale(0.8)">
-    <path d="M 32 6 C 42 22 50 30 50 40 C 50 51 42 58 32 58 C 22 58 14 51 14 40 C 14 30 22 22 32 6 Z" fill="#8fb8ff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  </g>
-  <path d="M 47 34 L 47 19 L 41 19 L 51 6 L 61 19 L 55 19 L 55 34 Z" fill="#8fb8ff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-</svg>

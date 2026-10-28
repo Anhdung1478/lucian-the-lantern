@@ -9,7 +9,7 @@ script = ExtResource("1_ucoc3")
 effect_name = "Cloudburst"
 active = true
 cooldown = 90.0
-description = "Dash a short distance toward the cursor and fire three missiles at the enemy with the lowest health nearby, each dealing [magic]60 (+15% bonus AD) magic damage[/magic]."
+description = "Dash a short distance toward the cursor and fire three missiles that curve onto the enemy with the lowest health nearby, each dealing [magic]60 (+15% bonus AD) magic damage[/magic]. You can't move while they leave."
 
 [resource]
 script = ExtResource("3_06e3t")

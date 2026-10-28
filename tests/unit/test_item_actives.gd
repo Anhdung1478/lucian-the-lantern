@@ -62,18 +62,39 @@ func test_galeforce_dashes_then_fires_missiles() -> void:
 	var start := lucian.global_position
 	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
 	assert_true(lucian.is_dashing())
-	await wait_seconds(1.0)
+	await wait_seconds(1.5)
 	assert_almost_eq(lucian.global_position.distance_to(start), ItemActives.GALEFORCE_DASH, 2.0)
 	assert_eq(sources.count(&"galeforce"), ItemActives.GALEFORCE_MISSILES)
 
 
-func test_rocketbelt_dashes_fires_bolts_and_speeds_up() -> void:
+func test_galeforce_holds_lucian_while_the_missiles_leave() -> void:
+	equip(&"galeforce")
+	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
+	lucian.command_move(Vector2(-1000, -200))
+	await wait_seconds(0.3)
+	assert_almost_eq(lucian.global_position, Vector2(0, -200), Vector2(2, 2), "still where the dash ended")
+	await wait_seconds(0.4)
+	assert_lt(lucian.global_position.x, -20.0, "walking again")
+
+
+func test_rocketbelt_dashes_and_fires_bolts_without_move_speed() -> void:
 	equip(&"hextech_rocketbelt")
 	var speed := lucian.current_move_speed()
 	assert_true(lucian.use_equip_slot(0, dummy.position))
-	assert_gt(lucian.current_move_speed(), speed * 1.5)
+	assert_eq(lucian.current_move_speed(), speed)
 	await wait_seconds(0.5)
 	assert_eq(sources.count(&"hextech_rocketbelt"), 1, "each enemy is hit once")
+
+
+func test_rocketbelt_holds_lucian_until_its_bolts_land() -> void:
+	equip(&"hextech_rocketbelt")
+	assert_lt(ItemActives.ROCKETBELT_DASH_SPEED, ItemActives.ROCKETBELT_BOLT_SPEED, "the bolts outrun Lucian")
+	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
+	lucian.command_move(Vector2(-1000, -275))
+	await wait_seconds(0.5)
+	assert_almost_eq(lucian.global_position, Vector2(0, -275), Vector2(2, 2), "still where the dash ended")
+	await wait_seconds(0.4)
+	assert_lt(lucian.global_position.x, -20.0, "walking again")
 
 
 func test_rocketbelt_bolts_reach_900_units() -> void:
