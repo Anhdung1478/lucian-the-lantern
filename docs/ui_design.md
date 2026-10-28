@@ -249,7 +249,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - Options:
   - **Resume**
   - **Settings** (cast mode, camera, volume, etc.)
-  - **Leave this stage** (keeps all essences collected; the game auto-saves). Works since Phase 5: the stage counts as left, the game saves to the current slot and goes back to the main screen (Journey → Training).
+  - **Leave this stage** (keeps all essences collected; the game auto-saves). Works since Phase 5: the stage counts as left, the game saves to the current slot and goes back to the main screen (Journey → Training). When `stage.tscn` runs on its own, it stays disabled ("Not available yet").
   - **Exit the game** (asks **"Save before leaving?"** Yes / No; see the game design doc §15)
 
 ## 5. Settings (from the ESC menu)

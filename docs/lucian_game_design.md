@@ -521,6 +521,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - **Leaving the game** (Exit the game in the ESC menu or the gear menu, Leave to main menu, or closing the window) asks **"Save before leaving?"** (Yes / No).
   - **Yes:** saves to the current slot right away, then leaves. Inside a stage, this keeps the essences collected so far, as leaving the stage would.
   - **No:** leaves without saving. Everything since the last save is lost.
+  - If the save fails, it asks **"Could not save. Quit anyway?"**: Yes leaves, No goes back to the game. A failed auto-save after a stage shows a red "Could not save" on the main screen.
 - Settings are not part of the save: they are written to `user://settings.json` on every change.
 
 ### Implementation notes (Godot 4)
@@ -538,9 +539,9 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 | `cleared` | Cleared stage ids: `["1-1", "2-1"]` |
 | `endless_best` | Best Endless wave |
 
-- Numbers are converted back with `int()` when loading (JSON numbers load as floats). Unknown keys, node ids, skins and stage ids are dropped, so an old or edited file still loads.
+- Numbers are converted back with `int()` when loading (JSON numbers load as floats). Unknown keys, node ids, skins, spell ids and stage ids are dropped, so an old or edited file still loads.
 - IDs are saved, not display names.
-- The old save is copied to the backup file before writing; the backup loads if the main file is broken. With both broken, it's a new game.
+- A save is written to a temp file first. Then the old save becomes the backup (only if it still reads, so a broken file never replaces a good backup) and the temp file replaces it. If anything fails, the old file and backup stay as they were. The backup loads if the main file is broken. With both broken, it's a new game.
 - Not saved yet: which bosses already gave their first-time purple (there are no bosses yet).
 - The main screen's debug table (F3 + Q) gives essences, sets the acts cleared, maxes or clears the tree, and resets the progress.
 

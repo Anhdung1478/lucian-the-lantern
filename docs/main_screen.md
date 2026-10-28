@@ -46,7 +46,7 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 | Save as copy | Turns the pop-up into a slot list: "Slot 1 (current)" (disabled), then "Slot 2 · empty" or "Slot 2 · saved 2026-10-28 14:03", and Back. An empty slot is written at once; a used one asks **"Overwrite slot 2?"** (Yes / No). Toast: "Copied to slot 2". The current slot stays slot 1 |
 | Settings | The same Settings screen as in a stage; Back returns to the menu |
 | Leave to main menu | **Disabled** until the title screen exists. Hover: "The title screen comes later" |
-| Exit the game | Asks **"Save before leaving?"** (Yes / No), then closes the game. Closing the window asks the same |
+| Exit the game | Asks **"Save before leaving?"** (Yes / No), then closes the game. Closing the window asks the same. If the save fails: "Could not save. Quit anyway?" (No goes back) |
 
 - **Toast:** a short message at the top center, inside the top bar, fading out over 1.6 s.
 - **ESC**, in this order:

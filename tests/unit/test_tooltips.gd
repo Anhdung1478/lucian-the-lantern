@@ -85,6 +85,6 @@ func test_buff_cards_build_for_every_buff() -> void:
 
 func test_summoner_cards_build() -> void:
 	for spell in SummonerSpells.SPELLS:
-		var card := TooltipCard.summoner(spell, "D")
+		var card := TooltipCard.summoner(spell, "D", spell.cooldown)
 		assert_not_null(card, str(spell.id))
 		card.free()

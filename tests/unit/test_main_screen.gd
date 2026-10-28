@@ -3,12 +3,14 @@ extends GutTest
 const PREFIX := "user://test_main_screen_save_slot_"
 
 var main: MainScreen
+var _prefix := ""
 
 
 func before_each() -> void:
 	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
 	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
 		SaveGame._instance = SaveGame.new(PREFIX)
+	_prefix = SaveGame.instance().prefix
 	SaveGame.instance().reset()
 	SaveGame.instance().slot = 1
 	_remove_files()
@@ -17,6 +19,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	SaveGame.instance().prefix = _prefix
 	_remove_files()
 
 
@@ -67,6 +70,25 @@ func test_save_writes_slot_one_and_toasts() -> void:
 	_press("Save")
 	assert_true(FileAccess.file_exists(SaveGame.instance().path(1)))
 	assert_eq(main.toast_text(), "Saved to slot 1")
+
+
+func test_a_failed_save_shows_a_red_toast() -> void:
+	# A folder that doesn't exist: the save fails.
+	SaveGame.instance().prefix = "user://no_such_dir/test_main_screen_save_slot_"
+	_press("Save")
+	assert_eq(main.toast_text(), "Could not save")
+	assert_eq(main._toast.get_theme_color(&"font_color"), UiStyle.ERROR_COLOR)
+	assert_push_warning_count(1)
+
+
+func test_answer_does_nothing_while_the_popup_is_closed() -> void:
+	var answers: Array[bool] = []
+	main.confirm.answer(true)
+	main.confirm.ask("Sure?", func() -> void: answers.append(true), func() -> void: answers.append(false))
+	main.confirm.answer(true)
+	main.confirm.answer(true)
+	main.confirm.answer(false)
+	assert_eq(answers, [true] as Array[bool], "no stale answer once closed")
 
 
 func test_the_toast_stays_in_the_top_bar() -> void:

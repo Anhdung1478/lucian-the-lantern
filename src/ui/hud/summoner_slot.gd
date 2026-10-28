@@ -32,7 +32,8 @@ func tooltip_content() -> Control:
 	var spell := lucian.summoners.spell_in(slot)
 	if spell == null:
 		return TooltipCard.note("No spell: pick one in Journey before starting.")
-	return TooltipCard.summoner(spell, _key(), lucian.summoners.upgrade_text(spell.id))
+	var summoners := lucian.summoners
+	return TooltipCard.summoner(spell, _key(), summoners.cooldown_of(spell), summoners.upgrade_text(spell.id))
 
 
 func tooltip_place() -> HoverTip.Place:

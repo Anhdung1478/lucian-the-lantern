@@ -9,6 +9,9 @@ signal leave_requested
 signal exit_requested
 
 const BUTTON_SIZE := Vector2(340, 56)
+const NOT_AVAILABLE := "Not available yet"
+
+var _leave: Button
 
 
 func _ready() -> void:
@@ -42,8 +45,18 @@ func _build() -> void:
 	box.add_child(HSeparator.new())
 	_button(box, "Resume", func() -> void: resume_requested.emit())
 	_button(box, "Settings", func() -> void: settings_requested.emit())
-	_button(box, "Leave this stage", func() -> void: leave_requested.emit())
+	_leave = _button(box, "Leave this stage", func() -> void: leave_requested.emit())
 	_button(box, "Exit the game", func() -> void: exit_requested.emit())
+
+
+## Leave this stage is shown disabled, with a hover note, when nothing would
+## take the player anywhere (the stage running alone).
+func set_leave_enabled(enabled: bool) -> void:
+	_leave.disabled = not enabled
+	if enabled:
+		_leave.remove_meta(&"hover_text")
+	else:
+		_leave.set_meta(&"hover_text", NOT_AVAILABLE)
 
 
 ## A button without an action is shown disabled, with a hover note.
@@ -56,6 +69,6 @@ func _button(parent: Control, text: String, action: Callable) -> Button:
 		button.pressed.connect(action)
 	else:
 		button.disabled = true
-		button.set_meta(&"hover_text", "Not available yet")
+		button.set_meta(&"hover_text", NOT_AVAILABLE)
 	parent.add_child(button)
 	return button

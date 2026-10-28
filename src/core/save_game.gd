@@ -157,17 +157,34 @@ func to_dict() -> Dictionary:
 	}
 
 
-## Old backup first: the file being replaced becomes the backup.
+## Writes `<file>.tmp` first. Once it is written, the file being replaced
+## becomes the backup (only when it still reads, so a broken file never
+## replaces a good backup), then the temp file takes its place. On any
+## failure the old file and backup stay as they were.
 func _write(of_slot: int) -> bool:
 	var file_path := path(of_slot)
-	if FileAccess.file_exists(file_path):
-		DirAccess.copy_absolute(ProjectSettings.globalize_path(file_path), ProjectSettings.globalize_path(backup_path(of_slot)))
-	var file := FileAccess.open(file_path, FileAccess.WRITE)
+	var temp_path := file_path + ".tmp"
+	var file := FileAccess.open(temp_path, FileAccess.WRITE)
 	if file == null:
-		push_warning("Could not save to %s" % file_path)
-		return false
-	file.store_string(JSON.stringify(to_dict(), "\t"))
+		return _write_failed(file_path, temp_path)
+	var written := file.store_string(JSON.stringify(to_dict(), "\t")) and file.get_error() == OK
+	file.close()
+	if not written:
+		return _write_failed(file_path, temp_path)
+	var main := ProjectSettings.globalize_path(file_path)
+	if not _read(file_path).is_empty() and DirAccess.copy_absolute(main, ProjectSettings.globalize_path(backup_path(of_slot))) != OK:
+		return _write_failed(file_path, temp_path)
+	# Replaces the old file (checked on Windows too).
+	if DirAccess.rename_absolute(ProjectSettings.globalize_path(temp_path), main) != OK:
+		return _write_failed(file_path, temp_path)
 	return true
+
+
+func _write_failed(file_path: String, temp_path: String) -> bool:
+	push_warning("Could not save to %s" % file_path)
+	if FileAccess.file_exists(temp_path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(temp_path))
+	return false
 
 
 func _read(file_path: String) -> Dictionary:
@@ -181,7 +198,7 @@ func _read(file_path: String) -> Dictionary:
 
 
 ## Each key is type-checked and falls back to the new-game value. Unknown
-## skin and stage ids are dropped.
+## skin, spell and stage ids are dropped.
 func _apply(data: Dictionary) -> void:
 	var saved_tree: Variant = data.get("tree", {})
 	tree.from_dict(saved_tree if saved_tree is Dictionary else {})
@@ -198,10 +215,14 @@ func _apply(data: Dictionary) -> void:
 	owned_skins = owned
 	var equipped: Variant = skin_data.get("equipped", "")
 	skin = StringName(equipped) if equipped is String and StringName(equipped) in owned else CLASSIC
+	# Each key keeps a known spell id; anything else, or F repeating D, is none.
 	var saved_loadout: Variant = data.get("loadout", [])
 	loadout = [&"", &""]
-	if saved_loadout is Array and saved_loadout.size() == 2 and saved_loadout[0] is String and saved_loadout[1] is String:
-		loadout = [StringName(saved_loadout[0]), StringName(saved_loadout[1])]
+	if saved_loadout is Array and saved_loadout.size() == 2:
+		for i in 2:
+			var id: Variant = saved_loadout[i]
+			if id is String and StringName(id) in StageSetup.SPELL_IDS and not StringName(id) in loadout:
+				loadout[i] = StringName(id)
 	cleared = []
 	var saved_cleared: Variant = data.get("cleared", [])
 	if saved_cleared is Array:

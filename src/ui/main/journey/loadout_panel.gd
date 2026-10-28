@@ -68,6 +68,7 @@ func _ready() -> void:
 	var save := SaveGame.instance()
 	save.changed.connect(refresh)
 	save.tree.changed.connect(refresh)
+	GameSettings.instance().changed.connect(_on_setting_changed)
 	refresh()
 
 
@@ -114,6 +115,12 @@ func refresh() -> void:
 			picks[i].remove_meta(&"hover_text")
 	if menu.visible and picks[menu.slot].disabled:
 		close_menu()
+
+
+## A rebound D or F key shows its new label.
+func _on_setting_changed(key: StringName) -> void:
+	if key == &"bindings":
+		refresh()
 
 
 func _on_picked(id: StringName) -> void:

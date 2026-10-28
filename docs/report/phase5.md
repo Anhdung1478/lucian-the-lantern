@@ -88,9 +88,9 @@ Settled while building:
 
 ## Verification
 
-- **Unit and scene tests (GUT):** **579 of 579 pass**, up from 413 at the plan commit.
+- **Unit and scene tests (GUT):** **596 of 596 pass**, up from 413 at the plan commit (579 before the final review's fixes).
   - New test files: `test_essences`, `test_save_game`, `test_evolution_tree`, `test_tree_data_files`, `test_journey`, `test_skins`, `test_stage_setup`, `test_game`, `test_main_screen`, `test_journey_section`, `test_tree_section`, `test_skin_shop`, `test_main_debug`.
-  - New cases were added to `test_summoner_spells`, `test_lucian_casting`, `test_shop` and `test_skill_slot`. No line of an older test was changed, so `stage.tscn` on its own still behaves as in Phase 4.
+  - New cases were added to `test_summoner_spells`, `test_lucian_casting`, `test_shop` and `test_skill_slot`. No line of an older test was changed, apart from one call in `test_tooltips` that now passes the summoner card's cooldown (final review), so `stage.tscn` on its own still behaves as in Phase 4.
 - **Screenshot runs in a real window:**
   - New scenarios: `art_sheet`, `main_journey`, `main_acts`, `main_endless`, `main_tree`, `main_tree_max`, `main_skins`, `main_gear`, `main_debug`, `training_setup`, `skins_stage`. Each prints its expected and actual values, and every check matched.
   - They start the real game, so they also cover Start Training, Leave this stage (back on Journey, save file written) and "Save before leaving?".
@@ -106,6 +106,11 @@ Settled while building:
   - Its test hid that by sending the save's change signal by hand.
 
   Both are fixed. The smaller findings, left as they are for now, are listed at the end of the plan (*Left as is*).
+- **Final review** of the whole phase found 2 important problems, both able to lose progress:
+  - **Two Yes / No pop-ups at once.** With "Overwrite slot 2?" open, closing the window opened "Save before leaving?" under it, and a click on the Yes you saw answered the hidden prompt (save and quit). The save prompt now sits above every other pop-up, and a closed pop-up never answers.
+  - **Saving could fail silently, and a broken save file could replace the good backup.** The game now writes a temp file first and keeps the old file and backup if anything fails. A failed save on leaving asks "Could not save. Quit anyway?"; a failed save after a stage shows a red "Could not save".
+
+  Also fixed: Leave this stage is disabled again when the stage runs on its own (as in Phase 4), the Journey D / F labels follow a rebind, a saved loadout keeps only known spells, and a summoner's card shows the upgraded cooldown. All are listed in the plan (*Fixes from the final review*), each with a test.
 
 ### Visual pass, before and after
 

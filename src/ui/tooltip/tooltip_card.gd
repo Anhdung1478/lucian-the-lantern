@@ -86,14 +86,15 @@ static func skill(lucian: Lucian, shown: LucianSkill, icon_texture: Texture2D, k
 	return card
 
 
-## A summoner spell's card: icon, name, key, cooldown and what it does, and
-## a green line under it for an Evolution Tree `upgrade` ("" for none).
-static func summoner(spell: SummonerData, key: String, upgrade := "") -> Control:
+## A summoner spell's card: icon, name, key, `cooldown` (Lucian's, after any
+## upgrade) and what it does, and a green line under it for an Evolution Tree
+## `upgrade` ("" for none).
+static func summoner(spell: SummonerData, key: String, cooldown: float, upgrade := "") -> Control:
 	var icon := TextureRect.new()
 	icon.texture = spell.icon
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	var card := _card(icon, spell.display_name, "Summoner spell [%s]" % key, "")
-	_body(card, TooltipText.color("Cooldown: ", TooltipText.DIM) + "%s s" % TooltipText.number(spell.cooldown))
+	_body(card, TooltipText.color("Cooldown: ", TooltipText.DIM) + "%s s" % TooltipText.number(cooldown))
 	_separator(card)
 	_body(card, TooltipText.colorize(spell.description))
 	if upgrade != "":

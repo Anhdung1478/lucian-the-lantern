@@ -1645,10 +1645,22 @@ Every other node is where the table says. The node table in `main_screen.md` lis
   - The **toast** sits inside the top bar; it used to cover the Journey tabs.
   - Each has a test.
 
+### Fixes from the final review
+- **Two Yes / No pop-ups at once:** with the main screen's "Overwrite slot N?" (or "Reset the Evolution Tree?") open, closing the window opened "Save before leaving?" on the same layer, 80. The screen's question was drawn on top, but a click answered the hidden prompt (save and quit). `ConfirmPopup` now takes its layer in `_init` (default `ConfirmPopup.LAYER`, 80), and Game's prompt uses `Game.PROMPT_LAYER` (90), so it is drawn on top and gets clicks first. `answer()` does nothing while the pop-up is closed, so an old question never answers.
+- **Safe saves:** `SaveGame._write` writes `save_slot_N.json.tmp` first and checks the write. Only then does the old main file become the backup, and only if it still reads, so a broken main file never replaces a good backup. Then the temp file replaces the main file (`DirAccess.rename_absolute` replaces an existing file on Windows; checked). Any failure returns false with a warning, removes the temp file and leaves the main file and the backup as they were.
+- **A failed save is never silent:**
+  - Yes to "Save before leaving?" with a failed save asks "Could not save. Quit anyway?" on the same prompt. Yes quits; No closes it and the game goes on (unpaused, unless the stage's ESC menu had paused it: that menu is still open).
+  - A failed stage-done save shows the red "Could not save" toast on the main screen it returns to.
+- **Leave this stage** is disabled again ("Not available yet") when `stage.tscn` runs on its own, as in Phase 4: nothing listens to `finished` there. Under Game it works. (`GameMenu.set_leave_enabled()`, called from `Stage._ready`.)
+- **Journey loadout:** the D / F key labels follow a rebind.
+- **Loadout on load:** each key keeps only a known spell id (`StageSetup.SPELL_IDS`); a spell on F that repeats D's becomes none.
+- **Summoner card:** shows Lucian's cooldown after the upgrade (Flash at −20%: 72 s) above "Upgraded: 20% shorter cooldown". `TooltipCard.summoner()` takes the cooldown.
+- **Tests:** one for each fix, plus the gear menu's red "Could not save" toast and `_apply`'s wrong-type fallbacks (`"skins": 5`, an equipped skin that isn't owned, a loadout of the wrong length).
+
 ### Left as is (small, from the reviews)
-- `SaveGame._write` doesn't check that the backup copy and the write succeeded, so a broken main file could overwrite a good backup. `copy_to` and `set_loadout` don't range-check their slot or index. `load_slot` emits `changed` twice.
+- `copy_to` and `set_loadout` don't range-check their slot or index. `load_slot` emits `changed` twice.
 - `EvolutionTree.node()` returns null for an unknown id (callers only pass known ids); setting `acts_cleared` emits `changed` even when it doesn't change.
-- `ConfirmPopup.answer()` runs its callables even when it isn't open; Leave this stage isn't guarded against a double press (the save is the same either way); the mouse stays confined after leaving a stage.
+- Leave this stage isn't guarded against a double press (the save is the same either way); the mouse stays confined after leaving a stage.
 - The spell menu's list doesn't follow a tree change while it is open. A tree purchase refreshes the map twice, and a skin purchase the shop twice. A failed purchase is silent. Tooltips can show while the map is being dragged. Grove names use the fallback font.
 - Debug only:
   - Picking D while F is locked can swap a spell into the locked F.

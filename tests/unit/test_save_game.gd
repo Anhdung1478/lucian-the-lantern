@@ -17,8 +17,8 @@ func after_each() -> void:
 func _delete_all() -> void:
 	var probe := SaveGame.new(PREFIX)
 	for n in range(1, SaveGame.SLOTS + 1):
-		for file in [probe.path(n), probe.backup_path(n)]:
-			if FileAccess.file_exists(file):
+		for file in [probe.path(n), probe.backup_path(n), probe.path(n) + ".tmp"]:
+			if FileAccess.file_exists(file) or DirAccess.dir_exists_absolute(file):
 				DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 
 
@@ -26,6 +26,11 @@ func _write_text(file_path: String, text: String) -> void:
 	var file := FileAccess.open(file_path, FileAccess.WRITE)
 	file.store_string(text)
 	file.close()
+
+
+func _blue_in(file_path: String) -> int:
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(file_path))
+	return int(data.essences.blue)
 
 
 func test_new_game_defaults() -> void:
@@ -81,6 +86,55 @@ func test_broken_main_file_loads_the_backup() -> void:
 	loaded.load_slot(1)
 	assert_eq(loaded.essences.amount(Essences.BLUE), 100)
 	assert_push_warning_count(1)
+
+
+func test_a_broken_main_file_never_replaces_a_good_backup() -> void:
+	save_game.essences.add(Essences.BLUE, 100)
+	save_game.save()
+	save_game.essences.set_amount(Essences.BLUE, 200)
+	save_game.save()
+	_write_text(save_game.path(1), "{not json")
+	save_game.essences.set_amount(Essences.BLUE, 300)
+	assert_true(save_game.save())
+	assert_eq(_blue_in(save_game.backup_path(1)), 100, "the backup keeps the last good copy")
+	assert_eq(_blue_in(save_game.path(1)), 300)
+	assert_false(FileAccess.file_exists(save_game.path(1) + ".tmp"), "no temp file left")
+	assert_push_warning_count(1)
+
+
+func test_a_failed_write_keeps_the_main_file_and_the_backup() -> void:
+	save_game.essences.add(Essences.BLUE, 100)
+	save_game.save()
+	save_game.essences.set_amount(Essences.BLUE, 200)
+	save_game.save()
+	var main_text := FileAccess.get_file_as_string(save_game.path(1))
+	var backup_text := FileAccess.get_file_as_string(save_game.backup_path(1))
+	# A folder where the temp file goes: the write can't open it.
+	var blocker := ProjectSettings.globalize_path(save_game.path(1) + ".tmp")
+	DirAccess.make_dir_absolute(blocker)
+	save_game.essences.set_amount(Essences.BLUE, 300)
+	var saved := save_game.save()
+	DirAccess.remove_absolute(blocker)
+	assert_false(saved)
+	assert_eq(FileAccess.get_file_as_string(save_game.path(1)), main_text)
+	assert_eq(FileAccess.get_file_as_string(save_game.backup_path(1)), backup_text)
+	assert_push_warning_count(1)
+
+
+func test_saving_into_a_missing_folder_fails() -> void:
+	var nowhere := SaveGame.new("user://no_such_dir/save_slot_")
+	assert_false(nowhere.save())
+	assert_false(nowhere.copy_to(2))
+	assert_false(nowhere.slot_exists(1))
+	assert_push_warning_count(2)
+
+
+func test_a_leftover_temp_file_is_replaced() -> void:
+	_write_text(save_game.path(1) + ".tmp", "half a save")
+	save_game.essences.add(Essences.BLUE, 40)
+	assert_true(save_game.save())
+	assert_false(FileAccess.file_exists(save_game.path(1) + ".tmp"))
+	assert_eq(_blue_in(save_game.path(1)), 40)
 
 
 func test_both_files_broken_is_a_new_game() -> void:
@@ -150,6 +204,36 @@ func test_equipped_skin_not_owned_is_classic() -> void:
 	save_game.load_slot(1)
 	assert_eq(save_game.owned_skins, [&"classic", &"high_noon"] as Array[StringName])
 	assert_eq(save_game.skin, &"classic")
+
+
+func test_wrong_types_fall_back_to_a_new_game() -> void:
+	_write_text(save_game.path(1), JSON.stringify({"skins": 5, "loadout": ["flash"], "cleared": "1-1", "endless_best": "7"}))
+	save_game.load_slot(1)
+	assert_eq(save_game.owned_skins, [&"classic"] as Array[StringName])
+	assert_eq(save_game.skin, &"classic")
+	assert_eq(save_game.loadout, [&"", &""] as Array[StringName], "a loadout of the wrong length")
+	assert_eq(save_game.cleared.size(), 0)
+	assert_eq(save_game.endless_best, 0)
+	_write_text(save_game.path(1), JSON.stringify({"skins": {"owned": 5, "equipped": "vampire"}, "loadout": "flash"}))
+	save_game.load_slot(1)
+	assert_eq(save_game.owned_skins, [&"classic"] as Array[StringName])
+	assert_eq(save_game.skin, &"classic", "an equipped skin that isn't owned")
+	assert_eq(save_game.loadout, [&"", &""] as Array[StringName])
+
+
+func test_loadout_keeps_only_known_spells_once() -> void:
+	_write_text(save_game.path(1), JSON.stringify({"loadout": ["warp", "heal"]}))
+	save_game.load_slot(1)
+	assert_eq(save_game.loadout, [&"", &"heal"] as Array[StringName], "unknown id")
+	_write_text(save_game.path(1), JSON.stringify({"loadout": ["flash", "flash"]}))
+	save_game.load_slot(1)
+	assert_eq(save_game.loadout, [&"flash", &""] as Array[StringName], "a duplicate on F")
+	_write_text(save_game.path(1), JSON.stringify({"loadout": ["Smite", 5]}))
+	save_game.load_slot(1)
+	assert_eq(save_game.loadout, [&"", &""] as Array[StringName], "wrong case and not a string")
+	_write_text(save_game.path(1), JSON.stringify({"loadout": ["", "ghost"]}))
+	save_game.load_slot(1)
+	assert_eq(save_game.loadout, [&"", &"ghost"] as Array[StringName], "none on D")
 
 
 func test_unknown_cleared_id_is_dropped() -> void:

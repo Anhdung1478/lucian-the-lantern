@@ -4,6 +4,10 @@ extends CanvasLayer
 ## ESC answers No when the question allows it.
 
 const BUTTON_SIZE := Vector2(200, 56)
+## Above the menus. A pop-up that must stay on top of another one (Game's
+## "Save before leaving?") gets a higher layer: it is drawn over the other and
+## gets clicks first.
+const LAYER := 80
 
 var _on_yes := Callable()
 var _on_no := Callable()
@@ -11,8 +15,11 @@ var _escape_means_no := true
 var _message: Label
 
 
+func _init(on_layer := LAYER) -> void:
+	layer = on_layer
+
+
 func _ready() -> void:
-	layer = 80
 	process_mode = PROCESS_MODE_ALWAYS
 	visible = false
 	_build()
@@ -64,8 +71,11 @@ func is_open() -> bool:
 	return visible
 
 
-## Hides the pop-up, then calls the matching callable.
+## Hides the pop-up, then calls the matching callable (which may ask again).
+## Does nothing while the pop-up is closed, so an old question never answers.
 func answer(yes: bool) -> void:
+	if not visible:
+		return
 	visible = false
 	var action := _on_yes if yes else _on_no
 	if action.is_valid():

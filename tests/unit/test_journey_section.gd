@@ -1,8 +1,11 @@
 extends GutTest
 
 const PREFIX := "user://test_journey_section_save_slot_"
+const SETTINGS_PATH := "user://test_journey_section_settings.json"
 
 var section: JourneySection
+## The shared settings, while a test uses scratch ones.
+var _settings: GameSettings
 
 
 func before_each() -> void:
@@ -12,6 +15,14 @@ func before_each() -> void:
 	SaveGame.instance().reset()
 	section = JourneySection.new()
 	add_child_autofree(section)
+
+
+func after_each() -> void:
+	if _settings:
+		GameSettings._instance = _settings
+		_settings = null
+	if FileAccess.file_exists(SETTINGS_PATH):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS_PATH))
 
 
 func _save() -> SaveGame:
@@ -176,6 +187,21 @@ func test_a_spell_no_longer_bought_shows_as_empty() -> void:
 	assert_null(section.loadout.picks[0].icon)
 	assert_eq(section.loadout.picks[0].text, "None")
 	assert_false(section.loadout.picks[0].has_meta(&"hover_text"))
+
+
+func test_key_labels_follow_a_rebind() -> void:
+	# Scratch settings, so the rebind never reaches a real settings file.
+	_settings = GameSettings.instance()
+	if FileAccess.file_exists(SETTINGS_PATH):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS_PATH))
+	GameSettings._instance = GameSettings.new(SETTINGS_PATH)
+	var panel := LoadoutPanel.new()
+	add_child_autofree(panel)
+	assert_eq(panel._key_labels[0].text, "D")
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_Z
+	GameSettings.instance().rebind(&"summoner_d", key)
+	assert_eq(panel._key_labels[0].text, "Z")
 
 
 func test_escape_closes_the_menu_first() -> void:

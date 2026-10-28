@@ -227,6 +227,21 @@ func test_flash_upgrade_shortens_its_cooldown() -> void:
 	assert_almost_eq(lucian.summoners.cooldown(&"flash").remaining, 72.0, 0.001)
 
 
+func test_the_card_shows_the_upgraded_cooldown() -> void:
+	var setup := StageSetup.new()
+	setup.summoner_upgrades = {&"flash": -0.2}
+	lucian.apply_setup(setup)
+	var slot := SummonerSlot.new(lucian, 0)
+	var card := slot.tooltip_content()
+	var text := ""
+	for label: RichTextLabel in card.find_children("*", "RichTextLabel", true, false):
+		text += TooltipText.plain(label.text) + "\n"
+	assert_string_contains(text, "Cooldown: 72 s")
+	assert_string_contains(text, "Upgraded: 20% shorter cooldown")
+	card.free()
+	slot.free()
+
+
 func test_heal_upgrade_strengthens_the_heal() -> void:
 	var setup := StageSetup.new()
 	setup.summoner_upgrades = {&"heal": 0.3}

@@ -49,6 +49,8 @@ func _ready() -> void:
 	if not Sfx.exists():
 		add_child(Sfx.new())
 	screens.menu.leave_requested.connect(func() -> void: finished.emit(&"left"))
+	# Game connects `finished` before adding the stage; alone, nobody would act on Leave.
+	screens.menu.set_leave_enabled(not finished.get_connections().is_empty())
 	screens.menu.exit_requested.connect(_exit)
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	camera.setup(lucian, arena.get_bounds().grow(TestArena.WALL_THICKNESS))

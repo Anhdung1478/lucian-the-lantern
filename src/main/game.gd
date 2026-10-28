@@ -5,12 +5,18 @@ extends Node
 ## from a menu or the window's close button, asks "Save before leaving?".
 
 const STAGE_SCENE := preload("res://src/stage/stage.tscn")
+## Above the screens' own pop-ups (ConfirmPopup.LAYER), which can be open
+## when the window is closed: the prompt is drawn on top and gets clicks first.
+const PROMPT_LAYER := 90
 
 ## The MainScreen or the Stage being played.
 var screen: Node
-var prompt := ConfirmPopup.new()
+var prompt := ConfirmPopup.new(PROMPT_LAYER)
 ## Replaced in tests, which must not close the test run.
 var quit_game := func() -> void: get_tree().quit()
+
+## Whether the tree was paused before the prompt paused it.
+var _was_paused := false
 
 
 func _ready() -> void:
@@ -43,23 +49,38 @@ func start_stage(run: StageSetup) -> void:
 
 ## "Save before leaving?": Yes saves to the current slot (inside a stage
 ## that keeps what was collected, as leaving it would), then the game closes.
+## If the save fails, "Could not save. Quit anyway?": No keeps playing.
 func ask_to_quit() -> void:
 	if prompt.is_open():
 		return
+	_was_paused = get_tree().paused
 	get_tree().paused = true
 	prompt.ask("Save before leaving?", _quit.bind(true), _quit.bind(false), false)
 
 
 func _quit(save: bool) -> void:
-	if save:
-		SaveGame.instance().save()
+	if save and not SaveGame.instance().save():
+		prompt.ask("Could not save. Quit anyway?", quit_game, _keep_playing, false)
+		return
 	quit_game.call()
 
 
-## Deferred: the stage is still inside its own menu's signal here.
+## Unpauses, unless something else (the stage's ESC menu) had paused first.
+func _keep_playing() -> void:
+	get_tree().paused = _was_paused
+
+
+## Deferred: the stage is still inside its own menu's signal here. A failed
+## save shows on the new main screen.
 func _on_stage_finished(result: StringName) -> void:
-	SaveGame.instance().finish_stage(result)
+	var saved := SaveGame.instance().finish_stage(result)
 	show_main_screen.call_deferred()
+	if not saved:
+		_report_save_failed.call_deferred()
+
+
+func _report_save_failed() -> void:
+	(screen as MainScreen).show_toast("Could not save", true)
 
 
 ## The old screen goes at once; the prompt stays last so it gets input first.
