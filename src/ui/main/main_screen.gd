@@ -107,8 +107,12 @@ func _build() -> void:
 	area.offset_bottom = -BOTTOM_BAR
 	area.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(area)
-	for text in ["Evolution Tree", "Skin Shop", "Journey"]:
-		sections.append(_placeholder(area, text))
+	sections.append(_placeholder(area, "Evolution Tree"))
+	sections.append(_placeholder(area, "Skin Shop"))
+	var journey := JourneySection.new()
+	journey.start_training.connect(_start_training)
+	area.add_child(journey)
+	sections.append(journey)
 
 	var top := Control.new()
 	top.set_anchors_preset(Control.PRESET_TOP_WIDE)
@@ -159,6 +163,10 @@ func _placeholder(parent: Control, text: String) -> Control:
 	page.add_child(UiStyle.label(text, 36, UiStyle.DIM_COLOR))
 	parent.add_child(page)
 	return page
+
+
+func _start_training() -> void:
+	start_requested.emit(StageSetup.from_save(SaveGame.instance()))
 
 
 func _open_settings() -> void:
