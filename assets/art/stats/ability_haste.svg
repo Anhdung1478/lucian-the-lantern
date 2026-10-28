@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Ability Haste: an hourglass -->
+  <path d="M 18 12 L 46 12 C 46 24 36 28 34 32 C 36 36 46 40 46 52 L 18 52 C 18 40 28 36 30 32 C 28 28 18 24 18 12 Z" fill="#ffffff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 23 50 L 41 50 C 40 44 35 42 32 39 C 29 42 24 44 23 50 Z" fill="#9aa3b2"/>
+  <path d="M 25 17 L 39 17 C 37 22 34 24 32 26 C 30 24 27 22 25 17 Z" fill="#9aa3b2"/>
+  <path d="M 13 6 L 51 6 L 51 12 L 13 12 Z" fill="#ffffff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 13 52 L 51 52 L 51 58 L 13 58 Z" fill="#ffffff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

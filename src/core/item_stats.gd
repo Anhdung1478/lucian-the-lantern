@@ -38,6 +38,11 @@ static func is_percent(key: StringName) -> bool:
 
 ## "+65 Attack Damage" or "+25% Attack Speed".
 static func line(key: StringName, value: float) -> String:
+	return "%s %s" % [amount(key, value), NAMES[key]]
+
+
+## "+65" or "+25%".
+static func amount(key: StringName, value: float) -> String:
 	if is_percent(key):
-		return "+%d%% %s" % [roundi(value * 100.0), NAMES[key]]
-	return "+%d %s" % [roundi(value), NAMES[key]]
+		return "+%d%%" % roundi(value * 100.0)
+	return "+%d" % roundi(value)

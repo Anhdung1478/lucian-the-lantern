@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Attack Speed: a dagger with speed lines -->
+  <g transform="rotate(45 32 32)">
+  <path d="M 17 32 L 17 52 M 47 32 L 47 52 M 11 42 L 11 58 M 53 42 L 53 58" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 17 32 L 17 52 M 47 32 L 47 52 M 11 42 L 11 58 M 53 42 L 53 58" fill="none" stroke="#fff3a3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 32 3 L 38 13 L 38 37 L 26 37 L 26 13 Z" fill="#fff3a3" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 20 37 L 44 37 L 44 42 L 20 42 Z" fill="#c9b86a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 29 42 L 35 42 L 35 54 L 29 54 Z" fill="#c9b86a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="32" cy="57" r="3.5" fill="#fff3a3" stroke="#1a1d24" stroke-width="2"/>
+  </g>
+</svg>

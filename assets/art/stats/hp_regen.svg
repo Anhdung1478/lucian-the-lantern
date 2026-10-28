@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Health Regen: a heart and an up arrow -->
+  <g transform="translate(-4 8) scale(0.8)">
+    <path d="M 32 54 C 10 40 6 28 10 20 C 14 10 26 8 32 18 C 38 8 50 10 54 20 C 58 28 54 40 32 54 Z" fill="#6fd36f" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  </g>
+  <path d="M 47 34 L 47 19 L 41 19 L 51 6 L 61 19 L 55 19 L 55 34 Z" fill="#6fd36f" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Attack Damage: a one-headed axe -->
+  <g transform="rotate(25 32 32)">
+  <path d="M 34 4 L 41 4 L 41 61 L 34 61 Z" fill="#b8692a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 36 12 C 29 12 23 9 17 4 C 7 14 6 31 12 40 C 19 35 28 31 36 31 Z" fill="#ff9a3c" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 16 9 C 10 17 10 29 13 35" fill="none" stroke="#ffd2a3" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Armor Penetration: an arrow through a breastplate -->
+  <path d="M 19 17 L 27 14 C 29 19 35 19 37 14 L 45 17 L 47 30 L 42 32 L 42 46 C 36 50 28 50 22 46 L 22 32 L 17 30 Z" fill="#a04a36" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 6 58 L 48 16" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 6 58 L 48 16" fill="none" stroke="#ff7a5a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 59 5 L 43 9 L 55 21 Z" fill="#ff7a5a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

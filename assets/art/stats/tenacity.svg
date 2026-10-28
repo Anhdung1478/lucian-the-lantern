@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Tenacity: a broken chain -->
+  <g transform="rotate(-35 32 32)">
+  <path d="M 14 25 L 22 25 A 7 7 0 0 1 22 39 L 14 39 A 7 7 0 0 1 14 25 Z" fill="none" stroke="#1a1d24" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 14 25 L 22 25 A 7 7 0 0 1 22 39 L 14 39 A 7 7 0 0 1 14 25 Z" fill="none" stroke="#c9b28a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 42 25 L 50 25 A 7 7 0 0 1 50 39 L 42 39 A 7 7 0 0 1 42 25 Z" fill="none" stroke="#1a1d24" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 42 25 L 50 25 A 7 7 0 0 1 50 39 L 42 39 A 7 7 0 0 1 42 25 Z" fill="none" stroke="#c9b28a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 29 32 L 31 32 M 33 32 L 35 32" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 29 32 L 31 32 M 33 32 L 35 32" fill="none" stroke="#c9b28a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 32 20 L 31 25 M 32 44 L 33 39" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 32 20 L 31 25 M 32 44 L 33 39" fill="none" stroke="#fff1c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

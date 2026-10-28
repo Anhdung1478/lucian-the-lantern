@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Armor: a breastplate inside a second frame -->
+  <path d="M 32 5 L 54 12 L 52 36 C 48 48 40 55 32 59 C 24 55 16 48 12 36 L 10 12 Z" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 32 5 L 54 12 L 52 36 C 48 48 40 55 32 59 C 24 55 16 48 12 36 L 10 12 Z" fill="none" stroke="#f2c94c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 19 17 L 27 14 C 29 19 35 19 37 14 L 45 17 L 47 30 L 42 32 L 42 46 C 36 50 28 50 22 46 L 22 32 L 17 30 Z" fill="#f2c94c" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

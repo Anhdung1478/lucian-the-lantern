@@ -20,7 +20,7 @@ static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 	var card := _card(icon, shown.display_name, KIND_NAMES[shown.kind], cost)
 	var stats: PackedStringArray = []
 	for key: StringName in shown.stats:
-		stats.append(ItemStats.line(key, shown.stats[key]))
+		stats.append(StatStyle.item_line(key, shown.stats[key]))
 	_body(card, "\n".join(stats))
 	if shown.is_potion():
 		_body(card, potion_text(shown))

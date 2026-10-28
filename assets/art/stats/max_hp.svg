@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Health: a heart -->
+  <path d="M 32 54 C 10 40 6 28 10 20 C 14 10 26 8 32 18 C 38 8 50 10 54 20 C 58 28 54 40 32 54 Z" fill="#6fd36f" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 16 22 C 18 16 24 15 27 19" fill="none" stroke="#c8f5c8" stroke-width="3" stroke-linecap="round"/>
+</svg>

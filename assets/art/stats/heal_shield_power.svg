@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Heal and Shield Power: a cross over a shield -->
+  <path d="M 32 5 L 54 12 L 52 36 C 48 48 40 55 32 59 C 24 55 16 48 12 36 L 10 12 Z" fill="#2f6f5f" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 27 17 L 37 17 L 37 27 L 47 27 L 47 37 L 37 37 L 37 47 L 27 47 L 27 37 L 17 37 L 17 27 L 27 27 Z" fill="#7fe3c4" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

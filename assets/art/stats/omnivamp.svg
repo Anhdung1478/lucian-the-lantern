@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Omnivamp: a swirling drop -->
+  <path d="M 32 6 C 42 22 50 30 50 40 C 50 51 42 58 32 58 C 22 58 14 51 14 40 C 14 30 22 22 32 6 Z" fill="#c0508f" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 33 51 C 23 51 21 41 29 39 C 37 37 38 29 31 26" fill="none" stroke="#f5d0e6" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

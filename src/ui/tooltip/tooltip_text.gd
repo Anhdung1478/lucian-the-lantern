@@ -4,11 +4,12 @@ extends RefCounted
 ## value lists such as "80/110/140/170/200" with the current rank lit up.
 
 ## Markup tag -> color. AD and physical match the physical damage numbers,
-## magic matches the magic ones, mana matches the HUD mana cost.
+## magic matches the magic ones, mana matches the HUD mana cost, AP matches
+## its stat icon.
 const COLORS := {
 	"ad": "ff9a3c",
 	"phys": "ff9a3c",
-	"ap": "c58cff",
+	"ap": "4a6cf7",
 	"magic": "4fa8ff",
 	"true": "ffffff",
 	"mana": "8fb8ff",
