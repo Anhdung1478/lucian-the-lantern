@@ -512,11 +512,8 @@ func displace(to: Vector2, speed: float) -> void:
 	if dead or in_stasis():
 		return
 	var offset := to - global_position
-	_cancel_windup()
 	_order = Order.NONE
-	_queued_slot = -1
-	_cast_lock_left = 0.0
-	(skills[ChampionProgress.Slot.R] as TheCulling).stop()
+	_drop_in_flight()
 	_displace_velocity = offset.normalized() * speed if offset.length() > 1.0 else Vector2.ZERO
 	_displace_left = offset.length() / speed
 	collision_mask = Layers.WORLD
@@ -533,7 +530,7 @@ func enter_stasis(seconds: float, revive_hp: float, revive_mana: float) -> void:
 	_revive = Vector2(revive_hp, revive_mana)
 	hp = 0.0
 	_order = Order.NONE
-	_cancel_windup()
+	_drop_in_flight()
 	visuals.modulate = STASIS_TINT
 
 
@@ -551,13 +548,26 @@ func bonus_armor() -> float:
 	return maxf(stats.armor - base_stats.at_level(progress.level).armor, 0.0)
 
 
+## Ends whatever Lucian was in the middle of: windup, queued cast, cast lock,
+## R, a dash (its trail finishes) and a displacement.
+func _drop_in_flight() -> void:
+	_cancel_windup()
+	_queued_slot = -1
+	_cast_lock_left = 0.0
+	(skills[ChampionProgress.Slot.R] as TheCulling).stop()
+	_dash_left = 0.0
+	if is_instance_valid(_dash_trail):
+		_dash_trail.finish()
+	_dash_trail = null
+	_displace_left = 0.0
+	collision_mask = _body_mask()
+
+
 func _die() -> void:
 	dead = true
 	_order = Order.NONE
-	_cancel_windup()
-	_displace_left = 0.0
+	_drop_in_flight()
 	collision_layer = 0
-	(skills[ChampionProgress.Slot.R] as TheCulling).stop()
 	visuals.modulate = Color(0.55, 0.55, 0.55)
 	create_tween().tween_property(visuals, "modulate:a", 0.0, DEATH_FADE)
 	died.emit()

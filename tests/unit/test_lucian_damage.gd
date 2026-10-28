@@ -90,3 +90,30 @@ func test_damage_received_reports_the_amount() -> void:
 	watch_signals(lucian)
 	lucian.take_damage(DamageInfo.create(50.0, DamageInfo.Type.TRUE, &"test"))
 	assert_almost_eq(get_signal_parameters(lucian, "damage_received")[1], 50.0, 0.01)
+
+
+func test_displace_ends_a_dash_in_progress() -> void:
+	lucian.start_dash(Vector2.RIGHT, 2000.0, 1000.0)
+	lucian.displace(Vector2(0, 300), 3000.0)
+	assert_false(lucian.is_dashing())
+	await wait_physics_frames(12)
+	assert_false(lucian.is_dashing())
+	assert_false(lucian.is_displaced())
+	assert_almost_eq(lucian.global_position.x, 0.0, 2.0)
+	assert_almost_eq(lucian.global_position.y, 300.0, 2.0)
+
+
+func test_death_ends_a_dash() -> void:
+	lucian.start_dash(Vector2.RIGHT, 2000.0, 1000.0)
+	lucian.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_false(lucian.is_dashing())
+
+
+func test_stasis_clears_a_displacement_in_flight() -> void:
+	lucian.displace(Vector2(2000, 0), 1000.0)
+	lucian.enter_stasis(0.1, 100.0, 0.0)
+	assert_false(lucian.is_displaced())
+	await wait_seconds(0.3)
+	assert_false(lucian.in_stasis())
+	assert_false(lucian.is_displaced())
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY)
