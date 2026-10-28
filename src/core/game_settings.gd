@@ -18,6 +18,8 @@ const DEFAULTS := {
 	&"sfx_volume": 80,
 	## "windowed", "borderless" or "fullscreen".
 	&"window_mode": "windowed",
+	## Window size in windowed mode, "WIDTHxHEIGHT".
+	&"resolution": "1600x900",
 	&"vsync": true,
 	## 0 is unlimited.
 	&"max_fps": 0,
@@ -27,6 +29,7 @@ const DEFAULTS := {
 	&"queue_casts": true,
 }
 const WINDOW_MODES := ["windowed", "borderless", "fullscreen"]
+const RESOLUTIONS := ["1280x720", "1366x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"]
 const QUALITIES := ["low", "medium", "high"]
 const FPS_CAPS := [30, 60, 120, 144, 0]
 ## Actions the player can rebind, in the order the Controls tab lists them.
@@ -141,6 +144,7 @@ func apply() -> void:
 	apply_audio()
 	apply_input()
 	apply_display()
+	apply_resolution()
 
 
 func apply_audio() -> void:
@@ -177,6 +181,28 @@ func apply_display() -> void:
 	var tree := Engine.get_main_loop() as SceneTree
 	if tree:
 		tree.root.msaa_2d = MSAA.get(_values[&"quality"], Viewport.MSAA_4X)
+
+
+## Sizes and centers the window in windowed mode (a maximized window is
+## restored first), never past the screen. Fullscreen modes keep the
+## screen's own size.
+func apply_resolution() -> void:
+	if DisplayServer.get_name() == "headless" or _values[&"window_mode"] != "windowed":
+		return
+	var usable := DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen())
+	var size := parse_resolution(_values[&"resolution"]).min(usable.size)
+	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	DisplayServer.window_set_size(size)
+	DisplayServer.window_set_position(usable.position + (usable.size - size) / 2)
+
+
+## "1920x1080" -> (1920, 1080); (0, 0) when it isn't a size.
+static func parse_resolution(text: String) -> Vector2i:
+	var parts := text.split("x")
+	if parts.size() != 2 or not parts[0].is_valid_int() or not parts[1].is_valid_int():
+		return Vector2i.ZERO
+	return Vector2i(int(parts[0]), int(parts[1]))
 
 
 ## The bindings in project.godot, one per action.
@@ -237,6 +263,8 @@ func _load() -> void:
 			# JSON numbers load as floats.
 			if DEFAULTS[name] is int and value is float:
 				value = int(value)
+			if name == &"resolution" and not RESOLUTIONS.has(value):
+				continue
 			if typeof(value) == typeof(DEFAULTS[name]):
 				_values[name] = value
 	var bindings: Dictionary = data.get("bindings", {})

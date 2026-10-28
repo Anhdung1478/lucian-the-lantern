@@ -123,3 +123,19 @@ func test_apply_input_sets_the_input_map() -> void:
 func test_the_test_run_uses_a_scratch_settings_file() -> void:
 	# Set by tests/pre_run.gd, so the player's settings never change the tests.
 	assert_eq(GameSettings.instance().path, "user://test_run_settings.json")
+
+
+func test_resolution_defaults_to_1600x900() -> void:
+	assert_eq(settings.get_value(&"resolution"), "1600x900")
+
+
+func test_parse_resolution() -> void:
+	assert_eq(GameSettings.parse_resolution("1920x1080"), Vector2i(1920, 1080))
+	assert_eq(GameSettings.parse_resolution("big"), Vector2i.ZERO)
+
+
+func test_resolution_round_trip_and_unknown_sizes_fall_back() -> void:
+	settings.set_value(&"resolution", "1920x1080")
+	assert_eq(GameSettings.new(PATH).get_value(&"resolution"), "1920x1080")
+	settings.set_value(&"resolution", "123x45")
+	assert_eq(GameSettings.new(PATH).get_value(&"resolution"), "1600x900")
