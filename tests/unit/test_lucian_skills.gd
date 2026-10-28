@@ -105,6 +105,25 @@ func test_cast_charges_passive_for_a_double_shot() -> void:
 	assert_almost_eq(hits[2][1], 0.6 * ad * DUMMY_ARMOR_MULTIPLIER, 0.01)
 
 
+func test_shots_alternate_guns() -> void:
+	var effects := Node2D.new()
+	add_child_autofree(effects)
+	lucian.projectile_parent = effects
+	# Facing the dummy (right), the left gun is above his center (y < 0).
+	var sides: Array[String] = []
+	effects.child_entered_tree.connect(func(node: Node) -> void:
+		if node is AttackProjectile:
+			sides.append("L" if (node as Node2D).position.y < lucian.position.y else "R"))
+	lucian.passive.fire_basic_attack(dummy)
+	lucian.passive.fire_basic_attack(dummy)
+	# Lightslinger's second shot comes from the other gun.
+	lucian.passive.charge()
+	lucian.passive.fire_basic_attack(dummy)
+	await wait_seconds(0.25)
+	lucian.passive.fire_basic_attack(dummy)
+	assert_eq(sides, ["L", "R", "L", "R", "L"] as Array[String])
+
+
 func test_failed_cast_does_not_charge_passive() -> void:
 	lucian.try_cast(Slot.Q, dummy.position)
 	assert_false(lucian.passive.charged)

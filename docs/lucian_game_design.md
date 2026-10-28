@@ -104,7 +104,7 @@
 
 | Skill | Effect |
 |---|---|
-| **Passive – Lightslinger** | After using a skill, the next attack shoots twice. |
+| **Passive – Lightslinger** | After using a skill, the next attack shoots twice. Lucian's shots (basic attacks, this second shot, R's bullets) take turns between his guns, left first. |
 | **Q – Piercing Light** | Laser through a target, hitting every enemy in a line. |
 | **W – Ardent Blaze** | Missile that explodes in a cross and marks enemies (magic damage, AP scaling). Hitting a marked enemy gives movement speed. |
 | **E – Relentless Pursuit** | Short dash. Passive hits lower its cooldown. |

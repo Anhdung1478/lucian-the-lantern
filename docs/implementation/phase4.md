@@ -876,6 +876,7 @@ Everything in the plan is in place, one commit per task (Tasks 0–9), then the 
 - **Summoner effects:** `HealBurst` (a green ring spreading to 80 and 7 crosses rising 56, 0.9 s) and `ClarityBurst` (10 blue motes spiralling in from 70, then a small flash, 0.9 s) are children of Lucian, so they move with him. Ghost leaves a `GhostImage` every 28 units Lucian moves: his body texture through `ghost_image.gdshader` (pale teal, a little of his shading kept), fading from 55% over 0.35 s. `Lucian.spawn_under()` puts them in the world just before Lucian, so he draws over them; in the Projectiles layer they covered him. All three are off on low effects.
 - **Barrier bubble:** `BarrierBubble`, a child of Lucian (radius 66, so the cape fits), pops in over 0.15 s, pulses and has a glint going round its rim, and fades for 0.25 s once `lucian.barrier` is 0. A new Barrier replaces the old bubble. Barrier, Heal and Clarity effects sit right after `Visuals` among Lucian's children, so his HP bar draws over them.
 - **Flash drops moves too:** `blink_to()` calls the same `_drop_move()` as `start_dash()`: a move or merchant visit ordered before it ends, and `move_dropped` (was `dash_started`) tells the controller to drop a held right-click.
+- **Guns take turns:** `Lucian.next_gun()` hands out left, right, left… Basic attacks, Lightslinger's second shot and R's bullets all take the next gun, so the second shot still comes from the other gun. Basic attacks used to fire from the right gun only.
 
 ### Running the checks
 

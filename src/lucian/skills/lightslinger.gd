@@ -1,8 +1,8 @@
 class_name Lightslinger
 extends Node
-## Passive: after any skill cast, the next basic attack shoots twice. The
-## second shot comes from the other gun, and each one that hits lowers E's
-## cooldown.
+## Passive: after any skill cast, the next basic attack shoots twice. Shots
+## take turns between the guns, so the second comes from the other one. Each
+## one that hits lowers E's cooldown.
 
 @export var second_shot_ratio := 0.6
 @export var second_shot_delay := 0.15
@@ -29,7 +29,7 @@ func charge() -> void:
 
 ## Lucian's basic attack: one shot, or two when charged.
 func fire_basic_attack(target: Enemy) -> void:
-	lucian.fire_attack_projectile(LucianVisuals.Gun.RIGHT, target, lucian.basic_attack(target))
+	lucian.fire_attack_projectile(lucian.next_gun(), target, lucian.basic_attack(target))
 	if charged:
 		charged = false
 		_second_shot_target = target
@@ -42,4 +42,4 @@ func _physics_process(delta: float) -> void:
 	_second_shot_in -= delta
 	if _second_shot_in <= 0.0 and is_instance_valid(_second_shot_target):
 		var info := lucian.roll_attack(second_shot_ratio, &"lightslinger")
-		lucian.fire_attack_projectile(LucianVisuals.Gun.LEFT, _second_shot_target, info)
+		lucian.fire_attack_projectile(lucian.next_gun(), _second_shot_target, info)

@@ -18,7 +18,6 @@ var _channel_left := 0.0
 var _direction := Vector2.RIGHT
 var _next_shot_in := 0.0
 var _shots_left := 0
-var _gun := LucianVisuals.Gun.LEFT
 
 
 func is_channeling() -> bool:
@@ -71,14 +70,14 @@ func _physics_process(delta: float) -> void:
 
 func _fire() -> void:
 	_shots_left -= 1
-	_gun = LucianVisuals.Gun.RIGHT if _gun == LucianVisuals.Gun.LEFT else LucianVisuals.Gun.LEFT
+	var gun := lucian.next_gun()
 	var bullet := LinearProjectile.new()
-	bullet.launch(lucian.visuals.muzzle_position(_gun), _direction, bullet_speed, bullet_range, 10.0, is_max_rank())
+	bullet.launch(lucian.visuals.muzzle_position(gun), _direction, bullet_speed, bullet_range, 10.0, is_max_rank())
 	bullet.streak_length = 36.0
 	bullet.streak_width = 5.0
 	bullet.hit_enemy.connect(_on_bullet_hit)
 	lucian.spawn(bullet)
-	lucian.flash_muzzle(_gun)
+	lucian.flash_muzzle(gun)
 
 
 func _on_bullet_hit(enemy: Enemy, prior_hits: int) -> void:

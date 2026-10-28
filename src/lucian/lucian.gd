@@ -92,6 +92,8 @@ var _dash_trail: DashTrail
 var _speed_buffs := {}
 var _last_position := Vector2.ZERO
 var _queued_slot := -1
+## The gun the next shot comes from: they take turns, left first.
+var _next_gun := LucianVisuals.Gun.LEFT
 var _queued_aim := Vector2.ZERO
 ## Ghost: seconds left passing through enemies.
 var _ghost_left := 0.0
@@ -516,6 +518,14 @@ func make_damage(amount: float, type: DamageInfo.Type, source: StringName, crit 
 	info.armor_pen = stats.armor_pen
 	info.magic_pen = stats.magic_pen
 	return info
+
+
+## Lucian fires his guns in turn: basic attacks, Lightslinger's second shot
+## and R's bullets all take the next one.
+func next_gun() -> LucianVisuals.Gun:
+	var gun := _next_gun
+	_next_gun = LucianVisuals.Gun.RIGHT if gun == LucianVisuals.Gun.LEFT else LucianVisuals.Gun.LEFT
+	return gun
 
 
 func fire_attack_projectile(gun: LucianVisuals.Gun, target: Enemy, info: DamageInfo) -> void:
