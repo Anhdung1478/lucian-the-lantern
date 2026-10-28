@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Clarity: a swirl of mana -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d2f6b"/><stop offset="1" stop-color="#0a1028"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="32" r="24" fill="url(#glow)" opacity="0.3"/>
+  <path d="M 32 32 C 32 28 38 28 38 33 C 38 40 28 41 26 34 C 23 25 34 19 42 24 C 52 30 48 46 36 50 C 22 54 10 44 12 30 C 14 18 26 10 38 12" fill="none" stroke="#8fb8ff" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 32 32 C 32 28 38 28 38 33 C 38 40 28 41 26 34 C 23 25 34 19 42 24 C 52 30 48 46 36 50 C 22 54 10 44 12 30 C 14 18 26 10 38 12" fill="none" stroke="#e0ecff" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 50 6 C 54 12 57 15 57 19 C 57 23 54 25 51 25 C 48 25 45 23 45 19 C 45 15 48 12 50 6 Z" fill="#8fb8ff" stroke="#e0ecff" stroke-width="1.5"/>
+</svg>

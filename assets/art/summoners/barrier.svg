@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Barrier: a golden dome of light -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a4120"/><stop offset="1" stop-color="#1f160a"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <path d="M 6 50 L 58 50" stroke="#c9a45c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 10 50 C 10 24 20 12 32 12 C 44 12 54 24 54 50 Z" fill="#ffcf5a" fill-opacity="0.28" stroke="#ffe9a8" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M 18 46 C 18 30 24 20 32 18 M 32 12 L 32 50 M 12 34 L 52 34" stroke="#ffe9a8" stroke-width="1.5" opacity="0.6" fill="none"/>
+  <path d="M 20 40 C 20 28 25 21 31 19" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8"/>
+</svg>

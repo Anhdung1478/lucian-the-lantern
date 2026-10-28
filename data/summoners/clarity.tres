@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SummonerData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/summoners/clarity.svg" id="1_icon"]
+[ext_resource type="Script" path="res://src/core/summoner_data.gd" id="2_data"]
+
+[resource]
+script = ExtResource("2_data")
+id = &"clarity"
+display_name = "Clarity"
+icon = ExtResource("1_icon")
+cooldown = 45.0
+description = "Restore [mana]50% of max mana[/mana]."

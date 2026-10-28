@@ -109,8 +109,8 @@ func _process(_delta: float) -> void:
 	var stats := lucian.stats
 	hp_bar.value = lucian.hp / stats.max_hp
 	hp_label.text = "%d / %d" % [roundi(lucian.hp), roundi(stats.max_hp)]
-	if lucian.shield > 0.0:
-		hp_label.text += "  (+%d)" % roundi(lucian.shield)
+	if lucian.total_shield() > 0.0:
+		hp_label.text += "  (+%d)" % roundi(lucian.total_shield())
 	_shield_overlay.queue_redraw()
 	_buff_bar.show_buffs(lucian.buffs())
 	mana_bar.value = lucian.mana / stats.max_mana
@@ -159,10 +159,10 @@ func _place_stats_panel() -> void:
 ## The shield, white, right after the HP on the HP bar (pushed back from the
 ## end when HP and shield are more than max HP).
 func _draw_shield() -> void:
-	if lucian == null or lucian.shield <= 0.0:
+	if lucian == null or lucian.total_shield() <= 0.0:
 		return
 	var width := _shield_overlay.size.x
-	var share := minf(lucian.shield / lucian.stats.max_hp, 1.0)
+	var share := minf(lucian.total_shield() / lucian.stats.max_hp, 1.0)
 	var start := minf(lucian.hp / lucian.stats.max_hp, 1.0 - share)
 	_shield_overlay.draw_rect(Rect2(width * start, 0, width * share, _shield_overlay.size.y), Color(0.92, 0.94, 0.97, 0.85))
 

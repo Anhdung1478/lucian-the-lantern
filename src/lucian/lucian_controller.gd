@@ -8,6 +8,7 @@ const REISSUE_DISTANCE := 8.0
 ## Extra slack around an enemy's radius when clicking on it.
 const CLICK_SLACK := 10.0
 const ITEM_ACTIONS: Array[StringName] = [&"item_1", &"item_2", &"item_3", &"item_4", &"item_5", &"item_6"]
+const SUMMONER_ACTIONS: Array[StringName] = [&"summoner_d", &"summoner_f"]
 const SKILL_ACTIONS := {
 	&"skill_q": ChampionProgress.Slot.Q,
 	&"skill_w": ChampionProgress.Slot.W,
@@ -38,6 +39,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	for slot in ITEM_ACTIONS.size():
 		if event.is_action_pressed(ITEM_ACTIONS[slot]):
 			lucian.use_equip_slot(slot, _cursor())
+			get_viewport().set_input_as_handled()
+			return
+	for slot in SUMMONER_ACTIONS.size():
+		if event.is_action_pressed(SUMMONER_ACTIONS[slot]):
+			lucian.use_summoner(slot, _cursor())
 			get_viewport().set_input_as_handled()
 			return
 	if event.is_action_pressed(&"move"):

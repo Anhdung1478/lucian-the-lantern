@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SummonerData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/summoners/ghost.svg" id="1_icon"]
+[ext_resource type="Script" path="res://src/core/summoner_data.gd" id="2_data"]
+
+[resource]
+script = ExtResource("2_data")
+id = &"ghost"
+display_name = "Ghost"
+icon = ExtResource("1_icon")
+cooldown = 60.0
+description = "Gain [ms]40% move speed[/ms] and pass through enemies for [kw]6 s[/kw]."

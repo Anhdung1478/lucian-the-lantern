@@ -3,7 +3,7 @@ extends CharacterBody2D
 ## The player champion. Holds one standing order (move / attack / attack-move
 ## / visit the merchant) and carries it out every physics frame. Attack
 ## windups pause the order. Item passives and actives live in the
-## ItemPassives and ItemActives children.
+## ItemPassives and ItemActives children, summoner spells in SummonerSpells.
 
 ## Lucian walked into range of the merchant he was sent to.
 signal merchant_reached(merchant: Merchant)
@@ -21,6 +21,7 @@ const MOVE_SPEED_ICON := preload("res://assets/art/ui/buff_move_speed.svg")
 const SHIELD_ICON := preload("res://assets/art/ui/buff_shield.svg")
 const SPEED_BUFF_NAMES := {
 	&"ardent_blaze": "Ardent Blaze", &"fervor": "Fervor", &"stormrazor": "Bolt", &"rocketbelt": "Supersonic",
+	&"ghost": "Ghost", &"heal": "Heal",
 }
 ## Bloodthirster's Ichorshield: the most it holds, and how fast it fades out
 ## of combat (per second).
@@ -36,6 +37,7 @@ var inventory := Inventory.new()
 var restores := RestoreOverTime.new()
 var passives := ItemPassives.new()
 var actives := ItemActives.new()
+var summoners := SummonerSpells.new()
 ## Item id -> Cooldown, shared by every copy of the item.
 var item_cooldowns := {}
 var stats: StatBlock
@@ -43,11 +45,14 @@ var hp := 0.0
 var mana := 0.0
 ## Absorbs damage before HP (Bloodthirster).
 var shield := 0.0
+## Barrier's shield, on top of `shield`, until it runs out.
+var barrier := 0.0
 ## Where spawned shots go. Set by the stage.
 var projectile_parent: Node
 ## Debug: values >= 0 replace Lucian's crit chance.
 var cheat_crit_chance := -1.0
-## Turning it on also refreshes every skill and item cooldown already running.
+## Turning it on also refreshes every skill, item and summoner cooldown
+## already running.
 var cheat_no_cooldowns := false:
 	set(value):
 		cheat_no_cooldowns = value
@@ -56,6 +61,7 @@ var cheat_no_cooldowns := false:
 				skill.cooldown.clear()
 			for cooldown: Cooldown in item_cooldowns.values():
 				cooldown.clear()
+			summoners.clear_cooldowns()
 var cheat_infinite_mana := false
 ## Setting: a skill pressed during a cast time or a dash is cast as soon as it
 ## ends, aimed where the key was pressed, like LoL's spell buffering. Only the
@@ -79,6 +85,10 @@ var _speed_buffs := {}
 var _last_position := Vector2.ZERO
 var _queued_slot := -1
 var _queued_aim := Vector2.ZERO
+## Ghost: seconds left passing through enemies.
+var _ghost_left := 0.0
+var _barrier_left := 0.0
+var _barrier_duration := 0.0
 
 @onready var visuals: LucianVisuals = $Visuals
 @onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
@@ -92,6 +102,9 @@ func _ready() -> void:
 	actives.name = "ItemActives"
 	actives.setup(self)
 	add_child(actives)
+	summoners.name = "SummonerSpells"
+	summoners.setup(self)
+	add_child(summoners)
 	stats = base_stats.at_level(progress.level)
 	passives.adjust_stats(stats)
 	hp = stats.max_hp
@@ -243,6 +256,11 @@ func use_equip_slot(slot: int, aim: Vector2) -> bool:
 	return use_item(index)
 
 
+## D and F: casts the summoner spell on `slot` (0-1) toward `aim`.
+func use_summoner(slot: int, aim: Vector2) -> bool:
+	return summoners.use(slot, aim)
+
+
 ## The cooldown every copy of item `id` shares.
 func item_cooldown(id: StringName) -> Cooldown:
 	if not item_cooldowns.has(id):
@@ -276,7 +294,61 @@ func basic_attack(target: Enemy) -> DamageInfo:
 	return info
 
 
-## HUD buff icons: potions, move speed, the shield and item passives. Each is
+## The Ichorshield and Barrier together.
+func total_shield() -> float:
+	return shield + barrier
+
+
+## Barrier: a shield of `amount` for `seconds`, replacing an older one.
+func add_barrier(amount: float, seconds: float) -> void:
+	barrier = amount
+	_barrier_left = seconds
+	_barrier_duration = seconds
+
+
+## Ghost: Lucian passes through enemies (walls still stop him) for `seconds`.
+func set_ghosted(seconds: float) -> void:
+	_ghost_left = seconds
+	collision_mask = _body_mask()
+
+
+func is_ghosted() -> bool:
+	return _ghost_left > 0.0
+
+
+## Lucian's body would fit at `point` without touching a wall (or an enemy,
+## unless he is ghosted).
+func fits_at(point: Vector2) -> bool:
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = ($CollisionShape2D as CollisionShape2D).shape
+	query.transform = Transform2D(0.0, point)
+	query.collision_mask = _body_mask()
+	query.exclude = [get_rid()]
+	return get_world_2d().direct_space_state.intersect_shape(query, 1).is_empty()
+
+
+## Moves Lucian straight to `point` (Flash). A blink doesn't build Energize.
+func blink_to(point: Vector2) -> void:
+	global_position = point
+	_last_position = point
+
+
+## The enemy nearest the cursor among those within `reach` of Lucian
+## (Gunblade, Smite), or null.
+func enemy_near_cursor(aim: Vector2, reach: float) -> Enemy:
+	var best: Enemy = null
+	var best_distance := INF
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		if global_position.distance_to(enemy.global_position) > reach + enemy.radius:
+			continue
+		var distance := aim.distance_to(enemy.global_position)
+		if distance < best_distance:
+			best_distance = distance
+			best = enemy
+	return best
+
+
+## HUD buff icons: potions, move speed, shields and item passives. Each is
 ## {id, name, icon, text, count, left, duration, ready}.
 func buffs() -> Array[Dictionary]:
 	var found: Array[Dictionary] = []
@@ -299,6 +371,10 @@ func buffs() -> Array[Dictionary]:
 		found.append({"id": &"ichorshield", "name": "Ichorshield", "icon": SHIELD_ICON,
 			"text": "A shield from Bloodthirster's life steal past full health. Absorbs %d damage." % roundi(shield),
 			"count": str(roundi(shield)), "left": 0.0, "duration": 0.0, "ready": false})
+	if barrier > 0.0:
+		found.append({"id": &"barrier", "name": "Barrier", "icon": SummonerSpells.find(&"barrier").icon,
+			"text": "A shield that absorbs %d damage." % roundi(barrier),
+			"count": str(roundi(barrier)), "left": _barrier_left, "duration": _barrier_duration, "ready": false})
 	found.append_array(passives.buffs())
 	return found
 
@@ -487,6 +563,15 @@ func _tick_buffs(delta: float) -> void:
 		cooldown.reduce(delta)
 	if shield > 0.0 and not passives.in_combat():
 		shield = maxf(shield - ICHORSHIELD_DECAY * delta, 0.0)
+	if _barrier_left > 0.0:
+		_barrier_left -= delta
+		if _barrier_left <= 0.0:
+			barrier = 0.0
+	if _ghost_left > 0.0:
+		_ghost_left -= delta
+		if _ghost_left <= 0.0:
+			_ghost_left = 0.0
+			collision_mask = _body_mask()
 
 
 ## Walking, dashing and moving during R all build Energize.
@@ -528,7 +613,12 @@ func _dash_step(delta: float) -> void:
 	_dash_left -= delta
 	if _dash_left <= 0.0 or get_slide_collision_count() > 0:
 		_dash_left = 0.0
-		collision_mask = Layers.WORLD | Layers.ENEMY_BODY
+		collision_mask = _body_mask()
+
+
+## Dashing or ghosted, Lucian passes through enemies; walls always stop him.
+func _body_mask() -> int:
+	return Layers.WORLD if is_dashing() or is_ghosted() else Layers.WORLD | Layers.ENEMY_BODY
 
 
 func _process_windup(delta: float) -> void:

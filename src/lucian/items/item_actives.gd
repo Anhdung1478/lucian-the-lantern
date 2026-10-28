@@ -71,15 +71,7 @@ func _physics_process(_delta: float) -> void:
 
 ## Lightning Bolt: the enemy nearest the cursor within range of Lucian.
 func _gunblade(aim: Vector2) -> bool:
-	var target: Enemy = null
-	var best := INF
-	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
-		if lucian.global_position.distance_to(enemy.global_position) > GUNBLADE_RANGE + enemy.radius:
-			continue
-		var distance := aim.distance_to(enemy.global_position)
-		if distance < best:
-			best = distance
-			target = enemy
+	var target := lucian.enemy_near_cursor(aim, GUNBLADE_RANGE)
 	if target == null:
 		return false
 	lucian.visuals.face(target.global_position - lucian.global_position)

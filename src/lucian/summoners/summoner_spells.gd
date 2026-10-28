@@ -1,0 +1,139 @@
+class_name SummonerSpells
+extends Node
+## Summoner spells on D and F (picked in the debug table until the Evolution
+## Tree exists). Each spell has its own cooldown, which moves with it to the
+## other key and counts down with the game. Ability haste doesn't shorten it.
+
+const SPELLS: Array[SummonerData] = [
+	preload("res://data/summoners/flash.tres"),
+	preload("res://data/summoners/ghost.tres"),
+	preload("res://data/summoners/barrier.tres"),
+	preload("res://data/summoners/heal.tres"),
+	preload("res://data/summoners/clarity.tres"),
+	preload("res://data/summoners/smite.tres"),
+]
+const FLASH_RANGE := 400.0
+## Flash steps back this far at a time until Lucian's body fits.
+const FLASH_STEP := 10.0
+const GHOST_SPEED := 0.4
+const GHOST_TIME := 6.0
+const BARRIER_BASE := 95.0
+const BARRIER_PER_LEVEL := 18.0
+const BARRIER_TIME := 2.5
+const HEAL_BASE := 80.0
+const HEAL_PER_LEVEL := 15.0
+const HEAL_SPEED := 0.3
+const HEAL_SPEED_TIME := 1.0
+## Share of max mana.
+const CLARITY_MANA := 0.5
+const SMITE_RANGE := 500.0
+const SMITE_DAMAGE := 450.0
+## Share of max HP.
+const SMITE_HEAL := 0.1
+
+var lucian: Lucian
+## Spell id on D (0) and F (1).
+var slots: Array[StringName] = [&"flash", &"heal"]
+
+## Spell id -> Cooldown.
+var _cooldowns := {}
+
+
+func setup(owner_lucian: Lucian) -> void:
+	lucian = owner_lucian
+
+
+static func find(id: StringName) -> SummonerData:
+	for spell in SPELLS:
+		if spell.id == id:
+			return spell
+	return null
+
+
+func spell_in(slot: int) -> SummonerData:
+	return find(slots[slot])
+
+
+## Puts spell `id` on `slot`. If it was on the other key, the two swap.
+func set_spell(slot: int, id: StringName) -> void:
+	var other := 1 - slot
+	if slots[other] == id:
+		slots[other] = slots[slot]
+	slots[slot] = id
+
+
+func cooldown(id: StringName) -> Cooldown:
+	if not _cooldowns.has(id):
+		_cooldowns[id] = Cooldown.new()
+	return _cooldowns[id]
+
+
+func clear_cooldowns() -> void:
+	for running: Cooldown in _cooldowns.values():
+		running.clear()
+
+
+## Casts the spell on `slot` (0 = D, 1 = F) toward `aim`. False on cooldown,
+## while dashing, or for Smite with no enemy in reach.
+func use(slot: int, aim: Vector2) -> bool:
+	var spell := spell_in(slot)
+	if spell == null or lucian.is_dashing() or not cooldown(spell.id).is_ready():
+		return false
+	match spell.id:
+		&"flash":
+			_flash(aim)
+		&"ghost":
+			lucian.add_speed_buff(&"ghost", 0.0, GHOST_SPEED, GHOST_TIME)
+			lucian.set_ghosted(GHOST_TIME)
+			Sfx.play(&"potion")
+		&"barrier":
+			lucian.add_barrier(BARRIER_BASE + BARRIER_PER_LEVEL * lucian.progress.level, BARRIER_TIME)
+			Sfx.play(&"potion")
+		&"heal":
+			lucian.heal(HEAL_BASE + HEAL_PER_LEVEL * lucian.progress.level)
+			lucian.add_speed_buff(&"heal", 0.0, HEAL_SPEED, HEAL_SPEED_TIME, true)
+			Sfx.play(&"potion")
+		&"clarity":
+			lucian.restore_mana(lucian.stats.max_mana * CLARITY_MANA)
+			Sfx.play(&"potion")
+		&"smite":
+			if not _smite(aim):
+				return false
+	cooldown(spell.id).start(0.0 if lucian.cheat_no_cooldowns else spell.cooldown)
+	return true
+
+
+func _physics_process(delta: float) -> void:
+	for running: Cooldown in _cooldowns.values():
+		running.reduce(delta)
+
+
+## Blinks toward the cursor, at most FLASH_RANGE, stepping back until
+## Lucian's body fits clear of walls and enemies.
+func _flash(aim: Vector2) -> void:
+	var from := lucian.global_position
+	var direction := lucian.aim_direction(aim)
+	var distance := minf(from.distance_to(aim), FLASH_RANGE)
+	while distance > 0.0 and not lucian.fits_at(from + direction * distance):
+		distance -= FLASH_STEP
+	lucian.blink_to(from + direction * maxf(distance, 0.0))
+	lucian.visuals.face(direction)
+	if not GameSettings.instance().low_effects():
+		var trail := DashTrail.new()
+		trail.setup(from, lucian.global_position)
+		lucian.spawn(trail)
+	Sfx.play(&"zap")
+
+
+## True damage to the enemy nearest the cursor, and a heal.
+func _smite(aim: Vector2) -> bool:
+	var target := lucian.enemy_near_cursor(aim, SMITE_RANGE)
+	if target == null:
+		return false
+	target.take_damage(lucian.make_damage(SMITE_DAMAGE, DamageInfo.Type.TRUE, &"smite"))
+	lucian.heal(lucian.stats.max_hp * SMITE_HEAL)
+	var bolt := ChainLightning.new()
+	bolt.setup(PackedVector2Array([lucian.global_position, target.global_position]), Color("ffb347"))
+	lucian.spawn(bolt)
+	Sfx.play(&"zap")
+	return true

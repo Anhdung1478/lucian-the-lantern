@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Smite: a bolt striking down -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b1f1a"/><stop offset="1" stop-color="#260a08"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <ellipse cx="32" cy="54" rx="20" ry="6" fill="#ffb347" opacity="0.45"/>
+  <path d="M 38 2 L 20 32 L 31 32 L 24 60 L 46 26 L 34 26 L 44 2 Z" fill="#ffb347" stroke="#fff1c2" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 37 7 L 26 28 L 34 28" stroke="#ffffff" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+  <path d="M 14 50 L 8 44 M 50 50 L 57 44 M 32 50 L 32 44" stroke="#ffdf9a" stroke-width="2.5" stroke-linecap="round"/>
+</svg>
