@@ -1,8 +1,9 @@
 class_name StageCamera
 extends Camera2D
 ## Free-cam with edge panning by default; the toggle_camera action (Y) switches
-## to following Lucian. The position is clamped by hand because Camera2D limits
-## only clamp the view, which makes panning back from an edge feel sticky.
+## to following Lucian, and center_camera (Space) jumps back over him once.
+## The position is clamped by hand because Camera2D limits only clamp the
+## view, which makes panning back from an edge feel sticky.
 
 enum Mode { FREE, FOLLOW }
 
@@ -38,6 +39,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"toggle_camera"):
 		mode = Mode.FOLLOW if mode == Mode.FREE else Mode.FREE
 		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"center_camera"):
+		center_on_target()
+		get_viewport().set_input_as_handled()
+
+
+## Jumps back over Lucian once. Free-cam stays free, so edge panning moves
+## it away again.
+func center_on_target() -> void:
+	global_position = _clamped(_target.global_position)
 
 
 func _physics_process(delta: float) -> void:

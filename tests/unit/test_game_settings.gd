@@ -43,6 +43,7 @@ func test_default_bindings_come_from_the_project() -> void:
 	assert_eq(settings.key_label(&"item_1"), "1")
 	assert_eq(settings.key_label(&"move"), "RMB")
 	assert_eq(settings.key_label(&"attack"), "LMB")
+	assert_eq(settings.key_label(&"center_camera"), "Space")
 
 
 func test_changes_are_saved_with_a_version() -> void:

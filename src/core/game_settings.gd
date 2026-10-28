@@ -36,7 +36,7 @@ const REBINDABLE: Array[StringName] = [
 	&"skill_q", &"skill_w", &"skill_e", &"skill_r",
 	&"summoner_d", &"summoner_f",
 	&"item_1", &"item_2", &"item_3", &"item_4", &"item_5", &"item_6",
-	&"open_backpack", &"toggle_stats", &"toggle_camera",
+	&"open_backpack", &"toggle_stats", &"toggle_camera", &"center_camera",
 ]
 const ACTION_NAMES := {
 	&"move": "Move", &"attack": "Attack", &"attack_move": "Attack-move",
@@ -45,6 +45,7 @@ const ACTION_NAMES := {
 	&"item_1": "Item slot 1", &"item_2": "Item slot 2", &"item_3": "Item slot 3",
 	&"item_4": "Item slot 4", &"item_5": "Item slot 5", &"item_6": "Item slot 6",
 	&"open_backpack": "Backpack", &"toggle_stats": "Stats panel", &"toggle_camera": "Camera mode",
+	&"center_camera": "Center camera on Lucian",
 }
 const MOUSE_LABELS := {
 	MOUSE_BUTTON_LEFT: "LMB", MOUSE_BUTTON_RIGHT: "RMB", MOUSE_BUTTON_MIDDLE: "MMB",
