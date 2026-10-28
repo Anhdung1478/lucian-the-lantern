@@ -15,6 +15,8 @@ signal exit_requested
 ## An enemy spawned by the stage died (after its rewards).
 signal enemy_died(enemy: EnemyUnit)
 
+## Damage numbers over Lucian are smaller than over enemies.
+const LUCIAN_NUMBER_SCALE := 0.8
 const ENEMY_PATH := "res://data/enemies/%s.tres"
 const ESSENCE_ICONS := {
 	Essences.BLUE: preload("res://assets/art/ui/essence_blue.svg"),
@@ -36,6 +38,15 @@ var extra_dummies: Array[TrainingDummy] = []
 ## Essences collected in this stage, for the HUD and the result panel.
 var collected := {Essences.BLUE: 0, Essences.ORANGE: 0, Essences.PURPLE: 0}
 var rng := RandomNumberGenerator.new()
+## The stage's waves; null in Training.
+var runner: WaveRunner
+var result := StageResult.new()
+## First-clear rewards, for the result panel.
+var reward_lines: Array[String] = []
+## Seconds played in this stage (the stage only processes while unpaused).
+var elapsed := 0.0
+
+var _next_spawn := 0
 
 @onready var arena: StageMap = $Arena
 @onready var lucian: Lucian = $World/Lucian
@@ -77,12 +88,47 @@ func _ready() -> void:
 	shop_slots = run.shop_slots
 	hud.setup(lucian, wallet)
 	debug_table.setup(self)
+	add_child(result)
+	result.continue_pressed.connect(func() -> void: finished.emit(&"cleared" if result.cleared else &"failed"))
+	lucian.died.connect(_on_lucian_died)
+	lucian.damage_received.connect(damage_numbers.spawn.bind(lucian, LUCIAN_NUMBER_SCALE))
 	screens.backpack.setup(lucian.inventory)
 	screens.backpack.potion_used.connect(lucian.use_item)
 	screens.backpack_toggled.connect(debug_table.set_docked_right)
 	lucian.merchant_reached.connect(_open_shop)
 	screens.backpack.traded.connect(func(ok: bool) -> void: Sfx.play(&"coin" if ok else &"error"))
-	add_merchant()
+	if run.act == 0:
+		add_merchant()
+	else:
+		_start_waves()
+
+
+func _process(delta: float) -> void:
+	if result.visible:
+		return
+	elapsed += delta
+	if runner and not lucian.dead:
+		runner.tick(delta)
+
+
+## Skip (the HUD's button): the next wave now, plus the regen of the time skipped.
+func skip_break() -> void:
+	if runner:
+		lucian.restore_for(runner.skip())
+
+
+## The result panel over a paused game; ESC and P stop working.
+func show_result(is_cleared: bool) -> void:
+	if result.visible:
+		return
+	remove_merchant()
+	if screens.backpack.visible:
+		screens.set_backpack_open(false)
+	screens.set_menu_open(false)
+	screens.locked = true
+	var waves_text := "Waves cleared: %d / %d   ·   " % [runner.waves_done(), runner.total_waves()] if runner else ""
+	result.show_result(is_cleared, run.display_name, waves_text + "Time %s" % StageResult.clock(elapsed), collected, reward_lines)
+	get_tree().paused = true
 
 
 ## Run alone (no Game around it) the stage closes the game itself.
@@ -196,6 +242,45 @@ func _open_shop(visited: Merchant) -> void:
 	var shop := Shop.new(visited.stock, lucian.inventory, wallet)
 	shop.refresh_cost = run.refresh_cost
 	screens.open_shop(shop)
+
+
+func _start_waves() -> void:
+	remove_merchant()
+	runner = WaveRunner.new(WavePlan.waves(run.stage_id), run.boss)
+	runner.spawn_requested.connect(_spawn_wave_enemy)
+	runner.break_started.connect(func(_seconds: float) -> void: add_merchant())
+	runner.break_ended.connect(remove_merchant)
+	runner.cleared.connect(_on_cleared)
+	enemy_died.connect(func(_enemy: EnemyUnit) -> void: runner.enemy_died())
+
+
+func _spawn_wave_enemy(id: StringName, wave: int) -> void:
+	if id == run.boss:
+		spawn_enemy(id, arena.boss_point)
+		return
+	var at := arena.spawn_points[_next_spawn % arena.spawn_points.size()]
+	_next_spawn += 1
+	spawn_enemy(id, at + Vector2(rng.randf_range(-70, 70), rng.randf_range(-70, 70)), wave)
+
+
+## The boss's purple (first-time or repeat) and the first-clear lines, then the result.
+func _on_cleared() -> void:
+	var save := SaveGame.instance()
+	if run.boss != &"":
+		var data: EnemyData = load(ENEMY_PATH % run.boss)
+		var first_time := not String(run.boss) in save.bosses
+		var purple := save.award_boss(String(run.boss), data.purple_first, data.purple_repeat)
+		if purple > 0:
+			add_essences(0, 0, purple, lucian.global_position)
+			reward_lines.append("+%d purple essence (%s)" % [purple, "first clear" if first_time else "repeat"])
+	if not run.stage_id in save.cleared and run.stage == Journey.stage_count(run.act) and run.act < Journey.ACTS.size():
+		reward_lines.append("Act %d is open" % (run.act + 1))
+	show_result(true)
+
+
+func _on_lucian_died() -> void:
+	await create_tween().tween_interval(Lucian.DEATH_FADE).finished
+	show_result(false)
 
 
 ## Minions for now; Tasks 10 and 11 add the bosses.

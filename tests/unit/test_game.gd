@@ -27,6 +27,10 @@ func before_each() -> void:
 ## The prompt and the ESC menu pause the tree; never leave GUT paused.
 func after_each() -> void:
 	get_tree().paused = false
+	# A stage ended into a save: other tests expect no slot file.
+	for file in [SaveGame.instance().path(1), SaveGame.instance().backup_path(1)]:
+		if FileAccess.file_exists(file):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 	SaveGame.instance().prefix = _prefix
 
 
@@ -160,3 +164,14 @@ func test_leave_is_disabled_when_the_stage_runs_alone() -> void:
 	var leave := _leave_button(stage)
 	assert_true(leave.disabled)
 	assert_eq(leave.get_meta(&"hover_text", ""), "Not available yet")
+
+
+func test_a_cleared_act_stage_is_saved_as_cleared() -> void:
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_frames(2)
+	var stage := game.screen as Stage
+	stage.show_result(true)
+	stage.result.continue_button.pressed.emit()
+	await wait_frames(2)
+	assert_true("2-1" in SaveGame.instance().cleared)
+	assert_is(game.screen, MainScreen)

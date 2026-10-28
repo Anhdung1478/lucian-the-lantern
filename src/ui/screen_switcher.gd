@@ -10,6 +10,8 @@ extends Node
 ## right, since the shop panel takes that side.
 signal backpack_toggled(open: bool)
 
+## The stage result is up: ESC and P do nothing.
+var locked := false
 ## Set by the stage; asked to drop an aimed cast before ESC opens the menu.
 var controller: LucianController
 
@@ -26,6 +28,8 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if locked:
+		return
 	# The settings screen reads its own keys (ESC goes back to the menu).
 	if settings.visible:
 		return

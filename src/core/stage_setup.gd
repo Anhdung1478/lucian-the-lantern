@@ -7,6 +7,9 @@ extends RefCounted
 
 const SPELL_IDS: Array[StringName] = [&"flash", &"ghost", &"barrier", &"heal", &"clarity", &"smite"]
 
+## Act 1's only stage: the tutorial, the first time it is played.
+const TUTORIAL_STAGE := "1-1"
+
 ## The stage played (0 for Training): its act, stage and "act-stage" id. The
 ## sandbox pays like act 1.
 var act := 0
@@ -30,6 +33,12 @@ var gold_bonus := 0.0
 var xp_bonus := 0.0
 var essence_bonus := 0.0
 var skin: SkinData = Skins.ALL[0]
+## Shown on the HUD and the result panel.
+var display_name := "Training"
+## The boss wave's enemy id, or &"" for none.
+var boss := &""
+## Act 1's first play: one gun, no skills or summoners; Senna fights too.
+var tutorial := false
 
 
 ## The setup a save's tree, equipped skin and loadout give.
@@ -57,4 +66,28 @@ static func from_save(save: SaveGame) -> StageSetup:
 	setup.xp_bonus = tree.value(&"bonus_xp")
 	setup.essence_bonus = tree.value(&"essence_drop")
 	setup.skin = Skins.find(save.skin)
+	return setup
+
+
+## A Journey stage: the save's setup plus the stage, its boss, and the
+## tutorial's limits on Act 1's first play. Thresh only comes that first time.
+static func for_stage(save: SaveGame, act_number: int, stage_number: int) -> StageSetup:
+	var setup := from_save(save)
+	setup.act = act_number
+	setup.stage = stage_number
+	setup.stage_id = Journey.stage_id(act_number, stage_number)
+	var act_name: String = Journey.ACTS[act_number - 1]["name"]
+	if Journey.stage_count(act_number) == 1:
+		setup.display_name = "Act %d · %s" % [act_number, act_name]
+	else:
+		setup.display_name = "Stage %s · %s" % [setup.stage_id, act_name]
+	setup.boss = WavePlan.boss(setup.stage_id)
+	if setup.stage_id == TUTORIAL_STAGE:
+		if TUTORIAL_STAGE in save.cleared:
+			setup.boss = &""
+		else:
+			setup.tutorial = true
+			setup.bought.assign([0, 0, 0, 0])
+			setup.passive = false
+			setup.summoners.assign([&"", &""])
 	return setup

@@ -78,3 +78,28 @@ func test_economy_nodes_reach_the_setup() -> void:
 	assert_almost_eq(setup.gold_bonus, 0.2, 0.001)
 	assert_eq(setup.xp_bonus, 0.0)
 	assert_eq(setup.essence_bonus, 0.0)
+
+
+func test_act_1_first_play_is_the_tutorial() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	var setup := StageSetup.for_stage(save, 1, 1)
+	assert_true(setup.tutorial)
+	assert_eq(setup.bought, [0, 0, 0, 0] as Array[int])
+	assert_false(setup.passive)
+	assert_eq(setup.summoners, [&"", &""] as Array[StringName])
+	assert_eq(setup.boss, &"thresh_1")
+	assert_eq(setup.display_name, "Act 1 · The Loss")
+
+
+func test_act_1_replayed_is_not_the_tutorial() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	save.cleared.append("1-1")
+	var setup := StageSetup.for_stage(save, 1, 1)
+	assert_false(setup.tutorial)
+	assert_eq(setup.boss, &"")
+
+
+func test_act_2_stage_3_has_akshan() -> void:
+	var setup := StageSetup.for_stage(SaveGame.new("user://test_setup_"), 2, 3)
+	assert_eq(setup.boss, &"akshan")
+	assert_eq(setup.display_name, "Stage 2-3 · The Sentinels")

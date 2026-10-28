@@ -11,6 +11,8 @@ const PROMPT_LAYER := 90
 
 ## The MainScreen or the Stage being played.
 var screen: Node
+## The stage being played, for its id when it ends.
+var _run := StageSetup.new()
 var prompt := ConfirmPopup.new(PROMPT_LAYER)
 ## Replaced in tests, which must not close the test run.
 var quit_game := func() -> void: get_tree().quit()
@@ -40,6 +42,7 @@ func show_main_screen() -> void:
 
 
 func start_stage(run: StageSetup) -> void:
+	_run = run
 	var stage: Stage = STAGE_SCENE.instantiate()
 	stage.setup(run)
 	stage.finished.connect(_on_stage_finished)
@@ -73,7 +76,7 @@ func _keep_playing() -> void:
 ## Deferred: the stage is still inside its own menu's signal here. A failed
 ## save shows on the new main screen.
 func _on_stage_finished(result: StringName) -> void:
-	var saved := SaveGame.instance().finish_stage(result)
+	var saved := SaveGame.instance().finish_stage(result, _run.stage_id)
 	show_main_screen.call_deferred()
 	if not saved:
 		_report_save_failed.call_deferred()

@@ -343,6 +343,7 @@ func apply_setup(setup: StageSetup) -> void:
 	summoners.open_slots = setup.summoner_slots
 	summoners.upgrades = setup.summoner_upgrades.duplicate()
 	tree_bonus = setup.stat_bonus.duplicate()
+	one_gun = setup.tutorial
 	apply_skin(setup.skin)
 	hp = stats.max_hp
 	mana = stats.max_mana

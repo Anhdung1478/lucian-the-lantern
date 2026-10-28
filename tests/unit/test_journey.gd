@@ -47,3 +47,11 @@ func test_act_and_stage_unlocks() -> void:
 func test_endless_needs_every_act() -> void:
 	assert_true(Journey.is_endless_open(Journey.all_stage_ids(Journey.ENDLESS_ACT)))
 	assert_false(Journey.is_endless_open(Journey.all_stage_ids(2)))
+
+
+func test_the_wave_plan_matches_the_journey() -> void:
+	for act in 2:
+		for stage in Journey.stage_count(act + 1):
+			var id := Journey.stage_id(act + 1, stage + 1)
+			assert_eq(Journey.waves(act + 1, stage + 1), WavePlan.waves(id).size(), id)
+			assert_eq(Journey.boss_kind(act + 1, stage + 1) == &"boss", WavePlan.boss(id) != &"", id)
