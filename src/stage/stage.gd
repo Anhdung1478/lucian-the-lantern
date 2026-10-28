@@ -383,11 +383,12 @@ func _on_thresh_phase_ended() -> void:
 	cutscene.start(self)
 
 
-## Thresh is beaten for this act: his blue and orange now, his purple in
-## _on_cleared. He and Senna leave the map.
+## Thresh is beaten for this act: his blue and orange now, rising where he
+## sank (as a kill's do), his purple over Lucian in _on_cleared. He and
+## Senna leave the map.
 func _on_cutscene_done() -> void:
 	var reward := KillRewards.roll(boss_unit.data, run.act, run, rng)
-	add_essences(reward.blue, reward.orange, 0, lucian.global_position)
+	add_essences(reward.blue, reward.orange, 0, boss_unit.global_position)
 	reward_lines.append("Lucian takes Senna's gun: two guns from now on")
 	reward_lines.append("E – Relentless Pursuit is free in the Evolution Tree")
 	# Out of "enemies" now, so the radar and the boss bar drop him at once.

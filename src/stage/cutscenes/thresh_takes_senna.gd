@@ -2,7 +2,8 @@ class_name ThreshTakesSenna
 extends Cutscene
 ## Act 1's end: Thresh hooks Senna, pulls her in and takes her soul into his
 ## lantern, then sinks into the river. Lucian goes to her and takes up her
-## gun. The stage frees Thresh and Senna when it is done.
+## gun. The stage frees Thresh and Senna when it is done. The camera frames
+## the hook's whole flight, then follows Senna in to Thresh.
 
 const CHAIN_WIDTH := 6.0
 const CHAIN_TIME := 0.35
@@ -36,7 +37,7 @@ func _play() -> void:
 	var lucian := stage.lucian
 	# The last hit's flash froze with him.
 	thresh.visuals.modulate = Color.WHITE
-	await pan_to(thresh.global_position)
+	await pan_to((thresh.global_position + senna.global_position) * 0.5)
 	if skipped:
 		return
 	await caption("Thresh", "Such a bright soul... it will make a fine light.")
@@ -66,6 +67,7 @@ func _play() -> void:
 	fall.tween_method(chain_end, senna.global_position, caught, PULL_TIME)
 	fall.tween_property(senna.visuals, "modulate", FALLEN_TINT, PULL_TIME)
 	fall.tween_property(senna.visuals, "rotation", senna.visuals.rotation + FALLEN_TILT, PULL_TIME)
+	fall.tween_property(stage.camera, "global_position", thresh.global_position, PULL_TIME).set_trans(Tween.TRANS_SINE)
 	await move(senna, caught, PULL_TIME)
 	if skipped:
 		return

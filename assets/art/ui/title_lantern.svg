@@ -10,15 +10,19 @@
       <stop offset="0" stop-color="#6ee6a0" stop-opacity="0.45"/>
       <stop offset="1" stop-color="#6ee6a0" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="rays" gradientUnits="userSpaceOnUse" cx="128" cy="150" r="120">
+      <stop offset="0" stop-color="#8fe3b0" stop-opacity="0.3"/>
+      <stop offset="0.55" stop-color="#8fe3b0" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#8fe3b0" stop-opacity="0"/>
+    </radialGradient>
   </defs>
   <circle cx="128" cy="150" r="118" fill="url(#halo)"/>
-  <g fill="#8fe3b0" opacity="0.16">
-    <polygon points="128,150 40,214 70,236"/>
-    <polygon points="128,150 216,214 186,236"/>
-    <polygon points="128,150 108,252 148,252"/>
-    <polygon points="128,150 8,170 8,140"/>
-    <polygon points="128,150 248,170 248,140"/>
-  </g>
+  <!-- light rays, fading out before the edge -->
+  <polygon points="128,150 40,214 70,236" fill="url(#rays)"/>
+  <polygon points="128,150 216,214 186,236" fill="url(#rays)"/>
+  <polygon points="128,150 108,252 148,252" fill="url(#rays)"/>
+  <polygon points="128,150 8,170 8,140" fill="url(#rays)"/>
+  <polygon points="128,150 248,170 248,140" fill="url(#rays)"/>
   <g fill="none" stroke-linecap="round">
     <path d="M96 62 Q56 56 20 30" stroke="#1a1d24" stroke-width="9"/>
     <path d="M160 62 Q200 56 236 30" stroke="#1a1d24" stroke-width="9"/>

@@ -115,3 +115,12 @@ func test_the_slot_list_shows_play_time() -> void:
 	SaveGame.instance().copy_to(2)
 	_title().show_slots(true)
 	assert_string_contains(_title().slot_list.buttons[1].text, "1h 23m")
+
+
+func test_a_used_slot_leaves_room_around_its_text() -> void:
+	SaveGame.instance().add_play_time(99.0 * 3600.0 + 59.0 * 60.0)
+	SaveGame.instance().copy_to(2)
+	_title().show_slots(false)
+	var button := _title().slot_list.buttons[1]
+	# The text's own width (and the button's padding) must not set the width.
+	assert_lte(button.get_minimum_size().x + 40.0, SlotList.BUTTON_SIZE.x, button.text)

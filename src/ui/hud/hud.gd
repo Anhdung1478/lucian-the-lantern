@@ -69,6 +69,7 @@ func setup(target: Lucian, stage_wallet: Wallet, stage_node: Stage = null) -> vo
 	if stage:
 		stage_info.skip_pressed.connect(stage.skip_break)
 	radar.setup(stage.arena.get_bounds() if stage else Rect2(0, 0, 4800, 2700), target)
+	_place_radar()
 	wallet = stage_wallet
 	wallet.changed.connect(_show_gold)
 	_show_gold(wallet.gold)
@@ -290,6 +291,10 @@ func _build_stage_info() -> void:
 	$Root.add_child(stage_info)
 	stage_info.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	stage_info.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	# No width of its own: it is always as wide as what it shows (Training
+	# hides Skip after this, and the panel must shrink with it).
+	stage_info.offset_left = 0.0
+	stage_info.offset_right = 0.0
 	stage_info.offset_top = MARGIN
 	$Root.add_child(boss_bar)
 	boss_bar.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
@@ -301,8 +306,11 @@ func _build_stage_info() -> void:
 	tips.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	tips.offset_top = TIPS_TOP
 	$Root.add_child(radar)
-	radar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+
+
+## Bottom right, MARGIN in from the corner, at the size its map gives it
+## (known only in setup).
+func _place_radar() -> void:
+	radar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, int(MARGIN))
 	radar.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	radar.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	radar.offset_right = -MARGIN
-	radar.offset_bottom = -MARGIN

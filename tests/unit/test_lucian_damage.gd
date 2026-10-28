@@ -109,6 +109,24 @@ func test_death_ends_a_dash() -> void:
 	assert_false(lucian.is_dashing())
 
 
+func test_a_hit_just_before_death_keeps_the_grey() -> void:
+	lucian.take_damage(DamageInfo.create(20.0, DamageInfo.Type.TRUE, &"test"))
+	await wait_physics_frames(2)
+	lucian.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	await wait_seconds(0.4)
+	var tint := lucian.visuals.modulate
+	assert_almost_eq(tint.r, Lucian.DEATH_TINT.r, 0.01, "grey, not the hurt flash's white")
+	assert_lt(tint.a, 1.0, "fading out")
+
+
+func test_a_hit_just_before_stasis_keeps_the_gold() -> void:
+	lucian.take_damage(DamageInfo.create(20.0, DamageInfo.Type.TRUE, &"test"))
+	await wait_physics_frames(2)
+	lucian.enter_stasis(1.0, 100.0, 0.0)
+	await wait_seconds(0.4)
+	assert_eq(lucian.visuals.modulate, Lucian.STASIS_TINT)
+
+
 func test_stasis_clears_a_displacement_in_flight() -> void:
 	lucian.displace(Vector2(2000, 0), 1000.0)
 	lucian.enter_stasis(0.1, 100.0, 0.0)

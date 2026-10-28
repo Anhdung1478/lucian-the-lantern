@@ -6,7 +6,8 @@ extends VBoxContainer
 
 signal picked(slot: int, used: bool)
 
-const BUTTON_SIZE := Vector2(420, 56)
+## Wide enough for "Slot 2 · 99h 59m · saved 2026-10-28 14:03" with room around it.
+const BUTTON_SIZE := Vector2(520, 56)
 
 var buttons: Array[Button] = []
 

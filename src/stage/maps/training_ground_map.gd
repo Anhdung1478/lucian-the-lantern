@@ -15,6 +15,7 @@ const FLOOR := Color("3a3f47")
 const FLOOR_ALT := Color("343941")
 const PILLAR := Color("8a8478")
 const GATE := Color("c9a45c")
+const WALL := Color("4a4f57")
 
 var stage := 1
 
@@ -47,6 +48,9 @@ static func pillars(stage_number: int) -> Array[Vector2]:
 
 
 func _draw() -> void:
+	# The outer wall, where the camera still sees past the floor.
+	for rect in border_rects():
+		draw_rect(rect, WALL)
 	var x := 0.0
 	while x < size.x:
 		var y := 0.0

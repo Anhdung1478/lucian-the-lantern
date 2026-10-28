@@ -63,6 +63,9 @@ func _band(from: Vector2, to: Vector2, half: float) -> PackedVector2Array:
 
 
 func _draw() -> void:
+	# The jungle runs on past the edges, where the camera still sees.
+	for rect in border_rects():
+		draw_rect(rect, JUNGLE_COLOR)
 	draw_rect(get_bounds(), LANE_COLOR)
 	draw_colored_polygon(_river, RIVER_COLOR)
 	var ripples := RandomNumberGenerator.new()

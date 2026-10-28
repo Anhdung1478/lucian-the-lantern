@@ -98,7 +98,7 @@ func _act1_stage() -> Stage:
 	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
 	stage.setup(StageSetup.for_stage(SaveGame.instance(), 1, 1))
 	add_child_autofree(stage)
-	await wait_frames(2)
+	await wait_physics_frames(2)
 	stage.lucian.invulnerable = true
 	return stage
 
@@ -124,13 +124,13 @@ func test_half_health_plays_the_cutscene_and_skip_clears_the_stage() -> void:
 	stage.jump_to_boss_wave()
 	stage.runner.tick(0.1)
 	stage.runner.tick(0.1)
-	await wait_frames(1)
+	await wait_physics_frames(1)
 	assert_is(stage.boss_unit, Thresh)
 	stage.boss_unit.take_damage(DamageInfo.create(5000.0, DamageInfo.Type.TRUE, &"test"))
-	await wait_frames(2)
+	await wait_physics_frames(2)
 	assert_not_null(stage.cutscene)
 	stage.cutscene.skip_button.pressed.emit()
-	await wait_frames(2)
+	await wait_physics_frames(2)
 	assert_eq(stage.result.title.text, "STAGE CLEARED")
 	assert_eq(stage.collected[Essences.PURPLE], 10)
 	assert_true("thresh_1" in SaveGame.instance().bosses)
@@ -160,9 +160,9 @@ func _start_cutscene() -> Stage:
 	stage.jump_to_boss_wave()
 	stage.runner.tick(0.1)
 	stage.runner.tick(0.1)
-	await wait_frames(1)
+	await wait_physics_frames(1)
 	stage.boss_unit.take_damage(DamageInfo.create(5000.0, DamageInfo.Type.TRUE, &"test"))
-	await wait_frames(1)
+	await wait_physics_frames(1)
 	return stage
 
 
@@ -182,7 +182,7 @@ func test_skip_takes_senna_and_thresh_away_with_the_rewards() -> void:
 	var senna := stage.senna
 	stage.cutscene.skip_button.pressed.emit()
 	assert_false(thresh.is_in_group(&"enemies"))
-	await wait_frames(2)
+	await wait_physics_frames(2)
 	assert_false(is_instance_valid(thresh))
 	assert_false(is_instance_valid(senna))
 	assert_eq(stage.collected[Essences.BLUE], KillRewards.BOSS_BLUE)
@@ -222,6 +222,37 @@ func test_the_cutscene_plays_to_its_end() -> void:
 	assert_null(stage.senna)
 	assert_lt(stage.lucian.global_position.distance_to(thresh_at), 250.0, "Lucian walked to where Senna fell")
 	assert_eq(stage.collected[Essences.PURPLE], 10)
+
+
+func test_the_cutscene_frames_the_hook_then_thresh() -> void:
+	var stage: Stage = await _start_cutscene()
+	var thresh_at := stage.boss_unit.global_position
+	var senna_at := stage.senna.global_position
+	await wait_seconds(1.0)
+	assert_almost_eq(stage.camera.global_position, (thresh_at + senna_at) * 0.5, Vector2.ONE * 2.0, "both ends of the hook in view")
+	# Space moves the captions on: Thresh's line, then "SENNA!" after the hook.
+	var space := InputEventKey.new()
+	space.keycode = KEY_SPACE
+	space.pressed = true
+	stage.cutscene._unhandled_input(space)
+	await wait_seconds(ThreshTakesSenna.CHAIN_TIME + 0.2)
+	stage.cutscene._unhandled_input(space)
+	await wait_seconds(ThreshTakesSenna.PULL_TIME + 0.2)
+	assert_almost_eq(stage.camera.global_position, thresh_at, Vector2.ONE * 2.0, "on Thresh as she is pulled in")
+	stage.cutscene.skip()
+
+
+func test_thresh_essences_rise_where_he_sank_and_the_purple_over_lucian() -> void:
+	var stage: Stage = await _start_cutscene()
+	var thresh_x := stage.boss_unit.global_position.x
+	var lucian_x := stage.lucian.global_position.x
+	stage.cutscene.skip()
+	var popups := {}
+	for node in stage.damage_numbers.get_children():
+		if node is FloatingText:
+			popups[(node as FloatingText).text] = (node as FloatingText).position
+	assert_almost_eq(popups["+%d" % KillRewards.BOSS_BLUE].x, thresh_x, 1.0)
+	assert_almost_eq(popups["+10"].x, lucian_x, 1.0, "not on top of the blue")
 
 
 func test_no_cutscene_or_boss_purple_after_a_defeat() -> void:

@@ -45,6 +45,7 @@ const ICHORSHIELD_DECAY := 100.0
 const HIT_RADIUS := 30.0
 ## Seconds Lucian greys out and fades after dying.
 const DEATH_FADE := 1.5
+const DEATH_TINT := Color(0.55, 0.55, 0.55)
 const HURT_FLASH := Color(1.0, 0.45, 0.45)
 const STASIS_TINT := Color(1.6, 1.35, 0.5)
 
@@ -137,6 +138,7 @@ var _displace_velocity := Vector2.ZERO
 var _displace_left := 0.0
 var _stasis_left := 0.0
 var _revive := Vector2.ZERO
+var _hurt_tween: Tween
 
 @onready var visuals: LucianVisuals = $Visuals
 @onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
@@ -537,6 +539,7 @@ func enter_stasis(seconds: float, revive_hp: float, revive_mana: float) -> void:
 	hp = 0.0
 	_order = Order.NONE
 	_drop_in_flight()
+	_stop_hurt_flash()
 	visuals.modulate = STASIS_TINT
 
 
@@ -574,7 +577,8 @@ func _die() -> void:
 	_order = Order.NONE
 	_drop_in_flight()
 	collision_layer = 0
-	visuals.modulate = Color(0.55, 0.55, 0.55)
+	_stop_hurt_flash()
+	visuals.modulate = DEATH_TINT
 	create_tween().tween_property(visuals, "modulate:a", 0.0, DEATH_FADE)
 	died.emit()
 
@@ -584,7 +588,16 @@ func _flash_hurt() -> void:
 		return
 	Sfx.play(&"hurt", -8.0)
 	visuals.modulate = HURT_FLASH
-	create_tween().tween_property(visuals, "modulate", Color.WHITE, 0.2)
+	_stop_hurt_flash()
+	_hurt_tween = create_tween()
+	_hurt_tween.tween_property(visuals, "modulate", Color.WHITE, 0.2)
+
+
+## A hurt flash still fading would paint over the death grey or the stasis gold.
+func _stop_hurt_flash() -> void:
+	if _hurt_tween:
+		_hurt_tween.kill()
+	_hurt_tween = null
 
 
 func _displace_step(delta: float) -> void:
