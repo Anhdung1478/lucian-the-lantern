@@ -1,8 +1,8 @@
 class_name DebugTable
 extends CanvasLayer
 ## Testing panel, toggled with F3 + Q (hidden by default), in tabs: Lucian
-## (level, cheats), Items, Shop (gold) and Dummy (settings, DPS meter, hit
-## log). Keeps working while the game is paused, so items can be given into an
+## (level, cheats, summoner spells), Items, Shop (gold) and Dummy (settings,
+## DPS meter, hit log). Keeps working while the game is paused, so items can be given into an
 ## open backpack.
 
 const LOG_SIZE := 10
@@ -26,6 +26,8 @@ var _item_picker: OptionButton
 ## The picker's items, A to Z.
 var _picker_items: Array[ItemData] = []
 var _equip_slots: SpinBox
+## D and F.
+var _summoner_pickers: Array[OptionButton] = []
 var _item_stats: Label
 var _armor: SpinBox
 var _mr: SpinBox
@@ -55,6 +57,7 @@ func setup(owner_stage: Stage) -> void:
 	for item in _picker_items:
 		_item_picker.add_item(item.display_name)
 	_equip_slots.set_value_no_signal(lucian.inventory.unlocked_equip)
+	_show_summoners()
 
 
 ## Adds a dummy's hits to the DPS meter and the hit log.
@@ -122,6 +125,17 @@ func _give_picked_item() -> void:
 	lucian.inventory.add(_picker_items[_item_picker.selected])
 
 
+## Picking the spell the other key has swaps the two, so both pickers follow.
+func _pick_summoner(index: int, slot: int) -> void:
+	lucian.summoners.set_spell(slot, SummonerSpells.SPELLS[index].id)
+	_show_summoners()
+
+
+func _show_summoners() -> void:
+	for slot in _summoner_pickers.size():
+		_summoner_pickers[slot].select(SummonerSpells.SPELLS.find(lucian.summoners.spell_in(slot)))
+
+
 func _give_random_fragment() -> void:
 	lucian.inventory.add(lucian.item_catalog.fragments().pick_random())
 
@@ -172,6 +186,19 @@ func _build() -> void:
 	_crit_toggle.toggled.connect(_apply_crit)
 	_crit_value = _spin(row, 0, 100, 100)
 	_crit_value.value_changed.connect(_apply_crit)
+
+	_section(box, "Summoner spells")
+	row = _row(box)
+	for slot in 2:
+		_label(row, "D" if slot == 0 else "F")
+		var picker := OptionButton.new()
+		picker.focus_mode = Control.FOCUS_NONE
+		picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		for spell in SummonerSpells.SPELLS:
+			picker.add_item(spell.display_name)
+		picker.item_selected.connect(_pick_summoner.bind(slot))
+		row.add_child(picker)
+		_summoner_pickers.append(picker)
 
 	box = _tab(tabs, "Items")
 	_section(box, "Items")

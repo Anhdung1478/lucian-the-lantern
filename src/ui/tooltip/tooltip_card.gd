@@ -85,6 +85,18 @@ static func skill(lucian: Lucian, shown: LucianSkill, icon_texture: Texture2D, k
 	return card
 
 
+## A summoner spell's card: icon, name, key, cooldown and what it does.
+static func summoner(spell: SummonerData, key: String) -> Control:
+	var icon := TextureRect.new()
+	icon.texture = spell.icon
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	var card := _card(icon, spell.display_name, "Summoner spell [%s]" % key, "")
+	_body(card, TooltipText.color("Cooldown: ", TooltipText.DIM) + "%s s" % TooltipText.number(spell.cooldown))
+	_separator(card)
+	_body(card, TooltipText.colorize(spell.description))
+	return card
+
+
 ## A HUD buff's card: icon, name, time left and what it does.
 static func buff(shown: Dictionary) -> Control:
 	var icon := TextureRect.new()

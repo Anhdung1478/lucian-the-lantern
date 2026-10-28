@@ -21,6 +21,8 @@ const GOLD_COLOR := Color("ffcf5a")
 const MARGIN := 12.0
 ## Space between the buff icons and the bottom panel.
 const BUFF_GAP := 8.0
+## Space between R and the summoner spells.
+const SUMMONER_GAP := 10.0
 
 var lucian: Lucian
 var wallet: Wallet
@@ -56,6 +58,12 @@ func setup(target: Lucian, stage_wallet: Wallet) -> void:
 	var settings := GameSettings.instance()
 	for i in SKILL_ICONS.size():
 		_add_skill_slot(target.skills[i], SKILL_ICONS[i], settings.key_label(SKILL_ACTIONS[i]))
+	var gap := Control.new()
+	gap.custom_minimum_size.x = SUMMONER_GAP
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	skill_row.add_child(gap)
+	for i in LucianController.SUMMONER_ACTIONS.size():
+		skill_row.add_child(SummonerSlot.new(target, i))
 	for i in Inventory.EQUIP_SIZE:
 		var item_slot := HudItemSlot.new(target.inventory, i)
 		item_slot.lucian = target

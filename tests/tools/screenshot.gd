@@ -84,6 +84,8 @@ func _run(scenario: String) -> void:
 			await scenario_stats()
 		"rfc_ring":
 			await scenario_rfc_ring()
+		"summoners":
+			await scenario_summoners()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -810,3 +812,45 @@ func scenario_rfc_ring() -> void:
 	await wait(1.5)
 	print("ring after the shot lands (expect false): ", lucian.passives.shows_rfc_ring())
 	await shot("rfc_ring_1_gone")
+
+
+func scenario_summoners() -> void:
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	var hud: Hud = stage.get_node("Hud")
+	var table: DebugTable = stage.get_node("DebugTable")
+	table.visible = true
+	await wait(0.2)
+	await shot("summoners_0_hud_and_picker")
+	table.visible = false
+	var start := lucian.global_position
+	lucian.use_summoner(0, start + Vector2(600, -300))
+	await wait(0.05)
+	print("flash distance (expect 400): ", roundi(lucian.global_position.distance_to(start)))
+	await shot("summoners_1_flash")
+	lucian.summoners.set_spell(0, &"barrier")
+	lucian.summoners.set_spell(1, &"ghost")
+	lucian.use_summoner(0, Vector2.ZERO)
+	lucian.use_summoner(1, Vector2.ZERO)
+	await wait(0.3)
+	print("shield (expect 113): ", roundi(lucian.total_shield()), "  ghosted (expect true): ", lucian.is_ghosted())
+	await shot("summoners_2_barrier_ghost")
+	lucian.summoners.set_spell(0, &"smite")
+	lucian.summoners.set_spell(1, &"heal")
+	lucian.blink_to(dummy.global_position + Vector2(-450, 0))
+	lucian.hp = 300.0
+	var before := dummy.hp
+	lucian.use_summoner(0, dummy.global_position)
+	print("smite damage (expect 450): ", roundi(before - dummy.hp), "  hp after smite (expect 360): ", roundi(lucian.hp))
+	await wait(0.1)
+	await shot("summoners_3_smite")
+	lucian.use_summoner(1, Vector2.ZERO)
+	lucian.summoners.set_spell(0, &"clarity")
+	lucian.mana = 50.0
+	lucian.use_summoner(0, Vector2.ZERO)
+	print("hp after heal (expect 455): ", roundi(lucian.hp), "  mana after clarity (expect 210): ", roundi(lucian.mana))
+	await wait(0.2)
+	await shot("summoners_4_heal_clarity")
+	var slot: Control = hud.skill_row.get_child(hud.skill_row.get_child_count() - 1)
+	await mouse_move(control_center(slot))
+	await wait_for_tooltip(slot)
+	await shot("summoners_5_card")

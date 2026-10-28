@@ -81,3 +81,10 @@ func test_buff_cards_build_for_every_buff() -> void:
 		var card := TooltipCard.buff(buff)
 		assert_not_null(card, str(buff.id))
 		card.free()
+
+
+func test_summoner_cards_build() -> void:
+	for spell in SummonerSpells.SPELLS:
+		var card := TooltipCard.summoner(spell, "D")
+		assert_not_null(card, str(spell.id))
+		card.free()
