@@ -27,31 +27,56 @@
 ### Bottom center – Lucian's panel
 - **Portrait** showing the current skin, with the **level number** and an **XP bar**.
 - **HP bar** and **mana bar**.
-- **Skill icons:** Passive, Q, W, E, R.
+- **Skill icons:** Passive, Q, W, E, R. The passive is smaller (45 px, 70% of a 64 px skill icon), centered on the skill row.
   - Cooldown timer and rank dots on each.
   - **Mana cost** shown as a number in the **top-left corner** of each skill icon.
-  - A **"+" button** appears when there is a skill point and a bought rank to spend it on.
+  - **"+" buttons:** while there is an unspent skill point, every skill that isn't maxed shows a "+" in a ring above it. **Gold** when it can rank up now (click it or press Ctrl + the skill key); **grey** when it can't yet (Q/W/E rank *r* needs level 2*r* − 1, R needs level 6 / 11 / 16); **grey with a small lock** when the next rank isn't bought in the Evolution Tree. No "+" with 0 points or on a maxed skill.
   - Unbought skills show a **lock icon**.
-- **Hover a skill or the passive** for about **1 second** to see its card, like LoL: name, key, rank, mana cost and cooldown per rank, and a description where per-rank values show the current rank lit up and scalings in their stat color (AD orange, AP purple). The max rank bonus is listed last and lights up once reached.
-- **Summoner spells** (D / F) with cooldowns.
+  - **Greyed out** while another skill holds it back: Q and W (once learned) while R fires, E during Q's cast time.
+- **Hover a skill or the passive** for about **1 second** to see its card, like LoL: name, key, rank, mana cost and cooldown per rank, and a description where per-rank values show the current rank lit up and scalings in their stat color (AD orange, AP blue). The max rank bonus is listed last and lights up once reached.
+- **Summoner spells** (D / F): 48 px icons right of R, with a cooldown sweep and seconds and the key. Hover one for its card (name, key, cooldown, effect).
 - **Item slots 1–6:** in a 3 × 2 grid right of the HP / mana bars. Only unlocked slots are shown, with cooldowns for active items (sweep and seconds) and a potion stack's count. Hovering one shows the item's card.
 - **Key labels** (skills and item slots) follow the bindings in Settings.
 
 ### Buff icons (above the skill bar)
 - **Very small icons** (36 px) in a row just above the HUD panel, starting over the portrait, like LoL.
 - Shows: Blue / Red buff (with timer), current Endless modifier, status effects (slow, stun, burn, etc.).
-- **Phase 3 shows:** potions being drunk, move speed buffs (W, Fervor, Stormrazor, Rocketbelt), the Bloodthirster shield, and item passive states:
+- **Phase 3 shows:** potions being drunk, move speed buffs (W, Fervor, Stormrazor, Rocketbelt, and since Phase 4 Ghost and Heal), the Bloodthirster shield, Barrier, and item passive states:
   - **Energized** (only while an Energized item is equipped): the charge 0–100; glows gold at 100.
   - **Kraken Slayer**: the hit count; glows before the 3rd hit.
   - Spellblade ready, Spear of Shojin stacks, Jak'Sho stacks, Archangel's mana charge.
 - A dark sweep shows the time that has run out; a number shows stacks, charge or shield.
 - **Hover** the cursor over an icon to see its effect.
 - **Enemy statuses** (Carve stacks, Grievous Wounds, slow, Hatefog) show as tiny icons above the enemy's HP bar.
-- A shield shows as a white segment after the HP on Lucian's HP bar, and as "(+N)" in its text.
+- A shield (Ichorshield and Barrier together) shows as a white segment after the HP on Lucian's HP bar, and as "(+N)" in its text.
+- With **Rapid Firecannon** equipped and the Energized charge full, a light-blue ring shows its longer attack range until the Energized shot lands.
 
 ### Stats panel (left of the portrait)
-- Shows AD, AP, Attack Speed, Armor, MR, Crit, Move Speed.
-- Press **C** to toggle it on or off.
+- Like LoL's: each stat is its **icon + value**, two per row. Main panel: AD | AP, Armor | MR, Attack speed | Ability haste, Crit | Move speed.
+- **Ctrl + C** toggles it on or off.
+- **Hold C** to show the extra stats above it (in its place when it is hidden): HP regen | Mana regen (per 5 s), Heal & shield power | Armor pen, Magic pen | Life steal, Omnivamp | Attack range, Tenacity.
+- **Hover a stat** for 1 second: a card with its icon, name, value and what it does.
+
+| Stat | Icon | Color |
+|---|---|---|
+| AD | one-headed axe | orange |
+| AP | round-headed missile | dark blue |
+| Armor | breastplate inside a second frame | yellow |
+| Magic resist | circle inside a circle frame | light blue |
+| Attack speed | dagger with speed lines | light yellow |
+| Ability haste | hourglass | white |
+| Crit chance | pointed missile | red |
+| Move speed | boot with speed lines | white |
+| Health / HP regen | heart / heart + up arrow | green |
+| Mana / Mana regen | droplet / droplet + up arrow | blue |
+| Heal & shield power | cross over a shield | teal |
+| Armor / Magic pen | arrow through a breastplate / a circle | orange-red / violet |
+| Life steal | fang and a drop of blood | crimson |
+| Omnivamp | swirling drop | magenta |
+| Attack range | crosshair | grey |
+| Tenacity | broken chain | tan |
+
+Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 
 ### Top center – Stage info
 - Stage name, **wave counter** (e.g. Wave 2/4) and **enemies remaining**.
@@ -174,6 +199,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Hover** the cursor over a cell with an item for about **1 second** → a pop-up shows that item's stats and effect.
 - Works in the **backpack**, the **merchant's shop**, the **recipe table** and the **HUD item slots**.
 - Layout like LoL: icon, name and cost; stat lines; each passive / active with its name; for a legendary, its recipe.
+- Each stat line is the **stat icon, the amount in the stat's color, then the name**, e.g. `[axe] +65 Attack Damage`.
 
 ---
 
@@ -231,8 +257,8 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 | Tab | Contents |
 |---|---|
 | Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. No music yet. |
-| Controls | Every rebindable action with its key or mouse button. Click one, then press a key or mouse button; ESC cancels. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound; Ctrl + a skill key still ranks the skill up. |
-| Graphics | Window mode (windowed, borderless fullscreen, fullscreen), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails or muzzle flashes; Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
+| Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. |
+| Graphics | Window mode (windowed, borderless fullscreen, fullscreen), Resolution (1280×720, 1366×768, 1600×900, 1920×1080, 2560×1440, 3840×2160; only sizes that fit the screen; sets and centers the window, greyed out in borderless/fullscreen), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails or muzzle flashes; Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
 | Gameplay | Skill queue (on by default; see the game design doc §2). |
 
 - **Not yet:** cast modes (normal / quick / quick with indicator) and camera options.

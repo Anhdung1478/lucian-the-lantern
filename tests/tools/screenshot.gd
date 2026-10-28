@@ -86,6 +86,8 @@ func _run(scenario: String) -> void:
 			await scenario_rfc_ring()
 		"summoners":
 			await scenario_summoners()
+		"camera":
+			await scenario_camera()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -721,6 +723,7 @@ func scenario_actives() -> void:
 	await wait(0.2)
 	print("gunblade (expect true): ", lucian.use_equip_slot(0, dummy.global_position))
 	await wait(0.05)
+	print("slow (expect true): ", dummy.has_status(Enemy.SLOW))
 	await shot("actives_0_gunblade")
 	await wait(0.5)
 	print("galeforce (expect true): ", lucian.use_equip_slot(1, dummy.global_position))
@@ -735,7 +738,7 @@ func scenario_actives() -> void:
 	lucian.try_cast(ChampionProgress.Slot.R, dummy.global_position)
 	await wait(1.0)
 	await shot("actives_3_hatefog")
-	print("hatefog on the dummy (expect true): ", dummy.has_status(Enemy.HATEFOG), "  slow (expect true): ", dummy.has_status(Enemy.SLOW))
+	print("hatefog on the dummy (expect true): ", dummy.has_status(Enemy.HATEFOG))
 
 
 func scenario_energized() -> void:
@@ -854,3 +857,17 @@ func scenario_summoners() -> void:
 	await mouse_move(control_center(slot))
 	await wait_for_tooltip(slot)
 	await shot("summoners_5_card")
+
+
+func scenario_camera() -> void:
+	var camera: StageCamera = stage.get_node("StageCamera")
+	camera.mode = StageCamera.Mode.FREE
+	lucian.global_position = Vector2(2000, 1500)
+	camera.global_position = Vector2(3200, 900)
+	await wait(0.2)
+	await shot("camera_0_away")
+	await press_key(KEY_SPACE, true)
+	await press_key(KEY_SPACE, false)
+	await wait(0.1)
+	print("camera after Space (expect (2000, 1500)): ", camera.global_position.round(), "  still free (expect true): ", camera.mode == StageCamera.Mode.FREE)
+	await shot("camera_1_back")

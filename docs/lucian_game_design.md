@@ -31,12 +31,14 @@
 | Left-click on enemy | Attack |
 | A + left-click | Attack-move |
 | Q / W / E / R | Skills |
-| D / F | Summoner spells *(proposed)* |
+| D / F | Summoner spells |
 | 1–6 | Item actives and potions in equip slots 1–6 |
 | P | Open backpack (pauses the game) |
 | ESC | Open menu: resume, settings, leave stage, exit (pauses the game) |
-| C | Toggle stats panel |
+| Ctrl + C | Toggle the stats panel |
+| Hold C | Show the extra stats (regen, heal & shield power, penetration, life steal, omnivamp, range, tenacity) |
 | Y | Toggle camera between free-cam and Lucian cam (follows Lucian). Default: free-cam |
+| Space | Move the camera back over Lucian once (free-cam stays free) |
 
 **Cast modes (chosen in settings):** normal cast, quick cast, or quick cast with indicator. *(Not built yet: skills are quick cast.)*
 
@@ -117,6 +119,7 @@
 - In a stage, skill points can only be spent on ranks that have been bought.
 - Skill points that can't be spent are **wasted** (they are not saved or converted).
 - R can only be ranked at **level 6, 11 and 16**, like LoL.
+- Q / W / E rank *r* needs level 2*r* − 1 (rank 2 at level 3, rank 3 at 5, rank 4 at 7, rank 5 at 9), like LoL.
 - Q / W / E have 5 ranks. R has 3 ranks.
 - Normal ranks add damage and lower cooldown.
 
@@ -241,6 +244,19 @@ Only these pairs combine. **Stats and unique passives/actives are based on LoL**
 | Clarity | Restore a large amount of mana |
 
 - Cooldowns: **30–90 seconds**. They do **not** reset between waves.
+
+**Built in Phase 4** (placeholder numbers; no ability haste; each spell keeps its own cooldown, also when moved to the other key):
+
+| Spell | Cooldown | Effect |
+|---|---|---|
+| Flash | 90 s | Blink up to 400 toward the cursor; walls and enemy bodies stop it short. |
+| Ghost | 60 s | +40% move speed and pass through enemies for 6 s. |
+| Barrier | 60 s | Shield of 95 + 18 × level for 2.5 s. |
+| Heal | 60 s | Heal 80 + 15 × level, +30% move speed fading over 1 s. |
+| Clarity | 45 s | Restore 50% of max mana. |
+| Smite | 30 s | 450 true damage to the enemy nearest the cursor within 500, heal 10% of max HP. |
+
+Until the Evolution Tree exists, both slots are open and every spell is available: D and F are picked in the debug table (default Flash on D, Heal on F).
 - **1st slot is free**, the **2nd slot** is bought in the Evolution Tree.
 - **Every spell must be bought** in the Evolution Tree.
 - Upgrades: shorter cooldown, more heal, more mana, more damage, bigger shield.

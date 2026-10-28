@@ -10,8 +10,8 @@ are equipped. Since Phase 3 most passives and all three actives work in combat; 
 *What works in combat* at the end.
 
 **Energized** attacks work like LoL: moving and attacking build stacks; at 100 the next attack is Energized.
-In this game: +10 per basic attack, +1 per 24 units walked, and dashes count double. The charge
-only builds while an Energized item is equipped.
+In this game: +9 per basic attack, +1 per 24 units walked, and dashes count double (Flash doesn't
+count). The charge only builds while an Energized item is equipped.
 
 The merchant buys items back for **70%** of their cost (**Guardian Angel: 40%**).
 
@@ -341,7 +341,8 @@ The merchant buys items back for **70%** of their cost (**Guardian Angel: 40%**)
 
 ## What works in combat (Phase 3)
 
-Numbers not given above were picked during Phase 3 (`docs/implementation/phase3.md`).
+Numbers not given above were picked during Phase 3 (`docs/implementation/phase3.md`) and tuned
+in Phase 4 (`docs/implementation/phase4.md`).
 
 | Item | Works as |
 |---|---|
@@ -362,16 +363,17 @@ Numbers not given above were picked during Phase 3 (`docs/implementation/phase3.
 | Shadowflame | Magic damage to enemies below 40% HP: +20%. |
 | Archangel's Staff | AP from 2% max mana. The first skill hit of each cast adds 3 max mana, up to 360 (kept for the stage). |
 | Fimbulwinter | Max HP from 8% max mana. *Everlasting* (shield) waits for enemies that hit back. |
-| Rapid Firecannon | Energized: +60 magic, and the attack reaches 35% further. |
+| Rapid Firecannon | Energized: +60 magic, and the attack reaches 35% further. A light-blue ring shows that reach from full charge until the Energized shot lands. |
 | Essence Reaver | After a skill, the next basic attack adds 100% base AD + 40% bonus AD physical and restores 40% of it as mana. 1.5 s cooldown. |
 | Spirit Visage | +25% heal & shield power (life steal, omnivamp, potions). |
 | Muramana | AD from 2.5% max mana. Skill hits add 3% max mana physical; attacks 1.5%. |
 | Jak'Sho | Each second in combat (dealt damage in the last 3 s): +5% armor and MR, up to 30%. |
 | Hextech Gunblade | Active (key 1–6): the enemy nearest the cursor within 700 takes 175 (+30% AP) magic and is slowed for 2 s. Refused with no enemy in range. |
 | Galeforce | Active: 200-unit dash toward the cursor, then 3 missiles at the lowest-health enemy within 750, 60 (+15% bonus AD) magic each. |
-| Hextech Rocketbelt | Active: 275-unit dash, an arc of 7 bolts forward (each enemy hit once) for 100 (+10% AP) magic, then +75% move speed fading over 2 s. |
+| Hextech Rocketbelt | Active: 275-unit dash, an arc of 7 bolts forward that fly 900 from where Lucian started (each enemy hit once) for 100 (+10% AP) magic, then +75% move speed fading over 2 s. |
 
-Actives share one cooldown per item (every copy), which keeps running after selling.
+Actives share one cooldown per item (every copy), which keeps running after selling. The debug
+"No cooldowns" cheat also refreshes item cooldowns that are already running.
 "On hit" effects use basic attacks and Lightslinger shots; counters and "next attack"
 effects (Kraken Slayer, Energized, Spellblade, Navori, Runaan's) use the main shot only.
 
