@@ -7,7 +7,15 @@ extends SceneTree
 const SETTINGS_PATH := "user://screenshot_settings.json"
 const SAVE_PREFIX := "user://screenshot_save_slot_"
 ## Scenarios that start from the game's root scene (the main screen).
-const GAME_SCENARIOS := ["training_setup", "skins_stage", "title"]
+const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots"]
+## Scenarios played on a Journey stage: [act, stage], built from the new save
+## (so Act 1 is its first play, the tutorial).
+const ACT_SCENARIOS := {
+	"act1_start": [1, 1], "act1_wave": [1, 1], "act1_shell": [1, 1], "act1_break": [1, 1],
+	"act1_thresh": [1, 1], "act1_cutscene": [1, 1], "act1_result": [1, 1],
+	"act2_pillars": [2, 3], "act2_super": [2, 1], "akshan_e": [2, 3], "akshan_r": [2, 3],
+	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
+}
 
 var stage: Node
 var lucian: Lucian
@@ -42,11 +50,12 @@ func _initialize() -> void:
 		# "Save before leaving?" must never close the run.
 		game_root.quit_game = func() -> void: print("quit_game called")
 		root.add_child(game_root)
-		if scenario != "title":
-			game_root.show_main_screen()
 		_run.call_deferred(scenario)
 		return
 	stage = load("res://src/stage/stage.tscn").instantiate()
+	if ACT_SCENARIOS.has(scenario):
+		var where: Array = ACT_SCENARIOS[scenario]
+		(stage as Stage).setup(StageSetup.for_stage(save, where[0], where[1]))
 	root.add_child(stage)
 	# The stage confines the mouse; give it back during automated runs.
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -56,6 +65,10 @@ func _initialize() -> void:
 
 
 func _run(scenario: String) -> void:
+	# The game opens on the title screen; these start on the main screen. Not
+	# in _initialize: the game root isn't in the tree yet there.
+	if game_root and not scenario.begins_with("title"):
+		game_root.show_main_screen()
 	await wait(0.3)
 	match scenario:
 		"move":
@@ -140,6 +153,36 @@ func _run(scenario: String) -> void:
 			await scenario_main_debug()
 		"title":
 			await scenario_title()
+		"title_slots":
+			await scenario_title_slots()
+		"act1_start":
+			await scenario_act1_start()
+		"act1_wave":
+			await scenario_act1_wave()
+		"act1_shell":
+			await scenario_act1_shell()
+		"act1_break":
+			await scenario_act1_break()
+		"act1_thresh":
+			await scenario_act1_thresh()
+		"act1_cutscene":
+			await scenario_act1_cutscene()
+		"act1_result":
+			await scenario_act1_result()
+		"act2_pillars":
+			await scenario_act2_pillars()
+		"act2_super":
+			await scenario_act2_super()
+		"akshan_e":
+			await scenario_akshan_e()
+		"akshan_r":
+			await scenario_akshan_r()
+		"defeat":
+			await scenario_defeat()
+		"loot":
+			await scenario_loot()
+		"guardian_angel":
+			await scenario_guardian_angel()
 		"training_setup":
 			await scenario_training_setup()
 		"skins_stage":
@@ -1311,10 +1354,7 @@ func scenario_main_gear() -> void:
 	await wait(0.2)
 	var leave := main.gear.find_button("Leave to main menu")
 	print("Leave to main menu enabled (expect true): ", not leave.disabled)
-	await mouse_move(control_center(leave))
-	await wait_for_tooltip(leave)
 	await shot("main_gear_0_menu")
-	await mouse_move(Vector2(960, 1000))
 	main.gear.find_button("Save").pressed.emit()
 	await wait(0.1)
 	print("Save: slot 1 written (expect true), toast (expect Saved to slot 1): ",
@@ -1376,19 +1416,6 @@ func scenario_main_debug() -> void:
 ## equip slot, an empty D and a chained F (with their cards), and the stage
 ## debug table. Then back, Max tree with Flash and Heal: everything open, the
 ## upgrade line on a spell card and the cheaper refresh in the shop.
-## The title screen, the new game slot list and the load list.
-func scenario_title() -> void:
-	var title := game_root.screen as TitleScreen
-	await wait(0.2)
-	await shot("title_0_menu")
-	title.show_slots(false)
-	await wait(0.1)
-	await shot("title_1_new_game")
-	title.show_slots(true)
-	await wait(0.1)
-	await shot("title_2_load")
-
-
 func scenario_training_setup() -> void:
 	await start_training()
 	var hud: Hud = stage.get_node("Hud")
@@ -1468,3 +1495,415 @@ func scenario_skins_stage() -> void:
 		await shot("skins_stage_%d_%s" % [i, skin.id])
 		Input.action_release(&"toggle_stats")
 		await leave_stage()
+
+
+# --- Phase 6: the title screen, Acts 1 and 2 -------------------------------
+
+
+## The title screen as it opens on a new game: Load game disabled (hovered:
+## why).
+func scenario_title() -> void:
+	var title := game_root.screen as TitleScreen
+	await wait(0.2)
+	print("Load game disabled on a new game (expect true): ", title.load_button.disabled,
+		"  hover (expect No saved games yet): ", title.load_button.get_meta(&"hover_text", ""))
+	await shot("title_0_menu")
+	await mouse_move(control_center(title.load_button))
+	await wait_for_tooltip(title.load_button)
+	await shot("title_1_load_disabled")
+
+
+## Slot 2 saved (with some play time): Start new game lists it, picking it
+## asks first; Load game lists only slot 2.
+func scenario_title_slots() -> void:
+	var title := game_root.screen as TitleScreen
+	var save := SaveGame.instance()
+	save.add_play_time(3720.0)
+	save.essences.add(Essences.BLUE, 300)
+	save.copy_to(2)
+	title.show_menu()
+	await wait(0.2)
+	print("Load game enabled once a slot exists (expect true): ", not title.load_button.disabled)
+	title.show_slots(false)
+	await wait(0.2)
+	print("new game slots (expect slot 2 with 1h 02m): ", title.slot_list.buttons.map(func(button: Button) -> String: return button.text))
+	await shot("title_slots_0_new_game")
+	title.slot_list.buttons[1].pressed.emit()
+	await wait(0.2)
+	print("slot 2 is used, so it asks (expect true): ", title.confirm.is_open())
+	await shot("title_slots_1_overwrite")
+	title.confirm.answer(false)
+	title.show_slots(true)
+	await wait(0.2)
+	print("load slots disabled (expect [true, false, true]): ", title.slot_list.buttons.map(func(button: Button) -> bool: return button.disabled))
+	await shot("title_slots_2_load")
+
+
+func game_stage() -> Stage:
+	return stage as Stage
+
+
+func map_lane() -> MidLaneMap:
+	return game_stage().arena as MidLaneMap
+
+
+## The tip on screen ends and any queued ones go, as if their time had run
+## (in real play a wave takes a minute or more, so the next tip is the one
+## that matters).
+func flush_tips() -> void:
+	var tips := game_stage().hud.tips
+	tips._queue.clear()
+	tips._left = 0.0
+	tips.visible = false
+
+
+## The debug table's Kill all: each enemy dies as a kill (gold, XP, essences,
+## loot) and counts toward the wave.
+func kill_all() -> void:
+	(stage.get_node("DebugTable") as DebugTable)._kill_all()
+
+
+## Skip (the HUD button) starts the next wave; once all of it has spawned,
+## Kill all ends it. The tips so far go first, so the break's tip shows.
+func clear_wave() -> void:
+	var game := game_stage()
+	game.skip_break()
+	while game.runner.alive() > get_nodes_in_group(&"enemies").size():
+		await wait(0.1)
+	flush_tips()
+	kill_all()
+	await wait(0.2)
+
+
+func info_text() -> String:
+	var info := game_stage().hud.stage_info
+	var parts := []
+	for label: Label in [info.name_label, info.wave_label, info.enemies_label, info.timer_label]:
+		if label.visible:
+			parts.append(label.text)
+	if info.skip_button.visible:
+		parts.append("[Skip]")
+	return "  ".join(parts)
+
+
+## The first ground warning of `shape` in the stage, waiting up to `timeout`.
+func wait_for_warning(shape: GroundWarning.Shape, timeout := 8.0) -> GroundWarning:
+	var left := timeout
+	while left > 0.0:
+		for node in stage.get_node("Warnings").get_children():
+			if node is GroundWarning and (node as GroundWarning).shape == shape:
+				return node
+		await wait(0.05)
+		left -= 0.05
+	push_error("no warning of shape %d" % shape)
+	return null
+
+
+## The boss of the boss wave, waiting for it to spawn.
+func wait_for_boss() -> EnemyUnit:
+	while not Lucian.is_target(game_stage().boss_unit):
+		await wait(0.05)
+	return game_stage().boss_unit
+
+
+## Lucian jumps to `to` (a shortcut for walking there); Senna, if she is
+## with him, lands at her place beside him as she would have walked.
+func blink(to: Vector2) -> void:
+	lucian.blink_to(to)
+	var senna := game_stage().senna
+	if senna:
+		senna.global_position = to + Senna.FOLLOW_OFFSET.rotated(lucian.visuals.rotation)
+
+
+## Act 1's first second: the move tip, Senna beside Lucian, "Wave 1 in 0:05"
+## and the radar.
+func scenario_act1_start() -> void:
+	var game := game_stage()
+	print("stage info (expect Act 1 · The Loss  Wave 1 in 0:05  [Skip]): ", info_text())
+	print("tip (expect Right-click to move…): ", game.hud.tips.label.text, "  shown: ", game.hud.tips.visible)
+	print("tutorial: one gun (expect true), ranks (expect [0, 0, 0, 0]), D/F (expect empty): ",
+		lucian.one_gun, " ", lucian.progress.bought, " ", lucian.summoners.slots)
+	print("Senna near Lucian (expect < 260): ", roundi(game.senna.global_position.distance_to(lucian.global_position)),
+		"  radar shown (expect true): ", game.hud.radar.is_visible_in_tree())
+	await shot("act1_start_0")
+
+
+## Wave 1 reaches Lucian: "Wave 1/2", the enemies left, red dots on the radar,
+## and the minions' hits as numbers over him.
+func scenario_act1_wave() -> void:
+	var game := game_stage()
+	game.skip_break()
+	flush_tips()
+	# Halfway up the lane, so the wave meets him sooner.
+	blink(map_lane().center() - map_lane().along() * 300.0)
+	var hits := [0]
+	lucian.damage_received.connect(func(_info: DamageInfo, _amount: float) -> void: hits[0] += 1)
+	while hits[0] < 4:
+		await wait(0.1)
+	lucian.command_attack_move(lucian.global_position)
+	await wait(1.2)
+	print("stage info (expect Act 1 · The Loss  Wave 1/2  Enemies: N): ", info_text())
+	print("enemies on the map: ", get_nodes_in_group(&"enemies").size(), "  hits on Lucian so far: ", hits[0],
+		"  HP: ", roundi(lucian.hp))
+	await shot("act1_wave_0")
+
+
+## A siege minion's Cannon Shell: the red circle on Lucian before it lands.
+func scenario_act1_shell() -> void:
+	var game := game_stage()
+	flush_tips()
+	var siege := game.spawn_enemy(WavePlan.SIEGE, lucian.global_position + map_lane().along() * 600.0)
+	game._tip(&"siege")
+	var warning := await wait_for_warning(GroundWarning.Shape.CIRCLE)
+	await wait(0.55)
+	print("shell circle: radius (expect 110), on Lucian (expect < 40): ", warning.reach, " ",
+		roundi(warning.global_position.distance_to(lucian.global_position)), "  siege alive: ", siege.is_alive())
+	print("tip (expect A red circle marks…): ", game.hud.tips.label.text)
+	await shot("act1_shell_0")
+
+
+## Wave 1 cleared: the break, "Wave 2 in 0:17" with Skip, the merchant on
+## the lane and his tip.
+func scenario_act1_break() -> void:
+	var game := game_stage()
+	await clear_wave()
+	# The first kill's tip; in real play it is long gone by the break.
+	game.hud.tips._left = 0.0
+	blink(game.arena.merchant_point - map_lane().along() * 380.0)
+	await wait(3.2)
+	print("stage info (expect Wave 2 in 0:17  [Skip]): ", info_text())
+	print("merchant on the map (expect true): ", is_instance_valid(game.merchant),
+		"  gold: ", game.wallet.gold, "  blue collected: ", game.collected[Essences.BLUE])
+	await shot("act1_break_0")
+
+
+## Both waves cleared, then the boss wave: Thresh rises from the river.
+func to_thresh() -> Thresh:
+	var game := game_stage()
+	await clear_wave()
+	await clear_wave()
+	flush_tips()
+	# Across the river from where he rises, so he isn't under the top of the HUD.
+	blink(game.arena.boss_point + map_lane().along() * 520.0)
+	game.skip_break()
+	return await wait_for_boss() as Thresh
+
+
+## The boss bar, and Death Sentence's line warning toward Lucian.
+func scenario_act1_thresh() -> void:
+	var game := game_stage()
+	var thresh := await to_thresh()
+	var warning := await wait_for_warning(GroundWarning.Shape.LINE)
+	await wait(0.45)
+	var toward := warning.global_position.direction_to(lucian.global_position)
+	print("stage info (expect Boss wave  Enemies: 1): ", info_text(), "  boss bar shown (expect true): ", game.hud.boss_bar.visible)
+	print("hook line: length (expect 1000), width (expect 70), aimed at Lucian (expect ~0°): ", warning.reach, " ",
+		warning.width, " ", roundi(rad_to_deg(absf(warning.direction.angle_to(toward)))))
+	print("tip (expect Thresh's hook…): ", game.hud.tips.label.text, "  Thresh HP: ", roundi(thresh.hp))
+	await shot("act1_thresh_0")
+
+
+## Thresh down to half: the cutscene's letterbox and captions, the hook on
+## Senna, her soul flying to his lantern, the lantern lit.
+func scenario_act1_cutscene() -> void:
+	var game := game_stage()
+	var thresh := await to_thresh()
+	await wait(0.5)
+	thresh.take_damage(lucian.make_damage(thresh.max_hp, DamageInfo.Type.TRUE, &"debug"))
+	print("Thresh stops at half (expect 1500): ", roundi(thresh.hp), "  cutscene (expect true): ", game.cutscene != null)
+	var scene := game.cutscene
+	await wait(1.6)
+	print("caption: ", scene._speaker.text, ": ", scene._caption.text, "  HUD hidden (expect true): ", not game.hud.visible)
+	await shot("act1_cutscene_0_caption")
+	await press_key(KEY_SPACE, true)
+	await press_key(KEY_SPACE, false)
+	await wait(0.9)
+	print("caption: ", scene._speaker.text, ": ", scene._caption.text)
+	await shot("act1_cutscene_1_hook")
+	await press_key(KEY_SPACE, true)
+	await press_key(KEY_SPACE, false)
+	# The pull (0.5 s), then the soul rises (0.4 s) and flies (1.2 s).
+	await wait(1.4)
+	await shot("act1_cutscene_2_soul")
+	await wait(1.2)
+	print("caption: ", scene._speaker.text, ": ", scene._caption.text)
+	await shot("act1_cutscene_3_lantern")
+
+
+## The cutscene skipped: STAGE CLEARED, first-clear purple, the E line and
+## "Act 2 is open".
+func scenario_act1_result() -> void:
+	var game := game_stage()
+	var thresh := await to_thresh()
+	await wait(0.5)
+	thresh.take_damage(lucian.make_damage(thresh.max_hp, DamageInfo.Type.TRUE, &"debug"))
+	await wait(1.0)
+	game.cutscene.skip_button.pressed.emit()
+	await wait(0.4)
+	print("result (expect STAGE CLEARED): ", game.result.title.text, "  paused (expect true): ", paused)
+	print("reward lines: ", game.reward_lines)
+	print("purple (expect 10), bosses (expect [thresh_1]): ", SaveGame.instance().essences.amount(Essences.PURPLE),
+		" ", SaveGame.instance().bosses, "  waves (expect 3 / 3): ", game.runner.waves_done(), " / ", game.runner.total_waves())
+	await shot("act1_result_0")
+	paused = false
+
+
+## Stage 2-3: the ring of pillars, wave 1 coming in from three gates.
+func scenario_act2_pillars() -> void:
+	var game := game_stage()
+	game.skip_break()
+	await wait(3.5)
+	print("stage info (expect Stage 2-3 · The Sentinels  Wave 1/3  Enemies: 14): ", info_text())
+	print("pillars (expect 10): ", TrainingGroundMap.pillars(3).size(), "  spawn gates (expect 3): ", game.arena.spawn_points.size())
+	await shot("act2_pillars_0_wave")
+	game.camera.zoom = Vector2(0.42, 0.42)
+	await wait(0.2)
+	await shot("act2_pillars_1_ring")
+
+
+## A super minion with melee and ranged minions around it: Empower's icon
+## over the near ones, none over the far one.
+func scenario_act2_super() -> void:
+	var game := game_stage()
+	var at := lucian.global_position + Vector2(0, -520)
+	var super_minion := game.spawn_enemy(WavePlan.SUPER, at)
+	var near: Array[EnemyUnit] = []
+	for offset: Vector2 in [Vector2(-150, 60), Vector2(150, 60), Vector2(-110, -120), Vector2(120, -110)]:
+		near.append(game.spawn_enemy(WavePlan.MELEE if offset.y > 0 else WavePlan.RANGED, at + offset))
+	var far := game.spawn_enemy(WavePlan.MELEE, at + Vector2(820, 0))
+	await wait(0.7)
+	print("empowered near (expect [true, true, true, true]): ", near.map(func(unit: EnemyUnit) -> bool: return unit.has_status(EnemyUnit.EMPOWER)),
+		"  far (expect false): ", far.has_status(EnemyUnit.EMPOWER), "  super: ", super_minion.data.display_name)
+	await shot("act2_super_0")
+	await mouse_move(Vector2(960, 540))
+	game.camera.mode = StageCamera.Mode.FREE
+	var middle := super_minion.global_position
+	for unit in near:
+		middle += unit.global_position
+	game.camera.global_position = middle / (near.size() + 1)
+	game.camera.zoom = Vector2(1.6, 1.6)
+	await wait(0.1)
+	await shot("act2_super_1_close")
+
+
+## Akshan in stage 2-3's boss wave.
+func to_akshan(lucian_at: Vector2) -> Akshan:
+	var game := game_stage()
+	flush_tips()
+	lucian.blink_to(lucian_at)
+	game.jump_to_boss_wave()
+	return await wait_for_boss() as Akshan
+
+
+## Heroic Swing: the circle warning near Lucian, then Akshan swinging round
+## it, firing gold bolts outward.
+func scenario_akshan_e() -> void:
+	var akshan := await to_akshan(Vector2(1500, 1000))
+	akshan._cooldowns[&"avengerang"] = 60.0
+	akshan._cooldowns[&"heroic_swing"] = 0.0
+	akshan.global_position = Vector2(950, 1000)
+	var warning := await wait_for_warning(GroundWarning.Shape.CIRCLE)
+	await wait(0.7)
+	print("swing circle: radius (expect 300), Lucian inside (expect true): ", warning.reach, " ",
+		warning.covers(lucian.global_position))
+	await shot("akshan_e_0_warning")
+	while not akshan.swinging():
+		await wait(0.05)
+	await wait(1.1)
+	var bolts := stage.get_node("Projectiles").get_children().filter(func(node: Node) -> bool: return node is EnemyProjectile)
+	print("swinging (expect true): ", akshan.swinging(), "  bolts in the air: ", bolts.size())
+	await shot("akshan_e_1_swing")
+
+
+## Comeuppance: Lucian behind a pillar of the ring. The lock line follows
+## him, then the burst hits the pillar, not him.
+func scenario_akshan_r() -> void:
+	# The ring's pillar at 18°, between Akshan (inside the ring) and Lucian.
+	var pillar := TrainingGroundMap.pillars(3)[0]
+	var akshan := await to_akshan(pillar + Vector2(130, 0))
+	akshan.global_position = pillar - Vector2(470, 0)
+	akshan.move_speed = 0.0
+	akshan.hp = akshan.max_hp * 0.7
+	akshan.health_bar.set_health(akshan.hp, akshan.max_hp)
+	akshan._cooldowns[&"avengerang"] = 60.0
+	akshan._cooldowns[&"heroic_swing"] = 60.0
+	var hp_before := lucian.hp
+	var warning := await wait_for_warning(GroundWarning.Shape.LOCK)
+	await wait(1.0)
+	print("lock line on Lucian (expect true): ", warning.follow == lucian, "  pillar at ", pillar)
+	await shot("akshan_r_0_lock")
+	await wait(1.15)
+	await shot("akshan_r_1_burst")
+	await wait(1.0)
+	print("Lucian's HP after the burst (expect unchanged %d): %d" % [roundi(hp_before), roundi(lucian.hp)])
+
+
+## Three melee minions around Lucian, low on HP.
+func surround(hp: float) -> void:
+	var game := game_stage()
+	for offset: Vector2 in [Vector2(-150, -110), Vector2(160, -100), Vector2(10, 170)]:
+		game.spawn_enemy(WavePlan.MELEE, lucian.global_position + offset)
+		if game.runner:
+			game.runner.enemy_spawned()
+	lucian.hp = hp
+
+
+## Lucian dies to minions in stage 2-1's second wave: grey and fading, then
+## DEFEATED.
+func scenario_defeat() -> void:
+	var game := game_stage()
+	await clear_wave()
+	game.skip_break()
+	surround(30.0)
+	while not lucian.dead:
+		await wait(0.05)
+	await wait(0.6)
+	print("dead (expect true), body tint (expect grey 0.55, fading): ", lucian.dead, " ", lucian.visuals.modulate)
+	await shot("defeat_0_fading")
+	await wait(1.2)
+	var blue: int = game.collected[Essences.BLUE]
+	print("result (expect DEFEATED): ", game.result.title.text, "  waves (expect 1 / 2): ", game.runner.waves_done(), " / ", game.runner.total_waves())
+	print("blue kept in the save (expect %d): %d" % [blue, SaveGame.instance().essences.amount(Essences.BLUE)])
+	await shot("defeat_1_result")
+	paused = false
+
+
+## A fragment and a legendary on the ground; with a full backpack, walking
+## onto one says "Backpack full".
+func scenario_loot() -> void:
+	var game := game_stage()
+	var catalog := lucian.item_catalog
+	var legendaries := catalog.legendaries()
+	for i in Inventory.BACKPACK_SIZE:
+		lucian.inventory.add(legendaries[i % legendaries.size()])
+	var fragment := catalog.find(&"bf_sword")
+	game.drop_loot(fragment, lucian.global_position + Vector2(300, -60))
+	game.drop_loot(catalog.find(&"infinity_edge"), lucian.global_position + Vector2(460, 80))
+	await wait(0.3)
+	await shot("loot_0_ground")
+	var drops := stage.get_node("World").get_children().filter(func(node: Node) -> bool: return node is LootDrop)
+	lucian.command_move(drops[0].global_position)
+	await wait(1.2)
+	var notes := stage.get_node("World").get_children().filter(func(node: Node) -> bool: return node is FloatingText)
+	print("backpack space for a fragment (expect 0): ", lucian.inventory.space_for(fragment),
+		"  drops left (expect 2): ", stage.get_node("World").get_children().filter(func(node: Node) -> bool: return node is LootDrop).size(),
+		"  notes: ", notes.map(func(note: FloatingText) -> String: return note.text))
+	await shot("loot_1_backpack_full")
+
+
+## Guardian Angel: minions bring Lucian down; he is in gold stasis, then
+## comes back with half his base HP.
+func scenario_guardian_angel() -> void:
+	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"guardian_angel"))
+	surround(25.0)
+	while not lucian.in_stasis():
+		await wait(0.05)
+	await wait(0.6)
+	print("in stasis (expect true), dead (expect false): ", lucian.in_stasis(), " ", lucian.dead,
+		"  tint (expect gold %s): %s" % [Lucian.STASIS_TINT, lucian.visuals.modulate])
+	await shot("guardian_angel_0_stasis")
+	while lucian.in_stasis():
+		await wait(0.02)
+	print("revived: HP (expect 300, half his base HP, less any hits since), dead (expect false): ", roundi(lucian.hp), " ", lucian.dead)
+	await wait(0.3)
+	await shot("guardian_angel_1_revived")

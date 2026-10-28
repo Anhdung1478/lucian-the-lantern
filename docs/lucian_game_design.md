@@ -15,11 +15,32 @@
 | **Platform** | PC (mouse + keyboard) |
 | **Graphics** | Top-down view like LoL, simpler and less detailed |
 | **Character** | Lucian (more champions could be added later) |
-| **Target length** | A skilled player can beat the story in about 5 hours |
+| **Target length** | A skilled player needs at least 5–7 hours to beat the story |
 
 **Design rule:** this is not LoL. Everything taken from LoL (stats, items, skills, UI, enemies) should stay only about **70–80% similar**, adapted to fit this game.
 
 **Core loop:** Clear waves of enemies in a stage → earn stage gold, XP and essences → buy and craft items between waves → finish the stage → spend essences on permanent upgrades in the Evolution Tree → push into harder stages.
+
+### Pacing
+Minutes for a skilled player's first clear of each act, counting a few deaths, shopping, and the replays needed to afford Evolution Tree nodes.
+
+| Act | Stages | Waves (+ boss / mini boss waves) | Minutes |
+|---|---|---|---|
+| 1 | 1 | 2 + 1 | 8–10 (tutorial and cutscene) |
+| 2 | 3 | 8 + 1 | 30–40 |
+| 3 | 5 | 21 + 3 | 70–90 |
+| 4 | 3 | 14 + 1 | 45–60 |
+| 5 | 5 | 28 + 3 | 80–100 |
+| 6 | 5 | 33 + 3 | 90–120 |
+| **All** | 22 | 106 + 12 | **323–420 (5.4–7 h)** |
+
+**Rules of thumb:**
+- A wave should take a skilled player **about 2 minutes** of fighting.
+- A boss should take **2–3 minutes**.
+- A break is used, on average, for about 30 s of shopping.
+- About a third of each act's time is deaths and replays: farming essence for the tree (see the balance goal in §11).
+
+**Measuring it:** each stage's result panel shows its time, and the slot lists (title screen, Save as copy) show each slot's total play time. If Act 2 clears in under 25 minutes, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards.
 
 ---
 
@@ -97,6 +118,25 @@ Casts with no aim (potions, Ghost, Barrier, Heal, Clarity) and casts that aren't
 | Elite | None | Can have a **special normal attack** (e.g. siege minion's shell) or a **special trait** |
 | Mini boss | 2 skills | |
 | Boss | At least 3 skills | Exception: Thresh in Act 1 has only 2 |
+
+### Built in Phase 6
+Acts 1 and 2 play this way. Training keeps its dummies and has no waves.
+
+**Stage flow:**
+1. **"Wave 1 in 0:05"** at the top center, with Skip.
+2. A wave spawns in **groups of 3 every 1.2 s**, taking turns over the map's spawn points.
+3. Once every enemy of the wave is dead, a **20 s break**: the merchant comes at its start and leaves at its end.
+4. After the last wave, one more break, then the **boss wave** (if the stage has a boss).
+5. The **result panel**.
+
+- **Skip** starts the next wave now and gives Lucian the HP and mana regen of the time skipped, at once. Cooldowns and buffs don't move.
+- **Enemies** attack only Lucian. They walk straight at him, sliding along walls; one that gets stuck sidesteps for a moment. They bump into each other and into Lucian. There is no navigation mesh.
+- **Enemy bolts** are stopped by walls and pillars. Lucian's homing shots still fly over walls.
+- **Enemy hits** reach Lucian within his radius (30) of his center. Red ground warnings (circle, line, cone, lock line) fill up before an attack lands.
+- **Scaling** (bosses don't scale): per act after the first, HP × (1 + 0.6 · (act − 1)), damage and rewards × (1 + 0.25 · (act − 1)). Each wave after the first adds +15% HP and damage.
+- **Death:** Lucian turns grey and fades for 1.5 s, then DEFEATED shows. Enemies stand still while he is dead or in stasis. Guardian Angel's stasis comes first.
+- **Result panel** (pauses the game; ESC and P do nothing): **STAGE CLEARED** or **DEFEATED**, the stage name, "Waves cleared: 2 / 3 · Time 4:32", the essences collected and any first-clear lines. **Continue** auto-saves and opens the main screen on that act.
+- **The stage time** only runs while the game does: the backpack, the shop, the ESC menu and the result panel stop it.
 
 ---
 
@@ -319,6 +359,33 @@ Act 1's Thresh appears only on the first clear, so he gives no repeat purple.
 
 **First-time purple total:** 100 (6 mini bosses × 5 + 5 act bosses × 10 + final Thresh × 20).
 
+### Built in Phase 6
+Every kill pays out at once, Senna's kills too:
+- **Stage gold and XP:** the enemy's own amounts (in the act files), × (1 + 0.25 · (act − 1)).
+- **Blue and orange:** as in the table above. A boss gives 100 blue and 5 orange.
+- **Purple:** only from bosses, through the save's list of bosses already beaten (`"bosses"`, §15): the first-time amount once, the repeat amount after.
+- **Essences go into the save as they drop.** Leaving the stage, dying, or a Yes to "Save before leaving?" keeps them; a No loses them. They rise over the kill as "+1" with their icon, and the HUD counts them next to the stage gold.
+
+**The Evolution Tree's economy nodes** (§11) raise them, +10% per level:
+
+| Node | Raises |
+|---|---|
+| Stage Gold | Gold per kill |
+| Bonus XP | XP per kill |
+| Essence Drops | Blue per kill (rounded), and the chance of orange |
+
+**Item loot:** a kill can drop an item on the ground, where the enemy died.
+
+| Enemy | Drop |
+|---|---|
+| Normal | 0.3% a legendary; else 4% a fragment |
+| Elite | 3% a legendary; else 25% a fragment |
+| Boss | A fragment for sure, plus 15% a legendary |
+
+- Loot stays until the stage ends. It shows as the item's icon over a bobbing glow (gold for a legendary).
+- Lucian picks it up by walking within 60 of it, into the backpack.
+- With no room it stays, and "Backpack full" shows at most once every 3 s.
+
 ---
 
 ## 10. Skins
@@ -408,9 +475,9 @@ They count as **bonus** stats (yellow in the stats panel) from the start of ever
 | Merchant 4 items | 800B + 10O |
 | Refresh cost −25 gold (2 levels: 100 → 75 → 50 gold) | 200B → 500B + 5O |
 
-Stage gold, bonus XP and essence drops can be bought and are saved, but change nothing yet: they start working once enemies give gold, XP or essences.
+Stage gold, bonus XP and essence drops work since Phase 6: +10% gold, XP or blue per kill for each level, and the essence node also raises the chance of orange (§9).
 
-**Balance goal:** in about 5 hours a skilled player can afford all skills, R, 4–5 equip slots and some stats, but not the full tree. The rest is a goal for Endless mode.
+**Balance goal:** in 5–7 hours a skilled player can afford all skills, R, 4–5 equip slots and some stats, but not the full tree. The rest is a goal for Endless mode.
 
 ---
 
@@ -454,7 +521,7 @@ Detailed enemy, elite, mini boss and boss designs for each act live in separate 
 - **Spawn points:** fixed places that fit the theme (lane end, jungle camps, mist).
 - **Cover:** every map has walls or pillars to dodge behind.
 - **No brush** (no bushes to hide in).
-- **Merchant:** appears near the center of the map between waves. *(Phase 3: on the training map he stands at the center from the start; the debug table adds or removes him.)*
+- **Merchant:** appears near the center of the map between waves. *(Phase 3: on the training map he stands at the center from the start; the debug table adds or removes him. Phase 6: on the act maps he comes at the start of each break and stands at the map's merchant point.)*
 
 ### Maps by act
 | Act | Map | Layout |
@@ -465,6 +532,17 @@ Detailed enemy, elite, mini boss and boss designs for each act live in separate 
 | 4 | Dark mid lane | Act 1 layout in dark colors. Normal vision. |
 | 5 | Dead forest | Twisted trees as obstacles. Saplings come out of trees, spider nests spawn spiderlings. Karthus fights in a ruined graveyard. |
 | 6 | Thresh's domain | Cliffs with chains and narrow paths; Chain Wardens on ledges. Final fight on a round, open platform with no walls. |
+
+### Built in Phase 6
+Maps are drawn in code. Walls (jungle, rocks, pillars, the border) block Lucian, enemies and enemy bolts.
+
+| Act | Map | Size | Details |
+|---|---|---|---|
+| 1 | Mid lane | 5200 × 3200 | A 900-wide diagonal lane, jungle walls on both sides, the river across its middle (walkable), 3 rocks. See `act1_the_loss.md`. |
+| 2 | Training ground | 4600 × 2800 | Stone tiles, three gates, 6 decorative dummies by the walls, and 6, 8 or 10 pillars by stage (a ring of 10 in stage 3). See `act2_the_sentinels.md`. |
+| — | Training | 4800 × 2700 | The Phase 3 test arena, with its dummy and no waves |
+
+The radar takes the map's shape. Acts 3–6 have no map yet.
 
 ---
 
@@ -500,8 +578,12 @@ A new pick **replaces** the previous modifier (they do not stack).
 ## 15. Save System
 
 ### Slots
-- **3 save slots.** The player picks a slot when starting the game. That is the **current slot**: every save writes to it. *(The slot selection screen is not designed yet; until then the current slot is slot 1.)*
+- **3 save slots.** The player picks a slot on the **title screen**. That is the **current slot**: every save writes to it.
+  - **Start new game** lists the 3 slots. A used slot asks "Overwrite slot N? Its progress will be lost." The new game is **written at once** (`SaveGame.start_new`), so the overwrite is real. Then Act 1 starts.
+  - **Load game** lists the same slots, with the empty ones disabled. The button itself is disabled ("No saved games yet") when no slot exists. It opens the main screen.
+  - Each used slot shows its play time and when it was saved: "Slot 2 · 1h 02m · saved 2026-10-29 03:10".
 - **Save as copy:** the current progress can be copied into another slot (asks for confirmation before overwriting).
+- **Leave to main menu** (gear menu) asks "Save before leaving?", then goes back to the title screen.
 - Files: `user://save_slot_1.json`, `save_slot_2.json`, `save_slot_3.json`, each with its own `_backup.json`.
 - Settings are saved separately in `user://settings.json` and shared by all slots.
 
@@ -512,6 +594,7 @@ A new pick **replaces** the previous modifier (they do not stack).
 - Owned skins, equipped skin
 - Cleared stages, and which bosses / mini bosses already gave first-time purple
 - Endless best wave
+- Play time: every second outside the title screen, pauses not counted
 
 Nothing inside a stage is saved (items, gold, level, enemies), since stages always reset.
 
@@ -521,7 +604,8 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - **Leaving the game** (Exit the game in the ESC menu or the gear menu, Leave to main menu, or closing the window) asks **"Save before leaving?"** (Yes / No).
   - **Yes:** saves to the current slot right away, then leaves. Inside a stage, this keeps the essences collected so far, as leaving the stage would.
   - **No:** leaves without saving. Everything since the last save is lost.
-  - If the save fails, it asks **"Could not save. Quit anyway?"**: Yes leaves, No goes back to the game. A failed auto-save after a stage shows a red "Could not save" on the main screen.
+  - If the save fails, it asks **"Could not save. Quit anyway?"** (Leave to main menu: "Could not save. Leave anyway?"): Yes leaves, No goes back to the game. A failed auto-save after a stage shows a red "Could not save" on the main screen.
+- The title screen has nothing unsaved: its **Exit game** and the window's close button quit at once, with no question.
 - Settings are not part of the save: they are written to `user://settings.json` on every change.
 
 ### Implementation notes (Godot 4)
@@ -537,13 +621,16 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 | `skins` | `{"owned": ["classic", "vampire"], "equipped": "vampire"}` |
 | `loadout` | The spells on D and F: `["flash", "heal"]` (`""` for none) |
 | `cleared` | Cleared stage ids: `["1-1", "2-1"]` |
+| `bosses` | Bosses that already gave their first-time purple: `["thresh_1", "akshan"]` |
 | `endless_best` | Best Endless wave |
+| `play_time` | Whole seconds played in this slot: `3720` |
 
 - Numbers are converted back with `int()` when loading (JSON numbers load as floats). Unknown keys, node ids, skins, spell ids and stage ids are dropped, so an old or edited file still loads.
 - IDs are saved, not display names.
 - A save is written to a temp file first. Then the old save becomes the backup (only if it still reads, so a broken file never replaces a good backup) and the temp file replaces it. If anything fails, the old file and backup stay as they were. The backup loads if the main file is broken. With both broken, it's a new game.
-- Not saved yet: which bosses already gave their first-time purple (there are no bosses yet).
-- The main screen's debug table (F3 + Q) gives essences, sets the acts cleared, maxes or clears the tree, and resets the progress.
+- `"version"` stays 1: Phase 6 only added keys. A file without `"bosses"` or `"play_time"` loads with none.
+- `SaveGame.start_new(slot)` makes that slot current, resets the progress and writes it at once. `award_boss(id, first, repeat)` returns the purple due and records the boss; the stage adds the essence.
+- The main screen's debug table (F3 + Q) gives essences, sets the acts cleared, maxes or clears the tree, resets the progress, and forgets the bosses' first-time purple.
 
 ---
 
@@ -556,6 +643,6 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - [x] Wave count per stage across the 22 stages
 - [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`, Phase 4: `implementation/phase4.md`, Phase 5: `implementation/phase5.md`, Phase 6: `implementation/phase6.md`)
 - [x] Item stats and effects (`items.md`)
-- [ ] UI (see `ui_design.md` and `main_screen.md`): HUD, backpack, crafting, recipe table, ESC menu, merchant's shop, Settings and the main screen (Journey, Evolution Tree, Skin Shop) done; the title screen and save slot selection still to design
+- [x] UI (see `ui_design.md` and `main_screen.md`): HUD (with the stage info, boss bar and radar), backpack, crafting, recipe table, ESC menu, merchant's shop, Settings, the main screen (Journey, Evolution Tree, Skin Shop), and the title screen with save slot selection
 - [x] Save system
 - [ ] Art style, sound (Phase 3 has generated placeholder sound effects and audio buses; no music yet)

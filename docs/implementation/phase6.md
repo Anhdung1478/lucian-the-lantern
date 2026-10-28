@@ -5376,3 +5376,79 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
    12. **Close the window** on the title: no prompt. During a stage: "Save before leaving?".
 4. **Save file:** after Act 1, `save_slot_1.json` has `"cleared": ["1-1"]`, `"bosses": ["thresh_1"]` and a `"play_time"`.
 5. **Pacing:** note each result panel's time. Act 1 should take about 8–10 minutes and Act 2's three stages 30–40 in all (the slot list's play time shows the total). Much faster means `EnemyData.ACT_HP` and the bosses' HP go up.
+
+## Implementation notes (Phase 6 done)
+
+Everything in the plan is in place, one commit per task (Tasks 0–14, plus a fix commit after the Task 2, 3 and 4 reviews), then the visual pass, the screenshot scenarios, the docs and the report (`docs/report/phase6.md`). Changes and details settled while building:
+
+### Deviations and rulings
+- **Enemies die** (Task 1): `Lucian.is_target(enemy: Variant)` is untyped. With an `Enemy` parameter, passing a freed object errors before `is_instance_valid` can run.
+- **Lucian takes damage** (Task 2):
+  - `_drop_in_flight()` ends a windup, a queued cast, the cast lock, R, a dash (its trail finishes) and a displacement. `displace()`, `enter_stasis()` and `_die()` call it, so a pull, stasis or death ends a dash, as in LoL.
+  - `FloatingNumber` keeps its crit flag in a field: comparing font sizes broke once `size_scale` came in.
+- **Defensive items** (Task 3):
+  - Thornmail checks that its attacker is still valid before casting it to `Enemy`.
+  - The plan's `test_deaths_dance_kill_clears_the_bleed` couldn't fail (Defy's heal outpaced the bleed). It now checks that the bleed list empties on a kill.
+  - The tooltip texts for Annul, Lifeline and Everlasting were written then.
+- **Minions** (Task 4): the ground warning's "fires once" test counts with a connected lambda; GUT's signal watcher fails on a node that frees itself. A follow-up commit fixed the `World` line of `stage.tscn`.
+- **Rewards** (Task 5): `StageSetup.act` was added here, ahead of Task 7. `var legendary: bool` is typed (inference failed on the `Array` element).
+- **Maps** (Task 7):
+  - `_use_map` moves Lucian with `blink_to`: a raw position jump counted as movement (Energize).
+  - `MidLaneMap` keeps every piece `clip_polygons` returns; Godot's polygon orientation is y-up, so a clockwise filter could drop the real jungle. A test checks there are exactly 2 jungle pieces.
+- **Waves** (Task 8):
+  - `Stage._ready` adds the merchant only in Training; act stages start their waves last in `_ready`.
+  - `_on_lucian_died` waits on a stage-owned tween, never a SceneTreeTimer (which could resume on a freed stage).
+  - `test_dying_shows_defeated` waits with a SceneTreeTimer: GUT's own wait freezes once the result pauses the tree.
+  - `test_game.gd`'s `after_each` deletes the slot-1 files.
+- **Stage HUD** (Task 9): the boss bar test waits 6 frames (2 were too few headless).
+- **Act 1** (Task 10):
+  - Every cutscene wait is a tween of the cutscene node. `_play()` checks `skipped` after each await, and Skip kills the scene's tweens and props, so nothing moves Thresh, Senna or the chain afterwards.
+  - The letterbox bars sit on screen (the plan's offsets put them off it). Props (chain, soul, ring) live in a cutscene-owned node. Thresh sinks by scaling his visuals, never his body.
+  - The lantern hangs at `LANTERN_OFFSET` (-20, 46): his right side when facing +X, as drawn. The plan's Art table said his left.
+  - Thresh's last hit flash is reset to white when the scene starts.
+  - `_on_cutscene_done` calls `runner.enemy_died()` before `finish()`, so Act 1 reads "Waves cleared: 3 / 3".
+  - `TipBanner` is pausable (a tip's 7 s only run with the game) and shrinks around its center for a shorter tip.
+- **Act 2** (Task 11):
+  - Two Comeuppance tests set `akshan.move_speed = 0`, so he can't walk into range during their waits.
+  - `Stage._on_thresh_phase_ended` and `_on_cleared` do nothing once Lucian is dead or the result shows: a death just before Thresh's half HP gives DEFEATED, with no cutscene and no purple (his repeat purple is 0, so it would be lost for good).
+- **Debug tables** (Task 14): `Stage.freeze(false)` restores the invulnerable value Lucian had before the freeze, so God mode survives a cutscene.
+- **Tests:** from Task 11 on, new waits use `wait_physics_frames` / `wait_process_frames` (`wait_frames` is deprecated). Task 15 converted `test_act1.gd` and `test_stage_hud.gd`, which brought GUT's Deprecated count from 39 to 15; other older files still use it.
+- **Journey after Act 1:** it opens on Act 1, the act just played (the rule in *Defaults*). The Verification checklist's "the main screen on Act 2" was wrong; the report's checklist is corrected.
+
+### Visual pass (Task 15)
+Every scenario was run in a window and every PNG looked at. Eight fixes:
+- **Radar:** `Radar.setup()` sets its size after the HUD anchored it, which moved its right and bottom edges past the corner: only a sliver showed. `Hud._place_radar()`, called after `radar.setup()`, re-anchors it with `PRESET_MODE_MINSIZE` and the 12 px margin. Test: `test_the_radar_sits_inside_the_bottom_right_corner`.
+- **Death grey and stasis gold:** a hit's red flash tween, still running, painted `modulate` back to white over `DEATH_TINT` (new const) and `STASIS_TINT`. `Lucian._hurt_tween` is now kept and killed in `_die()` and `enter_stasis()`. Tests: `test_a_hit_just_before_death_keeps_the_grey`, `test_a_hit_just_before_stasis_keeps_the_gold`.
+- **Cutscene framing:** the first pan goes to the midpoint of Thresh and Senna, and the camera tweens to Thresh during the pull. Before, the hook flew off screen and Lucian sat under the bottom bar. Test: `test_the_cutscene_frames_the_hook_then_thresh`.
+- **Slot list:** `SlotList.BUTTON_SIZE` 420 → 520; "Slot 2 · 99h 59m · saved …" needs 441. Test: `test_a_used_slot_leaves_room_around_its_text`.
+- **Thresh's essences** rise at `boss_unit.global_position`. They overlapped the first-clear purple over Lucian ("+110"), visible after a skipped cutscene. Test: `test_thresh_essences_rise_where_he_sank_and_the_purple_over_lucian`.
+- **Stage info width:** the HUD anchored the panel while the Skip button was still in its layout, so its offsets kept that width (206 px for "Training", which needs 104). Its left and right offsets are now 0 around the center, so it is always as wide as what it shows. Test: `test_the_stage_info_fits_training`.
+- **Map edges:** the camera's limits are the map grown by `WALL_THICKNESS`, and that band was empty (the clear color). `MidLaneMap` draws the border rects in jungle green, `TrainingGroundMap` in `WALL` (`#4a4f57`). Drawing only, no test.
+- **Title lantern:** its light rays ended in flat cuts at the SVG's edge. They now use a radial gradient (`gradientUnits="userSpaceOnUse"`, set on each polygon, not on a `<g>`) that fades out before the edge.
+
+### Screenshot harness (Task 15)
+- `ACT_SCENARIOS` maps each act scenario to [act, stage]. The stage gets `StageSetup.for_stage(save, act, stage)` through `stage.setup()` before it enters the tree, from the scratch new save.
+- `show_main_screen()` moved from `_initialize` to `_run`. In `_initialize` the Game root isn't in the tree yet, so every `main_*` scenario, `training_setup` and `skins_stage` had crashed since the title screen came first.
+- Helpers: `clear_wave()` (Skip, then the debug Kill all once the wave has spawned; earlier tips are flushed so the break's tip shows), `flush_tips()`, `blink()` (moves Lucian, and Senna to her place beside him), `wait_for_warning()`, `wait_for_boss()`, `surround()`.
+- `main_gear` no longer waits for a tooltip on Leave to main menu (it has none now). The doc comment of `scenario_training_setup` is back above it.
+
+### Left as is (small, from the reviews)
+- **Untested:** HomingMissile and Lightslinger second-shot `is_alive` guards; stasis, `one_gun`, `can_act` gating of casts, `bonus_armor`, `size_scale`; Magebane absorbing magic, its reset and unequip; Thornmail on a dead attacker, buffs, Gunblade → Fimbulwinter; the "Backpack full" throttle, elite and boss stage kills, `enemy_died`, orange and purple `add_essences`; skips after the first pan, the siege and attack tips at stage level; Akshan's boomerang wiring and his skills after he dies mid-skill; `MainScreen._start_stage`; "Could not save. Leave anyway?", Leave → No, the Exit button and ESC with Settings open on the title; a Training spawn from the debug table.
+- **Logic:** `Enemy.last_attacker` is set by any attacker (check kill credit when other damage sources arrive). `Shields.add` accepts ids outside `ORDER`. `LucianController` keeps an aim up while Lucian can't act. Death's Dance bleeds run out during stasis and aren't cleared on death; `before_hp_loss` counts magic-only Magebane in the total.
+- **Stage:** `spawn_enemy` has no guard for a bad id; `_on_enemy_died` assumes a live Lucian; drops scatter ±30 px with no wall check. A stage id without waves would index out of range (only Acts 1–2 are reachable). `skip_break` isn't guarded while the result or a death shows. `EnemyUnit.warning_parent` defaults to the parent.
+- **Act 2:** Heroic Swing sets `global_position`, so Akshan can swing through pillars and the edge; the swing keeps firing if Lucian dies mid-swing (the burst is gated).
+- **HUD:** radar dots aren't clipped to the panel. `BossBar` rescans the enemies every frame while there is no boss. `TipBanner` counts down while the HUD is hidden. A damage number may show the unclamped amount while Thresh is stopped.
+- **Save:** `start_new` sets the slot before saving (a failed write leaves the new slot current); `play_time_text` uses int division; `award_boss` doesn't check `BOSS_IDS`; `BOSS_IDS` sits among the vars. Loading a broken slot gives a new game silently. `ask_to_leave` doesn't pause, so play time runs while its prompt is up.
+- **Journey:** a picked card that becomes locked keeps its outline and "Start stage N" when nothing is open (debug or reset only); `open_on` computes `default_stage` twice. Act 1's card reads "+ boss wave" on replays too.
+- **Debug:** a nested `freeze(true)` overwrites the remembered invulnerable value; God mode toggled during a cutscene is overwritten when it ends; Kill all and Boss HP 51% aren't guarded during a cutscene or after Thresh stopped.
+- **Tests:** older files still use the deprecated `wait_frames`. The older `test_lucian_skills` leaves 4 shot nodes (GUT's one warning), and some full runs during the phase also warned about 2 unfreed nodes after `test_lucian_damage`. One early Task 4 run had a failure in `test_cast_modes` / `test_game` that never came back. Several tests use wall-clock waits.
+
+### Running the checks
+
+```
+godot_console --headless --path . --import
+godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
+godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+```
+
+New scenarios: `title`, `title_slots`, `act1_start`, `act1_wave`, `act1_shell`, `act1_break`, `act1_thresh`, `act1_cutscene`, `act1_result`, `act2_pillars`, `act2_super`, `akshan_e`, `akshan_r`, `defeat`, `loot`, `guardian_angel`. The `title*` scenarios start `src/main/game.tscn` on its title screen; the others start `stage.tscn` set up for a Journey stage (Act 1 as its first play). Every run uses scratch save slots and settings.

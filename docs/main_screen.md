@@ -34,7 +34,7 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 - **Sub-sections** (e.g. Act 1–6, Training, Endless): tabs at the **top** of the screen.
 
 ### Built in Phase 5
-- **The game opens on the main screen**, on **Journey → Training**. It loads save slot 1, or starts a new game when there is none (no file is written until the first save).
+- **The game opens on the main screen**, on **Journey → Training**. It loads save slot 1, or starts a new game when there is none (no file is written until the first save). *(Since Phase 6 the title screen comes first; see below.)*
 - **Top bar** (72 px): the gear button (48 px), then blue, orange and purple essence (36 px icon and the amount). Hovering an essence shows where it drops and what it buys.
 - **Bottom bar** (88 px): **Evolution Tree · Skin Shop · Journey**, three 280 × 60 buttons; the open section's button is lit.
 - **Gear menu** (a centered pop-up over a dark backdrop, title "MENU"):
@@ -45,7 +45,7 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 | Save | Saves to the current slot (slot 1 for now) and closes the pop-up. A toast says "Saved to slot 1" (red "Could not save" if writing failed) |
 | Save as copy | Turns the pop-up into a slot list: "Slot 1 (current)" (disabled), then "Slot 2 · empty" or "Slot 2 · saved 2026-10-28 14:03", and Back. An empty slot is written at once; a used one asks **"Overwrite slot 2?"** (Yes / No). Toast: "Copied to slot 2". The current slot stays slot 1 |
 | Settings | The same Settings screen as in a stage; Back returns to the menu |
-| Leave to main menu | **Disabled** until the title screen exists. Hover: "The title screen comes later" |
+| Leave to main menu | **Disabled** until the title screen exists. Hover: "The title screen comes later" *(works since Phase 6)* |
 | Exit the game | Asks **"Save before leaving?"** (Yes / No), then closes the game. Closing the window asks the same. If the save fails: "Could not save. Quit anyway?" (No goes back) |
 
 - **Toast:** a short message at the top center, inside the top bar, fading out over 1.6 s.
@@ -55,6 +55,13 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
   3. The slot list goes back to the menu; an open gear menu closes.
   4. Otherwise ESC opens the gear menu.
 - **Debug table (F3 + Q, hidden by default):** an **Essences** tab (blue +100 / +1000 / +10000, orange and purple +1 / +10 / +100, Reset for each) and a **Progress** tab (Acts cleared 0–6, Max tree (free), Clear tree (no refund), Reset progress: a new game in memory). Nothing there saves.
+
+### Built in Phase 6
+- **The game opens on the title screen** (`ui_design.md` §7): Start new game, Load game, Settings, Exit game. A new game goes straight into Act 1, then to the main screen. Loading a slot opens the main screen.
+- **The current slot** is the one picked on the title screen. Save writes to it, and the toast names it ("Saved to slot 2").
+- **Leave to main menu** works: "Save before leaving?" (Yes / No), then the title screen. If the save fails: "Could not save. Leave anyway?".
+- **Save as copy** uses the title screen's slot list, so a used slot also shows its play time: "Slot 2 · 1h 02m · saved 2026-10-29 03:10".
+- The debug table's Progress tab adds **Forget boss purple**: every boss gives its first-time purple again.
 
 ---
 
@@ -212,3 +219,13 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
   - A spell no longer bought (after a tree reset) shows as empty; the pick itself is kept.
   - The choice is saved with the progress.
 - **Start Training** builds the stage from the save: only bought ranks can be learned, the passive only works once bought, the equip slots, shop items, refresh cost and stat bonuses come from the tree, D and F from the loadout (F stays empty without the 2nd slot), and the look from the skin. The stage debug table can still change all of this for that run.
+
+### Built in Phase 6
+**Acts 1 and 2 start.**
+- **Picking a stage:** a click on an open card picks it; a gold outline marks it. A locked card can't be picked. The page opens on the first open stage not cleared yet, else the last open one.
+- **Start** plays the picked stage: "Start" for a one-stage act, "Start stage 2" otherwise. The stage is built from the save like Training, plus its waves, map and boss. Act 1's first play is the tutorial (`act1_the_loss.md`).
+- **Acts 3–6:** the cards can be picked, but Start stays disabled ("Act 3 comes in a later phase"). Endless's Start is still disabled.
+- **Which tab opens:**
+  - after a stage (Continue on its result, or Leave this stage), the act just played;
+  - otherwise (a loaded slot, after Training), the first act with an open stage not cleared yet, else Training.
+- A cleared stage can be played again. Act 1's card always reads "2 waves + boss wave", though a replay has no boss.

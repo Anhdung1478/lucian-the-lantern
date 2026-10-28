@@ -339,10 +339,11 @@ The merchant buys items back for **70%** of their cost (**Guardian Angel: 40%**)
 - *Passive — Magebane:* After 15 s without taking magic damage, gain a shield against magic damage equal to 15% max health.
 
 
-## What works in combat (Phase 3)
+## What works in combat
 
 Numbers not given above were picked during Phase 3 (`docs/implementation/phase3.md`) and tuned
-in Phase 4 (`docs/implementation/phase4.md`).
+in Phase 4 (`docs/implementation/phase4.md`). The defensive items work since Phase 6, when
+enemies started hitting Lucian.
 
 | Item | Works as |
 |---|---|
@@ -362,7 +363,7 @@ in Phase 4 (`docs/implementation/phase4.md`).
 | Malignance | R gets +20 ability haste. R hits leave Hatefog (once per 3 s): radius 150, 60 (+5% AP) magic per second for 3 s, −10 MR inside. |
 | Shadowflame | Magic damage to enemies below 40% HP: +20%. |
 | Archangel's Staff | AP from 2% max mana. The first skill hit of each cast adds 3 max mana, up to 360 (kept for the stage). |
-| Fimbulwinter | Max HP from 8% max mana. *Everlasting* (shield) waits for enemies that hit back. |
+| Fimbulwinter | Max HP from 8% max mana. *Everlasting:* slowing an enemy (Hextech Gunblade's active) gives a shield of 100 (+5% max mana) for 3 s. 8 s cooldown. |
 | Rapid Firecannon | Energized: +60 magic, and the attack reaches 35% further. A light-blue ring shows that reach from full charge until the Energized shot lands. |
 | Essence Reaver | After a skill, the next basic attack adds 100% base AD + 40% bonus AD physical and restores 40% of it as mana. 1.5 s cooldown. |
 | Spirit Visage | +25% heal & shield power (life steal, omnivamp, potions). |
@@ -372,11 +373,19 @@ in Phase 4 (`docs/implementation/phase4.md`).
 | Galeforce | Active: dash toward the cursor, as far as it but 200 at most (speed 1260), then 3 missiles at the lowest-health enemy within 750, 60 (+15% bonus AD) magic each. The missiles leave in a fan and curve onto it, faster and tighter as they fly. Lucian can move again as soon as the dash lands. The dash leaves a pale green wind trail. |
 | Hextech Rocketbelt | Active: dash toward the cursor, as far as it but 275 at most (speed 800, slower than the bolts' 1500), an arc of 7 bolts forward that fly 900 from where Lucian started (each enemy hit once) for 100 (+10% AP) magic. Lucian can move again as soon as the dash lands. No move speed. The dash leaves a violet trail, like the bolts. |
 
+| Banshee's Veil | *Annul:* blocks the next enemy skill hit whole (Thresh's hook with its pull, Flay, Akshan's skills). It comes back 40 s after it breaks. Basic attacks and the siege shell aren't skills. |
+| Thornmail | *Thorns:* an enemy's basic attack on Lucian deals 20 (+10% bonus armor) magic damage back to it and applies Grievous Wounds for 3 s. |
+| Immortal Shieldbow | *Lifeline:* a hit that would leave Lucian under 30% HP first gives a shield of 300 (level 1) to 650 (level 18) for 3 s. 90 s cooldown. |
+| Death's Dance | *Ignore Pain:* 30% of each hit is taken over the next 3 s instead. *Defy:* a kill clears the damage still to come and heals 15% max HP over 2 s. |
+| Guardian Angel | *Rebirth:* instead of dying, Lucian is held in gold stasis for 4 s (nothing can hurt him; enemies wait), then comes back with 50% base HP and 30% max mana. 300 s cooldown. |
+| Kaenic Rookern | *Magebane:* after 15 s without magic damage, a shield against magic damage only, 15% max HP. Any magic damage restarts the wait. |
+
 Actives share one cooldown per item (every copy), which keeps running after selling. The debug
 "No cooldowns" cheat also refreshes item cooldowns that are already running.
 "On hit" effects use basic attacks and Lightslinger shots; counters and "next attack"
 effects (Kraken Slayer, Energized, Spellblade, Navori, Runaan's) use the main shot only.
 
-**Still tooltip text** (they need enemies that hit Lucian): Banshee's Veil, Thornmail,
-Immortal Shieldbow, Death's Dance, Fimbulwinter's Everlasting, Guardian Angel and
-Kaenic Rookern. Void Staff has no passive.
+**Shields** take a hit in this order: Kaenic Rookern's Magebane (magic only), Shieldbow's
+Lifeline, Barrier, Fimbulwinter's Everlasting, Bloodthirster's Ichorshield.
+
+Void Staff has no passive.

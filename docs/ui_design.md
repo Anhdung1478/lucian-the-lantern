@@ -6,9 +6,9 @@
 
 ```
 +--------------------------------------------------------------+
-|        [Stage name]  Wave 2/4  Enemies: 12  [Skip 0:20] [Gold]|
-|              [========= Boss HP bar =========]   [B][O][P]   |
-|                                                              |
+|FPS     [Stage name  Wave 2/4  Enemies: 12]  [Gold][B][O][P]   |
+|          [====== Boss name, HP bar ======]                   |
+|                 [ Act 1 tip ]                                |
 |                                                              |
 |                       (battlefield)                         |
 |                                                              |
@@ -87,12 +87,21 @@ Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 - **Boss HP bar** during the boss wave, with the boss name.
   - Thresh's bar also shows **Phase 1 / 2**.
 
+**Built in Phase 6:**
+- One panel at the top center, in the HUD panel style, 20 px text: the stage's name in gold ("Act 1 · The Loss", "Stage 2-3 · The Sentinels"), then:
+  - before a wave: "Wave 2 in 0:17" in gold and a **Skip** button (hover: what Skip does);
+  - during a wave: "Wave 1/2" (or "Boss wave") and "Enemies: 13", which counts the ones still to spawn.
+- Training shows only its name.
+- Only Skip takes clicks; the rest lets right-clicks through to the battlefield.
+- **Boss bar** under it while a boss lives: the boss's name over a 600 × 22 red bar with "HP / max". It finds the boss by itself and hides when the boss dies or leaves. The phase text is for Act 6's Thresh.
+
 ### Top right – Loot
 - Stage gold: a coin and the amount, in the HUD panel style (Phase 3).
 - Essences collected in this stage (blue, orange, purple).
+- **Built in Phase 6:** each essence shows in the same panel, right of the gold, once at least one has dropped in this stage.
 
-### Top center – FPS
-- "FPS N", only when **Show FPS** is on in Settings.
+### Top left – FPS
+- "FPS N", only when **Show FPS** is on in Settings. It moved here from the top center in Phase 6.
 
 ### Bottom right – Radar (minimap)
 - Shows only dots, no terrain.
@@ -103,6 +112,22 @@ Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 | Normal enemy | Red dot |
 | Elite | Bigger red dot |
 | Mini boss / Boss | Red skull icon (same size as the elite dot) |
+
+**Built in Phase 6:**
+- A dark panel 260 px wide; its height follows the map's shape (160 px for the mid lane). It sits 12 px in from the corner and never takes clicks.
+
+| Marker | Look |
+|---|---|
+| Lucian | Blue dot (r 6) with a white ring, drawn last |
+| Normal enemy | Red dot (r 4) |
+| Elite | Red dot (r 7) |
+| Boss | Red skull, 16 px |
+| Senna | Small pale-blue dot |
+| Merchant | Gold dot, during breaks |
+
+### Act 1 tips
+- On Act 1's first play, tips show one at a time under the boss bar, in a gold-bordered panel, 7 s each. The list is in `act1_the_loss.md`.
+- The time only runs while the game does. A replay has no tips.
 
 ### On the battlefield
 - **Lucian's HP bar** above his head: green, with his shields as a white segment after the HP.
@@ -117,6 +142,23 @@ Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 | Critical hit | Bigger text |
 
 - **Skill warnings:** line and circle indicators for enemy attacks.
+
+**Built in Phase 6:**
+- Damage numbers over Lucian are 80% the size of those over enemies.
+- **Ground warnings** are red: an outline, and a fill that grows until the attack lands. Shapes: a circle (siege shell, Heroic Swing), a line (Thresh's hook, Avengerang), a cone (Flay) and a thin lock line that follows Lucian (Comeuppance).
+- An elite's HP bar has a small gold diamond at its left end; a boss's bar is wider. Statuses such as Empower show as small icons above the bar.
+- Items on the ground: the item's icon over a bobbing glow (gold for a legendary). "Backpack full" rises in red when Lucian can't pick one up.
+- Essences rise over a kill as "+1" with their icon.
+
+### Stage result
+- At the end of a stage, over a dimmed and paused game: **STAGE CLEARED** in gold or **DEFEATED** in red.
+- Then the stage's name, "Waves cleared: 3 / 3 · Time 0:11", the essences collected (icon and "+127"; "No essences" if none) and the first-clear lines in green ("+10 purple essence (first clear)", "Act 2 is open").
+- **Continue** goes back to the main screen (auto-save). ESC and P do nothing while it shows.
+
+### Cutscenes
+- Black bars (120 px) at the top and bottom; the HUD hides.
+- The speaker's name in gold over the caption, in the bottom bar.
+- **Skip** at the top right. Space or a left-click moves to the next caption.
 
 ---
 
@@ -249,7 +291,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - Options:
   - **Resume**
   - **Settings** (cast mode, camera, volume, etc.)
-  - **Leave this stage** (keeps all essences collected; the game auto-saves). Works since Phase 5: the stage counts as left, the game saves to the current slot and goes back to the main screen (Journey → Training). When `stage.tscn` runs on its own, it stays disabled ("Not available yet").
+  - **Leave this stage** (keeps all essences collected; the game auto-saves). Works since Phase 5: the stage counts as left, the game saves to the current slot and goes back to the main screen. Since Phase 6, Journey opens on the act just played (after Training: the first act with a stage left to clear, else Training). When `stage.tscn` runs on its own, it stays disabled ("Not available yet").
   - **Exit the game** (asks **"Save before leaving?"** Yes / No; see the game design doc §15)
 
 ## 5. Settings (from the ESC menu)
@@ -280,5 +322,25 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - [x] Settings
 - [x] Evolution Tree screen (built in Phase 5, see `main_screen.md`)
 - [x] Skin shop (built in Phase 5, see `main_screen.md`)
-- [ ] Main menu and save slot selection
+- [x] Main menu and save slot selection (the title screen, built in Phase 6, below)
 - [x] Stage select (Journey: act, Training and Endless tabs, built in Phase 5, see `main_screen.md`)
+
+## 7. Title screen
+
+The game opens here (built in Phase 6).
+
+- A dark green radial background, Thresh's lantern (200 px) with its green glow, **LUCIAN** in gold and **THE LANTERN** in pale green.
+- Four buttons (420 × 64): **Start new game**, **Load game**, **Settings**, **Exit game**.
+  - **Load game** is disabled with no saved slot (hover: "No saved games yet").
+  - **Settings** opens the shared Settings screen; Back or ESC closes it.
+  - **Exit game** quits at once. So does the window's close button on this screen: nothing is unsaved here.
+- **Start new game** and **Load game** turn the buttons into a slot list, titled "START NEW GAME" or "LOAD GAME", with **Back** (ESC works too):
+
+| Slot | Reads |
+|---|---|
+| Empty | "Slot 3 · empty" (disabled in Load game) |
+| Used | "Slot 2 · 1h 02m · saved 2026-10-29 03:10": its play time and when it was saved |
+
+- A new game on a used slot asks "Overwrite slot 2? Its progress will be lost." (Yes / No). Yes writes the new game at once and starts Act 1. An empty slot starts at once.
+- Loading a slot opens the main screen on Journey.
+- The slot buttons are 520 px wide, so the longest text keeps room around it. The gear menu's Save as copy uses the same list.
