@@ -7,9 +7,19 @@
 | | |
 |---|---|
 | **Stages** | 3 (short act) |
-| **Waves** | Stage 1: 2 · Stage 2: 3 · Stage 3: 3 + boss wave *(placeholder)* |
+| **Waves** | Stage 1: 2 · Stage 2: 3 · Stage 3: 3 + boss wave |
 | **Map** | Sentinels of Light training ground |
 | **Teaches** | Target priority, dodging boss patterns |
+
+## Waves (placeholder)
+
+m = melee, r = ranged, S = siege, U = super minion.
+
+| Stage | Waves | Boss wave |
+|---|---|---|
+| 1 | 6m 4r 1S · 6m 6r 1S 1U | — |
+| 2 | 6m 6r 1S · 6m 6r 2S · 6m 6r 1S 1U | — |
+| 3 | 6m 6r 2S · 6m 6r 1S 1U · 8m 6r 2S 1U | Akshan, alone |
 
 ## Story
 
