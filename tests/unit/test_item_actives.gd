@@ -67,14 +67,16 @@ func test_galeforce_dashes_then_fires_missiles() -> void:
 	assert_eq(sources.count(&"galeforce"), ItemActives.GALEFORCE_MISSILES)
 
 
-func test_galeforce_holds_lucian_while_the_missiles_leave() -> void:
+func test_galeforce_lets_lucian_walk_once_the_dash_lands() -> void:
 	equip(&"galeforce")
+	assert_almost_eq(ItemActives.GALEFORCE_DASH_SPEED, 1260.0, 0.01)
 	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
 	lucian.command_move(Vector2(-1000, -200))
-	await wait_seconds(0.3)
-	assert_almost_eq(lucian.global_position, Vector2(0, -200), Vector2(2, 2), "still where the dash ended")
-	await wait_seconds(0.4)
-	assert_lt(lucian.global_position.x, -20.0, "walking again")
+	await wait_seconds(0.1)
+	assert_almost_eq(lucian.global_position.x, 0.0, 0.5, "no walking during the dash")
+	# The dash takes 200 / 1260 = 0.16 s.
+	await wait_seconds(0.25)
+	assert_lt(lucian.global_position.x, -20.0, "walking right after it")
 
 
 func test_rocketbelt_dashes_and_fires_bolts_without_move_speed() -> void:
@@ -86,15 +88,17 @@ func test_rocketbelt_dashes_and_fires_bolts_without_move_speed() -> void:
 	assert_eq(sources.count(&"hextech_rocketbelt"), 1, "each enemy is hit once")
 
 
-func test_rocketbelt_holds_lucian_until_its_bolts_land() -> void:
+func test_rocketbelt_lets_lucian_walk_once_the_dash_lands() -> void:
 	equip(&"hextech_rocketbelt")
+	assert_almost_eq(ItemActives.ROCKETBELT_DASH_SPEED, 800.0, 0.01)
 	assert_lt(ItemActives.ROCKETBELT_DASH_SPEED, ItemActives.ROCKETBELT_BOLT_SPEED, "the bolts outrun Lucian")
 	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
 	lucian.command_move(Vector2(-1000, -275))
-	await wait_seconds(0.5)
-	assert_almost_eq(lucian.global_position, Vector2(0, -275), Vector2(2, 2), "still where the dash ended")
-	await wait_seconds(0.4)
-	assert_lt(lucian.global_position.x, -20.0, "walking again")
+	await wait_seconds(0.25)
+	assert_almost_eq(lucian.global_position.x, 0.0, 0.5, "no walking during the dash")
+	# The dash takes 275 / 800 = 0.34 s.
+	await wait_seconds(0.3)
+	assert_lt(lucian.global_position.x, -20.0, "walking right after it")
 
 
 func test_rocketbelt_bolts_reach_900_units() -> void:

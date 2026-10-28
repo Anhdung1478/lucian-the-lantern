@@ -3,26 +3,24 @@ extends Node
 ## Item actives on keys 1-6: Hextech Gunblade, Galeforce and Hextech
 ## Rocketbelt, aimed at the cursor. Every copy of an item shares one cooldown
 ## (Lucian.item_cooldown), which keeps running after the item is sold.
-## Not usable during a cast time or a dash. Galeforce and Rocketbelt hold
-## Lucian in place after their dash (a cast time) while their shots leave.
+## Not usable during a cast time or a dash. Lucian can't steer Galeforce's or
+## Rocketbelt's dash, and can move again as soon as it lands.
 
 const GUNBLADE_RANGE := 700.0
 const GUNBLADE_BASE := 175.0
 const GUNBLADE_AP := 0.3
 const GUNBLADE_SLOW := 2.0
 const GALEFORCE_DASH := 200.0
-const GALEFORCE_DASH_SPEED := 1400.0
+const GALEFORCE_DASH_SPEED := 1260.0
 const GALEFORCE_RANGE := 750.0
 const GALEFORCE_MISSILES := 3
 const GALEFORCE_BASE := 60.0
 const GALEFORCE_BONUS_AD := 0.15
-## Seconds Lucian stands after the dash while the missiles leave.
-const GALEFORCE_LOCK := 0.25
 ## Missiles leave this far (radians) to each side of the target's direction.
 const GALEFORCE_FAN := 1.0
 const ROCKETBELT_DASH := 275.0
 ## Slower than the bolts, so they fly ahead of Lucian.
-const ROCKETBELT_DASH_SPEED := 1000.0
+const ROCKETBELT_DASH_SPEED := 800.0
 const ROCKETBELT_BOLT_SPEED := 1500.0
 const ROCKETBELT_BOLTS := 7
 ## 50 degrees, in radians.
@@ -31,8 +29,6 @@ const ROCKETBELT_ARC := 0.8727
 const ROCKETBELT_RANGE := 900.0
 const ROCKETBELT_BASE := 100.0
 const ROCKETBELT_AP := 0.1
-## Lucian stands after the dash until the bolts have flown their full range.
-const ROCKETBELT_LOCK := ROCKETBELT_RANGE / ROCKETBELT_BOLT_SPEED - ROCKETBELT_DASH / ROCKETBELT_DASH_SPEED
 const ACTIVES: Array[StringName] = [&"hextech_gunblade", &"galeforce", &"hextech_rocketbelt"]
 
 var lucian: Lucian
@@ -63,8 +59,6 @@ func use(item: ItemData, aim: Vector2) -> bool:
 				return false
 		&"galeforce":
 			lucian.start_dash(lucian.aim_direction(aim), GALEFORCE_DASH, GALEFORCE_DASH_SPEED)
-			# A cast time only counts down once the dash is over.
-			lucian.lock_cast(GALEFORCE_LOCK)
 			_galeforce_pending = true
 		&"hextech_rocketbelt":
 			_rocketbelt(aim)
@@ -117,12 +111,10 @@ func _galeforce_missiles() -> void:
 
 
 ## Supersonic: a dash and an arc of bolts forward that outrun it (each enemy
-## hit once). Lucian stands until the bolts land.
+## hit once).
 func _rocketbelt(aim: Vector2) -> void:
 	var direction := lucian.aim_direction(aim)
 	lucian.start_dash(direction, ROCKETBELT_DASH, ROCKETBELT_DASH_SPEED)
-	# A cast time only counts down once the dash is over.
-	lucian.lock_cast(ROCKETBELT_LOCK)
 	var hit: Array[Enemy] = []
 	var damage := ROCKETBELT_BASE + ROCKETBELT_AP * lucian.stats.ap
 	for i in ROCKETBELT_BOLTS:

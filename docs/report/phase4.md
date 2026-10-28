@@ -59,8 +59,8 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 
 | You asked | Built |
 |---|---|
-| Can't move during Rocketbelt; don't dash faster than the rocket | The dash is slower (1000) than the bolts (1500), so they fly ahead. Lucian stands where the dash ends until the bolts land, 0.6 s after use. |
-| Can't move during Galeforce | Lucian stands for 0.25 s after the dash while the missiles leave. |
+| Can't move during Rocketbelt; don't dash faster than the rocket | The dash is slower than the bolts, so they fly ahead. Then, from your second round of feedback: dash speed −20% (800), and Lucian can move as soon as the dash lands. |
+| Can't move during Galeforce | Dash speed −10% (1260), and Lucian can move as soon as the dash lands. |
 | Galeforce missiles should follow a missile trajectory | The 3 missiles leave in a fan, then curve onto the chosen enemy, faster and tighter as they fly, with a trail. |
 | Remove Rocketbelt's move speed | Gone. |
 | HP bar for Lucian; regen per second on the bars | A green HP bar above Lucian's head (shields in white). The HUD's HP and mana bars show "+0.8/s" and "+1.6/s" at the right end. |

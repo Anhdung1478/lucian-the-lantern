@@ -9,7 +9,7 @@ script = ExtResource("1_ixxwp")
 effect_name = "Supersonic"
 active = true
 cooldown = 40.0
-description = "Dash toward the cursor and fire an arc of bolts that fly ahead of you, dealing [magic]100 (+10% AP) magic damage[/magic]. You can't move until they land."
+description = "Dash toward the cursor and fire an arc of bolts that fly ahead of you, dealing [magic]100 (+10% AP) magic damage[/magic]."
 
 [resource]
 script = ExtResource("3_fehd0")
