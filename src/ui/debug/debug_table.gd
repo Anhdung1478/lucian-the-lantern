@@ -1,12 +1,11 @@
 class_name DebugTable
-extends CanvasLayer
+extends DebugPanel
 ## Testing panel, toggled with F3 + Q (hidden by default), in tabs: Lucian
 ## (level, cheats, summoner spells), Items, Shop (gold) and Dummy (settings,
 ## DPS meter, hit log). Keeps working while the game is paused, so items can be given into an
 ## open backpack.
 
 const LOG_SIZE := 10
-const PANEL_WIDTH := 400.0
 
 var stage: Stage
 var lucian: Lucian
@@ -36,13 +35,10 @@ var _max_hp: SpinBox
 var _dps_label: Label
 var _log_label: RichTextLabel
 var _gold_label: Label
-var _panel: PanelContainer
 
 
 func _ready() -> void:
-	layer = 50
-	process_mode = PROCESS_MODE_ALWAYS
-	visible = false
+	super()
 	_build()
 
 
@@ -65,15 +61,6 @@ func setup(owner_stage: Stage) -> void:
 ## Adds a dummy's hits to the DPS meter and the hit log.
 func watch(target: Enemy) -> void:
 	target.damage_taken.connect(_on_damage_taken)
-
-
-## _input runs before the controller's _unhandled_input, so Q never casts here.
-func _input(event: InputEvent) -> void:
-	var key := event as InputEventKey
-	if key and key.pressed and not key.echo and key.physical_keycode == KEY_Q \
-			and Input.is_physical_key_pressed(KEY_F3):
-		visible = not visible
-		get_viewport().set_input_as_handled()
 
 
 ## Moves the table to the top-right while the backpack's recipe table needs
@@ -152,24 +139,7 @@ func _give_random_fragment() -> void:
 
 
 func _build() -> void:
-	var panel := PanelContainer.new()
-	_panel = panel
-	panel.custom_minimum_size.x = PANEL_WIDTH
-	panel.position = Vector2(12, 12)
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.05, 0.06, 0.08, 0.94)
-	style.border_color = Color(0.85, 0.35, 0.3)
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(8)
-	style.set_content_margin_all(12)
-	panel.add_theme_stylebox_override(&"panel", style)
-	add_child(panel)
-
-	var outer := VBoxContainer.new()
-	outer.add_theme_constant_override(&"separation", 6)
-	panel.add_child(outer)
-	var title := _label(outer, "DEBUG   (F3 + Q)")
-	title.add_theme_color_override(&"font_color", Color(0.95, 0.45, 0.4))
+	var outer := _build_frame("DEBUG   (F3 + Q)")
 	var tabs := TabContainer.new()
 	tabs.focus_mode = Control.FOCUS_NONE
 	tabs.get_tab_bar().focus_mode = Control.FOCUS_NONE
@@ -281,58 +251,3 @@ func _build() -> void:
 	_log_label.custom_minimum_size.x = PANEL_WIDTH - 24.0
 	_log_label.add_theme_font_size_override(&"normal_font_size", 14)
 	outer.add_child(_log_label)
-
-
-func _tab(tabs: TabContainer, tab_name: String) -> VBoxContainer:
-	var box := VBoxContainer.new()
-	box.name = tab_name
-	box.add_theme_constant_override(&"separation", 6)
-	tabs.add_child(box)
-	return box
-
-
-func _section(parent: Control, text: String) -> void:
-	parent.add_child(HSeparator.new())
-	var label := _label(parent, text.to_upper())
-	label.add_theme_color_override(&"font_color", Color("c9a45c"))
-	label.add_theme_font_size_override(&"font_size", 13)
-
-
-func _label(parent: Control, text: String) -> Label:
-	var label := Label.new()
-	label.text = text
-	parent.add_child(label)
-	return label
-
-
-func _row(parent: Control) -> HBoxContainer:
-	var row := HBoxContainer.new()
-	parent.add_child(row)
-	return row
-
-
-func _button(parent: Control, text: String, action: Callable) -> Button:
-	var button := Button.new()
-	button.text = text
-	button.focus_mode = Control.FOCUS_NONE
-	button.pressed.connect(action)
-	parent.add_child(button)
-	return button
-
-
-func _check(parent: Control, text: String) -> CheckBox:
-	var check := CheckBox.new()
-	check.text = text
-	check.focus_mode = Control.FOCUS_NONE
-	parent.add_child(check)
-	return check
-
-
-func _spin(parent: Control, low: float, high: float, value: float) -> SpinBox:
-	var spin := SpinBox.new()
-	spin.min_value = low
-	spin.max_value = high
-	spin.set_value_no_signal(value)
-	spin.select_all_on_focus = true
-	parent.add_child(spin)
-	return spin

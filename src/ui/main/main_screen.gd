@@ -158,6 +158,9 @@ func _build() -> void:
 	# The pop-up and the tooltip come last, so they read input first.
 	add_child(confirm)
 	add_child(HoverTip.new())
+	var debug := MainDebugTable.new()
+	debug.name = &"MainDebugTable"
+	add_child(debug)
 
 
 func _start_training() -> void:
