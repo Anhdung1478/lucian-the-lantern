@@ -125,6 +125,12 @@ func _ready() -> void:
 	inventory.changed.connect(_on_inventory_changed)
 
 
+func _exit_tree() -> void:
+	# A trail still growing would never get to fade out.
+	if is_instance_valid(_dash_trail):
+		_dash_trail.queue_free()
+
+
 func command_move(point: Vector2) -> void:
 	_cancel_windup()
 	_order = Order.MOVE

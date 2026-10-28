@@ -46,6 +46,15 @@ func test_galeforce_leaves_a_wind_trail_from_the_start_of_the_dash() -> void:
 	assert_almost_eq(trails()[0].length, 200.0, 2.0)
 
 
+func test_a_trail_still_growing_goes_when_lucian_does() -> void:
+	equip(&"galeforce")
+	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
+	var trail := trails()[0]
+	lucian.get_parent().remove_child(lucian)
+	await wait_physics_frames(1)
+	assert_false(is_instance_valid(trail))
+
+
 func test_rocketbelt_leaves_a_violet_trail_from_the_start_of_the_dash() -> void:
 	equip(&"hextech_rocketbelt")
 	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
