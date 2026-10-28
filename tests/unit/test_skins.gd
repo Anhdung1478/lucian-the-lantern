@@ -119,11 +119,13 @@ func test_vampire_trades_max_hp_for_lifesteal() -> void:
 
 func _hit(enemy_hp: float) -> float:
 	var enemy := Enemy.new()
+	enemy.max_hp = 1000.0
 	add_child_autofree(enemy)
-	enemy.hp = enemy_hp
+	enemy.hp = maxf(enemy_hp, 1.0)
 	lucian.hp = lucian.stats.max_hp * 0.5
 	var before := lucian.hp
-	lucian.on_damage_dealt(enemy, lucian.make_damage(1.0, DamageInfo.Type.PHYSICAL, &"q"), 1.0)
+	# A Q (no life steal) that kills an enemy at 1 HP, or scratches one at 50.
+	enemy.take_damage(lucian.make_damage(1.0 if enemy_hp > 1.0 else 5.0, DamageInfo.Type.TRUE, &"q"))
 	return lucian.hp - before
 
 

@@ -224,6 +224,11 @@ func before_damage(target: Enemy, info: DamageInfo) -> void:
 	info.amount *= multiplier
 
 
+## Death's Dance (Defy) reacts here.
+func on_kill() -> void:
+	pass
+
+
 func on_damage_dealt(target: Enemy, info: DamageInfo, _final_amount: float) -> void:
 	_combat_left = COMBAT_TIME
 	if info.type == DamageInfo.Type.PHYSICAL:

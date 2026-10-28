@@ -44,6 +44,6 @@ func _physics_process(delta: float) -> void:
 	if _second_shot_in <= 0.0:
 		return
 	_second_shot_in -= delta
-	if _second_shot_in <= 0.0 and is_instance_valid(_second_shot_target):
+	if _second_shot_in <= 0.0 and Lucian.is_target(_second_shot_target):
 		var info := lucian.roll_attack(second_shot_ratio, &"lightslinger")
 		lucian.fire_attack_projectile(lucian.next_gun(), _second_shot_target, info)

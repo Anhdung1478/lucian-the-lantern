@@ -13,6 +13,8 @@ signal merchant_reached(merchant: Merchant)
 ## A dash or a blink dropped the move ordered before it; the controller
 ## drops a held right-click with it.
 signal move_dropped
+## An enemy Lucian killed has just died.
+signal enemy_killed(enemy: Enemy)
 
 enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE, VISIT, CAST }
 
@@ -260,8 +262,7 @@ func before_damage(target: Enemy, info: DamageInfo) -> void:
 
 ## Called by an enemy after it takes damage from Lucian. Life steal works on
 ## basic attacks (and the passive's second shot); omnivamp on every hit. With
-## Bloodthirster, life steal healing past full HP becomes a shield. A skin's
-## kill heal works on the hit that kills.
+## Bloodthirster, life steal healing past full HP becomes a shield.
 func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> void:
 	if stats.omnivamp > 0.0:
 		heal(final_amount * stats.omnivamp)
@@ -270,14 +271,29 @@ func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> vo
 		var overheal := healing * (1.0 + stats.heal_shield_power) - heal(healing)
 		if passives.has(&"bloodthirster") and overheal > 0.0:
 			shield = minf(shield + overheal, ICHORSHIELD_MAX)
-	if skin.kill_heal > 0.0 and target.hp <= 0.0:
-		heal(stats.max_hp * skin.kill_heal)
 	passives.on_damage_dealt(target, info, final_amount)
 	if info.source == &"lightslinger":
 		skills[ChampionProgress.Slot.E].cooldown.reduce(passive.e_cooldown_reduction)
 	if info.source != &"w" and target.has_mark(ArdentBlaze.MARK):
 		var blaze := skills[ChampionProgress.Slot.W] as ArdentBlaze
 		add_move_speed_bonus(blaze.current_move_speed_bonus(), blaze.move_speed_duration)
+
+
+## Called once by an enemy Lucian killed: the skin's kill heal, E's max
+## rank bonus and item kill effects.
+func on_kill(enemy: Enemy) -> void:
+	if skin.kill_heal > 0.0:
+		heal(stats.max_hp * skin.kill_heal)
+	var e := skills[ChampionProgress.Slot.E]
+	if e.rank() >= ChampionProgress.MAX_RANKS[ChampionProgress.Slot.E]:
+		e.cooldown.reduce(RelentlessPursuit.KILL_CUT)
+	passives.on_kill()
+	enemy_killed.emit(enemy)
+
+
+## An enemy still worth aiming at: there, and not dead.
+static func is_target(enemy: Variant) -> bool:
+	return is_instance_valid(enemy) and enemy.is_alive()
 
 
 ## Heals, made stronger by heal and shield power. Returns the HP gained.
@@ -685,19 +701,19 @@ func _physics_process(delta: float) -> void:
 			if _step_toward(_move_point, delta):
 				_order = Order.NONE
 		Order.ATTACK:
-			if is_instance_valid(_target):
+			if is_target(_target):
 				_pursue(_target, delta)
 			else:
 				_order = Order.NONE
 		Order.ATTACK_MOVE:
-			if not is_instance_valid(_target) or not _in_range(_target):
+			if not is_target(_target) or not _in_range(_target):
 				_target = _nearest_enemy_in_range()
 			if _target:
 				_pursue(_target, delta)
 			elif _step_toward(_move_point, delta):
 				_order = Order.NONE
 		Order.CAST:
-			if not is_instance_valid(_cast_target):
+			if not is_target(_cast_target):
 				_order = Order.NONE
 			elif global_position.distance_to(_cast_target.global_position) <= _cast_reach + _cast_target.radius:
 				_order = Order.NONE
@@ -822,7 +838,7 @@ func _body_mask() -> int:
 
 
 func _process_windup(delta: float) -> void:
-	if not is_instance_valid(_target):
+	if not is_target(_target):
 		_cancel_windup()
 		return
 	visuals.face(_target.global_position - global_position)

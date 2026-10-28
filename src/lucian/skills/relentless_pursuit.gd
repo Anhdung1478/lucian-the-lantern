@@ -2,8 +2,11 @@ class_name RelentlessPursuit
 extends LucianSkill
 ## E: a quick dash toward the cursor that resets the attack timer.
 ## Lightslinger hits lower its cooldown (handled in Lucian.on_damage_dealt).
-## The max rank bonus (a kill lowers the cooldown by 1 s) needs enemies that
-## can die, so it arrives with them.
+## The max rank bonus (a kill lowers the cooldown by 1 s) is applied in
+## Lucian.on_kill.
+
+## Seconds a kill takes off the cooldown at max rank.
+const KILL_CUT := 1.0
 
 @export var min_distance := 0.0
 @export var max_distance := 280.0

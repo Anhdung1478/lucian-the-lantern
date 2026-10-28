@@ -21,7 +21,7 @@ func launch(from: Vector2, target: Enemy, info: DamageInfo) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if not is_instance_valid(_target):
+	if not Lucian.is_target(_target):
 		queue_free()
 		return
 	var offset := _target.global_position - global_position
