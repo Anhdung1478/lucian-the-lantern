@@ -165,6 +165,17 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 	return true
 
 
+## Skills another skill holds back, greyed on the HUD: Q and W while R
+## fires, E during Q's cast time.
+func is_skill_blocked(slot: ChampionProgress.Slot) -> bool:
+	match slot:
+		ChampionProgress.Slot.Q, ChampionProgress.Slot.W:
+			return (skills[ChampionProgress.Slot.R] as TheCulling).is_channeling()
+		ChampionProgress.Slot.E:
+			return (skills[ChampionProgress.Slot.Q] as PiercingLight).is_casting()
+	return false
+
+
 ## The slot waiting for the current cast time or dash to end, or -1.
 func queued_cast() -> int:
 	return _queued_slot

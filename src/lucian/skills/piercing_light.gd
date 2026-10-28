@@ -20,6 +20,11 @@ func execute(aim: Vector2) -> void:
 	_fire_in = cast_time
 
 
+## Q's cast time is still running.
+func is_casting() -> bool:
+	return _fire_in > 0.0
+
+
 func describe() -> String:
 	return TooltipText.colorize(
 		"After a [kw]%s s[/kw] cast, Lucian fires a piercing beam of light toward the cursor, dealing %s to every enemy in a line."

@@ -78,6 +78,8 @@ func _run(scenario: String) -> void:
 			await scenario_actives()
 		"energized":
 			await scenario_energized()
+		"skillbar":
+			await scenario_skillbar()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -746,3 +748,27 @@ func scenario_energized() -> void:
 	await wait(0.3)
 	print("range with RFC ready (expect 675): ", roundi(lucian.attack_range()))
 	await shot("energized_1_ready")
+
+
+func scenario_skillbar() -> void:
+	var Slot := ChampionProgress.Slot
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	lucian.progress.set_level(2)
+	lucian.try_rank_up(Slot.Q)
+	lucian.progress.bought[Slot.W] = 0
+	print("points (expect 1): ", lucian.progress.skill_points(), "  Q can rank (expect false): ", lucian.progress.can_rank_up(Slot.Q))
+	await wait(0.1)
+	await shot("skillbar_0_plus")
+	lucian.progress.bought[Slot.W] = 5
+	lucian.progress.set_level(6)
+	for slot in [Slot.W, Slot.E, Slot.R]:
+		lucian.try_rank_up(slot)
+	lucian.try_cast(Slot.R, dummy.global_position)
+	await wait(0.3)
+	print("Q/W blocked during R (expect true true): ", lucian.is_skill_blocked(Slot.Q), " ", lucian.is_skill_blocked(Slot.W))
+	await shot("skillbar_1_r_greys_qw")
+	(lucian.skills[Slot.R] as TheCulling).stop()
+	lucian.try_cast(Slot.Q, dummy.global_position)
+	await wait(0.05)
+	print("E blocked during Q (expect true): ", lucian.is_skill_blocked(Slot.E))
+	await shot("skillbar_2_q_greys_e")

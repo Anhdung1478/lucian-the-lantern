@@ -52,6 +52,15 @@ func can_rank_up(slot: Slot) -> bool:
 	)
 
 
+## The next rank of `slot` is bought in the Evolution Tree.
+func next_rank_bought(slot: Slot) -> bool:
+	return ranks[slot] < mini(MAX_RANKS[slot], bought[slot])
+
+
+func is_maxed(slot: Slot) -> bool:
+	return ranks[slot] >= MAX_RANKS[slot]
+
+
 func rank_up(slot: Slot) -> bool:
 	if not can_rank_up(slot):
 		return false

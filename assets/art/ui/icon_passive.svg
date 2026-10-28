@@ -1,11 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Lightslinger: two crossed bolts of light -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#fffbe8"/><stop offset="0.5" stop-color="#ffe9a8" stop-opacity="0.8"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="32" r="20" fill="url(#glow)" opacity="0.6"/>
-  <path d="M 12 50 L 50 14" stroke="#ffcf5a" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
-  <path d="M 12 50 L 50 14" stroke="#fffbe8" stroke-width="3" stroke-linecap="round"/>
-  <path d="M 14 14 L 52 50" stroke="#ffcf5a" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
-  <path d="M 14 14 L 52 50" stroke="#fffbe8" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="50" cy="14" r="5" fill="url(#glow)"/>
-  <circle cx="52" cy="50" r="5" fill="url(#glow)"/>
+  <!-- Lightslinger: two relic pistols firing rays of light -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#fffbe8"/><stop offset="0.5" stop-color="#ffe9a8" stop-opacity="0.8"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient>
+    <g id="gun">
+      <path d="M 27 -1.5 L 80 -1.5" stroke="#ffcf5a" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
+      <path d="M 27 -1.5 L 80 -1.5" stroke="#fffbe8" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M -5 -6 L 24 -6 L 26 -4 L 26 1 L 9 1 L 7 4 L 2.5 4 L 0.5 14 L -7 14 L -5 3 Z" fill="#2b2f38" stroke="#c9a45c" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M -3 -3.6 L 22 -3.6" stroke="#c9a45c" stroke-width="1"/>
+      <path d="M 3 4 C 3 7 7 7 8 1" fill="none" stroke="#c9a45c" stroke-width="1"/>
+      <circle cx="1.5" cy="-1" r="1.7" fill="#fffbe8"/>
+      <circle cx="27" cy="-1.5" r="5" fill="url(#glow)"/>
+    </g>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <use href="#gun" transform="translate(9 27) rotate(-30) scale(0.85)"/>
+  <use href="#gun" transform="translate(20 47) rotate(-30) scale(0.85)"/>
 </svg>

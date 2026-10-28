@@ -69,3 +69,23 @@ func test_level_up_raises_max_and_current_hp() -> void:
 	lucian.progress.set_level(2)
 	assert_gt(lucian.stats.max_hp, old_max)
 	assert_almost_eq(lucian.hp, 500.0 + lucian.stats.max_hp - old_max, 0.001)
+
+
+func test_q_cast_greys_e() -> void:
+	lucian.progress.set_level(3)
+	lucian.try_rank_up(Slot.Q)
+	lucian.try_rank_up(Slot.E)
+	assert_false(lucian.is_skill_blocked(Slot.E))
+	assert_true(lucian.try_cast(Slot.Q, lucian.global_position + Vector2.RIGHT * 100))
+	assert_true(lucian.is_skill_blocked(Slot.E))
+	await wait_seconds(0.4)
+	assert_false(lucian.is_skill_blocked(Slot.E))
+
+
+func test_r_greys_q_and_w_but_not_e() -> void:
+	lucian.progress.set_level(6)
+	lucian.try_rank_up(Slot.R)
+	assert_true(lucian.try_cast(Slot.R, lucian.global_position + Vector2.RIGHT * 100))
+	assert_true(lucian.is_skill_blocked(Slot.Q))
+	assert_true(lucian.is_skill_blocked(Slot.W))
+	assert_false(lucian.is_skill_blocked(Slot.E))

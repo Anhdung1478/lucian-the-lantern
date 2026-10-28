@@ -1,14 +1,18 @@
 class_name SkillSlot
 extends Control
 ## One skill icon on the HUD: cooldown sweep, rank dots, mana cost, "+" button
-## and lock icon. A slot without a skill is the passive. Hovering shows the
-## skill's card above it.
+## and lock icon. A slot without a skill is the passive, drawn smaller.
+## Hovering shows the skill's card above it.
 
 const ICON_SIZE := 64.0
+## 70% of a skill icon.
+const PASSIVE_SIZE := 45.0
 const PLUS_HEIGHT := 26.0
 const PLUS_RADIUS := 11.0
 const PLUS_FILL := Color(0.07, 0.08, 0.11, 0.92)
 const PLUS_HOVER := Color("fff1c2")
+## A "+" that can't be pressed yet.
+const PLUS_GREY := Color(0.45, 0.47, 0.52)
 const DOTS_HEIGHT := 12.0
 const SWEEP_COLOR := Color(0, 0, 0, 0.68)
 const FRAME_COLOR := Color(0.36, 0.4, 0.48)
@@ -16,6 +20,8 @@ const DOT_ON := Color("ffcf5a")
 const DOT_OFF := Color(0.2, 0.22, 0.27)
 const NO_MANA_TINT := Color(0.45, 0.55, 1.0)
 const UNLEARNED_TINT := Color(0.35, 0.35, 0.35)
+## Greys out a skill another one holds back (Q and W during R, E during Q).
+const GREY_SHADER := preload("res://src/ui/hud/grey_icon.gdshader")
 const LOCK_TEXTURE := preload("res://assets/art/ui/lock.svg")
 
 var lucian: Lucian
@@ -30,14 +36,21 @@ var _cost_label: Label
 var _lock: TextureRect
 var _key_label: Label
 var _key := ""
+var _icon_size := ICON_SIZE
+var _grey := ShaderMaterial.new()
+## The next rank isn't bought yet: the grey "+" gets a lock.
+var _plus_locked := false
 
 
-func setup(target: Lucian, slot_skill: LucianSkill, icon: Texture2D, key: String) -> void:
+## `icon_size` is smaller than ICON_SIZE for the passive, which then sits
+## centered in the skill icons' band.
+func setup(target: Lucian, slot_skill: LucianSkill, icon: Texture2D, key: String, icon_size := ICON_SIZE) -> void:
 	lucian = target
 	skill = slot_skill
 	_key = key
-	custom_minimum_size = Vector2(ICON_SIZE, PLUS_HEIGHT + ICON_SIZE + DOTS_HEIGHT)
-	var icon_rect := Rect2(0, PLUS_HEIGHT, ICON_SIZE, ICON_SIZE)
+	_icon_size = icon_size
+	custom_minimum_size = Vector2(icon_size, PLUS_HEIGHT + ICON_SIZE + DOTS_HEIGHT)
+	var icon_rect := Rect2(0, PLUS_HEIGHT + (ICON_SIZE - icon_size) * 0.5, icon_size, icon_size)
 
 	# A flat, text-less button: _draw_plus paints the ringed circle and the "+".
 	_plus = Button.new()
@@ -53,6 +66,7 @@ func setup(target: Lucian, slot_skill: LucianSkill, icon: Texture2D, key: String
 		_plus.pressed.connect(func() -> void: lucian.try_rank_up(skill.slot))
 	add_child(_plus)
 
+	_grey.shader = GREY_SHADER
 	_icon = TextureRect.new()
 	_icon.texture = icon
 	_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -92,8 +106,13 @@ func _process(_delta: float) -> void:
 	var cost := skill.mana_cost()
 	var remaining := skill.cooldown.remaining
 	_lock.visible = progress.bought[skill.slot] == 0
-	# No rank-ups while paused, same as Ctrl + key.
-	_plus.visible = progress.can_rank_up(skill.slot) and not get_tree().paused
+	# With a point to spend, every unmaxed skill shows its "+": gold when it
+	# can rank up, grey (and locked if the rank isn't bought) when not. No
+	# rank-ups while paused, same as Ctrl + key.
+	_plus.visible = progress.skill_points() > 0 and not progress.is_maxed(skill.slot) and not get_tree().paused
+	_plus.disabled = not progress.can_rank_up(skill.slot)
+	_plus_locked = not progress.next_rank_bought(skill.slot)
+	_plus.queue_redraw()
 	_cost_label.text = str(roundi(cost)) if cost > 0.0 else ""
 	if remaining <= 0.0:
 		_cooldown_label.text = ""
@@ -101,8 +120,12 @@ func _process(_delta: float) -> void:
 		_cooldown_label.text = "%.1f" % remaining
 	else:
 		_cooldown_label.text = str(ceili(remaining))
+	var blocked := skill.rank() > 0 and lucian.is_skill_blocked(skill.slot)
+	_icon.material = _grey if blocked else null
 	if skill.rank() == 0:
 		_icon.modulate = UNLEARNED_TINT
+	elif blocked:
+		_icon.modulate = Color.WHITE
 	elif lucian.mana < cost:
 		_icon.modulate = NO_MANA_TINT
 	else:
@@ -132,11 +155,11 @@ func _draw() -> void:
 
 
 func _draw_overlay() -> void:
-	var rect := Rect2(Vector2.ZERO, Vector2(ICON_SIZE, ICON_SIZE))
+	var rect := Rect2(Vector2.ZERO, Vector2(_icon_size, _icon_size))
 	if skill:
 		var fraction := skill.cooldown.fraction_remaining()
 		if fraction > 0.005:
-			_overlay.draw_colored_polygon(sweep_polygon(fraction, ICON_SIZE), SWEEP_COLOR)
+			_overlay.draw_colored_polygon(sweep_polygon(fraction, _icon_size), SWEEP_COLOR)
 	elif lucian.passive.charged:
 		_overlay.draw_rect(rect.grow(-2.0), DOT_ON, false, 4.0)
 		return
@@ -144,18 +167,24 @@ func _draw_overlay() -> void:
 
 
 ## The rank-up button: a gold "+" in a gold ring. Brighter on hover; pressing
-## fills the circle gold.
+## fills the circle gold. Grey when the skill can't rank up now, with a small
+## lock when its next rank isn't bought.
 func _draw_plus() -> void:
 	var center := _plus.size * 0.5
 	var mode := _plus.get_draw_mode()
 	var pressed := mode == BaseButton.DRAW_PRESSED or mode == BaseButton.DRAW_HOVER_PRESSED
 	var accent := PLUS_HOVER if mode == BaseButton.DRAW_HOVER else DOT_ON
+	if _plus.disabled:
+		accent = PLUS_GREY
+		pressed = false
 	_plus.draw_circle(center, PLUS_RADIUS, accent if pressed else PLUS_FILL)
 	_plus.draw_arc(center, PLUS_RADIUS, 0.0, TAU, 32, accent, 2.0, true)
 	var mark := PLUS_FILL if pressed else accent
 	var arm := PLUS_RADIUS * 0.55
 	_plus.draw_line(center - Vector2(arm, 0), center + Vector2(arm, 0), mark, 3.0, true)
 	_plus.draw_line(center - Vector2(0, arm), center + Vector2(0, arm), mark, 3.0, true)
+	if _plus.disabled and _plus_locked:
+		_plus.draw_texture_rect(LOCK_TEXTURE, Rect2(center + Vector2(PLUS_RADIUS - 2.0, -2.0), Vector2(14, 14)), false)
 
 
 ## Dark area of a square cooldown sweep: the last `fraction` of a clockwise

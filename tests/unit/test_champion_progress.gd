@@ -181,3 +181,23 @@ func test_set_level_clamps_and_clears_xp() -> void:
 	assert_signal_emitted_with_parameters(progress, "level_changed", [18])
 	progress.set_level(0)
 	assert_eq(progress.level, 1)
+
+
+func test_basic_ranks_2_to_5_wait_for_levels_3_5_7_9() -> void:
+	for rank in [2, 3, 4, 5]:
+		progress.set_level(2 * rank - 2)
+		progress.ranks[Slot.Q] = rank - 1
+		assert_false(progress.can_rank_up(Slot.Q), "rank %d at level %d" % [rank, 2 * rank - 2])
+		progress.set_level(2 * rank - 1)
+		progress.ranks[Slot.Q] = rank - 1
+		assert_true(progress.can_rank_up(Slot.Q), "rank %d at level %d" % [rank, 2 * rank - 1])
+
+
+func test_next_rank_bought_and_maxed() -> void:
+	progress.bought[Slot.W] = 1
+	assert_true(progress.next_rank_bought(Slot.W))
+	progress.ranks[Slot.W] = 1
+	assert_false(progress.next_rank_bought(Slot.W))
+	progress.ranks[Slot.R] = 3
+	assert_true(progress.is_maxed(Slot.R))
+	assert_false(progress.is_maxed(Slot.Q))

@@ -47,7 +47,7 @@ func setup(target: Lucian, stage_wallet: Wallet) -> void:
 	wallet.changed.connect(_show_gold)
 	_show_gold(wallet.gold)
 	stats_panel.lucian = target
-	_add_skill_slot(null, PASSIVE_ICON, "")
+	_add_skill_slot(null, PASSIVE_ICON, "", SkillSlot.PASSIVE_SIZE)
 	var settings := GameSettings.instance()
 	for i in SKILL_ICONS.size():
 		_add_skill_slot(target.skills[i], SKILL_ICONS[i], settings.key_label(SKILL_ACTIONS[i]))
@@ -107,9 +107,9 @@ func _process(_delta: float) -> void:
 		_fps_label.text = "FPS %d" % Engine.get_frames_per_second()
 
 
-func _add_skill_slot(skill: LucianSkill, icon: Texture2D, key: String) -> void:
+func _add_skill_slot(skill: LucianSkill, icon: Texture2D, key: String, icon_size := SkillSlot.ICON_SIZE) -> void:
 	var slot := SkillSlot.new()
-	slot.setup(lucian, skill, icon, key)
+	slot.setup(lucian, skill, icon, key, icon_size)
 	skill_row.add_child(slot)
 	if skill:
 		_skill_slots.append(slot)
