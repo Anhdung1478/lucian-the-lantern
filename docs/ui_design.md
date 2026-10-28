@@ -249,8 +249,8 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - Options:
   - **Resume**
   - **Settings** (cast mode, camera, volume, etc.)
-  - **Leave this stage** (keeps all essences collected)
-  - **Exit the game** (progress is saved first)
+  - **Leave this stage** (keeps all essences collected; the game auto-saves)
+  - **Exit the game** (asks **"Save before leaving?"** Yes / No; see the game design doc §15)
 
 ## 5. Settings (from the ESC menu)
 

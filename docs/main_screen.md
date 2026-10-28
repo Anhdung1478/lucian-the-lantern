@@ -14,6 +14,21 @@ The main screen has **3 sections**:
 
 The player's essences (blue, orange, purple) are shown in the **top-left** corner.
 
+### Gear menu
+- A **gear** button in the **top-left corner** (the essences are shown right next to it).
+- Clicking it opens a pop-up in the **center** of the screen with these buttons:
+
+| Button | Action |
+|---|---|
+| **Close** | Closes the pop-up |
+| **Save** | Saves to the current save slot |
+| **Save as copy** | Copies the current progress into another slot (asks before overwriting) |
+| **Settings** | Opens the game settings |
+| **Leave to main menu** | Asks **"Save before leaving?"** (Yes / No), then returns to the title screen / save slot selection |
+| **Exit the game** | Asks **"Save before leaving?"** (Yes / No), then closes the game |
+
+- **Nothing on the main screen saves by itself.** Evolution Tree and Skin Shop purchases are kept by **Save**, a **Yes** when leaving, or the auto-save when the next stage is done (see the game design doc §15).
+
 ### Navigation
 - **Sections** (Evolution Tree, Skin Shop, Journey): switched with a bar at the **bottom** of the screen.
 - **Sub-sections** (e.g. Act 1–6, Training, Endless): tabs at the **top** of the screen.

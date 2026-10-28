@@ -458,7 +458,7 @@ A new pick **replaces** the previous modifier (they do not stack).
 ## 15. Save System
 
 ### Slots
-- **3 save slots.** The player picks a slot when starting the game.
+- **3 save slots.** The player picks a slot when starting the game. That is the **current slot**: every save writes to it. *(The slot selection screen is not designed yet; until then the current slot is slot 1.)*
 - **Save as copy:** the current progress can be copied into another slot (asks for confirmation before overwriting).
 - Files: `user://save_slot_1.json`, `save_slot_2.json`, `save_slot_3.json`, each with its own `_backup.json`.
 - Settings are saved separately in `user://settings.json` and shared by all slots.
@@ -473,10 +473,12 @@ A new pick **replaces** the previous modifier (they do not stack).
 Nothing inside a stage is saved (items, gold, level, enemies), since stages always reset.
 
 ### When to save
-- After each wave
-- When a stage ends, or the player dies or quits
-- After any Evolution Tree purchase or reset, skin purchase or skin change
-- When settings change (settings file only)
+- **Auto-save only when a stage is done:** cleared, left (ESC → Leave this stage) or failed (Lucian dies). Nothing is saved between waves.
+- **Nothing on the main screen auto-saves.** Evolution Tree purchases and resets, skin purchases and skin changes are kept only by the next auto-save, the **Save** button in the gear menu, or a **Yes** when leaving.
+- **Leaving the game** (Exit the game in the ESC menu or the gear menu, Leave to main menu, or closing the window) asks **"Save before leaving?"** (Yes / No).
+  - **Yes:** saves to the current slot right away, then leaves. Inside a stage, this keeps the essences collected so far, as leaving the stage would.
+  - **No:** leaves without saving. Everything since the last save is lost.
+- Settings are not part of the save: they are written to `user://settings.json` on every change.
 
 ### Implementation notes (Godot 4)
 - **SaveManager** as an Autoload.
@@ -495,7 +497,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - [x] Full Endless modifier list
 - [x] Unspent skill points: wasted
 - [x] Wave count per stage across the 22 stages
-- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`, Phase 4: `implementation/phase4.md`)
+- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`, Phase 4: `implementation/phase4.md`, Phase 5: `implementation/phase5.md`)
 - [x] Item stats and effects (`items.md`)
 - [ ] UI (see `ui_design.md`): HUD, backpack, crafting, recipe table, ESC menu, merchant's shop and Settings done; other screens to design
 - [x] Save system
