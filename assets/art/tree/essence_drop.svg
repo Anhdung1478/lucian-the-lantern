@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Essence Drops: three small essence shards (blue, orange, purple) falling into an open palm -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6d6b0"/><stop offset="1" stop-color="#c8946a"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <path d="M 25 3 L 24 10 M 36 1 L 36 5 M 46 6 L 48 13" stroke="#e6eef0" stroke-width="1.6" stroke-linecap="round" opacity="0.4"/>
+  <path d="M 9 44 C 13 44 15 41 16.5 36 C 17.5 33 22 33 22.5 36.5 L 23 43 C 30 46.5 37 46.5 43 45.5 L 56 43.5 C 60 43 61 48.5 57 49 L 50 50 C 54 50 54.5 54.5 50.5 55 L 44 56 C 46.5 56.5 46 60 42.5 60 L 9 60 Z" fill="url(#skin)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 50 50 L 42 50.5 M 44 56 L 37 56" stroke="#8a5a3a" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 21 38 L 21.3 42" stroke="#fbe6cc" stroke-width="1.5" stroke-linecap="round"/>
+  <rect x="-3" y="41" width="13" height="21" rx="2" fill="#3a5a8a" stroke="#1a1d24" stroke-width="2.5"/>
+  <path d="M 8 42 L 8 61" stroke="#c9a45c" stroke-width="2"/>
+  <g stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round">
+    <path d="M 0 -9 L 4.5 -3.5 L 4 5 L 0 9 L -4 5 L -4.5 -3.5 Z" fill="#5aa9ff" transform="translate(23 22) rotate(-16)"/>
+    <path d="M 0 -9 L 4.5 -3.5 L 4 5 L 0 9 L -4 5 L -4.5 -3.5 Z" fill="#ffa040" transform="translate(35.5 14) rotate(6)"/>
+    <path d="M 0 -9 L 4.5 -3.5 L 4 5 L 0 9 L -4 5 L -4.5 -3.5 Z" fill="#b46cff" transform="translate(47 27) rotate(20)"/>
+  </g>
+  <g fill="#ffffff" opacity="0.7">
+    <path d="M 0 -6 L -2.5 -3 L -2 4 L 0 6 Z" transform="translate(23 22) rotate(-16)"/>
+    <path d="M 0 -6 L -2.5 -3 L -2 4 L 0 6 Z" transform="translate(35.5 14) rotate(6)"/>
+    <path d="M 0 -6 L -2.5 -3 L -2 4 L 0 6 Z" transform="translate(47 27) rotate(20)"/>
+  </g>
+</svg>

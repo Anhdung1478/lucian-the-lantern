@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Flash Upgrade: the Flash starburst without its medallion, larger, with three gold chevrons rising on the right -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <radialGradient id="burst"><stop offset="0" stop-color="#ffffff"/><stop offset="0.35" stop-color="#fff3a3" stop-opacity="0.8"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <g transform="translate(24 32) scale(1.2) translate(-32 -32)">
+    <circle cx="32" cy="32" r="18" fill="url(#burst)"/>
+    <path d="M 32 13 L 33.7 27.8 L 39.1 24.9 L 36.2 30.3 L 51 32 L 36.2 33.7 L 39.1 39.1 L 33.7 36.2 L 32 51 L 30.3 36.2 L 24.9 39.1 L 27.8 33.7 L 13 32 L 27.8 30.3 L 24.9 24.9 L 30.3 27.8 Z" fill="#fff3a3" stroke="#ffcf5a" stroke-width="1.2" stroke-linejoin="round"/>
+    <circle cx="32" cy="32" r="4.5" fill="#ffffff"/>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 49 47 L 55 41 L 61 47 M 49 36 L 55 30 L 61 36 M 49 25 L 55 19 L 61 25" stroke="#1a1d24" stroke-width="7"/>
+    <path d="M 49 47 L 55 41 L 61 47" stroke="#a8843c" stroke-width="4"/>
+    <path d="M 49 36 L 55 30 L 61 36" stroke="#c9a45c" stroke-width="4"/>
+    <path d="M 49 25 L 55 19 L 61 25" stroke="#ffe08a" stroke-width="4"/>
+  </g>
+</svg>

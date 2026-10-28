@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Ability Power: a glowing blue orb floating over an open book -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <radialGradient id="halo"><stop offset="0" stop-color="#4a6cf7" stop-opacity="0.7"/><stop offset="1" stop-color="#4a6cf7" stop-opacity="0"/></radialGradient>
+    <radialGradient id="orb" cx="0.38" cy="0.35" r="0.65"><stop offset="0" stop-color="#e6ecff"/><stop offset="0.35" stop-color="#8aa2ff"/><stop offset="1" stop-color="#4a6cf7"/></radialGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="22" r="21" fill="url(#halo)"/>
+  <path d="M 6 46 L 6 60 C 16 57 26 57 32 61 C 38 57 48 57 58 60 L 58 46 Z" fill="#6a3a2a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 32 45 C 26 41 16 41 9 44 L 9 57 C 16 54 26 54 32 58 Z" fill="#efe4c8" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 32 45 C 38 41 48 41 55 44 L 55 57 C 48 54 38 54 32 58 Z" fill="#e2d4b2" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 13 48 C 18 46.5 23 46.5 28 48 M 13 52 C 18 50.5 23 50.5 28 52 M 36 48 C 41 46.5 46 46.5 51 48 M 36 52 C 41 50.5 46 50.5 51 52" fill="none" stroke="#a8956c" stroke-width="1.2"/>
+  <circle cx="32" cy="22" r="12" fill="url(#orb)" stroke="#1a1d24" stroke-width="2"/>
+  <path d="M 25 18 A 8 8 0 0 1 30 13.5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <g fill="#9fb4ff">
+    <circle cx="22" cy="38" r="1.6"/>
+    <circle cx="42" cy="37" r="1.4"/>
+    <circle cx="32" cy="40" r="1.8"/>
+  </g>
+</svg>

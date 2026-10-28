@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Mana: a blue crystal flask, half full -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <linearGradient id="mana" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4d8ff"/><stop offset="0.5" stop-color="#8fb8ff"/><stop offset="1" stop-color="#4a6cc8"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <path d="M 27 21 L 37 21 L 51 34 L 51 47 L 41 59 L 23 59 L 13 47 L 13 34 Z" fill="#cfe0ff" fill-opacity="0.16"/>
+  <path d="M 13 40 L 51 40 L 51 47 L 41 59 L 23 59 L 13 47 Z" fill="url(#mana)"/>
+  <path d="M 13 40 L 51 40" stroke="#e0ecff" stroke-width="2"/>
+  <path d="M 13 47 L 24 50 L 41 50 L 51 47 M 24 50 L 23 59 M 41 50 L 41 59" fill="none" stroke="#4a6cc8" stroke-width="1.2" opacity="0.8"/>
+  <path d="M 27 21 L 24 34 L 13 34 M 37 21 L 40 34 L 51 34 M 24 34 L 40 34" fill="none" stroke="#e0ecff" stroke-width="1.2" opacity="0.5"/>
+  <path d="M 27 21 L 37 21 L 51 34 L 51 47 L 41 59 L 23 59 L 13 47 L 13 34 Z" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M 27 21 L 37 21 L 51 34 L 51 47 L 41 59 L 23 59 L 13 47 L 13 34 Z" fill="none" stroke="#e0ecff" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="27" y="11" width="10" height="11" fill="#cfe0ff" fill-opacity="0.25" stroke="#e0ecff" stroke-width="2"/>
+  <rect x="24.5" y="4" width="15" height="8" rx="2" fill="#a8744a" stroke="#1a1d24" stroke-width="2"/>
+  <path d="M 17 36 L 17 45" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Equip Slots: a 3 x 2 grid of item slots, the last one opening with a gold glow -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ffe9a8" stop-opacity="0.9"/><stop offset="0.45" stop-color="#ffcf5a" stop-opacity="0.45"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="open"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#ffe9a8"/><stop offset="1" stop-color="#c9a45c"/></radialGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="51" cy="41" r="21" fill="url(#glow)"/>
+  <g fill="#10171a" stroke="#7d8f86" stroke-width="2">
+    <rect x="5" y="14" width="16" height="16" rx="3"/>
+    <rect x="24" y="14" width="16" height="16" rx="3"/>
+    <rect x="43" y="14" width="16" height="16" rx="3"/>
+    <rect x="5" y="33" width="16" height="16" rx="3"/>
+    <rect x="24" y="33" width="16" height="16" rx="3"/>
+  </g>
+  <path d="M 8 27 L 8 18 Q 8 17 9 17 L 18 17 M 27 27 L 27 18 Q 27 17 28 17 L 37 17 M 46 27 L 46 18 Q 46 17 47 17 L 56 17 M 8 46 L 8 37 Q 8 36 9 36 L 18 36 M 27 46 L 27 37 Q 27 36 28 36 L 37 36" fill="none" stroke="#2c3a38" stroke-width="1.5"/>
+  <rect x="43" y="33" width="16" height="16" rx="3" fill="url(#open)" stroke="#c9a45c" stroke-width="2.5"/>
+  <path d="M 41 31 L 38.5 28.5 M 61 31 L 63.5 28.5 M 41 51 L 38.5 53.5 M 61 51 L 63.5 53.5" stroke="#ffe9a8" stroke-width="2" stroke-linecap="round"/>
+</svg>

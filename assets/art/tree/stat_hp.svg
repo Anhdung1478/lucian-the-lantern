@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Health: a green heart with a white plus -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <linearGradient id="heart" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8f0a8"/><stop offset="0.45" stop-color="#6fd36f"/><stop offset="1" stop-color="#2f8a3a"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <path d="M 32 57 C 14 45 5 35 5 24 C 5 14 12 8 20 8 C 25 8 29 11 32 15 C 35 11 39 8 44 8 C 52 8 59 14 59 24 C 59 35 50 45 32 57 Z" fill="url(#heart)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 28 19 L 36 19 L 36 26 L 43 26 L 43 34 L 36 34 L 36 41 L 28 41 L 28 34 L 21 34 L 21 26 L 28 26 Z" fill="#ffffff" stroke="#256a2c" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 10 22 C 10 16 14 13 19 13" fill="none" stroke="#e8ffe8" stroke-width="3" stroke-linecap="round"/>
+</svg>

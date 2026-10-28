@@ -18,6 +18,11 @@ func _initialize() -> void:
 	if FileAccess.file_exists(SETTINGS_PATH):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS_PATH))
 	GameSettings._instance = GameSettings.new(SETTINGS_PATH)
+	if scenario == "art_sheet":
+		# Art only: no stage, and no stretch, so a 32 px icon is 32 real pixels.
+		root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
+		_run.call_deferred(scenario)
+		return
 	stage = load("res://src/stage/stage.tscn").instantiate()
 	root.add_child(stage)
 	# The stage confines the mouse; give it back during automated runs.
@@ -92,6 +97,8 @@ func _run(scenario: String) -> void:
 			await scenario_indicators()
 		"cast_modes":
 			await scenario_cast_modes()
+		"art_sheet":
+			await scenario_art_sheet()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -943,3 +950,58 @@ func scenario_cast_modes() -> void:
 	await wait(0.1)
 	print("after the click (expect none, flash used): ", controller.aiming(), " ", not lucian.summoners.cooldown(&"flash").is_ready())
 	settings.set_value(&"cast_modes", {})
+
+
+## The Phase 5 art: essence, gear and skull icons, then every Evolution Tree
+## node icon, each at 64 px and 32 px with its file name under it.
+func scenario_art_sheet() -> void:
+	var paths: Array[String] = []
+	for file in ["essence_blue", "essence_orange", "essence_purple", "gear", "skull"]:
+		paths.append("res://assets/art/ui/%s.svg" % file)
+	for id in [
+		"skill_q", "skill_w", "skill_e", "passive", "skill_r",
+		"stat_ad", "stat_ap", "stat_hp", "stat_armor", "stat_mr", "stat_attack_speed", "stat_mana",
+		"equip_slots", "stage_gold", "bonus_xp", "essence_drop", "merchant_stock", "refresh_cost",
+		"flash", "ghost", "barrier", "heal", "clarity", "smite",
+		"flash_upgrade", "ghost_upgrade", "barrier_upgrade", "heal_upgrade", "clarity_upgrade", "smite_upgrade",
+		"summoner_slot_2",
+	]:
+		paths.append("res://assets/art/tree/%s.svg" % id)
+	var background := ColorRect.new()
+	background.color = Color("0b0d12")
+	background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.add_child(background)
+	var grid := GridContainer.new()
+	grid.columns = 8
+	grid.position = Vector2(16, 16)
+	grid.add_theme_constant_override(&"h_separation", 12)
+	grid.add_theme_constant_override(&"v_separation", 18)
+	root.add_child(grid)
+	var missing := 0
+	for path in paths:
+		var texture: Texture2D = load(path) if ResourceLoader.exists(path) else null
+		if texture == null:
+			missing += 1
+		var box := VBoxContainer.new()
+		box.custom_minimum_size.x = 180
+		var icons := HBoxContainer.new()
+		icons.alignment = BoxContainer.ALIGNMENT_CENTER
+		icons.add_theme_constant_override(&"separation", 10)
+		for side in [64, 32]:
+			var rect := TextureRect.new()
+			rect.texture = texture
+			rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			rect.custom_minimum_size = Vector2(side, side)
+			rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			icons.add_child(rect)
+		box.add_child(icons)
+		var label := Label.new()
+		label.text = path.get_file()
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override(&"font_size", 13)
+		box.add_child(label)
+		grid.add_child(box)
+	print("art icons: ", paths.size() - missing, " / ", paths.size())
+	await wait(0.3)
+	await shot("art_sheet_0")

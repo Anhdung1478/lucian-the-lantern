@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Gear: a steel gear with 8 teeth and a hole in its hub -->
+  <defs>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6ebf2"/><stop offset="0.5" stop-color="#a3acbb"/><stop offset="1" stop-color="#5a6272"/></linearGradient>
+  </defs>
+  <path d="M 26.3 10.7 L 27.5 3.4 L 36.5 3.4 L 37.7 10.7 A 22 22 0 0 1 43 12.9 L 49 8.5 L 55.5 15 L 51.1 21 A 22 22 0 0 1 53.3 26.3 L 60.6 27.5 L 60.6 36.5 L 53.3 37.7 A 22 22 0 0 1 51.1 43 L 55.5 49 L 49 55.5 L 43 51.1 A 22 22 0 0 1 37.7 53.3 L 36.5 60.6 L 27.5 60.6 L 26.3 53.3 A 22 22 0 0 1 21 51.1 L 15 55.5 L 8.5 49 L 12.9 43 A 22 22 0 0 1 10.7 37.7 L 3.4 36.5 L 3.4 27.5 L 10.7 26.3 A 22 22 0 0 1 12.9 21 L 8.5 15 L 15 8.5 L 21 12.9 A 22 22 0 0 1 26.3 10.7 Z M 32 23 A 9 9 0 0 0 32 41 A 9 9 0 0 0 32 23 Z" fill="url(#steel)" fill-rule="evenodd" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="32" cy="32" r="15" fill="none" stroke="#5a6272" stroke-width="2"/>
+  <path d="M 19 24 A 15 15 0 0 1 26 18" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+</svg>

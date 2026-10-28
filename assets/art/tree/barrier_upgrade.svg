@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Barrier Upgrade: the Barrier hex dome without its medallion, larger, with three gold chevrons rising on the right -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <linearGradient id="dome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffcf5a" stop-opacity="0.55"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0.15"/></linearGradient>
+    <radialGradient id="aura"><stop offset="0" stop-color="#ffcf5a" stop-opacity="0.5"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient>
+    <clipPath id="inside"><path d="M 14 41 A 18 18 0 0 1 50 41 Z"/></clipPath>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <g transform="translate(24 30) scale(1.25) translate(-32 -32)">
+    <circle cx="32" cy="36" r="21" fill="url(#aura)"/>
+    <path d="M 14 41 A 18 18 0 0 1 50 41 Z" fill="url(#dome)"/>
+    <g clip-path="url(#inside)">
+      <path d="M 16.4 36.5 L 20.3 38.8 L 20.3 43.2 L 16.4 45.5 L 12.5 43.2 L 12.5 38.8 Z M 24.2 36.5 L 28.1 38.8 L 28.1 43.2 L 24.2 45.5 L 20.3 43.2 L 20.3 38.8 Z M 32 36.5 L 35.9 38.8 L 35.9 43.2 L 32 45.5 L 28.1 43.2 L 28.1 38.8 Z M 39.8 36.5 L 43.7 38.8 L 43.7 43.2 L 39.8 45.5 L 35.9 43.2 L 35.9 38.8 Z M 47.6 36.5 L 51.5 38.8 L 51.5 43.2 L 47.6 45.5 L 43.7 43.2 L 43.7 38.8 Z M 12.5 29.8 L 16.4 32 L 16.4 36.5 L 12.5 38.8 L 8.6 36.5 L 8.6 32 Z M 20.3 29.8 L 24.2 32 L 24.2 36.5 L 20.3 38.8 L 16.4 36.5 L 16.4 32 Z M 28.1 29.8 L 32 32 L 32 36.5 L 28.1 38.8 L 24.2 36.5 L 24.2 32 Z M 35.9 29.8 L 39.8 32 L 39.8 36.5 L 35.9 38.8 L 32 36.5 L 32 32 Z M 43.7 29.8 L 47.6 32 L 47.6 36.5 L 43.7 38.8 L 39.8 36.5 L 39.8 32 Z M 51.5 29.8 L 55.4 32 L 55.4 36.5 L 51.5 38.8 L 47.6 36.5 L 47.6 32 Z M 16.4 23 L 20.3 25.2 L 20.3 29.8 L 16.4 32 L 12.5 29.8 L 12.5 25.2 Z M 24.2 23 L 28.1 25.2 L 28.1 29.8 L 24.2 32 L 20.3 29.8 L 20.3 25.2 Z M 32 23 L 35.9 25.2 L 35.9 29.8 L 32 32 L 28.1 29.8 L 28.1 25.2 Z M 39.8 23 L 43.7 25.2 L 43.7 29.8 L 39.8 32 L 35.9 29.8 L 35.9 25.2 Z M 47.6 23 L 51.5 25.2 L 51.5 29.8 L 47.6 32 L 43.7 29.8 L 43.7 25.2 Z M 20.3 16.2 L 24.2 18.5 L 24.2 23 L 20.3 25.2 L 16.4 23 L 16.4 18.5 Z M 28.1 16.2 L 32 18.5 L 32 23 L 28.1 25.2 L 24.2 23 L 24.2 18.5 Z M 35.9 16.2 L 39.8 18.5 L 39.8 23 L 35.9 25.2 L 32 23 L 32 18.5 Z M 43.7 16.2 L 47.6 18.5 L 47.6 23 L 43.7 25.2 L 39.8 23 L 39.8 18.5 Z" fill="none" stroke="#ffe9a8" stroke-width="1.2" opacity="0.6"/>
+    </g>
+    <path d="M 14 41 A 18 18 0 0 1 50 41" fill="none" stroke="#ffcf5a" stroke-width="4" opacity="0.5"/>
+    <path d="M 14 41 A 18 18 0 0 1 50 41" fill="none" stroke="#ffe9a8" stroke-width="2"/>
+    <path d="M 12 42 L 52 42" stroke="#c9a45c" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 19 33 A 14 14 0 0 1 27 25" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 49 47 L 55 41 L 61 47 M 49 36 L 55 30 L 61 36 M 49 25 L 55 19 L 61 25" stroke="#1a1d24" stroke-width="7"/>
+    <path d="M 49 47 L 55 41 L 61 47" stroke="#a8843c" stroke-width="4"/>
+    <path d="M 49 36 L 55 30 L 61 36" stroke="#c9a45c" stroke-width="4"/>
+    <path d="M 49 25 L 55 19 L 61 25" stroke="#ffe08a" stroke-width="4"/>
+  </g>
+</svg>

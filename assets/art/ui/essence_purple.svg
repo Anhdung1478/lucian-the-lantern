@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Purple essence: a cut gem with a crown of three points and a white sparkle -->
+  <defs>
+    <radialGradient id="glow"><stop offset="0" stop-color="#b46cff" stop-opacity="0.6"/><stop offset="1" stop-color="#b46cff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="gem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6ccff"/><stop offset="0.45" stop-color="#b46cff"/><stop offset="1" stop-color="#5e24a8"/></linearGradient>
+  </defs>
+  <circle cx="32" cy="36" r="27" fill="url(#glow)"/>
+  <path d="M 6 32 L 10 14 L 20 23 L 32 7 L 44 23 L 54 14 L 58 32 L 32 60 Z" fill="url(#gem)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 6 32 L 58 32 M 20 23 L 22 32 L 32 60 M 44 23 L 42 32 L 32 60 M 32 7 L 32 32" fill="none" stroke="#5e24a8" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 10 14 L 20 23 L 22 32 L 6 32 Z" fill="#f2e4ff" opacity="0.75"/>
+  <path d="M 32 7 L 32 32 L 22 32 L 20 23 Z" fill="#ffffff" opacity="0.4"/>
+  <path d="M 22 32 L 32 60 L 6 32 Z" fill="#d8b4ff" opacity="0.45"/>
+  <path d="M 51 3 L 53.2 9.8 L 60 12 L 53.2 14.2 L 51 21 L 48.8 14.2 L 42 12 L 48.8 9.8 Z" fill="#ffffff" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>

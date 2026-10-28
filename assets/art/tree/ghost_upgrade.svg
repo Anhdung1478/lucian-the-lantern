@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Ghost Upgrade: the Ghost runner without its medallion, larger, with three gold chevrons rising on the right -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#7fe3d4" stop-opacity="0.45"/><stop offset="1" stop-color="#7fe3d4" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <g transform="translate(23 32) scale(1.25) translate(-32 -32)">
+    <circle cx="33" cy="32" r="18" fill="url(#glow)"/>
+    <path d="M 13 27 L 19 27 M 11 34 L 18 34 M 14 41 L 19 41" stroke="#7fe3d4" stroke-width="2.2" stroke-linecap="round" opacity="0.7"/>
+    <g fill="none" stroke="#bff5ef" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 35.5 23 L 30 34"/>
+      <path d="M 34.5 25 L 41 29 L 45 25"/>
+      <path d="M 34.5 25 L 28 28 L 24 25"/>
+      <path d="M 30 34 L 38 38 L 37 46"/>
+      <path d="M 30 34 L 26 41 L 20 43"/>
+    </g>
+    <circle cx="37.5" cy="17.5" r="4.2" fill="#bff5ef"/>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 49 47 L 55 41 L 61 47 M 49 36 L 55 30 L 61 36 M 49 25 L 55 19 L 61 25" stroke="#1a1d24" stroke-width="7"/>
+    <path d="M 49 47 L 55 41 L 61 47" stroke="#a8843c" stroke-width="4"/>
+    <path d="M 49 36 L 55 30 L 61 36" stroke="#c9a45c" stroke-width="4"/>
+    <path d="M 49 25 L 55 19 L 61 25" stroke="#ffe08a" stroke-width="4"/>
+  </g>
+</svg>

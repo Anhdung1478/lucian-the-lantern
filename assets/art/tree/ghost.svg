@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Ghost: a pale teal running silhouette inside a round bronze medallion -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <linearGradient id="bronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0c27a"/><stop offset="0.5" stop-color="#b07a3a"/><stop offset="1" stop-color="#5e3a14"/></linearGradient>
+    <radialGradient id="face" cx="0.5" cy="0.4" r="0.6"><stop offset="0" stop-color="#22302c"/><stop offset="1" stop-color="#0a0f10"/></radialGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#7fe3d4" stop-opacity="0.45"/><stop offset="1" stop-color="#7fe3d4" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="32" r="29" fill="url(#bronze)" stroke="#1a1d24" stroke-width="2"/>
+  <circle cx="32" cy="32" r="22.5" fill="url(#face)" stroke="#3d2604" stroke-width="2"/>
+  <path d="M 9.5 22 A 24.5 24.5 0 0 1 22 9.5" fill="none" stroke="#fff1d0" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <circle cx="33" cy="32" r="18" fill="url(#glow)"/>
+  <path d="M 13 27 L 19 27 M 11 34 L 18 34 M 14 41 L 19 41" stroke="#7fe3d4" stroke-width="2.2" stroke-linecap="round" opacity="0.7"/>
+  <g fill="none" stroke="#bff5ef" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 35.5 23 L 30 34"/>
+    <path d="M 34.5 25 L 41 29 L 45 25"/>
+    <path d="M 34.5 25 L 28 28 L 24 25"/>
+    <path d="M 30 34 L 38 38 L 37 46"/>
+    <path d="M 30 34 L 26 41 L 20 43"/>
+  </g>
+  <circle cx="37.5" cy="17.5" r="4.2" fill="#bff5ef"/>
+</svg>
