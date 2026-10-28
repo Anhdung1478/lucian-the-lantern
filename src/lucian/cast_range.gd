@@ -1,8 +1,8 @@
 class_name CastRange
 extends RefCounted
 ## The shape a range indicator draws for a cast: a line toward the aim (Q, W,
-## a dash, Flash), two dashed lines (R) or a circle around Lucian (Gunblade,
-## Smite). Distances are from Lucian's center.
+## a dash), two dashed lines (R) or a circle around Lucian (Gunblade, Smite,
+## Flash). Distances are from Lucian's center.
 
 enum Kind { LINE, TWIN_LINES, CIRCLE }
 
@@ -21,6 +21,9 @@ var cross := Vector2.ZERO
 ## between min_reach and reach.
 var landing := false
 var min_reach := 0.0
+## Gunblade and Smite hit an enemy: aimed at one out of reach, Lucian walks
+## over first.
+var targets_enemy := false
 
 
 static func line(length: float, line_width: float) -> CastRange:
@@ -30,12 +33,26 @@ static func line(length: float, line_width: float) -> CastRange:
 	return shape
 
 
-## A dash or a blink: Lucian's path, `length` long. `shortest` is how short an
-## aim close by makes it (the full length when left out).
-static func dash(length: float, shortest := -1.0) -> CastRange:
+## A dash: Lucian's path, up to `length` long, as far as the cursor (but at
+## least `shortest`).
+static func dash(length: float, shortest := 0.0) -> CastRange:
 	var shape := line(length, BODY_WIDTH)
 	shape.landing = true
-	shape.min_reach = length if shortest < 0.0 else shortest
+	shape.min_reach = shortest
+	return shape
+
+
+## A blink (Flash): how far it reaches all around, and where Lucian lands.
+static func blink(radius: float) -> CastRange:
+	var shape := circle(radius)
+	shape.landing = true
+	return shape
+
+
+## A cast on the enemy nearest the cursor within `radius`.
+static func target(radius: float) -> CastRange:
+	var shape := circle(radius)
+	shape.targets_enemy = true
 	return shape
 
 

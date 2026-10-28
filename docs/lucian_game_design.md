@@ -38,16 +38,22 @@
 | Ctrl + C | Toggle the stats panel |
 | Hold C | Show the extra stats (health / mana regen, heal & shield power, penetration, life steal, omnivamp, range, tenacity) |
 | Y | Toggle camera between free-cam and Lucian cam (follows Lucian). Default: free-cam |
-| Space | Move the camera back over Lucian once (free-cam stays free) |
+| Space | Move the camera back over Lucian; hold it to keep the camera on him (free-cam stays free once let go) |
 
 **Cast modes (Settings → Controls, one per key):** for Q / W / E / R, D / F and item keys 1–6.
 - **Quick cast** (default): casts toward the cursor on press.
-- **Quick cast with indicator:** holding the key shows the range toward the cursor; releasing it casts.
-- **Normal cast:** pressing the key shows the range; left-click casts. Right-click, ESC or the same key again cancels (right-click doesn't move Lucian). Pressing another cast key switches to it.
+- **Quick cast with indicator:** holding the key shows the range toward the cursor; releasing it casts. Left-click does nothing meanwhile.
+- **Normal cast:** pressing the key shows the range; left-click casts. Pressing the same key again keeps aiming; another cast key switches to it.
+
+Right-click or ESC cancels an aim in either mode (right-click doesn't move Lucian, ESC doesn't open the menu).
 
 Casts with no aim (potions, Ghost, Barrier, Heal, Clarity) and casts that aren't ready (cooldown, mana, Q / W during R) always go on press. Pressing R while it fires still stops it.
 
-**Range indicators:** a ray for Q, W (ending in the cross it bursts into), E and the item dashes (with a ring where Lucian lands), two dashed rays for R, a circle for Gunblade (700) and Smite (500), a ray for Flash (400). They show while aiming (toward the cursor), and while a learned skill, an item active or Flash / Smite is hovered on the HUD (where Lucian faces).
+**Range indicators:** a ray for Q, W (ending in the cross it bursts into), E and the item dashes (with a ring where Lucian lands), two dashed rays for R, a circle for Gunblade (700), Smite (500) and Flash (400; a blink, so a circle, with the landing ring while aiming). They show while aiming (toward the cursor), and while a learned skill, an item active or Flash / Smite is hovered on the HUD (where Lucian faces).
+
+**Dashes** (E, Galeforce, Rocketbelt) go as far as the cursor, up to their range, so a cursor right on Lucian dashes 0.
+
+**Targeted casts** (Gunblade, Smite) hit the enemy nearest the cursor within range. Aimed at an enemy out of range, Lucian walks over and casts once it is in range; any new order (move, attack) drops it, a dash or Flash doesn't.
 
 **Key bindings** can be changed in Settings → Controls (all but ESC and the debug F3 + Q).
 
@@ -114,7 +120,7 @@ Casts with no aim (potions, Ghost, Barrier, Heal, Clarity) and casts that aren't
 | **Passive – Lightslinger** | After using a skill, the next attack shoots twice. Lucian's shots (basic attacks, this second shot, R's bullets) take turns between his guns, left first. |
 | **Q – Piercing Light** | Laser through a target, hitting every enemy in a line. |
 | **W – Ardent Blaze** | Missile that explodes in a cross and marks enemies (magic damage, AP scaling). Hitting a marked enemy gives movement speed. |
-| **E – Relentless Pursuit** | Short dash. Passive hits lower its cooldown. |
+| **E – Relentless Pursuit** | Short dash toward the cursor (up to 280, as far as the cursor). Passive hits lower its cooldown. |
 | **R – The Culling** | Fires a stream of bullets in one direction while Lucian can move. |
 
 **Story start:**

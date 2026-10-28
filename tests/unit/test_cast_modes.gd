@@ -85,14 +85,13 @@ func test_normal_cast_right_click_cancels_without_moving() -> void:
 	assert_eq(lucian.global_position, Vector2.ZERO, "no move either")
 
 
-func test_normal_cast_the_same_key_or_esc_cancels() -> void:
+func test_normal_cast_esc_cancels_and_the_same_key_keeps_aiming() -> void:
 	mode(&"skill_q", "normal")
 	press(&"skill_q", KEY_Q)
 	Input.action_release(&"skill_q")
 	press(&"skill_q", KEY_Q)
-	assert_eq(controller.aiming(), &"")
+	assert_eq(controller.aiming(), &"skill_q", "still aiming")
 	assert_false(q_cast())
-	press(&"skill_q", KEY_Q)
 	assert_true(controller.cancel_aim(), "ESC asks this first")
 	assert_false(controller.cancel_aim(), "nothing left to cancel")
 	assert_false(q_cast())
@@ -137,7 +136,7 @@ func test_items_and_summoners_aim_too() -> void:
 	press(&"item_1", KEY_1)
 	assert_eq(lucian.indicator.aimed.reach, ItemActives.GALEFORCE_DASH)
 	click(MOUSE_BUTTON_LEFT)
-	assert_true(lucian.is_dashing())
+	assert_false(lucian.item_cooldown(&"galeforce").is_ready(), "Galeforce used")
 	mode(&"summoner_d", "normal")
 	press(&"summoner_d", KEY_D)
 	assert_eq(lucian.indicator.aimed.reach, SummonerSpells.FLASH_RANGE)
@@ -186,3 +185,20 @@ func test_esc_drops_the_aim_before_opening_the_menu() -> void:
 	stage.screens._input(esc)
 	assert_true(stage.screens.menu.visible, "a second ESC opens it")
 	stage.screens.set_menu_open(false)
+
+
+func test_quick_cast_with_indicator_ignores_left_click_and_right_click_cancels() -> void:
+	mode(&"skill_q", "indicator")
+	press(&"skill_q", KEY_Q)
+	click(MOUSE_BUTTON_LEFT)
+	assert_eq(controller.aiming(), &"skill_q", "left-click does nothing")
+	assert_false(q_cast())
+	Input.action_press(&"move")
+	click(MOUSE_BUTTON_RIGHT)
+	Input.action_release(&"move")
+	assert_eq(controller.aiming(), &"")
+	Input.action_release(&"skill_q")
+	await wait_process_frames(2)
+	assert_false(q_cast(), "letting go after a cancel casts nothing")
+	await wait_seconds(0.2)
+	assert_eq(lucian.global_position, Vector2.ZERO, "the right-click didn't move him")

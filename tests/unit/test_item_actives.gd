@@ -78,8 +78,34 @@ func test_gunblade_bolts_the_enemy_near_the_cursor() -> void:
 func test_gunblade_needs_an_enemy_in_range() -> void:
 	dummy.position = Vector2(2000, 0)
 	equip(&"hextech_gunblade")
-	assert_false(lucian.use_equip_slot(0, dummy.position))
+	assert_false(lucian.use_equip_slot(0, Vector2(300, 300)), "no enemy under the cursor either")
 	assert_true(lucian.item_cooldown(&"hextech_gunblade").is_ready(), "a refused use costs no cooldown")
+	await wait_seconds(0.2)
+	assert_eq(lucian.global_position, Vector2.ZERO, "no walking")
+
+
+func test_gunblade_on_an_enemy_out_of_range_walks_over_then_casts() -> void:
+	dummy.position = Vector2(1000, 0)
+	await wait_physics_frames(2)
+	equip(&"hextech_gunblade")
+	assert_false(lucian.use_equip_slot(0, dummy.position), "not yet")
+	assert_true(lucian.item_cooldown(&"hextech_gunblade").is_ready())
+	# 1000 - 700 - 34 (the dummy's radius) = 266 to walk at 335.
+	await wait_seconds(1.2)
+	assert_eq(sources, [&"hextech_gunblade"])
+	assert_almost_eq(lucian.global_position.x, 1000.0 - ItemActives.GUNBLADE_RANGE - dummy.radius, 10.0, "walked only until in range")
+
+
+func test_galeforce_and_rocketbelt_dash_only_as_far_as_the_cursor() -> void:
+	equip(&"galeforce")
+	equip(&"hextech_rocketbelt", 1)
+	assert_true(lucian.use_equip_slot(0, Vector2(0, -100)))
+	await wait_seconds(0.3)
+	assert_almost_eq(lucian.global_position, Vector2(0, -100), Vector2(1, 1))
+	assert_true(lucian.use_equip_slot(1, lucian.global_position), "aimed right on him")
+	await wait_physics_frames(3)
+	assert_almost_eq(lucian.global_position, Vector2(0, -100), Vector2(1, 1), "no dash")
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY)
 
 
 func test_an_active_on_cooldown_is_refused() -> void:

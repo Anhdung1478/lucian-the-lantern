@@ -161,12 +161,24 @@ func test_e_dashes_max_distance_through_enemies() -> void:
 	assert_almost_eq(lucian.position.y, 0.0, 0.5)
 
 
-func test_e_has_minimum_distance() -> void:
+func test_e_dashes_as_far_as_the_cursor_even_zero() -> void:
 	dummy.position = Vector2(0, 600)
+	var effects := Node2D.new()
+	add_child_autofree(effects)
+	lucian.projectile_parent = effects
 	_rank(Slot.E, 1)
 	lucian.try_cast(Slot.E, Vector2(50, 0))
 	await wait_seconds(0.4)
-	assert_almost_eq(lucian.position.x, 160.0, 2.0)
+	assert_almost_eq(lucian.position.x, 50.0, 2.0)
+	lucian.skills[Slot.E].cooldown.clear()
+	await wait_seconds(0.4)
+	assert_true(lucian.try_cast(Slot.E, lucian.position), "aimed right on him")
+	await wait_physics_frames(3)
+	assert_almost_eq(lucian.position.x, 50.0, 0.5, "no move")
+	assert_false(lucian.is_dashing())
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY, "solid again")
+	await wait_seconds(0.4)
+	assert_eq(effects.get_child_count(), 0, "no trail left behind")
 
 
 func test_e_stops_at_walls() -> void:

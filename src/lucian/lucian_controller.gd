@@ -6,13 +6,11 @@ extends Node
 ## Skill, item and summoner keys cast by their cast mode (a setting per key):
 ## quick cast fires on press; quick cast with indicator shows the range while
 ## the key is held and fires on release; normal cast shows it on press and
-## fires on left-click (right-click, ESC or the key again cancels). Casts with
-## no aim, or not ready, always fire on press.
+## fires on left-click. Right-click or ESC cancels an aim. Casts with no aim,
+## or not ready, always fire on press.
 
 ## Holding move re-issues the order once the cursor has moved this far.
 const REISSUE_DISTANCE := 8.0
-## Extra slack around an enemy's radius when clicking on it.
-const CLICK_SLACK := 10.0
 const ITEM_ACTIONS: Array[StringName] = [&"item_1", &"item_2", &"item_3", &"item_4", &"item_5", &"item_6"]
 const SUMMONER_ACTIONS: Array[StringName] = [&"summoner_d", &"summoner_f"]
 const SKILL_ACTIONS := {
@@ -71,7 +69,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			lucian.command_attack_move(_cursor())
 			_set_attack_move_armed(false)
 		else:
-			var enemy := _enemy_under_cursor()
+			var enemy := lucian.enemy_at(_cursor())
 			if enemy:
 				lucian.command_attack(enemy)
 	else:
@@ -128,17 +126,18 @@ func _press_cast(action: StringName) -> void:
 	lucian.indicator.aim_point = _cursor()
 
 
-## While aiming in normal cast: left-click fires, right-click or the same key
-## cancels. Another cast key takes over the aim (the caller handles it).
-## True when the event was used.
+## While aiming: right-click cancels (without moving). Left-click fires in
+## normal cast and does nothing while a quick cast with indicator is held.
+## Another cast key takes over the aim (the caller handles it). True when the
+## event was used.
 func _aim_input(event: InputEvent) -> bool:
-	if _aim_mode == "normal":
-		if event.is_action_pressed(&"attack"):
+	if event.is_action_pressed(&"move"):
+		cancel_aim()
+		return true
+	if event.is_action_pressed(&"attack"):
+		if _aim_mode == "normal":
 			_fire_aim()
-			return true
-		if event.is_action_pressed(&"move") or event.is_action_pressed(_aiming):
-			cancel_aim()
-			return true
+		return true
 	return false
 
 
@@ -195,18 +194,6 @@ func _set_attack_move_armed(armed: bool) -> void:
 	_attack_move_armed = armed
 	lucian.set_range_ring_visible(armed)
 	Input.set_default_cursor_shape(Input.CURSOR_CROSS if armed else Input.CURSOR_ARROW)
-
-
-func _enemy_under_cursor() -> Enemy:
-	var cursor := _cursor()
-	var best: Enemy = null
-	var best_distance := INF
-	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
-		var distance := cursor.distance_to(enemy.global_position)
-		if distance <= enemy.radius + CLICK_SLACK and distance < best_distance:
-			best = enemy
-			best_distance = distance
-	return best
 
 
 func _merchant_under_cursor() -> Merchant:

@@ -54,7 +54,7 @@ static func cast_range(item: ItemData) -> CastRange:
 		return null
 	match item.id:
 		&"hextech_gunblade":
-			return CastRange.circle(GUNBLADE_RANGE)
+			return CastRange.target(GUNBLADE_RANGE)
 		&"galeforce":
 			return CastRange.dash(GALEFORCE_DASH)
 		&"hextech_rocketbelt":
@@ -75,7 +75,7 @@ func use(item: ItemData, aim: Vector2) -> bool:
 			if not _gunblade(aim):
 				return false
 		&"galeforce":
-			lucian.start_dash(lucian.aim_direction(aim), GALEFORCE_DASH, GALEFORCE_DASH_SPEED, GALEFORCE_TRAIL)
+			lucian.start_dash(lucian.aim_direction(aim), _dash_length(aim, GALEFORCE_DASH), GALEFORCE_DASH_SPEED, GALEFORCE_TRAIL)
 			_galeforce_pending = true
 		&"hextech_rocketbelt":
 			_rocketbelt(aim)
@@ -131,7 +131,7 @@ func _galeforce_missiles() -> void:
 ## hit once).
 func _rocketbelt(aim: Vector2) -> void:
 	var direction := lucian.aim_direction(aim)
-	lucian.start_dash(direction, ROCKETBELT_DASH, ROCKETBELT_DASH_SPEED, ROCKETBELT_TRAIL)
+	lucian.start_dash(direction, _dash_length(aim, ROCKETBELT_DASH), ROCKETBELT_DASH_SPEED, ROCKETBELT_TRAIL)
 	var hit: Array[Enemy] = []
 	var damage := ROCKETBELT_BASE + ROCKETBELT_AP * lucian.stats.ap
 	for i in ROCKETBELT_BOLTS:
@@ -146,6 +146,11 @@ func _rocketbelt(aim: Vector2) -> void:
 				enemy.take_damage(lucian.make_damage(damage, DamageInfo.Type.MAGIC, &"hextech_rocketbelt")))
 		lucian.spawn(bolt)
 	Sfx.play(&"refresh", -2.0)
+
+
+## Item dashes go as far as the cursor, up to `longest` (0 on Lucian).
+func _dash_length(aim: Vector2, longest: float) -> float:
+	return minf(lucian.global_position.distance_to(aim), longest)
 
 
 func _cooldown_of(item: ItemData) -> float:

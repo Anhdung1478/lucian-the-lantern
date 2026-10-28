@@ -5,13 +5,16 @@ extends CharacterBody2D
 ## windups pause the order. Item passives and actives live in the
 ## ItemPassives and ItemActives children, summoner spells in SummonerSpells.
 
+## Clicks this close to an enemy's edge count as clicking it.
+const CLICK_SLACK := 10.0
+
 ## Lucian walked into range of the merchant he was sent to.
 signal merchant_reached(merchant: Merchant)
 ## A dash or a blink dropped the move ordered before it; the controller
 ## drops a held right-click with it.
 signal move_dropped
 
-enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE, VISIT }
+enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE, VISIT, CAST }
 
 ## Share of the attack period spent winding up before the shot leaves the gun.
 const WINDUP_RATIO := 0.15
@@ -92,6 +95,11 @@ var _dash_trail: DashTrail
 var _speed_buffs := {}
 var _last_position := Vector2.ZERO
 var _queued_slot := -1
+## Order.CAST: the enemy a targeted cast waits to be in reach of, the reach,
+## and the cast, called with the enemy's position.
+var _cast_target: Enemy
+var _cast_reach := 0.0
+var _cast_call: Callable
 ## The gun the next shot comes from: they take turns, left first.
 var _next_gun := LucianVisuals.Gun.LEFT
 var _queued_aim := Vector2.ZERO
@@ -171,6 +179,17 @@ func command_visit(merchant: Merchant) -> void:
 		return
 	_order = Order.VISIT
 	_visit = merchant
+
+
+## Walks toward `target` until it is within `reach`, then calls `cast` with
+## its position (Gunblade or Smite aimed at an enemy out of reach). A new
+## order drops it; a dash or a blink doesn't.
+func command_cast_on(target: Enemy, reach: float, cast: Callable) -> void:
+	_cancel_windup()
+	_order = Order.CAST
+	_cast_target = target
+	_cast_reach = reach
+	_cast_call = cast
 
 
 func try_rank_up(slot: ChampionProgress.Slot) -> bool:
@@ -283,13 +302,32 @@ func use_equip_slot(slot: int, aim: Vector2) -> bool:
 		return false
 	var item := inventory.item_at(index)
 	if ItemActives.has_active(item):
-		return actives.use(item, aim)
+		if actives.use(item, aim):
+			return true
+		if item_cooldown(item.id).is_ready():
+			_walk_into_reach(aim, equip_range(slot), func(at: Vector2) -> void: use_equip_slot(slot, at))
+		return false
 	return use_item(index)
 
 
 ## D and F: casts the summoner spell on `slot` (0-1) toward `aim`.
 func use_summoner(slot: int, aim: Vector2) -> bool:
-	return summoners.use(slot, aim)
+	if summoners.use(slot, aim):
+		return true
+	var spell := summoners.spell_in(slot)
+	if spell and summoners.cooldown(spell.id).is_ready():
+		_walk_into_reach(aim, summoner_range(slot), func(at: Vector2) -> void: use_summoner(slot, at))
+	return false
+
+
+## A targeted cast (Gunblade, Smite) aimed at an enemy out of reach: Lucian
+## walks over and casts once it is in reach.
+func _walk_into_reach(aim: Vector2, shape: CastRange, cast: Callable) -> void:
+	if shape == null or not shape.targets_enemy:
+		return
+	var target := enemy_at(aim)
+	if target and global_position.distance_to(target.global_position) > shape.reach + target.radius:
+		command_cast_on(target, shape.reach, cast)
 
 
 ## The range indicator's shape for a skill, or null while it is unlearned.
@@ -393,6 +431,18 @@ func _drop_move() -> void:
 	move_dropped.emit()
 
 
+## The enemy under `point` (a click), or null.
+func enemy_at(point: Vector2) -> Enemy:
+	var best: Enemy = null
+	var best_distance := INF
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		var distance := point.distance_to(enemy.global_position)
+		if distance <= enemy.radius + CLICK_SLACK and distance < best_distance:
+			best = enemy
+			best_distance = distance
+	return best
+
+
 ## The enemy nearest the cursor among those within `reach` of Lucian
 ## (Gunblade, Smite), or null.
 func enemy_near_cursor(aim: Vector2, reach: float) -> Enemy:
@@ -471,9 +521,11 @@ func start_dash(direction: Vector2, distance: float, speed: float, trail_color :
 	_cancel_windup()
 	_dash_velocity = direction * speed
 	_dash_left = distance / speed
-	_start_dash_trail(trail_color)
 	_attack_cooldown = 0.0
-	collision_mask = Layers.WORLD
+	# A dash aimed right on Lucian goes nowhere, but still counts as one.
+	if _dash_left > 0.0:
+		_start_dash_trail(trail_color)
+		collision_mask = Layers.WORLD
 	_drop_move()
 	visuals.face(direction)
 
@@ -614,6 +666,14 @@ func _physics_process(delta: float) -> void:
 				_pursue(_target, delta)
 			elif _step_toward(_move_point, delta):
 				_order = Order.NONE
+		Order.CAST:
+			if not is_instance_valid(_cast_target):
+				_order = Order.NONE
+			elif global_position.distance_to(_cast_target.global_position) <= _cast_reach + _cast_target.radius:
+				_order = Order.NONE
+				_cast_call.call(_cast_target.global_position)
+			else:
+				_step_toward(_cast_target.global_position, delta)
 		Order.VISIT:
 			if not is_instance_valid(_visit):
 				_order = Order.NONE

@@ -31,11 +31,16 @@ func _draw() -> void:
 	var shape := shown()
 	if shape == null:
 		return
+	var lucian := get_parent() as Lucian
 	if shape.kind == CastRange.Kind.CIRCLE:
 		draw_circle(Vector2.ZERO, shape.reach, FILL)
 		draw_arc(Vector2.ZERO, shape.reach, 0.0, TAU, 128, EDGE, 2.0, true)
+		# Flash, while aimed: where Lucian lands.
+		if shape.landing and shape == aimed:
+			var offset := aim_point - global_position
+			var at := lucian.aim_direction(aim_point) * shape.landing_distance(offset.length())
+			draw_arc(at, CastRange.BODY_WIDTH * 0.5, 0.0, TAU, 48, LANDING, 2.5, true)
 		return
-	var lucian := get_parent() as Lucian
 	var direction := Vector2.from_angle(lucian.visuals.rotation)
 	var distance := shape.reach
 	if shape == aimed:

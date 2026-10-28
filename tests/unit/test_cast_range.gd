@@ -40,7 +40,7 @@ func test_skill_shapes() -> void:
 	assert_eq(w.cross, Vector2(400, 60), "the cross it bursts into")
 	var e := lucian.skill_range(Slot.E)
 	assert_eq(e.reach, 280.0)
-	assert_eq(e.min_reach, 160.0)
+	assert_eq(e.min_reach, 0.0, "as short as the cursor is close")
 	assert_true(e.landing)
 	var r := lucian.skill_range(Slot.R)
 	assert_eq(r.kind, CastRange.Kind.TWIN_LINES)
@@ -63,9 +63,12 @@ func test_item_shapes() -> void:
 	equip(&"infinity_edge", 3)
 	assert_eq(lucian.equip_range(0).kind, CastRange.Kind.CIRCLE)
 	assert_eq(lucian.equip_range(0).reach, ItemActives.GUNBLADE_RANGE)
+	assert_true(lucian.equip_range(0).targets_enemy)
 	assert_eq(lucian.equip_range(1).reach, ItemActives.GALEFORCE_DASH)
 	assert_true(lucian.equip_range(1).landing)
+	assert_eq(lucian.equip_range(1).min_reach, 0.0)
 	assert_eq(lucian.equip_range(2).reach, ItemActives.ROCKETBELT_DASH)
+	assert_eq(lucian.equip_range(2).min_reach, 0.0)
 	assert_null(lucian.equip_range(3), "no active")
 	assert_null(lucian.equip_range(4), "empty")
 
@@ -73,11 +76,13 @@ func test_item_shapes() -> void:
 func test_summoner_shapes() -> void:
 	lucian.summoners.slots = [&"flash", &"smite"]
 	var flash := lucian.summoner_range(0)
-	assert_eq(flash.kind, CastRange.Kind.LINE)
+	assert_eq(flash.kind, CastRange.Kind.CIRCLE, "a blink: a circle, not a path")
 	assert_eq(flash.reach, SummonerSpells.FLASH_RANGE)
-	assert_eq(flash.min_reach, 0.0, "Flash goes as far as the cursor")
+	assert_true(flash.landing, "where he lands, while aiming")
+	assert_false(flash.targets_enemy)
 	assert_eq(lucian.summoner_range(1).kind, CastRange.Kind.CIRCLE)
 	assert_eq(lucian.summoner_range(1).reach, SummonerSpells.SMITE_RANGE)
+	assert_true(lucian.summoner_range(1).targets_enemy)
 	for id in [&"ghost", &"barrier", &"heal", &"clarity"]:
 		lucian.summoners.slots = [id, &"smite"]
 		assert_null(lucian.summoner_range(0), str(id))

@@ -71,9 +71,9 @@ func set_spell(slot: int, id: StringName) -> void:
 static func cast_range(id: StringName) -> CastRange:
 	match id:
 		&"flash":
-			return CastRange.dash(FLASH_RANGE, 0.0)
+			return CastRange.blink(FLASH_RANGE)
 		&"smite":
-			return CastRange.circle(SMITE_RANGE)
+			return CastRange.target(SMITE_RANGE)
 	return null
 
 

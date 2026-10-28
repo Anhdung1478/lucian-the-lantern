@@ -74,6 +74,11 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | Show a skill's range on hover: a ray, two dashed rays for R, the Galeforce and Rocketbelt dashes, a circle for Gunblade | Hovering a learned skill, an item with an aimed active or Flash / Smite shows its range around Lucian, pointing where he faces: rays for Q, W (with the cross it bursts into), E and the dashes (with a ring where Lucian lands), two dashed rays for R, circles for Gunblade (700) and Smite (500). |
 | Lucian should fire his two guns in turn | Every shot takes the next gun: left, right, left… That covers basic attacks, Lightslinger's second shot (still from the other gun) and R. Basic attacks used to fire from the right gun only. |
 | Normal cast and quick cast with indicator | A cast mode per key in Settings → Controls (your choice): Quick cast (default), Quick + indicator (hold to see the range toward the cursor, release to cast), Normal cast (press to aim, left-click to cast; right-click, ESC or the key again cancels without moving). It covers skills, item actives and Flash / Smite; spells with no aim still cast on press. |
+| Cancelling an aim | Your rule: in both modes right-click or ESC cancels. Holding a quick cast with indicator, left-click does nothing; in normal cast, left-click casts and the same key keeps aiming. |
+| Holding Space follows Lucian | While Space is held the camera stays on Lucian; let go and free-cam is free again. A tap still recenters once. |
+| Flash shows a circle | Flash is a blink, so hovering shows its 400 circle; while aiming, a ring shows where Lucian lands. |
+| E, Galeforce and Rocketbelt can dash 0 | All three dash as far as the cursor, up to their range (E 280, Galeforce 200, Rocketbelt 275). With the cursor on Lucian they go nowhere but still count (E resets the attack timer, Galeforce fires, Rocketbelt shoots). |
+| Targeted casts walk into range | Gunblade and Smite aimed at an enemy out of range: Lucian walks over and casts once it is in range. A new move or attack order drops it; a dash or Flash on the way doesn't. |
 
 ## Choices I made where the request was open
 
@@ -123,7 +128,7 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | ![Heal](phase4/summoners_4_heal.png) Follow-up: Heal's ring and rising crosses | ![Clarity](phase4/summoners_5_clarity.png) Follow-up: Clarity's motes spiralling in |
 | ![W range](phase4/indicators_1_w.png) Follow-up: hovering W shows its range and the cross it bursts into | ![R range](phase4/indicators_3_r.png) Follow-up: hovering R, two dashed rays |
 | ![Gunblade range](phase4/indicators_6_gunblade.png) Follow-up: hovering Gunblade, its 700 circle | ![E aimed](phase4/cast_modes_1_e_landing.png) Follow-up: normal cast, E aimed at the cursor with its landing ring |
-| ![Cast modes](phase4/settings_2_controls.png) Follow-up: a cast mode picker beside each skill, summoner and item key | |
+| ![Cast modes](phase4/settings_2_controls.png) Follow-up: a cast mode picker beside each skill, summoner and item key | ![Flash aimed](phase4/cast_modes_2_flash.png) Follow-up: Flash aimed, its 400 circle and the landing ring |
 
 ## Known limits
 

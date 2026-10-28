@@ -153,7 +153,32 @@ func test_smite_deals_true_damage_and_heals() -> void:
 
 func test_smite_needs_an_enemy_in_reach() -> void:
 	lucian.summoners.set_spell(0, &"smite")
-	assert_false(lucian.use_summoner(0, dummy.position))
+	assert_false(lucian.use_summoner(0, Vector2(300, 300)), "no enemy under the cursor either")
+	assert_true(lucian.summoners.cooldown(&"smite").is_ready())
+	await wait_seconds(0.2)
+	assert_eq(lucian.global_position, Vector2.ZERO, "no walking")
+
+
+func test_smite_on_an_enemy_out_of_reach_walks_over_then_casts() -> void:
+	dummy.position = Vector2(900, 0)
+	await wait_physics_frames(2)
+	lucian.summoners.set_spell(0, &"smite")
+	assert_false(lucian.use_summoner(0, dummy.position), "not yet")
+	assert_true(lucian.summoners.cooldown(&"smite").is_ready())
+	# 900 - 500 - 34 (the dummy's radius) = 366 to walk at 335.
+	await wait_seconds(1.5)
+	assert_eq(sources, [&"smite"])
+	assert_almost_eq(lucian.global_position.x, 900.0 - SummonerSpells.SMITE_RANGE - dummy.radius, 10.0, "walked only until in reach")
+
+
+func test_a_new_order_drops_the_walk_to_smite() -> void:
+	dummy.position = Vector2(900, 0)
+	await wait_physics_frames(2)
+	lucian.summoners.set_spell(0, &"smite")
+	lucian.use_summoner(0, dummy.position)
+	lucian.command_move(Vector2(-200, 0))
+	await wait_seconds(1.5)
+	assert_eq(sources, [])
 	assert_true(lucian.summoners.cooldown(&"smite").is_ready())
 
 

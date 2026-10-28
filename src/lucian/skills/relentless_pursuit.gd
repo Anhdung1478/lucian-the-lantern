@@ -5,7 +5,7 @@ extends LucianSkill
 ## The max rank bonus (a kill lowers the cooldown by 1 s) needs enemies that
 ## can die, so it arrives with them.
 
-@export var min_distance := 160.0
+@export var min_distance := 0.0
 @export var max_distance := 280.0
 @export var dash_speed := 1350.0
 
@@ -21,9 +21,9 @@ func cast_range() -> CastRange:
 
 func describe() -> String:
 	return TooltipText.colorize(
-		"Lucian dashes up to [kw]%d[/kw] units toward the cursor (at least %d), passing through enemies, and resets his basic attack timer. "
+		"Lucian dashes toward the cursor, up to [kw]%d[/kw] units, passing through enemies, and resets his basic attack timer. "
 		+ "[kw]Lightslinger[/kw] hits lower this cooldown."
-	) % [max_distance, min_distance]
+	) % max_distance
 
 
 func max_rank_bonus() -> String:
