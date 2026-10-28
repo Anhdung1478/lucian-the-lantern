@@ -10,6 +10,9 @@ const STATUS_GAP := 3.0
 @export var size := Vector2(90, 10)
 @export var fill_color := Color("c8312b")
 
+## Elites: a small gold diamond at the bar's left end.
+var badge := false
+
 var _ratio := 1.0
 
 
@@ -27,6 +30,12 @@ func _draw() -> void:
 	var rect := Rect2(-size * 0.5, size)
 	draw_rect(rect.grow(2.0), Color(0, 0, 0, 0.8))
 	draw_rect(Rect2(rect.position, Vector2(size.x * _ratio, size.y)), fill_color)
+	if badge:
+		var left := Vector2(rect.position.x, 0.0)
+		var diamond := PackedVector2Array([left + Vector2(0, -6), left + Vector2(6, 0), left + Vector2(0, 6), left + Vector2(-6, 0)])
+		draw_colored_polygon(diamond, UiStyle.GOLD_COLOR)
+		diamond.append(diamond[0])
+		draw_polyline(diamond, Color.BLACK, 2.0)
 	var enemy := get_parent() as Enemy
 	if enemy == null:
 		return

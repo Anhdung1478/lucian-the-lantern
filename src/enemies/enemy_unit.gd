@@ -1,0 +1,180 @@
+class_name EnemyUnit
+extends Enemy
+## A fighting enemy built in code from an EnemyData: body, hurtbox, art and
+## health bar. It walks at Lucian (sliding along walls, sidestepping when
+## stuck), attacks when in range, and stands still while he is dead or
+## can't be hit. Subclasses say what an attack does (_attack), and may
+## think differently (_think).
+
+const HIT_FLASH := Color(1.8, 1.8, 1.8)
+## Moving less than this share of its speed in a frame counts as stuck.
+const STUCK_SHARE := 0.25
+const STUCK_TIME := 0.4
+## Gunblade's slow.
+const SLOW_AMOUNT := 0.4
+const ELITE_BAR := Vector2(110, 12)
+const BOSS_BAR := Vector2(140, 14)
+## A super minion's Empower on the minions around it: +15% damage.
+const EMPOWER := &"empower"
+const EMPOWER_BONUS := 0.15
+const EMPOWER_ICON := preload("res://assets/art/ui/status_empower.svg")
+
+var data: EnemyData
+var target: Lucian
+## This unit's numbers, after the act and wave scaling.
+var damage := 0.0
+var attack_range := 0.0
+var move_speed := 0.0
+## Where shots and ground warnings go; the parent when not set.
+var projectile_parent: Node
+var warning_parent: Node
+var visuals := Node2D.new()
+var health_bar := EnemyHealthBar.new()
+
+var _attack_left := 0.0
+var _stuck_left := 0.0
+var _sidestep := 1.0
+var _flash_tween: Tween
+
+
+## Call before adding the unit to the tree.
+func setup(enemy_data: EnemyData, act: int, wave: int, foe: Lucian) -> void:
+	data = enemy_data
+	target = foe
+	max_hp = data.max_hp * data.hp_scale(act, wave)
+	armor = data.armor
+	mr = data.mr
+	radius = data.radius
+	damage = data.damage * data.damage_scale(act, wave)
+	attack_range = data.attack_range
+	move_speed = data.move_speed
+
+
+func _ready() -> void:
+	super()
+	collision_layer = Layers.ENEMY_BODY
+	collision_mask = Layers.WORLD | Layers.ENEMY_BODY | Layers.PLAYER_BODY
+	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
+	add_child(_circle(data.radius * 0.85))
+	var hurtbox := Hurtbox.new()
+	hurtbox.collision_layer = Layers.ENEMY_HURTBOX
+	hurtbox.collision_mask = 0
+	hurtbox.monitoring = false
+	hurtbox.add_child(_circle(data.radius + 6.0))
+	add_child(hurtbox)
+	add_child(visuals)
+	var sprite := Sprite2D.new()
+	sprite.texture = data.art
+	visuals.add_child(sprite)
+	if data.kind == &"boss":
+		health_bar.size = BOSS_BAR
+	elif data.kind == &"elite":
+		health_bar.size = ELITE_BAR
+		health_bar.badge = true
+	health_bar.position = Vector2(0, -data.radius - 34.0)
+	health_bar.z_index = 10
+	add_child(health_bar)
+	health_bar.set_health(hp, max_hp)
+	if projectile_parent == null:
+		projectile_parent = get_parent()
+	if warning_parent == null:
+		warning_parent = get_parent()
+	_attack_left = randf_range(0.2, data.attack_interval)
+
+
+func _physics_process(delta: float) -> void:
+	super(delta)
+	if dead:
+		return
+	_attack_left = maxf(_attack_left - delta, 0.0)
+	if can_fight():
+		_think(delta)
+
+
+## Lucian is there to fight: alive, not in stasis, not untouchable.
+func can_fight() -> bool:
+	return is_instance_valid(target) and not target.dead and not target.invulnerable and not target.in_stasis()
+
+
+func distance_to_target() -> float:
+	return global_position.distance_to(target.global_position)
+
+
+func current_speed() -> float:
+	return move_speed * (1.0 - SLOW_AMOUNT if has_status(Enemy.SLOW) else 1.0)
+
+
+## A hit from this unit (Empower included): its basic attack by default.
+func make_hit(amount := -1.0, source := &"basic") -> DamageInfo:
+	var dealt := damage if amount < 0.0 else amount
+	if has_status(EMPOWER):
+		dealt *= 1.0 + EMPOWER_BONUS
+	return DamageInfo.create(dealt, data.damage_type, source, self)
+
+
+## A straight shot from this unit, at Lucian unless `toward` is given; walls
+## stop it.
+func fire_bolt(hit: DamageInfo, speed: float, reach: float, toward := Vector2.ZERO) -> EnemyProjectile:
+	var bolt := EnemyProjectile.new()
+	bolt.launch(global_position, toward if toward != Vector2.ZERO else global_position.direction_to(target.global_position), hit, target)
+	bolt.speed = speed
+	bolt.max_range = reach
+	projectile_parent.add_child(bolt)
+	return bolt
+
+
+## One step toward `point`, sliding along walls. A unit that barely moved
+## sidesteps for a moment.
+func walk_toward(point: Vector2, delta: float) -> void:
+	var direction := global_position.direction_to(point)
+	if _stuck_left > 0.0:
+		_stuck_left -= delta
+		direction = (direction + direction.orthogonal() * _sidestep).normalized()
+	var before := global_position
+	velocity = direction * current_speed()
+	move_and_slide()
+	velocity = Vector2.ZERO
+	face(global_position + direction)
+	if _stuck_left <= 0.0 and before.distance_to(global_position) < current_speed() * delta * STUCK_SHARE:
+		_stuck_left = STUCK_TIME
+		if randf() < 0.3:
+			_sidestep = -_sidestep
+
+
+func face(point: Vector2) -> void:
+	if point != global_position:
+		visuals.rotation = (point - global_position).angle()
+
+
+## Walks into range, then attacks whenever the attack is ready.
+func _think(delta: float) -> void:
+	if distance_to_target() > attack_range + Lucian.HIT_RADIUS:
+		walk_toward(target.global_position, delta)
+		return
+	face(target.global_position)
+	if _attack_left <= 0.0:
+		_attack_left = data.attack_interval
+		_attack()
+
+
+## One attack: by default a hit on Lucian at once (melee).
+func _attack() -> void:
+	target.take_damage(make_hit())
+
+
+func _lose_hp(amount: float) -> void:
+	super(amount)
+	health_bar.set_health(hp, max_hp)
+	visuals.modulate = HIT_FLASH
+	if _flash_tween:
+		_flash_tween.kill()
+	_flash_tween = create_tween()
+	_flash_tween.tween_property(visuals, "modulate", Color.WHITE, 0.15)
+
+
+func _circle(circle_radius: float) -> CollisionShape2D:
+	var round_shape := CircleShape2D.new()
+	round_shape.radius = circle_radius
+	var shape := CollisionShape2D.new()
+	shape.shape = round_shape
+	return shape

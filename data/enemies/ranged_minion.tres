@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/ranged_minion.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"ranged_minion"
+display_name = "Ranged Minion"
+kind = &"normal"
+behavior = &"ranged"
+art = ExtResource("2_art")
+max_hp = 160.0
+armor = 0.0
+mr = 10.0
+damage = 18.0
+attack_range = 550.0
+attack_interval = 1.6
+move_speed = 300.0
+radius = 26.0
+gold = 45
+xp = 25
+damage_type = 1
+keep_min = 420.0
+keep_max = 550.0
+projectile_speed = 450.0

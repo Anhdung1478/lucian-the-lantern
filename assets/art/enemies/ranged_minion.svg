@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="68" height="68" viewBox="0 0 68 68">
+  <!-- Ranged Minion: red-team caster seen from above, hooded, a glowing purple orb held forward (+X). -->
+  <g transform="translate(34 34)">
+    <ellipse cx="0" cy="3" rx="24" ry="22" fill="#000000" opacity="0.25"/>
+    <!-- cloak -->
+    <path d="M -22 0 Q -20 -22 0 -22 Q 8 -22 8 -12 L 8 12 Q 8 22 0 22 Q -20 22 -22 0 Z" fill="#6e1f2c" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -16 -6 Q -10 0 -16 6" fill="none" stroke="#3c1019" stroke-width="3" stroke-linecap="round"/>
+    <!-- arms reaching forward -->
+    <path d="M 2 -10 L 22 -4" stroke="#1a1d24" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 2 -10 L 22 -4" stroke="#8c2a3a" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 2 10 L 22 4" stroke="#1a1d24" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 2 10 L 22 4" stroke="#8c2a3a" stroke-width="5" stroke-linecap="round"/>
+    <!-- glowing purple orb -->
+    <circle cx="28" cy="0" r="13" fill="#c47cff" opacity="0.3"/>
+    <circle cx="28" cy="0" r="8.5" fill="#b05cf0" stroke="#1a1d24" stroke-width="3"/>
+    <circle cx="26" cy="-2.5" r="3" fill="#f0dcff"/>
+    <!-- hood -->
+    <ellipse cx="-2" cy="0" rx="13" ry="15" fill="#a02d3e" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M 4 -8 Q 9 0 4 8" fill="#1a1d24"/>
+    <circle cx="6" cy="-2.5" r="1.4" fill="#ff5a4a"/>
+    <circle cx="6" cy="2.5" r="1.4" fill="#ff5a4a"/>
+  </g>
+</svg>

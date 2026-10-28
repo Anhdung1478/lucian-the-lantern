@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/melee_minion.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"melee_minion"
+display_name = "Melee Minion"
+kind = &"normal"
+behavior = &"melee"
+art = ExtResource("2_art")
+max_hp = 240.0
+armor = 10.0
+mr = 0.0
+damage = 12.0
+attack_range = 110.0
+attack_interval = 1.25
+move_speed = 300.0
+radius = 28.0
+gold = 60
+xp = 30

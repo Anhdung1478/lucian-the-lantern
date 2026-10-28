@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <!-- Siege Minion: a wheeled cannon cart seen from above, barrel forward (+X), red crest. -->
+  <g transform="translate(48 48)">
+    <ellipse cx="0" cy="4" rx="38" ry="34" fill="#000000" opacity="0.25"/>
+    <!-- wheels -->
+    <rect x="-22" y="-37" width="30" height="11" rx="5" fill="#4a3a30" stroke="#1a1d24" stroke-width="3"/>
+    <rect x="-22" y="26" width="30" height="11" rx="5" fill="#4a3a30" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -14 -37 v 11 M -4 -37 v 11 M -14 26 v 11 M -4 26 v 11" stroke="#1a1d24" stroke-width="2"/>
+    <!-- cart bed -->
+    <rect x="-34" y="-24" width="52" height="48" rx="8" fill="#7a2a2a" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -34 -10 H 18 M -34 10 H 18" stroke="#4e1717" stroke-width="3"/>
+    <!-- barrel -->
+    <rect x="2" y="-10" width="44" height="20" rx="5" fill="#5a606c" stroke="#1a1d24" stroke-width="3"/>
+    <rect x="32" y="-12" width="9" height="24" rx="3" fill="#7d8492" stroke="#1a1d24" stroke-width="3"/>
+    <rect x="43" y="-8" width="5" height="16" rx="2" fill="#16181e" stroke="#1a1d24" stroke-width="2"/>
+    <!-- breech and fuse -->
+    <circle cx="4" cy="0" r="10" fill="#7d8492" stroke="#1a1d24" stroke-width="3"/>
+    <circle cx="4" cy="0" r="3.5" fill="#ff8a3a"/>
+    <!-- red crest -->
+    <path d="M -34 0 L -26 -14 L -18 0 L -26 14 Z" fill="#d03a3a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Empower status: a red up-chevron over a fist. -->
+  <!-- chevron -->
+  <path d="M 16 24 L 32 8 L 48 24" fill="none" stroke="#1a1d24" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 16 24 L 32 8 L 48 24" fill="none" stroke="#ff4a3a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- fist -->
+  <rect x="16" y="32" width="32" height="24" rx="8" fill="#e0b48a" stroke="#1a1d24" stroke-width="3"/>
+  <path d="M 24 33 v 9 M 32 33 v 9 M 40 33 v 9" stroke="#1a1d24" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 16 46 Q 10 44 12 38" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 20 52 H 44" stroke="#b8865a" stroke-width="3" stroke-linecap="round"/>
+</svg>
