@@ -291,8 +291,10 @@ func on_damage_taken(info: DamageInfo, _amount: float) -> void:
 	_combat_left = COMBAT_TIME
 	if info.type == DamageInfo.Type.MAGIC:
 		_magebane_wait = 0.0
+	if not has(&"thornmail") or info.source != &"basic" or not is_instance_valid(info.attacker):
+		return
 	var attacker := info.attacker as Enemy
-	if has(&"thornmail") and info.source == &"basic" and Lucian.is_target(attacker):
+	if Lucian.is_target(attacker):
 		attacker.take_damage(lucian.make_damage(THORNS_BASE + THORNS_BONUS_ARMOR * lucian.bonus_armor(), DamageInfo.Type.MAGIC, &"thornmail"))
 		attacker.add_status(Enemy.GRIEVOUS_WOUNDS, GRIEVOUS_DURATION, 1, _icon(&"thornmail"))
 

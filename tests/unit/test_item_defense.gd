@@ -67,10 +67,21 @@ func test_deaths_dance_delays_30_percent() -> void:
 func test_deaths_dance_kill_clears_the_bleed() -> void:
 	_equip(&"deaths_dance")
 	lucian.take_damage(_hit(100.0))
+	assert_false(lucian.passives._bleeds.is_empty())
 	lucian.passives.on_kill()
+	assert_true(lucian.passives._bleeds.is_empty())
 	var after_kill := lucian.hp
 	await wait_seconds(0.5)
 	assert_gte(lucian.hp, after_kill)
+
+
+func test_thornmail_ignores_a_freed_attacker() -> void:
+	_equip(&"thornmail")
+	var info := _hit(10.0)
+	attacker.free()
+	var before := lucian.hp
+	assert_true(lucian.take_damage(info))
+	assert_lt(lucian.hp, before)
 
 
 func test_fimbulwinter_shields_on_a_slow() -> void:
