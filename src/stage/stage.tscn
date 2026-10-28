@@ -22,7 +22,7 @@ script = ExtResource("2_arena")
 
 [node name="Warnings" type="Node2D" parent="."]
 
-[node name="World"type="Node2D" parent="."]
+[node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
 
 [node name="TrainingDummy" parent="World" instance=ExtResource("5_dummy")]
