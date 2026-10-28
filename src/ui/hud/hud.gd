@@ -28,6 +28,9 @@ var lucian: Lucian
 var wallet: Wallet
 ## Shown while the stats key is held.
 var extra_stats := StatsPanel.new()
+## Regeneration per second, at the right end of the HP and mana bars.
+var hp_regen_label: Label
+var mana_regen_label: Label
 
 var _gold_label: Label
 var _fps_label: Label
@@ -91,6 +94,8 @@ func _ready() -> void:
 	_shield_overlay.draw.connect(_draw_shield)
 	hp_bar.add_child(_shield_overlay)
 	hp_bar.move_child(_shield_overlay, 0)
+	hp_regen_label = _regen_label(hp_bar, 13)
+	mana_regen_label = _regen_label(mana_bar, 11)
 	_build_gold()
 	_fps_label = UiStyle.label("", 16, UiStyle.DIM_COLOR)
 	_fps_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
@@ -123,6 +128,8 @@ func _process(_delta: float) -> void:
 	_buff_bar.show_buffs(lucian.buffs())
 	mana_bar.value = lucian.mana / stats.max_mana
 	mana_label.text = "%d / %d" % [roundi(lucian.mana), roundi(stats.max_mana)]
+	hp_regen_label.text = "+%s/s" % TooltipText.number(snappedf(stats.hp_regen, 0.1))
+	mana_regen_label.text = "+%s/s" % TooltipText.number(snappedf(stats.mana_regen, 0.1))
 	extra_stats.visible = Input.is_action_pressed(&"toggle_stats") and not Input.is_key_pressed(KEY_CTRL)
 	if extra_stats.visible:
 		# On top of the stats panel, or in its place when it is hidden.
@@ -162,6 +169,20 @@ func _place_stats_panel() -> void:
 	_buff_bar.offset_right = _buff_bar.offset_left
 	_buff_bar.offset_bottom = -12.0 - bottom_panel.size.y - BUFF_GAP
 	_buff_bar.offset_top = _buff_bar.offset_bottom
+
+
+func _regen_label(bar: ProgressBar, font_size: int) -> Label:
+	var label := Label.new()
+	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	label.offset_right = -8.0
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override(&"font_size", font_size)
+	label.add_theme_color_override(&"font_outline_color", Color.BLACK)
+	label.add_theme_constant_override(&"outline_size", 4)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.add_child(label)
+	return label
 
 
 ## The shield, white, right after the HP on the HP bar (pushed back from the

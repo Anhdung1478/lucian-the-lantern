@@ -860,6 +860,13 @@ Everything in the plan is in place, one commit per task (Tasks 0–9), then the 
   - New: Flash's exact landing spot, Rocketbelt's upper bound, no summoners mid-dash, the Barrier buff and card, the "+" states.
   - Effects spawned in the summoner, casting and item-active tests now go into an auto-freed node.
 
+### Follow-up after the first playtest
+- **Rocketbelt:** the dash is slower (1000) than the bolts (1500), so they fly ahead. Lucian can't move until the bolts land: `lock_cast(ROCKETBELT_LOCK)`, which starts counting once the dash ends, fills the rest of the bolts' 0.6 s flight. The +75% move speed is gone.
+- **Galeforce:** Lucian can't move for 0.25 s after the dash. The missiles are `HomingMissile`s (`src/combat/homing_missile.gd`): they leave in a fan (±1 rad around the target's direction) at 500 speed, then curve onto the target. They speed up to 2200 and turn tighter the longer they fly (3 rad/s plus 18 rad/s per second), leaving a fading trail.
+- **Lucian's HP bar** (`src/lucian/lucian_health_bar.gd`) is a child of his body, 62 px above him, with the shields in white.
+- **Regen per second** shows at the right end of the HUD's HP and mana bars.
+- **One regen stat:** the extra table's `regen` cell shows "health / mana" per second with one icon (`assets/art/stats/regen.svg`); the separate `hp_regen` / `mana_regen` stat keys and icons are gone. The extra table is 2 × 4, like the main one.
+
 ### Running the checks
 
 ```

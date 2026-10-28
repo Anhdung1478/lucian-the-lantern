@@ -34,7 +34,7 @@ Your choices during planning:
 | 7 | Space returns the camera to Lucian | **Space** (new action "Center camera on Lucian", rebindable) moves the camera back over Lucian once. Free-cam stays free. |
 | 8 | Stat icons and colors | 19 hand-drawn stat icons (`assets/art/stats/`), with your 8 designs and colors for the main stats. The stats panel shows **icon + amount**. Item cards show **icon → amount (in the stat color) → name**. AP scalings in skill tooltips are now blue to match. |
 | 9 | Stat description on hover | Hover a stat for **1 s**: a card with its icon, name, current value and what it does. |
-| 10 | Ctrl + C toggles, hold C for extra stats | **Ctrl + C** shows or hides the main table: AD, AP, Armor, MR, AS, Ability Haste, Crit, MS, two per row like your image. **Holding C** shows the extra table above it: HP / mana regen (per 5 s), heal & shield power, armor / magic pen, life steal, omnivamp, attack range, tenacity. |
+| 10 | Ctrl + C toggles, hold C for extra stats | **Ctrl + C** shows or hides the main table: AD, AP, Armor, MR, AS, Ability Haste, Crit, MS, two per row like your image. **Holding C** shows the extra table above it: health / mana regen (one cell, per second), heal & shield power, armor / magic pen, life steal, omnivamp, attack range, tenacity. |
 | 11 | RFC range ring while Energized | With Rapid Firecannon equipped and the charge at 100, a **light-blue ring** shows its longer reach (675). It disappears when the Energized shot lands (or after 1 s if the target vanishes). |
 | 12 | Summoner spells | **Flash, Ghost, Barrier, Heal, Clarity, Smite** on D and F, each with its own icon, cooldown sweep on the HUD and hover card. Numbers are in the table below. |
 | 13 | Smaller passive icon | The passive is **45 px** (70% of a skill icon), centered on the skill row. |
@@ -54,6 +54,17 @@ Your choices during planning:
 | Smite | 30 s | 450 true damage to the enemy nearest the cursor within 500, and heals 10% of max HP. Refused, at no cost, with no enemy in reach. |
 
 Each spell keeps its own cooldown, also when you move it to the other key. Ability haste doesn't shorten them. Pick the spells in F3+Q → **Lucian** tab → *Summoner spells*; choosing the spell the other key has swaps them.
+
+## Follow-up after your first playtest
+
+| You asked | Built |
+|---|---|
+| Can't move during Rocketbelt; don't dash faster than the rocket | The dash is slower (1000) than the bolts (1500), so they fly ahead. Lucian stands where the dash ends until the bolts land, 0.6 s after use. |
+| Can't move during Galeforce | Lucian stands for 0.25 s after the dash while the missiles leave. |
+| Galeforce missiles should follow a missile trajectory | The 3 missiles leave in a fan, then curve onto the chosen enemy, faster and tighter as they fly, with a trail. |
+| Remove Rocketbelt's move speed | Gone. |
+| HP bar for Lucian; regen per second on the bars | A green HP bar above Lucian's head (shields in white). The HUD's HP and mana bars show "+0.8/s" and "+1.6/s" at the right end. |
+| One regen stat in the extra table | One cell with a heart-and-droplet icon: "0.8 / 1.6" (health / mana per second). The extra table is now 2 × 4. |
 
 ## Choices I made where the request was open
 
@@ -94,10 +105,11 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | ![Grey plus](phase4/skillbar_0_plus.png) Level 2 with a point: gold + on E, grey on Q (needs level 3) and R, grey with a lock on W (rank not bought); 45 px passive | ![R greys Q/W](phase4/skillbar_1_r_greys_qw.png) R firing: Q and W grey |
 | ![Q greys E](phase4/skillbar_2_q_greys_e.png) Q's cast time: E grey | ![Extra stats](phase4/stats_1_extra.png) Holding C: the extra stats above the main table |
 | ![Stat card](phase4/stats_2_hover.png) Hovering Attack Damage | ![Item card](phase4/stats_3_item_card.png) Item card: icon, amount, name |
-| ![RFC ring](phase4/rfc_ring_0_ready.png) RFC at full charge: the 675 range ring | ![Rocketbelt](phase4/actives_2_rocketbelt.png) Rocketbelt arc |
+| ![RFC ring](phase4/rfc_ring_0_ready.png) RFC at full charge: the 675 range ring | ![Rocketbelt](phase4/actives_2_rocketbelt.png) Rocketbelt arc, flying ahead of Lucian |
 | ![Summoners](phase4/summoners_0_hud_and_picker.png) D/F on the HUD, debug picker | ![Smite](phase4/summoners_3_smite.png) Smite: 450 true damage; Barrier on the HP bar, Ghost and Barrier buffs |
 | ![Summoner card](phase4/summoners_5_card.png) Heal's card; cooldowns on D and F | ![Resolution](phase4/settings_3_graphics.png) Graphics → Resolution |
 | ![Camera away](phase4/camera_0_away.png) Free camera panned away | ![Camera back](phase4/camera_1_back.png) After Space |
+| ![Galeforce](phase4/actives_1_galeforce.png) Follow-up: Galeforce's missiles curving onto the dummy; Lucian's HP bar | ![Regen](phase4/stats_1_extra.png) Follow-up: one regen cell, "+0.8/s" on the HP bar |
 
 ## Known limits
 

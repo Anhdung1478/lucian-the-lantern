@@ -17,10 +17,12 @@ const RANGE_RING_COLOR := Color(1.0, 0.91, 0.66, 0.35)
 const RFC_RING_COLOR := Color(0.62, 0.85, 1.0, 0.45)
 ## Distance from Lucian's center to his gun muzzles.
 const GUN_REACH := 44.0
+## How far above Lucian's center his HP bar sits.
+const HEALTH_BAR_HEIGHT := 62.0
 const MOVE_SPEED_ICON := preload("res://assets/art/ui/buff_move_speed.svg")
 const SHIELD_ICON := preload("res://assets/art/ui/buff_shield.svg")
 const SPEED_BUFF_NAMES := {
-	&"ardent_blaze": "Ardent Blaze", &"fervor": "Fervor", &"stormrazor": "Bolt", &"rocketbelt": "Supersonic",
+	&"ardent_blaze": "Ardent Blaze", &"fervor": "Fervor", &"stormrazor": "Bolt",
 	&"ghost": "Ghost", &"heal": "Heal",
 }
 ## Bloodthirster's Ichorshield: the most it holds, and how fast it fades out
@@ -105,6 +107,10 @@ func _ready() -> void:
 	summoners.name = "SummonerSpells"
 	summoners.setup(self)
 	add_child(summoners)
+	var health_bar := LucianHealthBar.new()
+	health_bar.name = "HealthBar"
+	health_bar.position = Vector2(0, -HEALTH_BAR_HEIGHT)
+	add_child(health_bar)
 	stats = base_stats.at_level(progress.level)
 	passives.adjust_stats(stats)
 	hp = stats.max_hp

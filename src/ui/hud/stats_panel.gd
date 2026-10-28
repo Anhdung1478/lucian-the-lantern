@@ -8,7 +8,7 @@ const MAIN: Array[StringName] = [
 	&"ad", &"ap", &"armor", &"mr", &"attack_speed", &"ability_haste", &"crit_chance", &"move_speed",
 ]
 const EXTRA: Array[StringName] = [
-	&"hp_regen", &"mana_regen", &"heal_shield_power", &"armor_pen", &"magic_pen",
+	&"regen", &"heal_shield_power", &"armor_pen", &"magic_pen",
 	&"lifesteal", &"omnivamp", &"attack_range", &"tenacity",
 ]
 
@@ -39,7 +39,7 @@ func _process(_delta: float) -> void:
 
 ## The number shown for `key`. Uses Lucian's live values where they differ
 ## from his stats: the crit cheat, move speed buffs, Rapid Firecannon's range.
-## Regen is per 5 seconds, like LoL.
+## Regen is "health / mana" per second, like the HUD bars.
 static func value_text(target: Lucian, key: StringName) -> String:
 	var stats := target.stats
 	match key:
@@ -51,8 +51,8 @@ static func value_text(target: Lucian, key: StringName) -> String:
 			return str(roundi(target.current_move_speed()))
 		&"attack_range":
 			return str(roundi(target.attack_range()))
-		&"hp_regen", &"mana_regen":
-			return TooltipText.number(snappedf(stats.get(key) * 5.0, 0.1))
+		&"regen":
+			return "%s / %s" % [TooltipText.number(snappedf(stats.hp_regen, 0.1)), TooltipText.number(snappedf(stats.mana_regen, 0.1))]
 	if ItemStats.is_percent(key):
 		return "%d%%" % roundi(stats.get(key) * 100.0)
 	return str(roundi(stats.get(key)))

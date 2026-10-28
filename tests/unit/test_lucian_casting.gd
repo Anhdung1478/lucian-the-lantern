@@ -93,3 +93,10 @@ func test_r_greys_q_and_w_but_not_e() -> void:
 	assert_true(lucian.is_skill_blocked(Slot.Q))
 	assert_true(lucian.is_skill_blocked(Slot.W))
 	assert_false(lucian.is_skill_blocked(Slot.E))
+
+
+func test_lucian_has_a_health_bar_that_never_turns() -> void:
+	var bar := lucian.get_node("HealthBar") as LucianHealthBar
+	assert_not_null(bar)
+	lucian.visuals.face(Vector2.DOWN)
+	assert_eq(bar.global_rotation, 0.0)

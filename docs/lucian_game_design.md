@@ -36,7 +36,7 @@
 | P | Open backpack (pauses the game) |
 | ESC | Open menu: resume, settings, leave stage, exit (pauses the game) |
 | Ctrl + C | Toggle the stats panel |
-| Hold C | Show the extra stats (regen, heal & shield power, penetration, life steal, omnivamp, range, tenacity) |
+| Hold C | Show the extra stats (health / mana regen, heal & shield power, penetration, life steal, omnivamp, range, tenacity) |
 | Y | Toggle camera between free-cam and Lucian cam (follows Lucian). Default: free-cam |
 | Space | Move the camera back over Lucian once (free-cam stays free) |
 

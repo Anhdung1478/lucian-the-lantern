@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Health and Mana Regen: a heart, a droplet and an up arrow -->
+  <g transform="translate(-4 18) scale(0.62)">
+  <path d="M 32 54 C 10 40 6 28 10 20 C 14 10 26 8 32 18 C 38 8 50 10 54 20 C 58 28 54 40 32 54 Z" fill="#6fd36f" stroke="#1a1d24" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(30 18) scale(0.62)">
+  <path d="M 32 6 C 42 22 50 30 50 40 C 50 51 42 58 32 58 C 22 58 14 51 14 40 C 14 30 22 22 32 6 Z" fill="#8fb8ff" stroke="#1a1d24" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+  <path d="M 27 20 L 27 10 L 21 10 L 32 1 L 43 10 L 37 10 L 37 20 Z" fill="#ffffff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

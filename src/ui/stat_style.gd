@@ -1,12 +1,12 @@
 class_name StatStyle
 extends RefCounted
 ## How each stat looks: icon, color, name and hover text. Covers every item
-## stat key (ItemStats) plus the panel-only hp_regen, mana_regen and
-## attack_range. move_speed_pct looks like move_speed.
+## stat key (ItemStats) plus the panel-only regen (health and mana together)
+## and attack_range. move_speed_pct looks like move_speed.
 
 const KEYS: Array[StringName] = [
 	&"ad", &"ap", &"armor", &"mr", &"attack_speed", &"ability_haste", &"crit_chance", &"move_speed",
-	&"move_speed_pct", &"max_hp", &"max_mana", &"hp_regen", &"mana_regen", &"heal_shield_power",
+	&"move_speed_pct", &"max_hp", &"max_mana", &"regen", &"heal_shield_power",
 	&"armor_pen", &"magic_pen", &"lifesteal", &"omnivamp", &"attack_range", &"tenacity",
 ]
 const ICONS := {
@@ -20,8 +20,7 @@ const ICONS := {
 	&"move_speed": preload("res://assets/art/stats/move_speed.svg"),
 	&"max_hp": preload("res://assets/art/stats/max_hp.svg"),
 	&"max_mana": preload("res://assets/art/stats/max_mana.svg"),
-	&"hp_regen": preload("res://assets/art/stats/hp_regen.svg"),
-	&"mana_regen": preload("res://assets/art/stats/mana_regen.svg"),
+	&"regen": preload("res://assets/art/stats/regen.svg"),
 	&"heal_shield_power": preload("res://assets/art/stats/heal_shield_power.svg"),
 	&"armor_pen": preload("res://assets/art/stats/armor_pen.svg"),
 	&"magic_pen": preload("res://assets/art/stats/magic_pen.svg"),
@@ -41,8 +40,7 @@ const COLORS := {
 	&"move_speed": Color("ffffff"),
 	&"max_hp": Color("6fd36f"),
 	&"max_mana": Color("8fb8ff"),
-	&"hp_regen": Color("6fd36f"),
-	&"mana_regen": Color("8fb8ff"),
+	&"regen": Color("6fd36f"),
 	&"heal_shield_power": Color("7fe3c4"),
 	&"armor_pen": Color("ff7a5a"),
 	&"magic_pen": Color("b48cff"),
@@ -52,7 +50,7 @@ const COLORS := {
 	&"tenacity": Color("c9b28a"),
 }
 ## Stats no item gives.
-const EXTRA_NAMES := {&"hp_regen": "Health Regen", &"mana_regen": "Mana Regen", &"attack_range": "Attack Range"}
+const EXTRA_NAMES := {&"regen": "Health / Mana Regen", &"attack_range": "Attack Range"}
 ## TooltipText markup.
 const DESCRIPTIONS := {
 	&"ad": "Basic attacks deal this much [phys]physical damage[/phys]. Many skills grow with it.",
@@ -65,8 +63,7 @@ const DESCRIPTIONS := {
 	&"move_speed": "Units Lucian moves per second.",
 	&"max_hp": "Lucian's health.",
 	&"max_mana": "Spent to cast skills.",
-	&"hp_regen": "[hp]Health[/hp] restored every 5 seconds.",
-	&"mana_regen": "[mana]Mana[/mana] restored every 5 seconds.",
+	&"regen": "[hp]Health[/hp] / [mana]mana[/mana] restored every second.",
 	&"heal_shield_power": "Makes heals and shields on Lucian stronger.",
 	&"armor_pen": "Ignores this share of the target's armor.",
 	&"magic_pen": "Ignores this share of the target's magic resist.",

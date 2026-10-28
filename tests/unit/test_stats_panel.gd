@@ -14,7 +14,8 @@ func test_value_texts() -> void:
 	assert_eq(StatsPanel.value_text(lucian, &"crit_chance"), "50%")
 	assert_eq(StatsPanel.value_text(lucian, &"attack_speed"), "%.2f" % lucian.stats.attack_speed)
 	assert_eq(StatsPanel.value_text(lucian, &"attack_range"), "500")
-	assert_eq(StatsPanel.value_text(lucian, &"hp_regen"), TooltipText.number(snappedf(lucian.stats.hp_regen * 5.0, 0.1)))
+	assert_eq(StatsPanel.value_text(lucian, &"regen"), "%s / %s" % [
+		TooltipText.number(snappedf(lucian.stats.hp_regen, 0.1)), TooltipText.number(snappedf(lucian.stats.mana_regen, 0.1))])
 	for key in StatsPanel.MAIN + StatsPanel.EXTRA:
 		assert_ne(StatsPanel.value_text(lucian, key), "", str(key))
 
@@ -24,7 +25,7 @@ func test_panels_have_one_cell_per_stat() -> void:
 	extra.keys = StatsPanel.EXTRA
 	add_child_autofree(extra)
 	var grid := extra.get_child(0)
-	assert_eq(grid.get_child_count(), 9)
+	assert_eq(grid.get_child_count(), 8)
 	assert_true(grid.get_child(0) is StatCell)
 
 
@@ -51,3 +52,12 @@ func test_ctrl_key_toggles_and_holding_shows_extra() -> void:
 	Input.action_release(&"toggle_stats")
 	await wait_process_frames(2)
 	assert_false(hud.extra_stats.visible)
+
+
+func test_bars_show_regen_per_second() -> void:
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	hud.setup(lucian, Wallet.new())
+	await wait_process_frames(2)
+	assert_eq(hud.hp_regen_label.text, "+%s/s" % TooltipText.number(snappedf(lucian.stats.hp_regen, 0.1)))
+	assert_eq(hud.mana_regen_label.text, "+%s/s" % TooltipText.number(snappedf(lucian.stats.mana_regen, 0.1)))

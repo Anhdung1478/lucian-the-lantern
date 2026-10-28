@@ -26,7 +26,7 @@
 
 ### Bottom center – Lucian's panel
 - **Portrait** showing the current skin, with the **level number** and an **XP bar**.
-- **HP bar** and **mana bar**.
+- **HP bar** and **mana bar**, each with its regeneration per second at the right end ("+0.8/s").
 - **Skill icons:** Passive, Q, W, E, R. The passive is smaller (45 px, 70% of a 64 px skill icon), centered on the skill row.
   - Cooldown timer and rank dots on each.
   - **Mana cost** shown as a number in the **top-left corner** of each skill icon.
@@ -41,7 +41,7 @@
 ### Buff icons (above the skill bar)
 - **Very small icons** (36 px) in a row just above the HUD panel, starting over the portrait, like LoL.
 - Shows: Blue / Red buff (with timer), current Endless modifier, status effects (slow, stun, burn, etc.).
-- **Phase 3 shows:** potions being drunk, move speed buffs (W, Fervor, Stormrazor, Rocketbelt, and since Phase 4 Ghost and Heal), the Bloodthirster shield, Barrier, and item passive states:
+- **Phase 3 shows:** potions being drunk, move speed buffs (W, Fervor, Stormrazor, and since Phase 4 Ghost and Heal), the Bloodthirster shield, Barrier, and item passive states:
   - **Energized** (only while an Energized item is equipped): the charge 0–100; glows gold at 100.
   - **Kraken Slayer**: the hit count; glows before the 3rd hit.
   - Spellblade ready, Spear of Shojin stacks, Jak'Sho stacks, Archangel's mana charge.
@@ -54,7 +54,7 @@
 ### Stats panel (left of the portrait)
 - Like LoL's: each stat is its **icon + value**, two per row. Main panel: AD | AP, Armor | MR, Attack speed | Ability haste, Crit | Move speed.
 - **Ctrl + C** toggles it on or off.
-- **Hold C** to show the extra stats above it (in its place when it is hidden): HP regen | Mana regen (per 5 s), Heal & shield power | Armor pen, Magic pen | Life steal, Omnivamp | Attack range, Tenacity.
+- **Hold C** to show the extra stats above it (in its place when it is hidden), also 2 × 4: Health / mana regen (one cell, "0.8 / 1.6" per second) | Heal & shield power, Armor pen | Magic pen, Life steal | Omnivamp, Attack range | Tenacity.
 - **Hover a stat** for 1 second: a card with its icon, name, value and what it does.
 
 | Stat | Icon | Color |
@@ -67,8 +67,9 @@
 | Ability haste | hourglass | white |
 | Crit chance | pointed missile | red |
 | Move speed | boot with speed lines | white |
-| Health / HP regen | heart / heart + up arrow | green |
-| Mana / Mana regen | droplet / droplet + up arrow | blue |
+| Health | heart | green |
+| Mana | droplet | blue |
+| Health / mana regen | heart and droplet under an up arrow | green |
 | Heal & shield power | cross over a shield | teal |
 | Armor / Magic pen | arrow through a breastplate / a circle | orange-red / violet |
 | Life steal | fang and a drop of blood | crimson |
@@ -102,6 +103,7 @@ Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 | Mini boss / Boss | Red skull icon (same size as the elite dot) |
 
 ### On the battlefield
+- **Lucian's HP bar** above his head: green, with his shields as a white segment after the HP.
 - **HP bars** above enemies, with a special icon for elites.
 - **Damage numbers:**
 
