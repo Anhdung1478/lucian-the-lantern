@@ -7,8 +7,11 @@ extends RefCounted
 
 const SPELL_IDS: Array[StringName] = [&"flash", &"ghost", &"barrier", &"heal", &"clarity", &"smite"]
 
-## The act being played (0 for the sandbox, which pays like act 1).
+## The stage played (0 for Training): its act, stage and "act-stage" id. The
+## sandbox pays like act 1.
 var act := 0
+var stage := 0
+var stage_id := ""
 var bought: Array[int] = [5, 5, 5, 3]
 var passive := true
 var equip_slots := Inventory.EQUIP_SIZE

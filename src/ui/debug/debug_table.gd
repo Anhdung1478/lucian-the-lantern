@@ -35,6 +35,8 @@ var _max_hp: SpinBox
 var _dps_label: Label
 var _log_label: RichTextLabel
 var _gold_label: Label
+var _tabs: TabContainer
+var _dummy_tab := 0
 
 
 func _ready() -> void:
@@ -46,10 +48,13 @@ func setup(owner_stage: Stage) -> void:
 	stage = owner_stage
 	lucian = stage.lucian
 	dummy = stage.dummy
-	watch(dummy)
-	_armor.set_value_no_signal(dummy.armor)
-	_mr.set_value_no_signal(dummy.mr)
-	_max_hp.set_value_no_signal(dummy.max_hp)
+	if dummy:
+		watch(dummy)
+		_armor.set_value_no_signal(dummy.armor)
+		_mr.set_value_no_signal(dummy.mr)
+		_max_hp.set_value_no_signal(dummy.max_hp)
+	else:
+		_tabs.set_tab_hidden(_dummy_tab, true)
 	_picker_items = lucian.item_catalog.by_name()
 	for item in _picker_items:
 		_item_picker.add_item(item.display_name)
@@ -107,6 +112,8 @@ func _apply_crit(_value: Variant = null) -> void:
 
 
 func _apply_dummy(_value: float) -> void:
+	if dummy == null:
+		return
 	dummy.set_defenses(_armor.value, _mr.value, _max_hp.value)
 
 
@@ -141,6 +148,7 @@ func _give_random_fragment() -> void:
 func _build() -> void:
 	var outer := _build_frame("DEBUG   (F3 + Q)")
 	var tabs := TabContainer.new()
+	_tabs = tabs
 	tabs.focus_mode = Control.FOCUS_NONE
 	tabs.get_tab_bar().focus_mode = Control.FOCUS_NONE
 	outer.add_child(tabs)
@@ -221,6 +229,7 @@ func _build() -> void:
 	slots.value_changed.connect(func(value: float) -> void: stage.set_shop_slots(int(value)))
 
 	box = _tab(tabs, "Dummy")
+	_dummy_tab = tabs.get_tab_count() - 1
 	_section(box, "Training dummy")
 	var grid := GridContainer.new()
 	grid.columns = 6
@@ -236,7 +245,9 @@ func _build() -> void:
 	row = _row(box)
 	_label(row, "Dummies (for Runaan's / Statikk)")
 	var count := _spin(row, 1, 5, 1)
-	count.value_changed.connect(func(value: float) -> void: stage.set_dummy_count(int(value)))
+	count.value_changed.connect(func(value: float) -> void:
+		if dummy:
+			stage.set_dummy_count(int(value)))
 
 	# The DPS meter and hit log stay under the tabs, always in view.
 	_section(outer, "Damage")

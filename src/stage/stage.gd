@@ -37,7 +37,7 @@ var extra_dummies: Array[TrainingDummy] = []
 var collected := {Essences.BLUE: 0, Essences.ORANGE: 0, Essences.PURPLE: 0}
 var rng := RandomNumberGenerator.new()
 
-@onready var arena: TestArena = $Arena
+@onready var arena: StageMap = $Arena
 @onready var lucian: Lucian = $World/Lucian
 @onready var dummy: TrainingDummy = $World/TrainingDummy
 @onready var damage_numbers: DamageNumberSpawner = $DamageNumbers
@@ -53,6 +53,8 @@ func setup(stage_run: StageSetup) -> void:
 
 
 func _ready() -> void:
+	if run.act > 0:
+		_use_map(StageMaps.create(run.act, run.stage))
 	rng.randomize()
 	var settings := GameSettings.instance()
 	settings.apply()
@@ -67,9 +69,10 @@ func _ready() -> void:
 	screens.menu.set_leave_enabled(not finished.get_connections().is_empty())
 	screens.menu.exit_requested.connect(_exit)
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED
-	camera.setup(lucian, arena.get_bounds().grow(TestArena.WALL_THICKNESS))
+	camera.setup(lucian, arena.get_bounds().grow(StageMap.WALL_THICKNESS))
 	lucian.projectile_parent = $Projectiles
-	dummy.damage_taken.connect(damage_numbers.spawn.bind(dummy))
+	if dummy:
+		dummy.damage_taken.connect(damage_numbers.spawn.bind(dummy))
 	lucian.apply_setup(run)
 	shop_slots = run.shop_slots
 	hud.setup(lucian, wallet)
@@ -90,14 +93,14 @@ func _exit() -> void:
 		exit_requested.emit()
 
 
-## Puts a new merchant at the map center, replacing any old one. A new
+## Puts a new merchant at the map's merchant point, replacing any old one. A new
 ## merchant is a new visit, with new stock.
 func add_merchant() -> void:
 	remove_merchant()
 	merchant = Merchant.new()
 	merchant.setup(lucian.item_catalog)
 	merchant.stock.unlocked = shop_slots
-	merchant.position = arena.get_bounds().get_center()
+	merchant.position = arena.merchant_point
 	$World.add_child(merchant)
 
 
@@ -109,6 +112,20 @@ func remove_merchant() -> void:
 		merchant.remove_from_group(&"merchants")
 		merchant.queue_free()
 	merchant = null
+
+
+## An act's map in place of the sandbox arena; the training dummy goes too.
+func _use_map(map: StageMap) -> void:
+	remove_child(arena)
+	arena.queue_free()
+	map.name = "Arena"
+	add_child(map)
+	move_child(map, 0)
+	arena = map
+	$World.remove_child(dummy)
+	dummy.queue_free()
+	dummy = null
+	lucian.blink_to(map.lucian_start)
 
 
 ## Debug: `count` dummies in all, the extras in a ring around the first.
