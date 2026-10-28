@@ -34,8 +34,9 @@ func _notification(what: int) -> void:
 		ask_to_quit()
 
 
-func show_main_screen() -> void:
+func show_main_screen(focus_act := 0) -> void:
 	var main := MainScreen.new()
+	main.focus_act = focus_act
 	main.start_requested.connect(start_stage)
 	main.exit_requested.connect(ask_to_quit)
 	_swap(main)
@@ -77,7 +78,7 @@ func _keep_playing() -> void:
 ## save shows on the new main screen.
 func _on_stage_finished(result: StringName) -> void:
 	var saved := SaveGame.instance().finish_stage(result, _run.stage_id)
-	show_main_screen.call_deferred()
+	show_main_screen.call_deferred(_run.act)
 	if not saved:
 		_report_save_failed.call_deferred()
 

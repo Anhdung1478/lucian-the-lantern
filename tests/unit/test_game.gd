@@ -167,6 +167,7 @@ func test_leave_is_disabled_when_the_stage_runs_alone() -> void:
 
 
 func test_a_cleared_act_stage_is_saved_as_cleared() -> void:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
 	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
 	await wait_frames(2)
 	var stage := game.screen as Stage
@@ -175,3 +176,5 @@ func test_a_cleared_act_stage_is_saved_as_cleared() -> void:
 	await wait_frames(2)
 	assert_true("2-1" in SaveGame.instance().cleared)
 	assert_is(game.screen, MainScreen)
+	var journey: JourneySection = game.screen.sections[MainScreen.SECTION_JOURNEY]
+	assert_eq(journey.current, 1)

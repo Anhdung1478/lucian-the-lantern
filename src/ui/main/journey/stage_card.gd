@@ -12,6 +12,10 @@ const BOSS_COLOR := Color("e0475a")
 const CHECK_COLOR := Color("5ad07a")
 const SKULL_SIZE := 36.0
 
+## The card was clicked (open cards only).
+signal chosen
+
+var selected := false
 var locked := false
 var cleared := false
 var skull: TextureRect
@@ -66,11 +70,24 @@ func _init(stage: int, waves: int, kind: StringName) -> void:
 	add_child(_chain)
 
 
+func _gui_input(event: InputEvent) -> void:
+	var click := event as InputEventMouseButton
+	if click and click.pressed and click.button_index == MOUSE_BUTTON_LEFT and not locked:
+		chosen.emit()
+		accept_event()
+
+
+func set_selected(on: bool) -> void:
+	selected = on
+	queue_redraw()
+
+
 ## Sets the card's state: locked (chain), open, or cleared (check).
 func set_state(is_locked: bool, is_cleared: bool) -> void:
 	locked = is_locked
 	cleared = is_cleared
 	_chain.visible = is_locked
+	mouse_default_cursor_shape = Control.CURSOR_ARROW if is_locked else Control.CURSOR_POINTING_HAND
 	modulate = Color(1, 1, 1, 0.6) if is_locked else Color.WHITE
 	queue_redraw()
 
@@ -80,6 +97,8 @@ func _draw() -> void:
 	if cleared:
 		border = CHECK_COLOR
 	draw_style_box(UiStyle.panel(UiStyle.PANEL_COLOR, border, 2, 8.0), Rect2(Vector2.ZERO, size))
+	if selected:
+		draw_style_box(UiStyle.panel(Color(0, 0, 0, 0), UiStyle.TITLE_COLOR, 3, 11.0), Rect2(Vector2(-5, -5), size + Vector2(10, 10)))
 	if cleared:
 		var corner := Vector2(size.x - 34.0, 12.0)
 		var points := PackedVector2Array([corner + Vector2(0, 12), corner + Vector2(9, 21), corner + Vector2(24, 2)])

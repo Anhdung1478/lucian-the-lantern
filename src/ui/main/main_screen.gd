@@ -21,6 +21,8 @@ const TOAST_TIME := 1.6
 
 ## The Evolution Tree, Skin Shop and Journey pages, in that order.
 var sections: Array[Control] = []
+## The act Journey opens on (the one just played), or 0.
+var focus_act := 0
 var essence_bar := EssenceBar.new()
 var section_bar := SectionBar.new()
 var gear := GearMenu.new()
@@ -115,7 +117,9 @@ func _build() -> void:
 	area.add_child(skin_shop)
 	sections.append(skin_shop)
 	var journey := JourneySection.new()
+	journey.focus_act = focus_act
 	journey.start_training.connect(_start_training)
+	journey.start_stage.connect(_start_stage)
 	area.add_child(journey)
 	sections.append(journey)
 
@@ -166,6 +170,10 @@ func _build() -> void:
 
 func _start_training() -> void:
 	start_requested.emit(StageSetup.from_save(SaveGame.instance()))
+
+
+func _start_stage(act: int, stage: int) -> void:
+	start_requested.emit(StageSetup.for_stage(SaveGame.instance(), act, stage))
 
 
 func _open_settings() -> void:

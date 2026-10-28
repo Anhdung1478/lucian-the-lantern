@@ -39,10 +39,10 @@ func test_a_new_save_locks_acts_two_to_six_and_endless() -> void:
 	assert_true(section.tabs[JourneySection.ENDLESS_TAB].locked)
 
 
-func test_opens_on_training() -> void:
-	assert_eq(section.current, JourneySection.TRAINING_TAB)
-	assert_true(section.training_page.visible)
-	assert_false(section.act_pages[0].visible)
+func test_a_new_game_opens_on_act_one() -> void:
+	assert_eq(section.current, 0)
+	assert_true(section.act_pages[0].visible)
+	assert_false(section.training_page.visible)
 
 
 func test_a_locked_tab_label_starts_right_of_its_chain() -> void:
@@ -128,11 +128,63 @@ func test_a_locked_tab_cannot_be_shown() -> void:
 	assert_false(section.act_pages[3].visible)
 
 
-func test_start_buttons_of_acts_and_endless_are_disabled() -> void:
-	assert_true(section.act_pages[0].start_button.disabled)
+func test_act_one_start_is_enabled_on_a_new_game() -> void:
+	assert_false(section.act_pages[0].start_button.disabled)
+
+
+func test_start_is_disabled_for_locked_and_unbuilt_acts_and_endless() -> void:
+	assert_true(section.act_pages[1].start_button.disabled, "act 2 is locked")
+	_save().set_cleared(Journey.all_stage_ids(2))
+	assert_true(section.act_pages[2].start_button.disabled)
+	assert_eq(section.act_pages[2].start_button.get_meta(&"hover_text"), "Act 3 comes in a later phase")
 	assert_true(section.endless_page.start_button.disabled)
 	assert_eq(section.endless_page.map_buttons.size(), 7)
 	assert_eq(section.endless_page.map_index(), 0)
+
+
+func test_a_locked_card_cannot_be_chosen() -> void:
+	_save().set_cleared(["1-1"] as Array[String])
+	var page := section.act_pages[1]
+	assert_eq(page.selected, 1)
+	page.cards[1].chosen.emit()
+	page.select(2)
+	assert_eq(page.selected, 1)
+
+
+func test_the_default_stage_is_the_first_open_uncleared_one() -> void:
+	_save().set_cleared(["1-1", "2-1"] as Array[String])
+	assert_eq(section.act_pages[1].selected, 2)
+
+
+func test_start_emits_the_act_and_stage() -> void:
+	_save().set_cleared(["1-1", "2-1"] as Array[String])
+	watch_signals(section)
+	section.act_pages[1].select(2)
+	section.act_pages[1].start_button.pressed.emit()
+	assert_signal_emitted_with_parameters(section, "start_stage", [2, 2])
+
+
+func test_clicking_a_card_selects_it() -> void:
+	_save().set_cleared(["1-1", "2-1"] as Array[String])
+	var click := InputEventMouseButton.new()
+	click.pressed = true
+	click.button_index = MOUSE_BUTTON_LEFT
+	section.act_pages[1].select(2)
+	section.act_pages[1].cards[0]._gui_input(click)
+	assert_eq(section.act_pages[1].selected, 1)
+	assert_true(section.act_pages[1].cards[0].selected)
+
+
+func test_it_opens_on_the_first_act_with_work_to_do() -> void:
+	assert_eq(section.current, 0)
+	_save().set_cleared(["1-1"] as Array[String])
+	section.open_on()
+	assert_eq(section.current, 1)
+	_save().set_cleared(Journey.all_stage_ids(2))
+	section.open_on()
+	assert_eq(section.current, JourneySection.TRAINING_TAB)
+	section.open_on(1)
+	assert_eq(section.current, 0)
 
 
 func test_endless_shows_the_best_wave() -> void:

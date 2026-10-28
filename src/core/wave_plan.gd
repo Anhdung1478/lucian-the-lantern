@@ -18,6 +18,10 @@ const STAGES := {
 const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan"}
 
 
+static func has_stage(stage_id: String) -> bool:
+	return STAGES.has(stage_id)
+
+
 ## Each wave as the enemy ids to spawn, in order.
 static func waves(stage_id: String) -> Array:
 	var found := []

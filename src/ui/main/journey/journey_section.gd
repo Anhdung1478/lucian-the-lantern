@@ -2,10 +2,11 @@ class_name JourneySection
 extends Control
 ## The Journey page of the main screen: tabs Act 1 to Act 6, Training and
 ## Endless across the top, the open tab's page on the left and the D/F
-## loadout on the right. It opens on Training. Tabs unlock along the Journey
+## loadout on the right. Tabs unlock along the Journey
 ## chain. Nothing here saves.
 
 signal start_training
+signal start_stage(act: int, stage: int)
 
 const TRAINING_TAB := 6
 const ENDLESS_TAB := 7
@@ -18,6 +19,8 @@ var training_page := TrainingPage.new()
 var endless_page := EndlessPage.new()
 var loadout := LoadoutPanel.new()
 var current := 0
+## The act just played, which the page opens on (0: none).
+var focus_act := 0
 
 var _pages: Array[Control] = []
 
@@ -45,6 +48,7 @@ func _ready() -> void:
 	add_child(page_area)
 	for act in range(1, Journey.ACTS.size() + 1):
 		var page := ActPage.new(act)
+		page.start_pressed.connect(func(stage: int) -> void: start_stage.emit(page.act, stage))
 		page_area.add_child(page)
 		act_pages.append(page)
 		_pages.append(page)
@@ -62,6 +66,21 @@ func _ready() -> void:
 	save.changed.connect(refresh)
 	save.tree.changed.connect(refresh)
 	refresh()
+	open_on(focus_act)
+
+
+## The tab to open on: `act` (just played) if it is open, else the first
+## playable act with an open stage not cleared yet, else Training.
+func open_on(act := 0) -> void:
+	var cleared := SaveGame.instance().cleared
+	if act > 0 and Journey.is_act_open(act, cleared):
+		show_tab(act - 1)
+		return
+	for page in act_pages:
+		if page.playable and Journey.is_act_open(page.act, cleared) and page.default_stage(cleared) > 0 \
+				and not Journey.stage_id(page.act, page.default_stage(cleared)) in cleared:
+			show_tab(page.act - 1)
+			return
 	show_tab(TRAINING_TAB)
 
 
