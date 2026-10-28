@@ -254,7 +254,7 @@ Placeholder numbers. Ability haste doesn't shorten them, and each spell keeps it
 
 | Spell | Cooldown | Effect |
 |---|---|---|
-| Flash | 90 s | Blink up to 400 toward the cursor. If that spot is inside a wall or an enemy, land just short of it (so Flash can cross them). |
+| Flash | 90 s | Blink up to 400 toward the cursor. If that spot is inside a wall or an enemy, land just short of it (so Flash can cross them). A blink leaves no trail: yellow sparks ring the spot Lucian left. |
 | Ghost | 60 s | +40% move speed and pass through enemies for 6 s. |
 | Barrier | 60 s | Shield of 95 + 18 × level for 2.5 s; heal and shield power makes it stronger. |
 | Heal | 60 s | Heal 80 + 15 × level, +30% move speed fading over 1 s. |

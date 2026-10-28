@@ -18,6 +18,9 @@ const GALEFORCE_BASE := 60.0
 const GALEFORCE_BONUS_AD := 0.15
 ## Missiles leave this far (radians) to each side of the target's direction.
 const GALEFORCE_FAN := 1.0
+## Dash trails: a pale wind for Galeforce, Rocketbelt's hextech violet.
+const GALEFORCE_TRAIL := Color(0.72, 1.0, 0.9)
+const ROCKETBELT_TRAIL := Color(0.9, 0.4, 1.0)
 const ROCKETBELT_DASH := 275.0
 ## Slower than the bolts, so they fly ahead of Lucian.
 const ROCKETBELT_DASH_SPEED := 800.0
@@ -58,7 +61,7 @@ func use(item: ItemData, aim: Vector2) -> bool:
 			if not _gunblade(aim):
 				return false
 		&"galeforce":
-			lucian.start_dash(lucian.aim_direction(aim), GALEFORCE_DASH, GALEFORCE_DASH_SPEED)
+			lucian.start_dash(lucian.aim_direction(aim), GALEFORCE_DASH, GALEFORCE_DASH_SPEED, GALEFORCE_TRAIL)
 			_galeforce_pending = true
 		&"hextech_rocketbelt":
 			_rocketbelt(aim)
@@ -114,7 +117,7 @@ func _galeforce_missiles() -> void:
 ## hit once).
 func _rocketbelt(aim: Vector2) -> void:
 	var direction := lucian.aim_direction(aim)
-	lucian.start_dash(direction, ROCKETBELT_DASH, ROCKETBELT_DASH_SPEED)
+	lucian.start_dash(direction, ROCKETBELT_DASH, ROCKETBELT_DASH_SPEED, ROCKETBELT_TRAIL)
 	var hit: Array[Enemy] = []
 	var damage := ROCKETBELT_BASE + ROCKETBELT_AP * lucian.stats.ap
 	for i in ROCKETBELT_BOLTS:

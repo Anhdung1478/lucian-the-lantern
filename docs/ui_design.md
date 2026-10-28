@@ -261,7 +261,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 |---|---|
 | Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. No music yet. |
 | Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. |
-| Graphics | Window mode (windowed, borderless fullscreen, fullscreen), Resolution (1280×720, 1366×768, 1600×900, 1920×1080, 2560×1440, 3840×2160; sizes too big for a window on this screen, title bar included, are greyed out and marked "too big"; sets and centers the window, greyed out in borderless/fullscreen), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails or muzzle flashes; Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
+| Graphics | Window mode (windowed, borderless fullscreen, fullscreen), Resolution (1280×720, 1366×768, 1600×900, 1920×1080, 2560×1440, 3840×2160; sizes too big for a window on this screen, title bar included, are greyed out and marked "too big"; sets and centers the window, greyed out in borderless/fullscreen), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails, Flash sparks or muzzle flashes; Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
 | Gameplay | Skill queue (on by default; see the game design doc §2). |
 
 - **Not yet:** cast modes (normal / quick / quick with indicator) and camera options.

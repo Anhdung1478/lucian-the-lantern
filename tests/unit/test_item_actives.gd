@@ -26,6 +26,35 @@ func equip(id: StringName, slot := 0) -> void:
 	lucian.inventory.put(EQUIP + slot, lucian.item_catalog.find(id))
 
 
+func trails() -> Array[DashTrail]:
+	var found: Array[DashTrail] = []
+	for node in lucian.projectile_parent.get_children():
+		if node is DashTrail:
+			found.append(node)
+	return found
+
+
+func test_galeforce_leaves_a_wind_trail_once_the_dash_lands() -> void:
+	equip(&"galeforce")
+	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
+	assert_eq(trails().size(), 0, "drawn once the dash lands")
+	# The dash takes 200 / 1260 = 0.16 s; the trail lasts 0.3 s after.
+	await wait_seconds(0.25)
+	assert_eq(trails().size(), 1)
+	assert_eq(trails()[0].color, ItemActives.GALEFORCE_TRAIL)
+	assert_eq(trails()[0].position, Vector2.ZERO, "from where the dash started")
+
+
+func test_rocketbelt_leaves_a_violet_trail_once_the_dash_lands() -> void:
+	equip(&"hextech_rocketbelt")
+	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
+	assert_eq(trails().size(), 0, "drawn once the dash lands")
+	# The dash takes 275 / 800 = 0.34 s.
+	await wait_seconds(0.45)
+	assert_eq(trails().size(), 1)
+	assert_eq(trails()[0].color, ItemActives.ROCKETBELT_TRAIL)
+
+
 func test_gunblade_bolts_the_enemy_near_the_cursor() -> void:
 	equip(&"hextech_gunblade")
 	assert_true(lucian.use_equip_slot(0, dummy.position))

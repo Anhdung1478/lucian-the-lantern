@@ -9,15 +9,10 @@ extends LucianSkill
 @export var max_distance := 280.0
 @export var dash_speed := 1350.0
 
-var _dash_start := Vector2.ZERO
-var _was_dashing := false
-
 
 func execute(aim: Vector2) -> void:
 	var distance := clampf(lucian.global_position.distance_to(aim), min_distance, max_distance)
-	_dash_start = lucian.global_position
 	lucian.start_dash(lucian.aim_direction(aim), distance, dash_speed)
-	_was_dashing = true
 
 
 func describe() -> String:
@@ -29,15 +24,3 @@ func describe() -> String:
 
 func max_rank_bonus() -> String:
 	return "Killing an enemy lowers this cooldown by 1 s."
-
-
-func _physics_process(delta: float) -> void:
-	super(delta)
-	# Draw the trail once the dash is over, so it matches where Lucian stopped.
-	if _was_dashing and not lucian.is_dashing():
-		_was_dashing = false
-		if GameSettings.instance().low_effects():
-			return
-		var trail := DashTrail.new()
-		trail.setup(_dash_start, lucian.global_position)
-		lucian.spawn(trail)

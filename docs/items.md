@@ -369,8 +369,8 @@ in Phase 4 (`docs/implementation/phase4.md`).
 | Muramana | AD from 2.5% max mana. Skill hits add 3% max mana physical; attacks 1.5%. |
 | Jak'Sho | Each second in combat (dealt damage in the last 3 s): +5% armor and MR, up to 30%. |
 | Hextech Gunblade | Active (key 1–6): the enemy nearest the cursor within 700 takes 175 (+30% AP) magic and is slowed for 2 s. Refused with no enemy in range. |
-| Galeforce | Active: 200-unit dash toward the cursor (speed 1260), then 3 missiles at the lowest-health enemy within 750, 60 (+15% bonus AD) magic each. The missiles leave in a fan and curve onto it, faster and tighter as they fly. Lucian can move again as soon as the dash lands. |
-| Hextech Rocketbelt | Active: 275-unit dash (speed 800, slower than the bolts' 1500), an arc of 7 bolts forward that fly 900 from where Lucian started (each enemy hit once) for 100 (+10% AP) magic. Lucian can move again as soon as the dash lands. No move speed. |
+| Galeforce | Active: 200-unit dash toward the cursor (speed 1260), then 3 missiles at the lowest-health enemy within 750, 60 (+15% bonus AD) magic each. The missiles leave in a fan and curve onto it, faster and tighter as they fly. Lucian can move again as soon as the dash lands. The dash leaves a pale green wind trail. |
+| Hextech Rocketbelt | Active: 275-unit dash (speed 800, slower than the bolts' 1500), an arc of 7 bolts forward that fly 900 from where Lucian started (each enemy hit once) for 100 (+10% AP) magic. Lucian can move again as soon as the dash lands. No move speed. The dash leaves a violet trail, like the bolts. |
 
 Actives share one cooldown per item (every copy), which keeps running after selling. The debug
 "No cooldowns" cheat also refreshes item cooldowns that are already running.

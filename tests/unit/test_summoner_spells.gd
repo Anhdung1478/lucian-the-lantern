@@ -50,6 +50,14 @@ func test_flash_blinks_400_toward_the_cursor_and_keeps_its_cooldown_on_the_other
 	assert_false(lucian.use_summoner(1, Vector2(1000, 0)), "the cooldown moved with it")
 
 
+func test_flash_leaves_sparks_where_lucian_stood_and_no_trail() -> void:
+	assert_true(lucian.use_summoner(0, Vector2(1000, 0)))
+	var effects := lucian.projectile_parent.get_children()
+	assert_eq(effects.size(), 1)
+	assert_true(effects[0] is BlinkSparks, "sparks, not a dash trail")
+	assert_eq((effects[0] as Node2D).position, Vector2.ZERO, "where Lucian stood")
+
+
 func test_flash_stops_short_of_an_enemy_body() -> void:
 	dummy.position = Vector2(350, 0)
 	await wait_physics_frames(2)

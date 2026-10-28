@@ -869,6 +869,9 @@ Everything in the plan is in place, one commit per task (Tasks 0–9), then the 
 - **One regen stat:** the extra table's `regen` cell shows "health / mana" per second with one icon (`assets/art/stats/regen.svg`); the separate `hp_regen` / `mana_regen` stat keys and icons are gone. The extra table is 2 × 4, like the main one.
 
 - **Bonus stats in yellow:** `StatsPanel` compares each value with `base_stats.at_level(level)` (Lucian's level alone), as shown on screen, so tiny float differences never count. A difference turns the number yellow (`StatCell.BONUS_COLOR`), and the hover card adds "base + bonus".
+- **Dash trails:** `Lucian.start_dash()` takes a trail color and leaves a `DashTrail` from the start to where the dash ended (E's own trail code moved there). E keeps its light blue (`DashTrail.LIGHT`); Galeforce's is pale green (`GALEFORCE_TRAIL`), Rocketbelt's violet like its bolts (`ROCKETBELT_TRAIL`). None on low effects.
+- **Flash** no longer draws a trail. `BlinkSparks` (`src/combat/blink_sparks.gd`) rings the spot Lucian left with 16 yellow sparks that drift out and up and fade over 0.6 s, with a thin ring popping out.
+- **Icons redrawn:** Flash is a burst of light where it lands, with a ring of yellow sparks where it left; Barrier is a gold figure inside a golden bubble with faint hex lines.
 
 ### Running the checks
 

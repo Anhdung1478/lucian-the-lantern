@@ -162,6 +162,23 @@ func test_e_stops_at_walls() -> void:
 	assert_false(lucian.is_dashing())
 
 
+func test_e_leaves_a_light_trail_once_it_lands() -> void:
+	dummy.position = Vector2(0, 600)
+	var effects := Node2D.new()
+	add_child_autofree(effects)
+	lucian.projectile_parent = effects
+	_rank(Slot.E, 1)
+	lucian.try_cast(Slot.E, Vector2(1000, 0))
+	assert_eq(effects.get_child_count(), 0, "drawn once the dash lands")
+	# The dash takes 280 / 1350 = 0.21 s; the trail lasts 0.3 s after.
+	await wait_seconds(0.3)
+	assert_eq(effects.get_child_count(), 1)
+	var trail := effects.get_child(0) as DashTrail
+	assert_not_null(trail)
+	assert_eq(trail.color, DashTrail.LIGHT)
+	assert_eq(trail.position, Vector2.ZERO, "from where the dash started")
+
+
 func test_no_other_casts_while_dashing() -> void:
 	dummy.position = Vector2(0, 600)
 	lucian.progress.set_level(3)

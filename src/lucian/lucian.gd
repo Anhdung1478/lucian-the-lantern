@@ -81,6 +81,8 @@ var _rfc_ring_shown := false
 var _cast_lock_left := 0.0
 var _dash_velocity := Vector2.ZERO
 var _dash_left := 0.0
+var _dash_from := Vector2.ZERO
+var _dash_trail_color := DashTrail.LIGHT
 ## Id -> {flat, pct, left, duration, fade}. A fading buff's percent shrinks
 ## to 0 over its duration.
 var _speed_buffs := {}
@@ -411,12 +413,15 @@ func is_cast_locked() -> bool:
 	return _cast_lock_left > 0.0
 
 
-## Dashes through enemies (walls still stop him). A move order ends here, but
-## attack orders carry on, and the attack timer resets.
-func start_dash(direction: Vector2, distance: float, speed: float) -> void:
+## Dashes through enemies (walls still stop him), leaving a trail in
+## `trail_color`. A move order ends here, but attack orders carry on, and the
+## attack timer resets.
+func start_dash(direction: Vector2, distance: float, speed: float, trail_color := DashTrail.LIGHT) -> void:
 	_cancel_windup()
 	_dash_velocity = direction * speed
 	_dash_left = distance / speed
+	_dash_from = global_position
+	_dash_trail_color = trail_color
 	_attack_cooldown = 0.0
 	collision_mask = Layers.WORLD
 	if _order == Order.MOVE:
@@ -621,6 +626,17 @@ func _dash_step(delta: float) -> void:
 	if _dash_left <= 0.0 or get_slide_collision_count() > 0:
 		_dash_left = 0.0
 		collision_mask = _body_mask()
+		_leave_dash_trail()
+
+
+## Drawn once the dash is over, so it matches where Lucian stopped. None on
+## low effects.
+func _leave_dash_trail() -> void:
+	if GameSettings.instance().low_effects():
+		return
+	var trail := DashTrail.new()
+	trail.setup(_dash_from, global_position, _dash_trail_color)
+	spawn(trail)
 
 
 ## Dashing or ghosted, Lucian passes through enemies; walls always stop him.

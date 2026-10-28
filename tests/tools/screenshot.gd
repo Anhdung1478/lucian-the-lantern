@@ -731,7 +731,8 @@ func scenario_actives() -> void:
 	await shot("actives_1_galeforce")
 	await wait(0.6)
 	print("rocketbelt (expect true): ", lucian.use_equip_slot(2, dummy.global_position + Vector2(0, -100)))
-	await wait(0.15)
+	# The dash lands at 0.34 s; its trail shows while the bolts still fly.
+	await wait(0.4)
 	await shot("actives_2_rocketbelt")
 	lucian.progress.set_level(6)
 	lucian.try_rank_up(ChampionProgress.Slot.R)

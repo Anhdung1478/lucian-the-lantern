@@ -119,10 +119,11 @@ func _flash(aim: Vector2) -> void:
 		distance -= FLASH_STEP
 	lucian.blink_to(from + direction * maxf(distance, 0.0))
 	lucian.visuals.face(direction)
+	# A blink leaves no trail, only sparks where Lucian stood.
 	if not GameSettings.instance().low_effects():
-		var trail := DashTrail.new()
-		trail.setup(from, lucian.global_position)
-		lucian.spawn(trail)
+		var sparks := BlinkSparks.new()
+		sparks.position = from
+		lucian.spawn(sparks)
 	Sfx.play(&"zap")
 
 
