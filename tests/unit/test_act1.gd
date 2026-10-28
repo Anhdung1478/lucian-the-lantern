@@ -222,3 +222,18 @@ func test_the_cutscene_plays_to_its_end() -> void:
 	assert_null(stage.senna)
 	assert_lt(stage.lucian.global_position.distance_to(thresh_at), 250.0, "Lucian walked to where Senna fell")
 	assert_eq(stage.collected[Essences.PURPLE], 10)
+
+
+func test_no_cutscene_or_boss_purple_after_a_defeat() -> void:
+	var stage: Stage = await _act1_stage()
+	stage.jump_to_boss_wave()
+	stage.runner.tick(0.1)
+	stage.runner.tick(0.1)
+	await wait_process_frames(1)
+	stage.lucian.invulnerable = false
+	stage.lucian.take_damage(DamageInfo.create(999999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_true(stage.lucian.dead)
+	stage.boss_unit.take_damage(DamageInfo.create(5000.0, DamageInfo.Type.TRUE, &"test"))
+	await wait_process_frames(2)
+	assert_null(stage.cutscene)
+	assert_true(SaveGame.instance().bosses.is_empty())

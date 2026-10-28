@@ -304,6 +304,8 @@ func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 
 ## The boss's purple (first-time or repeat) and the first-clear lines, then the result.
 func _on_cleared() -> void:
+	if lucian.dead or result.visible:
+		return
 	var save := SaveGame.instance()
 	if run.boss != &"":
 		var data: EnemyData = load(ENEMY_PATH % run.boss)
@@ -327,6 +329,8 @@ func _new_unit(data: EnemyData) -> EnemyUnit:
 	match data.behavior:
 		&"thresh":
 			return Thresh.new()
+		&"akshan":
+			return Akshan.new()
 	return Minion.new()
 
 
@@ -364,6 +368,8 @@ func _tip(id: StringName) -> void:
 
 ## Thresh at half HP: the fight stops and the cutscene plays.
 func _on_thresh_phase_ended() -> void:
+	if lucian.dead or result.visible:
+		return
 	for node: Node in $Warnings.get_children() + $Projectiles.get_children():
 		node.queue_free()
 	cutscene = ThreshTakesSenna.new()
