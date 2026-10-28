@@ -15,6 +15,10 @@ func execute(aim: Vector2) -> void:
 	lucian.start_dash(lucian.aim_direction(aim), distance, dash_speed)
 
 
+func cast_range() -> CastRange:
+	return CastRange.dash(max_distance, min_distance)
+
+
 func describe() -> String:
 	return TooltipText.colorize(
 		"Lucian dashes up to [kw]%d[/kw] units toward the cursor (at least %d), passing through enemies, and resets his basic attack timer. "

@@ -66,6 +66,17 @@ func set_spell(slot: int, id: StringName) -> void:
 	slots[slot] = id
 
 
+## The range indicator's shape for spell `id`: Flash's blink and Smite's
+## reach. The others have no aim.
+static func cast_range(id: StringName) -> CastRange:
+	match id:
+		&"flash":
+			return CastRange.dash(FLASH_RANGE, 0.0)
+		&"smite":
+			return CastRange.circle(SMITE_RANGE)
+	return null
+
+
 func cooldown(id: StringName) -> Cooldown:
 	if not _cooldowns.has(id):
 		_cooldowns[id] = Cooldown.new()

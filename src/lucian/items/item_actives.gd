@@ -48,6 +48,20 @@ static func has_active(item: ItemData) -> bool:
 	return item != null and ACTIVES.has(item.id)
 
 
+## The range indicator's shape for `item`'s active, or null without one.
+static func cast_range(item: ItemData) -> CastRange:
+	if item == null:
+		return null
+	match item.id:
+		&"hextech_gunblade":
+			return CastRange.circle(GUNBLADE_RANGE)
+		&"galeforce":
+			return CastRange.dash(GALEFORCE_DASH)
+		&"hextech_rocketbelt":
+			return CastRange.dash(ROCKETBELT_DASH)
+	return null
+
+
 ## Uses `item`'s active toward `aim`. False when it is not an active, is on
 ## cooldown, Lucian is busy, or (Gunblade) there is no enemy in range.
 func use(item: ItemData, aim: Vector2) -> bool:

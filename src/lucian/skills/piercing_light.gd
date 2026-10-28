@@ -20,6 +20,12 @@ func execute(aim: Vector2) -> void:
 	_fire_in = cast_time
 
 
+func cast_range() -> CastRange:
+	if is_max_rank():
+		return CastRange.line(max_rank_length, max_rank_width)
+	return CastRange.line(length, width)
+
+
 ## Q's cast time is still running.
 func is_casting() -> bool:
 	return _fire_in > 0.0

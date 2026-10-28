@@ -20,6 +20,11 @@ func _init(target: Lucian, summoner_slot: int) -> void:
 	mouse_filter = MOUSE_FILTER_PASS
 
 
+## Flash's and Smite's range, shown around Lucian while hovered.
+func hover_range() -> CastRange:
+	return lucian.summoner_range(slot)
+
+
 func tooltip_content() -> Control:
 	return TooltipCard.summoner(lucian.summoners.spell_in(slot), _key())
 

@@ -22,6 +22,11 @@ func _init(target_inventory: Inventory, slot: int) -> void:
 	_refresh()
 
 
+## The active's range, shown around Lucian while hovered.
+func hover_range() -> CastRange:
+	return lucian.equip_range(index - Inventory.EQUIP_START) if lucian else null
+
+
 func tooltip_content() -> Control:
 	var item := inventory.item_at(index)
 	return TooltipCard.item(item, inventory.catalog) if item else null

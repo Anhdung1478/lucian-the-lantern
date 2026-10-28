@@ -88,6 +88,8 @@ func _run(scenario: String) -> void:
 			await scenario_summoners()
 		"camera":
 			await scenario_camera()
+		"indicators":
+			await scenario_indicators()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -878,3 +880,30 @@ func scenario_camera() -> void:
 	await wait(0.1)
 	print("camera after Space (expect (2000, 1500)): ", camera.global_position.round(), "  still free (expect true): ", camera.mode == StageCamera.Mode.FREE)
 	await shot("camera_1_back")
+
+
+## Hovering each slot shows its range around Lucian, pointing where he faces.
+func scenario_indicators() -> void:
+	var hud: Hud = stage.get_node("Hud")
+	lucian.progress.set_level(6)
+	for slot in [ChampionProgress.Slot.Q, ChampionProgress.Slot.W, ChampionProgress.Slot.E, ChampionProgress.Slot.R]:
+		lucian.try_rank_up(slot)
+	lucian.summoners.slots = [&"flash", &"smite"]
+	equip_all([&"hextech_gunblade", &"galeforce", &"hextech_rocketbelt"])
+	lucian.visuals.face(Vector2(1.0, -0.5))
+	var count := hud.skill_row.get_child_count()
+	var hovers := [
+		["q", hud.skill_row.get_child(1)], ["w", hud.skill_row.get_child(2)],
+		["e", hud.skill_row.get_child(3)], ["r", hud.skill_row.get_child(4)],
+		["flash", hud.skill_row.get_child(count - 2)], ["smite", hud.skill_row.get_child(count - 1)],
+		["gunblade", hud.item_grid.get_child(0)], ["galeforce", hud.item_grid.get_child(1)],
+	]
+	for i in hovers.size():
+		await mouse_move(control_center(hovers[i][1]))
+		await wait(0.1)
+		var shown := lucian.indicator.shown()
+		print("%s: %s" % [hovers[i][0], "none" if shown == null else "kind %d reach %d" % [shown.kind, shown.reach]])
+		await shot("indicators_%d_%s" % [i, hovers[i][0]])
+	await mouse_move(Vector2(200, 200))
+	await wait(0.1)
+	print("off the HUD (expect none): ", "none" if lucian.indicator.shown() == null else "shown")

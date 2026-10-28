@@ -43,6 +43,7 @@ var restores := RestoreOverTime.new()
 var passives := ItemPassives.new()
 var actives := ItemActives.new()
 var summoners := SummonerSpells.new()
+var indicator := RangeIndicator.new()
 ## Item id -> Cooldown, shared by every copy of the item.
 var item_cooldowns := {}
 var stats: StatBlock
@@ -112,6 +113,10 @@ func _ready() -> void:
 	summoners.name = "SummonerSpells"
 	summoners.setup(self)
 	add_child(summoners)
+	indicator.name = "RangeIndicator"
+	add_child(indicator)
+	# Under his body.
+	move_child(indicator, 0)
 	var health_bar := LucianHealthBar.new()
 	health_bar.name = "HealthBar"
 	health_bar.position = Vector2(0, -HEALTH_BAR_HEIGHT)
@@ -276,6 +281,24 @@ func use_equip_slot(slot: int, aim: Vector2) -> bool:
 ## D and F: casts the summoner spell on `slot` (0-1) toward `aim`.
 func use_summoner(slot: int, aim: Vector2) -> bool:
 	return summoners.use(slot, aim)
+
+
+## The range indicator's shape for a skill, or null while it is unlearned.
+func skill_range(slot: ChampionProgress.Slot) -> CastRange:
+	var skill := skills[slot]
+	return skill.cast_range() if skill.rank() > 0 else null
+
+
+## The range indicator's shape for the active of the item in equip slot
+## `slot` (0-5), or null when it has none.
+func equip_range(slot: int) -> CastRange:
+	return ItemActives.cast_range(inventory.item_at(Inventory.EQUIP_START + slot))
+
+
+## The range indicator's shape for the summoner spell on `slot` (0-1), or null.
+func summoner_range(slot: int) -> CastRange:
+	var spell := summoners.spell_in(slot)
+	return SummonerSpells.cast_range(spell.id) if spell else null
 
 
 ## The cooldown every copy of item `id` shares.

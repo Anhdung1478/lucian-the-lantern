@@ -11,6 +11,9 @@ extends LucianSkill
 @export var pierce_falloff := 0.15
 @export var pierce_minimum := 0.3
 
+## The guns are this far each side of Lucian's aim line.
+const MUZZLE_SPREAD := 15.0
+
 var _channel_left := 0.0
 var _direction := Vector2.RIGHT
 var _next_shot_in := 0.0
@@ -32,6 +35,11 @@ func execute(aim: Vector2) -> void:
 	_channel_left = duration
 	_shots_left = shots
 	_next_shot_in = 0.0
+
+
+## Two streams of bullets, one from each gun.
+func cast_range() -> CastRange:
+	return CastRange.twin(Lucian.GUN_REACH + bullet_range, MUZZLE_SPREAD)
 
 
 func describe() -> String:

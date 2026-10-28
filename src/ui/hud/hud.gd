@@ -115,6 +115,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	if lucian == null:
 		return
+	# Hovering a skill, item or summoner slot shows its range around Lucian.
+	lucian.indicator.hovered = hover_range_of(get_viewport().gui_get_hovered_control())
 	var progress := lucian.progress
 	level_label.text = str(progress.level)
 	var xp_needed := progress.xp_for_next()
@@ -138,6 +140,16 @@ func _process(_delta: float) -> void:
 	_fps_label.visible = GameSettings.instance().get_value(&"show_fps")
 	if _fps_label.visible:
 		_fps_label.text = "FPS %d" % Engine.get_frames_per_second()
+
+
+## The range of the HUD slot `control` is in (a control opts in with
+## hover_range()), or null.
+static func hover_range_of(control: Control) -> CastRange:
+	while control:
+		if control.has_method(&"hover_range"):
+			return control.hover_range()
+		control = control.get_parent() as Control
+	return null
 
 
 func _add_skill_slot(skill: LucianSkill, icon: Texture2D, key: String, icon_size := SkillSlot.ICON_SIZE) -> void:

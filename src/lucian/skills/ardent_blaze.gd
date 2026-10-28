@@ -27,6 +27,13 @@ func execute(aim: Vector2) -> void:
 	_fire_in = cast_time
 
 
+## The missile's flight, ending in the cross it bursts into.
+func cast_range() -> CastRange:
+	var shape := CastRange.line(Lucian.GUN_REACH + missile_range, 32.0)
+	shape.cross = bar_size * (max_rank_scale if is_max_rank() else 1.0)
+	return shape
+
+
 func describe() -> String:
 	return TooltipText.colorize(
 		"Lucian fires a missile that bursts in a cross on the first enemy hit or at max range, dealing %s and marking enemies for [kw]%s s[/kw]. "

@@ -135,6 +135,11 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 
 
+## Shown around Lucian while hovered, once the skill is learned.
+func hover_range() -> CastRange:
+	return lucian.skill_range(skill.slot) if skill else null
+
+
 func tooltip_content() -> Control:
 	return TooltipCard.skill(lucian, skill, _icon.texture, _key)
 

@@ -32,6 +32,11 @@ func execute(_aim: Vector2) -> void:
 	pass
 
 
+## The range indicator's shape at the current rank.
+func cast_range() -> CastRange:
+	return null
+
+
 ## LoL-style tooltip text (BBCode) at the current rank.
 func describe() -> String:
 	return ""
