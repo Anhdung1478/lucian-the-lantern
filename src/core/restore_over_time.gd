@@ -9,11 +9,16 @@ var _running: Array[Dictionary] = []
 
 
 func start(potion: ItemData) -> void:
-	var duration := maxf(potion.restore_time, 0.01)
+	start_amount(potion.id, potion.restore_hp, potion.restore_mana, potion.restore_time)
+
+
+## Restores `hp` and `mana` evenly over `seconds`, listed under `id`.
+func start_amount(id: StringName, hp: float, mana: float, seconds: float) -> void:
+	var duration := maxf(seconds, 0.01)
 	_running.append({
-		"id": potion.id,
-		"hp_rate": potion.restore_hp / duration,
-		"mana_rate": potion.restore_mana / duration,
+		"id": id,
+		"hp_rate": hp / duration,
+		"mana_rate": mana / duration,
 		"left": duration,
 		"duration": duration,
 	})

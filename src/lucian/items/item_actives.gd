@@ -96,6 +96,7 @@ func _gunblade(aim: Vector2) -> bool:
 		return false
 	lucian.visuals.face(target.global_position - lucian.global_position)
 	target.add_status(Enemy.SLOW, GUNBLADE_SLOW, 1, _icon(&"hextech_gunblade"))
+	lucian.passives.on_enemy_slowed()
 	target.take_damage(lucian.make_damage(GUNBLADE_BASE + GUNBLADE_AP * lucian.stats.ap, DamageInfo.Type.MAGIC, &"hextech_gunblade"))
 	var bolt := ChainLightning.new()
 	bolt.setup(PackedVector2Array([lucian.global_position, target.global_position]), Color("6fe8d8"))

@@ -480,9 +480,12 @@ func add_shield(id: StringName, amount: float, seconds: float, magic_only := fal
 func take_damage(info: DamageInfo) -> bool:
 	if dead or invulnerable or in_stasis():
 		return false
+	if not passives.before_damage_taken(info):
+		return false
 	var amount := DamageCalc.mitigate(info.amount, info.type, stats.armor, stats.mr, info.armor_pen, info.magic_pen)
 	damage_received.emit(info, amount)
-	lose_hp(amount, info.type)
+	lose_hp(passives.delay_damage(amount), info.type)
+	passives.on_damage_taken(info, amount)
 	_flash_hurt()
 	return true
 
@@ -491,10 +494,12 @@ func take_damage(info: DamageInfo) -> bool:
 func lose_hp(amount: float, type: DamageInfo.Type) -> void:
 	if dead or in_stasis():
 		return
+	passives.before_hp_loss(amount)
 	hp -= shields.absorb(amount, type)
 	if hp <= 0.0:
 		hp = 0.0
-		_die()
+		if not passives.on_lethal():
+			_die()
 
 
 ## Skip between waves: the HP and mana regen of `seconds`, at once.

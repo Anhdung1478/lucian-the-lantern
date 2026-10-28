@@ -1,16 +1,17 @@
 class_name ItemPassives
 extends Node
 ## The item passives that work in combat, for Lucian's equipped items only.
-## Each item counts once however many copies are equipped. Defensive passives
-## need enemies that hit back, so they are still tooltip text: Banshee's Veil,
-## Thornmail, Immortal Shieldbow, Death's Dance, Fimbulwinter's Everlasting,
-## Guardian Angel and Kaenic Rookern.
+## Each item counts once however many copies are equipped.
 ##
 ## Lucian calls the hooks: adjust_stats (stat passives), on_cast, on_moved,
 ## on_basic_attack (counters and "next attack" effects, as the shot leaves
 ## the gun), before_damage (damage multipliers, at impact) and
 ## on_damage_dealt (on-hit damage and statuses on the target). Item damage
 ## uses the item's id as its source and never triggers on-hit effects again.
+## Defensive passives react to hits on Lucian: before_damage_taken (Banshee's),
+## delay_damage (Death's Dance), before_hp_loss (Shieldbow), on_damage_taken
+## (Thornmail, Kaenic Rookern), on_lethal (Guardian Angel), on_kill (Death's
+## Dance) and on_enemy_slowed (Fimbulwinter).
 
 const ENERGIZED: Array[StringName] = [&"statikk_shiv", &"rapid_firecannon", &"stormrazor"]
 const ATTACK_SOURCES: Array[StringName] = [&"basic", &"lightslinger"]
@@ -70,6 +71,28 @@ const JAKSHO_MAX := 6
 const COMBAT_TIME := 3.0
 const HATEFOG_COOLDOWN := 3.0
 const SCORN_HASTE := 20.0
+const ANNUL_COOLDOWN := 40.0
+const THORNS_BASE := 20.0
+const THORNS_BONUS_ARMOR := 0.1
+const LIFELINE_HP := 0.3
+const LIFELINE_MIN := 300.0
+const LIFELINE_MAX := 650.0
+const LIFELINE_TIME := 3.0
+const LIFELINE_COOLDOWN := 90.0
+const IGNORE_PAIN := 0.3
+const IGNORE_PAIN_TIME := 3.0
+const DEFY_HEAL := 0.15
+const DEFY_TIME := 2.0
+const EVERLASTING_BASE := 100.0
+const EVERLASTING_MANA := 0.05
+const EVERLASTING_TIME := 3.0
+const EVERLASTING_COOLDOWN := 8.0
+const REBIRTH_STASIS := 4.0
+const REBIRTH_HP := 0.5
+const REBIRTH_MANA := 0.3
+const REBIRTH_COOLDOWN := 300.0
+const MAGEBANE_WAIT := 15.0
+const MAGEBANE_SHIELD := 0.15
 
 var lucian: Lucian
 var energize := EnergizeCharge.new()
@@ -92,6 +115,9 @@ var _combat_left := 0.0
 var _jaksho_tick := 0.0
 var _hatefog_left := 0.0
 var _rfc_shot_left := 0.0
+## Death's Dance's delayed damage: {rate, left}.
+var _bleeds: Array[Dictionary] = []
+var _magebane_wait := 0.0
 
 
 func setup(owner_lucian: Lucian) -> void:
@@ -135,6 +161,10 @@ func refresh() -> void:
 		_mana_charge_armed = false
 	if not has(&"jaksho_the_protean"):
 		jaksho_stacks = 0
+	if not has(&"deaths_dance"):
+		_bleeds.clear()
+	if not has(&"kaenic_rookern"):
+		_magebane_wait = 0.0
 
 
 ## Stat passives, applied after the level and item stats.
@@ -224,9 +254,75 @@ func before_damage(target: Enemy, info: DamageInfo) -> void:
 	info.amount *= multiplier
 
 
-## Death's Dance (Defy) reacts here.
+## Banshee's Veil: a spell shield blocks the next boss skill, whole.
+func before_damage_taken(info: DamageInfo) -> bool:
+	if info.from_skill and has(&"banshees_veil") and lucian.item_cooldown(&"banshees_veil").is_ready():
+		lucian.item_cooldown(&"banshees_veil").start(0.0 if lucian.cheat_no_cooldowns else ANNUL_COOLDOWN)
+		Sfx.play(&"buff")
+		return false
+	return true
+
+
+## Death's Dance: 30% of the hit is taken over 3 s instead. Returns what
+## lands now.
+func delay_damage(amount: float) -> float:
+	if not has(&"deaths_dance") or amount <= 0.0:
+		return amount
+	var delayed := amount * IGNORE_PAIN
+	_bleeds.append({"rate": delayed / IGNORE_PAIN_TIME, "left": IGNORE_PAIN_TIME})
+	return amount - delayed
+
+
+## Immortal Shieldbow: a hit that would leave Lucian under 30% HP first
+## gives him Lifeline (300 at level 1 to 650 at 18).
+func before_hp_loss(amount: float) -> void:
+	if not has(&"immortal_shieldbow") or not lucian.item_cooldown(&"immortal_shieldbow").is_ready():
+		return
+	if lucian.hp + lucian.shields.total() - amount >= lucian.stats.max_hp * LIFELINE_HP:
+		return
+	var share := (lucian.progress.level - 1) / float(ChampionProgress.MAX_LEVEL - 1)
+	lucian.add_shield(&"lifeline", lerpf(LIFELINE_MIN, LIFELINE_MAX, share), LIFELINE_TIME)
+	lucian.item_cooldown(&"immortal_shieldbow").start(0.0 if lucian.cheat_no_cooldowns else LIFELINE_COOLDOWN)
+
+
+## Thornmail answers a basic attack; any magic damage resets Kaenic
+## Rookern's wait. Being hit counts as being in combat.
+func on_damage_taken(info: DamageInfo, _amount: float) -> void:
+	_combat_left = COMBAT_TIME
+	if info.type == DamageInfo.Type.MAGIC:
+		_magebane_wait = 0.0
+	var attacker := info.attacker as Enemy
+	if has(&"thornmail") and info.source == &"basic" and Lucian.is_target(attacker):
+		attacker.take_damage(lucian.make_damage(THORNS_BASE + THORNS_BONUS_ARMOR * lucian.bonus_armor(), DamageInfo.Type.MAGIC, &"thornmail"))
+		attacker.add_status(Enemy.GRIEVOUS_WOUNDS, GRIEVOUS_DURATION, 1, _icon(&"thornmail"))
+
+
+## Guardian Angel: instead of dying, stasis then a revive. True when it saved him.
+func on_lethal() -> bool:
+	if not has(&"guardian_angel") or not lucian.item_cooldown(&"guardian_angel").is_ready():
+		return false
+	lucian.item_cooldown(&"guardian_angel").start(0.0 if lucian.cheat_no_cooldowns else REBIRTH_COOLDOWN)
+	_bleeds.clear()
+	var base_hp := lucian.base_stats.at_level(lucian.progress.level).max_hp
+	lucian.enter_stasis(REBIRTH_STASIS, base_hp * REBIRTH_HP, lucian.stats.max_mana * REBIRTH_MANA)
+	Sfx.play(&"buff")
+	return true
+
+
+## Death's Dance (Defy): a kill clears the delayed damage and heals 15%
+## max HP over 2 s.
 func on_kill() -> void:
-	pass
+	if has(&"deaths_dance"):
+		_bleeds.clear()
+		lucian.restores.start_amount(&"deaths_dance", lucian.stats.max_hp * DEFY_HEAL, 0.0, DEFY_TIME)
+
+
+## Fimbulwinter (Everlasting): slowing an enemy shields Lucian.
+func on_enemy_slowed() -> void:
+	if not has(&"fimbulwinter") or not lucian.item_cooldown(&"fimbulwinter").is_ready():
+		return
+	lucian.add_shield(&"everlasting", EVERLASTING_BASE + EVERLASTING_MANA * lucian.stats.max_mana, EVERLASTING_TIME)
+	lucian.item_cooldown(&"fimbulwinter").start(0.0 if lucian.cheat_no_cooldowns else EVERLASTING_COOLDOWN)
 
 
 func on_damage_dealt(target: Enemy, info: DamageInfo, _final_amount: float) -> void:
@@ -277,10 +373,46 @@ func buffs() -> Array[Dictionary]:
 		found.append(_buff(&"archangels_staff", "Mana Charge", _icon(&"archangels_staff"),
 			"+%d max [mana]mana[/mana] from skill hits (up to %d)." % [roundi(mana_charge), MANA_CHARGE_MAX],
 			str(roundi(mana_charge)), mana_charge >= MANA_CHARGE_MAX))
+	if has(&"banshees_veil") and lucian.item_cooldown(&"banshees_veil").is_ready():
+		found.append(_buff(&"banshees_veil", "Annul", _icon(&"banshees_veil"),
+			"A spell shield blocks the next enemy skill.", "", true))
+	if has(&"kaenic_rookern"):
+		var magebane := _buff(&"kaenic_rookern", "Magebane", _icon(&"kaenic_rookern"),
+			"A shield against [magic]magic damage[/magic] after %d s without magic damage." % roundi(MAGEBANE_WAIT), "", false)
+		if lucian.shields.has(&"magebane"):
+			magebane.count = str(roundi(lucian.shields.amount(&"magebane")))
+			magebane.ready = true
+		else:
+			magebane.left = MAGEBANE_WAIT - _magebane_wait
+			magebane.duration = MAGEBANE_WAIT
+		found.append(magebane)
+	for shield in [[&"lifeline", "Lifeline", &"immortal_shieldbow"], [&"everlasting", "Everlasting", &"fimbulwinter"]]:
+		if lucian.shields.has(shield[0]):
+			var buff := _buff(shield[0], shield[1], _icon(shield[2]),
+				"A shield absorbs damage.", str(roundi(lucian.shields.amount(shield[0]))), true)
+			buff.left = lucian.shields.time_left(shield[0])
+			buff.duration = lucian.shields.duration(shield[0])
+			found.append(buff)
 	return found
 
 
 func _physics_process(delta: float) -> void:
+	if not _bleeds.is_empty():
+		var bleed := 0.0
+		for entry in _bleeds:
+			var step := minf(delta, entry.left)
+			bleed += entry.rate * step
+			entry.left -= step
+		_bleeds.assign(_bleeds.filter(func(entry: Dictionary) -> bool: return entry.left > 0.0))
+		lucian.lose_hp(bleed, DamageInfo.Type.TRUE)
+	if has(&"kaenic_rookern"):
+		if not lucian.shields.has(&"magebane"):
+			_magebane_wait += delta
+			if _magebane_wait >= MAGEBANE_WAIT:
+				lucian.add_shield(&"magebane", lucian.stats.max_hp * MAGEBANE_SHIELD, 0.0, true)
+	elif lucian.shields.has(&"magebane"):
+		lucian.shields.remove(&"magebane")
+		_magebane_wait = 0.0
 	if _shojin_left > 0.0:
 		_shojin_left -= delta
 		if _shojin_left <= 0.0:
