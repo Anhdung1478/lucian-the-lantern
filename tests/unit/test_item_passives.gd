@@ -321,3 +321,22 @@ func test_unequipping_mid_cast_ends_the_shojin_arming() -> void:
 	lucian.inventory.clear()
 	skill_hit(&"q")
 	assert_eq(lucian.passives.shojin_stacks, 0)
+
+
+func test_rfc_ring_shows_from_full_energize_until_the_shot_lands() -> void:
+	equip(&"rapid_firecannon")
+	assert_false(lucian.passives.shows_rfc_ring())
+	lucian.passives.energize.value = 100.0
+	assert_true(lucian.passives.shows_rfc_ring())
+	var info := lucian.basic_attack(dummy)
+	assert_true(lucian.passives.shows_rfc_ring(), "the Energized shot is still flying")
+	dummy.take_damage(info)
+	assert_false(lucian.passives.shows_rfc_ring())
+
+
+func test_rfc_ring_gives_up_when_the_shot_never_lands() -> void:
+	equip(&"rapid_firecannon")
+	lucian.passives.energize.value = 100.0
+	lucian.basic_attack(dummy)
+	await wait_seconds(1.2)
+	assert_false(lucian.passives.shows_rfc_ring())

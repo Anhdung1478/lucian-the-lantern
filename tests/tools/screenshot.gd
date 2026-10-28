@@ -82,6 +82,8 @@ func _run(scenario: String) -> void:
 			await scenario_skillbar()
 		"stats":
 			await scenario_stats()
+		"rfc_ring":
+			await scenario_rfc_ring()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -795,3 +797,16 @@ func scenario_stats() -> void:
 	await mouse_move(control_center(grid.get_child(0)))
 	await wait_for_tooltip(grid.get_child(0))
 	await shot("stats_3_item_card")
+
+
+func scenario_rfc_ring() -> void:
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	equip_all([&"rapid_firecannon"])
+	lucian.passives.energize.value = 100.0
+	await wait(0.2)
+	print("ring while Energized (expect true): ", lucian.passives.shows_rfc_ring())
+	await shot("rfc_ring_0_ready")
+	lucian.command_attack(dummy)
+	await wait(1.5)
+	print("ring after the shot lands (expect false): ", lucian.passives.shows_rfc_ring())
+	await shot("rfc_ring_1_gone")

@@ -13,6 +13,8 @@ enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE, VISIT }
 ## Share of the attack period spent winding up before the shot leaves the gun.
 const WINDUP_RATIO := 0.15
 const RANGE_RING_COLOR := Color(1.0, 0.91, 0.66, 0.35)
+## Rapid Firecannon's Energized reach.
+const RFC_RING_COLOR := Color(0.62, 0.85, 1.0, 0.45)
 ## Distance from Lucian's center to his gun muzzles.
 const GUN_REACH := 44.0
 const MOVE_SPEED_ICON := preload("res://assets/art/ui/buff_move_speed.svg")
@@ -67,6 +69,7 @@ var _visit: Merchant
 var _attack_cooldown := 0.0
 var _windup_left := 0.0
 var _show_range_ring := false
+var _rfc_ring_shown := false
 var _cast_lock_left := 0.0
 var _dash_velocity := Vector2.ZERO
 var _dash_left := 0.0
@@ -424,6 +427,9 @@ func _physics_process(delta: float) -> void:
 		restore_mana(restored.y)
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	_tick_buffs(delta)
+	if passives.shows_rfc_ring() != _rfc_ring_shown:
+		_rfc_ring_shown = not _rfc_ring_shown
+		queue_redraw()
 	var was_dashing := is_dashing()
 	velocity = Vector2.ZERO
 	if _queued_slot >= 0 and not is_cast_locked() and not is_dashing():
@@ -510,6 +516,8 @@ func _refresh_stats(keep_share: bool) -> void:
 func _draw() -> void:
 	if _show_range_ring:
 		draw_arc(Vector2.ZERO, attack_range(), 0.0, TAU, 96, RANGE_RING_COLOR, 3.0, true)
+	elif _rfc_ring_shown:
+		draw_arc(Vector2.ZERO, stats.attack_range * (1.0 + ItemPassives.RFC_RANGE), 0.0, TAU, 96, RFC_RING_COLOR, 3.0, true)
 
 
 func _dash_step(delta: float) -> void:

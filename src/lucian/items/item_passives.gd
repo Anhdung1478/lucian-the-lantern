@@ -58,6 +58,9 @@ const STATIKK_TARGETS := 5
 const STATIKK_JUMP := 500.0
 const RFC_DAMAGE := 60.0
 const RFC_RANGE := 0.35
+## Seconds the RFC ring waits for the Energized shot to land before giving up
+## (its target may vanish).
+const RFC_RING_WAIT := 1.0
 const STORMRAZOR_DAMAGE := 90.0
 const STORMRAZOR_SPEED := 0.35
 const STORMRAZOR_DURATION := 1.5
@@ -88,6 +91,7 @@ var _mana_charge_armed := false
 var _combat_left := 0.0
 var _jaksho_tick := 0.0
 var _hatefog_left := 0.0
+var _rfc_shot_left := 0.0
 
 
 func setup(owner_lucian: Lucian) -> void:
@@ -163,6 +167,12 @@ func attack_range_bonus() -> float:
 	return RFC_RANGE if has(&"rapid_firecannon") and energize.is_ready() else 0.0
 
 
+## Rapid Firecannon's longer reach shows as a ring from full Energize until
+## the Energized shot lands.
+func shows_rfc_ring() -> bool:
+	return has(&"rapid_firecannon") and (energize.is_ready() or _rfc_shot_left > 0.0)
+
+
 func on_cast(_slot: ChampionProgress.Slot) -> void:
 	_shojin_armed = has(&"spear_of_shojin")
 	_mana_charge_armed = has(&"archangels_staff")
@@ -182,6 +192,8 @@ func on_basic_attack(target: Enemy, info: DamageInfo) -> void:
 		if energize.is_ready():
 			energize.consume()
 			info.procs.append(&"energized")
+			if has(&"rapid_firecannon"):
+				_rfc_shot_left = RFC_RING_WAIT
 		else:
 			energize.add_attack()
 	if has(&"kraken_slayer"):
@@ -269,6 +281,7 @@ func _physics_process(delta: float) -> void:
 		if _shojin_left <= 0.0:
 			shojin_stacks = 0
 	_hatefog_left = maxf(_hatefog_left - delta, 0.0)
+	_rfc_shot_left = maxf(_rfc_shot_left - delta, 0.0)
 	if _combat_left > 0.0:
 		_combat_left = maxf(_combat_left - delta, 0.0)
 		if has(&"jaksho_the_protean"):
@@ -323,6 +336,7 @@ func _on_skill_hit(target: Enemy, info: DamageInfo) -> void:
 
 
 func _energized_hit(target: Enemy) -> void:
+	_rfc_shot_left = 0.0
 	Sfx.play(&"zap")
 	if has(&"statikk_shiv"):
 		_chain_lightning(target)
