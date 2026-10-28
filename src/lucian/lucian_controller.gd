@@ -24,9 +24,9 @@ var _attack_move_armed := false
 
 
 func _ready() -> void:
-	# A right-click held from before a dash stops steering Lucian; a new
-	# click (during the dash or after it) walks on.
-	lucian.dash_started.connect(func() -> void: _move_held = false)
+	# A right-click held from before a dash or Flash stops steering Lucian; a
+	# new click (during the dash or after it) walks on.
+	lucian.move_dropped.connect(func() -> void: _move_held = false)
 
 
 func _unhandled_input(event: InputEvent) -> void:

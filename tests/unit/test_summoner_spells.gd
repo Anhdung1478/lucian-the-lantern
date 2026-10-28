@@ -122,6 +122,19 @@ func test_ghost_leaves_afterimages_behind_lucian_while_he_moves() -> void:
 	assert_eq(ghost_images().size(), 0)
 
 
+func test_barrier_shows_a_bubble_until_the_shield_is_gone() -> void:
+	lucian.summoners.set_spell(0, &"barrier")
+	assert_true(lucian.use_summoner(0, Vector2.ZERO))
+	var bubbles := func() -> Array: return lucian.get_children().filter(func(node: Node) -> bool: return node is BarrierBubble)
+	assert_eq(bubbles.call().size(), 1)
+	await wait_seconds(1.0)
+	assert_eq(bubbles.call().size(), 1, "still shielded")
+	# Shorten the shield; the bubble fades for 0.25 s once it is gone.
+	lucian.add_barrier(50.0, 0.1)
+	await wait_seconds(0.5)
+	assert_eq(bubbles.call().size(), 0)
+
+
 func test_barrier_runs_out() -> void:
 	lucian.add_barrier(50.0, 0.1)
 	await wait_seconds(0.2)

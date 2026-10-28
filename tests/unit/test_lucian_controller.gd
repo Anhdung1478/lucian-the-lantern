@@ -1,6 +1,6 @@
 extends GutTest
-## Player input around dashes: a move from before the dash is dropped, a
-## right-click during the dash is kept.
+## Player input around dashes and Flash: a move from before them is dropped,
+## a right-click during the dash or after it is kept.
 
 const Slot := ChampionProgress.Slot
 
@@ -10,6 +10,10 @@ var controller: LucianController
 
 func before_each() -> void:
 	lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	# Trails and sparks go here, so they are freed with the test.
+	var effects := Node2D.new()
+	add_child_autofree(effects)
+	lucian.projectile_parent = effects
 	add_child_autofree(lucian)
 	controller = lucian.get_node("Controller")
 	lucian.progress.set_level(3)
@@ -68,3 +72,22 @@ func test_a_dash_drops_a_merchant_visit() -> void:
 	var landed := lucian.global_position
 	await wait_seconds(0.3)
 	assert_almost_eq(lucian.global_position, landed, Vector2(0.5, 0.5), "no longer walking to the merchant")
+
+
+func test_flash_drops_a_move_held_from_before_it() -> void:
+	right_click()
+	assert_true(lucian.use_summoner(0, Vector2(300, 0)))
+	scroll_camera()
+	await wait_physics_frames(2)
+	var landed := lucian.global_position
+	await wait_seconds(0.3)
+	assert_almost_eq(lucian.global_position, landed, Vector2(0.5, 0.5), "stands where Flash landed")
+
+
+func test_a_right_click_after_flash_walks_on() -> void:
+	assert_true(lucian.use_summoner(0, Vector2(300, 0)))
+	right_click()
+	Input.action_release(&"move")
+	var landed := lucian.global_position
+	await wait_seconds(0.3)
+	assert_gt(lucian.global_position.distance_to(landed), 20.0, "walking to the new click")

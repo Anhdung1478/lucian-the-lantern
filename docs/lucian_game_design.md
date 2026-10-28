@@ -27,7 +27,7 @@
 
 | Input | Action |
 |---|---|
-| Right-click | Move (hold to keep following the cursor). A dash (E, Galeforce, Rocketbelt) drops a move or merchant visit ordered before it, even with the button still held: right-click again, during the dash or after it, to walk on. |
+| Right-click | Move (hold to keep following the cursor). A dash (E, Galeforce, Rocketbelt) or Flash drops a move or merchant visit ordered before it, even with the button still held: right-click again, during the dash or after it, to walk on. |
 | Left-click on enemy | Attack |
 | A + left-click | Attack-move |
 | Q / W / E / R | Skills |
@@ -254,9 +254,9 @@ Placeholder numbers. Ability haste doesn't shorten them, and each spell keeps it
 
 | Spell | Cooldown | Effect |
 |---|---|---|
-| Flash | 90 s | Blink up to 400 toward the cursor. If that spot is inside a wall or an enemy, land just short of it (so Flash can cross them). A blink leaves no trail: yellow sparks ring the spot Lucian left. |
+| Flash | 90 s | Blink up to 400 toward the cursor. If that spot is inside a wall or an enemy, land just short of it (so Flash can cross them). A blink leaves no trail: yellow sparks ring the spot Lucian left. Like a dash, it drops a move ordered before it. |
 | Ghost | 60 s | +40% move speed and pass through enemies for 6 s. Pale afterimages trail behind Lucian as he runs. |
-| Barrier | 60 s | Shield of 95 + 18 × level for 2.5 s; heal and shield power makes it stronger. |
+| Barrier | 60 s | Shield of 95 + 18 × level for 2.5 s; heal and shield power makes it stronger. A golden bubble shows around Lucian while it lasts. |
 | Heal | 60 s | Heal 80 + 15 × level, +30% move speed fading over 1 s. A green ring spreads out and crosses rise around Lucian. |
 | Clarity | 45 s | Restore 50% of max mana. Blue motes spiral into Lucian. |
 | Smite | 30 s | 450 true damage to the enemy nearest the cursor within 500, heal 10% of max HP. |

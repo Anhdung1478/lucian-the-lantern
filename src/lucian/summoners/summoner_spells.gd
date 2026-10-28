@@ -93,6 +93,11 @@ func use(slot: int, aim: Vector2) -> bool:
 			Sfx.play(&"potion")
 		&"barrier":
 			lucian.add_barrier(BARRIER_BASE + BARRIER_PER_LEVEL * lucian.progress.level, BARRIER_TIME)
+			# A new shield pops a new bubble.
+			for node in lucian.get_children():
+				if node is BarrierBubble:
+					node.queue_free()
+			_show_on_lucian(BarrierBubble.new())
 			Sfx.play(&"potion")
 		&"heal":
 			lucian.heal(HEAL_BASE + HEAL_PER_LEVEL * lucian.progress.level)
@@ -121,12 +126,14 @@ func _physics_process(delta: float) -> void:
 			lucian.spawn_under(image)
 
 
-## Heal's and Clarity's effects follow Lucian. None on low effects.
+## Barrier's, Heal's and Clarity's effects follow Lucian, drawn over his
+## body but under his HP bar. None on low effects.
 func _show_on_lucian(effect: Node2D) -> void:
 	if GameSettings.instance().low_effects():
 		effect.free()
 		return
 	lucian.add_child(effect)
+	lucian.move_child(effect, lucian.visuals.get_index() + 1)
 
 
 ## Blinks toward the cursor, at most FLASH_RANGE, stepping back until
