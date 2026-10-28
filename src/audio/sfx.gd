@@ -86,6 +86,12 @@ static func _generate(sound: StringName) -> AudioStreamWAV:
 				samples.append_array(_tone(0.11, note, note, 0.0, 0.0, 12.0))
 		&"zap":
 			samples = _tone(0.16, 1800.0, 600.0, 0.6, 1.0, 12.0, 70.0)
+		&"hurt":
+			samples = _tone(0.12, 220.0, 120.0, 0.4, 0.6, 18.0)
+		&"hook":
+			samples = _tone(0.25, 700.0, 250.0, 0.7, 0.3, 6.0, 40.0)
+		&"shell":
+			samples = _tone(0.3, 140.0, 50.0, 0.9, 0.2, 7.0)
 		&"buff":
 			samples = _tone(0.18, 600.0, 1200.0, 0.0, 0.0, 10.0)
 		_:

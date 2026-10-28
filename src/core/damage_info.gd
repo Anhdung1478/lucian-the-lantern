@@ -16,6 +16,8 @@ var magic_pen := 0.0
 ## Item effects this basic attack carries to its target, e.g. &"energized",
 ## &"kraken_slayer", &"spellblade".
 var procs: Array[StringName] = []
+## A boss or mini boss skill (Banshee's Veil blocks it).
+var from_skill := false
 
 
 static func create(amount: float, type: Type, source: StringName, attacker: Node = null, is_crit := false) -> DamageInfo:

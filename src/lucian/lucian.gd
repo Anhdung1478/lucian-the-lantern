@@ -15,6 +15,10 @@ signal merchant_reached(merchant: Merchant)
 signal move_dropped
 ## An enemy Lucian killed has just died.
 signal enemy_killed(enemy: Enemy)
+## Lucian died: the stage shows DEFEATED.
+signal died
+## A hit landed, after armor and before shields (the number shown).
+signal damage_received(info: DamageInfo, amount: float)
 
 enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE, VISIT, CAST }
 
@@ -37,6 +41,12 @@ const SPEED_BUFF_NAMES := {
 ## of combat (per second).
 const ICHORSHIELD_MAX := 300.0
 const ICHORSHIELD_DECAY := 100.0
+## Enemy hits reach Lucian within this distance of his center (+ theirs).
+const HIT_RADIUS := 30.0
+## Seconds Lucian greys out and fades after dying.
+const DEATH_FADE := 1.5
+const HURT_FLASH := Color(1.0, 0.45, 0.45)
+const STASIS_TINT := Color(1.6, 1.35, 0.5)
 
 @export var base_stats: UnitStats
 @export var item_catalog: ItemCatalog
@@ -54,10 +64,22 @@ var item_cooldowns := {}
 var stats: StatBlock
 var hp := 0.0
 var mana := 0.0
-## Absorbs damage before HP (Bloodthirster).
-var shield := 0.0
-## Barrier's shield, on top of `shield`, until it runs out.
-var barrier := 0.0
+var shields := Shields.new()
+## Bloodthirster's Ichorshield (kept as a property for older callers).
+var shield: float:
+	get:
+		return shields.amount(&"ichorshield")
+	set(value):
+		shields.set_amount(&"ichorshield", minf(value, ICHORSHIELD_MAX))
+## Barrier's shield.
+var barrier: float:
+	get:
+		return shields.amount(&"barrier")
+var dead := false
+## Cutscenes and the debug God mode: every hit is refused.
+var invulnerable := false
+## Act 1's first play: every shot leaves the left gun.
+var one_gun := false
 ## Where spawned shots go. Set by the stage.
 var projectile_parent: Node
 ## Debug: values >= 0 replace Lucian's crit chance.
@@ -111,8 +133,10 @@ var _next_gun := LucianVisuals.Gun.LEFT
 var _queued_aim := Vector2.ZERO
 ## Ghost: seconds left passing through enemies.
 var _ghost_left := 0.0
-var _barrier_left := 0.0
-var _barrier_duration := 0.0
+var _displace_velocity := Vector2.ZERO
+var _displace_left := 0.0
+var _stasis_left := 0.0
+var _revive := Vector2.ZERO
 
 @onready var visuals: LucianVisuals = $Visuals
 @onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
@@ -207,6 +231,8 @@ func try_rank_up(slot: ChampionProgress.Slot) -> bool:
 ## During R only E can be cast, and pressing R again stops R. A cast blocked
 ## only by a cast time or a dash is queued when queue_casts is on.
 func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
+	if not can_act():
+		return false
 	var culling := skills[ChampionProgress.Slot.R] as TheCulling
 	if culling.is_channeling() and slot == ChampionProgress.Slot.R:
 		culling.stop()
@@ -270,7 +296,7 @@ func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> vo
 		var healing := final_amount * stats.lifesteal
 		var overheal := healing * (1.0 + stats.heal_shield_power) - heal(healing)
 		if passives.has(&"bloodthirster") and overheal > 0.0:
-			shield = minf(shield + overheal, ICHORSHIELD_MAX)
+			shield = shield + overheal
 	passives.on_damage_dealt(target, info, final_amount)
 	if info.source == &"lightslinger":
 		skills[ChampionProgress.Slot.E].cooldown.reduce(passive.e_cooldown_reduction)
@@ -343,6 +369,8 @@ func use_item(index: int) -> bool:
 ## Keys 1-6: drinks the potion, or uses the item active, in equip slot `slot`
 ## (0-5).
 func use_equip_slot(slot: int, aim: Vector2) -> bool:
+	if not can_act():
+		return false
 	var index := Inventory.EQUIP_START + slot
 	if inventory.is_locked(index):
 		return false
@@ -358,6 +386,8 @@ func use_equip_slot(slot: int, aim: Vector2) -> bool:
 
 ## D and F: casts the summoner spell on `slot` (0-1) toward `aim`.
 func use_summoner(slot: int, aim: Vector2) -> bool:
+	if not can_act():
+		return false
 	if summoners.use(slot, aim):
 		return true
 	var spell := summoners.spell_in(slot)
@@ -427,17 +457,128 @@ func basic_attack(target: Enemy) -> DamageInfo:
 	return info
 
 
-## The Ichorshield and Barrier together.
+## Every shield together.
 func total_shield() -> float:
-	return shield + barrier
+	return shields.total()
 
 
 ## Barrier: a shield of `amount` (made stronger by heal and shield power) for
 ## `seconds`, replacing an older one.
 func add_barrier(amount: float, seconds: float) -> void:
-	barrier = amount * (1.0 + stats.heal_shield_power)
-	_barrier_left = seconds
-	_barrier_duration = seconds
+	add_shield(&"barrier", amount, seconds)
+
+
+## A shield made stronger by heal and shield power (Barrier, Lifeline,
+## Everlasting, Magebane).
+func add_shield(id: StringName, amount: float, seconds: float, magic_only := false) -> void:
+	shields.add(id, amount * (1.0 + stats.heal_shield_power), seconds, magic_only)
+
+
+## A hit from an enemy. False when it is refused: Lucian is dead, in stasis
+## or untouchable. Armor or magic resist lower it, then the shields and HP
+## take it.
+func take_damage(info: DamageInfo) -> bool:
+	if dead or invulnerable or in_stasis():
+		return false
+	var amount := DamageCalc.mitigate(info.amount, info.type, stats.armor, stats.mr, info.armor_pen, info.magic_pen)
+	damage_received.emit(info, amount)
+	lose_hp(amount, info.type)
+	_flash_hurt()
+	return true
+
+
+## HP lost through the shields; Lucian dies at 0.
+func lose_hp(amount: float, type: DamageInfo.Type) -> void:
+	if dead or in_stasis():
+		return
+	hp -= shields.absorb(amount, type)
+	if hp <= 0.0:
+		hp = 0.0
+		_die()
+
+
+## Skip between waves: the HP and mana regen of `seconds`, at once.
+func restore_for(seconds: float) -> void:
+	if dead:
+		return
+	hp = minf(hp + stats.hp_regen * seconds, stats.max_hp)
+	mana = minf(mana + stats.mana_regen * seconds, stats.max_mana)
+
+
+## Forced movement (Thresh's hook, Flay): Lucian slides to `to` and can't
+## move, attack or cast until he lands. Walls stop him. Drops his orders,
+## windup and queued cast, and stops R. No trail, no Energize.
+func displace(to: Vector2, speed: float) -> void:
+	if dead or in_stasis():
+		return
+	var offset := to - global_position
+	_cancel_windup()
+	_order = Order.NONE
+	_queued_slot = -1
+	_cast_lock_left = 0.0
+	(skills[ChampionProgress.Slot.R] as TheCulling).stop()
+	_displace_velocity = offset.normalized() * speed if offset.length() > 1.0 else Vector2.ZERO
+	_displace_left = offset.length() / speed
+	collision_mask = Layers.WORLD
+	move_dropped.emit()
+
+
+func is_displaced() -> bool:
+	return _displace_left > 0.0
+
+
+## Guardian Angel: `seconds` of stasis, then back with these HP and mana.
+func enter_stasis(seconds: float, revive_hp: float, revive_mana: float) -> void:
+	_stasis_left = seconds
+	_revive = Vector2(revive_hp, revive_mana)
+	hp = 0.0
+	_order = Order.NONE
+	_cancel_windup()
+	visuals.modulate = STASIS_TINT
+
+
+func in_stasis() -> bool:
+	return _stasis_left > 0.0
+
+
+## Lucian can take orders and cast.
+func can_act() -> bool:
+	return not dead and not in_stasis() and not is_displaced()
+
+
+## Armor above what his level alone gives (Thornmail).
+func bonus_armor() -> float:
+	return maxf(stats.armor - base_stats.at_level(progress.level).armor, 0.0)
+
+
+func _die() -> void:
+	dead = true
+	_order = Order.NONE
+	_cancel_windup()
+	_displace_left = 0.0
+	collision_layer = 0
+	(skills[ChampionProgress.Slot.R] as TheCulling).stop()
+	visuals.modulate = Color(0.55, 0.55, 0.55)
+	create_tween().tween_property(visuals, "modulate:a", 0.0, DEATH_FADE)
+	died.emit()
+
+
+func _flash_hurt() -> void:
+	if dead or in_stasis():
+		return
+	Sfx.play(&"hurt", -8.0)
+	visuals.modulate = HURT_FLASH
+	create_tween().tween_property(visuals, "modulate", Color.WHITE, 0.2)
+
+
+func _displace_step(delta: float) -> void:
+	velocity = _displace_velocity * minf(delta, _displace_left) / delta
+	move_and_slide()
+	velocity = Vector2.ZERO
+	_displace_left -= delta
+	if _displace_left <= 0.0 or get_slide_collision_count() > 0:
+		_displace_left = 0.0
+		collision_mask = _body_mask()
 
 
 ## Ghost: Lucian passes through enemies (walls still stop him) for `seconds`.
@@ -530,7 +671,8 @@ func buffs() -> Array[Dictionary]:
 	if barrier > 0.0:
 		found.append({"id": &"barrier", "name": "Barrier", "icon": SummonerSpells.find(&"barrier").icon,
 			"text": "A shield that absorbs %d damage." % roundi(barrier),
-			"count": str(roundi(barrier)), "left": _barrier_left, "duration": _barrier_duration, "ready": false})
+			"count": str(roundi(barrier)), "left": shields.time_left(&"barrier"),
+			"duration": shields.duration(&"barrier"), "ready": false})
 	found.append_array(passives.buffs())
 	return found
 
@@ -628,6 +770,8 @@ func make_damage(amount: float, type: DamageInfo.Type, source: StringName, crit 
 ## Lucian fires his guns in turn: basic attacks, Lightslinger's second shot
 ## and R's bullets all take the next one.
 func next_gun() -> LucianVisuals.Gun:
+	if one_gun:
+		return LucianVisuals.Gun.LEFT
 	var gun := _next_gun
 	_next_gun = LucianVisuals.Gun.RIGHT if gun == LucianVisuals.Gun.LEFT else LucianVisuals.Gun.LEFT
 	return gun
@@ -669,6 +813,15 @@ func aim_direction(aim: Vector2) -> Vector2:
 
 
 func _physics_process(delta: float) -> void:
+	if dead:
+		return
+	if _stasis_left > 0.0:
+		_stasis_left -= delta
+		if _stasis_left <= 0.0:
+			hp = _revive.x
+			mana = _revive.y
+			visuals.modulate = Color.WHITE
+		return
 	hp = minf(hp + stats.hp_regen * delta, stats.max_hp)
 	mana = stats.max_mana if cheat_infinite_mana else minf(mana + stats.mana_regen * delta, stats.max_mana)
 	if not restores.is_empty():
@@ -682,6 +835,10 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 	var was_dashing := is_dashing()
 	velocity = Vector2.ZERO
+	if _displace_left > 0.0:
+		_displace_step(delta)
+		_last_position = global_position
+		return
 	if _queued_slot >= 0 and not is_cast_locked() and not is_dashing():
 		var queued := _queued_slot as ChampionProgress.Slot
 		_queued_slot = -1
@@ -745,10 +902,7 @@ func _tick_buffs(delta: float) -> void:
 		cooldown.reduce(delta)
 	if shield > 0.0 and not passives.in_combat():
 		shield = maxf(shield - ICHORSHIELD_DECAY * delta, 0.0)
-	if _barrier_left > 0.0:
-		_barrier_left -= delta
-		if _barrier_left <= 0.0:
-			barrier = 0.0
+	shields.tick(delta)
 	if _ghost_left > 0.0:
 		_ghost_left -= delta
 		if _ghost_left <= 0.0:
@@ -788,11 +942,12 @@ func _refresh_stats(keep_share: bool) -> void:
 	stats = base_stats.at_level(progress.level, _stat_bonus())
 	passives.adjust_stats(stats)
 	_scale_by_skin(stats)
+	var hp_floor := 0.0 if dead or in_stasis() else 1.0
 	if keep_share:
-		hp = clampf(hp / old.max_hp * stats.max_hp, 1.0, stats.max_hp)
+		hp = clampf(hp / old.max_hp * stats.max_hp, hp_floor, stats.max_hp)
 		mana = mana / old.max_mana * stats.max_mana if old.max_mana > 0.0 else 0.0
 	else:
-		hp = clampf(hp + stats.max_hp - old.max_hp, 1.0, stats.max_hp)
+		hp = clampf(hp + stats.max_hp - old.max_hp, hp_floor, stats.max_hp)
 		mana = clampf(mana + stats.max_mana - old.max_mana, 0.0, stats.max_mana)
 	queue_redraw()
 

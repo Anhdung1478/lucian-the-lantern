@@ -37,6 +37,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not lucian.can_act():
+		return
 	if event is InputEventMouseButton and event.pressed:
 		# A focused debug SpinBox would otherwise keep eating Q/W/E/R.
 		get_viewport().gui_release_focus()
@@ -176,6 +178,8 @@ func _ready_to_cast(action: StringName) -> bool:
 
 
 func _physics_process(_delta: float) -> void:
+	if not lucian.can_act():
+		_move_held = false
 	if not _move_held:
 		return
 	# Polled so a release eaten by the GUI still ends the hold.

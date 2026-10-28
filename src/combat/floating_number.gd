@@ -13,11 +13,14 @@ const RISE := 70.0
 const DRIFT := 35.0
 const LIFETIME := 0.9
 
+var _is_crit := false
 
-func setup(amount: float, type: DamageInfo.Type, is_crit: bool) -> void:
+
+func setup(amount: float, type: DamageInfo.Type, is_crit: bool, size_scale := 1.0) -> void:
+	_is_crit = is_crit
 	text = str(roundi(amount)) + ("!" if is_crit else "")
 	var settings := LabelSettings.new()
-	settings.font_size = CRIT_SIZE if is_crit else NORMAL_SIZE
+	settings.font_size = roundi((CRIT_SIZE if is_crit else NORMAL_SIZE) * size_scale)
 	settings.font_color = COLORS[type]
 	settings.outline_size = 6
 	settings.outline_color = Color(0, 0, 0, 0.85)
@@ -34,7 +37,7 @@ func _ready() -> void:
 	tween.tween_property(self, "position:y", position.y - RISE, LIFETIME).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tween.tween_property(self, "position:x", position.x + randf_range(-DRIFT, DRIFT), LIFETIME).set_ease(Tween.EASE_OUT)
 	tween.tween_property(self, "modulate:a", 0.0, LIFETIME * 0.4).set_delay(LIFETIME * 0.6)
-	if label_settings.font_size == CRIT_SIZE:
+	if _is_crit:
 		scale = Vector2(1.4, 1.4)
 		tween.tween_property(self, "scale", Vector2.ONE, 0.2)
 	tween.chain().tween_callback(queue_free)
