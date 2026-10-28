@@ -8,6 +8,11 @@ const EXTRA_DUMMY_RING := 300.0
 ## Up, right, left and up-right of the first dummy: never toward the merchant.
 const EXTRA_DUMMY_ANGLES := [-PI / 2.0, 0.0, PI, -PI / 4.0]
 
+## The stage is over: &"left" now; &"cleared" and &"failed" come with waves.
+signal finished(result: StringName)
+## Exit the game was chosen in the menu.
+signal exit_requested
+
 var wallet := Wallet.new()
 ## The merchant on the map, or null.
 var merchant: Merchant
@@ -41,7 +46,10 @@ func _ready() -> void:
 	lucian.queue_casts = settings.get_value(&"queue_casts")
 	screens.settings.setup(settings)
 	screens.controller = lucian.get_node("Controller")
-	add_child(Sfx.new())
+	if not Sfx.exists():
+		add_child(Sfx.new())
+	screens.menu.leave_requested.connect(func() -> void: finished.emit(&"left"))
+	screens.menu.exit_requested.connect(_exit)
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	camera.setup(lucian, arena.get_bounds().grow(TestArena.WALL_THICKNESS))
 	lucian.projectile_parent = $Projectiles
@@ -56,6 +64,14 @@ func _ready() -> void:
 	lucian.merchant_reached.connect(_open_shop)
 	screens.backpack.traded.connect(func(ok: bool) -> void: Sfx.play(&"coin" if ok else &"error"))
 	add_merchant()
+
+
+## Run alone (no Game around it) the stage closes the game itself.
+func _exit() -> void:
+	if exit_requested.get_connections().is_empty():
+		get_tree().quit()
+	else:
+		exit_requested.emit()
 
 
 ## Puts a new merchant at the map center, replacing any old one. A new

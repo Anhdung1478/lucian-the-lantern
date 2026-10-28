@@ -1,10 +1,12 @@
 class_name GameMenu
 extends CanvasLayer
-## The ESC menu: Resume, Settings, Leave this stage, Exit the game. Leave
-## this stage is not built yet, so it is shown disabled.
+## The ESC menu: Resume, Settings, Leave this stage, Exit the game. The last
+## two only ask; the stage and the game root act on them.
 
 signal resume_requested
 signal settings_requested
+signal leave_requested
+signal exit_requested
 
 const BUTTON_SIZE := Vector2(340, 56)
 
@@ -40,8 +42,8 @@ func _build() -> void:
 	box.add_child(HSeparator.new())
 	_button(box, "Resume", func() -> void: resume_requested.emit())
 	_button(box, "Settings", func() -> void: settings_requested.emit())
-	_button(box, "Leave this stage", Callable())
-	_button(box, "Exit the game", func() -> void: get_tree().quit())
+	_button(box, "Leave this stage", func() -> void: leave_requested.emit())
+	_button(box, "Exit the game", func() -> void: exit_requested.emit())
 
 
 ## A button without an action is shown disabled, with a hover note.

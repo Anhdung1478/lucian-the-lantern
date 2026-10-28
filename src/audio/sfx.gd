@@ -18,6 +18,11 @@ var _next := 0
 var _last_played := {}
 
 
+## True when an Sfx node is in the tree.
+static func exists() -> bool:
+	return _node != null
+
+
 static func play(sound: StringName, volume_db := 0.0, pitch := 1.0) -> void:
 	if _node == null:
 		return
