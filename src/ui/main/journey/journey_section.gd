@@ -2,8 +2,8 @@ class_name JourneySection
 extends Control
 ## The Journey page of the main screen: tabs Act 1 to Act 6, Training and
 ## Endless across the top, the open tab's page on the left and the D/F
-## loadout on the right. Tabs unlock along the Journey chain. Nothing here
-## saves.
+## loadout on the right. It opens on Training. Tabs unlock along the Journey
+## chain. Nothing here saves.
 
 signal start_training
 
@@ -62,7 +62,7 @@ func _ready() -> void:
 	save.changed.connect(refresh)
 	save.tree.changed.connect(refresh)
 	refresh()
-	show_tab(0)
+	show_tab(TRAINING_TAB)
 
 
 ## Shows tab `index`; a locked tab stays closed.

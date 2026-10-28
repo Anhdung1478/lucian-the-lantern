@@ -149,6 +149,11 @@ func test_stat_ad_at_level_two_reads_now_and_next() -> void:
 	assert_eq(section.info.level_label.text, "LVL 2 / 5")
 
 
+func test_the_info_panel_is_opaque() -> void:
+	var style := section.info.get_theme_stylebox(&"panel") as StyleBoxFlat
+	assert_eq(style.bg_color.a, 1.0)
+
+
 func test_a_maxed_node_shows_only_its_value_in_green() -> void:
 	_buy(&"stat_ad", 5)
 	section.select(&"stat_ad")

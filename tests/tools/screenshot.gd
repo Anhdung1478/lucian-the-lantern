@@ -1,12 +1,18 @@
 extends SceneTree
-## Visual check harness. Loads the stage, drives Lucian by calling his commands
-## directly, and saves viewport screenshots. Needs a real window (not --headless).
+## Visual check harness. Loads the stage (or, for the main screen scenarios,
+## the whole game), drives it by calling its commands directly, and saves
+## viewport screenshots. Needs a real window (not --headless).
 ## Usage: godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
 
 const SETTINGS_PATH := "user://screenshot_settings.json"
+const SAVE_PREFIX := "user://screenshot_save_slot_"
+## Scenarios that start from the game's root scene (the main screen).
+const GAME_SCENARIOS := ["training_setup", "skins_stage"]
 
 var stage: Node
 var lucian: Lucian
+## The Game root, for the main screen scenarios and the Training they start.
+var game_root: Game
 var out_dir := ""
 
 
@@ -18,9 +24,24 @@ func _initialize() -> void:
 	if FileAccess.file_exists(SETTINGS_PATH):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS_PATH))
 	GameSettings._instance = GameSettings.new(SETTINGS_PATH)
+	# Scratch save slots too, so every run starts from a new game.
+	var save := SaveGame.new(SAVE_PREFIX)
+	for n in range(1, SaveGame.SLOTS + 1):
+		for file in [save.path(n), save.backup_path(n)]:
+			if FileAccess.file_exists(file):
+				DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
+	save.load_slot(1)
+	SaveGame._instance = save
 	if scenario == "art_sheet":
 		# Art only: no stage, and no stretch, so a 32 px icon is 32 real pixels.
 		root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
+		_run.call_deferred(scenario)
+		return
+	if scenario.begins_with("main_") or scenario in GAME_SCENARIOS:
+		game_root = load("res://src/main/game.tscn").instantiate()
+		# "Save before leaving?" must never close the run.
+		game_root.quit_game = func() -> void: print("quit_game called")
+		root.add_child(game_root)
 		_run.call_deferred(scenario)
 		return
 	stage = load("res://src/stage/stage.tscn").instantiate()
@@ -99,6 +120,26 @@ func _run(scenario: String) -> void:
 			await scenario_cast_modes()
 		"art_sheet":
 			await scenario_art_sheet()
+		"main_journey":
+			await scenario_main_journey()
+		"main_acts":
+			await scenario_main_acts()
+		"main_endless":
+			await scenario_main_endless()
+		"main_tree":
+			await scenario_main_tree()
+		"main_tree_max":
+			await scenario_main_tree_max()
+		"main_skins":
+			await scenario_main_skins()
+		"main_gear":
+			await scenario_main_gear()
+		"main_debug":
+			await scenario_main_debug()
+		"training_setup":
+			await scenario_training_setup()
+		"skins_stage":
+			await scenario_skins_stage()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -406,7 +447,7 @@ func scenario_backpack() -> void:
 ## stray OS motion event can move the hover off `source`; then it is hovered
 ## again, and the retry is counted.
 func wait_for_tooltip(source: Control, timeout := 4.0) -> void:
-	var tip: HoverTip = stage.get_node("HoverTip")
+	var tip := hover_tip()
 	var start := Time.get_ticks_msec()
 	var since := start
 	var retries := 0
@@ -419,6 +460,15 @@ func wait_for_tooltip(source: Control, timeout := 4.0) -> void:
 	print("tooltip for %s shown: " % source.get_class(), tip.is_showing() and tip._source == source,
 		" after %.2f s of resting, %d re-hovers" % [(Time.get_ticks_msec() - since) / 1000.0, retries])
 	await wait(0.1)
+
+
+## The HoverTip of what is on screen: the stage's or the main screen's.
+func hover_tip() -> HoverTip:
+	var screen: Node = stage if game_root == null else game_root.screen
+	for child in screen.get_children():
+		if child is HoverTip:
+			return child
+	return null
 
 
 func scenario_craft() -> void:
@@ -1005,3 +1055,399 @@ func scenario_art_sheet() -> void:
 	print("art icons: ", paths.size() - missing, " / ", paths.size())
 	await wait(0.3)
 	await shot("art_sheet_0")
+
+
+# --- Phase 5: the main screen, and Training started from it ---------------
+
+
+func main_screen() -> MainScreen:
+	return game_root.screen as MainScreen
+
+
+func journey() -> JourneySection:
+	return main_screen().sections[MainScreen.SECTION_JOURNEY] as JourneySection
+
+
+func tree_section() -> TreeSection:
+	return main_screen().sections[MainScreen.SECTION_TREE] as TreeSection
+
+
+func main_debug() -> MainDebugTable:
+	return main_screen().get_node("MainDebugTable") as MainDebugTable
+
+
+## Every button under `node` reading `text`, in tree order.
+func find_buttons(node: Node, text: String) -> Array[Button]:
+	var found: Array[Button] = []
+	for child in node.find_children("*", "Button", true, false):
+		if (child as Button).text == text:
+			found.append(child)
+	return found
+
+
+## Journey → Start Training, as the player does it: the stage is built from
+## the save. `stage` and `lucian` point at it afterwards.
+func start_training() -> void:
+	main_screen().show_section(MainScreen.SECTION_JOURNEY)
+	journey().show_tab(JourneySection.TRAINING_TAB)
+	journey().training_page.start_button.pressed.emit()
+	stage = game_root.screen
+	lucian = (stage as Stage).lucian
+	# The stage confines the mouse; give it back during automated runs.
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	(stage as Stage).camera.mode = StageCamera.Mode.FOLLOW
+	await wait(0.4)
+
+
+## ESC menu → Leave this stage: the stage-done auto-save, then the main screen.
+func leave_stage() -> void:
+	(stage as Stage).screens.menu.leave_requested.emit()
+	await wait(0.2)
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	print("left the stage: main screen (expect true): ", game_root.screen is MainScreen,
+		"  save file written (expect true): ", FileAccess.file_exists(SaveGame.instance().path(1)))
+	stage = null
+	lucian = null
+
+
+func locked_tab_names(section: JourneySection) -> Array:
+	return section.tabs.filter(func(tab: JourneyTab) -> bool: return tab.locked).map(
+		func(tab: JourneyTab) -> String: return tab.text)
+
+
+## Journey's Training tab with the loadout on a new save, then with spells
+## bought: the spell menu for F, and a pick that swaps D and F.
+func scenario_main_journey() -> void:
+	var section := journey()
+	var loadout := section.loadout
+	await wait(0.2)
+	print("opens on Journey, Training tab (expect true true): ",
+		main_screen().sections[MainScreen.SECTION_JOURNEY].visible, " ", section.training_page.visible)
+	print("new save: D reads (expect None), F chained (expect true): ", loadout.picks[0].text, " ", loadout.picks[1].disabled)
+	await shot("main_journey_0_training")
+	var save := SaveGame.instance()
+	save.essences.add(Essences.BLUE, 2000)
+	save.essences.add(Essences.ORANGE, 10)
+	for id: StringName in [&"flash", &"ghost", &"heal", &"smite", &"summoner_slot_2"]:
+		save.tree.buy(id, save.essences)
+	save.set_loadout(0, &"flash")
+	save.set_loadout(1, &"heal")
+	await wait(0.1)
+	print("2nd slot bought: F chained (expect false): ", loadout.picks[1].disabled)
+	loadout.open_menu(1)
+	await wait(0.1)
+	print("menu lists (expect [flash, ghost, heal, smite]): ", loadout.menu.spell_ids())
+	await shot("main_journey_1_spell_menu")
+	loadout.menu.pick(&"flash")
+	await wait(0.1)
+	print("Flash on F swaps (expect [heal, flash]): ", save.loadout)
+	await shot("main_journey_2_swapped")
+
+
+## Act 1 on a new save; then the debug table's "Acts cleared" at 2: Act 3
+## with its skulls and chains, and Act 2 cleared.
+func scenario_main_acts() -> void:
+	var section := journey()
+	section.show_tab(0)
+	await wait(0.2)
+	print("locked tabs on a new save (expect Act 2-6 and Endless): ", locked_tab_names(section))
+	await shot("main_acts_0_act1")
+	var spin: SpinBox = main_debug().find_children("*", "SpinBox", true, false)[0]
+	spin.value = 2
+	print("acts cleared after the debug spin (expect 2): ", Journey.acts_cleared(SaveGame.instance().cleared))
+	print("locked tabs (expect Act 4-6 and Endless): ", locked_tab_names(section))
+	section.show_tab(2)
+	await wait(0.2)
+	var cards := section.act_pages[2].cards
+	print("Act 3 cards locked (expect [false, true, true, true, true]): ",
+		cards.map(func(card: StageCard) -> bool: return card.locked))
+	print("Act 3 skulls (expect [false, true, false, true, true]): ",
+		cards.map(func(card: StageCard) -> bool: return card.skull.visible))
+	await shot("main_acts_1_act3")
+	section.show_tab(1)
+	await wait(0.2)
+	print("Act 2 cards cleared (expect [true, true, true]): ",
+		section.act_pages[1].cards.map(func(card: StageCard) -> bool: return card.cleared))
+	await shot("main_acts_2_act2_cleared")
+
+
+## The Endless tab locked (hovered: what to clear), then open after Act 3.
+func scenario_main_endless() -> void:
+	var section := journey()
+	var tab := section.tabs[JourneySection.ENDLESS_TAB]
+	await wait(0.2)
+	print("Endless locked on a new save (expect true): ", tab.locked,
+		"  hover (expect Clear Act 3 first): ", tab.get_meta(&"hover_text", ""))
+	await mouse_move(control_center(tab))
+	await wait_for_tooltip(tab)
+	await shot("main_endless_0_locked")
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(Journey.ENDLESS_ACT))
+	section.show_tab(JourneySection.ENDLESS_TAB)
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.2)
+	print("after Act 3: Endless locked, shown (expect false true): ", tab.locked, " ", section.endless_page.visible)
+	print("best wave (expect Best wave: 0): ", section.endless_page.best_label.text)
+	await shot("main_endless_1_open")
+
+
+## The Evolution Tree on a new save; then with essence, some nodes bought and
+## the info panel open; a drag that starts on a node; zoomed out to 0.6.
+func scenario_main_tree() -> void:
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	var map := section.map
+	await wait(0.3)
+	print("new save: Q, passive, E (expect poor hidden hidden): ",
+		[map.views[&"skill_q"].state(), map.views[&"passive"].state(), map.views[&"skill_e"].state()])
+	await shot("main_tree_0_new_save")
+	var save := SaveGame.instance()
+	save.essences.add(Essences.BLUE, 10000)
+	save.essences.add(Essences.ORANGE, 100)
+	for id: StringName in [&"skill_q", &"skill_q", &"skill_w", &"passive", &"stat_ad", &"stat_ad",
+			&"stat_hp", &"equip_slots", &"flash"]:
+		section.select(id)
+		section.info.cost_bar.buy()
+	section.select(&"stat_ad")
+	await wait(0.2)
+	print("Q level, state (expect 2 bought): ", save.tree.level(&"skill_q"), " ", map.views[&"skill_q"].state())
+	print("stat_ad panel (expect LVL 2 / 5, +8 AD → +12 AD): ", section.info.level_label.text, ", ", section.info.value_label.text)
+	print("blue left (expect 10000 - 1050 = 8950): ", save.essences.amount(Essences.BLUE))
+	await shot("main_tree_1_bought_info")
+	section.select(&"skill_r")
+	await wait(0.2)
+	print("R hidden (expect ???, LOCKED): ", section.info.name_label.text, ", ", section.info.cost_bar.status.text)
+	print("R requires: ", section.info.requires_label.text)
+	await shot("main_tree_2_hidden_info")
+	section.close_popup()
+	# A drag that starts on top of a node pans the map (real input routing).
+	var start := control_center(map.views[&"skill_w"])
+	var before := map.layer.position.x
+	await mouse_move(start)
+	await mouse_button(start, true)
+	for step in 6:
+		await mouse_move(start + Vector2(-40.0 * (step + 1), 0.0), true)
+	await mouse_button(start + Vector2(-240.0, 0.0), false)
+	print("drag from a node: moved (expect -240), panel shown (expect false): ",
+		roundi(map.layer.position.x - before), " ", section.info.visible)
+	await click(map.views[&"stat_hp"])
+	print("click on a node selects it (expect stat_hp): ", section.info.id)
+	section.close_popup()
+	await mouse_move(Vector2(960, 140))
+	await hover_node(map.views[&"skill_q"])
+	await shot("main_tree_3_hover")
+	await mouse_move(Vector2(960, 140))
+	map.zoom_at(Vector2.ZERO, 0.6)
+	map.pan_by(Vector2(10000, 0))
+	await wait(0.2)
+	print("zoom (expect 0.6): ", map.zoom)
+	await shot("main_tree_4_zoom_06")
+	map.pan_by(Vector2(-10000, 0))
+	await wait(0.2)
+	await shot("main_tree_5_zoom_06_right")
+
+
+func hover_node(view: TreeNodeView) -> void:
+	await mouse_move(control_center(view))
+	await wait_for_tooltip(view)
+
+
+## Debug Max tree: every node maxed and every line lit, at zoom 0.6 from
+## both ends, then the Summoners grove at zoom 1 with a node chosen.
+func scenario_main_tree_max() -> void:
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	var map := section.map
+	find_buttons(main_debug(), "Max tree (free)")[0].pressed.emit()
+	await wait(0.2)
+	var maxed := map.views.values().filter(func(view: TreeNodeView) -> bool: return view.state() == &"maxed").size()
+	print("maxed nodes (expect 31): ", maxed)
+	map.zoom_at(Vector2.ZERO, 0.6)
+	await wait(0.2)
+	await shot("main_tree_max_0_left")
+	map.pan_by(Vector2(-10000, 0))
+	await wait(0.2)
+	await shot("main_tree_max_1_right")
+	map.zoom_at(map.size, 1.0)
+	map.pan_by(Vector2(-10000, 0))
+	section.select(&"heal_upgrade")
+	await wait(0.2)
+	print("heal_upgrade (expect +45% healing, MAXED): ", section.info.value_label.text, ", ", section.info.cost_bar.status.text)
+	await shot("main_tree_max_2_summoners")
+
+
+## The Skin Shop with 0 purple, then with 100 purple: Vampire bought and
+## equipped.
+func scenario_main_skins() -> void:
+	main_screen().show_section(MainScreen.SECTION_SKINS)
+	var shop := main_screen().sections[MainScreen.SECTION_SKINS] as SkinShop
+	var buttons := func() -> Array:
+		return shop.cards.map(func(card: SkinCard) -> String:
+			return "%s%s" % [card.button.text, " (off)" if card.button.disabled else ""])
+	await wait(0.3)
+	print("0 purple (expect Equipped (off), then Purchase N (off) x4): ", buttons.call())
+	await shot("main_skins_0_zero")
+	var save := SaveGame.instance()
+	save.essences.add(Essences.PURPLE, 100)
+	var vampire := shop.cards[4]
+	vampire.button.pressed.emit()
+	print("bought Vampire: purple (expect 75), skin (expect classic): ", save.essences.amount(Essences.PURPLE), " ", save.skin)
+	vampire.button.pressed.emit()
+	await wait(0.2)
+	print("equipped (expect vampire): ", save.skin, "  buttons: ", buttons.call())
+	print("no file written (expect false): ", FileAccess.file_exists(save.path(1)))
+	await shot("main_skins_1_vampire")
+
+
+## The gear menu (Leave to main menu disabled and hovered), Save and its
+## toast, the slot list, the overwrite question and "Save before leaving?".
+func scenario_main_gear() -> void:
+	var main := main_screen()
+	var save := SaveGame.instance()
+	main.gear.open()
+	await wait(0.2)
+	var leave := main.gear.find_button("Leave to main menu")
+	print("Leave to main menu disabled (expect true): ", leave.disabled)
+	await mouse_move(control_center(leave))
+	await wait_for_tooltip(leave)
+	await shot("main_gear_0_menu")
+	await mouse_move(Vector2(960, 1000))
+	main.gear.find_button("Save").pressed.emit()
+	await wait(0.1)
+	print("Save: slot 1 written (expect true), toast (expect Saved to slot 1): ",
+		FileAccess.file_exists(save.path(1)), " ", main.toast_text())
+	await shot("main_gear_1_toast")
+	main.gear.open()
+	main.gear.show_slots()
+	main.gear.find_button("Slot 2 · empty").pressed.emit()
+	print("copied to an empty slot 2 without asking (expect false true): ", main.confirm.is_open(), " ",
+		save.slot_exists(2), "  toast: ", main.toast_text())
+	main.gear.open()
+	main.gear.show_slots()
+	await wait(0.2)
+	print("slot list: ", main.gear._slot_buttons.map(func(button: Button) -> String: return button.text))
+	await shot("main_gear_2_slots")
+	main.gear._slot_buttons[1].pressed.emit()
+	await wait(0.1)
+	print("slot 2 exists, so it asks (expect true): ", main.confirm.is_open())
+	await shot("main_gear_3_overwrite")
+	main.confirm.answer(false)
+	main.gear.open()
+	main.gear.find_button("Exit the game").pressed.emit()
+	await wait(0.2)
+	print("Exit asks to save (expect true): ", game_root.prompt.is_open())
+	await shot("main_gear_4_save_prompt")
+	game_root.prompt.answer(false)
+	paused = false
+
+
+## The main screen's debug table: F3 + Q, the Essences tab after +1000 blue
+## and +10 purple, then the Progress tab.
+func scenario_main_debug() -> void:
+	var table := main_debug()
+	var save := SaveGame.instance()
+	print("hidden at start (expect false): ", table.visible)
+	await press_key(KEY_F3, true)
+	await press_key(KEY_Q, true)
+	await press_key(KEY_Q, false)
+	await press_key(KEY_F3, false)
+	print("shown after F3 + Q (expect true): ", table.visible)
+	find_buttons(table, "+1000")[0].pressed.emit()
+	find_buttons(table, "+10")[1].pressed.emit()
+	await wait(0.2)
+	print("blue, purple (expect 1000 10): ", save.essences.amount(Essences.BLUE), " ", save.essences.amount(Essences.PURPLE),
+		"  bar reads (expect 1000): ", main_screen().essence_bar.amount_label(Essences.BLUE).text)
+	await shot("main_debug_0_essences")
+	var tabs: TabContainer = table.find_children("*", "TabContainer", true, false)[0]
+	tabs.current_tab = 1
+	await wait(0.2)
+	await shot("main_debug_1_progress")
+	await press_key(KEY_F3, true)
+	await press_key(KEY_Q, true)
+	await press_key(KEY_Q, false)
+	await press_key(KEY_F3, false)
+	print("hidden after F3 + Q again (expect false): ", table.visible)
+
+
+## Start Training from a new save: locked ranks, the locked passive, one
+## equip slot, an empty D and a chained F (with their cards), and the stage
+## debug table. Then back, Max tree with Flash and Heal: everything open, the
+## upgrade line on a spell card and the cheaper refresh in the shop.
+func scenario_training_setup() -> void:
+	await start_training()
+	var hud: Hud = stage.get_node("Hud")
+	var row := hud.skill_row
+	var count := row.get_child_count()
+	print("new save: bought (expect [0, 0, 0, 0]): ", lucian.progress.bought)
+	print("passive learned, charged (expect false false): ", lucian.passive.learned, " ", lucian.passive.charged)
+	print("equip slots (expect 1): ", lucian.inventory.unlocked_equip, "  shop slots (expect 2): ", (stage as Stage).shop_slots)
+	print("D/F (expect empty, empty), open (expect 1): ", lucian.summoners.slots, " ", lucian.summoners.open_slots)
+	await shot("training_setup_0_new_save")
+	await mouse_move(control_center(row.get_child(count - 2)))
+	await wait_for_tooltip(row.get_child(count - 2))
+	await shot("training_setup_1_d_empty")
+	await mouse_move(control_center(row.get_child(count - 1)))
+	await wait_for_tooltip(row.get_child(count - 1))
+	await shot("training_setup_2_f_chained")
+	await mouse_move(Vector2(960, 300))
+	var table: DebugTable = stage.get_node("DebugTable")
+	table.visible = true
+	await wait(0.2)
+	var pickers := table._summoner_pickers.map(func(picker: OptionButton) -> String: return picker.get_item_text(picker.selected))
+	print("debug D/F pickers (expect [None, None]): ", pickers, "  Buy all ranks buttons (expect 1): ", find_buttons(table, "Buy all ranks").size())
+	await shot("training_setup_3_debug_table")
+	table.visible = false
+	await leave_stage()
+	var save := SaveGame.instance()
+	save.tree.max_all()
+	save.set_loadout(0, &"flash")
+	save.set_loadout(1, &"heal")
+	await start_training()
+	row = (stage.get_node("Hud") as Hud).skill_row
+	var stats := lucian.stats
+	print("max tree: bought (expect [5, 5, 5, 3]), passive (expect true): ", lucian.progress.bought, " ", lucian.passive.learned)
+	print("equip slots (expect 6), shop slots (expect 4): ", lucian.inventory.unlocked_equip, " ", (stage as Stage).shop_slots)
+	print("D/F (expect flash heal, 2 open): ", lucian.summoners.slots, " ", lucian.summoners.open_slots)
+	print("AD (expect 80), max HP (expect 800): ", stats.ad, " ", stats.max_hp, "  tree bonus: ", lucian.tree_bonus)
+	await shot("training_setup_4_max_tree")
+	await mouse_move(control_center(row.get_child(count - 1)))
+	await wait_for_tooltip(row.get_child(count - 1))
+	print("Heal upgrade (expect Upgraded: 45% stronger): ", lucian.summoners.upgrade_text(&"heal"))
+	await shot("training_setup_5_upgrade_card")
+	await mouse_move(Vector2(960, 300))
+	(stage as Stage)._open_shop((stage as Stage).merchant)
+	await wait(0.3)
+	var panel := (stage as Stage).screens.backpack.shop_panel()
+	print("shop open (expect true), refresh button (expect Refresh  50): ", (stage as Stage).screens.is_shopping(), " ", panel._refresh.text)
+	await shot("training_setup_6_shop_refresh")
+
+
+## Each skin in Training: its body, HUD portrait and stats. Bought and
+## equipped on the main screen, then Start Training, then Leave this stage.
+func scenario_skins_stage() -> void:
+	var save := SaveGame.instance()
+	var expected := {
+		&"classic": "AD 60, AS 0.65, MS 335, HP 600",
+		&"high_noon": "AD 69, AS 0.5525",
+		&"project": "AD 54, AS 0.78, MS 385.25",
+		&"pulsefire": "AS 0.585, AH 15",
+		&"vampire": "HP 480, LS 0.15",
+	}
+	for i in Skins.ALL.size():
+		var skin := Skins.ALL[i]
+		save.essences.add(Essences.PURPLE, skin.cost)
+		save.buy_skin(skin.id)
+		save.equip_skin(skin.id)
+		await start_training()
+		(stage as Stage).camera.zoom = Vector2(1.6, 1.6)
+		# Holding C shows the extra stats too (life steal for Vampire).
+		Input.action_press(&"toggle_stats")
+		await wait(0.3)
+		var stats := lucian.stats
+		var body := (lucian.get_node("Visuals/Body") as Sprite2D).texture == skin.body
+		var portrait := (stage.get_node("Hud") as Hud).portrait.texture == skin.portrait
+		print("%s (expect %s): AD %s, AS %s, MS %s, HP %s, AH %s, LS %s; body %s, portrait %s" % [
+			skin.id, expected[skin.id], stats.ad, stats.attack_speed, stats.move_speed, stats.max_hp,
+			stats.ability_haste, stats.lifesteal, body, portrait])
+		await shot("skins_stage_%d_%s" % [i, skin.id])
+		Input.action_release(&"toggle_stats")
+		await leave_stage()

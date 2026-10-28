@@ -69,6 +69,12 @@ func test_save_writes_slot_one_and_toasts() -> void:
 	assert_eq(main.toast_text(), "Saved to slot 1")
 
 
+func test_the_toast_stays_in_the_top_bar() -> void:
+	main.show_toast("Saved to slot 1")
+	await wait_process_frames(1)
+	assert_lte(main._toast.get_global_rect().end.y, MainScreen.TOP_BAR)
+
+
 func test_copy_to_an_empty_slot_writes_without_asking() -> void:
 	_press("Save as copy")
 	_press("Slot 2 · empty")

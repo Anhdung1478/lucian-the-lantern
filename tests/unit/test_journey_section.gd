@@ -28,6 +28,19 @@ func test_a_new_save_locks_acts_two_to_six_and_endless() -> void:
 	assert_true(section.tabs[JourneySection.ENDLESS_TAB].locked)
 
 
+func test_opens_on_training() -> void:
+	assert_eq(section.current, JourneySection.TRAINING_TAB)
+	assert_true(section.training_page.visible)
+	assert_false(section.act_pages[0].visible)
+
+
+func test_a_locked_tab_label_starts_right_of_its_chain() -> void:
+	var endless := section.tabs[JourneySection.ENDLESS_TAB]
+	assert_eq(endless.get_theme_stylebox(&"disabled").content_margin_left, JourneyTab.CHAIN_ROOM)
+	_save().set_cleared(Journey.all_stage_ids(Journey.ENDLESS_ACT))
+	assert_lt(endless.get_theme_stylebox(&"normal").content_margin_left, JourneyTab.CHAIN_ROOM)
+
+
 func test_locked_tabs_say_what_to_clear() -> void:
 	assert_eq(section.tabs[1].get_meta(&"hover_text"), "Clear Act 1 first")
 	assert_eq(section.tabs[JourneySection.ENDLESS_TAB].get_meta(&"hover_text"), "Clear Act 3 first")

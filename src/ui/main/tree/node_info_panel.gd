@@ -22,7 +22,8 @@ var cost_bar: CostBar
 func _init(evolution_tree: EvolutionTree, essences: Essences) -> void:
 	tree = evolution_tree
 	custom_minimum_size.x = WIDTH
-	add_theme_stylebox_override(&"panel", UiStyle.panel(UiStyle.PANEL_COLOR, UiStyle.BORDER_COLOR, 2, 20.0))
+	# Opaque: the nodes and lines under it must not show through.
+	add_theme_stylebox_override(&"panel", UiStyle.panel(Color(UiStyle.PANEL_COLOR, 1.0), UiStyle.BORDER_COLOR, 2, 20.0))
 	visible = false
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override(&"separation", 10)
