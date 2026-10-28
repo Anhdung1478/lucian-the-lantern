@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="384" viewBox="0 0 96 96">
+  <!-- PROJECT Lucian portrait: black armor with cyan neon lines, a visor over the eyes and a chrome gun, on a digital blue grid. -->
+  <defs>
+    <radialGradient id="bg" cx="0.5" cy="0.4" r="0.72">
+      <stop offset="0" stop-color="#1a6ad0"/>
+      <stop offset="0.5" stop-color="#0b2f72"/>
+      <stop offset="1" stop-color="#040b1e"/>
+    </radialGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6a4532"/>
+      <stop offset="1" stop-color="#4d3122"/>
+    </linearGradient>
+    <linearGradient id="armor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#262b36"/>
+      <stop offset="1" stop-color="#0c0e13"/>
+    </linearGradient>
+    <linearGradient id="visor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d2236"/>
+      <stop offset="1" stop-color="#14405e"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5f6b78"/>
+      <stop offset="0.45" stop-color="#f0f5fa"/>
+      <stop offset="1" stop-color="#7d8894"/>
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" fill="url(#bg)"/>
+  <!-- digital grid and data blocks -->
+  <path d="M 0 8 H 96 M 0 20 H 96 M 0 32 H 96 M 0 44 H 96 M 0 56 H 96 M 0 68 H 96 M 0 80 H 96 M 8 0 V 96 M 20 0 V 96 M 32 0 V 96 M 64 0 V 96 M 76 0 V 96 M 88 0 V 96" stroke="#38e8ff" stroke-width="0.4" opacity="0.18"/>
+  <g fill="#38e8ff">
+    <rect x="9" y="9" width="10" height="2" opacity="0.5"/>
+    <rect x="21" y="45" width="10" height="2" opacity="0.35"/>
+    <rect x="77" y="21" width="10" height="2" opacity="0.45"/>
+    <rect x="65" y="9" width="4" height="10" opacity="0.25"/>
+    <rect x="9" y="57" width="4" height="10" opacity="0.3"/>
+    <rect x="89" y="45" width="6" height="2" opacity="0.4"/>
+    <rect x="3" y="33" width="4" height="2" opacity="0.5"/>
+  </g>
+  <circle cx="48" cy="38" r="30" fill="#38e8ff" opacity="0.08"/>
+  <!-- black armor: shoulder plates and chest, cyan neon seams -->
+  <path d="M 8 96 Q 12 70 34 64 L 62 64 Q 84 70 88 96 Z" fill="url(#armor)"/>
+  <path d="M 8 96 Q 10 74 26 68 L 32 77 Q 21 82 19 96 Z" fill="#1c2029"/>
+  <path d="M 88 96 Q 86 74 70 68 L 64 77 Q 75 82 77 96 Z" fill="#1c2029"/>
+  <g fill="none" stroke="#38e8ff" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 26 68 L 32 77 Q 21 82 19 96 M 70 68 L 64 77 Q 75 82 77 96 M 36 66 L 48 81 L 60 66 M 48 81 L 48 96" stroke-width="3.5" opacity="0.25"/>
+    <path d="M 26 68 L 32 77 Q 21 82 19 96 M 70 68 L 64 77 Q 75 82 77 96 M 36 66 L 48 81 L 60 66 M 48 81 L 48 96" stroke-width="1.1"/>
+    <path d="M 13 84 L 22 79 M 83 84 L 74 79" stroke-width="0.8" opacity="0.7"/>
+  </g>
+  <path d="M 45 84 L 48 87 L 51 84 L 48 81 Z" fill="#b8fbff"/>
+  <!-- neck and armored collar -->
+  <path d="M 41 54 L 41 64 L 55 64 L 55 54 Z" fill="#4d3122"/>
+  <path d="M 37 57 Q 48 62 59 57 L 60 66 L 36 66 Z" fill="#1c2029"/>
+  <path d="M 37 57 Q 48 62 59 57" fill="none" stroke="#38e8ff" stroke-width="1"/>
+  <!-- head -->
+  <path d="M 31 34 Q 31 18 48 17 Q 65 18 65 34 L 64 44 Q 62 58 48 62 Q 34 58 32 44 Z" fill="url(#skin)"/>
+  <!-- short hair with a neon circuit line -->
+  <path d="M 31 33 Q 31 16 48 15 Q 65 16 65 33 Q 60 24 48 24 Q 36 24 31 33 Z" fill="#141010"/>
+  <path d="M 34 27 L 38 21 L 46 19 M 62 27 L 58 21 L 50 19" fill="none" stroke="#38e8ff" stroke-width="0.7" opacity="0.8"/>
+  <!-- nose -->
+  <path d="M 48 43 L 46 48 L 50 48" fill="none" stroke="#3e271b" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- moustache and goatee -->
+  <path d="M 42 52 Q 48 49 54 52" fill="none" stroke="#141010" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 44 56 Q 48 62 52 56 L 50 55 Q 48 57 46 55 Z" fill="#141010"/>
+  <!-- ear pieces and the visor over the eyes -->
+  <rect x="27" y="34" width="6" height="11" rx="1.5" fill="#1c2029" stroke="#38e8ff" stroke-width="0.7"/>
+  <rect x="63" y="34" width="6" height="11" rx="1.5" fill="#1c2029" stroke="#38e8ff" stroke-width="0.7"/>
+  <path d="M 30 34 L 66 34 L 64.5 44 Q 48 46.5 31.5 44 Z" fill="url(#visor)" stroke="#38e8ff" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M 34 39.5 L 62 39.5" stroke="#38e8ff" stroke-width="4" stroke-linecap="round" opacity="0.3"/>
+  <path d="M 34 39.5 L 62 39.5" stroke="#b8fbff" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M 33 36 L 44 36" stroke="#ffffff" stroke-width="0.6" stroke-linecap="round" opacity="0.5"/>
+  <!-- chrome gun raised beside him -->
+  <g transform="rotate(8 81 60)">
+    <path d="M 78.5 38 L 83.5 38 L 84.5 41 L 84.5 62 L 77.5 62 L 77.5 41 Z" fill="url(#chrome)" stroke="#2a3038" stroke-width="0.6" stroke-linejoin="round"/>
+    <path d="M 81 41 L 81 59" stroke="#38e8ff" stroke-width="1.1" stroke-linecap="round"/>
+    <path d="M 77.5 62 L 84.5 62 L 87 77 L 80.5 78 Z" fill="#1c2029" stroke="#38e8ff" stroke-width="0.6" stroke-linejoin="round"/>
+    <path d="M 77 66 L 88 66 L 89 100 L 76 100 Z" fill="#1c2029" stroke="#38e8ff" stroke-width="0.6" stroke-linejoin="round"/>
+    <path d="M 76.6 78 L 88.4 78" stroke="#38e8ff" stroke-width="1.2"/>
+    <rect x="76.5" y="65" width="11" height="11" rx="3" fill="#14171e" stroke="#38e8ff" stroke-width="0.6"/>
+    <path d="M 76.8 68.5 L 82 68.5 M 76.8 71.5 L 82 71.5 M 76.8 74.5 L 82 74.5" stroke="#38e8ff" stroke-width="0.6" stroke-linecap="round"/>
+  </g>
+</svg>

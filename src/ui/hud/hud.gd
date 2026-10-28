@@ -39,6 +39,7 @@ var _shield_overlay := Control.new()
 var _skill_slots: Array[SkillSlot] = []
 
 @onready var bottom_panel: PanelContainer = %BottomPanel
+@onready var portrait: TextureRect = %Portrait
 @onready var stats_panel: StatsPanel = %StatsPanel
 @onready var skill_row: HBoxContainer = %SkillRow
 @onready var item_grid: GridContainer = %ItemGrid
@@ -55,6 +56,7 @@ func setup(target: Lucian, stage_wallet: Wallet) -> void:
 	wallet = stage_wallet
 	wallet.changed.connect(_show_gold)
 	_show_gold(wallet.gold)
+	portrait.texture = target.skin.portrait
 	stats_panel.lucian = target
 	extra_stats.lucian = target
 	_add_skill_slot(null, PASSIVE_ICON, "", SkillSlot.PASSIVE_SIZE)

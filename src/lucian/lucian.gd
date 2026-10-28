@@ -76,6 +76,10 @@ var cheat_infinite_mana := false
 ## ends, aimed where the key was pressed, like LoL's spell buffering. Only the
 ## latest press is kept.
 var queue_casts := true
+## The equipped skin: its body art, stat changes and kill heal.
+var skin: SkinData = Skins.ALL[0]
+## Flat stats from the Evolution Tree's stat nodes, keyed like ItemStats.
+var tree_bonus := {}
 
 var _order := Order.NONE
 var _move_point := Vector2.ZERO
@@ -131,8 +135,9 @@ func _ready() -> void:
 	health_bar.name = "HealthBar"
 	health_bar.position = Vector2(0, -HEALTH_BAR_HEIGHT)
 	add_child(health_bar)
-	stats = base_stats.at_level(progress.level)
+	stats = base_stats.at_level(progress.level, _stat_bonus())
 	passives.adjust_stats(stats)
+	_scale_by_skin(stats)
 	hp = stats.max_hp
 	mana = stats.max_mana
 	_last_position = global_position
@@ -255,7 +260,8 @@ func before_damage(target: Enemy, info: DamageInfo) -> void:
 
 ## Called by an enemy after it takes damage from Lucian. Life steal works on
 ## basic attacks (and the passive's second shot); omnivamp on every hit. With
-## Bloodthirster, life steal healing past full HP becomes a shield.
+## Bloodthirster, life steal healing past full HP becomes a shield. A skin's
+## kill heal works on the hit that kills.
 func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> void:
 	if stats.omnivamp > 0.0:
 		heal(final_amount * stats.omnivamp)
@@ -264,6 +270,8 @@ func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> vo
 		var overheal := healing * (1.0 + stats.heal_shield_power) - heal(healing)
 		if passives.has(&"bloodthirster") and overheal > 0.0:
 			shield = minf(shield + overheal, ICHORSHIELD_MAX)
+	if skin.kill_heal > 0.0 and target.hp <= 0.0:
+		heal(stats.max_hp * skin.kill_heal)
 	passives.on_damage_dealt(target, info, final_amount)
 	if info.source == &"lightslinger":
 		skills[ChampionProgress.Slot.E].cooldown.reduce(passive.e_cooldown_reduction)
@@ -281,6 +289,13 @@ func heal(amount: float) -> float:
 
 func restore_mana(amount: float) -> void:
 	mana = minf(mana + amount, stats.max_mana)
+
+
+## Wears `new_skin`: its body art and stats. Keeps the HP and mana share.
+func apply_skin(new_skin: SkinData) -> void:
+	skin = new_skin
+	($Visuals/Body as Sprite2D).texture = skin.body
+	_refresh_stats(true)
 
 
 ## Drinks the potion in inventory cell `index`. False when there is none.
@@ -718,13 +733,30 @@ func _track_movement(dashing: bool) -> void:
 		passives.on_moved(moved, dashing)
 
 
-## Recomputes stats from the level and the equipped items. Leveling up grants
-## the max HP / mana gained, like LoL. Item changes keep the current share of
-## HP and mana instead, so swapping items can never refill them.
+## Items, tree and skin flat stats together, for UnitStats.at_level().
+func _stat_bonus() -> Dictionary:
+	var total := inventory.equipped_bonus()
+	for source: Dictionary in [tree_bonus, skin.flat]:
+		for key: StringName in source:
+			total[key] = total.get(key, 0.0) + source[key]
+	return total
+
+
+## Skin multipliers (AD, AP, max HP), after item passives.
+func _scale_by_skin(block: StatBlock) -> void:
+	for key: StringName in skin.scale:
+		block.set(key, block.get(key) * skin.scale[key])
+
+
+## Recomputes stats from the level, the equipped items, the tree and the
+## skin. Leveling up grants the max HP / mana gained, like LoL. Item and skin
+## changes keep the current share of HP and mana instead, so swapping items
+## can never refill them.
 func _refresh_stats(keep_share: bool) -> void:
 	var old := stats
-	stats = base_stats.at_level(progress.level, inventory.equipped_bonus())
+	stats = base_stats.at_level(progress.level, _stat_bonus())
 	passives.adjust_stats(stats)
+	_scale_by_skin(stats)
 	if keep_share:
 		hp = clampf(hp / old.max_hp * stats.max_hp, 1.0, stats.max_hp)
 		mana = mana / old.max_mana * stats.max_mana if old.max_mana > 0.0 else 0.0

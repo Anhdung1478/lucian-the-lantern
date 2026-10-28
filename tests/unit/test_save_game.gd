@@ -138,6 +138,20 @@ func test_tree_levels_round_trip() -> void:
 	assert_eq(loaded.tree.to_dict(), save_game.tree.to_dict())
 
 
+func test_unknown_skin_is_dropped() -> void:
+	_write_text(save_game.path(1), JSON.stringify({"skins": {"owned": ["high_noon", "golden", "Vampire", "vampire"], "equipped": "golden"}}))
+	save_game.load_slot(1)
+	assert_eq(save_game.owned_skins, [&"classic", &"high_noon", &"vampire"] as Array[StringName])
+	assert_eq(save_game.skin, &"classic")
+
+
+func test_equipped_skin_not_owned_is_classic() -> void:
+	_write_text(save_game.path(1), JSON.stringify({"skins": {"owned": ["high_noon"], "equipped": "vampire"}}))
+	save_game.load_slot(1)
+	assert_eq(save_game.owned_skins, [&"classic", &"high_noon"] as Array[StringName])
+	assert_eq(save_game.skin, &"classic")
+
+
 func test_unknown_cleared_id_is_dropped() -> void:
 	_write_text(save_game.path(1), JSON.stringify({"cleared": ["1-1", "9-9", "x"]}))
 	save_game.load_slot(1)

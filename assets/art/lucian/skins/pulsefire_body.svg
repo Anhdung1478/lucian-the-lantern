@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Pulsefire Lucian, top-down, facing +X: white-blue armor with glowing cyan pulse cores and a holo visor. Center of the image = center of his body. -->
+  <defs>
+    <radialGradient id="muzzle">
+      <stop offset="0" stop-color="#f0ffff"/>
+      <stop offset="0.4" stop-color="#7fd8ff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#3a8cff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.35" stop-color="#7ff8ff"/>
+      <stop offset="0.6" stop-color="#2ee6ff" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#2ee6ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a9bcd8"/>
+      <stop offset="1" stop-color="#f2f6fc"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(64 64)">
+    <!-- shadow -->
+    <ellipse cx="-4" cy="3" rx="34" ry="30" fill="#000000" opacity="0.28"/>
+    <!-- white armor plates behind him, with pulse cores -->
+    <path d="M -4 -23 L -38 -33 Q -47 -16 -45 -3 L -16 -2 Z" fill="url(#coat)" stroke="#3a6cc8" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M -4 23 L -38 33 Q -47 16 -45 3 L -16 2 Z" fill="url(#coat)" stroke="#3a6cc8" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M -18 -12 L -32 -16 M -18 12 L -32 16" stroke="#2ee6ff" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="-34" cy="-17" r="7" fill="url(#core)"/>
+    <circle cx="-34" cy="17" r="7" fill="url(#core)"/>
+    <!-- arms reaching forward -->
+    <path d="M 0 -20 L 20 -15" stroke="#dfe8f5" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 0 20 L 20 15" stroke="#dfe8f5" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 4 -21 L 18 -17" stroke="#3a6cc8" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 4 21 L 18 17" stroke="#3a6cc8" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- white guns with glowing cores -->
+    <path d="M 18 -19 L 42 -18 L 44 -15 L 42 -12 L 18 -11 Z" fill="#eef3fb" stroke="#3a6cc8" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 18 19 L 42 18 L 44 15 L 42 12 L 18 11 Z" fill="#eef3fb" stroke="#3a6cc8" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 33 -15 L 41 -15" stroke="#2ee6ff" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 33 15 L 41 15" stroke="#2ee6ff" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="29" cy="-15" r="5" fill="url(#core)"/>
+    <circle cx="29" cy="15" r="5" fill="url(#core)"/>
+    <!-- white gloves -->
+    <circle cx="20" cy="-15" r="4.5" fill="#c8d6ea" stroke="#3a6cc8" stroke-width="1"/>
+    <circle cx="20" cy="15" r="4.5" fill="#c8d6ea" stroke="#3a6cc8" stroke-width="1"/>
+    <!-- muzzle light -->
+    <circle cx="46" cy="-15" r="7" fill="url(#muzzle)"/>
+    <circle cx="46" cy="15" r="7" fill="url(#muzzle)"/>
+    <!-- shoulders and torso, a pulse line down the back -->
+    <ellipse cx="0" cy="0" rx="15" ry="26" fill="#e6edf8" stroke="#3a6cc8" stroke-width="2"/>
+    <path d="M -10 -21 L -10 21" stroke="#2ee6ff" stroke-width="2"/>
+    <circle cx="-10" cy="0" r="6" fill="url(#core)"/>
+    <!-- high collar -->
+    <path d="M -7 -15 Q 6 0 -7 15" fill="none" stroke="#3a6cc8" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- head: short black hair, a white headset band and the holo visor in front -->
+    <circle cx="2" cy="0" r="11" fill="#5a3a2a"/>
+    <circle cx="0" cy="0" r="9.5" fill="#171313"/>
+    <path d="M 0 -10 L 0 10" stroke="#eef3fb" stroke-width="3"/>
+    <circle cx="0" cy="-10.5" r="3.5" fill="#eef3fb" stroke="#3a6cc8" stroke-width="1"/>
+    <circle cx="0" cy="10.5" r="3.5" fill="#eef3fb" stroke="#3a6cc8" stroke-width="1"/>
+    <circle cx="0" cy="-10.5" r="1.4" fill="#2ee6ff"/>
+    <circle cx="0" cy="10.5" r="1.4" fill="#2ee6ff"/>
+    <path d="M 6 -10 Q 15 0 6 10 Q 10 0 6 -10 Z" fill="#5ff4ff" fill-opacity="0.45" stroke="#bff8ff" stroke-width="1.2" stroke-linejoin="round"/>
+  </g>
+</svg>

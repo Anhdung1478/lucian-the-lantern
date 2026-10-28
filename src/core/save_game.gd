@@ -160,7 +160,8 @@ func _read(file_path: String) -> Dictionary:
 	return json.data
 
 
-## Each key is type-checked and falls back to the new-game value.
+## Each key is type-checked and falls back to the new-game value. Unknown
+## skin and stage ids are dropped.
 func _apply(data: Dictionary) -> void:
 	var saved_tree: Variant = data.get("tree", {})
 	tree.from_dict(saved_tree if saved_tree is Dictionary else {})
@@ -172,7 +173,7 @@ func _apply(data: Dictionary) -> void:
 	var saved_owned: Variant = skin_data.get("owned", [])
 	if saved_owned is Array:
 		for id: Variant in saved_owned:
-			if id is String and not StringName(id) in owned:
+			if id is String and Skins.find(StringName(id)).id == StringName(id) and not StringName(id) in owned:
 				owned.append(StringName(id))
 	owned_skins = owned
 	var equipped: Variant = skin_data.get("equipped", "")

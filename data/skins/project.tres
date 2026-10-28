@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SkinData" format=3]
+
+[ext_resource type="Script" path="res://src/core/skin_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/lucian/skins/project_portrait.svg" id="2_portrait"]
+[ext_resource type="Texture2D" path="res://assets/art/lucian/skins/project_body.svg" id="3_body"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"project"
+display_name = "PROJECT"
+cost = 30
+portrait = ExtResource("2_portrait")
+body = ExtResource("3_body")
+bonuses = PackedStringArray("+20% Attack Speed", "+15% Move Speed")
+weaknesses = PackedStringArray("−10% AD")
+playstyle = "Fast, always moving, faster energized stacks"
+flat = Dictionary[StringName, float]({
+&"attack_speed": 0.2,
+&"move_speed_pct": 0.15
+})
+scale = Dictionary[StringName, float]({
+&"ad": 0.9
+})
