@@ -868,6 +868,8 @@ Everything in the plan is in place, one commit per task (Tasks 0–9), then the 
 - **Regen per second** shows at the right end of the HUD's HP and mana bars.
 - **One regen stat:** the extra table's `regen` cell shows "health / mana" per second with one icon (`assets/art/stats/regen.svg`); the separate `hp_regen` / `mana_regen` stat keys and icons are gone. The extra table is 2 × 4, like the main one.
 
+- **Bonus stats in yellow:** `StatsPanel` compares each value with `base_stats.at_level(level)` (Lucian's level alone), as shown on screen, so tiny float differences never count. A difference turns the number yellow (`StatCell.BONUS_COLOR`), and the hover card adds "base + bonus".
+
 ### Running the checks
 
 ```

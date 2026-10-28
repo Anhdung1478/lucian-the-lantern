@@ -65,6 +65,7 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | Remove Rocketbelt's move speed | Gone. |
 | HP bar for Lucian; regen per second on the bars | A green HP bar above Lucian's head (shields in white). The HUD's HP and mana bars show "+0.8/s" and "+1.6/s" at the right end. |
 | One regen stat in the extra table | One cell with a heart-and-droplet icon: "0.8 / 1.6" (health / mana per second). The extra table is now 2 × 4. |
+| Stats with a bonus in yellow; base + bonus on hover | A number turns yellow when items, passives, buffs or cheats add to what the level alone gives. Its hover card shows "60 base + 22 bonus" with the bonus in yellow. |
 
 ## Choices I made where the request was open
 

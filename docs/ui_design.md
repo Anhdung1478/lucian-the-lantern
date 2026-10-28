@@ -55,7 +55,8 @@
 - Like LoL's: each stat is its **icon + value**, two per row. Main panel: AD | AP, Armor | MR, Attack speed | Ability haste, Crit | Move speed.
 - **Ctrl + C** toggles it on or off.
 - **Hold C** to show the extra stats above it (in its place when it is hidden), also 2 × 4: Health / mana regen (one cell, "0.8 / 1.6" per second) | Heal & shield power, Armor pen | Magic pen, Life steal | Omnivamp, Attack range | Tenacity.
-- **Hover a stat** for 1 second: a card with its icon, name, value and what it does.
+- A value shows in **yellow** when something adds to what Lucian's level alone gives: items, item passives, buffs (move speed counts its buffs, attack range counts Rapid Firecannon), or the debug crit cheat.
+- **Hover a stat** for 1 second: a card with its icon, name and value, then the split, e.g. "60 base + 22 bonus" with the bonus in yellow (regen has a health and a mana line), and what the stat does.
 
 | Stat | Icon | Color |
 |---|---|---|
