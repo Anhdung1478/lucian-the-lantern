@@ -130,3 +130,10 @@ func test_reset_progress_is_a_new_game_in_memory() -> void:
 	assert_eq(save.essences.amount(Essences.BLUE), 0)
 	assert_eq(save.skin, SaveGame.CLASSIC)
 	assert_false(FileAccess.file_exists(save.path(1)), "nothing is written")
+
+
+func test_forget_boss_purple_empties_bosses() -> void:
+	var save := SaveGame.instance()
+	save.award_boss("akshan", 10, 2)
+	_press("Forget boss purple")
+	assert_true(save.bosses.is_empty())

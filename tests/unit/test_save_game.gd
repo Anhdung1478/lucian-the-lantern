@@ -288,3 +288,59 @@ func test_buy_and_equip_write_no_file() -> void:
 	save_game.buy_skin(&"vampire")
 	save_game.equip_skin(&"vampire")
 	assert_false(save_game.slot_exists(1))
+
+
+func test_award_boss_gives_the_first_amount_once_then_the_repeat() -> void:
+	assert_eq(save_game.award_boss("akshan", 10, 2), 10)
+	assert_eq(save_game.award_boss("akshan", 10, 2), 2)
+	assert_eq(save_game.bosses, ["akshan"] as Array[String])
+
+
+func test_bosses_round_trip_and_unknown_ids_are_dropped() -> void:
+	save_game.award_boss("thresh_1", 10, 0)
+	save_game.save()
+	var data := JSON.parse_string(FileAccess.get_file_as_string(save_game.path(1))) as Dictionary
+	data["bosses"] = ["thresh_1", "teemo"]
+	var file := FileAccess.open(save_game.path(1), FileAccess.WRITE)
+	file.store_string(JSON.stringify(data))
+	file.close()
+	var loaded := SaveGame.new(PREFIX)
+	loaded.load_slot(1)
+	assert_eq(loaded.bosses, ["thresh_1"] as Array[String])
+
+
+func test_a_file_without_bosses_loads() -> void:
+	save_game.save()
+	var loaded := SaveGame.new(PREFIX)
+	loaded.load_slot(1)
+	assert_true(loaded.bosses.is_empty())
+
+
+func test_start_new_writes_that_slot_and_makes_it_current() -> void:
+	save_game.essences.add(Essences.BLUE, 500)
+	assert_true(save_game.start_new(2))
+	assert_eq(save_game.slot, 2)
+	assert_true(save_game.slot_exists(2))
+	assert_eq(save_game.essences.amount(Essences.BLUE), 0)
+
+
+func test_any_slot_exists() -> void:
+	assert_false(save_game.any_slot_exists())
+	save_game.copy_to(3)
+	assert_true(save_game.any_slot_exists())
+
+
+func test_play_time_round_trips_and_reads_per_slot() -> void:
+	save_game.add_play_time(5025.4)
+	save_game.save()
+	assert_eq(save_game.play_time_of(1), 5025)
+	assert_eq(save_game.play_time_of(2), 0)
+	var loaded := SaveGame.new(PREFIX)
+	loaded.load_slot(1)
+	assert_almost_eq(loaded.play_time, 5025.0, 0.001)
+
+
+func test_play_time_text() -> void:
+	assert_eq(SaveGame.play_time_text(5025), "1h 23m")
+	assert_eq(SaveGame.play_time_text(59), "0m")
+	assert_eq(SaveGame.play_time_text(600), "10m")

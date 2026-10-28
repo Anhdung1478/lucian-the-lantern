@@ -46,6 +46,8 @@ func _build() -> void:
 	row = _row(box)
 	_button(row, "Max tree (free)", func() -> void: SaveGame.instance().tree.max_all())
 	_button(row, "Clear tree (no refund)", func() -> void: SaveGame.instance().tree.clear())
+	_section(box, "Bosses")
+	_button(box, "Forget boss purple", func() -> void: SaveGame.instance().forget_bosses())
 	_section(box, "Save")
 	_button(box, "Reset progress", func() -> void: SaveGame.instance().reset())
 	_label(box, "A new game in memory; nothing is saved until you save.")

@@ -15,8 +15,7 @@ const CLASSIC := &"classic"
 static var _instance: SaveGame
 
 var prefix := DEFAULT_PREFIX
-## The current slot: every save writes to it. Slot 1 until a slot
-## selection screen exists.
+## The current slot: every save writes to it. The title screen picks it.
 var slot := 1
 var essences := Essences.new()
 ## Evolution Tree levels.
@@ -28,9 +27,16 @@ var loadout: Array[StringName] = [&"", &""]
 ## Stage ids ("1-1" ... "6-5") cleared at least once.
 var cleared: Array[String] = []
 var endless_best := 0
+## Bosses with a first-time purple reward, by id.
+const BOSS_IDS: Array[String] = ["thresh_1", "akshan"]
+
+## Boss ids that already gave their first-time purple.
+var bosses: Array[String] = []
+## Seconds played in this slot (title screen and pauses not counted).
+var play_time := 0.0
 
 
-## The running game's progress: slot 1, loaded on first use.
+## The running game's progress: slot 1 until the title screen loads another.
 static func instance() -> SaveGame:
 	if _instance == null:
 		_instance = SaveGame.new()
@@ -102,8 +108,62 @@ func reset() -> void:
 	loadout = [&"", &""]
 	cleared = []
 	endless_best = 0
+	bosses = []
+	play_time = 0.0
 	tree.acts_cleared = 0
 	changed.emit()
+
+
+## A new game in slot `of_slot`, which becomes current and is written at
+## once (it replaces what was there).
+func start_new(of_slot: int) -> bool:
+	slot = of_slot
+	reset()
+	return save()
+
+
+func any_slot_exists() -> bool:
+	for n in range(1, SLOTS + 1):
+		if slot_exists(n):
+			return true
+	return false
+
+
+## A boss was beaten: the purple due (`first` the first time, `repeat`
+## after), and the boss is marked as paid. The caller adds the essence.
+func award_boss(id: String, first: int, repeat: int) -> int:
+	if id in bosses:
+		return repeat
+	bosses.append(id)
+	changed.emit()
+	return first
+
+
+## Debug: every boss gives its first-time purple again.
+func forget_bosses() -> void:
+	bosses = []
+	changed.emit()
+
+
+## Seconds played in this slot. Game adds to it; nothing saves by itself.
+func add_play_time(seconds: float) -> void:
+	play_time += maxf(seconds, 0.0)
+
+
+## The play time written in `of_slot` (main file, else backup), in whole seconds.
+func play_time_of(of_slot: int) -> int:
+	for file in [path(of_slot), backup_path(of_slot)]:
+		var data := _read(file)
+		if not data.is_empty():
+			var seconds: Variant = data.get("play_time", 0)
+			return maxi(int(seconds), 0) if (seconds is int or seconds is float) else 0
+	return 0
+
+
+## "1h 23m", or "23m" under an hour.
+static func play_time_text(seconds: int) -> String:
+	var minutes := seconds / 60
+	return "%dh %02dm" % [minutes / 60, minutes % 60] if minutes >= 60 else "%dm" % minutes
 
 
 ## Debug: replaces the cleared stages (unknown ids are dropped).
@@ -154,6 +214,8 @@ func to_dict() -> Dictionary:
 		"loadout": loadout.map(func(id: StringName) -> String: return String(id)),
 		"cleared": cleared.duplicate(),
 		"endless_best": endless_best,
+		"bosses": bosses.duplicate(),
+		"play_time": int(play_time),
 	}
 
 
@@ -231,5 +293,13 @@ func _apply(data: Dictionary) -> void:
 				cleared.append(id)
 	var best: Variant = data.get("endless_best", 0)
 	endless_best = maxi(int(best), 0) if (best is int or best is float) else 0
+	bosses = []
+	var saved_bosses: Variant = data.get("bosses", [])
+	if saved_bosses is Array:
+		for id: Variant in saved_bosses:
+			if id is String and id in BOSS_IDS and not id in bosses:
+				bosses.append(id)
+	var seconds: Variant = data.get("play_time", 0)
+	play_time = maxf(float(seconds), 0.0) if (seconds is int or seconds is float) else 0.0
 	tree.acts_cleared = Journey.acts_cleared(cleared)
 	changed.emit()
