@@ -49,6 +49,8 @@ var collected := {Essences.BLUE: 0, Essences.ORANGE: 0, Essences.PURPLE: 0}
 var rng := RandomNumberGenerator.new()
 ## The stage's waves; null in Training.
 var runner: WaveRunner
+## Lucian's invulnerable flag as a cutscene found it (debug God mode survives).
+var _invulnerable_before_freeze := false
 var result := StageResult.new()
 ## First-clear rewards, for the result panel.
 var reward_lines: Array[String] = []
@@ -141,7 +143,11 @@ func freeze(on: bool) -> void:
 		node.process_mode = Node.PROCESS_MODE_DISABLED if on else Node.PROCESS_MODE_INHERIT
 	hud.visible = not on
 	screens.locked = on
-	lucian.invulnerable = on
+	if on:
+		_invulnerable_before_freeze = lucian.invulnerable
+		lucian.invulnerable = true
+	else:
+		lucian.invulnerable = _invulnerable_before_freeze
 
 
 ## Debug and tests: every enemy goes (no rewards) and the boss wave comes next.

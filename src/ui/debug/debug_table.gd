@@ -1,8 +1,8 @@
 class_name DebugTable
 extends DebugPanel
 ## Testing panel, toggled with F3 + Q (hidden by default), in tabs: Lucian
-## (level, cheats, summoner spells), Items, Shop (gold) and Dummy (settings,
-## DPS meter, hit log). Keeps working while the game is paused, so items can be given into an
+## (level, cheats, summoner spells), Items, Shop (gold), Waves (skip, kill all,
+## spawn, boss wave, God mode) and Dummy (settings, DPS meter, hit log). Keeps working while the game is paused, so items can be given into an
 ## open backpack.
 
 const LOG_SIZE := 10
@@ -35,6 +35,7 @@ var _max_hp: SpinBox
 var _dps_label: Label
 var _log_label: RichTextLabel
 var _gold_label: Label
+var _wave_label: Label
 var _tabs: TabContainer
 var _dummy_tab := 0
 
@@ -83,6 +84,13 @@ func _process(_delta: float) -> void:
 		progress.level, progress.xp, progress.xp_for_next(), progress.skill_points()]
 	_dps_label.text = "DPS %.1f   Total %d   %.1f s" % [_meter.dps(), roundi(_meter.total), _meter.elapsed()]
 	_gold_label.text = "Gold %d" % stage.wallet.gold
+	var runner := stage.runner
+	if runner:
+		_wave_label.text = "Wave %d / %d   state %s   alive %d   next %s" % [
+			runner.wave, runner.total_waves(), WaveRunner.State.find_key(runner.state),
+			runner.alive(), "%.1f s" % runner.countdown()]
+	else:
+		_wave_label.text = "Training: no waves"
 	var stats := lucian.stats
 	_item_stats.text = "AH %d   Life steal %d%%   Omnivamp %d%%   Pen %d%% / %d%%" % [
 		roundi(stats.ability_haste), roundi(stats.lifesteal * 100.0), roundi(stats.omnivamp * 100.0),
@@ -139,6 +147,27 @@ func _buy_all_ranks() -> void:
 func _show_summoners() -> void:
 	for slot in _summoner_pickers.size():
 		_summoner_pickers[slot].select(SummonerSpells.SPELLS.find(SummonerSpells.find(lucian.summoners.slots[slot])) + 1)
+
+
+func _kill_all() -> void:
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		if not enemy is TrainingDummy:
+			enemy.take_damage(lucian.make_damage(999999.0, DamageInfo.Type.TRUE, &"debug"))
+
+
+## A minion near the cursor; it counts toward the wave.
+func _spawn(id: StringName) -> void:
+	stage.spawn_enemy(id, lucian.get_global_mouse_position())
+	if stage.runner:
+		stage.runner.enemy_spawned()
+
+
+func _boss_to_51() -> void:
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		var unit := enemy as EnemyUnit
+		if unit and unit.data.kind == &"boss":
+			unit.hp = unit.max_hp * 0.51
+			unit.health_bar.set_health(unit.hp, unit.max_hp)
 
 
 func _give_random_fragment() -> void:
@@ -227,6 +256,20 @@ func _build() -> void:
 	var slots := _spin(row, 1, MerchantStock.SLOTS, 2)
 	_shop_slots = slots
 	slots.value_changed.connect(func(value: float) -> void: stage.set_shop_slots(int(value)))
+
+	box = _tab(tabs, "Waves")
+	_section(box, "Waves")
+	_wave_label = _label(box, "")
+	row = _row(box)
+	_button(row, "Skip break", func() -> void: stage.skip_break())
+	_button(row, "Kill all enemies", _kill_all)
+	_button(row, "Jump to boss wave", func() -> void: stage.jump_to_boss_wave())
+	row = _row(box)
+	for id: StringName in [WavePlan.MELEE, WavePlan.RANGED, WavePlan.SIEGE, WavePlan.SUPER]:
+		_button(row, "Spawn %s" % String(id).trim_suffix("_minion"), _spawn.bind(id))
+	row = _row(box)
+	_button(row, "Boss HP 51%", _boss_to_51)
+	_check(box, "God mode (no damage)").toggled.connect(func(on: bool) -> void: stage.lucian.invulnerable = on)
 
 	box = _tab(tabs, "Dummy")
 	_dummy_tab = tabs.get_tab_count() - 1
