@@ -274,7 +274,24 @@ Placeholder numbers. Ability haste doesn't shorten them, and each spell keeps it
 | Clarity | 45 s | Restore 50% of max mana. Blue motes spiral into Lucian. |
 | Smite | 30 s | 450 true damage to the enemy nearest the cursor within 500, heal 10% of max HP. |
 
-Until the Evolution Tree exists, both slots are open and every spell is available: D and F are picked in the debug table (default Flash on D, Heal on F).
+### Built in Phase 5
+- **Every spell is bought in the Evolution Tree** (its own node, 150B). A new game has none.
+- **D is open from the start. F is chained** until the **Second Summoner Slot** node is bought (400B + 5O, needs any 2 spells).
+- **D and F are picked in Journey's loadout panel**, among the bought spells (or None). Picking the spell already on the other key swaps them. The pick is saved with the progress.
+- **Upgrades:** one node per spell, 3 levels, bought after the spell:
+
+| Spell | Per level | At level 3 |
+|---|---|---|
+| Flash | −10% cooldown | 63 s |
+| Ghost | −10% cooldown | 42 s |
+| Barrier | +15% shield | ×1.45 |
+| Heal | +15% healing | ×1.45 |
+| Clarity | +15% mana restored | ×1.45 |
+| Smite | +15% damage (not its heal) | ×1.45 |
+
+- An upgraded spell's card adds a green line: "Upgraded: 30% shorter cooldown" or "Upgraded: 45% stronger".
+- On the HUD, an empty D shows only its frame, and a locked F shows a chain; each has a hover card saying why.
+- `stage.tscn` run on its own (F6, tests) keeps the Phase 4 sandbox: both slots open, Flash on D and Heal on F, swapped in the debug table (which now also offers None).
 
 ---
 
@@ -316,13 +333,24 @@ Skins can only be changed **outside stages**.
 | Pulsefire | 20 | +15% AP, +15 Ability Haste | −10% Attack Speed | Skill-focused, W and R as main damage |
 | Vampire *(custom)* | 25 | +15% Lifesteal, kills heal 2% max HP | −20% max HP | Risky but sustainable |
 
+**Built in Phase 5:**
+- Bought and equipped in the Skin Shop (`main_screen.md`). Lucian's body sprite and the HUD portrait follow the equipped skin.
+- Attack speed, move speed, ability haste and lifesteal are added like item stats. The AD, AP and max HP percentages multiply the final stats, after item passives.
+- Vampire's kill heal works on real kills; training dummies never die, so only the tests show it for now.
+
 ---
 
 ## 11. Evolution Tree
 
-A node opens once **all of its requirements** are bought. B = blue essence, O = orange essence.
+A node opens once **all of its requirements** are bought (or any 1 / any 2 of them, where the table says so). B = blue essence, O = orange essence.
 
 **Reset:** costs **5 purple** and refunds all blue and orange essence.
+
+**Nodes have levels** (built in Phase 5; 31 nodes, laid out in `main_screen.md`):
+- Q, W and E are one node each with 5 levels, R one node with 3. Equip slots are one node with 5 levels (slots 2–6), Merchant stock one node with 2 (3 and 4 items). Each level costs what the tables below say for that rank, slot or step.
+- A node opens once its requirements have level 1; its later levels need nothing more.
+- **E level 1 is free** and stays hidden until Act 1 is cleared. A reset takes it back like any level, and it is free to buy again.
+- In a stage, skill points only go into bought ranks, and the passive only works once bought.
 
 ### Skills
 | Node | Cost | Requires |
@@ -351,6 +379,18 @@ A node opens once **all of its requirements** are bought. B = blue essence, O = 
 AD, AP, HP, Armor, MR, Attack Speed, Mana — 5 levels each.
 Costs: 50B → 100B → 200B → 350B + 3O → 500B + 8O.
 
+| Stat | Per level | At level 5 |
+|---|---|---|
+| AD | +4 | +20 |
+| AP | +8 | +40 |
+| HP | +40 | +200 |
+| Armor | +4 | +20 |
+| MR | +4 | +20 |
+| Attack Speed | +3% | +15% |
+| Mana | +40 | +200 |
+
+They count as **bonus** stats (yellow in the stats panel) from the start of every stage.
+
 ### Summoners
 | Node | Cost | Requires |
 |---|---|---|
@@ -366,7 +406,9 @@ Costs: 50B → 100B → 200B → 350B + 3O → 500B + 8O.
 | Essence drop rate +10% (3 levels) | 100B → 250B → 500B + 5O |
 | Merchant 3 items | 300B |
 | Merchant 4 items | 800B + 10O |
-| Refresh cost −25% (2 levels) | TBD |
+| Refresh cost −25 gold (2 levels: 100 → 75 → 50 gold) | 200B → 500B + 5O |
+
+Stage gold, bonus XP and essence drops can be bought and are saved, but change nothing yet: they start working once enemies give gold, XP or essences.
 
 **Balance goal:** in about 5 hours a skilled player can afford all skills, R, 4–5 equip slots and some stats, but not the full tree. The rest is a goal for Endless mode.
 
@@ -428,7 +470,7 @@ Detailed enemy, elite, mini boss and boss designs for each act live in separate 
 
 ## 14. Endless Mode
 
-- **Unlocks** after beating Thresh.
+- **Unlocks** once **Act 3** is cleared.
 - **Map:** random from all acts, or chosen by the player.
 - Waves never end; enemies get stronger every wave.
 - **Mini boss every 5 waves**, **act boss every 10 waves** (random, stronger than in story).
@@ -465,8 +507,9 @@ A new pick **replaces** the previous modifier (they do not stack).
 
 ### What is saved (permanent progress only)
 - Blue, orange and purple essences
-- Bought Evolution Tree nodes
-- Unlocked summoner spells, owned skins, equipped skin
+- Bought Evolution Tree nodes (summoner spells included)
+- The spells picked for D and F
+- Owned skins, equipped skin
 - Cleared stages, and which bosses / mini bosses already gave first-time purple
 - Endless best wave
 
@@ -481,12 +524,25 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - Settings are not part of the save: they are written to `user://settings.json` on every change.
 
 ### Implementation notes (Godot 4)
-- **SaveManager** as an Autoload.
-- JSON format with a `"version"` field for future changes.
-- Convert numbers back with `int()` when loading (JSON numbers load as floats).
-- Save IDs (e.g. `"q_rank_2"`), not display names.
-- Copy the old save to the backup file before writing; load the backup if the main file is broken.
-- Debug button to give essences / unlock everything during testing.
+- **`SaveGame`** (`src/core/save_game.gd`) is **not an autoload**. Like `GameSettings`, it is a class with a static `instance()` that loads slot 1 on first use, so GUT tests and `-s` scripts can point it at scratch files.
+- One JSON file per slot, with a `"version"` field for future changes:
+
+| Key | Holds |
+|---|---|
+| `version` | 1 |
+| `saved_at` | Local date and time of the save, e.g. `"2026-10-28 14:03:12"` (Save as copy's slot list shows it) |
+| `essences` | `{"blue": 1200, "orange": 5, "purple": 0}` |
+| `tree` | Node id → level, for bought nodes only: `{"skill_q": 2, "stat_ad": 3}` |
+| `skins` | `{"owned": ["classic", "vampire"], "equipped": "vampire"}` |
+| `loadout` | The spells on D and F: `["flash", "heal"]` (`""` for none) |
+| `cleared` | Cleared stage ids: `["1-1", "2-1"]` |
+| `endless_best` | Best Endless wave |
+
+- Numbers are converted back with `int()` when loading (JSON numbers load as floats). Unknown keys, node ids, skins and stage ids are dropped, so an old or edited file still loads.
+- IDs are saved, not display names.
+- The old save is copied to the backup file before writing; the backup loads if the main file is broken. With both broken, it's a new game.
+- Not saved yet: which bosses already gave their first-time purple (there are no bosses yet).
+- The main screen's debug table (F3 + Q) gives essences, sets the acts cleared, maxes or clears the tree, and resets the progress.
 
 ---
 
@@ -499,6 +555,6 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - [x] Wave count per stage across the 22 stages
 - [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`, Phase 4: `implementation/phase4.md`, Phase 5: `implementation/phase5.md`)
 - [x] Item stats and effects (`items.md`)
-- [ ] UI (see `ui_design.md`): HUD, backpack, crafting, recipe table, ESC menu, merchant's shop and Settings done; other screens to design
+- [ ] UI (see `ui_design.md` and `main_screen.md`): HUD, backpack, crafting, recipe table, ESC menu, merchant's shop, Settings and the main screen (Journey, Evolution Tree, Skin Shop) done; the title screen and save slot selection still to design
 - [x] Save system
 - [ ] Art style, sound (Phase 3 has generated placeholder sound effects and audio buses; no music yet)

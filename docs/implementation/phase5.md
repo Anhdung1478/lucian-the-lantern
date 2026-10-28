@@ -1579,3 +1579,89 @@ Note: `SaveGame` holds an `EvolutionTree` (Task 3) and validates skins and stage
 10. Gear → Save → toast. Save as copy → slot 2, then again → "Overwrite slot 2?".
 11. Close the window with X during Training → the prompt shows; Yes saves.
 12. Break `save_slot_1.json` by hand: the game loads the backup.
+
+---
+
+## Implementation notes (Phase 5 done)
+
+Everything in the plan is in place, one commit per task (Tasks 0–11, plus one fix commit after the Task 10 review), then the visual pass and the screenshot scenarios, then the docs and this report. Changes and details settled while building:
+
+### Final node grids
+Task 9 moved some nodes after its visual check, so lines never cross a frame or a badge. The table above shows the planned grids; these are the ones in `data/tree/*.tres`:
+
+| Node | Planned | Shipped |
+|---|---|---|
+| `passive` | (0, 1) | **(0, 1.5)**: the passive → E line grazed W's frame corner |
+| `flash_upgrade` … `smite_upgrade` | row 1 | **row 2** (21, 22, 23, 25, 26, 27): two rows above their spell, joined by a straight stem |
+| `summoner_slot_2` | (24, 1) | **(24, 1.25)**: its lines to the far spells crossed the upgrade badges on row 1 |
+
+Every other node is where the table says. The node table in `main_screen.md` lists the shipped grids.
+
+### Deviations and rulings
+- **Save files** (Task 1): as planned. `test_instance_uses_the_test_prefix` needs the pre-run hook, so it only passes in the full suite (or with `-gpre_run_script=res://tests/pre_run.gd`), not with `-gconfig=`.
+- **Tree icons** (Task 2): `skill_q` uses solid fills; a gradient inherited from a `<g>` didn't render as expected in ThorVG. The `art_sheet` scenario (no stage, stretch off) shows every new icon at 64 and 32 px.
+- **Tree data** (Task 3):
+  - The 31 `.tres` files were generated from the node table.
+  - Skill, passive and spell nodes have `per_level = 1.0`, so `value()` is the level.
+  - `Journey.ENDLESS_ACT = 3` is the number of acts to clear.
+  - `SaveGame.set_cleared` also drops duplicates.
+- **Descriptions** (ruling from Task 3, done in Task 9): the requirement text was taken out of the passive, E, R and Second Summoner Slot descriptions. The info panel builds the "Requires: …" line from the data, and a test checks that no description says "Needs".
+- **Skins** (Task 4):
+  - `SkinData.flat` and `scale` are typed dictionaries, like `ItemData`'s stats.
+  - The HUD's portrait became a `%Portrait` unique node.
+  - `Lucian.apply_skin()` must run once Lucian is in the tree (it reads his old stats); the stage calls it from `_ready`.
+  - The stats panel counts a skin's multiplier as a bonus, so High Noon's lower attack speed shows as "base − bonus" and PROJECT's lower AD is yellow.
+  - Vampire's card line is "Kills heal 2% max HP" (capitalized, since it stands on its own line).
+- **StageSetup** (Task 5):
+  - `SummonerSpells.set_spell(slot, &"")` no longer swaps, so picking None on one key never moves the other key's spell.
+  - The debug table's shop-slots spin is set in `setup()` (its `_build()` runs before it knows the stage).
+  - `ShopPanel.show_refresh_cost()` is called from `BackpackScreen.open_shop()`, since the panel has no reference to the `Shop`.
+  - An unlearned passive also hides its charged ring.
+  - The Smite upgrade raises its damage only, not its 10% heal.
+- **Game root** (Task 6): the `MainScreen` stub started in `src/ui/`; Task 7 moved it to `src/ui/main/`. `test_game.gd` swaps in a scratch `SaveGame` when it runs alone.
+- **Main screen shell** (Task 7):
+  - Save and Save as copy close the gear menu, so the toast isn't hidden behind the backdrop.
+  - A section takes part in ESC with `close_popup() -> bool`.
+- **Journey** (Task 8):
+  - Mini boss cards read "N waves + mini boss wave".
+  - A second click on the open key closes the spell menu.
+  - The D/F picks are plain Buttons (no `SpellPick` class).
+  - Ruling: a loadout spell the tree no longer has (after a reset) shows as empty; the save keeps the pick, and the stage already drops it.
+- **Evolution Tree screen** (Task 9):
+  - `TreeMap.right_room` lets the map's right end come in by the info panel's width (+ 24), so the Summoners grove can be dragged out from under the panel. The soil runs on under that room.
+  - While the map is shorter than the screen, its ground stays at the bottom.
+  - A node with a level is never hidden (after the debug Max tree, E was maxed but showed "?").
+  - A hidden node's panel still shows its level, value and description; only the name is "???".
+  - The panel's margin is 20 px, so the 400 px cost bar fits in 440.
+  - `zoom_at(point, factor)` takes the new zoom, not a multiplier.
+  - A press becomes a drag after more than 6 px.
+  - Ruling: real mouse routing (a press on a node view → the map's drag) was only unit-tested. Task 12's `main_tree` scenario now drags from on top of W through the real viewport (`Input.parse_input_event`) and the map pans 240 px without choosing a node; the playtest checklist keeps a real-mouse check.
+- **Skin Shop** (Task 10): `SaveGame.buy_skin()` / `equip_skin()` hold the rules. After the review, the shop also listens to `essences.changed`, so the Purchase buttons follow essence that changes without a save change (debug, rewards).
+- **Debug tables** (Task 11): `DebugPanel` is the shared base (F3 + Q, the frame, the widget helpers). The main screen's table is its child `MainDebugTable`. The stage table had no toggle test, so the toggle is tested on the main one (same code).
+- **Visual pass** (Task 12):
+  - **Journey opens on Training**, as planned; it opened on Act 1.
+  - A **locked tab's label** starts 40 px in (`JourneyTab.CHAIN_ROOM`), clear of its chain; "Endless" touched it.
+  - The **node info panel is opaque**; the nodes and lines under it showed through.
+  - The **toast** sits inside the top bar; it used to cover the Journey tabs.
+  - Each has a test.
+
+### Left as is (small, from the reviews)
+- `SaveGame._write` doesn't check that the backup copy and the write succeeded, so a broken main file could overwrite a good backup. `copy_to` and `set_loadout` don't range-check their slot or index. `load_slot` emits `changed` twice.
+- `EvolutionTree.node()` returns null for an unknown id (callers only pass known ids); setting `acts_cleared` emits `changed` even when it doesn't change.
+- `ConfirmPopup.answer()` runs its callables even when it isn't open; Leave this stage isn't guarded against a double press (the save is the same either way); the mouse stays confined after leaving a stage.
+- The spell menu's list doesn't follow a tree change while it is open. A tree purchase refreshes the map twice, and a skin purchase the shop twice. A failed purchase is silent. Tooltips can show while the map is being dragged. Grove names use the fallback font.
+- Debug only:
+  - Picking D while F is locked can swap a spell into the locked F.
+  - "Acts cleared" doesn't follow Reset progress.
+  - Max tree then Reset tree refunds the price of every level, though Max tree paid nothing.
+- No tests yet for the Barrier, Clarity and Smite upgrade amounts (Flash and Heal have them).
+
+### Running the checks
+
+```
+godot_console --headless --path . --import
+godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
+godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+```
+
+New scenarios: `art_sheet`, `main_journey`, `main_acts`, `main_endless`, `main_tree`, `main_tree_max`, `main_skins`, `main_gear`, `main_debug`, `training_setup`, `skins_stage`. The `main_*` scenarios, `training_setup` and `skins_stage` start `src/main/game.tscn`; the others start the stage alone, as before. Every run uses scratch save slots (`user://screenshot_save_slot_N.json`) and starts from a new game.

@@ -31,10 +31,10 @@
   - Cooldown timer and rank dots on each.
   - **Mana cost** shown as a number in the **top-left corner** of each skill icon.
   - **"+" buttons:** while there is an unspent skill point, every skill that isn't maxed shows a "+" in a ring above it. **Gold** when it can rank up now (click it or press Ctrl + the skill key); **grey** when it can't yet (Q/W/E rank *r* needs level 2*r* − 1, R needs level 6 / 11 / 16); **grey with a small lock** when the next rank isn't bought in the Evolution Tree. No "+" with 0 points or on a maxed skill.
-  - Unbought skills show a **lock icon**.
+  - Unbought skills show a **lock icon**. Until it is bought in the Evolution Tree, the passive is greyed out with a lock and never shows its charged ring.
   - **Greyed out** while another skill holds it back: Q and W (once learned) while R fires, E during Q's cast time.
 - **Hover a skill or the passive** for about **1 second** to see its card, like LoL: name, key, rank, mana cost and cooldown per rank, and a description where per-rank values show the current rank lit up and scalings in their stat color (AD orange, AP blue). The max rank bonus is listed last and lights up once reached.
-- **Summoner spells** (D / F): 48 px icons right of R, with a cooldown sweep and seconds and the key. Hover one for its card (name, key, cooldown, effect).
+- **Summoner spells** (D / F): 48 px icons right of R, with a cooldown sweep and seconds and the key. Hover one for its card (name, key, cooldown, effect, and a green "Upgraded: …" line once its upgrade is bought). An empty key shows only its frame ("No spell: pick one in Journey before starting."); F shows a chain until the 2nd slot is bought.
 - **Item slots 1–6:** in a 3 × 2 grid right of the HP / mana bars. Only unlocked slots are shown, with cooldowns for active items (sweep and seconds) and a potion stack's count. Hovering one shows the item's card.
 - **Range on hover:** hovering a learned skill, an item with an aimed active (Galeforce, Rocketbelt, Gunblade) or Flash / Smite shows its range around Lucian at once, pointing where he faces: a ray for Q, W (ending in its cross), E and the item dashes (ending in a ring where Lucian lands), two dashed rays for R, a circle for Gunblade, Smite and Flash (Flash's shows the landing ring while aiming). Drawn in pale blue under Lucian.
 - **Key labels** (skills and item slots) follow the bindings in Settings.
@@ -249,7 +249,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - Options:
   - **Resume**
   - **Settings** (cast mode, camera, volume, etc.)
-  - **Leave this stage** (keeps all essences collected; the game auto-saves)
+  - **Leave this stage** (keeps all essences collected; the game auto-saves). Works since Phase 5: the stage counts as left, the game saves to the current slot and goes back to the main screen (Journey → Training).
   - **Exit the game** (asks **"Save before leaving?"** Yes / No; see the game design doc §15)
 
 ## 5. Settings (from the ESC menu)
@@ -278,7 +278,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - [x] Merchant's shop layout (built in Phase 3)
 - [x] ESC menu
 - [x] Settings
-- [ ] Evolution Tree screen
-- [ ] Skin shop
+- [x] Evolution Tree screen (built in Phase 5, see `main_screen.md`)
+- [x] Skin shop (built in Phase 5, see `main_screen.md`)
 - [ ] Main menu and save slot selection
-- [ ] Stage select
+- [x] Stage select (Journey: act, Training and Endless tabs, built in Phase 5, see `main_screen.md`)
