@@ -56,6 +56,7 @@ Where Phase 5 left things:
 | Item drops | **Ground loot.** Enemies can drop a fragment, or very rarely a legendary. It lies where the enemy died, and Lucian walks over it to pick it up. |
 | Thresh cutscene | **In-engine and scripted:** letterbox bars, camera pans, Thresh hooks Senna, her soul flies into his lantern, he sinks into the river. Captions; Space or a click moves on; a Skip button. |
 | New game | After a slot is picked, the game goes **straight into Act 1** (the tutorial, with tips), then to the main screen. |
+| Game length | A skilled player needs **at least 5–7 hours** to beat the story. Numbers are set to that pace (see **Pacing**), and play time is measured: each stage's time on its result panel, and each slot's total play time in the slot lists. |
 
 ### Defaults chosen during planning (placeholders, tune later; each goes into the docs in Task 15)
 - **Who enemies attack:** only Lucian. Senna can't be targeted, so she "cannot die before the cutscene" with no special case.
@@ -139,13 +140,14 @@ Lucian at level 1: 600 HP, 60 AD, 0.65 AS, 28 armor, 30 MR, range 500.
 | `super_minion` | elite | 1400 | 40 / 20 | 45 physical, melee; **Empower**: melee and ranged minions within 500 deal +15% | 130 | 1.4 s | 260 | 40 | 150 | 90 |
 
 **Scaling** (bosses don't scale):
-- Per act: HP × (1 + 0.4·(act − 1)), damage × (1 + 0.25·(act − 1)), gold and XP × (1 + 0.25·(act − 1)).
-- Per wave: HP and damage +10% for each wave after the first.
+- Per act: HP × (1 + 0.6·(act − 1)), damage × (1 + 0.25·(act − 1)), gold and XP × (1 + 0.25·(act − 1)).
+- Per wave: HP and damage +15% for each wave after the first.
+- These are set for the pace in **Pacing** below.
 
 | Boss | HP | Armor / MR | Basic | Skills |
 |---|---|---|---|---|
-| **Thresh** (`thresh_1`) | 2400; the fight stops at 50% | 30 / 30 | 30 physical, range 450, every 1.8 s, speed 300 | **Death Sentence (Q):** a line warning (1000 × 70) for 0.9 s, then the hook at 1400 px/s. On a hit: 80 magic, and Lucian is pulled to 120 in front of Thresh. Cooldown 9 s. **Flay (E):** a cone warning (70°, 400) for 0.6 s, then 60 magic and a 250 push away. Cooldown 7 s. |
-| **Akshan** (`akshan`) | 4000 | 35 / 30 | 28 physical, range 550, every 1.4 s, speed 320 | **Avengerang (Q):** a line warning (900) for 0.8 s; out 900 at 1000 px/s, then back to Akshan; 70 physical, once per pass. Cooldown 8 s. **Heroic Swing (E):** a circle warning (r 300) on a point near Lucian for 1.2 s; then 2.5 s swinging around it, a bolt outward every 0.3 s (25 physical). Cooldown 14 s. **Comeuppance (R):** a lock line follows Lucian for a 2.0 s charge; then 6 bullets 0.12 s apart, aimed at him (40 physical, range 1200, stopped by pillars). Cooldown 20 s; first used at 75% HP. |
+| **Thresh** (`thresh_1`) | 3000; the fight stops at 50% | 30 / 30 | 30 physical, range 450, every 1.8 s, speed 300 | **Death Sentence (Q):** a line warning (1000 × 70) for 0.9 s, then the hook at 1400 px/s. On a hit: 80 magic, and Lucian is pulled to 120 in front of Thresh. Cooldown 9 s. **Flay (E):** a cone warning (70°, 400) for 0.6 s, then 60 magic and a 250 push away. Cooldown 7 s. |
+| **Akshan** (`akshan`) | 5000 | 35 / 30 | 28 physical, range 550, every 1.4 s, speed 320 | **Avengerang (Q):** a line warning (900) for 0.8 s; out 900 at 1000 px/s, then back to Akshan; 70 physical, once per pass. Cooldown 8 s. **Heroic Swing (E):** a circle warning (r 300) on a point near Lucian for 1.2 s; then 2.5 s swinging around it, a bolt outward every 0.3 s (25 physical). Cooldown 14 s. **Comeuppance (R):** a lock line follows Lucian for a 2.0 s charge; then 6 bullets 0.12 s apart, aimed at him (40 physical, range 1200, stopped by pillars). Cooldown 20 s; first used at 75% HP. |
 
 **Senna** (Act 1 first play): stays 150 behind and to the left of Lucian. Every 1.5 s she shoots the nearest enemy within 900 for 45 physical.
 
@@ -166,6 +168,42 @@ Lucian at level 1: 600 HP, 60 AD, 0.65 AS, 28 armor, 30 MR, range 500.
 | 2-1 | 6m 4r 1S · 6m 6r 1S 1U | — |
 | 2-2 | 6m 6r 1S · 6m 6r 2S · 6m 6r 1S 1U | — |
 | 2-3 | 6m 6r 2S · 6m 6r 1S 1U · 8m 6r 2S 1U | Akshan, alone |
+
+### Pacing (at least 5–7 hours for a skilled player)
+
+**The whole story, per act.** These are minutes for a skilled player's first clear, including a few deaths, shopping, and the replays needed to afford Evolution Tree nodes.
+
+| Act | Stages | Waves (+ boss / mini boss waves) | Minutes |
+|---|---|---|---|
+| 1 | 1 | 2 + 1 | 8–10 (tutorial and cutscene) |
+| 2 | 3 | 8 + 1 | 30–40 |
+| 3 | 5 | 21 + 3 | 70–90 |
+| 4 | 3 | 14 + 1 | 45–60 |
+| 5 | 5 | 28 + 3 | 80–100 |
+| 6 | 5 | 33 + 3 | 90–120 |
+| **All** | 22 | 106 + 12 | **323–420 (5.4–7 h)** |
+
+**Rules of thumb for this and later phases:**
+- A wave should take a skilled player **about 2 minutes** of fighting.
+- A boss should take **2–3 minutes**.
+- A break is used, on average, for about 30 s of shopping.
+- About a third of each act's time is deaths and replays: farming essence for the tree, as the design doc's balance goal expects.
+
+**How Acts 1–2 hit their share.** Lucian restarts every stage at level 1; Act 2 stages have Q/W rank 1–2, E 1 and the passive by 2-3, and a fragment or two per stage, so his pack damage is about 60–90 at levels 1–3 and 120–160 at levels 4–7 with a legendary.
+- **Act 1:**
+  - The waves hold 2.1k and 3.4k HP of minions. Against Lucian (~35 damage per second) plus Senna (~27), each takes about 1–1.5 minutes with walking and dodging.
+  - Thresh's 1,500 HP to the cutscene takes about 1.5 minutes, dodging hooks.
+  - Add the countdown, a break, tips and the cutscene: about **8 minutes**.
+- **Act 2:**
+  - With the scaling above (×1.6 HP, +15% per wave), waves hold 4.4k to 11.8k HP: about 1.5–2.5 minutes each.
+  - Akshan's 5,000 HP with dodge windows takes about 3 minutes.
+  - A clean pass is about **27 minutes**. One or two defeats, or a replay of 2-1 or 2-2 for essence, bring it to the **30–40** budget.
+- **Economy check (unchanged §9 rates):**
+  - Act 1 gives about 127 blue (Thresh's 100 included): Q rank 1.
+  - Act 2 gives about 450 blue on a first pass: W, the passive, and Q or E rank 2.
+  - Across the story a first pass earns about 11k blue. Buying "all skills, R, 4–5 equip slots and some stats" (about 14k blue and 130 orange) needs some replays, which the minutes above include.
+
+Tune against this in playtests. The result panel's stage time and the slot's total play time (below) are the measurements. If Act 2 clears in under 25 minutes, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards.
 
 ### Maps (drawn in code; walls on `Layers.WORLD`)
 - **Act 1 – Mid lane** (`MidLaneMap`, 5200 × 3200):
@@ -202,7 +240,7 @@ Lucian at level 1: 600 HP, 60 AD, 0.65 AS, 28 armor, 30 MR, range 500.
 - **No autoloads.** Pure logic stays in `src/core/` with no scene dependencies. UI is built in code; there is no new `.tscn`.
 - `stage.tscn` run on its own stays the sandbox: Training, everything unlocked. `StageSetup.new()` is that sandbox (`act = 0`).
 - **Everything that holds an enemy** (Lucian's orders, attack shots, homing missiles, Lightslinger's second shot) checks `is_alive()`. A dead enemy leaves `&"enemies"` and its hitboxes at once, then fades for 0.4 s and is freed.
-- New player-facing numbers are constants at the top of their script or exports on `.tres` data.
+- New player-facing numbers are constants at the top of their script or exports on `.tres` data, set for the **Pacing** budget (a skilled player: at least 5–7 hours for the story).
 - Work on `main`, **one verified commit per task**, never pushed. Each commit: GUT suite green. Every commit message ends with `Co-Authored-By: Claude <noreply@anthropic.com>`.
 - Docs follow the existing voice: short plain sentences, tables for numbers.
 
@@ -1374,8 +1412,8 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
 
     func test_numbers_scale_with_act_and_wave() -> void:
     	var minion := _minion("melee_minion", Vector2(2000, 0), 2, 3)
-    	assert_almost_eq(minion.max_hp, 240.0 * 1.4 * 1.2, 0.01)
-    	assert_almost_eq(minion.damage, 12.0 * 1.25 * 1.2, 0.01)
+    	assert_almost_eq(minion.max_hp, 240.0 * 1.6 * 1.3, 0.01)
+    	assert_almost_eq(minion.damage, 12.0 * 1.25 * 1.3, 0.01)
 
 
     func test_minions_stand_still_while_lucian_is_untouchable() -> void:
@@ -1404,10 +1442,10 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
 
     ## HP, damage and reward growth per act after the first; HP and damage
     ## growth per wave after the first.
-    const ACT_HP := 0.4
+    const ACT_HP := 0.6
     const ACT_DAMAGE := 0.25
     const ACT_REWARD := 0.25
-    const WAVE_GROWTH := 0.1
+    const WAVE_GROWTH := 0.15
 
     @export var id: StringName
     @export var display_name := ""
@@ -2276,12 +2314,13 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
 
 ---
 
-### Task 6: Save system: first-time boss purple, a new game in any slot
+### Task 6: Save system: first-time boss purple, a new game in any slot, play time
 
 **Files:** Modify `src/core/save_game.gd` and `src/ui/debug/main_debug_table.gd`. Tests: extend `tests/unit/test_save_game.gd` and `tests/unit/test_main_debug.gd`.
 
 **Interfaces — Produces:**
-- `SaveGame`: `BOSS_IDS`, `bosses: Array[String]`, `award_boss(id, first, repeat) -> int`, `forget_bosses()`, `start_new(of_slot) -> bool`, `any_slot_exists() -> bool`.
+- `SaveGame`: `BOSS_IDS`, `bosses: Array[String]`, `award_boss(id, first, repeat) -> int`, `forget_bosses()`, `start_new(of_slot) -> bool`, `any_slot_exists() -> bool`, `play_time: float` (seconds), `add_play_time(seconds)`, `play_time_of(of_slot) -> int`, `static play_time_text(seconds) -> String`.
+- The save gains `"play_time": 5025` (whole seconds).
 - The save gains a `"bosses"` key, e.g. `["thresh_1"]`.
 
 - [ ] **Step 1: Failing tests** (`test_save_game.gd`; `save_game` and `PREFIX` are the file's own, and its `after_each` already deletes slots 1–3):
@@ -2324,6 +2363,22 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
   	assert_false(save_game.any_slot_exists())
   	save_game.copy_to(3)
   	assert_true(save_game.any_slot_exists())
+
+
+  func test_play_time_round_trips_and_reads_per_slot() -> void:
+  	save_game.add_play_time(5025.4)
+  	save_game.save()
+  	assert_eq(save_game.play_time_of(1), 5025)
+  	assert_eq(save_game.play_time_of(2), 0)
+  	var loaded := SaveGame.new(PREFIX)
+  	loaded.load_slot(1)
+  	assert_almost_eq(loaded.play_time, 5025.0, 0.001)
+
+
+  func test_play_time_text() -> void:
+  	assert_eq(SaveGame.play_time_text(5025), "1h 23m")
+  	assert_eq(SaveGame.play_time_text(59), "0m")
+  	assert_eq(SaveGame.play_time_text(600), "10m")
   ```
   - `test_main_debug.gd`: "Forget boss purple" empties `bosses`.
 - [ ] **Step 2:** Run → FAIL.
@@ -2366,14 +2421,40 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
   			return true
   	return false
   ```
-  - `reset()` sets `bosses = []`. `to_dict()` adds `"bosses": bosses.duplicate()`.
+  - `reset()` sets `bosses = []` and `play_time = 0.0`. `to_dict()` adds `"bosses": bosses.duplicate()` and `"play_time": int(play_time)`.
+  - Play time (Game adds to it in Task 13; nothing saves by itself):
+    ```gdscript
+    ## Seconds played in this slot (title screen and pauses not counted).
+    var play_time := 0.0
+
+
+    func add_play_time(seconds: float) -> void:
+    	play_time += maxf(seconds, 0.0)
+
+
+    ## The play time written in `of_slot` (main file, else backup), in whole seconds.
+    func play_time_of(of_slot: int) -> int:
+    	for file in [path(of_slot), backup_path(of_slot)]:
+    		var data := _read(file)
+    		if not data.is_empty():
+    			var seconds: Variant = data.get("play_time", 0)
+    			return maxi(int(seconds), 0) if (seconds is int or seconds is float) else 0
+    	return 0
+
+
+    ## "1h 23m", or "23m" under an hour.
+    static func play_time_text(seconds: int) -> String:
+    	var minutes := seconds / 60
+    	return "%dh %02dm" % [minutes / 60, minutes % 60] if minutes >= 60 else "%dm" % minutes
+    ```
+    `_apply` reads `"play_time"` like `"endless_best"` (a number, never below 0).
   - `_apply` reads `"bosses"` like `"cleared"`: Strings in `BOSS_IDS` only, no repeats.
   - The doc comments change:
     - `slot`: "The current slot: every save writes to it. The title screen picks it."
     - `instance()`: "The running game's progress: slot 1 until the title screen loads another."
   - `MainDebugTable` gets a "Forget boss purple" button on its Progress tab that calls `SaveGame.instance().forget_bosses()`.
 - [ ] **Step 4:** Run → PASS. Full suite → PASS.
-- [ ] **Step 5:** Commit `"Save: first-time boss purple, a new game in any slot"`.
+- [ ] **Step 5:** Commit `"Save: first-time boss purple, a new game in any slot, play time"`.
 
 ---
 
@@ -2781,8 +2862,8 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
   - Reads: `wave_count()`, `total_waves()`, `waves_done()`, `is_boss_wave()`, `is_waiting()`, `countdown()`, `alive()`.
   - Signals: `spawn_requested(enemy_id, wave)`, `wave_started(wave)`, `break_started(seconds)`, `break_ended`, `boss_wave_started(boss_id)`, `cleared`.
 - `StageSetup`: `TUTORIAL_STAGE`, `display_name`, `boss`, `tutorial`, `static for_stage(save, act, stage)`.
-- `StageResult` (CanvasLayer): `cleared`, `title`, `continue_button`, `show_result(cleared, stage_name, waves_text, collected, rewards)`, `signal continue_pressed`.
-- `Stage`: `runner`, `result`, `reward_lines`, `LUCIAN_NUMBER_SCALE`, `skip_break()`, `show_result(cleared)`.
+- `StageResult` (CanvasLayer): `cleared`, `title`, `continue_button`, `show_result(cleared, stage_name, waves_text, collected, rewards)`, `static clock(seconds) -> String`, `signal continue_pressed`.
+- `Stage`: `runner`, `result`, `reward_lines`, `elapsed` (seconds played in this stage, pauses not counted), `LUCIAN_NUMBER_SCALE`, `skip_break()`, `show_result(cleared)`.
 - `ScreenSwitcher.locked`.
 
 - [ ] **Step 1: Failing tests.**
@@ -2963,6 +3044,20 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     	esc.pressed = true
     	stage.screens._input(esc)
     	assert_false(stage.screens.menu.visible)
+
+
+    func test_the_result_shows_the_stage_time() -> void:
+    	var stage: Stage = await _stage(2, 1)
+    	await wait_seconds(0.5)
+    	stage.show_result(true)
+    	assert_gt(stage.elapsed, 0.4)
+    	var texts := stage.result.find_children("*", "Label", true, false).map(func(label: Label) -> String: return label.text)
+    	assert_true(texts.any(func(text: String) -> bool: return text.contains("Time 0:01")), str(texts))
+
+
+    func test_the_clock() -> void:
+    	assert_eq(StageResult.clock(17.2), "0:18")
+    	assert_eq(StageResult.clock(65.0), "1:05")
     ```
   - `test_game.gd` gains:
     ```gdscript
@@ -3222,6 +3317,12 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     	_build()
 
 
+    ## "4:32": minutes and seconds, rounded up.
+    static func clock(seconds: float) -> String:
+    	var whole := ceili(seconds)
+    	return "%d:%02d" % [whole / 60, whole % 60]
+
+
     func show_result(is_cleared: bool, stage_name: String, waves_text: String, collected: Dictionary, rewards: Array[String]) -> void:
     	cleared = is_cleared
     	title.text = "STAGE CLEARED" if cleared else "DEFEATED"
@@ -3290,6 +3391,8 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     var result := StageResult.new()
     ## First-clear rewards, for the result panel.
     var reward_lines: Array[String] = []
+    ## Seconds played in this stage (the stage only processes while unpaused).
+    var elapsed := 0.0
 
     var _next_spawn := 0
     ```
@@ -3305,7 +3408,10 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     Then:
     ```gdscript
     func _process(delta: float) -> void:
-    	if runner and not result.visible and not lucian.dead:
+    	if result.visible:
+    		return
+    	elapsed += delta
+    	if runner and not lucian.dead:
     		runner.tick(delta)
 
 
@@ -3324,8 +3430,8 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     		screens.set_backpack_open(false)
     	screens.set_menu_open(false)
     	screens.locked = true
-    	var waves_text := "Waves cleared: %d / %d" % [runner.waves_done(), runner.total_waves()] if runner else ""
-    	result.show_result(is_cleared, run.display_name, waves_text, collected, reward_lines)
+    	var waves_text := "Waves cleared: %d / %d   ·   " % [runner.waves_done(), runner.total_waves()] if runner else ""
+    	result.show_result(is_cleared, run.display_name, waves_text + "Time %s" % StageResult.clock(elapsed), collected, reward_lines)
     	get_tree().paused = true
 
 
@@ -3385,7 +3491,7 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
 
 **Interfaces — Produces:**
 - `StageInfo` (PanelContainer):
-  - `setup(stage_name, runner)`, `refresh()`, `static clock(seconds) -> String`, `signal skip_pressed`.
+  - `setup(stage_name, runner)`, `refresh()`, `signal skip_pressed` (times use `StageResult.clock`).
   - Labels and button: `name_label`, `wave_label`, `enemies_label`, `timer_label`, `skip_button`.
 - `BossBar` (Control): `boss`, `phase_text`, `SIZE`.
 - `Radar` (Control):
@@ -3425,11 +3531,6 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
   	assert_eq(info.name_label.text, "Training")
   	assert_false(info.wave_label.visible)
   	assert_false(info.skip_button.visible)
-
-
-  func test_the_clock() -> void:
-  	assert_eq(StageInfo.clock(17.2), "0:18")
-  	assert_eq(StageInfo.clock(65.0), "1:05")
 
 
   func test_skip_on_the_hud_starts_the_wave() -> void:
@@ -3542,16 +3643,10 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     	if waiting:
     		var next := runner.wave + 1
     		var what := "Boss wave" if next > runner.wave_count() else "Wave %d" % next
-    		timer_label.text = "%s in %s" % [what, clock(runner.countdown())]
+    		timer_label.text = "%s in %s" % [what, StageResult.clock(runner.countdown())]
     	else:
     		wave_label.text = "Boss wave" if runner.is_boss_wave() else "Wave %d/%d" % [runner.wave, runner.wave_count()]
     		enemies_label.text = "Enemies: %d" % runner.alive()
-
-
-    ## "0:17": minutes and seconds, rounded up.
-    static func clock(seconds: float) -> String:
-    	var whole := ceili(seconds)
-    	return "%d:%02d" % [whole / 60, whole % 60]
     ```
   - `BossBar`:
     ```gdscript
@@ -3998,7 +4093,7 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     		target.displace(target.global_position + global_position.direction_to(target.global_position) * FLAY_PUSH, PULL_SPEED)
     ```
   - `data/enemies/thresh_1.tres`:
-    - Stats: `kind = &"boss"`, `behavior = &"thresh"`, `max_hp = 2400.0`, `armor = 30.0`, `mr = 30.0`, `damage = 30.0`, `attack_range = 450.0`, `attack_interval = 1.8`, `move_speed = 300.0`, `radius = 44.0`, `projectile_speed = 900.0`.
+    - Stats: `kind = &"boss"`, `behavior = &"thresh"`, `max_hp = 3000.0`, `armor = 30.0`, `mr = 30.0`, `damage = 30.0`, `attack_range = 450.0`, `attack_interval = 1.8`, `move_speed = 300.0`, `radius = 44.0`, `projectile_speed = 900.0`.
     - Rewards: `gold = 300`, `purple_first = 10`, `purple_repeat = 0`.
   - `Senna`:
     ```gdscript
@@ -4331,7 +4426,7 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
 - Constants as below. `swinging() -> bool`.
 
 **`data/enemies/akshan.tres`:**
-- Stats: `kind = &"boss"`, `behavior = &"akshan"`, `max_hp = 4000.0`, `armor = 35.0`, `mr = 30.0`, `damage = 28.0`, `attack_range = 550.0`, `attack_interval = 1.4`, `move_speed = 320.0`, `radius = 40.0`, `projectile_speed = 1200.0`.
+- Stats: `kind = &"boss"`, `behavior = &"akshan"`, `max_hp = 5000.0`, `armor = 35.0`, `mr = 30.0`, `damage = 28.0`, `attack_range = 550.0`, `attack_interval = 1.4`, `move_speed = 320.0`, `radius = 40.0`, `projectile_speed = 1200.0`.
 - Rewards: `gold = 300`, `purple_first = 10`, `purple_repeat = 2`.
 
 - [ ] **Step 1: Failing tests** (`test_akshan.gd`):
@@ -4724,7 +4819,7 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
   - `show_menu()`, `show_slots(loading: bool)`, `is_showing_slots() -> bool`, `find_button(text) -> Button`.
   - Signals: `new_game_started`, `game_loaded`, `exit_requested`.
 - `GearMenu.leave_requested`. `MainScreen.leave_requested`.
-- `Game`: `show_title()`, `ask_to_leave()`.
+- `Game`: `show_title()`, `ask_to_leave()`. Play time: `Game._process` adds to `SaveGame.play_time` everywhere but the title screen; pauses don't count (Game pauses with the tree).
 
 - [ ] **Step 1: Failing tests.**
   - `test_title_screen.gd` (slot files deleted in `before_each`/`after_each`, as in `test_main_screen.gd`):
@@ -4831,6 +4926,21 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     	await wait_frames(2)
     	assert_is(game.screen, TitleScreen)
     	assert_true(SaveGame.instance().slot_exists(SaveGame.instance().slot))
+
+
+    func test_play_time_counts_off_the_title_screen_only() -> void:
+    	await wait_seconds(0.3)
+    	assert_eq(SaveGame.instance().play_time, 0.0)
+    	game.show_main_screen()
+    	await wait_seconds(0.3)
+    	assert_gt(SaveGame.instance().play_time, 0.2)
+
+
+    func test_the_slot_list_shows_play_time() -> void:
+    	SaveGame.instance().add_play_time(5025.0)
+    	SaveGame.instance().copy_to(2)
+    	_title().show_slots(true)
+    	assert_string_contains(_title().slot_list.buttons[1].text, "1h 23m")
     ```
   - `test_game.gd`:
     - `test_starts_on_the_main_screen` becomes `test_starts_on_the_title_screen`.
@@ -4842,8 +4952,8 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     ```gdscript
     class_name SlotList
     extends VBoxContainer
-    ## The 3 save slots as buttons: "Slot 2 · saved 2026-10-28 14:03", "Slot 3 ·
-    ## empty" or "Slot 1 (current)". The owner decides what a pick does. Used
+    ## The 3 save slots as buttons: "Slot 2 · 1h 23m · saved 2026-10-28 14:03",
+    ## "Slot 3 · empty" or "Slot 1 (current)". The owner decides what a pick does. Used
     ## by Save as copy, Start new game and Load game.
 
     signal picked(slot: int, used: bool)
@@ -4876,7 +4986,7 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     		if n == current:
     			button.text = "Slot %d (current)" % n
     		elif used:
-    			button.text = "Slot %d · saved %s" % [n, save.saved_at(n).substr(0, 16)]
+    			button.text = "Slot %d · %s · saved %s" % [n, SaveGame.play_time_text(save.play_time_of(n)), save.saved_at(n).substr(0, 16)]
     		else:
     			button.text = "Slot %d · empty" % n
     		button.disabled = n == current or (not used and not empty_enabled)
@@ -5060,6 +5170,13 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     	show_title()
 
 
+    ## Play time, for the slot lists: everywhere but the title screen. Game pauses
+    ## with the tree, so pauses don't count.
+    func _process(delta: float) -> void:
+    	if screen and not screen is TitleScreen:
+    		SaveGame.instance().add_play_time(delta)
+
+
     ## The title screen has nothing unsaved: its Exit and the window's X quit at once.
     func _notification(what: int) -> void:
     	if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -5196,11 +5313,12 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
     - The super minion's numbers and Akshan's numbers.
     - The training ground and the pillars per stage.
   - **`lucian_game_design.md`:**
-    - §3: the stage flow as built (countdown, spawns in groups, Skip and regen, death, result).
+    - §1: "Target length" becomes "A skilled player needs at least 5–7 hours to beat the story", plus the **Pacing** table and rules of thumb from this plan.
+    - §3: the stage flow as built (countdown, spawns in groups, Skip and regen, death, result with the stage time).
     - §9: the drops as built, the tree's economy bonuses, item loot.
-    - §11: Stage Gold / Bonus XP / Essence Drops now work.
+    - §11: Stage Gold / Bonus XP / Essence Drops now work. The balance goal reads "in 5–7 hours".
     - §13: maps built.
-    - §15: slots on the title screen, `"bosses"`, `start_new`, Leave to main menu; delete "Not saved yet: which bosses…".
+    - §15: slots on the title screen, `"bosses"`, `"play_time"`, `start_new`, Leave to main menu; delete "Not saved yet: which bosses…".
     - §16: tick the title screen.
   - **`ui_design.md`:**
     - "Top center – Stage info" as built, the FPS move, the radar as built, the boss bar.
@@ -5213,6 +5331,7 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
   - What was asked → what was built (a table).
   - Choices made where the request was open.
   - Verification (suite count, scenarios).
+  - Pacing: the budget table, and the stage times measured in the screenshot runs (the cleared stages' result panels).
   - Screenshots.
   - Known limits:
     - Acts 3–6 and Endless still wait.
@@ -5255,4 +5374,5 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
    10. **Buy Guardian Angel** (debug gold and Give) and die: gold stasis, then a revive at half base HP.
    11. **Gear → Leave to main menu → Yes** → the title. Load game → slot 1 is there, with the same progress.
    12. **Close the window** on the title: no prompt. During a stage: "Save before leaving?".
-4. **Save file:** after Act 1, `save_slot_1.json` has `"cleared": ["1-1"]` and `"bosses": ["thresh_1"]`.
+4. **Save file:** after Act 1, `save_slot_1.json` has `"cleared": ["1-1"]`, `"bosses": ["thresh_1"]` and a `"play_time"`.
+5. **Pacing:** note each result panel's time. Act 1 should take about 8–10 minutes and Act 2's three stages 30–40 in all (the slot list's play time shows the total). Much faster means `EnemyData.ACT_HP` and the bosses' HP go up.
