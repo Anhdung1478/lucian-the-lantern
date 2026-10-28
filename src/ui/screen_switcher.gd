@@ -4,10 +4,14 @@ extends Node
 ## (the backpack in shop mode, opened by walking to the merchant), the menu on
 ## ESC and the settings over the menu. The only place that pauses the game.
 ## Keys are read in _input, so a focused text field can never swallow them.
+## ESC first drops a cast being aimed (normal cast), if any.
 
 ## The plain backpack opened or closed. The shop never docks the debug table
 ## right, since the shop panel takes that side.
 signal backpack_toggled(open: bool)
+
+## Set by the stage; asked to drop an aimed cast before ESC opens the menu.
+var controller: LucianController
 
 @onready var menu: GameMenu = $Menu
 @onready var backpack: BackpackScreen = $Backpack
@@ -27,7 +31,9 @@ func _input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed(&"open_menu"):
 		# ESC closes the backpack or shop first; the menu only opens over the game.
-		if backpack.visible:
+		if controller and controller.cancel_aim():
+			pass
+		elif backpack.visible:
 			set_backpack_open(false)
 		else:
 			set_menu_open(not menu.visible)

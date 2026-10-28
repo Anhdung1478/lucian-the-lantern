@@ -2,6 +2,12 @@ class_name LucianController
 extends Node
 ## Turns player input into Lucian commands. Uses _unhandled_input so clicks
 ## that land on the HUD or the debug table never reach the world.
+##
+## Skill, item and summoner keys cast by their cast mode (a setting per key):
+## quick cast fires on press; quick cast with indicator shows the range while
+## the key is held and fires on release; normal cast shows it on press and
+## fires on left-click (right-click, ESC or the key again cancels). Casts with
+## no aim, or not ready, always fire on press.
 
 ## Holding move re-issues the order once the cursor has moved this far.
 const REISSUE_DISTANCE := 8.0
@@ -19,6 +25,9 @@ const SKILL_ACTIONS := {
 var _move_held := false
 var _last_move_point := Vector2.ZERO
 var _attack_move_armed := false
+## The key whose cast is being aimed (&"" when none), and its cast mode.
+var _aiming: StringName = &""
+var _aim_mode := ""
 
 @onready var lucian: Lucian = get_parent()
 
@@ -33,23 +42,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		# A focused debug SpinBox would otherwise keep eating Q/W/E/R.
 		get_viewport().gui_release_focus()
-	for action: StringName in SKILL_ACTIONS:
+	if _aiming != &"" and _aim_input(event):
+		get_viewport().set_input_as_handled()
+		return
+	for action in GameSettings.CASTABLE:
 		if event.is_action_pressed(action):
 			# Ctrl+Q also matches skill_q, so the rank-up check comes first.
-			if (event as InputEventWithModifiers).ctrl_pressed:
+			var with_ctrl := event is InputEventWithModifiers and (event as InputEventWithModifiers).ctrl_pressed
+			if SKILL_ACTIONS.has(action) and with_ctrl:
 				lucian.try_rank_up(SKILL_ACTIONS[action])
 			else:
-				lucian.try_cast(SKILL_ACTIONS[action], _cursor())
-			get_viewport().set_input_as_handled()
-			return
-	for slot in ITEM_ACTIONS.size():
-		if event.is_action_pressed(ITEM_ACTIONS[slot]):
-			lucian.use_equip_slot(slot, _cursor())
-			get_viewport().set_input_as_handled()
-			return
-	for slot in SUMMONER_ACTIONS.size():
-		if event.is_action_pressed(SUMMONER_ACTIONS[slot]):
-			lucian.use_summoner(slot, _cursor())
+				_press_cast(action)
 			get_viewport().set_input_as_handled()
 			return
 	if event.is_action_pressed(&"move"):
@@ -61,6 +64,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_move_held = true
 			_issue_move()
 	elif event.is_action_pressed(&"attack_move"):
+		cancel_aim()
 		_set_attack_move_armed(true)
 	elif event.is_action_pressed(&"attack"):
 		if _attack_move_armed:
@@ -75,11 +79,101 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 
-## A pause screen opening drops the held move and the armed attack-move.
+## A pause screen opening drops the held move, the armed attack-move and the
+## cast being aimed.
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PAUSED:
 		_move_held = false
 		_set_attack_move_armed(false)
+		cancel_aim()
+
+
+## The key whose cast is being aimed, or &"".
+func aiming() -> StringName:
+	return _aiming
+
+
+## Drops the cast being aimed. False when there was none (ESC then opens the
+## menu instead).
+func cancel_aim() -> bool:
+	if _aiming == &"":
+		return false
+	_aiming = &""
+	lucian.indicator.aimed = null
+	return true
+
+
+func _process(_delta: float) -> void:
+	if _aiming == &"":
+		return
+	# Quick cast with indicator fires once the key is let go.
+	if _aim_mode == "indicator" and not Input.is_action_pressed(_aiming):
+		_fire_aim()
+		return
+	lucian.indicator.aim_point = _cursor()
+
+
+## A cast key pressed: fired now, or aimed first by its cast mode.
+func _press_cast(action: StringName) -> void:
+	cancel_aim()
+	var mode := GameSettings.instance().cast_mode(action)
+	var shape := _range_of(action)
+	if mode == "quick" or shape == null or not _ready_to_cast(action):
+		_cast(action, _cursor())
+		return
+	_set_attack_move_armed(false)
+	_aiming = action
+	_aim_mode = mode
+	lucian.indicator.aimed = shape
+	lucian.indicator.aim_point = _cursor()
+
+
+## While aiming in normal cast: left-click fires, right-click or the same key
+## cancels. Another cast key takes over the aim (the caller handles it).
+## True when the event was used.
+func _aim_input(event: InputEvent) -> bool:
+	if _aim_mode == "normal":
+		if event.is_action_pressed(&"attack"):
+			_fire_aim()
+			return true
+		if event.is_action_pressed(&"move") or event.is_action_pressed(_aiming):
+			cancel_aim()
+			return true
+	return false
+
+
+func _fire_aim() -> void:
+	var action := _aiming
+	cancel_aim()
+	_cast(action, _cursor())
+
+
+func _cast(action: StringName, aim: Vector2) -> void:
+	if SKILL_ACTIONS.has(action):
+		lucian.try_cast(SKILL_ACTIONS[action], aim)
+	elif ITEM_ACTIONS.has(action):
+		lucian.use_equip_slot(ITEM_ACTIONS.find(action), aim)
+	else:
+		lucian.use_summoner(SUMMONER_ACTIONS.find(action), aim)
+
+
+## The range indicator's shape for the cast on `action`, or null without aim.
+func _range_of(action: StringName) -> CastRange:
+	if SKILL_ACTIONS.has(action):
+		return lucian.skill_range(SKILL_ACTIONS[action])
+	if ITEM_ACTIONS.has(action):
+		return lucian.equip_range(ITEM_ACTIONS.find(action))
+	return lucian.summoner_range(SUMMONER_ACTIONS.find(action))
+
+
+## Off cooldown (and with the mana, for skills), so aiming it can end in a cast.
+func _ready_to_cast(action: StringName) -> bool:
+	if SKILL_ACTIONS.has(action):
+		return lucian.can_cast(SKILL_ACTIONS[action])
+	if ITEM_ACTIONS.has(action):
+		var item := lucian.inventory.item_at(Inventory.EQUIP_START + ITEM_ACTIONS.find(action))
+		return lucian.item_cooldown(item.id).is_ready()
+	return lucian.summoners.cooldown(lucian.summoners.spell_in(SUMMONER_ACTIONS.find(action)).id).is_ready()
 
 
 func _physics_process(_delta: float) -> void:

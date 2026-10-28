@@ -1,7 +1,7 @@
 class_name SettingsScreen
 extends CanvasLayer
-## Settings, opened from the ESC menu: Audio (volumes), Controls (rebinding),
-## Graphics (window, resolution, VSync, FPS cap, quality, FPS counter) and Gameplay
+## Settings, opened from the ESC menu: Audio (volumes), Controls (rebinding,
+## and a cast mode for each skill, item and summoner key), Graphics (window, resolution, VSync, FPS cap, quality, FPS counter) and Gameplay
 ## (skill queue). Every change applies at once and is saved. ESC or Back
 ## returns to the menu; while waiting for a new key, ESC cancels instead.
 ##
@@ -14,6 +14,7 @@ const PANEL_SIZE := Vector2(760, 640)
 const TAB_NAMES := ["Audio", "Controls", "Graphics", "Gameplay"]
 const ROW_HEIGHT := 40.0
 const BIND_WIDTH := 170.0
+const CAST_MODE_LABELS := ["Quick cast", "Quick + indicator", "Normal cast"]
 ## Pressed alone, these never become a binding.
 const MODIFIER_KEYS := [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META]
 const WHEEL_BUTTONS := [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN, MOUSE_BUTTON_WHEEL_LEFT, MOUSE_BUTTON_WHEEL_RIGHT]
@@ -23,6 +24,8 @@ var settings: GameSettings
 var _tab_buttons: Array[Button] = []
 var _pages: Array[Control] = []
 var _bind_buttons := {}
+## Castable action -> its cast mode picker.
+var _cast_modes := {}
 ## Greyed out unless the window mode is windowed.
 var _resolution: OptionButton
 ## The action waiting for a new key, or &"".
@@ -112,6 +115,9 @@ func _on_changed(key: StringName) -> void:
 		&"bindings":
 			_refresh_bindings()
 			settings.apply_input()
+		&"cast_modes":
+			for action: StringName in _cast_modes:
+				_cast_modes[action].select(GameSettings.CAST_MODES.find(settings.cast_mode(action)))
 		&"master_volume", &"music_volume", &"sfx_volume":
 			settings.apply_audio()
 		&"window_mode":
@@ -127,6 +133,19 @@ func _on_changed(key: StringName) -> void:
 func _refresh_bindings() -> void:
 	for action: StringName in _bind_buttons:
 		_bind_buttons[action].text = settings.key_label(action)
+
+
+func _cast_mode_picker(action: StringName) -> OptionButton:
+	var option := OptionButton.new()
+	option.focus_mode = Control.FOCUS_NONE
+	option.custom_minimum_size = Vector2(190, ROW_HEIGHT - 4.0)
+	option.add_theme_font_size_override(&"font_size", 15)
+	for label: String in CAST_MODE_LABELS:
+		option.add_item(label)
+	option.select(GameSettings.CAST_MODES.find(settings.cast_mode(action)))
+	option.item_selected.connect(func(index: int) -> void: settings.set_cast_mode(action, GameSettings.CAST_MODES[index]))
+	_cast_modes[action] = option
+	return option
 
 
 func _build() -> void:
@@ -224,17 +243,22 @@ func _build_controls() -> Control:
 		button.pressed.connect(listen.bind(action))
 		row.add_child(button)
 		_bind_buttons[action] = button
+		if GameSettings.CASTABLE.has(action):
+			row.add_child(_cast_mode_picker(action))
 	_refresh_bindings()
 	var bottom := HBoxContainer.new()
 	outer.add_child(bottom)
-	var hint := UiStyle.label("Click a binding, then press a key (or click it again with a mouse\nbutton). ESC or a click elsewhere cancels. Ctrl + a skill key ranks it up.\nCtrl + the stats key toggles the stats panel; hold it for more stats.", 14, UiStyle.DIM_COLOR)
+	var hint := UiStyle.label("Click a binding, then press a key (or click it again with a mouse button).\nESC or a click elsewhere cancels. Ctrl + a skill key ranks it up; Ctrl + the\nstats key toggles the stats panel (hold it for more). Quick + indicator casts on\nrelease; Normal casts on left-click (right-click, ESC or the key again cancels).", 14, UiStyle.DIM_COLOR)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(hint)
 	var reset := Button.new()
 	reset.text = "Reset to defaults"
 	reset.custom_minimum_size = Vector2(200, 40)
+	reset.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	UiStyle.style_button(reset, 16)
-	reset.pressed.connect(func() -> void: settings.reset_bindings())
+	reset.pressed.connect(func() -> void:
+		settings.reset_bindings()
+		settings.set_value(&"cast_modes", {}))
 	bottom.add_child(reset)
 	return outer
 

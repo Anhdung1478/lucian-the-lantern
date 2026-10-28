@@ -33,6 +33,7 @@ func _ready() -> void:
 	settings.changed.connect(_on_setting_changed)
 	lucian.queue_casts = settings.get_value(&"queue_casts")
 	screens.settings.setup(settings)
+	screens.controller = lucian.get_node("Controller")
 	add_child(Sfx.new())
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	camera.setup(lucian, arena.get_bounds().grow(TestArena.WALL_THICKNESS))

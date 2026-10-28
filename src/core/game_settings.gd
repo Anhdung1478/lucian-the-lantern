@@ -27,11 +27,23 @@ const DEFAULTS := {
 	&"quality": "high",
 	&"show_fps": false,
 	&"queue_casts": true,
+	## Key (action name) -> "indicator" or "normal". Keys not listed use quick
+	## cast. See CAST_MODES.
+	&"cast_modes": {},
 }
 const WINDOW_MODES := ["windowed", "borderless", "fullscreen"]
 const RESOLUTIONS := ["1280x720", "1366x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"]
 const QUALITIES := ["low", "medium", "high"]
 const FPS_CAPS := [30, 60, 120, 144, 0]
+## "quick" casts on press. "indicator" shows the range while the key is held
+## and casts on release. "normal" shows it on press and casts on left-click.
+const CAST_MODES := ["quick", "indicator", "normal"]
+## Keys that cast toward the cursor, each with its own cast mode.
+const CASTABLE: Array[StringName] = [
+	&"skill_q", &"skill_w", &"skill_e", &"skill_r",
+	&"summoner_d", &"summoner_f",
+	&"item_1", &"item_2", &"item_3", &"item_4", &"item_5", &"item_6",
+]
 ## Actions the player can rebind, in the order the Controls tab lists them.
 ## ESC (open_menu) and the F3 + Q debug toggle stay fixed.
 const REBINDABLE: Array[StringName] = [
@@ -91,6 +103,20 @@ func set_value(key: StringName, value: Variant) -> void:
 	_values[key] = value
 	save()
 	changed.emit(key)
+
+
+func cast_mode(action: StringName) -> String:
+	return (_values[&"cast_modes"] as Dictionary).get(String(action), "quick")
+
+
+func set_cast_mode(action: StringName, mode: String) -> void:
+	# A copy, so the default dictionary is never changed.
+	var modes: Dictionary = (_values[&"cast_modes"] as Dictionary).duplicate()
+	if mode == "quick":
+		modes.erase(String(action))
+	else:
+		modes[String(action)] = mode
+	set_value(&"cast_modes", modes)
 
 
 ## Effects that cost the most (dash trails, muzzle flashes) are skipped on low.
@@ -287,6 +313,13 @@ func _load() -> void:
 				continue
 			if typeof(value) == typeof(DEFAULTS[name]):
 				_values[name] = value
+	# Only castable keys with a known mode.
+	var modes := {}
+	for action: Variant in _values[&"cast_modes"]:
+		var mode: Variant = _values[&"cast_modes"][action]
+		if action is String and CASTABLE.has(StringName(action)) and mode is String and CAST_MODES.has(mode) and mode != "quick":
+			modes[action] = mode
+	_values[&"cast_modes"] = modes
 	var bindings: Dictionary = data.get("bindings", {})
 	for key: String in bindings:
 		var action := StringName(key)

@@ -164,3 +164,30 @@ func test_binding_an_unbound_action_takes_the_key_from_its_owner() -> void:
 	loaded.rebind(&"center_camera", key(KEY_SPACE))
 	assert_eq(loaded.key_label(&"center_camera"), "Space")
 	assert_eq(loaded.key_label(&"toggle_camera"), "-")
+
+
+func test_cast_modes_default_to_quick_cast() -> void:
+	for action in GameSettings.CASTABLE:
+		assert_eq(settings.cast_mode(action), "quick", str(action))
+
+
+func test_cast_modes_are_saved_per_key() -> void:
+	settings.set_cast_mode(&"skill_q", "normal")
+	settings.set_cast_mode(&"item_1", "indicator")
+	var loaded := GameSettings.new(PATH)
+	assert_eq(loaded.cast_mode(&"skill_q"), "normal")
+	assert_eq(loaded.cast_mode(&"item_1"), "indicator")
+	assert_eq(loaded.cast_mode(&"skill_w"), "quick")
+	settings.set_cast_mode(&"skill_q", "quick")
+	assert_eq(GameSettings.new(PATH).cast_mode(&"skill_q"), "quick")
+	assert_eq(GameSettings.DEFAULTS[&"cast_modes"], {}, "the default is never changed")
+
+
+func test_unknown_cast_modes_and_keys_are_dropped() -> void:
+	var file := FileAccess.open(PATH, FileAccess.WRITE)
+	file.store_string(JSON.stringify({"version": 1, "values": {"cast_modes": {"skill_q": "normal", "skill_w": "sideways", "open_backpack": "normal"}}}))
+	file.close()
+	var loaded := GameSettings.new(PATH)
+	assert_eq(loaded.cast_mode(&"skill_q"), "normal")
+	assert_eq(loaded.cast_mode(&"skill_w"), "quick")
+	assert_eq(loaded.get_value(&"cast_modes"), {"skill_q": "normal"})

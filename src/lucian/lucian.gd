@@ -182,15 +182,12 @@ func try_rank_up(slot: ChampionProgress.Slot) -> bool:
 ## only by a cast time or a dash is queued when queue_casts is on.
 func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 	var culling := skills[ChampionProgress.Slot.R] as TheCulling
-	if culling.is_channeling():
-		if slot == ChampionProgress.Slot.R:
-			culling.stop()
-			return true
-		if slot != ChampionProgress.Slot.E:
-			return false
-	var skill := skills[slot]
-	if skill.rank() == 0 or not skill.cooldown.is_ready() or mana < skill.mana_cost():
+	if culling.is_channeling() and slot == ChampionProgress.Slot.R:
+		culling.stop()
+		return true
+	if not can_cast(slot):
 		return false
+	var skill := skills[slot]
 	if is_cast_locked() or is_dashing():
 		if queue_casts:
 			_queued_slot = slot
@@ -203,6 +200,16 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 	passive.charge()
 	passives.on_cast(slot)
 	return true
+
+
+## Learned, off cooldown, with the mana for it, and not held back by R (only
+## E can be cast while R fires): try_cast casts it now, or queues it behind a
+## cast time or a dash.
+func can_cast(slot: ChampionProgress.Slot) -> bool:
+	if (skills[ChampionProgress.Slot.R] as TheCulling).is_channeling() and slot != ChampionProgress.Slot.E:
+		return false
+	var skill := skills[slot]
+	return skill.rank() > 0 and skill.cooldown.is_ready() and mana >= skill.mana_cost()
 
 
 ## Skills another skill holds back, greyed on the HUD: Q and W while R

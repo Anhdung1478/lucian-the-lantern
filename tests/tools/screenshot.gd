@@ -90,6 +90,8 @@ func _run(scenario: String) -> void:
 			await scenario_camera()
 		"indicators":
 			await scenario_indicators()
+		"cast_modes":
+			await scenario_cast_modes()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -907,3 +909,37 @@ func scenario_indicators() -> void:
 	await mouse_move(Vector2(200, 200))
 	await wait(0.1)
 	print("off the HUD (expect none): ", "none" if lucian.indicator.shown() == null else "shown")
+
+
+## Normal cast: pressing a key aims at the cursor until a left-click.
+func scenario_cast_modes() -> void:
+	var settings := GameSettings.instance()
+	var controller: LucianController = lucian.get_node("Controller")
+	lucian.progress.set_level(6)
+	for slot in [ChampionProgress.Slot.Q, ChampionProgress.Slot.W, ChampionProgress.Slot.E, ChampionProgress.Slot.R]:
+		lucian.try_rank_up(slot)
+	for action in [&"skill_q", &"skill_e", &"summoner_d"]:
+		settings.set_cast_mode(action, "normal")
+	var screen := root.get_visible_rect().size
+	await mouse_move(screen * Vector2(0.75, 0.3))
+	await press_key(KEY_Q, true)
+	await press_key(KEY_Q, false)
+	await wait(0.1)
+	print("aiming Q (expect skill_q): ", controller.aiming())
+	await shot("cast_modes_0_q_aimed")
+	await press_key(KEY_E, true)
+	await press_key(KEY_E, false)
+	await mouse_move(screen * Vector2(0.58, 0.42))
+	await wait(0.1)
+	print("aiming E (expect skill_e): ", controller.aiming())
+	await shot("cast_modes_1_e_landing")
+	await press_key(KEY_D, true)
+	await press_key(KEY_D, false)
+	await mouse_move(screen * Vector2(0.62, 0.62))
+	await wait(0.1)
+	await shot("cast_modes_2_flash")
+	await mouse_button(screen * Vector2(0.62, 0.62), true)
+	await mouse_button(screen * Vector2(0.62, 0.62), false)
+	await wait(0.1)
+	print("after the click (expect none, flash used): ", controller.aiming(), " ", not lucian.summoners.cooldown(&"flash").is_ready())
+	settings.set_value(&"cast_modes", {})
