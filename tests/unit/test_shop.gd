@@ -103,3 +103,10 @@ func test_refresh_costs_gold() -> void:
 	wallet.add(MerchantStock.REFRESH_COST)
 	assert_eq(shop.refresh(), Result.OK)
 	assert_eq(wallet.gold, 0)
+
+
+func test_a_refresh_costs_what_the_shop_says() -> void:
+	shop.refresh_cost = 50
+	wallet.add(120)
+	assert_eq(shop.refresh(), Result.OK)
+	assert_eq(wallet.gold, 70)

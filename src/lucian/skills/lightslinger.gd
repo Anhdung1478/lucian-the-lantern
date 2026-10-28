@@ -8,6 +8,8 @@ extends Node
 @export var second_shot_delay := 0.15
 @export var e_cooldown_reduction := 1.0
 
+## Bought in the Evolution Tree. Unlearned, skills never charge the second shot.
+var learned := true
 var charged := false
 
 var _second_shot_target: Enemy
@@ -24,6 +26,8 @@ func describe() -> String:
 
 
 func charge() -> void:
+	if not learned:
+		return
 	charged = true
 
 

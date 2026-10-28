@@ -101,6 +101,12 @@ func _process(_delta: float) -> void:
 		return
 	_overlay.queue_redraw()
 	if skill == null:
+		# The passive: locked and grey until the Evolution Tree teaches it.
+		var learned := lucian.passive.learned
+		_lock.visible = not learned
+		var passive_material: Material = null if learned else _grey
+		if _icon.material != passive_material:
+			_icon.material = passive_material
 		return
 	var progress := lucian.progress
 	var cost := skill.mana_cost()
@@ -167,7 +173,7 @@ func _draw_overlay() -> void:
 		var fraction := skill.cooldown.fraction_remaining()
 		if fraction > 0.005:
 			_overlay.draw_colored_polygon(sweep_polygon(fraction, _icon_size), SWEEP_COLOR)
-	elif lucian.passive.charged:
+	elif lucian.passive.learned and lucian.passive.charged:
 		_overlay.draw_rect(rect.grow(-2.0), DOT_ON, false, 4.0)
 		return
 	_overlay.draw_rect(rect, FRAME_COLOR, false, 2.0)

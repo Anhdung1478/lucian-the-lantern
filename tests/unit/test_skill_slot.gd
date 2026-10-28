@@ -47,3 +47,16 @@ func test_rank_up_button_states() -> void:
 	lucian.try_rank_up(Slot.E)
 	await wait_process_frames(1)
 	assert_false(slots[Slot.Q]._plus.visible, "no points, no +")
+
+
+func test_the_passive_slot_locks_when_not_learned() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var ui := SkillSlot.new()
+	ui.setup(lucian, null, null, "", SkillSlot.PASSIVE_SIZE)
+	add_child_autofree(ui)
+	await wait_process_frames(1)
+	assert_false(ui._lock.visible, "learned: no lock")
+	lucian.passive.learned = false
+	await wait_process_frames(1)
+	assert_true(ui._lock.visible, "unlearned: locked")

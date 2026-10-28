@@ -93,6 +93,7 @@ func open_shop(new_shop: Shop) -> void:
 	shop = new_shop
 	_shop_panel.visible = true
 	_shop_panel.show_tab(0)
+	_shop_panel.show_refresh_cost(shop.refresh_cost)
 	_recipes.visible = false
 	open()
 	_place_column()

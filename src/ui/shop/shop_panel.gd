@@ -76,7 +76,7 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	_message.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(_message)
 	_refresh = Button.new()
-	_refresh.text = "Refresh  %d" % MerchantStock.REFRESH_COST
+	_refresh.text = "Refresh"
 	_refresh.icon = ShopSlot.COIN
 	_refresh.expand_icon = false
 	_refresh.add_theme_constant_override(&"icon_max_width", 22)
@@ -86,6 +86,11 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	_refresh.pressed.connect(func() -> void: screen.refresh_shop())
 	bottom.add_child(_refresh)
 	show_tab(0)
+
+
+## Shows what the open shop charges for a refresh.
+func show_refresh_cost(cost: int) -> void:
+	_refresh.text = "Refresh  %d" % cost
 
 
 func show_tab(tab: int) -> void:

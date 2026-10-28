@@ -203,3 +203,44 @@ func test_barrier_shows_a_buff_and_grows_with_heal_and_shield_power() -> void:
 	var card := TooltipCard.buff(barrier[0])
 	assert_not_null(card)
 	card.free()
+
+
+func test_a_locked_f_key_has_no_spell_and_cannot_cast() -> void:
+	var setup := StageSetup.new()
+	setup.summoner_slots = 1
+	lucian.apply_setup(setup)
+	assert_null(lucian.summoners.spell_in(1))
+	assert_false(lucian.use_summoner(1, Vector2.ZERO))
+
+
+func test_an_empty_slot_has_no_spell() -> void:
+	lucian.summoners.slots = [&"flash", &""]
+	assert_null(lucian.summoners.spell_in(1))
+	assert_false(lucian.use_summoner(1, Vector2.ZERO))
+
+
+func test_flash_upgrade_shortens_its_cooldown() -> void:
+	var setup := StageSetup.new()
+	setup.summoner_upgrades = {&"flash": -0.2}
+	lucian.apply_setup(setup)
+	assert_true(lucian.use_summoner(0, Vector2(1000, 0)))
+	assert_almost_eq(lucian.summoners.cooldown(&"flash").remaining, 72.0, 0.001)
+
+
+func test_heal_upgrade_strengthens_the_heal() -> void:
+	var setup := StageSetup.new()
+	setup.summoner_upgrades = {&"heal": 0.3}
+	lucian.apply_setup(setup)
+	lucian.hp = 1.0
+	lucian.stats.heal_shield_power = 0.0
+	assert_true(lucian.use_summoner(1, Vector2.ZERO))
+	var expected := (80.0 + 15.0 * lucian.progress.level) * 1.3
+	assert_almost_eq(lucian.hp, 1.0 + expected, 0.01)
+
+
+func test_upgrade_text() -> void:
+	var spells := lucian.summoners
+	spells.upgrades = {&"flash": -0.2, &"heal": 0.3}
+	assert_eq(spells.upgrade_text(&"flash"), "Upgraded: 20% shorter cooldown")
+	assert_eq(spells.upgrade_text(&"heal"), "Upgraded: 30% stronger")
+	assert_eq(spells.upgrade_text(&"smite"), "")

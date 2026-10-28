@@ -1,7 +1,7 @@
 class_name SummonerSpells
 extends Node
-## Summoner spells on D and F (picked in the debug table until the Evolution
-## Tree exists). Each spell has its own cooldown, which moves with it to the
+## Summoner spells on D and F (the Journey loadout; the debug table can pick
+## too). Each spell has its own cooldown, which moves with it to the
 ## other key and counts down with the game. Ability haste doesn't shorten it.
 
 const SPELLS: Array[SummonerData] = [
@@ -12,6 +12,8 @@ const SPELLS: Array[SummonerData] = [
 	preload("res://data/summoners/clarity.tres"),
 	preload("res://data/summoners/smite.tres"),
 ]
+## Spells whose upgrade is a shorter cooldown.
+const COOLDOWN_UPGRADES: Array[StringName] = [&"flash", &"ghost"]
 const FLASH_RANGE := 400.0
 ## Flash steps back this far at a time until Lucian's body fits.
 const FLASH_STEP := 10.0
@@ -36,6 +38,10 @@ const SMITE_HEAL := 0.1
 var lucian: Lucian
 ## Spell id on D (0) and F (1).
 var slots: Array[StringName] = [&"flash", &"heal"]
+## How many keys work: D always, F once the 2nd slot is bought.
+var open_slots := 2
+## Spell id -> Evolution Tree upgrade (see StageSetup).
+var upgrades := {}
 
 ## Spell id -> Cooldown.
 var _cooldowns := {}
@@ -55,13 +61,35 @@ static func find(id: StringName) -> SummonerData:
 
 
 func spell_in(slot: int) -> SummonerData:
-	return find(slots[slot])
+	return find(slots[slot]) if slot < open_slots else null
 
 
-## Puts spell `id` on `slot`. If it was on the other key, the two swap.
+## The cooldown `spell` starts with: Flash and Ghost shortened by their upgrade.
+func cooldown_of(spell: SummonerData) -> float:
+	if spell.id in COOLDOWN_UPGRADES:
+		return spell.cooldown * (1.0 + upgrades.get(spell.id, 0.0))
+	return spell.cooldown
+
+
+## "Upgraded: ..." for the spell's card, or "" when it has no upgrade.
+func upgrade_text(id: StringName) -> String:
+	var value: float = upgrades.get(id, 0.0)
+	if value == 0.0:
+		return ""
+	if id in COOLDOWN_UPGRADES:
+		return "Upgraded: %d%% shorter cooldown" % roundi(-value * 100.0)
+	return "Upgraded: %d%% stronger" % roundi(value * 100.0)
+
+
+## Multiplier on the effect of a spell with a strength upgrade.
+func _effect(id: StringName) -> float:
+	return 1.0 if id in COOLDOWN_UPGRADES else 1.0 + upgrades.get(id, 0.0)
+
+
+## Puts spell `id` on `slot` (&"" for none). If it was on the other key, the two swap.
 func set_spell(slot: int, id: StringName) -> void:
 	var other := 1 - slot
-	if slots[other] == id:
+	if id != &"" and slots[other] == id:
 		slots[other] = slots[slot]
 	slots[slot] = id
 
@@ -103,7 +131,7 @@ func use(slot: int, aim: Vector2) -> bool:
 			_ghost_image_at = lucian.global_position
 			Sfx.play(&"potion")
 		&"barrier":
-			lucian.add_barrier(BARRIER_BASE + BARRIER_PER_LEVEL * lucian.progress.level, BARRIER_TIME)
+			lucian.add_barrier((BARRIER_BASE + BARRIER_PER_LEVEL * lucian.progress.level) * _effect(spell.id), BARRIER_TIME)
 			# A new shield pops a new bubble.
 			for node in lucian.get_children():
 				if node is BarrierBubble:
@@ -111,18 +139,18 @@ func use(slot: int, aim: Vector2) -> bool:
 			_show_on_lucian(BarrierBubble.new())
 			Sfx.play(&"potion")
 		&"heal":
-			lucian.heal(HEAL_BASE + HEAL_PER_LEVEL * lucian.progress.level)
+			lucian.heal((HEAL_BASE + HEAL_PER_LEVEL * lucian.progress.level) * _effect(spell.id))
 			lucian.add_speed_buff(&"heal", 0.0, HEAL_SPEED, HEAL_SPEED_TIME, true)
 			_show_on_lucian(HealBurst.new())
 			Sfx.play(&"potion")
 		&"clarity":
-			lucian.restore_mana(lucian.stats.max_mana * CLARITY_MANA)
+			lucian.restore_mana(lucian.stats.max_mana * CLARITY_MANA * _effect(spell.id))
 			_show_on_lucian(ClarityBurst.new())
 			Sfx.play(&"potion")
 		&"smite":
-			if not _smite(aim):
+			if not _smite(aim, _effect(spell.id)):
 				return false
-	cooldown(spell.id).start(0.0 if lucian.cheat_no_cooldowns else spell.cooldown)
+	cooldown(spell.id).start(0.0 if lucian.cheat_no_cooldowns else cooldown_of(spell))
 	return true
 
 
@@ -167,11 +195,11 @@ func _flash(aim: Vector2) -> void:
 
 
 ## True damage to the enemy nearest the cursor, and a heal.
-func _smite(aim: Vector2) -> bool:
+func _smite(aim: Vector2, effect: float) -> bool:
 	var target := lucian.enemy_near_cursor(aim, SMITE_RANGE)
 	if target == null:
 		return false
-	target.take_damage(lucian.make_damage(SMITE_DAMAGE, DamageInfo.Type.TRUE, &"smite"))
+	target.take_damage(lucian.make_damage(SMITE_DAMAGE * effect, DamageInfo.Type.TRUE, &"smite"))
 	lucian.heal(lucian.stats.max_hp * SMITE_HEAL)
 	var bolt := ChainLightning.new()
 	bolt.setup(PackedVector2Array([lucian.global_position, target.global_position]), Color("ffb347"))

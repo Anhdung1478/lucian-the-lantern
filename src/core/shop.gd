@@ -9,6 +9,8 @@ enum Result { OK, NO_GOLD, NO_ROOM, CELL_TAKEN, SOLD_OUT }
 var stock: MerchantStock
 var inventory: Inventory
 var wallet: Wallet
+## What a refresh costs (the Evolution Tree can lower it).
+var refresh_cost := MerchantStock.REFRESH_COST
 
 
 func _init(merchant_stock: MerchantStock, target_inventory: Inventory, stage_wallet: Wallet) -> void:
@@ -50,7 +52,7 @@ func sell(index: int) -> int:
 
 
 func refresh() -> Result:
-	if not wallet.spend(MerchantStock.REFRESH_COST):
+	if not wallet.spend(refresh_cost):
 		return Result.NO_GOLD
 	stock.refresh()
 	return Result.OK

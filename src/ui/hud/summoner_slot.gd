@@ -6,6 +6,7 @@ extends Control
 const SIZE := 48.0
 const FILL := Color(0.09, 0.105, 0.14)
 const FRAME_COLOR := Color(0.36, 0.4, 0.48)
+const CHAIN := preload("res://assets/art/ui/chain.svg")
 const SWEEP_COLOR := Color(0, 0, 0, 0.65)
 
 var lucian: Lucian
@@ -26,7 +27,12 @@ func hover_range() -> CastRange:
 
 
 func tooltip_content() -> Control:
-	return TooltipCard.summoner(lucian.summoners.spell_in(slot), _key())
+	if slot >= lucian.summoners.open_slots:
+		return TooltipCard.note("Locked: buy the 2nd summoner slot in the Evolution Tree.")
+	var spell := lucian.summoners.spell_in(slot)
+	if spell == null:
+		return TooltipCard.note("No spell: pick one in Journey before starting.")
+	return TooltipCard.summoner(spell, _key(), lucian.summoners.upgrade_text(spell.id))
 
 
 func tooltip_place() -> HoverTip.Place:
@@ -46,6 +52,11 @@ func _draw() -> void:
 	var rect := _icon_rect()
 	var spell := lucian.summoners.spell_in(slot)
 	draw_rect(rect, FILL)
+	if spell == null:
+		draw_rect(rect, FRAME_COLOR, false, 2.0)
+		if slot >= lucian.summoners.open_slots:
+			draw_texture_rect(CHAIN, rect.grow(-8.0), false, Color(1, 1, 1, 0.85))
+		return
 	draw_texture_rect(spell.icon, rect, false)
 	var cooldown := lucian.summoners.cooldown(spell.id)
 	if not cooldown.is_ready():

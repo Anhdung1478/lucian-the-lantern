@@ -14,6 +14,8 @@ var merchant: Merchant
 ## Items tab slots the merchant can sell from (2, up to 4 later from the
 ## Evolution Tree).
 var shop_slots := 2
+## What Lucian and the merchant start with. The default is the sandbox.
+var run := StageSetup.new()
 ## Debug: more dummies around the first one, for Runaan's and Statikk Shiv.
 var extra_dummies: Array[TrainingDummy] = []
 
@@ -25,6 +27,11 @@ var extra_dummies: Array[TrainingDummy] = []
 @onready var hud: Hud = $Hud
 @onready var debug_table: DebugTable = $DebugTable
 @onready var screens: ScreenSwitcher = $Screens
+
+
+## Call before adding the stage to the tree.
+func setup(stage_run: StageSetup) -> void:
+	run = stage_run
 
 
 func _ready() -> void:
@@ -39,6 +46,8 @@ func _ready() -> void:
 	camera.setup(lucian, arena.get_bounds().grow(TestArena.WALL_THICKNESS))
 	lucian.projectile_parent = $Projectiles
 	dummy.damage_taken.connect(damage_numbers.spawn.bind(dummy))
+	lucian.apply_setup(run)
+	shop_slots = run.shop_slots
 	hud.setup(lucian, wallet)
 	debug_table.setup(self)
 	screens.backpack.setup(lucian.inventory)
@@ -96,4 +105,6 @@ func _on_setting_changed(key: StringName) -> void:
 
 
 func _open_shop(visited: Merchant) -> void:
-	screens.open_shop(Shop.new(visited.stock, lucian.inventory, wallet))
+	var shop := Shop.new(visited.stock, lucian.inventory, wallet)
+	shop.refresh_cost = run.refresh_cost
+	screens.open_shop(shop)

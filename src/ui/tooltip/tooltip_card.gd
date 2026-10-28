@@ -10,6 +10,7 @@ const BG_COLOR := Color(0.04, 0.05, 0.07, 0.97)
 const BORDER_COLOR := Color(0.79, 0.64, 0.36)
 const NAME_COLOR := Color("ffe9a8")
 const SUB_COLOR := Color("9aa3b2")
+const UPGRADE_COLOR := "7fd67f"
 const KIND_NAMES := {ItemData.Kind.FRAGMENT: "Fragment", ItemData.Kind.LEGENDARY: "Legendary", ItemData.Kind.POTION: "Potion"}
 
 
@@ -85,8 +86,9 @@ static func skill(lucian: Lucian, shown: LucianSkill, icon_texture: Texture2D, k
 	return card
 
 
-## A summoner spell's card: icon, name, key, cooldown and what it does.
-static func summoner(spell: SummonerData, key: String) -> Control:
+## A summoner spell's card: icon, name, key, cooldown and what it does, and
+## a green line under it for an Evolution Tree `upgrade` ("" for none).
+static func summoner(spell: SummonerData, key: String, upgrade := "") -> Control:
 	var icon := TextureRect.new()
 	icon.texture = spell.icon
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -94,6 +96,8 @@ static func summoner(spell: SummonerData, key: String) -> Control:
 	_body(card, TooltipText.color("Cooldown: ", TooltipText.DIM) + "%s s" % TooltipText.number(spell.cooldown))
 	_separator(card)
 	_body(card, TooltipText.colorize(spell.description))
+	if upgrade != "":
+		_body(card, TooltipText.color(upgrade, UPGRADE_COLOR))
 	return card
 
 

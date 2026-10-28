@@ -291,6 +291,21 @@ func restore_mana(amount: float) -> void:
 	mana = minf(mana + amount, stats.max_mana)
 
 
+## Everything permanent Lucian starts the stage with. Called by the stage
+## before the HUD and debug table read him.
+func apply_setup(setup: StageSetup) -> void:
+	progress.bought = setup.bought.duplicate()
+	passive.learned = setup.passive
+	inventory.unlocked_equip = setup.equip_slots
+	summoners.slots = setup.summoners.duplicate()
+	summoners.open_slots = setup.summoner_slots
+	summoners.upgrades = setup.summoner_upgrades.duplicate()
+	tree_bonus = setup.stat_bonus.duplicate()
+	apply_skin(setup.skin)
+	hp = stats.max_hp
+	mana = stats.max_mana
+
+
 ## Wears `new_skin`: its body art and stats. Keeps the HP and mana share.
 func apply_skin(new_skin: SkinData) -> void:
 	skin = new_skin

@@ -100,3 +100,37 @@ func test_lucian_has_a_health_bar_that_never_turns() -> void:
 	assert_not_null(bar)
 	lucian.visuals.face(Vector2.DOWN)
 	assert_eq(bar.global_rotation, 0.0)
+
+
+func test_setup_without_the_passive_never_charges_it() -> void:
+	var setup := StageSetup.new()
+	setup.passive = false
+	lucian.apply_setup(setup)
+	lucian.try_rank_up(Slot.Q)
+	lucian.try_cast(Slot.Q, lucian.global_position + Vector2.RIGHT * 100)
+	assert_false(lucian.passive.charged)
+
+
+func test_setup_with_nothing_bought_blocks_rank_ups() -> void:
+	var setup := StageSetup.new()
+	setup.bought = [0, 0, 0, 0]
+	lucian.apply_setup(setup)
+	assert_eq(lucian.progress.skill_points(), 1)
+	assert_false(lucian.progress.can_rank_up(Slot.Q))
+
+
+func test_setup_equip_slots_lock_the_rest() -> void:
+	var setup := StageSetup.new()
+	setup.equip_slots = 1
+	lucian.apply_setup(setup)
+	assert_eq(lucian.inventory.unlocked_equip, 1)
+
+
+func test_setup_stat_bonus_adds_to_stats_and_fills_hp_and_mana() -> void:
+	var base := lucian.base_ad()
+	var setup := StageSetup.new()
+	setup.stat_bonus = {&"ad": 8.0}
+	lucian.apply_setup(setup)
+	assert_almost_eq(lucian.stats.ad, base + 8.0, 0.001)
+	assert_eq(lucian.hp, lucian.stats.max_hp)
+	assert_eq(lucian.mana, lucian.stats.max_mana)

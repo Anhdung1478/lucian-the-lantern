@@ -26,6 +26,7 @@ var _item_picker: OptionButton
 ## The picker's items, A to Z.
 var _picker_items: Array[ItemData] = []
 var _equip_slots: SpinBox
+var _shop_slots: SpinBox
 ## D and F.
 var _summoner_pickers: Array[OptionButton] = []
 var _item_stats: Label
@@ -57,6 +58,7 @@ func setup(owner_stage: Stage) -> void:
 	for item in _picker_items:
 		_item_picker.add_item(item.display_name)
 	_equip_slots.set_value_no_signal(lucian.inventory.unlocked_equip)
+	_shop_slots.set_value_no_signal(stage.shop_slots)
 	_show_summoners()
 
 
@@ -127,13 +129,22 @@ func _give_picked_item() -> void:
 
 ## Picking the spell the other key has swaps the two, so both pickers follow.
 func _pick_summoner(index: int, slot: int) -> void:
-	lucian.summoners.set_spell(slot, SummonerSpells.SPELLS[index].id)
+	# Index 0 is "None".
+	lucian.summoners.set_spell(slot, &"" if index == 0 else SummonerSpells.SPELLS[index - 1].id)
+	if slot == 1:
+		lucian.summoners.open_slots = 2
 	_show_summoners()
+
+
+## Debug: every skill rank and the passive, as if bought in the Evolution Tree.
+func _buy_all_ranks() -> void:
+	lucian.progress.bought = ChampionProgress.MAX_RANKS.duplicate()
+	lucian.passive.learned = true
 
 
 func _show_summoners() -> void:
 	for slot in _summoner_pickers.size():
-		_summoner_pickers[slot].select(SummonerSpells.SPELLS.find(lucian.summoners.spell_in(slot)))
+		_summoner_pickers[slot].select(SummonerSpells.SPELLS.find(SummonerSpells.find(lucian.summoners.slots[slot])) + 1)
 
 
 func _give_random_fragment() -> void:
@@ -175,6 +186,7 @@ func _build() -> void:
 	_level_value = _spin(row, 1, 18, 1)
 	_button(row, "Set level", func() -> void: lucian.progress.set_level(int(_level_value.value)))
 	_button(row, "Reset skill ranks", func() -> void: lucian.progress.reset_ranks())
+	_button(row, "Buy all ranks", _buy_all_ranks)
 	row = _row(box)
 	_button(row, "Lucian HP 50%", func() -> void: lucian.hp = lucian.stats.max_hp * 0.5)
 
@@ -194,6 +206,7 @@ func _build() -> void:
 		var picker := OptionButton.new()
 		picker.focus_mode = Control.FOCUS_NONE
 		picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		picker.add_item("None")
 		for spell in SummonerSpells.SPELLS:
 			picker.add_item(spell.display_name)
 		picker.item_selected.connect(_pick_summoner.bind(slot))
@@ -234,6 +247,7 @@ func _build() -> void:
 	row = _row(box)
 	_label(row, "Shop item slots")
 	var slots := _spin(row, 1, MerchantStock.SLOTS, 2)
+	_shop_slots = slots
 	slots.value_changed.connect(func(value: float) -> void: stage.set_shop_slots(int(value)))
 
 	box = _tab(tabs, "Dummy")
