@@ -14,6 +14,13 @@ func find(id: StringName) -> ItemData:
 	return null
 
 
+## Every item by display name, A to Z (case ignored). The debug picker uses it.
+func by_name() -> Array[ItemData]:
+	var sorted: Array[ItemData] = items.duplicate()
+	sorted.sort_custom(func(a: ItemData, b: ItemData) -> bool: return a.display_name.nocasecmp_to(b.display_name) < 0)
+	return sorted
+
+
 func fragments() -> Array[ItemData]:
 	return _of_kind(ItemData.Kind.FRAGMENT)
 

@@ -17,6 +17,11 @@ func test_attacks_build_charge() -> void:
 	assert_almost_eq(charge.value, EnergizeCharge.PER_ATTACK, 0.001)
 
 
+func test_attacks_build_nine_charge() -> void:
+	charge.add_attack()
+	assert_almost_eq(charge.value, 9.0, 0.001)
+
+
 func test_walking_builds_one_point_per_24_units() -> void:
 	charge.add_distance(240.0, false)
 	assert_almost_eq(charge.value, 10.0, 0.001)

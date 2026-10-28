@@ -20,7 +20,8 @@ const ROCKETBELT_DASH_SPEED := 1500.0
 const ROCKETBELT_BOLTS := 7
 ## 50 degrees, in radians.
 const ROCKETBELT_ARC := 0.8727
-const ROCKETBELT_RANGE := 500.0
+## How far the bolts fly from where Lucian stood when he used it.
+const ROCKETBELT_RANGE := 900.0
 const ROCKETBELT_BASE := 100.0
 const ROCKETBELT_AP := 0.1
 const ROCKETBELT_SPEED := 0.75

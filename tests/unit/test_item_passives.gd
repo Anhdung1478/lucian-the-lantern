@@ -238,7 +238,7 @@ func test_energize_needs_an_energized_item() -> void:
 	lucian.passives.on_moved(240.0, false)
 	assert_almost_eq(lucian.passives.energize.value, 10.0, 0.001)
 	basic_hit()
-	assert_almost_eq(lucian.passives.energize.value, 20.0, 0.001)
+	assert_almost_eq(lucian.passives.energize.value, 19.0, 0.001)
 
 
 func test_walking_builds_energize() -> void:

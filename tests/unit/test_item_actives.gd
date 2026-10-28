@@ -72,6 +72,21 @@ func test_rocketbelt_dashes_fires_bolts_and_speeds_up() -> void:
 	assert_eq(sources.count(&"hextech_rocketbelt"), 1, "each enemy is hit once")
 
 
+func test_rocketbelt_bolts_reach_900_units() -> void:
+	dummy.position = Vector2(850, 0)
+	equip(&"hextech_rocketbelt")
+	assert_true(lucian.use_equip_slot(0, dummy.position))
+	await wait_seconds(0.8)
+	assert_has(sources, &"hextech_rocketbelt")
+
+
+func test_turning_on_no_cooldowns_refreshes_item_cooldowns() -> void:
+	equip(&"hextech_gunblade")
+	assert_true(lucian.use_equip_slot(0, dummy.position))
+	lucian.cheat_no_cooldowns = true
+	assert_true(lucian.item_cooldown(&"hextech_gunblade").is_ready())
+
+
 func test_items_without_actives_do_nothing() -> void:
 	equip(&"bf_sword")
 	assert_false(lucian.use_equip_slot(0, dummy.position))

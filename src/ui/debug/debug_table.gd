@@ -23,6 +23,8 @@ var _level_value: SpinBox
 var _crit_toggle: CheckBox
 var _crit_value: SpinBox
 var _item_picker: OptionButton
+## The picker's items, A to Z.
+var _picker_items: Array[ItemData] = []
 var _equip_slots: SpinBox
 var _item_stats: Label
 var _armor: SpinBox
@@ -49,7 +51,8 @@ func setup(owner_stage: Stage) -> void:
 	_armor.set_value_no_signal(dummy.armor)
 	_mr.set_value_no_signal(dummy.mr)
 	_max_hp.set_value_no_signal(dummy.max_hp)
-	for item in lucian.item_catalog.items:
+	_picker_items = lucian.item_catalog.by_name()
+	for item in _picker_items:
 		_item_picker.add_item(item.display_name)
 	_equip_slots.set_value_no_signal(lucian.inventory.unlocked_equip)
 
@@ -116,7 +119,7 @@ func _apply_dummy(_value: float) -> void:
 
 
 func _give_picked_item() -> void:
-	lucian.inventory.add(lucian.item_catalog.items[_item_picker.selected])
+	lucian.inventory.add(_picker_items[_item_picker.selected])
 
 
 func _give_random_fragment() -> void:

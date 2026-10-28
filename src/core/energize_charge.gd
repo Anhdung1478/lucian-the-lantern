@@ -4,7 +4,7 @@ extends RefCounted
 ## count double). At 100 the next basic attack is Energized and uses it up.
 
 const MAX := 100.0
-const PER_ATTACK := 10.0
+const PER_ATTACK := 9.0
 ## Units walked for one point of charge.
 const UNITS_PER_POINT := 24.0
 const DASH_FACTOR := 2.0

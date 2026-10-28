@@ -192,7 +192,7 @@ func on_basic_attack(target: Enemy, info: DamageInfo) -> void:
 	if spellblade_ready:
 		spellblade_ready = false
 		info.procs.append(&"spellblade")
-		lucian.item_cooldown(&"essence_reaver").start(SPELLBLADE_COOLDOWN)
+		lucian.item_cooldown(&"essence_reaver").start(0.0 if lucian.cheat_no_cooldowns else SPELLBLADE_COOLDOWN)
 	if has(&"navori_flickerblade"):
 		for slot in [ChampionProgress.Slot.Q, ChampionProgress.Slot.W, ChampionProgress.Slot.E]:
 			lucian.skills[slot].cooldown.reduce_fraction(NAVORI_CUT)

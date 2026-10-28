@@ -45,13 +45,15 @@ var shield := 0.0
 var projectile_parent: Node
 ## Debug: values >= 0 replace Lucian's crit chance.
 var cheat_crit_chance := -1.0
-## Turning it on also refreshes every cooldown already running.
+## Turning it on also refreshes every skill and item cooldown already running.
 var cheat_no_cooldowns := false:
 	set(value):
 		cheat_no_cooldowns = value
 		if value:
 			for skill in skills:
 				skill.cooldown.clear()
+			for cooldown: Cooldown in item_cooldowns.values():
+				cooldown.clear()
 var cheat_infinite_mana := false
 ## Setting: a skill pressed during a cast time or a dash is cast as soon as it
 ## ends, aimed where the key was pressed, like LoL's spell buffering. Only the

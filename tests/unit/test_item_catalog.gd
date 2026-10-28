@@ -38,3 +38,12 @@ func test_combine_without_recipe_is_null() -> void:
 
 func test_legendaries_never_combine() -> void:
 	assert_null(catalog.combine(catalog.find(&"edge"), catalog.find(&"sword")))
+
+
+func test_by_name_sorts_a_to_z() -> void:
+	var names: Array = (load("res://data/items/catalog.tres") as ItemCatalog).by_name().map(
+		func(item: ItemData) -> String: return item.display_name)
+	assert_eq(names[0], "Archangel's Staff")
+	assert_eq(names[1], "B.F. Sword")
+	for i in names.size() - 1:
+		assert_true(names[i].nocasecmp_to(names[i + 1]) <= 0, "%s before %s" % [names[i], names[i + 1]])
