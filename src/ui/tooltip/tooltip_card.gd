@@ -98,6 +98,16 @@ static func buff(shown: Dictionary) -> Control:
 	return card
 
 
+## A stat's card: icon, name, its current value and what it does.
+static func stat(key: StringName, value: String) -> Control:
+	var icon := TextureRect.new()
+	icon.texture = StatStyle.icon(key)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	var card := _card(icon, StatStyle.stat_name(key), "Stat", TooltipText.color(value, StatStyle.color(key).to_html(false)))
+	_body(card, TooltipText.colorize(StatStyle.description(key)))
+	return card
+
+
 ## A small card with one line of text.
 static func note(text: String) -> Control:
 	var card := _panel()

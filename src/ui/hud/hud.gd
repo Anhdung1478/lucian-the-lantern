@@ -1,8 +1,10 @@
 class_name Hud
 extends CanvasLayer
 ## Lucian's bottom panel (portrait, skills, bars, equipped items), the buff
-## icons above it, the stats panel and the stage gold (top right). Reads Lucian every frame, also while
-## the game is paused, so equipping items shows up right away.
+## icons above it, the stats panels and the stage gold (top right). Ctrl + the
+## stats key toggles the stats panel; holding the key alone shows the extra
+## stats above it. Reads Lucian every frame, also while the game is paused, so
+## equipping items shows up right away.
 
 ## Space between the stats panel and the bottom panel.
 const STATS_GAP := 10.0
@@ -22,6 +24,8 @@ const BUFF_GAP := 8.0
 
 var lucian: Lucian
 var wallet: Wallet
+## Shown while the stats key is held.
+var extra_stats := StatsPanel.new()
 
 var _gold_label: Label
 var _fps_label: Label
@@ -47,6 +51,7 @@ func setup(target: Lucian, stage_wallet: Wallet) -> void:
 	wallet.changed.connect(_show_gold)
 	_show_gold(wallet.gold)
 	stats_panel.lucian = target
+	extra_stats.lucian = target
 	_add_skill_slot(null, PASSIVE_ICON, "", SkillSlot.PASSIVE_SIZE)
 	var settings := GameSettings.instance()
 	for i in SKILL_ICONS.size():
@@ -61,6 +66,13 @@ func setup(target: Lucian, stage_wallet: Wallet) -> void:
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
 	bottom_panel.resized.connect(_place_stats_panel)
+	extra_stats.keys = StatsPanel.EXTRA
+	extra_stats.visible = false
+	extra_stats.add_theme_stylebox_override(&"panel", stats_panel.get_theme_stylebox(&"panel"))
+	extra_stats.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	extra_stats.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	extra_stats.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	$Root.add_child(extra_stats)
 	$Root.add_child(_buff_bar)
 	_buff_bar.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	_buff_bar.grow_horizontal = Control.GROW_DIRECTION_END
@@ -81,7 +93,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"toggle_stats"):
+	# Holding the key without Ctrl shows the extra stats (see _process).
+	if event.is_action_pressed(&"toggle_stats") and (event as InputEventWithModifiers).ctrl_pressed:
 		stats_panel.visible = not stats_panel.visible
 		get_viewport().set_input_as_handled()
 
@@ -102,6 +115,11 @@ func _process(_delta: float) -> void:
 	_buff_bar.show_buffs(lucian.buffs())
 	mana_bar.value = lucian.mana / stats.max_mana
 	mana_label.text = "%d / %d" % [roundi(lucian.mana), roundi(stats.max_mana)]
+	extra_stats.visible = Input.is_action_pressed(&"toggle_stats") and not Input.is_key_pressed(KEY_CTRL)
+	if extra_stats.visible:
+		# On top of the stats panel, or in its place when it is hidden.
+		extra_stats.offset_bottom = -12.0 - (stats_panel.size.y + STATS_GAP if stats_panel.visible else 0.0)
+		extra_stats.offset_top = extra_stats.offset_bottom
 	_fps_label.visible = GameSettings.instance().get_value(&"show_fps")
 	if _fps_label.visible:
 		_fps_label.text = "FPS %d" % Engine.get_frames_per_second()
@@ -129,6 +147,8 @@ func _place_stats_panel() -> void:
 	# Zero-width rect at the panel's left edge; the minimum size grows it leftward.
 	stats_panel.offset_right = -bottom_panel.size.x * 0.5 - STATS_GAP
 	stats_panel.offset_left = stats_panel.offset_right
+	extra_stats.offset_right = stats_panel.offset_right
+	extra_stats.offset_left = stats_panel.offset_right
 	# Buffs sit just above the panel, starting over the portrait.
 	_buff_bar.offset_left = -bottom_panel.size.x * 0.5 + 12.0
 	_buff_bar.offset_right = _buff_bar.offset_left

@@ -227,7 +227,7 @@ func _build_controls() -> Control:
 	_refresh_bindings()
 	var bottom := HBoxContainer.new()
 	outer.add_child(bottom)
-	var hint := UiStyle.label("Click a binding, then press a key (or click it again with a mouse\nbutton). ESC or a click elsewhere cancels. Ctrl + a skill key ranks it up.", 14, UiStyle.DIM_COLOR)
+	var hint := UiStyle.label("Click a binding, then press a key (or click it again with a mouse\nbutton). ESC or a click elsewhere cancels. Ctrl + a skill key ranks it up.\nCtrl + the stats key toggles the stats panel; hold it for more stats.", 14, UiStyle.DIM_COLOR)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(hint)
 	var reset := Button.new()

@@ -80,6 +80,8 @@ func _run(scenario: String) -> void:
 			await scenario_energized()
 		"skillbar":
 			await scenario_skillbar()
+		"stats":
+			await scenario_stats()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -772,3 +774,24 @@ func scenario_skillbar() -> void:
 	await wait(0.05)
 	print("E blocked during Q (expect true): ", lucian.is_skill_blocked(Slot.E))
 	await shot("skillbar_2_q_greys_e")
+
+
+func scenario_stats() -> void:
+	equip_all([&"infinity_edge", &"rabadons_deathcap", &"lord_dominiks_regards"])
+	await wait(0.2)
+	var hud: Hud = stage.get_node("Hud")
+	print("main panel visible (expect true): ", hud.stats_panel.visible)
+	await shot("stats_0_main")
+	Input.action_press(&"toggle_stats")
+	await wait(0.1)
+	print("extra panel while held (expect true): ", hud.extra_stats.visible)
+	await shot("stats_1_extra")
+	Input.action_release(&"toggle_stats")
+	var cell: Control = hud.stats_panel.get_child(0).get_child(0)
+	await mouse_move(control_center(cell))
+	await wait_for_tooltip(cell)
+	await shot("stats_2_hover")
+	var grid: GridContainer = hud.item_grid
+	await mouse_move(control_center(grid.get_child(0)))
+	await wait_for_tooltip(grid.get_child(0))
+	await shot("stats_3_item_card")

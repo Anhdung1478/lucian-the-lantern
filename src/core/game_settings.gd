@@ -47,7 +47,7 @@ const ACTION_NAMES := {
 	&"summoner_d": "Summoner spell 1", &"summoner_f": "Summoner spell 2",
 	&"item_1": "Item slot 1", &"item_2": "Item slot 2", &"item_3": "Item slot 3",
 	&"item_4": "Item slot 4", &"item_5": "Item slot 5", &"item_6": "Item slot 6",
-	&"open_backpack": "Backpack", &"toggle_stats": "Stats panel", &"toggle_camera": "Camera mode",
+	&"open_backpack": "Backpack", &"toggle_stats": "Stats panel (Ctrl: toggle, hold: more)", &"toggle_camera": "Camera mode",
 	&"center_camera": "Center camera on Lucian",
 }
 const MOUSE_LABELS := {
