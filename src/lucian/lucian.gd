@@ -81,8 +81,8 @@ var _rfc_ring_shown := false
 var _cast_lock_left := 0.0
 var _dash_velocity := Vector2.ZERO
 var _dash_left := 0.0
-var _dash_from := Vector2.ZERO
-var _dash_trail_color := DashTrail.LIGHT
+## Grows behind Lucian during a dash; null with low effects.
+var _dash_trail: DashTrail
 ## Id -> {flat, pct, left, duration, fade}. A fading buff's percent shrinks
 ## to 0 over its duration.
 var _speed_buffs := {}
@@ -420,8 +420,7 @@ func start_dash(direction: Vector2, distance: float, speed: float, trail_color :
 	_cancel_windup()
 	_dash_velocity = direction * speed
 	_dash_left = distance / speed
-	_dash_from = global_position
-	_dash_trail_color = trail_color
+	_start_dash_trail(trail_color)
 	_attack_cooldown = 0.0
 	collision_mask = Layers.WORLD
 	if _order == Order.MOVE:
@@ -623,20 +622,26 @@ func _dash_step(delta: float) -> void:
 	move_and_slide()
 	velocity = Vector2.ZERO
 	_dash_left -= delta
+	if is_instance_valid(_dash_trail):
+		_dash_trail.reach(global_position)
 	if _dash_left <= 0.0 or get_slide_collision_count() > 0:
 		_dash_left = 0.0
 		collision_mask = _body_mask()
-		_leave_dash_trail()
+		if is_instance_valid(_dash_trail):
+			_dash_trail.finish()
+		_dash_trail = null
 
 
-## Drawn once the dash is over, so it matches where Lucian stopped. None on
-## low effects.
-func _leave_dash_trail() -> void:
+## The trail starts with the dash and grows behind Lucian. None on low effects.
+func _start_dash_trail(color: Color) -> void:
+	if is_instance_valid(_dash_trail):
+		_dash_trail.finish()
+	_dash_trail = null
 	if GameSettings.instance().low_effects():
 		return
-	var trail := DashTrail.new()
-	trail.setup(_dash_from, global_position, _dash_trail_color)
-	spawn(trail)
+	_dash_trail = DashTrail.new()
+	_dash_trail.setup(global_position, color)
+	spawn(_dash_trail)
 
 
 ## Dashing or ghosted, Lucian passes through enemies; walls always stop him.

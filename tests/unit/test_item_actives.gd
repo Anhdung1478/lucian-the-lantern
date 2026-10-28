@@ -34,25 +34,28 @@ func trails() -> Array[DashTrail]:
 	return found
 
 
-func test_galeforce_leaves_a_wind_trail_once_the_dash_lands() -> void:
+func test_galeforce_leaves_a_wind_trail_from_the_start_of_the_dash() -> void:
 	equip(&"galeforce")
 	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
-	assert_eq(trails().size(), 0, "drawn once the dash lands")
-	# The dash takes 200 / 1260 = 0.16 s; the trail lasts 0.3 s after.
-	await wait_seconds(0.25)
-	assert_eq(trails().size(), 1)
+	assert_eq(trails().size(), 1, "drawn from the start of the dash")
 	assert_eq(trails()[0].color, ItemActives.GALEFORCE_TRAIL)
 	assert_eq(trails()[0].position, Vector2.ZERO, "from where the dash started")
+	# The dash takes 200 / 1260 = 0.16 s; the trail fades for 0.3 s after.
+	await wait_seconds(0.25)
+	assert_eq(trails().size(), 1)
+	assert_almost_eq(trails()[0].length, 200.0, 2.0)
 
 
-func test_rocketbelt_leaves_a_violet_trail_once_the_dash_lands() -> void:
+func test_rocketbelt_leaves_a_violet_trail_from_the_start_of_the_dash() -> void:
 	equip(&"hextech_rocketbelt")
 	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
-	assert_eq(trails().size(), 0, "drawn once the dash lands")
-	# The dash takes 275 / 800 = 0.34 s.
-	await wait_seconds(0.45)
-	assert_eq(trails().size(), 1)
+	assert_eq(trails().size(), 1, "drawn from the start of the dash")
 	assert_eq(trails()[0].color, ItemActives.ROCKETBELT_TRAIL)
+	# The dash takes 275 / 800 = 0.34 s.
+	await wait_seconds(0.2)
+	assert_between(trails()[0].length, 100.0, 220.0, "still growing")
+	await wait_seconds(0.25)
+	assert_almost_eq(trails()[0].length, 275.0, 2.0)
 
 
 func test_gunblade_bolts_the_enemy_near_the_cursor() -> void:

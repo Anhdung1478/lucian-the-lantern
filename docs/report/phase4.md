@@ -67,7 +67,7 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | One regen stat in the extra table | One cell with a heart-and-droplet icon: "0.8 / 1.6" (health / mana per second). The extra table is now 2 × 4. |
 | Stats with a bonus in yellow; base + bonus on hover | A number turns yellow when items, passives, buffs or cheats add to what the level alone gives. Its hover card shows "60 base + 22 bonus" with the bonus in yellow. |
 | Redraw the Flash and Barrier icons | Flash: a burst of light where it lands and a ring of yellow sparks where it left. Barrier: a gold figure inside a golden bubble. |
-| Every dash shows a trail; Flash only marks where Lucian was | E (light blue), Galeforce (pale green) and Rocketbelt (violet) leave a trail once the dash lands. Flash leaves none: yellow sparks ring the spot Lucian left, drift out and fade in 0.6 s. |
+| Every dash shows a trail; Flash only marks where Lucian was | E (light blue), Galeforce (pale green) and Rocketbelt (violet) leave a trail that grows behind Lucian from the start of the dash and fades once it lands. Flash leaves none: yellow sparks ring the spot Lucian left, drift out and fade in 0.6 s. |
 
 ## Choices I made where the request was open
 
@@ -108,7 +108,7 @@ Each spell keeps its own cooldown, also when you move it to the other key. Abili
 | ![Grey plus](phase4/skillbar_0_plus.png) Level 2 with a point: gold + on E, grey on Q (needs level 3) and R, grey with a lock on W (rank not bought); 45 px passive | ![R greys Q/W](phase4/skillbar_1_r_greys_qw.png) R firing: Q and W grey |
 | ![Q greys E](phase4/skillbar_2_q_greys_e.png) Q's cast time: E grey | ![Extra stats](phase4/stats_1_extra.png) Holding C: the extra stats above the main table |
 | ![Stat card](phase4/stats_2_hover.png) Hovering Attack Damage | ![Item card](phase4/stats_3_item_card.png) Item card: icon, amount, name |
-| ![RFC ring](phase4/rfc_ring_0_ready.png) RFC at full charge: the 675 range ring | ![Rocketbelt](phase4/actives_2_rocketbelt.png) Rocketbelt arc, flying ahead of Lucian; its violet dash trail |
+| ![RFC ring](phase4/rfc_ring_0_ready.png) RFC at full charge: the 675 range ring | ![Rocketbelt](phase4/actives_2_rocketbelt.png) Rocketbelt arc, flying ahead of Lucian; mid-dash, its violet trail grows behind him |
 | ![Summoners](phase4/summoners_0_hud_and_picker.png) D/F on the HUD, debug picker | ![Smite](phase4/summoners_3_smite.png) Smite: 450 true damage; Barrier on the HP bar, Ghost and Barrier buffs |
 | ![Summoner card](phase4/summoners_5_card.png) Heal's card; cooldowns on D and F | ![Resolution](phase4/settings_3_graphics.png) Graphics → Resolution |
 | ![Camera away](phase4/camera_0_away.png) Free camera panned away | ![Camera back](phase4/camera_1_back.png) After Space |

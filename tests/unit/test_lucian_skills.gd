@@ -162,21 +162,26 @@ func test_e_stops_at_walls() -> void:
 	assert_false(lucian.is_dashing())
 
 
-func test_e_leaves_a_light_trail_once_it_lands() -> void:
+func test_e_trail_grows_behind_lucian_then_fades() -> void:
 	dummy.position = Vector2(0, 600)
 	var effects := Node2D.new()
 	add_child_autofree(effects)
 	lucian.projectile_parent = effects
 	_rank(Slot.E, 1)
 	lucian.try_cast(Slot.E, Vector2(1000, 0))
-	assert_eq(effects.get_child_count(), 0, "drawn once the dash lands")
-	# The dash takes 280 / 1350 = 0.21 s; the trail lasts 0.3 s after.
-	await wait_seconds(0.3)
-	assert_eq(effects.get_child_count(), 1)
+	assert_eq(effects.get_child_count(), 1, "drawn from the start of the dash")
 	var trail := effects.get_child(0) as DashTrail
 	assert_not_null(trail)
 	assert_eq(trail.color, DashTrail.LIGHT)
 	assert_eq(trail.position, Vector2.ZERO, "from where the dash started")
+	await wait_physics_frames(3)
+	assert_almost_eq(trail.length, lucian.position.x, 0.5, "up to Lucian")
+	assert_lt(trail.length, 280.0, "still growing")
+	assert_eq(trail.modulate.a, 1.0, "no fading during the dash")
+	# The dash takes 280 / 1350 = 0.21 s; the trail fades for 0.3 s after.
+	await wait_seconds(0.25)
+	assert_almost_eq(trail.length, 280.0, 2.0)
+	assert_lt(trail.modulate.a, 1.0, "fading once it lands")
 
 
 func test_no_other_casts_while_dashing() -> void:
