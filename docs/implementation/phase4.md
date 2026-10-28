@@ -834,3 +834,38 @@ Lucian.barrier: float; Lucian.add_barrier(amount: float, seconds: float); Lucian
 9. D/F: every spell works; swap them in the debug table; cooldowns show on the HUD and keep running when moved to the other key.
 10. Cast R: Q/W grey. Cast Q: E grey for its cast time.
 11. Settings → Graphics → Resolution: the window resizes and centers; greyed in fullscreen; kept after a restart.
+
+## Implementation notes (Phase 4 done)
+
+Everything in the plan is in place, one commit per task (Tasks 0–9), then the screenshot scenarios and docs, then this report. Changes and details settled while building:
+
+- **Greyed skills use a shader**, not a tint: `src/ui/hud/grey_icon.gdshader` desaturates the icon (and darkens it a little). A multiply tint only turned the orange W icon brown instead of grey.
+- **Screenshot scenarios were added with the task they check** (`skillbar` in Task 2, `stats` in 6, `rfc_ring` in 7, `summoners` in 9, `camera` in 10). The `actives` scenario's Gunblade slow check moved right after the hit: it used to run 2.6 s later, after the 2 s slow had ended, so it had printed `false` since Phase 3.
+- **Shared nearest-enemy search:** Gunblade and Smite both use `Lucian.enemy_near_cursor(aim, reach)`.
+- **Collision while dashing or ghosted:** `Lucian._body_mask()` is WORLD only while dashing or under Ghost, else WORLD + ENEMY_BODY. A dash ending during Ghost keeps passing through enemies.
+- **Flash** checks Lucian's own circle with a shape query (`Lucian.fits_at`) at the target and steps back 10 units at a time. `Lucian.blink_to` resets the moved-distance tracker, so a blink doesn't build Energize.
+- **Barrier** is its own value next to Bloodthirster's `shield`; `Lucian.total_shield()` feeds the HP bar and its "(+N)".
+- **Summoner cooldowns** live on `SummonerSpells` (spell id → Cooldown), tick in its `_physics_process` (so they stop while paused), and are cleared by the No cooldowns cheat.
+- **Ctrl + C:** `toggle_stats` is still one rebindable action. Bindings carry no modifiers, so Ctrl + the key reaches the same action; the HUD checks `ctrl_pressed` to toggle and polls `Input.is_action_pressed` (without Ctrl) to show the extra stats.
+- **Resolution** is validated on load (an unknown size falls back to 1600×900) and applied only in windowed mode by `GameSettings.apply_resolution()`, which runs at startup and when the resolution or window mode changes.
+
+### Fixes from the code review
+- **Resolution and the window frame:** `window_set_size` / `window_set_position` work on the client area, so a size as big as the screen pushed the title bar off it. `GameSettings.max_window_size()` (usable screen minus the frame) caps the size, and the window is centered with its frame. Checked in a real window at 1280×720 up to 3840×2160 on a 1080p screen.
+- **Resolution list:** every size is listed. The ones bigger than `max_window_size()` are disabled and marked "(too big)", so the saved value always shows and the list is never empty.
+- **New actions and old settings files:** an action missing from the file keeps its default input only if no saved action uses it; otherwise it is unbound. `apply_input` clears unbound actions in the InputMap, and `rebind` on an unbound action takes the input away from its owner instead of swapping.
+- **Barrier** is multiplied by heal & shield power.
+- **Flash's tooltip and docs** say that only the landing spot is checked.
+- **The grey material** is only reassigned when it changes.
+- **Tests:**
+  - New: Flash's exact landing spot, Rocketbelt's upper bound, no summoners mid-dash, the Barrier buff and card, the "+" states.
+  - Effects spawned in the summoner, casting and item-active tests now go into an auto-freed node.
+
+### Running the checks
+
+```
+godot_console --headless --path . --import
+godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
+godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+```
+
+New scenarios: `skillbar`, `stats`, `rfc_ring`, `summoners`, `camera`.
