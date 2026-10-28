@@ -19,6 +19,9 @@ const SKILL_ACTIONS: Array[StringName] = [&"skill_q", &"skill_w", &"skill_e", &"
 const GOLD_ICON := preload("res://assets/art/ui/gold.svg")
 const GOLD_COLOR := Color("ffcf5a")
 const MARGIN := 12.0
+## The tips sit under the boss bar.
+const TIPS_TOP := 130.0
+const TIP_MARGIN := 14.0
 ## Space between the buff icons and the bottom panel.
 const BUFF_GAP := 8.0
 ## Space between R and the summoner spells.
@@ -32,8 +35,8 @@ var extra_stats := StatsPanel.new()
 var hp_regen_label: Label
 var mana_regen_label: Label
 
-## Task 10 fills the tips.
-var tips: Control
+## Act 1's tips, under the boss bar.
+var tips := TipBanner.new()
 var stage: Stage
 var stage_info := StageInfo.new()
 var boss_bar := BossBar.new()
@@ -280,7 +283,8 @@ func _build_gold() -> void:
 		_essence_pairs[kind] = [icon, amount, gap]
 
 
-## Top center: the stage info with the boss bar under it; bottom right: the radar.
+## Top center: the stage info with the boss bar and the tips under it; bottom
+## right: the radar.
 func _build_stage_info() -> void:
 	stage_info.add_theme_stylebox_override(&"panel", bottom_panel.get_theme_stylebox(&"panel"))
 	$Root.add_child(stage_info)
@@ -291,6 +295,11 @@ func _build_stage_info() -> void:
 	boss_bar.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	boss_bar.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	boss_bar.offset_top = 72.0
+	tips.add_theme_stylebox_override(&"panel", UiStyle.panel(UiStyle.PANEL_COLOR, UiStyle.BORDER_COLOR, 2, TIP_MARGIN))
+	$Root.add_child(tips)
+	tips.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	tips.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	tips.offset_top = TIPS_TOP
 	$Root.add_child(radar)
 	radar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
 	radar.grow_horizontal = Control.GROW_DIRECTION_BEGIN

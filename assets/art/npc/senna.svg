@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <!-- Senna: seen from above, hooded, a big relic cannon held forward (+X), glowing with teal-white light. -->
+  <g transform="translate(50 50)">
+    <ellipse cx="-2" cy="3" rx="38" ry="34" fill="#000000" opacity="0.25"/>
+    <!-- cloak -->
+    <path d="M -28 0 Q -28 -30 -4 -30 Q 10 -30 10 -18 L 10 18 Q 10 30 -4 30 Q -28 30 -28 0 Z" fill="#1e2a33" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -20 -14 Q -24 0 -20 14" fill="none" stroke="#3a5866" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- arms holding the cannon -->
+    <path d="M 0 -20 L 18 -12" stroke="#1a1d24" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 0 -20 L 18 -12" stroke="#2c3e4a" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 0 20 L 22 10" stroke="#1a1d24" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 0 20 L 22 10" stroke="#2c3e4a" stroke-width="5" stroke-linecap="round"/>
+    <!-- the relic cannon: a heavy stock, a long barrel and glowing rings -->
+    <path d="M -6 -12 L 14 -14 L 14 14 L -6 12 Q -12 0 -6 -12 Z" fill="#3a4650" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="12" y="-9" width="32" height="18" rx="4" fill="#4c5a64" stroke="#1a1d24" stroke-width="3"/>
+    <rect x="18" y="-11" width="5" height="22" rx="2" fill="#b8fff0" stroke="#1a1d24" stroke-width="2"/>
+    <rect x="31" y="-11" width="5" height="22" rx="2" fill="#b8fff0" stroke="#1a1d24" stroke-width="2"/>
+    <path d="M 44 -11 L 48 -7 L 48 7 L 44 11 Z" fill="#2c363e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="4" cy="0" r="5.5" fill="#b8fff0" stroke="#1a1d24" stroke-width="2"/>
+    <!-- muzzle light -->
+    <circle cx="48" cy="0" r="8" fill="#b8fff0" opacity="0.35"/>
+    <circle cx="48" cy="0" r="3.5" fill="#f0fffc"/>
+    <!-- hood, with her light inside -->
+    <ellipse cx="-6" cy="0" rx="12" ry="13" fill="#2a3a46" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -2 -9 Q 6 0 -2 9" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="-8" cy="0" r="5" fill="#b8fff0" opacity="0.3"/>
+    <path d="M -14 -4 Q -10 0 -14 4" fill="none" stroke="#b8fff0" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+  </g>
+</svg>

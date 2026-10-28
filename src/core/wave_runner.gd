@@ -98,6 +98,17 @@ func finish() -> void:
 	cleared.emit()
 
 
+## Debug: the boss wave comes next, straight away (the enemies left don't count).
+func skip_to_boss() -> void:
+	if boss == &"":
+		return
+	_to_spawn.clear()
+	_alive = 0
+	wave = _waves.size()
+	state = State.BREAK
+	_countdown = 0.0
+
+
 ## An enemy that wasn't asked for (debug) still has to die.
 func enemy_spawned() -> void:
 	_alive += 1

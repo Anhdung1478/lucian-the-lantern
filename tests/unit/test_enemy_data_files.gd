@@ -1,6 +1,6 @@
 extends GutTest
 
-const IDS := ["melee_minion", "ranged_minion", "siege_minion", "super_minion"]
+const IDS := ["melee_minion", "ranged_minion", "siege_minion", "super_minion", "thresh_1"]
 
 
 func _data(id: String) -> EnemyData:

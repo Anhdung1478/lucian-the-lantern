@@ -24,6 +24,15 @@ const ESSENCE_ICONS := {
 	Essences.PURPLE: preload("res://assets/art/ui/essence_purple.svg"),
 }
 const ESSENCE_COLORS := {Essences.BLUE: Color("5aa9ff"), Essences.ORANGE: Color("ffa040"), Essences.PURPLE: Color("b46cff")}
+## Act 1's tips: id -> [the text, the actions whose keys it names].
+const TIPS := {
+	&"move": ["%s to move. Hold it to keep walking.", [&"move"]],
+	&"attack": ["%s on an enemy to attack it.", [&"attack"]],
+	&"attack_move": ["Hold %s and press %s to attack the nearest enemy.", [&"attack_move", &"attack"]],
+	&"siege": ["A red circle marks where a shell will land. Step out of it!", []],
+	&"merchant": ["%s on the merchant to buy items with your gold.", [&"move"]],
+	&"hook": ["Thresh's hook flies along the red line. Move sideways!", []],
+}
 
 var wallet := Wallet.new()
 ## The merchant on the map, or null.
@@ -45,6 +54,12 @@ var result := StageResult.new()
 var reward_lines: Array[String] = []
 ## Seconds played in this stage (the stage only processes while unpaused).
 var elapsed := 0.0
+## Act 1's ally, on the first play only.
+var senna: Senna
+## The boss of the boss wave, once spawned.
+var boss_unit: EnemyUnit
+## The scene playing, or null.
+var cutscene: Cutscene
 
 var _next_spawn := 0
 
@@ -101,6 +116,8 @@ func _ready() -> void:
 	else:
 		_start_waves()
 	hud.setup(lucian, wallet, self)
+	if run.tutorial:
+		_start_tutorial()
 
 
 func _process(delta: float) -> void:
@@ -115,6 +132,26 @@ func _process(delta: float) -> void:
 func skip_break() -> void:
 	if runner:
 		lucian.restore_for(runner.skip())
+
+
+## Cutscenes: the world stops (tweens still move it), the HUD hides, and
+## ESC and P do nothing.
+func freeze(on: bool) -> void:
+	for node: Node in [$World, $Warnings, $Projectiles, camera]:
+		node.process_mode = Node.PROCESS_MODE_DISABLED if on else Node.PROCESS_MODE_INHERIT
+	hud.visible = not on
+	screens.locked = on
+	lucian.invulnerable = on
+
+
+## Debug and tests: every enemy goes (no rewards) and the boss wave comes next.
+func jump_to_boss_wave() -> void:
+	if runner == null or run.boss == &"":
+		return
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		enemy.remove_from_group(&"enemies")
+		enemy.queue_free()
+	runner.skip_to_boss()
 
 
 ## The result panel over a paused game; ESC and P stop working.
@@ -256,7 +293,9 @@ func _start_waves() -> void:
 
 func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 	if id == run.boss:
-		spawn_enemy(id, arena.boss_point)
+		boss_unit = spawn_enemy(id, arena.boss_point)
+		if boss_unit is Thresh:
+			(boss_unit as Thresh).phase_ended.connect(_on_thresh_phase_ended)
 		return
 	var at := arena.spawn_points[_next_spawn % arena.spawn_points.size()]
 	_next_spawn += 1
@@ -283,9 +322,74 @@ func _on_lucian_died() -> void:
 	show_result(false)
 
 
-## Minions for now; Tasks 10 and 11 add the bosses.
-func _new_unit(_data: EnemyData) -> EnemyUnit:
+## A boss has its own script; every other enemy is a minion.
+func _new_unit(data: EnemyData) -> EnemyUnit:
+	match data.behavior:
+		&"thresh":
+			return Thresh.new()
 	return Minion.new()
+
+
+## Act 1's first play: Senna fights too, and a tip comes with each new thing.
+func _start_tutorial() -> void:
+	_add_senna()
+	_tip(&"move")
+	runner.spawn_requested.connect(_on_tutorial_spawn)
+	enemy_died.connect(func(_enemy: EnemyUnit) -> void: _tip(&"attack_move"))
+	runner.break_started.connect(func(_seconds: float) -> void: _tip(&"merchant"))
+	runner.boss_wave_started.connect(func(_boss: StringName) -> void: _tip(&"hook"))
+
+
+func _on_tutorial_spawn(id: StringName, _wave: int) -> void:
+	_tip(&"attack")
+	if id == WavePlan.SIEGE:
+		_tip(&"siege")
+
+
+func _add_senna() -> void:
+	senna = Senna.new()
+	senna.lucian = lucian
+	senna.projectile_parent = $Projectiles
+	senna.position = arena.ally_start
+	$World.add_child(senna)
+
+
+## A tip from TIPS, with the keys as bound now.
+func _tip(id: StringName) -> void:
+	var keys := []
+	for action: StringName in TIPS[id][1]:
+		keys.append(GameSettings.instance().key_label(action))
+	hud.tips.show_tip(id, TIPS[id][0] % keys)
+
+
+## Thresh at half HP: the fight stops and the cutscene plays.
+func _on_thresh_phase_ended() -> void:
+	for node: Node in $Warnings.get_children() + $Projectiles.get_children():
+		node.queue_free()
+	cutscene = ThreshTakesSenna.new()
+	cutscene.done.connect(_on_cutscene_done)
+	cutscene.start(self)
+
+
+## Thresh is beaten for this act: his blue and orange now, his purple in
+## _on_cleared. He and Senna leave the map.
+func _on_cutscene_done() -> void:
+	var reward := KillRewards.roll(boss_unit.data, run.act, run, rng)
+	add_essences(reward.blue, reward.orange, 0, lucian.global_position)
+	reward_lines.append("Lucian takes Senna's gun: two guns from now on")
+	reward_lines.append("E – Relentless Pursuit is free in the Evolution Tree")
+	# Out of "enemies" now, so the radar and the boss bar drop him at once.
+	boss_unit.remove_from_group(&"enemies")
+	for node: Node2D in [boss_unit, senna]:
+		if is_instance_valid(node):
+			node.queue_free()
+	boss_unit = null
+	senna = null
+	cutscene = null
+	# His leaving ends the boss wave like a death would (all 3 waves cleared);
+	# finish() ends the stage even if other enemies are still about.
+	runner.enemy_died()
+	runner.finish()
 
 
 func _on_enemy_died(enemy: Enemy) -> void:

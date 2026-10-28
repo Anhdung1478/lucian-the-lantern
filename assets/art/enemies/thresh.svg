@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <!-- Thresh: the green-black warden seen from above, a chain sickle forward (+X), his green lantern hanging at his side. -->
+  <g transform="translate(60 60)">
+    <ellipse cx="-2" cy="4" rx="46" ry="44" fill="#000000" opacity="0.25"/>
+    <!-- the sickle's chain, looped back over his shoulder -->
+    <path d="M 30 -26 Q 12 -46 -14 -40 Q -32 -36 -30 -20" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 30 -26 Q 12 -46 -14 -40 Q -32 -36 -30 -20" fill="none" stroke="#8fe3b0" stroke-width="2.5" stroke-dasharray="5 3" stroke-linecap="round"/>
+    <!-- tattered robe trailing behind -->
+    <path d="M -30 -22 L -44 -16 L -36 -8 L -47 -1 L -36 6 L -45 14 L -34 18 L -40 26 L -26 24 Z" fill="#141c18" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- robe -->
+    <path d="M -32 0 Q -32 -36 -4 -38 Q 16 -38 18 -24 L 20 24 Q 16 38 -4 38 Q -32 36 -32 0 Z" fill="#1f2c26" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -22 -20 Q -26 0 -22 20" fill="none" stroke="#2f4a3c" stroke-width="3" stroke-linecap="round"/>
+    <!-- sickle arm, reaching forward -->
+    <path d="M 6 -28 L 28 -22" stroke="#1a1d24" stroke-width="11" stroke-linecap="round"/>
+    <path d="M 6 -28 L 28 -22" stroke="#2c3b33" stroke-width="7" stroke-linecap="round"/>
+    <!-- the sickle: haft, then a curved green-steel blade -->
+    <path d="M 26 -24 L 46 -16" stroke="#1a1d24" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 26 -24 L 46 -16" stroke="#5a4a3a" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 44 -20 Q 60 -14 56 6 Q 52 -6 40 -10 Z" fill="#c8e8d6" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 47 -16 Q 56 -10 55 2" fill="none" stroke="#8fe3b0" stroke-width="2" stroke-linecap="round"/>
+    <!-- lantern arm, down at his side -->
+    <path d="M 4 28 L -8 40" stroke="#1a1d24" stroke-width="11" stroke-linecap="round"/>
+    <path d="M 4 28 L -8 40" stroke="#2c3b33" stroke-width="7" stroke-linecap="round"/>
+    <!-- spiked shoulder plates -->
+    <path d="M -6 -36 L -12 -50 L 0 -40 L 4 -52 L 10 -38 Z" fill="#3c5446" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <ellipse cx="2" cy="-28" rx="15" ry="11" fill="#33463c" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -6 36 L -12 50 L 0 40 L 4 52 L 10 38 Z" fill="#3c5446" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <ellipse cx="2" cy="28" rx="15" ry="11" fill="#33463c" stroke="#1a1d24" stroke-width="3"/>
+    <!-- hooded head, skull face forward with green eyes -->
+    <ellipse cx="2" cy="0" rx="15" ry="16" fill="#18221d" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M 8 -10 Q 20 -8 20 0 Q 20 8 8 10 Q 12 0 8 -10 Z" fill="#b8c8b0" stroke="#1a1d24" stroke-width="2"/>
+    <circle cx="14" cy="-4" r="2.6" fill="#8fe3b0"/>
+    <circle cx="14" cy="4" r="2.6" fill="#8fe3b0"/>
+    <circle cx="14" cy="-4" r="5" fill="#8fe3b0" opacity="0.3"/>
+    <circle cx="14" cy="4" r="5" fill="#8fe3b0" opacity="0.3"/>
+    <!-- the lantern, on a short chain from his hand -->
+    <path d="M -9 41 L -20 36" stroke="#8fe3b0" stroke-width="2" stroke-dasharray="3 2"/>
+    <circle cx="-20" cy="46" r="13" fill="#8fe3b0" opacity="0.35"/>
+    <path d="M -20 35 L -12 40 L -12 52 L -20 57 L -28 52 L -28 40 Z" fill="#26362d" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="-20" cy="46" r="5.5" fill="#c8ffdc"/>
+    <path d="M -20 37 L -20 55 M -26 43 L -14 49" stroke="#1a1d24" stroke-width="1.5" opacity="0.7"/>
+  </g>
+</svg>
