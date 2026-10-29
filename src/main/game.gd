@@ -10,7 +10,7 @@ const STAGE_SCENE := preload("res://src/stage/stage.tscn")
 ## when the window is closed: the prompt is drawn on top and gets clicks first.
 const PROMPT_LAYER := 90
 
-## The TitleScreen, the MainScreen or the Stage being played.
+## The TitleScreen, the MainScreen, the Stage being played or the TheEndScreen.
 var screen: Node
 ## The stage being played, for its id when it ends.
 var _run := StageSetup.new()
@@ -124,16 +124,21 @@ func _keep_playing() -> void:
 ## screen. A failed save sends retry and next to the main screen, where it
 ## shows; so does next after the last stage.
 func _on_stage_finished(result: StringName, then: StringName) -> void:
-	var saved := SaveGame.instance().finish_stage(result, _run.stage_id)
 	var act := _run.act
 	var stage := _run.stage
 	var next := Journey.next_stage(act, stage)
+	# Before finish_stage records it.
+	var story_ends := result == &"cleared" and next == Vector2i.ZERO and not _run.stage_id in SaveGame.instance().cleared
+	var saved := SaveGame.instance().finish_stage(result, _run.stage_id)
 	if result == &"failed" and _run.tutorial:
 		then = &"title"
 	if not saved and then in [&"retry", &"next"]:
 		then = &"main"
 	if then == &"next" and next == Vector2i.ZERO:
 		then = &"main"
+	if story_ends:
+		_show_the_end.call_deferred(then, saved)
+		return
 	match then:
 		&"title":
 			show_title.call_deferred()
@@ -145,6 +150,23 @@ func _on_stage_finished(result: StringName, then: StringName) -> void:
 			show_main_screen.call_deferred(act)
 	if not saved:
 		_report_save_failed.call_deferred()
+
+
+## The story's end, after the stage-end screen's button; Continue goes where
+## that button said (retry: the stage again, else the main screen). A failed
+## save shows its toast on the main screen, as for any stage.
+func _show_the_end(then: StringName, saved: bool) -> void:
+	var act := _run.act
+	var stage := _run.stage
+	var end := TheEndScreen.new()
+	end.continue_pressed.connect(func() -> void:
+		if then == &"retry":
+			start_stage(StageSetup.for_stage(SaveGame.instance(), act, stage))
+		else:
+			show_main_screen(act)
+			if not saved:
+				_report_save_failed())
+	_swap(end)
 
 
 func _report_save_failed() -> void:

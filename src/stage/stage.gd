@@ -438,6 +438,8 @@ func _on_cleared() -> void:
 			reward_lines.append("Stage %s is open" % Journey.stage_id(run.act, run.stage + 1))
 		elif run.act < Journey.ACTS.size():
 			reward_lines.append("Act %d is open" % (run.act + 1))
+		else:
+			reward_lines.append("The story is complete")
 	show_result(true)
 
 
@@ -577,7 +579,20 @@ func _on_thresh_fell(thresh: ThreshFinal) -> void:
 		var unit := enemy as EnemyUnit
 		if unit and unit.summoned and unit.summoner == thresh:
 			unit.vanish()
-	_thresh_leaves(thresh)
+	if thresh != boss_unit:
+		_thresh_leaves(thresh)
+		return
+	cutscene = SennaFreed.new()
+	cutscene.done.connect(_on_ending_done)
+	cutscene.start(self)
+
+
+## The ending is over (played or skipped): Senna is free, and he leaves.
+func _on_ending_done() -> void:
+	cutscene = null
+	reward_lines.append("Senna is free")
+	if is_instance_valid(boss_unit):
+		_thresh_leaves(boss_unit)
 
 
 ## A Thresh is beaten: his blue and orange now, rising where he stands (as a

@@ -787,6 +787,9 @@ func test_his_fall_frees_every_summoned_soul_and_6_5_pays_20_purple_then_4() -> 
 	boss.fell.connect(func(thresh: ThreshFinal) -> void: fell.append(thresh))
 	_shoot(stage, boss, 999999.0)
 	await wait_physics_frames(4)
+	assert_is(stage.cutscene, SennaFreed, "the ending plays on his fall")
+	stage.cutscene.skip()
+	await wait_physics_frames(2)
 	assert_eq(fell.size(), 1, "fell, once")
 	assert_eq(fell[0], boss, "and says who fell")
 	for soul: EnemyUnit in souls:
@@ -813,6 +816,8 @@ func test_his_fall_frees_every_summoned_soul_and_6_5_pays_20_purple_then_4() -> 
 	await _to_phase_2(second)
 	_shoot(again, second, 999999.0)
 	await wait_physics_frames(4)
+	again.cutscene.skip()
+	await wait_physics_frames(2)
 	assert_true(again.result.visible)
 	assert_has(again.reward_lines, "+4 purple essence (repeat)")
 	assert_eq(again.collected[Essences.PURPLE], 4)

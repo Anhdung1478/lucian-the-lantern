@@ -219,6 +219,13 @@ func test_next_after_the_last_stage_goes_to_the_main_screen() -> void:
 	assert_eq(Journey.next_stage(game._run.act, game._run.stage), Vector2i.ZERO, "no stage after it")
 	game._on_stage_finished(&"cleared", &"next")
 	await wait_process_frames(2)
+	assert_is(game.screen, TheEndScreen, "the story's first clear ends on its own screen")
+	(game.screen as TheEndScreen).continue_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, MainScreen)
+	# A replay goes straight to the main screen.
+	game._on_stage_finished(&"cleared", &"next")
+	await wait_process_frames(2)
 	assert_is(game.screen, MainScreen)
 
 
