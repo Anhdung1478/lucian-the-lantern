@@ -233,6 +233,7 @@ func show_result(is_cleared: bool) -> void:
 		["Gold earned", StageStats.format(stats.gold_earned)],
 		["Level reached", str(lucian.progress.level)],
 	])
+	Sfx.play(&"victory" if is_cleared else &"defeat")
 	var next := Journey.next_stage(run.act, run.stage) if run.act > 0 else Vector2i.ZERO
 	var can_next := is_cleared and next != Vector2i.ZERO and WavePlan.has_stage(Journey.stage_id(next.x, next.y))
 	# Losing the tutorial (Act 1 before its first clear) is a game over.
@@ -339,8 +340,11 @@ func spawn_unit(data: EnemyData, at: Vector2, wave := 1) -> EnemyUnit:
 	return unit
 
 
-## Essences go into the save at once, so leaving or losing keeps them.
+## Essences go into the save at once, so leaving or losing keeps them. Orange
+## and purple sparkle (blue comes with every kill, so it is quiet).
 func add_essences(blue: int, orange: int, purple: int, at: Vector2) -> void:
+	if orange > 0 or purple > 0:
+		Sfx.play(&"essence")
 	var amounts := {Essences.BLUE: blue, Essences.ORANGE: orange, Essences.PURPLE: purple}
 	var row := 0
 	for kind: StringName in Essences.KINDS:
@@ -383,6 +387,7 @@ func _start_waves() -> void:
 	remove_merchant()
 	runner = WaveRunner.new(WavePlan.waves(run.stage_id), run.boss)
 	runner.spawn_requested.connect(_spawn_wave_enemy)
+	runner.wave_started.connect(_on_wave_started)
 	## Deferred, both to keep their order: a shot's physics callback can end a wave, and the merchant's body can't be added mid-flush.
 	runner.break_started.connect(func(_seconds: float) -> void: add_merchant(), CONNECT_DEFERRED)
 	runner.break_ended.connect(remove_merchant, CONNECT_DEFERRED)
@@ -390,10 +395,21 @@ func _start_waves() -> void:
 	enemy_died.connect(func(_enemy: EnemyUnit) -> void: runner.enemy_died())
 
 
+## A horn for each wave. The boss wave has none: the boss's own sound plays
+## as it comes (_spawn_wave_enemy).
+func _on_wave_started(_wave: int) -> void:
+	if not runner.is_boss_wave():
+		Sfx.play(&"wave")
+
+
 ## The boss comes at the boss point. A perched enemy (data.perch) stands on
 ## the map's free ledge nearest Lucian and is marked perched; with none free,
 ## it comes like any other, from its camp or the spawn points (_spawn_point).
+## A boss or a mini boss (any, not only the stage's boss) sounds as it comes.
 func _spawn_wave_enemy(id: StringName, wave: int) -> void:
+	var data: EnemyData = load(ENEMY_PATH % id)
+	if data.is_boss_kind():
+		Sfx.play(&"boss")
 	if id == run.boss:
 		boss_unit = spawn_enemy(id, arena.boss_point)
 		# Act 1's cutscene, for a plain Thresh only (spawn_unit wires a final one's fall).
@@ -401,7 +417,6 @@ func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 			## Deferred: a shot's physics callback can bring him to half HP, and the freeze can't disable bodies mid-flush.
 			(boss_unit as Thresh).phase_ended.connect(_on_thresh_phase_ended, CONNECT_DEFERRED)
 		return
-	var data: EnemyData = load(ENEMY_PATH % id)
 	var ledge := _free_ledge() if data.perch else -1
 	if ledge < 0:
 		spawn_unit(data, _spawn_point(data), wave)

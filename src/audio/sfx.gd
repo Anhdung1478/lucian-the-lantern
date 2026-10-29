@@ -98,6 +98,38 @@ static func _generate(sound: StringName) -> AudioStreamWAV:
 			# A soft rising chime, each note ringing out (a soul set free).
 			for note in [659.3, 987.8, 1318.5]:
 				samples.append_array(_tone(0.22, note, note * 1.01, 0.0, 0.0, 7.0))
+		&"level_up":
+			# A bright rising C major chime, its top note ringing out.
+			samples = _notes([1046.5, 1318.5, 1568.0], 0.09, 12.0, 0.15, 4.0)
+		&"rank_up":
+			samples = _notes([987.8, 1480.0], 0.06, 28.0, 0.4)
+		&"cast_q":
+			# A bright laser zap.
+			samples = _tone(0.2, 2600.0, 1100.0, 0.08, 0.35, 13.0, 110.0)
+		&"cast_w":
+			# A fiery whoosh, then the pop of the missile leaving.
+			samples = _tone(0.12, 250.0, 700.0, 0.85, 0.0, 9.0)
+			samples.append_array(_tone(0.09, 520.0, 160.0, 0.3, 0.6, 30.0))
+		&"cast_e":
+			# An airy dash whoosh.
+			samples = _tone(0.2, 900.0, 300.0, 0.95, 0.0, 11.0)
+		&"wave":
+			# A short low horn.
+			samples = _tone(0.5, 174.6, 196.0, 0.03, 0.55, 4.0, 6.0)
+		&"boss":
+			# A deep gong and roar.
+			samples = _tone(0.9, 110.0, 55.0, 0.35, 0.4, 3.5, 9.0)
+		&"victory":
+			# A short fanfare: C E G and a held high C.
+			samples = _notes([523.3, 659.3, 784.0, 1046.5], 0.11, 9.0, 0.35, 3.5)
+		&"defeat":
+			# A falling sting.
+			samples = _notes([392.0, 311.1, 233.1], 0.16, 6.0, 0.45, 2.5)
+		&"click":
+			samples = _tone(0.025, 2200.0, 1800.0, 0.2, 0.0, 120.0)
+		&"essence":
+			# A quick high sparkle.
+			samples = _notes([1760.0, 2637.0, 2217.5, 3520.0], 0.045, 35.0, 0.0, 3.0)
 		_:
 			samples = _tone(0.05, 440.0, 440.0, 0.0, 0.0, 30.0)
 	var bytes := PackedByteArray()
@@ -132,4 +164,14 @@ static func _tone(seconds: float, start_hz: float, end_hz: float, noise: float, 
 		if tremolo_hz > 0.0:
 			envelope *= 0.6 + 0.4 * sin(TAU * tremolo_hz * t)
 		out[i] = value * envelope * 0.6
+	return out
+
+
+## Steady notes one after another (chimes and fanfares), each `seconds`
+## long; the last one rings `hold` times as long.
+static func _notes(hz: Array, seconds: float, decay: float, square := 0.0, hold := 1.0) -> PackedFloat32Array:
+	var out := PackedFloat32Array()
+	for i in hz.size():
+		var length := seconds * (hold if i == hz.size() - 1 else 1.0)
+		out.append_array(_tone(length, hz[i], hz[i], 0.0, square, decay))
 	return out

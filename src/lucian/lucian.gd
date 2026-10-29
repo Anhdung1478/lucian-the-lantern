@@ -188,6 +188,8 @@ var _launch_from := Vector2.ZERO
 var _launch_to := Vector2.ZERO
 var _launch_time := 0.0
 var _launch_left := 0.0
+## The level last cheered: only a higher one gets the chime and the burst.
+var _level_shown := 1
 
 @onready var visuals: LucianVisuals = $Visuals
 @onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
@@ -223,7 +225,8 @@ func _ready() -> void:
 	if projectile_parent == null:
 		projectile_parent = get_parent()
 	inventory.catalog = item_catalog
-	progress.level_changed.connect(func(_level: int) -> void: _refresh_stats(false))
+	_level_shown = progress.level
+	progress.level_changed.connect(_on_level_changed)
 	inventory.changed.connect(_on_inventory_changed)
 
 
@@ -279,8 +282,12 @@ func command_cast_on(target: Enemy, reach: float, cast: Callable) -> void:
 	_cast_call = cast
 
 
+## The HUD's "+" and Ctrl+key both come here.
 func try_rank_up(slot: ChampionProgress.Slot) -> bool:
-	return progress.rank_up(slot)
+	if not progress.rank_up(slot):
+		return false
+	Sfx.play(&"rank_up")
+	return true
 
 
 ## The cast gate: rank, cooldown, mana and state, then pay and cast.
@@ -1334,6 +1341,18 @@ func _refresh_stats(keep_share: bool) -> void:
 	if dead:
 		hp = 0.0
 	queue_redraw()
+
+
+## Stats follow the level. A level gained (not one lost on the debug table)
+## also gets a chime and a gold burst over his art.
+func _on_level_changed(level: int) -> void:
+	_refresh_stats(false)
+	if level > _level_shown:
+		Sfx.play(&"level_up")
+		var burst := LevelUpBurst.new(level)
+		add_child(burst)
+		move_child(burst, visuals.get_index() + 1)
+	_level_shown = level
 
 
 func _draw() -> void:

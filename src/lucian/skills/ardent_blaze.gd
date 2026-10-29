@@ -69,6 +69,7 @@ func _launch() -> void:
 	# Deferred: physics queries are locked while area overlaps are reported.
 	missile.finished.connect(_explode, CONNECT_DEFERRED)
 	lucian.spawn(missile)
+	Sfx.play(&"cast_w")
 
 
 func _explode(at: Vector2) -> void:

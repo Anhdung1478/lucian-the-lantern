@@ -62,3 +62,4 @@ func _fire() -> void:
 	var beam := LaserBeam.new()
 	beam.setup(origin + _direction * Lucian.GUN_REACH, _direction, beam_length - Lucian.GUN_REACH, beam_width)
 	lucian.spawn(beam)
+	Sfx.play(&"cast_q")

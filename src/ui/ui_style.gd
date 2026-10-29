@@ -11,6 +11,10 @@ const DIM_COLOR := Color("9aa3b2")
 const GOLD_COLOR := Color("ffcf5a")
 const ERROR_COLOR := Color("ff6a5a")
 const DISABLED_FONT := Color(0.45, 0.48, 0.55)
+## A styled button's soft click, quiet under the game's sounds.
+const CLICK_DB := -10.0
+## Set on a button once its click is connected, so a restyle adds no second.
+const CLICK_META := &"click_sound"
 
 
 static func panel(color := PANEL_COLOR, border := BORDER_COLOR, border_width := 2, margin := 28.0, radius := 10) -> StyleBoxFlat:
@@ -44,8 +48,12 @@ static func button_style(state: StringName, selected := false) -> StyleBoxFlat:
 	return style
 
 
-## Applies the button look. `selected` keeps it lit, e.g. the open tab.
+## Applies the button look and its click. `selected` keeps it lit, e.g. the
+## open tab.
 static func style_button(button: Button, font_size := 22, selected := false) -> void:
+	if not button.has_meta(CLICK_META):
+		button.set_meta(CLICK_META, true)
+		button.pressed.connect(func() -> void: Sfx.play(&"click", CLICK_DB))
 	button.focus_mode = Control.FOCUS_NONE
 	button.add_theme_font_size_override(&"font_size", font_size)
 	for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
