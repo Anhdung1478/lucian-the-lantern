@@ -91,7 +91,7 @@ func test_gunblade_on_an_enemy_out_of_range_walks_over_then_casts() -> void:
 	equip(&"hextech_gunblade")
 	assert_false(lucian.use_equip_slot(0, dummy.position), "not yet")
 	assert_true(lucian.item_cooldown(&"hextech_gunblade").is_ready())
-	# 1000 - 700 - 34 (the dummy's radius) = 266 to walk at 335.
+	# 1000 - 700 - 34 (the dummy's radius) = 266 to walk at 345.
 	await wait_seconds(1.2)
 	assert_eq(sources, [&"hextech_gunblade"])
 	assert_almost_eq(lucian.global_position.x, 1000.0 - ItemActives.GUNBLADE_RANGE - dummy.radius, 10.0, "walked only until in range")

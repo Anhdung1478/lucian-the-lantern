@@ -36,3 +36,20 @@ func test_skill_max_ranks_match_progress_rules() -> void:
 	for i in SKILL_FILES.size():
 		var data := load(SKILL_FILES[i]) as SkillData
 		assert_eq(data.max_rank, expected[i], SKILL_FILES[i])
+
+func test_lucian_base_move_speed_is_345() -> void:
+	var stats := load("res://data/lucian_stats.tres") as UnitStats
+	assert_almost_eq(stats.at_level(1).move_speed, 345.0, 0.001)
+
+
+func test_lucian_mana_regen_is_1_75_times_the_old_base() -> void:
+	var stats := load("res://data/lucian_stats.tres") as UnitStats
+	assert_almost_eq(stats.at_level(1).mana_regen, 2.8, 0.001)
+	# (14 + 1.225 * 17) / 5
+	assert_almost_eq(stats.at_level(18).mana_regen, 6.965, 0.001)
+
+
+func test_blue_buff_mana_regen_is_added_unscaled() -> void:
+	var stats := load("res://data/lucian_stats.tres") as UnitStats
+	var blue := stats.at_level(1, JungleBuffs.BLUE_BONUS)
+	assert_almost_eq(blue.mana_regen, 2.8 + 10.0, 0.001)

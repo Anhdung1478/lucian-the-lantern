@@ -165,7 +165,7 @@ func test_smite_on_an_enemy_out_of_reach_walks_over_then_casts() -> void:
 	lucian.summoners.set_spell(0, &"smite")
 	assert_false(lucian.use_summoner(0, dummy.position), "not yet")
 	assert_true(lucian.summoners.cooldown(&"smite").is_ready())
-	# 900 - 500 - 34 (the dummy's radius) = 366 to walk at 335.
+	# 900 - 500 - 34 (the dummy's radius) = 366 to walk at 345.
 	await wait_seconds(1.5)
 	assert_eq(sources, [&"smite"])
 	assert_almost_eq(lucian.global_position.x, 900.0 - SummonerSpells.SMITE_RANGE - dummy.radius, 10.0, "walked only until in reach")
