@@ -18,7 +18,7 @@ var spread := 0.0
 ## W: the cross its missile bursts into at the end (arm length x width).
 var cross := Vector2.ZERO
 ## Dashes and Flash: a ring where Lucian lands, at the aimed distance kept
-## between min_reach and reach.
+## between min_reach and reach. These casts move him, so a root refuses them.
 var landing := false
 var min_reach := 0.0
 ## Gunblade and Smite hit an enemy: aimed at one out of reach, Lucian walks

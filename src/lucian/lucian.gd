@@ -314,7 +314,7 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 func can_cast(slot: ChampionProgress.Slot) -> bool:
 	if (skills[ChampionProgress.Slot.R] as TheCulling).is_channeling() and slot != ChampionProgress.Slot.E:
 		return false
-	if slot == ChampionProgress.Slot.E and not can_move():
+	if _move_refused(skill_range(slot)):
 		return false
 	var skill := skills[slot]
 	return skill.rank() > 0 and skill.cooldown.is_ready() and mana >= skill.mana_cost()
@@ -471,12 +471,12 @@ func use_item(index: int) -> bool:
 
 
 ## Keys 1-6: drinks the potion, or uses the item active, in equip slot `slot`
-## (0-5).
+## (0-5). No item dash while rooted.
 func use_equip_slot(slot: int, aim: Vector2) -> bool:
 	if not can_act():
 		return false
 	var index := Inventory.EQUIP_START + slot
-	if inventory.is_locked(index):
+	if inventory.is_locked(index) or _move_refused(equip_range(slot)):
 		return false
 	var item := inventory.item_at(index)
 	if ItemActives.has_active(item):
@@ -491,16 +491,20 @@ func use_equip_slot(slot: int, aim: Vector2) -> bool:
 ## D and F: casts the summoner spell on `slot` (0-1) toward `aim`. No Flash
 ## while rooted.
 func use_summoner(slot: int, aim: Vector2) -> bool:
-	if not can_act():
-		return false
-	var spell := summoners.spell_in(slot)
-	if spell and spell.id == &"flash" and not can_move():
+	if not can_act() or _move_refused(summoner_range(slot)):
 		return false
 	if summoners.use(slot, aim):
 		return true
+	var spell := summoners.spell_in(slot)
 	if spell and summoners.cooldown(spell.id).is_ready():
 		_walk_into_reach(aim, summoner_range(slot), func(at: Vector2) -> void: use_summoner(slot, at))
 	return false
+
+
+## A cast that moves Lucian (its range shows where he lands: E, an item dash,
+## Flash) while he can't move (rooted).
+func _move_refused(shape: CastRange) -> bool:
+	return shape != null and shape.landing and not can_move()
 
 
 ## A targeted cast (Gunblade, Smite) aimed at an enemy out of reach: Lucian

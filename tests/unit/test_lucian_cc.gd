@@ -101,6 +101,31 @@ func test_a_root_refuses_e_and_flash_but_not_other_skills() -> void:
 	assert_true(lucian.try_cast(Slot.W, Vector2(600, 0)), "W still works")
 
 
+func test_a_root_refuses_item_dashes_without_spending_them() -> void:
+	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"galeforce"))
+	lucian.inventory.put(Inventory.EQUIP_START + 1, lucian.item_catalog.find(&"hextech_rocketbelt"))
+	lucian.add_cc(Kind.ROOT, 1.0)
+	assert_false(lucian.use_equip_slot(0, Vector2(0, -400)), "Galeforce")
+	assert_false(lucian.use_equip_slot(1, Vector2(0, -400)), "Rocketbelt")
+	assert_false(lucian.is_dashing())
+	assert_true(lucian.item_cooldown(&"galeforce").is_ready())
+	assert_true(lucian.item_cooldown(&"hextech_rocketbelt").is_ready())
+	await wait_physics_frames(10)
+	assert_eq(lucian.global_position, Vector2.ZERO, "nothing fires later either")
+	assert_eq(lucian._order, Lucian.Order.NONE)
+
+
+func test_a_root_leaves_actives_that_do_not_move_him() -> void:
+	var enemy := _enemy(Vector2(300, 0), 5000.0)
+	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"hextech_gunblade"))
+	lucian.inventory.put(Inventory.EQUIP_START + 1, lucian.item_catalog.find(&"hp_potion"))
+	lucian.add_cc(Kind.ROOT, 1.0)
+	assert_true(lucian.use_equip_slot(0, enemy.global_position), "Gunblade")
+	assert_lt(enemy.hp, enemy.max_hp)
+	assert_true(lucian.use_equip_slot(1, Vector2.ZERO), "a potion")
+	assert_eq(lucian.restores.count(&"hp_potion"), 1)
+
+
 func test_e_pressed_while_rooted_is_not_queued() -> void:
 	lucian.add_cc(Kind.ROOT, 1.0)
 	lucian.lock_cast(0.1)
