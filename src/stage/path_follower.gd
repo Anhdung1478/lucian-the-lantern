@@ -3,15 +3,17 @@ extends RefCounted
 ## Walking around walls, for enemies and Lucian alike. A walker heads
 ## straight for its goal while a ray on Layers.WORLD to it hits nothing.
 ## When a wall is in the way it follows a path on the world's navigation map
-## (baked by StageMap), asked again every REPATH_TIME or as soon as the goal
-## has moved REPATH_MOVE. Until the map has synced once, and whenever a path
-## comes back empty, it heads straight for the goal.
+## (baked by StageMap), asked again every REPATH_TIME, as soon as the goal
+## has moved REPATH_MOVE, and as soon as the walker itself jumped (a dash, a
+## blink, a throw). Until the map has synced once, and whenever a path comes
+## back empty, it heads straight for the goal.
 
 ## Seconds between path queries while a wall is in the way.
 const REPATH_TIME := 0.4
 ## A goal this far from the one the path was asked for asks again at once.
 const REPATH_MOVE := 120.0
-## Path corners this close count as passed.
+## Path corners this close count as passed. A walker that moved farther
+## than this since the last call jumped: its path was asked from elsewhere.
 const CORNER_REACH := 24.0
 
 ## Path queries asked so far (none while the line is clear).
@@ -25,6 +27,8 @@ var _index := 0
 var _asked_for := Vector2.ZERO
 var _repath_left := 0.0
 var _at_end := false
+## Where the walker was on the last call.
+var _last_from := Vector2.INF
 
 
 func _init() -> void:
@@ -38,6 +42,8 @@ func _init() -> void:
 func next_point(from: Vector2, goal: Vector2, delta: float, space: PhysicsDirectSpaceState2D, nav_map: RID) -> Vector2:
 	_repath_left -= delta
 	_at_end = false
+	var jumped := from.distance_to(_last_from) > CORNER_REACH
+	_last_from = from
 	_ray.from = from
 	_ray.to = goal
 	if space.intersect_ray(_ray).is_empty():
@@ -48,7 +54,7 @@ func next_point(from: Vector2, goal: Vector2, delta: float, space: PhysicsDirect
 	# Asking an unsynced map is an engine error.
 	if NavigationServer2D.map_get_iteration_id(nav_map) == 0:
 		return goal
-	if _repath_left <= 0.0 or goal.distance_to(_asked_for) > REPATH_MOVE:
+	if jumped or _repath_left <= 0.0 or goal.distance_to(_asked_for) > REPATH_MOVE:
 		_path = NavigationServer2D.map_get_path(nav_map, from, goal, true)
 		_index = 0
 		_asked_for = goal

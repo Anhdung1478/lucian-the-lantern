@@ -70,6 +70,24 @@ func test_lucian_walks_around_the_wall_to_a_point_behind_it() -> void:
 	assert_lt(lucian.global_position.distance_to(BEHIND), 5.0)
 
 
+func test_after_a_jump_past_a_corner_he_heads_on_not_back() -> void:
+	await _build_synced()
+	lucian.command_move(BEHIND)
+	await wait_seconds(0.3)
+	var path := lucian.path_follower._path
+	assert_eq(path.size(), 4, "start, both corners of the wall's end, goal")
+	# The corners on his side of the wall and past it, at the same end.
+	var near_corner := path[1]
+	var far_corner := path[2]
+	var outward := signf(near_corner.y - LUCIAN_AT.y)
+	# Between the corners, beyond the wall's end: the line to the goal still crosses the wall.
+	var jump_to := (near_corner + far_corner) * 0.5 + Vector2(0, outward * 34.0)
+	lucian.global_position = jump_to
+	await wait_physics_frames(1)
+	assert_gt(lucian.global_position.x, jump_to.x, "on toward the far corner, not back to the near one")
+	assert_lt(lucian.global_position.distance_to(far_corner), jump_to.distance_to(far_corner))
+
+
 func test_a_click_inside_the_wall_ends_at_the_closest_reachable_point() -> void:
 	await _build_synced()
 	# Nearer his side of the wall, whose face is at x = 1460.
