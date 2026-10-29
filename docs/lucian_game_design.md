@@ -40,7 +40,9 @@ Minutes for a skilled player's first clear of each act, counting a few deaths, s
 - A break is used, on average, for about 30 s of shopping.
 - About a third of each act's time is deaths and replays: farming essence for the tree (see the balance goal in §11).
 
-**Measuring it:** each stage's result panel shows its time, and the slot lists (title screen, Save as copy) show each slot's total play time. Both clocks skip paused time, so shopping (the shop pauses the game) isn't in them, while the budget counts about 30 s of shopping per break. If Act 2 clears in under 25 minutes, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards.
+**Measuring it:** each stage's end screen shows its time, and the slot lists (title screen, Save as copy) show each slot's total play time. Both clocks skip paused time, so shopping (the shop pauses the game) isn't in them, while the budget counts about 30 s of shopping per break. If Act 2 clears in under 25 minutes, or Act 3 in under 60, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards.
+
+**As built (Phase 7):** Act 3's waves hold about 275k HP, plus 35k for the two drakes and the dragon; Act 4's about 313k, plus 18k for Dark Lucian. The drakes come last in their stage's last wave, not in a wave of their own, so Act 3 has 21 waves plus the Elder Dragon's boss wave.
 
 ---
 
@@ -49,8 +51,8 @@ Minutes for a skilled player's first clear of each act, counting a few deaths, s
 | Input | Action |
 |---|---|
 | Right-click | Move (hold to keep following the cursor). A dash (E, Galeforce, Rocketbelt) or Flash drops a move or merchant visit ordered before it, even with the button still held: right-click again, during the dash or after it, to walk on. |
-| Left-click on enemy | Attack |
-| A + left-click | Attack-move |
+| Left-click on enemy | Attack (a Blast Cone too) |
+| A + left-click | Attack what the player means: the enemy under the cursor, else the weakest in range, else the nearest (see below) |
 | Q / W / E / R | Skills |
 | D / F | Summoner spells |
 | 1–6 | Item actives and potions in equip slots 1–6 |
@@ -79,6 +81,14 @@ Casts with no aim (potions, Ghost, Barrier, Heal, Clarity) and casts that aren't
 **Key bindings** can be changed in Settings → Controls (all but ESC and the debug F3 + Q).
 
 **Skill queueing (setting, on by default):** a skill pressed during another skill's cast time or the E dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept. Q / W pressed during R are still refused.
+
+**A + Left-click (built in Phase 7).** A arms it: Lucian's attack range shows as a ring and the cursor turns to a cross. The left-click then picks one target, in this order:
+1. The enemy (or Blast Cone) under the cursor, even out of range.
+2. Else the enemy with the **lowest HP %** within his attack range; on a tie, the nearer one.
+3. Else the **nearest enemy on the map**: he walks to it (around walls) and shoots once in range.
+4. With no enemy at all, he walks to the clicked point.
+
+It is one target: after that kill Lucian stops and idles. A dead or untargetable enemy is never picked. Act 1's tip reads "Press A, then LMB: attack the enemy under the cursor, or the weakest one in range." (the keys follow the bindings).
 
 ---
 
@@ -130,14 +140,50 @@ Acts 1 and 2 play this way. Training keeps its dummies and has no waves.
 5. The **result panel**.
 
 - **Skip** starts the next wave now and gives Lucian the HP and mana regen of the time skipped, at once. Cooldowns and buffs don't move.
-- **Enemies** attack only Lucian. They walk straight at him, sliding along walls; one that gets stuck sidesteps for a moment. They bump into each other and into Lucian. There is no navigation mesh.
+- **Enemies** attack only Lucian. They walk straight at him, sliding along walls; one that gets stuck sidesteps for a moment. They bump into each other and into Lucian. There is no navigation mesh. *(Phase 7: they path around walls; see below.)*
 - **Enemy bolts** are stopped by walls and pillars. Lucian's homing shots still fly over walls.
 - **Enemy hits** reach Lucian within his radius (30) of his center. Red ground warnings (circle, line, cone, lock line) fill up before an attack lands.
 - **Scaling** (bosses don't scale): per act after the first, HP × (1 + 0.6 · (act − 1)), damage and rewards × (1 + 0.25 · (act − 1)). Each wave after the first adds +15% HP and damage. A stage can also lower some enemies' HP on its own: in Act 1 (1-1), melee and ranged minions have 20% less HP.
 - **Death:** Lucian turns grey and fades for 1.5 s, then DEFEATED shows. Enemies stand still while he is dead or in stasis. Guardian Angel's stasis comes first.
 - **Game over:** losing Act 1 before its first clear (the tutorial) shows **GAME OVER** instead, and **Back to title** returns to the title screen. It still auto-saves, so the essences collected are kept.
-- **Result panel** (pauses the game; ESC and P do nothing): **STAGE CLEARED**, **DEFEATED** or **GAME OVER**, the stage name, "Waves cleared: 2 / 3 · Time 4:32", the essences collected and any first-clear lines. **Continue** auto-saves and opens the main screen on that act (Back to title after a game over).
+- **Result panel** (pauses the game; ESC and P do nothing): **STAGE CLEARED**, **DEFEATED** or **GAME OVER**, the stage name, "Waves cleared: 2 / 3 · Time 4:32", the essences collected and any first-clear lines. **Continue** auto-saves and opens the main screen on that act (Back to title after a game over). *(Phase 7: the end screen replaces it; see below.)*
 - **The stage time** only runs while the game does: the backpack, the shop, the ESC menu and the result panel stop it.
+
+### Built in Phase 7
+Acts 3 and 4 play this way too (`act3_the_jungle.md`, `act4_the_darkness.md`): packs from their camps, jungle buffs, terrain, two mini bosses, the Elder Dragon, the dark lane and Dark Lucian.
+
+**The end screen** (`StageResult`) replaces the result panel. It covers the whole screen; the game pauses, the HUD hides, and ESC and P do nothing.
+- A banner: **STAGE CLEARED** in gold, or **DEFEATED** / **GAME OVER** in red, over a soft gold or dark red glow. The stage's name under it.
+- **Stats:** Time, Waves, Kills, Damage dealt, Damage taken, Gold earned, Level reached.
+  - Kills count every enemy death in the stage; an escaped Scuttler isn't one.
+  - Damage dealt is the HP Lucian's hits really took (capped at the HP left). Debug kills add nothing.
+  - Damage taken is after armor and MR, before shields, as the numbers over Lucian show.
+  - Numbers have commas under 10,000 ("9,999") and read "41.2k" above.
+- **Rewards:** each essence collected with its icon ("No essences" when there are none), then the green lines: first-clear and first-kill purple, Act 1's lines, and **"Stage 3-3 is open"** or **"Act 4 is open"** on a first clear.
+- **Buttons** (Main screen is the lit one; each auto-saves first):
+
+| Outcome | Buttons |
+|---|---|
+| Cleared | **Retry** · **Next stage** (only when the next stage can be played) · **Main screen** |
+| Defeated | **Retry** · **Main screen** |
+| Game over (the tutorial) | **Back to title** |
+
+- **Retry** starts the same stage again, built fresh from the save. **Next stage** starts the next one (after 2-3, it is 3-1). **Main screen** opens the main screen on that act. If the save fails, Retry and Next go to the main screen instead, with its "Could not save" toast.
+
+**Walking around walls:** enemies and Lucian walk straight while nothing blocks the line to their goal. When a wall does, they follow a path baked from the map's walls (agent radius 36), asked again every 0.4 s or when the goal moves 120. Lucian's moves, attack chases, merchant visits and cast walks use it; a click inside a wall walks to the closest reachable point. The enemies' sidestep stays as a fallback. Until the map's navigation is ready, and whenever a path comes back empty, everyone walks straight. Acts 1–2 benefit too.
+
+**Status effects:**
+- **Slows** work on Lucian and on enemies. The strongest one wins; tenacity doesn't shorten them. Gunblade's 40% uses the same rule.
+- **Burns** deal damage every 0.5 s for their time, physical, magic or true (armor and MR lower them as usual). A tick makes no hit sound and no flash. It isn't a basic attack or a skill, so it triggers no on-hit effect, no Thornmail, and Banshee's Veil doesn't spend itself on one.
+- On Lucian they show in the buff row ("Slowed", "Burning", the strongest slow); on an enemy, as icons over its HP bar.
+- **Timed stat buffs** (the jungle buffs) raise HP regen, mana regen and ability haste for their time.
+- Death clears them all.
+
+**Untargetable enemies** (the Elder Dragon's Sky Dive, Dark Lucian's E): they leave the enemies, so attacks, homing shots in flight, A + Left-click, Senna and the radar drop them, and they take no damage, burns included. Lucian keeps an attack order on one and shoots again once it is back; the boss bar keeps it too.
+
+**Thrown over walls:** a Blast Cone throws Lucian. He can't act in flight, nothing pushes him then, and he lands on walkable ground. The throw builds no Energize.
+
+**Mini bosses** come last in their stage's last wave (`kind = mini_boss`). They don't scale. Their purple is paid on the kill.
 
 ---
 
@@ -390,6 +436,19 @@ Every kill pays out at once, Senna's kills too:
 - Lucian picks it up by walking within 60 of it, into the backpack.
 - With no room it stays, and "Backpack full" shows at most once every 3 s.
 
+### Built in Phase 7
+- **Blue per kill:** 3 in Act 3 and 4 in Act 4 (elites 15 and 20), as the table says.
+- **Mini bosses** (the Infernal and Ocean Drakes) pay on the kill: 300 gold, **50 blue, 3 orange**, and **5 purple the first time, 1 after**. The purple rises over Lucian and adds a line to the end screen ("+5 purple essence (Infernal Drake, first kill)", or "repeat"). They are in the save's `"bosses"` list with the bosses.
+- **Rift Scuttler:** caught, it pays an elite's rewards plus **45 blue** (raised by Essence Drops like all blue) and **4 orange** for sure. After 15 s alive it escapes with nothing: no gold, no XP, no essence, and not a kill.
+- **Jungle buffs:** the Blue Sentinel and the Red Brambleback leave Lucian their buff (60 s) when they die (`act3_the_jungle.md`).
+- **Item loot**, the mini-boss row:
+
+| Enemy | Drop |
+|---|---|
+| Mini boss | A fragment for sure, plus 8% a legendary |
+
+- As before, the kill that ends the stage drops nothing.
+
 ---
 
 ## 10. Skins
@@ -498,6 +557,8 @@ Stage gold, bonus XP and essence drops work since Phase 6: +10% gold, XP or blue
 | 5 | Shadow Isles | 5 | Maokai's saplings, Elise's spiderlings | Maiden of the Mist, Broodmother | Maokai (stage 2), Elise (stage 4) | Karthus |
 | 6 | The Lantern | 5 | Mist Walkers, Lantern Souls | Spectral Riders, Chain Wardens | Karthus – revived (stage 2), Hecarim (stage 4) | Thresh (2 phases) |
 
+**Built so far:** Acts 1–2 (Phase 6) and Acts 3–4 (Phase 7) can be played, 12 of the 22 stages. Acts 5–6 and Endless come in a later phase.
+
 ### Story summary
 - **Act 1 – The Loss:** Lucian and Senna fight together until Thresh kills Senna and traps her soul in his lantern.
 - **Act 2 – The Sentinels:** Lucian trains with Akshan to prove he's ready to hunt Thresh.
@@ -546,7 +607,18 @@ Maps are drawn in code. Walls (jungle, rocks, pillars, the border) block Lucian,
 | 2 | Training ground | 4600 × 2800 | Stone tiles, three gates, 6 decorative dummies by the walls, and 6, 8 or 10 pillars by stage (a ring of 10 in stage 3). See `act2_the_sentinels.md`. |
 | — | Training | 4800 × 2700 | The Phase 3 test arena, with its dummy and no waves |
 
-The radar takes the map's shape. Acts 3–6 have no map yet.
+The radar takes the map's shape. Acts 5–6 have no map yet. *(Phase 6 said Acts 3–6; Acts 3 and 4 came in Phase 7.)*
+
+### Built in Phase 7
+Every map now bakes a navigation mesh from its walls (agent radius 36), so enemies and Lucian walk around them (§3).
+
+| Act | Map | Size | Details |
+|---|---|---|---|
+| 3, stages 1–4 | Jungle | 5600 × 3600 | Paths 420 wide and round clearings in dense jungle: the pit at the top, the center, the start at the bottom, and a clearing for each camp (raptors and Gromp in the top corners, wolves and Krugs at the side edges, Blue and Red low on each side, the Scuttler on the river). The paths make two loops. A riverbed runs from the pit to the start: dry in 3-1 and 3-3, lava pools and Blast Cones in 3-2, shallow water and Honeyfruit in 3-4. |
+| 3, stage 5 | The Elder Dragon's pit | 3600 × 3600 | A round stone floor (r 1650) with rock all round it, 6 rocks for cover, waves from the north, east and west rim. |
+| 4 | Dark mid lane | 5200 × 3200 | Act 1's layout in black and purple. Dark Lucian rises from the river. |
+
+No wall polygon has a hole: a hole would collide as solid wall. The jungle keeps each loop's inner jungle as a wall of its own, and the pit's rock is 8 arc pieces. Maps draw under the units, at `StageMap.FLOOR_Z`. Details and terrain numbers are in `act3_the_jungle.md` and `act4_the_darkness.md`.
 
 ---
 

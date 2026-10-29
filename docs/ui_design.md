@@ -50,6 +50,7 @@
 - A dark sweep shows the time that has run out; a number shows stacks, charge or shield.
 - **Hover** the cursor over an icon to see its effect.
 - **Enemy statuses** (Carve stacks, Grievous Wounds, slow, Hatefog) show as tiny icons above the enemy's HP bar.
+- **Built in Phase 7:** the **Blue** and **Red** jungle buffs (a blue rune shield, a red flame shield) with their 60 s sweep; **Slowed** (the strongest slow on Lucian) and **Burning** while a burn ticks on him. Over an enemy's bar, slow and burn icons.
 - A shield (Ichorshield and Barrier together) shows as a white segment after the HP on Lucian's HP bar, and as "(+N)" in its text.
 - With **Rapid Firecannon** equipped and the Energized charge full, a light-blue ring shows its longer attack range until the Energized shot lands.
 
@@ -95,6 +96,7 @@ Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 - Training shows only its name.
 - Only Skip takes clicks; the rest lets right-clicks through to the battlefield.
 - **Boss bar** under it while a boss lives: the boss's name over a 600 × 22 red bar with "HP / max". It finds the boss by itself and hides when the boss dies or leaves. The phase text is for Act 6's Thresh.
+- **Phase 7:** the boss bar also shows a mini boss while no boss is out (a boss takes it over). It keeps a boss that is untargetable for a moment (Sky Dive, Dark Lucian's dash).
 
 ### Top right – Loot
 - Stage gold: a coin and the amount, in the HUD panel style (Phase 3).
@@ -123,8 +125,11 @@ Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 | Normal enemy | Red dot (r 4) |
 | Elite | Red dot (r 7) |
 | Boss | Red skull, 16 px |
+| Mini boss | Red skull, 12 px *(Phase 7)* |
 | Senna | Small pale-blue dot |
 | Merchant | Gold dot, during breaks |
+
+An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves the radar until it is back *(Phase 7)*.
 
 ### Act 1 tips
 - On Act 1's first play, tips show one at a time under the boss bar, in a gold-bordered panel, 7 s each. The list is in `act1_the_loss.md`.
@@ -151,10 +156,51 @@ Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 - Items on the ground: the item's icon over a bobbing glow (gold for a legendary). "Backpack full" rises in red when Lucian can't pick one up.
 - Essences rise over a kill as "+1" with their icon.
 
-### Stage result
-- At the end of a stage, over a dimmed and paused game: **STAGE CLEARED** in gold or **DEFEATED** in red. Losing Act 1 before its first clear reads **GAME OVER** in red.
-- Then the stage's name, "Waves cleared: 3 / 3 · Time 0:11", the essences collected (icon and "+127"; "No essences" if none) and the first-clear lines in green ("+10 purple essence (first clear)", "Act 2 is open").
-- **Continue** goes back to the main screen (auto-save). After a game over the button reads **Back to title** and goes to the title screen (still auto-saved). ESC and P do nothing while it shows.
+**Built in Phase 7:**
+- A mini boss has a boss-size health bar.
+- More ground warnings in the same red style: Fire Breath and Elder Breath cones, Meteor Fall's four circles, Tidal Wave's wide line, the Sky Dive landing circle, Piercing Light's line and The Culling's wide line. The ground left burning after Fire Breath and Meteor Fall glows like lava.
+- **Elder's Mark:** a sigil over Lucian's head and a violet ring round him that empties over 4 s; the ring turns red while he is under 25% HP.
+- **Sky Dive:** only a dark shadow shows while the dragon is up.
+- The Tidal Wave is a wide wave front with a foam crest, not a ball (visual pass).
+- Floating text: "Escaped!" over a Scuttler that gets away, "Interrupted!" in gold over the Ocean Drake, with stars circling its head while it is dazed.
+- **Terrain:** lava pools (a molten orange glow with a dark crust), shallow water (pale blue with ripples), Honeyfruit (golden fruit; an empty stalk while it regrows), Blast Cones (a yellow-green bulb, 108 px, glowing while ripe; a bud swelling back while it regrows).
+- **A + Left-click:** pressing A shows Lucian's attack range as a ring and turns the cursor into a cross until the click.
+
+### Stage result: the end screen
+*(Phase 6 had a 560 px panel with one Continue button over the HUD. Phase 7 replaced it with this full-screen summary.)*
+
+```
+┌──────────────────────────────────────────────────────┐   full-screen dim 0.85 + a soft
+│                    STAGE CLEARED                     │   gold (clear) or dark red
+│               Stage 3-2 · The Jungle                 │   (defeat) radial glow
+├──────────────────────────┬───────────────────────────┤
+│ STATS                    │ REWARDS                   │
+│ Time             0:20    │ ◆ +275 blue essence       │
+│ Waves            4 / 4   │ ◆ +7 orange essence       │
+│ Kills            49      │ ◆ +5 purple essence       │
+│ Damage dealt     41.2k   │ +5 purple essence         │
+│ Damage taken     6,140   │   (Infernal Drake, first  │
+│ Gold earned      3,609   │   kill)                   │
+│ Level reached    5       │ Stage 3-3 is open         │
+├──────────────────────────┴───────────────────────────┤
+│      [ Retry ]      [ Next stage ]      [ Main screen ]     │
+└──────────────────────────────────────────────────────┘
+```
+
+- **When:** at the end of a stage, cleared or lost. The game pauses, the HUD hides, and ESC and P do nothing while it shows.
+- **Banner:** **STAGE CLEARED** in gold, or **DEFEATED** in red. Losing Act 1 before its first clear reads **GAME OVER** in red. Under it, the stage's name.
+- **Stats** (left column): Time, Waves, Kills, Damage dealt, Damage taken, Gold earned, Level reached. Numbers have commas under 10,000 and read "41.2k" above.
+- **Rewards** (right column): each essence collected, with its icon and color ("+275 blue essence"; "No essences" when there are none), then the lines in green: first-clear or repeat purple, a mini boss's purple, Act 1's lines, "Stage 3-3 is open" or "Act 4 is open".
+- **Buttons** (each auto-saves first; **Main screen** is lit in gold):
+
+| Outcome | Buttons |
+|---|---|
+| Cleared | Retry · Next stage (hidden when there is no next stage to play) · Main screen |
+| Defeated | Retry · Main screen |
+| Game over | Back to title |
+
+- **Retry** starts the stage again. **Next stage** starts the next one. **Main screen** opens the main screen on that act. **Back to title** goes to the title screen. If the save fails, Retry and Next go to the main screen with a red "Could not save" toast.
+- **Built:** the panel is 1040 px wide in the HUD panel style. Title 56, stage name 26, section heads 20 (dim), rows 22 (label left, value right), reward lines 20. Buttons 260 × 60, text 24.
 
 ### Cutscenes
 - Black bars (120 px) at the top and bottom; the HUD hides.
@@ -325,6 +371,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - [x] Skin shop (built in Phase 5, see `main_screen.md`)
 - [x] Main menu and save slot selection (the title screen, built in Phase 6, below)
 - [x] Stage select (Journey: act, Training and Endless tabs, built in Phase 5, see `main_screen.md`)
+- [x] Stage end screen (stats, rewards, Retry / Next stage / Main screen; built in Phase 7, above)
 
 ## 7. Title screen
 

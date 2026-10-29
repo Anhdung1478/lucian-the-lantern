@@ -678,3 +678,83 @@ Every task follows the same steps: tests first (red), then code (green), then th
   5. **Lose a stage:** DEFEATED; Retry restarts it, Main screen returns to that act. **Lose the tutorial:** GAME OVER with only Back to title.
 - **Screenshots** for every scenario in Task 13, checked by eye, embedded in the report.
 - **Pacing:** each stage's time on the end screen. Compare against the per-act budget; tune `ACT_HP` and boss HP if Act 3 clears in under 60 minutes.
+
+## Implementation notes (Phase 7 done)
+
+Everything in the plan is in place, one commit per task (Tasks 0–12), plus a fix commit after the Task 3, 5, 7 and 9 reviews. Task 13 is two commits: the visual pass, then the screenshots, docs and report (`docs/report/phase7.md`). The numbers in *Context* were placeholders; the docs (`act3_the_jungle.md`, `act4_the_darkness.md`) give the built ones. Changes and details settled while building:
+
+### Deviations and rulings
+- **Work on `main`**, as the plan's constraints say and as Phases 1–6 did. Nothing is pushed.
+- **Order of the pieces** (the pre-flight rulings):
+  - A: Task 1 tests dead enemies only; "A + Left-click misses an untargetable enemy" is tested in Task 3, where untargetable is built.
+  - B: Task 3 adds `EnemyData.hit_slow`, `hit_slow_time`, `hit_burn`, `hit_burn_time` and applies them in `EnemyUnit`; Task 4 adds the other new fields.
+  - C: Task 3 defines the Blue and Red buffs in one place Lucian owns (`JungleBuffs`) and builds Red's on-hit; Task 4 only wires `buff_on_kill` to them.
+  - D: escaping lives on `EnemyUnit` (`escape_after` > 0: it sets `has_escaped`, leaves the group, zeroes its layers, emits `escaped`, fades), so the stage handling is testable with any data. `Monster`'s flee only runs away.
+- **`extra_blue`** (the Scuttler's 45) is raised by Essence Drops like all blue.
+- **The pit (3-5) spawns at the north, east and west rim only.** The plan put a spawn point and Lucian's start both at the south rim, 450 px apart, inside his attack range at the wave's start.
+- **Fire Breath triggers within 580** (the 550 cone plus Lucian's 30 hit radius): the cone hit is judged against his body, so at 550 a player standing at attack range never saw it.
+- **Sky Dive's landing warning lasts 1.2 s** (the plan's table: 0.8 s; radius 260; time up about 3.6 s). At 0.8 s a Lucian under the shadow couldn't walk out at base speed, against the gentle-difficulty note.
+- **The Elder Dragon lands on its own 1.2 s fall timer**, not only on the warning's `fired`: a freed warning would have left it untargetable for good and the stage uncleared.
+- **`test_journey_section`'s Act 4 cards** flipped to "starts" in Task 10, as soon as `WavePlan` had 4-1; Task 11 extended `test_journey`'s wave-plan check to Act 4.
+- **Act 3's HP:** *Pacing* says the waves hold about 310k HP; the *Waves* table adds up to 275k, and that is what is built (plus 35k for the drakes and the dragon). The report's pacing estimate uses 275k.
+- **Implementation calls accepted in review:**
+  - Red Brambleback: `EnemyData.hit_burn_type` (-1 = the hit's type), so its hit is physical and its burn magic.
+  - The Scuttler's flee walks straight away from Lucian with `EnemyUnit.walk(direction)`, no path.
+  - Gromp stands 0.4 s each time it spits (`SPIT_STAND`), even when Lucian is closer than 380.
+  - Raptor swarm spots use a golden-angle counter.
+  - Meteor Fall reaches 900; bosses stand 0.3 s after a skill (`RECOVER`); Tidal Wave and Sky Dive push at 1200 px/s.
+  - The Ocean Drake's interrupt is checked in `_physics_process` (the damage is recorded in `_lose_hp`).
+  - Elder's Mark vanishes if the dragon dies. A Sky Dive push drops Lucian's attack order, as Flay does.
+  - The jungle merchant stands at the center clearing's south-west rim (2610, 2160), out of 3-4's water.
+  - Every map draws at `StageMap.FLOOR_Z` (-10).
+  - A Blast Cone pop with no landing at least 250 px away throws nobody; the plant still pops and regrows. Shooting a cone counts as a basic attack for on-attack item stacks, and a ripe cone stops a non-piercing W missile or R bullet.
+  - `launch()` drops Lucian's order, as `displace` does. A throw cut short (stasis, death) lands him at its end.
+  - `PathFollower` asks again at once when the walker jumped more than 24 px since the last call.
+  - Death clears Lucian's slows, burns and stat buffs.
+  - `Boss.arena` was added (Meteor Fall and the Elder Dragon's landing need walkable ground); `LaserBeam` gained a color (Dark Lucian's violet).
+
+### Visual pass (Task 13)
+Every Phase 7 scenario was run in a window and every PNG looked at. Seven fixes:
+- **Tidal Wave:** `EnemyProjectile.front_width` (0 = a ball). The Ocean Drake sets it to `WAVE_WIDTH` (180). `_draw_front()` draws a crescent across the travel: a faint wake, the water fading back from the crest (`draw_polygon` with per-vertex colors; the tips appear once, so no degenerate triangles), then a foam crest (`FOAM`) and a few foam dots. `FRONT_BOW` 22, `FRONT_DEPTH` 58, `WAKE_DEPTH` 56. The hit is unchanged: `hit_radius` 90 around its middle. Test: `test_the_wave_is_drawn_as_a_wide_front`.
+- **Blast Cone:** the SVG renders at 108 px (its `width`/`height`; the viewBox stays 72). While ripe it draws 5 soft yellow rings (`GLOW`, `GLOW_RADIUS` 66) that breathe at `GLOW_PULSE` 0.6 Hz, under the art. `RADIUS` 32 → 36, so a click on a leaf tip (46 from the middle) still picks it. Test: `test_a_click_on_a_leaf_tip_picks_it`.
+- **Dark lane palette** (`DarkMidLaneMap`): lane `#2a2633` → `#37313f`, jungle edge `#3b2a52` → `#5e4285`, river `#1d1630` → `#2a1f45`, ripples `#7a4fb0` → `#9467d0`, rocks `#3a3742` → `#4a4554`. The jungle `#120f1a` and trees `#0c0a12` stay. Tests: the palette in `test_act_4_is_the_dark_mid_lane`, and `test_the_dark_lane_reads_against_its_jungle` (by luminance: lane and river apart from the jungle, rocks apart from the lane, the edge visible, every color darker than Act 1's lane).
+- **3-2's pit lava:** `JungleMap.LAVA_POOLS`' two pit pools moved from beside the drake ((2600, 620) r 160, (3020, 760) r 150) to the back of the pit ((2580, 480) and (3020, 480), r 140). Test: `test_the_pit_lava_stays_behind_the_drake`.
+- **Mini-boss stage cards:** `StageCard` read "4 waves + mini boss wave", but the drake comes last in the last wave. It reads "4 waves + mini boss" (it fits one line of the 200 px card). Test: `test_a_mini_boss_card_puts_it_in_the_last_wave`.
+- **End-screen shots** showed "Damage dealt 0": the harness killed with debug damage, which the stage doesn't count. `act1_result` now shoots Thresh for 4 s first; `defeat` and `game_over` let Lucian A + Left-click the minions that kill him.
+- **Harness framing:** `to_dark_lucian` put Lucian 76 px from a rock's middle (inside it); he now stands 600 down the lane. `to_drake` spawned the drake 180 px behind its camp; it now spawns at `JungleMap.PIT`, where waves bring it.
+
+Looked at and left: the whole-map shots show a grey band past the map's edge (the harness zooms out past the camera's limits; play never shows it); the radar shows no terrain (by design).
+
+### Screenshot harness (Task 13)
+- New scenarios: `attack_pick` (2-1: A pressed through the real key, the click through the real mouse, on a hovered minion out of range, then on open ground), `act3_packs` (3-1's first wave from its camps, then the raptors wrapping Lucian), `act3_elites` (Blue and Red buffs and Red's on-hit, a Krug split, a Scuttler escape), `act3_result` (3-2 cleared, the drake shot for real first). `act3_water` adds two Honeyfruit shots. `game_over` now dies to minions instead of calling `show_result(false)`.
+- Helpers: `clear_wave()` is split into `wait_for_spawns()` and `kill_wave()` (the loop over `runner.alive()` with the boss through `boss_unit`), so a scenario can fight part of a wave for real. `shoot_for(enemy, seconds)`, `result_rows()`, `stand(id, at, share)` (an enemy that never walks or attacks, at a share of its HP) and `finish(unit)` (a debug hit of exactly the HP left, so the number shown is real).
+- `act1_result`'s printed expectation said Next stage was hidden; it shows (1-1 → 2-1), as designed.
+
+### Fixes from reviews
+- **Task 3:** Guardian Angel's stasis in the middle of a throw revived Lucian inside the wall he was flying over. A throw cut short by stasis or death now lands him at its end (`3621975`). Test: `test_stasis_mid_flight_lands_him_on_the_far_side`.
+- **Task 5:** after a dash, Flash, push or throw, a walker headed back to the path corner it had passed. `PathFollower` asks again at once after a jump of more than 24 px (`b5a512f`). Test: `test_after_a_jump_past_a_corner_he_heads_on_not_back`.
+- **Task 7:** the pit's south spawn (`d459685`, see the rulings).
+- **Task 9:** the Sky Dive warning time and the fall timer (`494d6dc`, see the rulings).
+- **Task 12** (while building): the debug Boss HP 51% also finds an Elder Dragon that is diving, out of the enemies group.
+
+### Left as is (small, from the reviews)
+- **Flagged for the final review:**
+  - Ranged minions backing into a wall or the border stop and go (`walk_toward` returns a point within 1 px, so the direction is zero and the sidestep can't move) instead of sliding, as they did before pathing. A fix: fall back to the raw point when the path point is within 1 px.
+  - Shooting a Blast Cone spends Lucian's charged on-attack procs (Energize, Spellblade, Essence Reaver's cooldown, Kraken's count), since `BlastCone.take_damage` never reaches `on_damage_dealt`. Smite and Gunblade aimed at a cone walk Lucian to it (`_walk_into_reach` uses the widened `enemy_at`) and cast at nothing; they could look in `&"enemies"` only.
+- **Combat:** slow bookkeeping is duplicated between `Enemy` and `Lucian`. Red's true burn ticks get Lucian's damage amps through `before_damage`. `restore_for` (Skip) credits jungle-buff regen without shortening the buff. `JungleBuffs` treats any non-Blue id as Red; a non-jungle stat buff shows no icon. Thresh flashes while stopped. `set_untargetable(false)` doesn't check `has_escaped`. `_mist_damage` counts burn ticks too. A death mid-dash by a path that skips untargetable leaves the dash state on Dark Lucian's corpse (the fade hides it). A dodge waits out Q's busy time, so the 1.5 s window may lapse.
+- **Pathing:** the merchant's body on `WORLD` makes walkers crossing it re-ask paths every 0.4 s. Bodies wider than 36 (the drakes, the Elder Dragon) can catch on corners. The bake test only checks that the mesh has polygons.
+- **Monsters:** `Monster._swarmed` is a static counter that never resets. The flank's skip within 250 is undocumented. Gromp's backoff can fail in a corner.
+- **Stage:** "Escaped!" is shown by the stage, not the unit. `_count_damage_dealt` sits between `_on_cleared`'s doc comment and the function. The boss bar rescans each frame while it holds a mini boss; an untargetable boss can't take the bar until it is targetable. The wave helpers give up silently at their frame cap, and `screenshot.gd` reads the private `runner._to_spawn`.
+- **Art:** stale SVG comments (`shadow_melee` "round crimson helmet", `shadow_siege` "red crest").
+- **Tests:** several use real-time windows (possible flakiness on a slow machine). `test_attack_move` asserts some values only to use them; it has no hovered-in-range case. The failed-save fallback is tested for Retry only. Coverage gaps: the `boss_unit` branch of the wave helper, the last split's no-loot, a mini boss's camp, the radar skull's drawing, a shot before an escape, the Elder Dragon's fall-death tween, a merchant outside 3-4's water, Honeyfruit not eaten in flight. Run alone, `test_status_effects` prints harmless ObjectDB leak lines. GUT's 2 warnings: `test_act4` (2 unfreed nodes) and the older `test_lucian_skills` (4).
+- Missing `##` docs on `DamageOverTime.has/is_empty/clear`, `Lucian.has_stat_buff/is_launched`, `JungleBuffs.is_jungle_buff/display_name/icon`.
+
+### Running the checks
+
+```
+godot_console --headless --path . --import
+godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
+godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+```
+
+Phase 7's scenarios: `attack_pick`, `act3_packs`, `act3_elites`, `act3_result`, `act3_jungle`, `act3_water`, `act3_pit`, `infernal_meteor`, `ocean_mist`, `elder_sky_dive`, `elder_mark`, `act4_lane`, `dark_lucian_q`, `dark_lucian_r`, plus the end screens `act1_result`, `defeat` and `game_over`. They start `stage.tscn` set up for a Journey stage from a scratch new save (`ACT_SCENARIOS`). Some hold wave 1 back (`runner._countdown = 999`), so their stage info reads "Wave 1 in 16:38".

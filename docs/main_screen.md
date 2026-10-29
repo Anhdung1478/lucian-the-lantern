@@ -229,3 +229,16 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
   - after a stage (Continue on its result, or Leave this stage), the act just played;
   - otherwise (a loaded slot, after Training), the first act with an open stage not cleared yet, else Training.
 - A cleared stage can be played again. Act 1's card always reads "2 waves + boss wave", though a replay has no boss.
+
+### Built in Phase 7
+**Acts 3 and 4 start**, like Acts 1 and 2: an act's Start works as soon as its first stage has waves.
+- **Act 3's cards:** "3 waves", "4 waves + mini boss" (grey skull), "4 waves", "5 waves + mini boss" (grey skull), "5 waves + boss wave" (red skull). The drake comes last in the last wave, not in a wave of its own, so its card no longer says "+ mini boss wave".
+- **Act 4's cards:** "4 waves", "5 waves", "5 waves + boss wave" (red skull).
+- **Acts 5–6** can be picked once open, but Start stays disabled ("Act 5 comes in a later phase").
+- **Endless** still opens once Act 3 is cleared, and its Start stays disabled ("Endless comes in a later phase").
+- **The end screen's buttons start stages directly** (`ui_design.md`, "Stage result"):
+  - **Retry** starts the same stage again, built fresh from the save, without passing through the main screen.
+  - **Next stage** starts the next one: 1-1 → 2-1, 2-3 → 3-1, 3-2 → 3-3. It shows only after a clear, when that stage can be played.
+  - **Main screen** opens the main screen on the act just played, as Continue did.
+  - Each saves first. If the save fails, Retry and Next land on the main screen instead, with the red "Could not save" toast.
+- After Retry or Next, the next end screen leads back here the same way, so the main screen only shows when the player asks for it.
