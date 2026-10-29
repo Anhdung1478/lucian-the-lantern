@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Fear: a pale purple ghost with a frightened face -->
+  <rect width="64" height="64" fill="#1e1428"/>
+  <!-- ghost -->
+  <path d="M 14 56 L 14 28 C 14 16 22 8 32 8 C 42 8 50 16 50 28 L 50 56 L 44 50 L 38 56 L 32 50 L 26 56 L 20 50 Z" fill="#c9a8ff" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+  <!-- brows raised in the middle, wide eyes and an open mouth -->
+  <path d="M 19 21 L 27 17 M 45 21 L 37 17" stroke="#1a1d24" stroke-width="2.6" stroke-linecap="round"/>
+  <ellipse cx="25" cy="29" rx="4" ry="5.5" fill="#1a1d24"/>
+  <ellipse cx="39" cy="29" rx="4" ry="5.5" fill="#1a1d24"/>
+  <ellipse cx="32" cy="43" rx="5" ry="6.5" fill="#1a1d24"/>
+  <!-- trembling -->
+  <path d="M 8 20 L 5 25 L 8 30 L 5 35 L 8 40 M 56 20 L 59 25 L 56 30 L 59 35 L 56 40" fill="none" stroke="#a070ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -37,9 +37,28 @@ const MOVE_SPEED_ICON := preload("res://assets/art/ui/buff_move_speed.svg")
 const SHIELD_ICON := preload("res://assets/art/ui/buff_shield.svg")
 const SLOW_ICON := preload("res://assets/art/ui/debuff_slow.svg")
 const BURN_ICON := preload("res://assets/art/ui/debuff_burn.svg")
-## Buff row ids: the strongest slow on Lucian, and his burns together.
+const ROOT_ICON := preload("res://assets/art/ui/debuff_root.svg")
+const STUN_ICON := preload("res://assets/art/ui/debuff_stun.svg")
+const FEAR_ICON := preload("res://assets/art/ui/debuff_fear.svg")
+## Buff row ids: the strongest slow on Lucian, his burns together, and each
+## crowd control.
 const SLOWED := &"slowed"
 const BURNING := &"burning"
+const ROOTED := &"rooted"
+const STUNNED := &"stunned"
+const FEARED := &"feared"
+## Crowd control in the buff row, the strongest first (the word under his HP
+## bar is the first one he has).
+const CC_DEBUFFS := {
+	CrowdControl.Kind.STUN: {"id": STUNNED, "name": "Stunned", "icon": STUN_ICON,
+		"text": "Can't move, attack or cast."},
+	CrowdControl.Kind.FEAR: {"id": FEARED, "name": "Feared", "icon": FEAR_ICON,
+		"text": "Running away in fear. Can't attack or cast."},
+	CrowdControl.Kind.ROOT: {"id": ROOTED, "name": "Rooted", "icon": ROOT_ICON,
+		"text": "Can't walk, dash or Flash. Attacks and other skills still work."},
+}
+## Feared, Lucian runs at this share of his move speed.
+const FEAR_SPEED := 0.6
 ## A throw (launch) makes Lucian look this much bigger at its peak, for height.
 const LAUNCH_RISE := 0.25
 const SPEED_BUFF_NAMES := {
@@ -160,6 +179,7 @@ var _hurt_tween: Tween
 ## Slow id -> {pct, left, duration}. The strongest one counts.
 var _slows := {}
 var _burns := DamageOverTime.new()
+var _cc := CrowdControl.new()
 ## Stat buff id -> {bonus, left, duration}; bonus is keyed like
 ## UnitStats.at_level's.
 var _stat_buffs := {}
@@ -289,23 +309,25 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 
 
 ## Learned, off cooldown, with the mana for it, and not held back by R (only
-## E can be cast while R fires): try_cast casts it now, or queues it behind a
-## cast time or a dash.
+## E can be cast while R fires) or a root (no E dash): try_cast casts it now,
+## or queues it behind a cast time or a dash.
 func can_cast(slot: ChampionProgress.Slot) -> bool:
 	if (skills[ChampionProgress.Slot.R] as TheCulling).is_channeling() and slot != ChampionProgress.Slot.E:
+		return false
+	if slot == ChampionProgress.Slot.E and not can_move():
 		return false
 	var skill := skills[slot]
 	return skill.rank() > 0 and skill.cooldown.is_ready() and mana >= skill.mana_cost()
 
 
-## Skills another skill holds back, greyed on the HUD: Q and W while R
-## fires, E during Q's cast time.
+## Skills held back, greyed on the HUD: Q and W while R fires, E during Q's
+## cast time or a root.
 func is_skill_blocked(slot: ChampionProgress.Slot) -> bool:
 	match slot:
 		ChampionProgress.Slot.Q, ChampionProgress.Slot.W:
 			return (skills[ChampionProgress.Slot.R] as TheCulling).is_channeling()
 		ChampionProgress.Slot.E:
-			return (skills[ChampionProgress.Slot.Q] as PiercingLight).is_casting()
+			return (skills[ChampionProgress.Slot.Q] as PiercingLight).is_casting() or has_cc(CrowdControl.Kind.ROOT)
 	return false
 
 
@@ -466,13 +488,16 @@ func use_equip_slot(slot: int, aim: Vector2) -> bool:
 	return use_item(index)
 
 
-## D and F: casts the summoner spell on `slot` (0-1) toward `aim`.
+## D and F: casts the summoner spell on `slot` (0-1) toward `aim`. No Flash
+## while rooted.
 func use_summoner(slot: int, aim: Vector2) -> bool:
 	if not can_act():
 		return false
+	var spell := summoners.spell_in(slot)
+	if spell and spell.id == &"flash" and not can_move():
+		return false
 	if summoners.use(slot, aim):
 		return true
-	var spell := summoners.spell_in(slot)
 	if spell and summoners.cooldown(spell.id).is_ready():
 		_walk_into_reach(aim, summoner_range(slot), func(at: Vector2) -> void: use_summoner(slot, at))
 	return false
@@ -600,6 +625,26 @@ func add_burn(id: StringName, dps: float, seconds: float, type: DamageInfo.Type,
 	_burns.add(id, dps, seconds, type, attacker)
 
 
+## A root, stun or fear for `seconds`, shortened by tenacity; a fear runs from
+## `from`. The same kind keeps the longer time. Refused while dead, in stasis,
+## invulnerable or thrown. A stun or fear drops his orders, windup, queued
+## cast, dash and R, as a displacement does; one landing mid-pull lets the
+## pull finish (it has dropped them already).
+func add_cc(kind: CrowdControl.Kind, seconds: float, from := Vector2.ZERO) -> void:
+	if dead or invulnerable or in_stasis() or is_launched():
+		return
+	_cc.add(kind, seconds, stats.tenacity, from)
+	if kind != CrowdControl.Kind.ROOT and _cc.has(kind) and not is_displaced():
+		_order = Order.NONE
+		_drop_in_flight()
+		move_dropped.emit()
+
+
+## A root, stun or fear (add_cc) is on him.
+func has_cc(kind: CrowdControl.Kind) -> bool:
+	return _cc.has(kind)
+
+
 ## Raises stats by `bonus` (keyed like UnitStats.at_level's bonus, regen per
 ## second) for `seconds`. The same id replaces the old one. Keeps the HP and
 ## mana share. Ignored while dead.
@@ -704,9 +749,16 @@ func in_stasis() -> bool:
 	return _stasis_left > 0.0
 
 
-## Lucian can take orders and cast.
+## Lucian can take orders and cast: not dead, in stasis, moved by force,
+## stunned or feared.
 func can_act() -> bool:
-	return not dead and not in_stasis() and not is_displaced() and not is_launched()
+	return not dead and not in_stasis() and not is_displaced() and not is_launched() \
+		and not _cc.has(CrowdControl.Kind.STUN) and not _cc.has(CrowdControl.Kind.FEAR)
+
+
+## Lucian can walk, dash and Flash: he can act and no root holds him.
+func can_move() -> bool:
+	return can_act() and not _cc.has(CrowdControl.Kind.ROOT)
 
 
 ## Armor above what his level alone gives (Thornmail).
@@ -734,13 +786,14 @@ func _drop_in_flight() -> void:
 	collision_mask = _body_mask()
 
 
-## Death ends his slows, burns and stat buffs.
+## Death ends his slows, burns, crowd control and stat buffs.
 func _die() -> void:
 	dead = true
 	_order = Order.NONE
 	_drop_in_flight()
 	_slows.clear()
 	_burns.clear()
+	_cc.clear()
 	if not _stat_buffs.is_empty():
 		_stat_buffs.clear()
 		_refresh_stats(true)
@@ -776,6 +829,18 @@ func _displace_step(delta: float) -> void:
 	if _displace_left <= 0.0 or get_slide_collision_count() > 0:
 		_displace_left = 0.0
 		collision_mask = _body_mask()
+
+
+## Feared: Lucian runs straight away from the fear's source at FEAR_SPEED of
+## his move speed, sliding along walls (no path). Right on the source, he
+## runs backward. Forced, like a displacement, so it builds no Energize.
+func _fear_step() -> void:
+	var away := -aim_direction(_cc.fear_from())
+	velocity = away * current_move_speed() * FEAR_SPEED
+	visuals.face(away)
+	move_and_slide()
+	velocity = Vector2.ZERO
+	_last_position = global_position
 
 
 ## A throw's frame: along the straight line, growing to 1 + LAUNCH_RISE at
@@ -896,8 +961,8 @@ func enemy_near_cursor(aim: Vector2, reach: float) -> Enemy:
 
 
 ## HUD buff icons: potions, stat buffs (the jungle buffs), move speed,
-## shields, item passives, then the strongest slow and the burns. Each is
-## {id, name, icon, text, count, left, duration, ready}.
+## shields, item passives, then the strongest slow, crowd control and the
+## burns. Each is {id, name, icon, text, count, left, duration, ready}.
 func buffs() -> Array[Dictionary]:
 	var found: Array[Dictionary] = []
 	if item_catalog:
@@ -937,6 +1002,11 @@ func buffs() -> Array[Dictionary]:
 		found.append({"id": SLOWED, "name": "Slowed", "icon": SLOW_ICON,
 			"text": TooltipText.colorize("[ms]-%d%% move speed[/ms]." % roundi(slow.pct * 100.0)), "count": "",
 			"left": slow.left, "duration": slow.duration, "ready": false})
+	for kind: CrowdControl.Kind in CC_DEBUFFS:
+		if _cc.has(kind):
+			var row: Dictionary = CC_DEBUFFS[kind].duplicate()
+			row.merge({"count": "", "left": _cc.time_left(kind), "duration": _cc.duration(kind), "ready": false})
+			found.append(row)
 	if not _burns.is_empty():
 		var longest := _burns.longest()
 		found.append({"id": BURNING, "name": "Burning", "icon": BURN_ICON,
@@ -1125,6 +1195,11 @@ func _physics_process(delta: float) -> void:
 		_displace_step(delta)
 		_last_position = global_position
 		return
+	if _cc.has(CrowdControl.Kind.STUN):
+		return
+	if _cc.has(CrowdControl.Kind.FEAR):
+		_fear_step()
+		return
 	if _queued_slot >= 0 and not is_cast_locked() and not is_dashing():
 		var queued := _queued_slot as ChampionProgress.Slot
 		_queued_slot = -1
@@ -1182,6 +1257,7 @@ func _tick_buffs(delta: float) -> void:
 		_slows[id].left -= delta
 		if _slows[id].left <= 0.0:
 			_slows.erase(id)
+	_cc.tick(delta)
 	var expired := false
 	for id in _stat_buffs.keys():
 		_stat_buffs[id].left -= delta
@@ -1334,8 +1410,11 @@ func _in_range(target: Enemy) -> bool:
 ## Moves toward `point` this frame: straight while no wall is in the way,
 ## else along a path around it (see PathFollower). Returns true once Lucian
 ## has arrived, or has reached the end of a path that gets him no closer (a
-## click inside a wall ends at the nearest point he can reach).
+## click inside a wall ends at the nearest point he can reach). Rooted, he
+## doesn't step and the order waits.
 func _step_toward(point: Vector2, delta: float) -> bool:
+	if not can_move():
+		return false
 	var world := get_world_2d()
 	var toward := path_follower.next_point(global_position, point, delta, world.direct_space_state, world.navigation_map)
 	var offset := toward - global_position
