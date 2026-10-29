@@ -40,8 +40,9 @@ static func landing_spot(spot: Vector2, map: StageMap, body_radius: float) -> Ve
 	return spot if map.is_walkable(spot, body_radius) else middle
 
 
+## A skill's hit of `amount`, times skill_scale.
 func skill_hit(amount: float, type: DamageInfo.Type, source: StringName) -> DamageInfo:
-	var info := DamageInfo.create(amount, type, source, self)
+	var info := DamageInfo.create(amount * skill_scale, type, source, self)
 	info.from_skill = true
 	return info
 

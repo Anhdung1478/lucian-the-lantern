@@ -69,6 +69,9 @@ var collected := {Essences.BLUE: 0, Essences.ORANGE: 0, Essences.PURPLE: 0}
 var rng := RandomNumberGenerator.new()
 ## The stage's waves; null in Training.
 var runner: WaveRunner
+## Endless mode's flow (its runner, spawn strength, the best); null in the
+## story and Training.
+var endless: EndlessDirector
 ## Lucian's invulnerable flag as a cutscene found it (debug God mode survives).
 var _invulnerable_before_freeze := false
 var result := StageResult.new()
@@ -186,18 +189,22 @@ func freeze(on: bool) -> void:
 		lucian.invulnerable = _invulnerable_before_freeze
 
 
-## Debug and tests: every enemy goes (no rewards) and the boss wave comes next.
+## Debug and tests: every enemy goes (no rewards) and the boss wave comes next
+## (in Endless, the next tenth wave).
 func jump_to_boss_wave() -> void:
-	if runner == null or run.boss == &"":
+	if runner == null or (run.boss == &"" and endless == null):
 		return
 	_remove_every_enemy()
-	runner.skip_to_boss()
+	if endless:
+		endless.skip_to_boss()
+	else:
+		runner.skip_to_boss()
 
 
 ## Debug and tests: every enemy goes (no rewards) and the stage's last wave comes next
-## (a mini boss stage's mini boss wave).
+## (a mini boss stage's mini boss wave). Endless has no last wave.
 func jump_to_last_wave() -> void:
-	if runner == null:
+	if runner == null or endless:
 		return
 	_remove_every_enemy()
 	runner.skip_to_last_wave()
@@ -321,6 +328,8 @@ func spawn_enemy(id: StringName, at: Vector2, wave := 1) -> EnemyUnit:
 func spawn_unit(data: EnemyData, at: Vector2, wave := 1) -> EnemyUnit:
 	var unit := _new_unit(data)
 	unit.setup(data, maxi(run.act, 1), wave, lucian)
+	if endless:
+		endless.scale(unit)
 	unit.max_hp *= WavePlan.hp_share(run.stage_id, data.id)
 	unit.projectile_parent = $Projectiles
 	unit.warning_parent = $Warnings
@@ -385,7 +394,12 @@ func _open_shop(visited: Merchant) -> void:
 
 func _start_waves() -> void:
 	remove_merchant()
-	runner = WaveRunner.new(WavePlan.waves(run.stage_id), run.boss)
+	if run.endless:
+		endless = EndlessDirector.new()
+		add_child(endless)
+		runner = endless.start(self)
+	else:
+		runner = WaveRunner.new(WavePlan.waves(run.stage_id), run.boss)
 	runner.spawn_requested.connect(_spawn_wave_enemy)
 	runner.wave_started.connect(_on_wave_started)
 	## Deferred, both to keep their order: a shot's physics callback can end a wave, and the merchant's body can't be added mid-flush.
@@ -402,10 +416,11 @@ func _on_wave_started(_wave: int) -> void:
 		Sfx.play(&"wave")
 
 
-## The boss comes at the boss point. A perched enemy (data.perch) stands on
-## the map's free ledge nearest Lucian and is marked perched; with none free,
-## it comes like any other, from its camp or the spawn points (_spawn_point).
-## A boss or a mini boss (any, not only the stage's boss) sounds as it comes.
+## The boss comes at the boss point, and so does any other boss (Endless's,
+## never the stage's boss). A perched enemy (data.perch) stands on the map's
+## free ledge nearest Lucian and is marked perched; with none free, it comes
+## like any other, from its camp or the spawn points (_spawn_point). A boss
+## or a mini boss (any, not only the stage's boss) sounds as it comes.
 func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 	var data: EnemyData = load(ENEMY_PATH % id)
 	if data.is_boss_kind():
@@ -416,6 +431,9 @@ func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 		if boss_unit is Thresh and not (boss_unit is ThreshFinal):
 			## Deferred: a shot's physics callback can bring him to half HP, and the freeze can't disable bodies mid-flush.
 			(boss_unit as Thresh).phase_ended.connect(_on_thresh_phase_ended, CONNECT_DEFERRED)
+		return
+	if data.kind == &"boss":
+		spawn_unit(data, arena.boss_point, wave)
 		return
 	var ledge := _free_ledge() if data.perch else -1
 	if ledge < 0:
@@ -645,9 +663,12 @@ func _on_ending_done() -> void:
 ## kill's do). He leaves the map and the wave counts him out, as a death
 ## would (that may end the wave). The boss wave's Thresh also ends the stage:
 ## finish(), even with other enemies about; his purple comes in _on_cleared.
+## Endless's pays his repeat purple here.
 func _thresh_leaves(thresh: EnemyUnit) -> void:
-	var reward := KillRewards.roll(thresh.data, maxi(run.act, 1), run, rng)
+	var reward := KillRewards.roll(thresh.data, _reward_act(thresh), run, rng)
 	add_essences(reward.blue, reward.orange, 0, thresh.global_position)
+	if endless:
+		_award_mini_boss(thresh.data)
 	# Out of "enemies" now, so the radar and the boss bar drop him at once.
 	thresh.remove_from_group(&"enemies")
 	thresh.queue_free()
@@ -662,11 +683,12 @@ func _thresh_leaves(thresh: EnemyUnit) -> void:
 
 ## A kill: its rewards (a summon's are small); its splits (counted at once,
 ## spawned deferred); its loot (none from a summon); its buff for Lucian; a
-## mini boss's purple; its summoner told. Then `enemy_died`.
+## mini boss's purple (in Endless, a boss's too); its summoner told. Then
+## `enemy_died`.
 func _on_enemy_died(enemy: Enemy) -> void:
 	var unit := enemy as EnemyUnit
 	var data := unit.data
-	var reward := KillRewards.roll(data, maxi(run.act, 1), run, rng, unit.summoned)
+	var reward := KillRewards.roll(data, _reward_act(unit), run, rng, unit.summoned)
 	wallet.add(reward.gold)
 	stats.gold_earned += reward.gold
 	stats.kills += 1
@@ -687,10 +709,16 @@ func _on_enemy_died(enemy: Enemy) -> void:
 		_spawn_splits.call_deferred(data.split_into, splits, unit.global_position, unit.wave, _jumps)
 	if data.buff_on_kill != &"":
 		lucian.add_jungle_buff(data.buff_on_kill)
-	if data.kind == &"mini_boss":
+	if data.kind == &"mini_boss" or (endless and data.is_boss_kind()):
 		_award_mini_boss(data)
 	_summon_gone(unit)
 	enemy_died.emit(unit)
+
+
+## The act whose gold, XP and blue a kill pays: the stage's (the sandbox
+## pays like act 1); in Endless, the unit's wave's.
+func _reward_act(unit: EnemyUnit) -> int:
+	return EndlessPlan.reward_act(unit.wave) if endless else maxi(run.act, 1)
 
 
 ## `count` enemies of `id` around where their parent died, in its wave
@@ -703,8 +731,13 @@ func _spawn_splits(id: StringName, count: int, at: Vector2, wave: int, jumps: in
 
 
 ## A mini boss's purple, paid on the kill: first-time or repeat, rising over
-## Lucian (as a boss's does), with a line for the result.
+## Lucian (as a boss's does), with a line for the result. In Endless a boss
+## or mini boss always pays its repeat purple (× the modifier's), and the
+## save's first kills are left alone.
 func _award_mini_boss(data: EnemyData) -> void:
+	if endless:
+		add_essences(0, 0, KillRewards.repeat_purple(data, run), lucian.global_position)
+		return
 	var save := SaveGame.instance()
 	var first_time := not String(data.id) in save.bosses
 	var purple := save.award_boss(String(data.id), data.purple_first, data.purple_repeat)

@@ -38,6 +38,8 @@ var _dps_label: Label
 var _log_label: RichTextLabel
 var _gold_label: Label
 var _wave_label: Label
+## Hidden in Endless: it has no last wave.
+var _last_wave_button: Button
 var _tabs: TabContainer
 var _dummy_tab := 0
 
@@ -63,6 +65,7 @@ func setup(owner_stage: Stage) -> void:
 		_item_picker.add_item(item.display_name)
 	_equip_slots.set_value_no_signal(lucian.inventory.unlocked_equip)
 	_shop_slots.set_value_no_signal(stage.shop_slots)
+	_last_wave_button.visible = not stage.run.endless
 	_show_summoners()
 
 
@@ -88,9 +91,9 @@ func _process(_delta: float) -> void:
 	_gold_label.text = "Gold %d" % stage.wallet.gold
 	var runner := stage.runner
 	if runner:
-		_wave_label.text = "Wave %d / %d   state %s   alive %d   next %s" % [
-			runner.wave, runner.total_waves(), WaveRunner.State.find_key(runner.state),
-			runner.alive(), "%.1f s" % runner.countdown()]
+		var waves := "%d (Endless)" % runner.wave if stage.run.endless else "%d / %d" % [runner.wave, runner.total_waves()]
+		_wave_label.text = "Wave %s   state %s   alive %d   next %s" % [
+			waves, WaveRunner.State.find_key(runner.state), runner.alive(), "%.1f s" % runner.countdown()]
 	else:
 		_wave_label.text = "Training: no waves"
 	var stats := lucian.stats
@@ -289,7 +292,7 @@ func _build() -> void:
 	_button(row, "Skip break", func() -> void: stage.skip_break())
 	_button(row, "Kill all enemies", _kill_all)
 	_button(row, "Jump to boss wave", func() -> void: stage.jump_to_boss_wave())
-	_button(row, "Jump to the last wave", func() -> void: stage.jump_to_last_wave())
+	_last_wave_button = _button(row, "Jump to the last wave", func() -> void: stage.jump_to_last_wave())
 	row = _row(box)
 	_enemy_picker = OptionButton.new()
 	_enemy_picker.focus_mode = Control.FOCUS_NONE

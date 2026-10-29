@@ -74,6 +74,8 @@ var veiled := false:
 var damage := 0.0
 var attack_range := 0.0
 var move_speed := 0.0
+## Its Boss.skill_hit damage times this (Endless's boss and mini boss power).
+var skill_scale := 1.0
 ## Where shots and ground warnings go; the parent when not set.
 var projectile_parent: Node
 var warning_parent: Node
