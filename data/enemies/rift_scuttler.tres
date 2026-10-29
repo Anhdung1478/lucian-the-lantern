@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/rift_scuttler.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"rift_scuttler"
+display_name = "Rift Scuttler"
+kind = &"elite"
+behavior = &"flee"
+art = ExtResource("2_art")
+max_hp = 600.0
+armor = 20.0
+mr = 20.0
+damage = 0.0
+attack_range = 0.0
+move_speed = 250.0
+radius = 34.0
+gold = 120
+xp = 60
+camp = &"scuttle"
+escape_after = 15.0
+extra_blue = 45
+extra_orange = 4

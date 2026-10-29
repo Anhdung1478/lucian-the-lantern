@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112">
+  <!-- Blue Sentinel: a hulking blue stone golem seen from above, a glowing blue rune crest on its head, two great stone fists forward (+X). -->
+  <g transform="translate(56 56)">
+    <ellipse cx="0" cy="5" rx="47" ry="43" fill="#000000" opacity="0.25"/>
+    <!-- arms and fists -->
+    <path d="M 2 -30 L 34 -30 M 2 30 L 34 30" stroke="#1a1d24" stroke-width="20" stroke-linecap="round"/>
+    <path d="M 2 -30 L 34 -30 M 2 30 L 34 30" stroke="#2f4c72" stroke-width="14" stroke-linecap="round"/>
+    <path d="M 32 -42 L 47 -37 L 49 -24 L 38 -19 L 28 -26 Z" fill="#4a72a6" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 32 42 L 47 37 L 49 24 L 38 19 L 28 26 Z" fill="#4a72a6" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <!-- stone body -->
+    <path d="M -38 -12 L -30 -34 L -10 -42 L 10 -38 L 22 -22 L 24 0 L 22 22 L 10 38 L -10 42 L -30 34 L -38 12 Z" fill="#3e5f8a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <!-- shoulder boulders -->
+    <path d="M -14 -44 L 4 -46 L 12 -34 L 0 -26 L -16 -30 Z" fill="#5a82b4" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -14 44 L 4 46 L 12 34 L 0 26 L -16 30 Z" fill="#5a82b4" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -30 -20 L -20 -8 M -30 20 L -20 8 M -34 0 L -24 0" stroke="#27405e" stroke-width="3" stroke-linecap="round"/>
+    <!-- glowing runes down its back -->
+    <g stroke="#7fe3ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M -22 -6 L -16 0 L -22 6"/>
+      <path d="M -10 -14 L -4 -10"/>
+      <path d="M -10 14 L -4 10"/>
+    </g>
+    <!-- head with the rune crest -->
+    <path d="M 4 -14 L 18 -12 L 24 0 L 18 12 L 4 14 L -2 0 Z" fill="#4a72a6" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="6" cy="0" r="12" fill="#7fe3ff" opacity="0.3"/>
+    <path d="M -8 0 L 2 -8 L 14 0 L 2 8 Z" fill="#bff3ff" stroke="#2a8fc8" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M -2 0 L 10 0 M 4 -4 L 4 4" stroke="#2a8fc8" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="19" cy="-5" r="2.2" fill="#bff3ff"/>
+    <circle cx="19" cy="5" r="2.2" fill="#bff3ff"/>
+  </g>
+</svg>

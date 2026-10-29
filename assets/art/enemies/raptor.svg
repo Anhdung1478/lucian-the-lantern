@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56">
+  <!-- Raptor: a small jungle bird raptor seen from above, red-crested, beak forward (+X), tail feathers trailing. -->
+  <g transform="translate(28 28)">
+    <ellipse cx="-1" cy="2" rx="24" ry="19" fill="#000000" opacity="0.25"/>
+    <!-- tail feathers -->
+    <path d="M -9 -6 L -25 -12 L -20 -4 L -26 0 L -20 4 L -25 12 L -9 6 Z" fill="#8f3a24" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- talons reaching forward -->
+    <path d="M 2 -8 L 9 -12 M 2 8 L 9 12" stroke="#1a1d24" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M 2 -8 L 9 -12 M 2 8 L 9 12" stroke="#d9b45a" stroke-width="2" stroke-linecap="round"/>
+    <!-- body -->
+    <ellipse cx="-1" cy="0" rx="13" ry="12" fill="#d0643a" stroke="#1a1d24" stroke-width="2.5"/>
+    <!-- folded wings -->
+    <path d="M 5 -8 Q -6 -19 -18 -11 Q -8 -5 3 -3 Z" fill="#a8452a" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 5 8 Q -6 19 -18 11 Q -8 5 3 3 Z" fill="#a8452a" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <!-- head -->
+    <circle cx="12" cy="0" r="7" fill="#e07444" stroke="#1a1d24" stroke-width="2.5"/>
+    <!-- beak -->
+    <path d="M 17.5 -3.5 L 26 0 L 17.5 3.5 Z" fill="#f2c14e" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <!-- red crest along the head, swept back -->
+    <path d="M 15 0 L 9 -3.5 L 8 -1 L 2 -4.5 L 4 0 L 2 4.5 L 8 1 L 9 3.5 Z" fill="#ff3b3b" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- eyes -->
+    <circle cx="14.5" cy="-4.5" r="1.6" fill="#ffe066"/>
+    <circle cx="14.5" cy="4.5" r="1.6" fill="#ffe066"/>
+  </g>
+</svg>

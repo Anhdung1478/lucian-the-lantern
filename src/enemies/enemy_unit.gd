@@ -171,24 +171,28 @@ func fire_bolt(hit: DamageInfo, speed: float, reach: float, toward := Vector2.ZE
 	return bolt
 
 
-## A basic attack landed on Lucian: the data's slow and burn (its damage
-## type), each under the data's id so one kind of enemy refreshes its own.
+## A basic attack landed on Lucian: the data's slow and burn (of its
+## burn_type), each under the data's id so one kind of enemy refreshes its own.
 func apply_on_hit() -> void:
 	if not is_instance_valid(target):
 		return
 	if data.hit_slow > 0.0:
 		target.add_slow(data.id, data.hit_slow, data.hit_slow_time)
 	if data.hit_burn > 0.0:
-		target.add_burn(data.id, data.hit_burn, data.hit_burn_time, data.damage_type, self)
+		target.add_burn(data.id, data.hit_burn, data.hit_burn_time, data.burn_type(), self)
 
 
 ## One step toward `point`: straight while no wall is in the way, else along
-## a path around it (see PathFollower), sliding along walls. A unit that
-## barely moved sidesteps for a moment.
+## a path around it (see PathFollower), as walk does.
 func walk_toward(point: Vector2, delta: float) -> void:
 	var world := get_world_2d()
 	var toward := path_follower.next_point(global_position, point, delta, world.direct_space_state, world.navigation_map)
-	var direction := global_position.direction_to(toward)
+	walk(global_position.direction_to(toward), delta)
+
+
+## One step in `direction`, with no path, sliding along walls. A unit that
+## barely moved sidesteps for a moment.
+func walk(direction: Vector2, delta: float) -> void:
 	if _stuck_left > 0.0:
 		_stuck_left -= delta
 		direction = (direction + direction.orthogonal() * _sidestep).normalized()

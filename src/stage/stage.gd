@@ -399,13 +399,16 @@ func _on_lucian_died() -> void:
 	show_result(false)
 
 
-## A boss has its own script; every other enemy is a minion.
+## A boss has its own script; a jungle monster is a Monster; every other
+## enemy is a minion.
 func _new_unit(data: EnemyData) -> EnemyUnit:
 	match data.behavior:
 		&"thresh":
 			return Thresh.new()
 		&"akshan":
 			return Akshan.new()
+		&"swarm", &"flank", &"brute", &"spit", &"flee":
+			return Monster.new()
 	return Minion.new()
 
 

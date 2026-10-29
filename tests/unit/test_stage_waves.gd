@@ -464,3 +464,13 @@ func test_units_with_a_camp_spawn_at_it() -> void:
 			var near_a_spawn_point := stage.arena.spawn_points.any(func(point: Vector2) -> bool: return enemy.global_position.distance_to(point) <= 70.0 * sqrt(2.0) + 0.1)
 			assert_true(near_a_spawn_point, "no camp: the spawn points")
 	assert_eq(found, 6)
+
+
+func test_the_jungle_behaviors_come_as_monsters_and_minions_stay_minions() -> void:
+	var stage: Stage = await _stage(2, 1)
+	var at := stage.arena.spawn_points[0]
+	for id in [&"raptor", &"raptor_big", &"murkwolf", &"murkwolf_big", &"krug", &"krug_big", &"gromp", &"blue_sentinel", &"red_brambleback", &"rift_scuttler"]:
+		assert_true(stage.spawn_enemy(id, at) is Monster, String(id))
+	for id in [WavePlan.MELEE, WavePlan.RANGED, WavePlan.SIEGE, WavePlan.SUPER]:
+		var unit := stage.spawn_enemy(id, at)
+		assert_true(unit is Minion and not (unit is Monster), String(id))

@@ -92,9 +92,9 @@ func take_damage(info: DamageInfo) -> float:
 ## Sky Dive and the like: the enemy leaves the enemies group, its body's
 ## layer and every hurtbox's, so attacks, homing shots, clicks, Senna and
 ## the radar drop it, and it takes no damage. Turning it off puts the old
-## layers back. Does nothing on a dead enemy.
+## layers back. Does nothing on a dead or escaped enemy: it never comes back.
 func set_untargetable(on: bool) -> void:
-	if dead or on == untargetable:
+	if not is_alive() or on == untargetable:
 		return
 	untargetable = on
 	if on:

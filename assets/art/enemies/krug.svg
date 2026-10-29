@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Krug: a small mossy rock golem seen from above, brown-grey stone, two stone fists forward (+X). -->
+  <g transform="translate(32 32)">
+    <ellipse cx="0" cy="3" rx="28" ry="25" fill="#000000" opacity="0.25"/>
+    <!-- stone arms and fists -->
+    <path d="M 2 -17 L 16 -18 M 2 17 L 16 18" stroke="#1a1d24" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 2 -17 L 16 -18 M 2 17 L 16 18" stroke="#5e564c" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 15 -25 L 26 -22 L 28 -14 L 21 -10 L 14 -14 Z" fill="#6e655a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 15 25 L 26 22 L 28 14 L 21 10 L 14 14 Z" fill="#6e655a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- lumpy rock body -->
+    <path d="M -22 -7 L -16 -19 L -2 -23 L 10 -17 L 15 -5 L 15 5 L 10 17 L -2 23 L -16 19 L -23 7 Z" fill="#8a7e70" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- facets -->
+    <path d="M -16 -19 L -9 -7 L 10 -17 M -9 -7 L -13 7 L -2 23 M -9 -7 L 4 2 L 10 17 M 4 2 L 15 -5" fill="none" stroke="#5c5349" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- moss -->
+    <path d="M -19 -9 Q -17 -18 -7 -18 Q -5 -12 -11 -9 Q -15 -6 -19 -9 Z" fill="#6b9a3c" stroke="#1a1d24" stroke-width="1.5"/>
+    <path d="M -17 10 Q -11 8 -9 14 Q -11 19 -16 16 Z" fill="#6b9a3c" stroke="#1a1d24" stroke-width="1.5"/>
+    <!-- brow and eyes, looking forward -->
+    <path d="M 6 -7 L 14 -3 L 14 3 L 6 7 Z" fill="#6e655a" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="11.5" cy="-2.8" r="1.7" fill="#ffcf6b"/>
+    <circle cx="11.5" cy="2.8" r="1.7" fill="#ffcf6b"/>
+  </g>
+</svg>

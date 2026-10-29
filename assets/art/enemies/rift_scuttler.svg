@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 76 76">
+  <!-- Rift Scuttler: a purple shelled river crab seen from above, a wide flat shell, stubby legs out to the sides, pincers and eyestalks forward (+X). -->
+  <g transform="translate(38 38)">
+    <ellipse cx="0" cy="3" rx="33" ry="33" fill="#000000" opacity="0.25"/>
+    <!-- stubby legs, three a side -->
+    <g stroke="#1a1d24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M 0 -20 L 2 -30 L -2 -34"/>
+      <path d="M -9 -19 L -13 -29 L -18 -31"/>
+      <path d="M -17 -14 L -25 -22 L -30 -22"/>
+      <path d="M 0 20 L 2 30 L -2 34"/>
+      <path d="M -9 19 L -13 29 L -18 31"/>
+      <path d="M -17 14 L -25 22 L -30 22"/>
+    </g>
+    <g stroke="#9a62cc" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M 0 -20 L 2 -30 L -2 -34"/>
+      <path d="M -9 -19 L -13 -29 L -18 -31"/>
+      <path d="M -17 -14 L -25 -22 L -30 -22"/>
+      <path d="M 0 20 L 2 30 L -2 34"/>
+      <path d="M -9 19 L -13 29 L -18 31"/>
+      <path d="M -17 14 L -25 22 L -30 22"/>
+    </g>
+    <!-- arms and pincers forward -->
+    <path d="M 10 -15 L 19 -18 M 10 15 L 19 18" stroke="#1a1d24" stroke-width="7" stroke-linecap="round"/>
+    <path d="M 10 -15 L 19 -18 M 10 15 L 19 18" stroke="#9a62cc" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 16 -25 Q 30 -28 33 -17 L 26 -18 L 30 -12 Q 20 -9 16 -16 Q 13 -21 16 -25 Z" fill="#b17ee0" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 16 25 Q 30 28 33 17 L 26 18 L 30 12 Q 20 9 16 16 Q 13 21 16 25 Z" fill="#b17ee0" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- wide flat shell -->
+    <path d="M 14 0 Q 14 -21 -4 -22 Q -22 -21 -24 0 Q -22 21 -4 22 Q 14 21 14 0 Z" fill="#7b4bb0" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 8 0 Q 8 -14 -4 -15 Q -16 -14 -17 0 Q -16 14 -4 15 Q 8 14 8 0 Z" fill="#9468c8"/>
+    <path d="M -4 -15 L -4 15 M -12 -10 Q -6 0 -12 10 M 4 -10 Q -2 0 4 10" fill="none" stroke="#5a3488" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="-8" cy="-6" r="2.4" fill="#d4b0f4"/>
+    <circle cx="0" cy="7" r="2" fill="#d4b0f4"/>
+    <!-- eyestalks -->
+    <path d="M 12 -5 L 20 -7 M 12 5 L 20 7" stroke="#1a1d24" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="21" cy="-7" r="3.2" fill="#3ff5d8" stroke="#1a1d24" stroke-width="1.5"/>
+    <circle cx="21" cy="7" r="3.2" fill="#3ff5d8" stroke="#1a1d24" stroke-width="1.5"/>
+  </g>
+</svg>

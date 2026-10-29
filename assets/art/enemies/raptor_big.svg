@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+  <!-- Crimson Raptor: the pack's big bird raptor seen from above, dark crimson with a tall red crest, beak forward (+X), talons out front. -->
+  <g transform="translate(40 40)">
+    <ellipse cx="-2" cy="3" rx="34" ry="24" fill="#000000" opacity="0.25"/>
+    <!-- tail feathers -->
+    <path d="M -13 -7 L -36 -15 L -29 -5 L -38 1 L -29 7 L -35 16 L -13 7 Z" fill="#5c1420" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -16 -2 L -30 -6 M -16 2 L -30 6" stroke="#a8323e" stroke-width="2" stroke-linecap="round"/>
+    <!-- talons reaching forward -->
+    <path d="M 4 -11 L 14 -15 M 4 11 L 14 15" stroke="#1a1d24" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 4 -11 L 14 -15 M 4 11 L 14 15" stroke="#d9b45a" stroke-width="3" stroke-linecap="round"/>
+    <!-- body -->
+    <ellipse cx="-2" cy="0" rx="19" ry="14" fill="#9a2232" stroke="#1a1d24" stroke-width="3"/>
+    <!-- folded wings -->
+    <path d="M 6 -10 Q -8 -21 -24 -12 Q -12 -6 3 -4 Z" fill="#6e1824" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 6 10 Q -8 21 -24 12 Q -12 6 3 4 Z" fill="#6e1824" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M -4 -11 L -16 -11 M -4 11 L -16 11" stroke="#c0404e" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- head -->
+    <circle cx="17" cy="0" r="10" fill="#b02a3a" stroke="#1a1d24" stroke-width="3"/>
+    <!-- beak -->
+    <path d="M 25 -5 L 38 0 L 25 5 Z" fill="#f2c14e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- tall red crest, swept back over the neck -->
+    <path d="M 22 0 L 13 -5 L 12 -2 L 3 -7 L 5 -2 L -2 -4 L 0 0 L -2 4 L 5 2 L 3 7 L 12 2 L 13 5 Z" fill="#ff3b3b" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <!-- eyes -->
+    <circle cx="20.5" cy="-6.5" r="2.2" fill="#ffe066"/>
+    <circle cx="20.5" cy="6.5" r="2.2" fill="#ffe066"/>
+  </g>
+</svg>

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/murkwolf_big.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"murkwolf_big"
+display_name = "Greater Murk Wolf"
+kind = &"normal"
+behavior = &"flank"
+art = ExtResource("2_art")
+max_hp = 480.0
+armor = 20.0
+mr = 15.0
+damage = 24.0
+attack_range = 110.0
+attack_interval = 1.2
+move_speed = 320.0
+radius = 36.0
+gold = 70
+xp = 36
+camp = &"wolves"

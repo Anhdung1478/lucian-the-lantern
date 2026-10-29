@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/blue_sentinel.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"blue_sentinel"
+display_name = "Blue Sentinel"
+kind = &"elite"
+behavior = &"brute"
+art = ExtResource("2_art")
+max_hp = 1700.0
+armor = 35.0
+mr = 35.0
+damage = 42.0
+attack_range = 150.0
+attack_interval = 1.6
+move_speed = 240.0
+radius = 50.0
+gold = 160
+xp = 90
+hit_slow = 0.3
+hit_slow_time = 1.5
+camp = &"blue"
+buff_on_kill = &"blue_buff"

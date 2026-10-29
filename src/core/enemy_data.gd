@@ -17,7 +17,8 @@ const BOSS_KINDS: Array[StringName] = [&"mini_boss", &"boss"]
 @export var display_name := ""
 ## &"normal", &"elite", &"mini_boss" or &"boss".
 @export var kind := &"normal"
-## How it fights: &"melee", &"ranged", &"siege", &"super", or a boss id.
+## How it fights: &"melee", &"ranged", &"siege", &"super" (a Minion);
+## &"swarm", &"flank", &"brute", &"spit", &"flee" (a Monster); or a boss id.
 @export var behavior := &"melee"
 @export var art: Texture2D
 @export var max_hp := 100.0
@@ -34,7 +35,8 @@ const BOSS_KINDS: Array[StringName] = [&"mini_boss", &"boss"]
 @export var radius := 28.0
 @export var gold := 0
 @export var xp := 0
-## Ranged: the distance band it keeps from Lucian, and its bolt's speed.
+## Ranged and spit: the distance band it keeps from Lucian, and its bolt's
+## speed.
 @export var keep_min := 0.0
 @export var keep_max := 0.0
 @export var projectile_speed := 0.0
@@ -44,12 +46,15 @@ const BOSS_KINDS: Array[StringName] = [&"mini_boss", &"boss"]
 ## Super: how far Empower reaches.
 @export var empower_radius := 0.0
 ## What a basic attack that lands (a melee hit or a bolt) leaves on Lucian:
-## a slow (a fraction) for `hit_slow_time` seconds, and a burn of its damage
-## type (damage per second) for `hit_burn_time` seconds. 0 = none.
+## a slow (a fraction) for `hit_slow_time` seconds, and a burn (damage per
+## second, of burn_type) for `hit_burn_time` seconds. 0 = none.
 @export var hit_slow := 0.0
 @export var hit_slow_time := 0.0
 @export var hit_burn := 0.0
 @export var hit_burn_time := 0.0
+## The burn's damage type when it isn't the hit's (Red: a physical hit, a
+## magic burn); -1 = damage_type.
+@export_enum("Same as the hit:-1", "Physical:0", "Magic:1", "True:2") var hit_burn_type := -1
 ## Bosses and mini bosses: purple essence the first time, and on every
 ## later clear (a boss) or kill (a mini boss).
 @export var purple_first := 0
@@ -73,6 +78,11 @@ const BOSS_KINDS: Array[StringName] = [&"mini_boss", &"boss"]
 ## A boss or a mini boss.
 func is_boss_kind() -> bool:
 	return kind in BOSS_KINDS
+
+
+## The damage type of its on-hit burn: hit_burn_type, else its hit's.
+func burn_type() -> DamageInfo.Type:
+	return damage_type if hit_burn_type < 0 else hit_burn_type as DamageInfo.Type
 
 
 func hp_scale(act: int, wave: int) -> float:

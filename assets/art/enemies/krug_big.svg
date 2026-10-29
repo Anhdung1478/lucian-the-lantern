@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="104" height="104" viewBox="0 0 104 104">
+  <!-- Ancient Krug: the big mossy rock golem seen from above, cracked with glowing orange seams, two heavy stone fists forward (+X). -->
+  <g transform="translate(52 52)">
+    <ellipse cx="0" cy="4" rx="45" ry="40" fill="#000000" opacity="0.25"/>
+    <!-- stone arms and fists -->
+    <path d="M 8 -26 L 30 -26 M 8 26 L 30 26" stroke="#1a1d24" stroke-width="16" stroke-linecap="round"/>
+    <path d="M 8 -26 L 30 -26 M 8 26 L 30 26" stroke="#5e564c" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 26 -36 L 40 -32 L 43 -20 L 33 -15 L 24 -20 Z" fill="#6e655a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 26 36 L 40 32 L 43 20 L 33 15 L 24 20 Z" fill="#6e655a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <!-- huge lumpy rock body -->
+    <path d="M -36 -10 L -28 -30 L -8 -38 L 12 -32 L 24 -16 L 27 0 L 24 16 L 12 32 L -8 38 L -28 30 L -37 10 Z" fill="#7a6f62" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <!-- glowing cracks -->
+    <path d="M -26 -26 L -14 -12 L -18 2 L -6 14 L -10 30 M -14 -12 L 4 -18 L 14 -28 M -18 2 L -30 8 M -6 14 L 10 10 L 20 18" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -26 -26 L -14 -12 L -18 2 L -6 14 L -10 30 M -14 -12 L 4 -18 L 14 -28 M -18 2 L -30 8 M -6 14 L 10 10 L 20 18" fill="none" stroke="#ff8a2a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- moss -->
+    <path d="M -34 -12 Q -30 -28 -14 -32 Q -10 -26 -18 -22 Q -24 -14 -34 -12 Z" fill="#6b9a3c" stroke="#1a1d24" stroke-width="2"/>
+    <path d="M -30 16 Q -22 14 -18 22 Q -20 30 -28 26 Z" fill="#6b9a3c" stroke="#1a1d24" stroke-width="2"/>
+    <path d="M 2 26 Q 10 22 14 28 Q 8 34 2 30 Z" fill="#5d8a34" stroke="#1a1d24" stroke-width="2"/>
+    <!-- brow and eyes, looking forward -->
+    <path d="M 14 -11 L 26 -5 L 26 5 L 14 11 Z" fill="#5e564c" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="22" cy="-4.5" r="2.4" fill="#ffb347"/>
+    <circle cx="22" cy="4.5" r="2.4" fill="#ffb347"/>
+  </g>
+</svg>
