@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://drcg5ak07ogh4"
-path="res://.godot/imported/ending_cutscene_3_senna.png-5971009fdf89034789d4485a400acd9c.ctex"
+uid="uid://c7qoespawc4nt"
+path="res://.godot/imported/ending_cutscene_2_shot.png-fc85b83e23609c5cf0570742f623884d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/report/phase8/ending_cutscene_3_senna.png"
-dest_files=["res://.godot/imported/ending_cutscene_3_senna.png-5971009fdf89034789d4485a400acd9c.ctex"]
+source_file="res://docs/report/phase8/ending_cutscene_2_shot.png"
+dest_files=["res://.godot/imported/ending_cutscene_2_shot.png-fc85b83e23609c5cf0570742f623884d.ctex"]
 
 [params]
 

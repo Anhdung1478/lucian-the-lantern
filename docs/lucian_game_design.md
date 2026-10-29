@@ -194,7 +194,7 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 |---|---|
 | Root | He can't walk, use E, Flash or an item dash (Galeforce, Rocketbelt). A move order waits and runs when the root ends. Attacks in range, Q, W, R and items that don't move him still work. |
 | Stun | He can't act. It drops the windup, the queued cast, a dash and R, as a displacement does. |
-| Fear | He can't act. It drops the same, and he runs straight away from the source at 60% of his speed, sliding along walls. It builds no Energize. |
+| Fear | He can't act. It drops the same, and he runs straight away from the source at 60% of his speed, sliding along walls. Walls and the abyss stop him; enemy bodies don't, so nothing can push him along. It builds no Energize. With a root at the same time, the fear still walks him (the fear wins). |
 
 - **Tenacity** shortens root, stun and fear (a time × (1 − tenacity)); the same kind keeps the longer time. **Slows are not shortened**, as before.
 - A stun or fear during a pull lets the pull finish and holds him after it. A root doesn't end a dash already under way.

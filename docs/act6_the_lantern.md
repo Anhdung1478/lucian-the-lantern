@@ -128,7 +128,7 @@ Base numbers (the data files). The last column shows wave 1 of Act 6, scaled.
 | Spectral Rider | elite | 1300 | 40 / 20 | **Charge** (below), 60 physical | 800 | 4.0 s | 280 | 42 | 140 / 80 | 5200 HP, charge 135 |
 | Chain Warden | elite | 1200 | 35 / 35 | **Chain** (below), 45 physical. Keeps 500–700 away | 700 | 3.5 s | 220 | 40 | 150 / 90 | 4800 HP, chain 101 |
 
-- **Lantern Soul:** killed, it is **freed** and pays like any kill. It rises and brightens into teal-white light, then fades upward with a soft chime (0.9 s), in place of the grey fade.
+- **Lantern Soul:** killed, it is **freed** and pays like any kill. It rises and brightens into teal-white light, then fades upward with a soft chime (0.9 s), in place of the grey fade. Its health bar goes at once.
 - **Spectral Rider:** it walks in until Lucian is within 800 (and keeps 250 away while the charge cools down). When the charge is ready it locks a red line (800 × 90) toward him and stands 0.8 s. Then it charges along the line at 1400 px/s. A hit is 60 physical (× 2.25) and a **push of 150** along the charge, at 1600 px/s. It hits at most once per charge. A wall or the abyss stops it. Step sideways to dodge. A perched rider never charges (it only faces him).
 - **Chain Warden:** when the chain is ready and Lucian is within 700, it marks a red line (700 × 60) for 0.8 s, then throws a chain at 1200 px/s. A hit is 45 physical (× 2.25) and a **pull of 300** toward the warden at 1600 px/s. The pull stops in front of the warden (it never pulls him past it) and at the abyss edge: it can't drag him into the abyss. Practice for Thresh's hook.
 - **Perched wardens:** a warden spawns on a free **ledge**, the one **nearest Lucian**, and never moves. It turns to face him. With no free ledge (6-5 has none) it spawns at the spawn points and walks, keeping 500–700 away.
@@ -181,7 +181,7 @@ Last in wave 7, from the east end. Melee, 100 physical, range 110, every 1.3 s. 
 | Skill | Numbers |
 |---|---|
 | **Devastating Charge** | Used only from 300 or more away, so it can be seen. His speed is × 1.8 for 2.5 s, with a glowing teal trail, chasing Lucian. On contact, once per cast: 170 physical and a **300 knockback** (1200 px/s) when the hit lands. Cooldown 13 s, first use 3 s in. |
-| **Onslaught of Shadows** | At 80% HP or less. A red band (1100 × 300) for 1.0 s, then he rides along it at 1600 px/s with **four ghost riders** (the rider art at 55% alpha) beside him. Lucian inside the band, at most Hecarim's radius ahead of him along the ride, is hit once: 150 magic and a **fear of 1.0 s**. A wall that stops the ride short means no hit. Cooldown 18 s, first use 2 s in; never during a Charge. |
+| **Onslaught of Shadows** | At 80% HP or less. A red band (1100 × 300) for 1.0 s, then he rides along it at 1600 px/s with **four ghost riders** (the rider art at 55% alpha) beside him, 40 and 130 behind him. The pack is the hit area: Lucian inside the band, from Hecarim's radius ahead of him to **180 behind him** (the last riders' backs) along the ride, is hit once: 150 magic and a **fear of 1.0 s**. A step into the band behind the pack is safe. The fear runs from the nearest point on the ride's centre line, so he runs **sideways out of the band** (right on the line, to one side). A wall that stops the ride short means no hit. Cooldown 18 s, first use 2 s in; never during a Charge. |
 
 ### Thresh, final (`thresh_final`, boss, stage 6-5)
 Boss wave. Chain whip bolt, 85 physical (900 px/s), range 450, every 1.6 s. 16000 HP **per phase**, armor 45, MR 45, speed 320, radius 48. `thresh.svg`. He is Act 1's Thresh with his skill numbers as variables.
@@ -192,7 +192,7 @@ Boss wave. Chain whip bolt, 85 physical (900 px/s), range 450, every 1.6 s. 1600
 |---|---|
 | **Death Sentence (Q)** | Act 1's hook: a red line, then a hook that pulls Lucian in. 160 magic, a 0.8 s warning, cooldown 8 s, first use 2 s in. |
 | **Flay (E)** | 120 magic and a push of 300, cooldown 7 s, first use 4 s in. |
-| **The Box (R)** | Used when Lucian is within 450. A ring warning (r 450, a band 60 wide) for 1.0 s, then a ring of **12 wall pieces** for 4 s. A piece Lucian touches or crosses (a dash or Flash too) breaks, and he takes **150 magic and an 80% slow for 2 s**. Cooldown 22 s, first use 6 s in. |
+| **The Box (R)** | Used when Lucian is within 450. A ring warning (r 450, a band 60 wide) for 1.0 s, then a ring of **12 wall pieces** for 4 s. A piece Lucian touches or crosses (a dash or Flash too) breaks, and he takes **150 magic and an 80% slow for 2 s**. **One crossing, one hit:** a touch within 0.3 s of the last one does nothing, so a crossing at a joint (it touches both pieces) hits once and breaks both. A piece touches nobody while Lucian can't be hit (God mode, a cutscene, stasis), and stays up. Cooldown 22 s, first use 6 s in. |
 
 **The rise.** At 0 HP in Phase 1 he doesn't die. For **2.5 s** he takes no damage and thinks of nothing; his warnings, wall pieces, hooks and lanterns are cleared; he gets **full HP**, a darker tint (× (0.5, 0.56, 0.54)) and a green aura (`#4dff9a`) that swells to 1.6× and settles. The boss bar reads "Thresh   Phase 2".
 
@@ -204,7 +204,7 @@ Boss wave. Chain whip bolt, 85 physical (900 px/s), range 450, every 1.6 s. 1600
 | **Dark Passage (W)** | Throws his lantern to a spot within 250 of Lucian (a circle warning r 100, 0.6 s; the spot has room for the circle). The lantern lies there 6 s and **3 Lantern Souls** come out at once, 60 px round it. Used within 1000. Cooldown 16 s. **Only while fewer than 6 of his souls are alive.** |
 | **The Box (R)** | As in Phase 1, but **220 magic**, cooldown 18 s. |
 
-**The fall.** At 0 HP in Phase 2 he never dies in the usual way: the fight clears every warning and shot, every summoned Lantern Soul **vanishes** (freed, no pay), and the ending cutscene plays. His blue (100) and orange (5) are paid where he stood, with the line "Senna is free". Clearing 6-5 pays **20 purple the first time, 4 after**.
+**The fall.** At 0 HP in Phase 2 he never dies in the usual way: the fight clears every warning and shot, every summoned Lantern Soul **vanishes** (freed, no pay), and the ending cutscene plays. The freed souls rise, brighten and fade with the chime as the scene begins (their fade runs while the world is frozen), and are gone before its first line. His blue (100) and orange (5) are paid where he stood, with the line "Senna is free". Clearing 6-5 pays **20 purple the first time, 4 after**.
 
 ### The ending
 **`SennaFreed`** (a cutscene, skippable with its Skip button; every wait ends when skipped):

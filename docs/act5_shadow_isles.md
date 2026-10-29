@@ -181,7 +181,7 @@ Boss wave. Ranged bolt, 80 magic (900 px/s), range 600, every 1.5 s. 20000 HP, a
 | Skill | Numbers |
 |---|---|
 | **Lay Waste (Q)** | 5 circles (r 110): one on Lucian, four within 300 of him, laid 0.15 s apart. Each fills for 0.7 s and deals 110 magic. Reach 900. Cooldown 6 s, first use 2 s in. |
-| **Wall of Pain (W)** | A red line (900 × 60) across the way between them for 0.6 s, then a spectral wall for 5 s. Touching or crossing it **slows Lucian 70% for 2.5 s**, once per cast (a dash or Flash across it counts). Cooldown 14 s, first use 5 s in. |
+| **Wall of Pain (W)** | A red line (900 × 60) across the way between them for 0.6 s, then a spectral wall for 5 s. Touching or crossing it **slows Lucian 70% for 2.5 s**, once per cast (a dash or Flash across it counts). It touches nobody while Lucian can't be hit (God mode, a cutscene, stasis), and that doesn't use it up. Cooldown 14 s, first use 5 s in. |
 | **Requiem (R)** | At 75%, 45% and 15% HP, once each. He stands and channels for 3 s: a pulsing purple ring on Lucian, a filling ring round him, and a thin **break bar** under the boss bar. **8% of his max HP (1600)** of damage during the channel breaks it ("Broken!"). Otherwise Lucian takes **900 magic**. One Requiem per burst: thresholds his HP has already passed (in a burst, or by the break itself) are spent. |
 
 ### The waves

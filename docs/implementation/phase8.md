@@ -649,7 +649,7 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
 
 ## Implementation notes (Phase 8 done)
 
-Everything in the plan is in place, one commit per task (Tasks 0–12), plus a fix commit after the Task 1, 6, 7, 8 and 10 reviews (Task 6 had two). Task 13 is two commits: the visual pass, then the screenshots, docs and report (`docs/report/phase8.md`). **The final whole-branch review follows this commit;** its fixes will be added below, as Phase 7's were. The numbers in *Design* were placeholders; `act5_shadow_isles.md` and `act6_the_lantern.md` give the built ones ("Built in Phase 8"). Changes and details settled while building:
+Everything in the plan is in place, one commit per task (Tasks 0–12), plus a fix commit after the Task 1, 6, 7, 8 and 10 reviews (Task 6 had two). Task 13 is two commits: the visual pass, then the screenshots, docs and report (`docs/report/phase8.md`). **The final whole-branch review followed,** and its fix wave is two more commits: the code, then these docs. Its fixes are under *Fixes from reviews* (*Final review*), as Phase 7's were. The numbers in *Design* were placeholders; `act5_shadow_isles.md` and `act6_the_lantern.md` give the built ones ("Built in Phase 8"). Changes and details settled while building:
 
 | Task | Commits |
 |---|---|
@@ -667,6 +667,8 @@ Everything in the plan is in place, one commit per task (Tasks 0–12), plus a f
 | 11 The ending | `0ff2a40` |
 | 12 Debug | `b2ad250` |
 | 13a Visual pass | `b1f87a7` |
+| 13b Screenshots, docs, report | `8fd8ee8` |
+| Final review | fixes `4a78b0c`, docs: the commit after it ("Phase 8 docs after the final review") |
 
 ### Deviations and rulings
 The plan's own *Rulings from the revision* 1–10 stand. The controller's rulings while building, each with its reason:
@@ -694,6 +696,14 @@ The plan's own *Rulings from the revision* 1–10 stand. The controller's ruling
 - **Task 13 is two dispatches and two commits**, as Phase 7's was.
 - **The visual pass's look changes stand:** a dark spiderling with pale legs and a pale dais at 6-5's heart. They read on their ground in the screenshots.
 - **Commit lines:** each commit ends with the `Claude-Session:` line, then `Co-Authored-By:` (the user's memory rule keeps the Co-Authored-By line last).
+- **Final review rulings** (the controller's, for the fix wave):
+  - **Onslaught's hit area is the visible pack.** Lucian is hit only between Hecarim's radius ahead of him and `RIDE_TAIL` (180) behind him: the last ghosts ride 130 behind, and the rider art is 92 long. A step into the band behind the pack, after the warning is gone, is safe. This keeps the fairness rule: the fear comes from the warning or from riders he can see.
+  - **Onslaught fears from the ride's centre line**, the nearest point on it to Lucian, so he runs sideways out of the band. Right on the line, he runs to the ride's orthogonal side.
+  - **A feared Lucian walks through enemy bodies.** `_fear_step` moves with `WORLD | CHASM` only, so no body can push him along (Hecarim's ride carried him about 490 px, in the tests up to 700). Walls and the abyss still stop him.
+  - **One hit per Box crossing.** A touch within `BOX_TOUCH_GAP` (0.3 s) of the last one does nothing; its piece still breaks. A crossing at a joint touches both pieces, so it hits once and breaks both. The gap starts on any touch Thresh acts on, so a Banshee's Veil that blocks one piece blocks the crossing. Chosen over a joint rule in `SpectralWall`: a crossing near a joint can touch the two pieces frames apart, and Wall of Pain (one piece) is untouched.
+  - **The freed souls go free as the ending begins.** The freed fade is a tween that keeps running while the world is frozen (`TWEEN_PAUSE_STOP`: it still stops while the game is paused). At Thresh's fall his souls rise, brighten into light and fade with the chime during the scene's first pan, and are gone before "It ends here.". A freed soul's health bar goes at once (the screenshots showed a full red bar left behind as the soul rose).
+  - **`SpectralWall` ignores touches while Lucian can't be touched** (dead, invulnerable: God mode or a cutscene, or in stasis). The piece isn't used up, so it can touch him later. A Box piece broke with no hit, and Wall of Pain slowed a God-mode or stasis Lucian (`add_slow` only checks `dead`).
+  - **Left as known limits:** a root and a fear at once still walk him (the fear wins). If the player closes the window on 6-5's first-clear result panel, `Game._save()` records the clear, so The End is skipped.
 
 Other calls made by the implementers and accepted in review:
 - **`Lucian.add_cc(kind, seconds, from)`** is the only entry. The plan's pre-flight draft said `apply_cc(kind, seconds, amount, from)`; the revised plan and the code use `add_cc`.
@@ -707,7 +717,7 @@ Other calls made by the implementers and accepted in review:
 - **`Boss.phase_label()`** is virtual like `channel()`; the boss bar reads both each frame.
 - **Thresh:** `ThreshFinal._die()` only sets a flag (no `died`, no on-kill), so he never dies before the stage takes him away. His rise and fall run in `_physics_process` (the flush rule). `hp` is set directly at the rise, so Grievous Wounds can't cut it. `stopped` is reused for the down, rising and fallen states.
 - **The ending:** `Game` works out `story_ends` (cleared, no next stage, not yet in `cleared`) before the save, then shows `TheEndScreen` deferred. A failed save puts the toast on the main screen after Continue.
-- **Debug:** `Stage.jump_to_last_wave()` shares `_remove_every_enemy()` with `jump_to_boss_wave()`. A deferred summon pending at the jump is accepted and documented.
+- **Debug:** `Stage.jump_to_last_wave()` shares `_remove_every_enemy()` with `jump_to_boss_wave()`. A deferred summon pending at the jump was first accepted and documented; the final review drops it (see *Final review*).
 
 ### Visual pass (Task 13a)
 Every Phase 8 scenario was run in a window (three rounds) and every PNG looked at. Four fixes:
@@ -716,12 +726,13 @@ Every Phase 8 scenario was run in a window (three rounds) and every PNG looked a
 - **Spiderlings on the forest floor** were nearly invisible: bone-pale legs (`#a9a392`) and a pale mark (`#d8d1bc`). Test: the spiderling's luminance against the floor.
 - **Thresh in the ending:** his aura and boss bar now fade with him (an empty bar hung over the kneeling Thresh, and the dissolve left the aura). The dissolve fades the whole unit over `DISSOLVE_TIME` (1.4 s). Test: `test_ending.gd`.
 
-Two gameplay problems were found by looking and are **not fixed** (they need a ruling, and are queued for the final review's fix wave); see the report's *Known limits*:
-- A feared Lucian is carried along Hecarim's Onslaught.
-- A Box crossing at a joint between two pieces touches both.
+Two gameplay problems were found by looking and left for a ruling. The final review fixed both (see *Final review*):
+- A feared Lucian was carried along Hecarim's Onslaught.
+- A Box crossing at a joint between two pieces touched both.
 
 ### Screenshot harness (Task 13a)
-- **Scenarios:** `act5_mist`, `act5_sapling`, `act5_brood`, `maokai_grasp`, `elise_rappel`, `karthus_wall`, `karthus_requiem`, `act6_rider`, `karthus_defile`, `hecarim_onslaught`, `thresh_box`, `thresh_phase2`, `thresh_lantern`, `ending_cutscene` and `the_end` are new; `act6_bridges` and `act6_platform` came with Task 7 and `act6_bridges` gained the Chain Warden and its pull. 52 PNGs in all (`docs/report/phase8/`).
+- **Scenarios:** `act5_mist`, `act5_sapling`, `act5_brood`, `maokai_grasp`, `elise_rappel`, `karthus_wall`, `karthus_requiem`, `act6_rider`, `karthus_defile`, `hecarim_onslaught`, `thresh_box`, `thresh_phase2`, `thresh_lantern`, `ending_cutscene` and `the_end` are new; `act6_bridges` and `act6_platform` came with Task 7 and `act6_bridges` gained the Chain Warden and its pull. 53 PNGs in all (`docs/report/phase8/`).
+- **Final review:** `ending_cutscene` now brings a Dark Passage in Phase 2 before the fall, so three souls are on the map, and shoots them going free as the scene begins (`ending_cutscene_0_souls`); the other ending shots moved up one number. It prints each soul's alpha and rise, and that none is left at the first caption. `hecarim_onslaught` prints the fear walk along and across the ride (0 and 198 px). Both were re-shot.
 - **Helpers:** `hold(boss)` (stands, no shots, skills wait), `free_camera(at, zoom)` (a free camera clamped as play clamps it, edge panning off, so another mouse or a window without focus can't move it), `open_ground(near)`, `to_boss(id, at, lucian_at, zoom)` (the boss faces Lucian), `to_final_thresh(offset, zoom)` (6-5's real boss wave through `jump_to_boss_wave`), `spectral_walls()` and `buff_icon(id)`.
 - **Framing fixes (harness, not game):** Maokai's Lucian stands in front of the tree west of the gap; Elise's Lucian steps out after the lock; the Box walk goes through a piece's middle; Lay Waste waits for all its circles; Phase 2 waits for `stopped` to clear before the next hit.
 - Some Phase 7 scenarios and `whole_map` keep the old camera handling: keep the mouse off the window while they run. The stage info "Wave 1 in 16:38" and "Waves 1 / 8" on the ending's result are harness artifacts, as in Phase 7.
@@ -732,6 +743,16 @@ Two gameplay problems were found by looking and are **not fixed** (they need a r
 - **Task 7:** the lowest-index ledge choice meant some ledges were never used (nearest to Lucian now); the 6-5 west stub is out of the spawns; a perched unit refuses `leap_to` and `charge` (documented); bridge spawns get a jitter of 50 with a 45 px body margin; perched units face Lucian; path tests assert end distances (`b9a7ff9`).
 - **Task 8:** `chain_warden.svg`'s hook was clipped by its canvas (fixed and rendered to check); the rider has its own `CHARGE_PUSH_SPEED`; the pull stops at the warden's radius plus Lucian's hit radius (never past it); a dead warden's late chain pulls nobody; a perched rider never marks a line. Tests for refused hits (Banshee-like via invulnerable) and a push into the abyss edge (`cccad60`).
 - **Task 10:** the 6-soul cap; `fell` wired for any `ThreshFinal`; `_box_touched` guards `stopped`; a `_clear_fight` helper; `REHOOK_SLACK` 0.15 s so a hook that just landed or was blocked isn't answered at once (`df80915`).
+- **Final review** (`4a78b0c`; the rulings are under *Deviations and rulings*):
+  - **The freed souls froze through the ending.** `_on_thresh_fell` vanished Thresh's souls and started `SennaFreed` at once. Their freed fade was a tween bound to the soul under `$World`, and `Stage.freeze` disables `$World`, so the souls stood at full alpha, in their own colour, with their bars, through the whole scene. The fade's tween now uses `TWEEN_PAUSE_STOP` (it runs while the world is frozen, and stops while the game is paused), and a freed soul's bar goes at once. Tests: `test_ending.gd` `test_the_souls_freed_at_the_fall_are_gone_before_the_first_caption`; `test_enemy_blocks.gd` `test_a_vanished_freeing_enemy_is_freed_too` (the bar).
+  - **Onslaught hit a Lucian who stepped into the band behind Hecarim,** anywhere back along the 1100 px band, after the warning was gone. `_ride_check` has a lower bound, `ahead >= -RIDE_TAIL` (180). Tests: `test_hecarim.gd` `test_stepping_into_the_band_behind_the_last_ghost_is_safe`, `test_stepping_in_among_the_ghosts_behind_him_is_a_hit`; standing ahead is still a hit (`test_onslaught_hits_and_fears_for_a_second`).
+  - **A feared Lucian was carried along the ride** (about 490 px; 698 in the test). The fear came from Hecarim's centre, so he ran ahead along the ride, and `_fear_step` moved with `ENEMY_BODY` in its mask, so `move_and_slide` kept pushing him out of Hecarim's passing body. Hecarim now fears from the nearest point on the ride's centre line (`_fear_source`; on the line, the ride's orthogonal), and `_fear_step` moves with `WORLD | CHASM` only. Tests: `test_hecarim.gd` `test_the_fear_runs_sideways_out_of_the_band`, `test_a_feared_lucian_on_the_line_is_not_carried_along_the_ride` (he ends a plain fear walk, 1.0 s at 60% speed, to the side); `test_lucian_cc.gd` `test_fear_walks_through_an_enemy_body`, `test_fear_stops_at_the_abyss` (and `test_fear_slides_along_a_wall`).
+  - **Crossing The Box at a joint hit twice.** Each piece was tested on its own, and within `HIT_RADIUS` (30) of a joint both touch: two hits (2 × 150 or 220 magic) and two slows, about a quarter of crossings, and also when he stood on the band as the walls rose. `_box_touched` ignores a touch within `BOX_TOUCH_GAP` (0.3 s) of the last one; both pieces still break. Tests: `test_thresh_final.gd` `test_a_crossing_at_a_joint_hits_once_and_breaks_both_pieces`, `test_standing_on_a_joint_as_the_box_rises_hits_once`. `test_crossing_the_box_hurts_150_...` waits out the gap before its second crossing (it teleports between pieces 90° apart in 0.1 s, which play can't do).
+  - **`SpectralWall` counted touches while Lucian was untouchable** (God mode, a cutscene's freeze, stasis): a Box piece broke with no hit, and Wall of Pain slowed him. It skips them now and doesn't use the piece up. Test: `test_spectral_wall.gd` `test_no_touch_while_lucian_is_untouchable_and_the_piece_stays`.
+  - **`_on_ending_done` never finished the stage if `boss_unit` was gone.** It calls `runner.finish()` then; the purple still comes in `_on_cleared`. Test: `test_ending.gd` `test_the_ending_clears_the_stage_even_with_thresh_gone`.
+  - **A summon pending at a debug jump came uncounted.** `_skip_to` resets the wave's count, so its death could end the last wave one enemy early. `Stage._jumps` counts jumps (`_remove_every_enemy`), and a deferred summon or split asked for before the last jump is dropped. Test: `test_stage_debug_waves.gd` `test_a_summon_pending_at_a_jump_never_comes`.
+  - **`karthus.gd`** had three tabs in the middle of an `if` (a collapsed line continuation). The condition is wrapped in parentheses over two lines.
+  - Each fix's test failed before its fix and passes now; two guard tests (the abyss still stops a fear, a step in among the ghosts is still a hit) passed before too, as they should. The suite: **1342 tests** (12 new), all green, with GUT's 2 known warnings.
 
 ### Left as is (small, from the reviews)
 - **Summons and enemy blocks (Task 2):**
@@ -739,7 +760,7 @@ Two gameplay problems were found by looking and are **not fixed** (they need a r
   - Leap and charge don't cancel each other. A vanish or death mid-leap never emits `landed` (don't `await` it) and fades at the enlarged scale. The charge hit uses the end-of-frame position, not a swept segment.
   - Generic code comments name Act 5–6 content. `WORLD | CHASM` is spelled out in four places (a shared constant would be better). `enemy_unit.gd` grew from 261 to 460 lines.
   - A boomerang can emit both `missed` and `hit_lucian` (documented, untested).
-- **Crowd control (Task 1):** fear with the source on top of him runs backward from his facing (untested). A move or attack command given during a stun is held and runs after it (the controller prevents it today). `use_summoner` hard-codes `&"flash"`. `add_cc` re-drops orders on every call during a stun or fear. A stunned or feared Lucian doesn't pick up loot or Honeyfruit (they check `can_act()`).
+- **Crowd control (Task 1):** fear with the source on top of him runs backward from his facing (untested; Hecarim's Onslaught avoids it). A root and a fear at once still walk him: the fear wins (final review: a known limit). A move or attack command given during a stun is held and runs after it (the controller prevents it today). `use_summoner` hard-codes `&"flash"`. `add_cc` re-drops orders on every call during a stun or fear. A stunned or feared Lucian doesn't pick up loot or Honeyfruit (they check `can_act()`).
 - **Act 5 map and enemies (Tasks 3–5):**
   - `BlackMist` redraws every frame (a modulate tween would do); `DeadForestMap._draw` re-runs the tree sampling.
   - Only Maokai's camp jitter is checked walkable; the mist-clear test skips spawn points; "a veiled enemy is still hit" calls `take_damage` directly.
@@ -747,11 +768,9 @@ Two gameplay problems were found by looking and are **not fixed** (they need a r
   - Tight real-time margins in `test_elise.gd` and `test_maokai.gd`; no test with a landing spot in a tree. **Elise's art could stay at alpha 0 if she is killed out of band while up** (not reachable in play).
 - **Karthus and the boss bar (Task 6):** loose Lay Waste tests; the boss bar's minimum height grows 12 px for every boss; `Karthus.is_channeling()` ignores `is_alive`; Lay Waste lays one frame early; Wall of Pain's direction is `ZERO` if the two overlap.
 - **Act 6 map and enemies (Tasks 7–8):** the warden's art body sits 4 px off-centre (not visible at game zoom); the abyss push test's lower bound is weak; no tests for a rider dying mid-charge or Lucian dying mid-warning.
-- **Hecarim and Karthus, revived (Task 9):**
-  - **Fairness, for the final review:** Onslaught still hits a Lucian who steps into the band **behind** Hecarim mid-ride (`hecarim.gd`, the `ahead` check is negative there), with no cue after the warning fired.
-  - A multi-line condition in `karthus.gd` continues by tabs (wrap in parentheses). Hecarim's `move_speed` isn't restored if he dies mid-charge (harmless). No tests for a death mid-charge or mid-ride, the Veil blocking the knockback, or the fear's direction. A filler assert in the Defile tick test. Defile's look depends on Karthus's `_draw`.
+- **Hecarim and Karthus, revived (Task 9):** Hecarim's `move_speed` isn't restored if he dies mid-charge (harmless). No tests for a death mid-charge or mid-ride, or the Veil blocking the knockback. A filler assert in the Defile tick test. Defile's look depends on Karthus's `_draw`. (The behind-the-pack hit, the fear's direction and the tabs in `karthus.gd` were fixed in the final review.)
 - **Thresh (Task 10):** a debug Thresh's fall runs `_clear_fight` (it clears every warning and shot on the stage). `REHOOK_SLACK` adds 0.15 s idle after a landed or blocked hook. Test gaps: a soul pending at the fall, a risen Box at the fall, Lucian dying during the rise.
-- **The ending (Task 11):** thin scene coverage (only a skip at the start; no full play-through or late-skip prop check); the failed-save toast after Continue is untested; `play_time` keeps growing on `TheEndScreen` (the label is fixed when built, accepted); credits lines 1–2 are placeholders; `test_act4`'s unfreed-children count varies 2–3 between runs.
+- **The ending (Task 11):** thin scene coverage (only a skip at the start; no full play-through or late-skip prop check); the failed-save toast after Continue is untested; `play_time` keeps growing on `TheEndScreen` (the label is fixed when built, accepted); credits lines 1–2 are placeholders; `test_act4`'s unfreed-children count varies 2–3 between runs. **Closing the window on 6-5's first-clear result panel** saves the clear (`Game._save()`), so The End is skipped (final review: a known limit).
 - **Debug (Task 12):** `skip_to_last_wave` on a 0-wave stage with no boss gives wave -1 (no such content); the training test only asserts no crash; the no-reward check is gold only; the "mini boss left alone" test relies on the data's kind.
 - **Visual pass (13a):** `_art_luminance` ignores `data.tint`; the CC font test pins the literal; `senna_freed` fades `thresh.modulate:a` (could fight a hit flash); `free_camera` calls the private `camera._clamped`; Phase 7's scenarios keep the old camera handling.
 - **Plan checklists:** the task checklists in this file are left unticked; the commits above are the record.

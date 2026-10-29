@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dwikyersmqakm"
-path="res://.godot/imported/ending_cutscene_1_shot.png-5e5069f3a539090a3f6b2c1db34e8903.ctex"
+uid="uid://dwmwfos2422no"
+path="res://.godot/imported/ending_cutscene_1_lantern.png-1d18e59f53f90623316592cbc7162032.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/report/phase8/ending_cutscene_1_shot.png"
-dest_files=["res://.godot/imported/ending_cutscene_1_shot.png-5e5069f3a539090a3f6b2c1db34e8903.ctex"]
+source_file="res://docs/report/phase8/ending_cutscene_1_lantern.png"
+dest_files=["res://.godot/imported/ending_cutscene_1_lantern.png-1d18e59f53f90623316592cbc7162032.ctex"]
 
 [params]
 
