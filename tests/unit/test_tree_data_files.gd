@@ -48,7 +48,20 @@ func test_every_node_has_name_description_and_icon() -> void:
 		assert_ne(data.display_name, "", str(data.id))
 		assert_ne(data.description, "", str(data.id))
 		assert_not_null(data.icon, str(data.id))
-		assert_eq(data.icon.resource_path, "res://assets/art/tree/%s.svg" % data.id)
+		assert_eq(data.icon.resource_path, _expected_icon_path(data.id), str(data.id))
+
+
+## The stage's own icon for skill and summoner nodes, else tree/<id>.svg.
+func _expected_icon_path(id: StringName) -> String:
+	var skill_ids: Array[StringName] = [&"skill_q", &"skill_w", &"skill_e", &"skill_r"]
+	if id == &"passive":
+		return Hud.PASSIVE_ICON.resource_path
+	if id in skill_ids:
+		return Hud.SKILL_ICONS[skill_ids.find(id)].resource_path
+	if id in SPELLS:
+		var summoner: SummonerData = load("res://data/summoners/%s.tres" % id)
+		return summoner.icon.resource_path
+	return "res://assets/art/tree/%s.svg" % id
 
 
 func test_cost_arrays_match_max_level() -> void:
