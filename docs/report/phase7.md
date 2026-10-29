@@ -20,7 +20,7 @@ Under that, the game gained:
 
 Acts 1–4 now play: 12 of the 22 stages.
 
-The test suite grew from **765 to 1036 tests**, and all of them pass. Every new fight, map and screen was checked in screenshots from a real game window. The last task's visual pass fixed seven things (see *Visual pass*).
+The test suite grew from **765 to 1041 tests**, and all of them pass. Every new fight, map and screen was checked in screenshots from a real game window. The last task's visual pass fixed seven things (see *Visual pass*).
 
 Your choices during planning:
 
@@ -93,9 +93,9 @@ Settled while building:
 
 ## Verification
 
-- **Unit and scene tests (GUT):** **1036 of 1036 pass**, up from 765 at the end of Phase 6.
+- **Unit and scene tests (GUT):** **1041 of 1041 pass**, up from 765 at the end of Phase 6.
   - New test files: `test_attack_move`, `test_stage_stats`, `test_stage_result`, `test_damage_over_time`, `test_status_effects`, `test_enemy_paths`, `test_monsters`, `test_terrain`, `test_drakes`, `test_elder_dragon`, `test_dark_lucian`, `test_act4`.
-  - Extended: `test_stage_waves`, `test_game`, `test_journey`, `test_journey_section`, `test_kill_rewards`, `test_loot`, `test_stage_hud`, `test_enemy_data_files`, `test_maps`, `test_wave_runner`, `test_stage_debug_waves`, `test_minions`, `test_item_actives`.
+  - Extended: `test_stage_waves`, `test_game`, `test_journey`, `test_journey_section`, `test_kill_rewards`, `test_loot`, `test_stage_hud`, `test_enemy_data_files`, `test_maps`, `test_wave_runner`, `test_stage_debug_waves`, `test_minions`, `test_item_actives`, `test_summoner_spells`.
   - Tests that kill through real shots also check for engine errors: nothing adds a body or runs a physics query inside a damage path.
 - **Screenshot runs in a real window:**
   - New scenarios: `attack_pick`, `act3_packs`, `act3_elites`, `act3_result`, `act3_jungle`, `act3_water`, `act3_pit`, `infernal_meteor`, `ocean_mist`, `elder_sky_dive`, `elder_mark`, `act4_lane`, `dark_lucian_q`, `dark_lucian_r`, `game_over`. Each prints its expected and actual values, and every check matched.
@@ -114,6 +114,10 @@ Settled while building:
   - The pit's south spawn sat on top of Lucian's start.
   - Sky Dive's landing couldn't be walked out of, and a lost warning could leave the dragon in the air. *(tests)*
   - Boss HP 51% missed a diving Elder Dragon (it is out of the enemies group then). *(test)*
+- **Fixed in the final review:**
+  - Ranged minions (Acts 1, 2 and 4) backing into a wall or a corner got stuck or twitched: their back-off took a path to a point inside the wall, and stepped past the path's end and back every frame. They and Gromp now back off straight away from Lucian, as the Scuttler flees: they slide along a wall and stand in a corner. A walker within a step of a path's end now stands there. *(tests)*
+  - Smite or Gunblade aimed at a Blast Cone walked Lucian to it, then cast at nothing. It now looks for enemies only. *(test)*
+  - Next stage after the very last stage now goes to the main screen. *(test)*
 
 ## Pacing
 
@@ -189,12 +193,9 @@ The stage info in some shots reads "Wave 1 in 16:38": those scenarios hold wave 
 
 - **Acts 5–6 and Endless still wait.** Clearing Act 4 says "Act 5 is open", and its tab opens with Start disabled ("Act 5 comes in a later phase"). Endless opens after Act 3 with its Start disabled.
 - **Pacing isn't measured yet,** and Act 3 may land at the low end of its budget (see *Pacing*).
-- **Blast Cones and item procs** (flagged for the final review):
-  - Shooting a cone spends Lucian's charged on-attack effects (Energize, Spellblade, Essence Reaver's cooldown, Kraken Slayer's count) for nothing.
-  - Smite or Gunblade aimed at a cone walks Lucian to it, then casts at nothing.
-- **Ranged minions backing into a wall** (Acts 1, 2 and 4) now stop and go instead of sliding along it, since pathing came in (flagged for the final review).
+- **Blast Cones and item procs:** shooting a cone spends Lucian's charged on-attack effects (Energize, Spellblade, Essence Reaver's cooldown, Kraken Slayer's count) for nothing.
 - **Big bodies can catch on corners.** The navigation mesh is baked for a 36 px body; the drakes (70) and the Elder Dragon (84) can snag on a jungle corner until their sidestep frees them.
-- **Gromp can get stuck backing into a corner.** It then stands and spits from too close.
+- **A ranged minion or Gromp backed into a corner** stands there and shoots from too close.
 - **Dark Lucian's dodge** waits out his Q, so a burst during the laser may not make him dodge.
 - **Skip** gives the jungle buffs' regen for the time skipped, but doesn't shorten the buffs.
 - **Red's true burn** gets Lucian's damage boosts (a design call; easy to change).
@@ -230,7 +231,7 @@ Your save and settings live in `%APPDATA%\lucian_the_lantern\`. F3 + Q opens the
 ## Feedback and suggestions
 
 - **Play Act 3 for time first.** Its waves hold a little less HP than the plan's estimate, so it may clear on the short side. If it takes under 60 minutes, raise `EnemyData.ACT_HP` and the drakes' and dragon's HP before touching rewards.
-- **Two flagged items** are worth a decision before Act 5: Blast Cones spending item procs, and ranged minions stuttering against walls. Each is a small fix.
+- **One flagged item** is worth a decision before Act 5: Blast Cones spending item procs. It is a small fix.
 - **Act 5 (Shadow Isles)** is the natural next step. It can reuse the camps, packs, mini-boss kind, terrain zones and pathing built here.
 - **Endless** opens after Act 3 and can reuse the wave runner, the six maps and every boss.
 - **The numbers are placeholders:** enemy stats in `data/enemies/*.tres`, scaling in `EnemyData`, rewards in `KillRewards`, loot in `LootTable`, waves and packs in `WavePlan`, terrain in `HazardZone`, `BlastCone` and `Honeyfruit`, boss skills at the top of each boss script.
