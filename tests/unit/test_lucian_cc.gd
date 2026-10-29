@@ -33,10 +33,10 @@ func _enemy(at: Vector2, hp := 100.0) -> Enemy:
 	return enemy
 
 
-## A wall 40 wide and 400 tall centered on `at`.
-func _wall(at: Vector2) -> void:
+## A wall 40 wide and 400 tall centered on `at`, on `layer`.
+func _wall(at: Vector2, layer := Layers.WORLD) -> void:
 	var wall := StaticBody2D.new()
-	wall.collision_layer = Layers.WORLD
+	wall.collision_layer = layer
 	var shape := CollisionShape2D.new()
 	var box := RectangleShape2D.new()
 	box.size = Vector2(40, 400)
@@ -258,6 +258,29 @@ func test_fear_slides_along_a_wall() -> void:
 	await wait_physics_frames(30)
 	assert_lt(lucian.global_position.x, 31.0, "the wall stops him")
 	assert_lt(lucian.global_position.y, -40.0, "he slides along it")
+
+
+## The final review: a feared Lucian walks through enemy bodies, so none can
+## push him along (Hecarim's ride carried him about 490 px). His walking mask
+## is back once it ends.
+func test_fear_walks_through_an_enemy_body() -> void:
+	# The body's near side is at x = 60; Lucian's body is 30 wide.
+	_wall(Vector2(80, 0), Layers.ENEMY_BODY)
+	await wait_physics_frames(1)
+	lucian.add_cc(Kind.FEAR, 0.5, Vector2(-100, 0))
+	await wait_physics_frames(40)
+	assert_false(lucian.has_cc(Kind.FEAR))
+	var expected := lucian.current_move_speed() * Lucian.FEAR_SPEED * 0.5
+	assert_almost_eq(lucian.global_position.x, expected, 6.0, "through it, the whole fear walk")
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM, "his walking mask is back")
+
+
+func test_fear_stops_at_the_abyss() -> void:
+	_wall(Vector2(80, 0), Layers.CHASM)
+	await wait_physics_frames(1)
+	lucian.add_cc(Kind.FEAR, 0.5, Vector2(-100, 0))
+	await wait_physics_frames(40)
+	assert_lt(lucian.global_position.x, 31.0, "the abyss stops him")
 
 
 # --- Refused and cleared ----------------------------------------------------

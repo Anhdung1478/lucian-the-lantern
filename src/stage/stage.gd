@@ -88,6 +88,9 @@ var _next_spawn := 0
 var _perched := {}
 ## Act 1's first play: Senna has taught E (at the first break).
 var _taught_e := false
+## Debug jumps so far (_remove_every_enemy); a deferred summon or split
+## asked for before the last one is dropped.
+var _jumps := 0
 
 @onready var arena: StageMap = $Arena
 @onready var lucian: Lucian = $World/Lucian
@@ -189,8 +192,7 @@ func jump_to_boss_wave() -> void:
 
 
 ## Debug and tests: every enemy goes (no rewards) and the stage's last wave comes next
-## (a mini boss stage's mini boss wave). A summon or split still waiting to spawn
-## may appear in that wave uncounted: debug only.
+## (a mini boss stage's mini boss wave).
 func jump_to_last_wave() -> void:
 	if runner == null:
 		return
@@ -198,7 +200,11 @@ func jump_to_last_wave() -> void:
 	runner.skip_to_last_wave()
 
 
+## A jump's sweep: every enemy goes, and a summon or split still on its way
+## never comes (_jumps): the jump reset the wave's count, so it would come
+## uncounted, and its death would end the next wave one enemy early.
 func _remove_every_enemy() -> void:
+	_jumps += 1
 	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
 		enemy.remove_from_group(&"enemies")
 		enemy.queue_free()
@@ -602,11 +608,14 @@ func _on_thresh_fell(thresh: ThreshFinal) -> void:
 
 
 ## The ending is over (played or skipped): Senna is free, and he leaves.
+## With him gone already, the stage still ends (its purple comes in _on_cleared).
 func _on_ending_done() -> void:
 	cutscene = null
 	reward_lines.append("Senna is free")
 	if is_instance_valid(boss_unit):
 		_thresh_leaves(boss_unit)
+	elif runner:
+		runner.finish()
 
 
 ## A Thresh is beaten: his blue and orange now, rising where he stands (as a
@@ -652,7 +661,7 @@ func _on_enemy_died(enemy: Enemy) -> void:
 			drop_loot(item, unit.global_position)
 	if splits > 0:
 		# Deferred: the killing shot can land inside a physics callback, where no body can be added.
-		_spawn_splits.call_deferred(data.split_into, splits, unit.global_position, unit.wave)
+		_spawn_splits.call_deferred(data.split_into, splits, unit.global_position, unit.wave, _jumps)
 	if data.buff_on_kill != &"":
 		lucian.add_jungle_buff(data.buff_on_kill)
 	if data.kind == &"mini_boss":
@@ -662,8 +671,10 @@ func _on_enemy_died(enemy: Enemy) -> void:
 
 
 ## `count` enemies of `id` around where their parent died, in its wave
-## (already counted in it).
-func _spawn_splits(id: StringName, count: int, at: Vector2, wave: int) -> void:
+## (already counted in it), unless a debug jump came since (`jumps`).
+func _spawn_splits(id: StringName, count: int, at: Vector2, wave: int, jumps: int) -> void:
+	if jumps != _jumps:
+		return
 	for i in count:
 		spawn_enemy(id, at + Vector2.from_angle(TAU * i / count) * SPLIT_SPREAD, wave)
 
@@ -702,11 +713,14 @@ func _on_summon_requested(unit: EnemyUnit, id: StringName, at: Vector2) -> void:
 	var spot := at if arena.is_walkable(at, SUMMON_MARGIN) else unit.global_position
 	# Deferred, like splits: a summon called from a physics callback can't add
 	# its body there. A weak ref: the deferred call never holds a freed node.
-	_spawn_summon.call_deferred(weakref(unit), id, spot, unit.wave)
+	_spawn_summon.call_deferred(weakref(unit), id, spot, unit.wave, _jumps)
 
 
-## A summon comes, in its summoner's wave (already counted in it).
-func _spawn_summon(from: WeakRef, id: StringName, at: Vector2, wave: int) -> void:
+## A summon comes, in its summoner's wave (already counted in it), unless a
+## debug jump came since (`jumps`).
+func _spawn_summon(from: WeakRef, id: StringName, at: Vector2, wave: int, jumps: int) -> void:
+	if jumps != _jumps:
+		return
 	var summon := spawn_enemy(id, at, wave)
 	summon.summoned = true
 	summon.summoner = from.get_ref() as EnemyUnit

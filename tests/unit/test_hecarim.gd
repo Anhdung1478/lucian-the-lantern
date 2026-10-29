@@ -222,6 +222,92 @@ func test_a_step_out_of_the_band_dodges_it() -> void:
 	assert_gt(boss.global_position.x, 900.0, "he rode the whole line")
 
 
+## Waits (up to 3 s) until his ride has carried him to `x`.
+func _ride_to(boss: Hecarim, x: float) -> void:
+	for frame in 180:
+		if boss.global_position.x >= x:
+			return
+		await wait_physics_frames(1)
+
+
+## Waits (up to 3 s) for the Onslaught hit.
+func _wait_for_the_hit() -> void:
+	for frame in 180:
+		if not _hits(&"onslaught_of_shadows").is_empty():
+			return
+		await wait_physics_frames(1)
+
+
+## The final review: the visible pack (Hecarim and his ghost riders) is the
+## hit area. A Lucian who steps into the band behind the last ghost, after
+## the warning is gone, is safe; standing ahead of him is a hit (above).
+func test_stepping_into_the_band_behind_the_last_ghost_is_safe() -> void:
+	assert_eq(Hecarim.RIDE_TAIL, 180.0, "the last ghost (130 behind) plus half the rider art (46)")
+	var boss := _hecarim(Vector2.ZERO)
+	lucian.global_position = Vector2(600, 0)
+	boss.busy_left = boss.onslaught_of_shadows()
+	lucian.global_position = Vector2(300, 400)
+	await _ride_to(boss, 600.0)
+	assert_true(boss.is_riding())
+	# 300 behind him, in the middle of the band.
+	lucian.global_position = Vector2(boss.global_position.x - 300.0, 0)
+	await wait_seconds(0.8)
+	assert_false(boss.is_riding(), "the ride is over")
+	assert_eq(_hits(&"onslaught_of_shadows").size(), 0)
+	assert_false(lucian.has_cc(CrowdControl.Kind.FEAR))
+
+
+func test_stepping_in_among_the_ghosts_behind_him_is_a_hit() -> void:
+	var boss := _hecarim(Vector2.ZERO)
+	lucian.global_position = Vector2(600, 0)
+	boss.busy_left = boss.onslaught_of_shadows()
+	lucian.global_position = Vector2(300, 400)
+	await _ride_to(boss, 400.0)
+	# Beside the back ghosts (130 behind him, 130 to the side).
+	lucian.global_position = boss.global_position + Vector2(-120.0, 100.0)
+	await wait_physics_frames(2)
+	assert_eq(_hits(&"onslaught_of_shadows").size(), 1)
+	assert_true(lucian.has_cc(CrowdControl.Kind.FEAR))
+
+
+## The final review: the fear runs from the nearest point on the ride's
+## centre line, so Lucian runs sideways out of the band, not ahead of
+## Hecarim along the ride.
+func test_the_fear_runs_sideways_out_of_the_band() -> void:
+	var boss := _hecarim(Vector2.ZERO)
+	lucian.global_position = Vector2(600, 0)
+	boss.busy_left = boss.onslaught_of_shadows()
+	lucian.global_position = Vector2(600, 100)
+	await _wait_for_the_hit()
+	assert_true(lucian.has_cc(CrowdControl.Kind.FEAR))
+	assert_almost_eq(lucian._cc.fear_from(), Vector2(600, 0), Vector2(1, 1), "the nearest point on the ride's line")
+	var start := lucian.global_position
+	await wait_seconds(0.5)
+	var moved := lucian.global_position - start
+	assert_almost_eq(moved.x, 0.0, 2.0, "straight sideways")
+	assert_gt(moved.y, 60.0, "away from the line, out of the band")
+
+
+## The final review: a Lucian right on the line runs to the ride's side
+## (its orthogonal) as far as a plain fear walk takes him (1.0 s at 60% of
+## his speed). Hecarim's body passing through him no longer carries him
+## along the ride (it did, about 490 px).
+func test_a_feared_lucian_on_the_line_is_not_carried_along_the_ride() -> void:
+	var boss := _hecarim(Vector2.ZERO)
+	lucian.global_position = Vector2(600, 0)
+	var walk := lucian.current_move_speed() * Lucian.FEAR_SPEED * Hecarim.RIDE_FEAR
+	boss.busy_left = boss.onslaught_of_shadows()
+	await _wait_for_the_hit()
+	assert_eq(_hits(&"onslaught_of_shadows").size(), 1)
+	assert_true(lucian.has_cc(CrowdControl.Kind.FEAR))
+	await wait_seconds(Hecarim.RIDE_FEAR + 0.3)
+	assert_false(lucian.has_cc(CrowdControl.Kind.FEAR))
+	var moved := lucian.global_position - Vector2(600, 0)
+	assert_lt(absf(moved.x), 20.0, "not carried along the ride")
+	assert_almost_eq(moved.length(), walk, 15.0, "a plain fear walk")
+	assert_almost_eq(absf(moved.y), walk, 15.0, "to the side")
+
+
 func test_the_ride_stops_at_a_wall() -> void:
 	var wall := StaticBody2D.new()
 	wall.collision_layer = Layers.WORLD

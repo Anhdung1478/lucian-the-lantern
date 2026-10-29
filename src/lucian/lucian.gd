@@ -840,11 +840,15 @@ func _displace_step(delta: float) -> void:
 ## Feared: Lucian runs straight away from the fear's source at FEAR_SPEED of
 ## his move speed, sliding along walls (no path). Right on the source, he
 ## runs backward. Forced, like a displacement, so it builds no Energize.
+## Walls and the abyss stop him; enemy bodies don't, so none can push him
+## along (a ride through him).
 func _fear_step() -> void:
 	var away := -aim_direction(_cc.fear_from())
 	velocity = away * current_move_speed() * FEAR_SPEED
 	visuals.face(away)
+	collision_mask = Layers.WORLD | Layers.CHASM
 	move_and_slide()
+	collision_mask = _body_mask()
 	velocity = Vector2.ZERO
 	_last_position = global_position
 

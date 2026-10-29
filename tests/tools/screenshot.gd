@@ -2851,6 +2851,7 @@ func scenario_hecarim_onslaught() -> void:
 	await wait(0.3)
 	hecarim._cooldowns[&"onslaught_of_shadows"] = 0.0
 	var warning := await wait_for_warning(GroundWarning.Shape.LINE)
+	var ride_dir := warning.direction
 	await wait(0.6)
 	print("ride line (expect 1100 x 300, 1 s): ", warning.reach, " x ", warning.width, ", ", warning.warn_time)
 	await shot("hecarim_onslaught_0_warning")
@@ -2862,11 +2863,15 @@ func scenario_hecarim_onslaught() -> void:
 	await shot("hecarim_onslaught_1_ride")
 	while not lucian.has_cc(CrowdControl.Kind.FEAR):
 		await wait(0.01)
+	var feared_at := lucian.global_position
 	await wait(0.3)
 	print("feared (expect true), fear icon (expect true): ", lucian.has_cc(CrowdControl.Kind.FEAR), ", ", buff_icon(Lucian.FEARED) != null)
 	await shot("hecarim_onslaught_2_feared")
 	while lucian.has_cc(CrowdControl.Kind.FEAR) or hecarim.is_riding():
 		await wait(0.05)
+	var ran := lucian.global_position - feared_at
+	print("fear walk (expect along the ride about 0, sideways about 200): along ", roundi(ran.dot(ride_dir)),
+		", sideways ", roundi(absf(ran.dot(ride_dir.orthogonal()))))
 	hold(hecarim)
 	hecarim.global_position = camp
 	blink(camp + Vector2(-760, 0))
@@ -2967,11 +2972,13 @@ func scenario_thresh_lantern() -> void:
 	await shot("thresh_lantern_1_souls")
 
 
-## The ending: Phase 2's Thresh at 0 HP falls and the scene plays. He kneels
-## and drops his lantern, "It ends here."; Lucian's shot flies to it; it
-## cracks, Senna's soul forms as he dissolves; "Lucian… you came.". Then the
-## stage-end screen (STAGE CLEARED, +20 purple, "The story is complete").
-## Lucian shoots him first, so Damage dealt shows his hits.
+## The ending: Phase 2's Thresh brings his souls (Dark Passage), then falls
+## at 0 HP and the scene plays. As it begins his souls go free: they rise,
+## brighten into light and fade. He kneels and drops his lantern, "It ends
+## here."; Lucian's shot flies to it; it cracks, Senna's soul forms as he
+## dissolves; "Lucian… you came.". Then the stage-end screen (STAGE CLEARED,
+## +20 purple, "The story is complete"). Lucian shoots him first, so Damage
+## dealt shows his hits.
 func scenario_ending_cutscene() -> void:
 	var game := game_stage()
 	var thresh := await to_final_thresh(Vector2(-460, 0))
@@ -2982,27 +2989,41 @@ func scenario_ending_cutscene() -> void:
 	while thresh.stopped:
 		await wait(0.02)
 	hold(thresh)
+	# Dark Passage: his lantern near Lucian and three souls out of it.
+	thresh._cooldowns[&"dark_passage"] = 0.0
+	var warning := await wait_for_warning(GroundWarning.Shape.CIRCLE)
+	while is_instance_valid(warning):
+		await wait(0.02)
+	await wait(0.5)
+	var souls := get_nodes_in_group(&"enemies").filter(func(node: Node) -> bool: return (node as EnemyUnit).summoned)
+	print("souls before the fall (expect 3): ", souls.size())
 	finish(thresh)
 	while game.cutscene == null:
 		await process_frame
 	var scene := game.cutscene as SennaFreed
+	await wait(0.4)
+	var shown := souls.filter(func(soul: Variant) -> bool: return is_instance_valid(soul))
+	print("souls going free (expect 3, alpha < 1, risen): ", shown.size(), "  ",
+		shown.map(func(soul: EnemyUnit) -> String: return "alpha %.2f rise %d" % [soul.modulate.a, roundi(-soul.visuals.position.y)]))
+	await shot("ending_cutscene_0_souls")
 	while scene._caption.text == "":
 		await wait(0.05)
 	await wait(0.3)
-	print("caption: ", scene._speaker.text, ": ", scene._caption.text, "  HUD hidden (expect true): ", not game.hud.visible)
-	await shot("ending_cutscene_0_lantern")
+	print("caption: ", scene._speaker.text, ": ", scene._caption.text, "  HUD hidden (expect true): ", not game.hud.visible,
+		"  souls left (expect 0): ", souls.filter(func(soul: Variant) -> bool: return is_instance_valid(soul)).size())
+	await shot("ending_cutscene_1_lantern")
 	await press_key(KEY_SPACE, true)
 	await press_key(KEY_SPACE, false)
 	await wait(0.3)
-	await shot("ending_cutscene_1_shot")
+	await shot("ending_cutscene_2_shot")
 	# The shot's last 0.2 s, the burst (0.6 s), then the soul rising (1.4 s).
 	await wait(1.6)
-	await shot("ending_cutscene_2_freed")
+	await shot("ending_cutscene_3_freed")
 	while scene._caption.text == "":
 		await wait(0.05)
 	await wait(0.3)
 	print("caption: ", scene._speaker.text, ": ", scene._caption.text)
-	await shot("ending_cutscene_3_senna")
+	await shot("ending_cutscene_4_senna")
 	while not game.result.visible:
 		await press_key(KEY_SPACE, true)
 		await press_key(KEY_SPACE, false)
@@ -3010,7 +3031,7 @@ func scenario_ending_cutscene() -> void:
 	await wait(0.4)
 	print("result (expect STAGE CLEARED): ", game.result.title.text, "  reward lines: ", game.reward_lines)
 	print("purple (expect 20): ", SaveGame.instance().essences.amount(Essences.PURPLE), "  stats (expect Damage dealt > 0): ", result_rows())
-	await shot("ending_cutscene_4_result")
+	await shot("ending_cutscene_5_result")
 	paused = false
 
 

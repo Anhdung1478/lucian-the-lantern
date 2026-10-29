@@ -280,13 +280,45 @@ func test_crossing_the_box_hurts_150_and_slows_80_percent_for_2_seconds_once_per
 	assert_eq(lucian._slows[ThreshFinal.BOX_SLOW_ID].duration, 2.0)
 	assert_true(wall.is_broken(0), "the piece he crossed breaks")
 	assert_false(wall.is_broken(1))
-	# Back in across the broken piece: nothing.
+	# Past BOX_TOUCH_GAP (one crossing, one hit): back in across the broken piece, nothing.
+	await wait_seconds(ThreshFinal.BOX_TOUCH_GAP)
 	lucian.global_position = Vector2.from_angle(deg_to_rad(15.0)) * 300.0
 	await wait_physics_frames(2)
 	assert_eq(_hits(&"the_box").size(), 1, "once per piece")
 	await _cross(105.0)
 	assert_eq(_hits(&"the_box").size(), 2, "another piece hurts again")
 	assert_true(wall.is_broken(3))
+
+
+## The final review: one crossing, one hit. A crossing exactly at a joint
+## comes within his hit radius of both pieces; it hits once, and both break.
+func test_a_crossing_at_a_joint_hits_once_and_breaks_both_pieces() -> void:
+	assert_eq(ThreshFinal.BOX_TOUCH_GAP, 0.3)
+	lucian.global_position = Vector2(200, 0)
+	var boss := _thresh(Vector2.ZERO)
+	var wall := await _raised_box(boss)
+	if wall == null:
+		return
+	# 30 degrees: the joint between pieces 0 and 1.
+	await _cross(30.0)
+	assert_eq(_hits(&"the_box").size(), 1, "one hit")
+	assert_true(wall.is_broken(0), "both pieces break")
+	assert_true(wall.is_broken(1), "both pieces break")
+	assert_false(wall.is_broken(2))
+	await wait_seconds(ThreshFinal.BOX_TOUCH_GAP)
+	await _cross(195.0)
+	assert_eq(_hits(&"the_box").size(), 2, "a new crossing hits again")
+
+
+func test_standing_on_a_joint_as_the_box_rises_hits_once() -> void:
+	lucian.global_position = Vector2.from_angle(deg_to_rad(60.0)) * ThreshFinal.BOX_RADIUS
+	var boss := _thresh(Vector2.ZERO)
+	var wall := await _raised_box(boss)
+	if wall == null:
+		return
+	await wait_physics_frames(2)
+	assert_eq(_hits(&"the_box").size(), 1)
+	assert_true(wall.is_broken(1) and wall.is_broken(2), "the pieces on either side of the joint break")
 
 
 func test_a_box_touch_banshees_veil_blocks_does_not_slow() -> void:

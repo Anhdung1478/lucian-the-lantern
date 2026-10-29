@@ -144,6 +144,32 @@ func test_a_touched_piece_stands_without_break_on_touch() -> void:
 	assert_false(wall.is_broken(0))
 
 
+## The final review: no touch while Lucian can't be touched (God mode, a
+## cutscene, stasis), and the piece isn't used up: it touches him later.
+## (A Box piece broke with no hit; Wall of Pain slowed a God-mode Lucian.)
+func test_no_touch_while_lucian_is_untouchable_and_the_piece_stays() -> void:
+	var wall := _across()
+	wall.break_on_touch = true
+	var touched := _raise(wall)
+	await wait_physics_frames(1)
+	lucian.invulnerable = true
+	lucian.global_position = Vector2(300, 0)
+	await wait_physics_frames(2)
+	assert_eq(touched, [] as Array[int], "invulnerable")
+	assert_false(wall.is_broken(0), "the piece stands")
+	lucian.invulnerable = false
+	lucian.enter_stasis(0.2, 100.0, 0.0)
+	lucian.global_position = Vector2(-300, 0)
+	await wait_physics_frames(2)
+	assert_eq(touched, [] as Array[int], "in stasis")
+	await wait_physics_frames(15)
+	assert_false(lucian.in_stasis())
+	lucian.global_position = Vector2(300, 0)
+	await wait_physics_frames(2)
+	assert_eq(touched, [0] as Array[int], "touchable again: the piece was still there")
+	assert_true(wall.is_broken(0))
+
+
 func test_it_fades_out_at_the_end_then_goes() -> void:
 	var wall := SpectralWall.line(Vector2(0, 500), Vector2.RIGHT, 400.0, 0.6)
 	_raise(wall)

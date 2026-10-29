@@ -260,6 +260,23 @@ func test_jump_to_the_last_wave_brings_the_mini_boss_without_rewards() -> void:
 	assert_eq(stage.wallet.gold, gold, "still no rewards")
 
 
+## The final review: a summon called just before a jump (counted in the old
+## wave, still on its way) never comes. The jump reset the count, so its
+## death would have ended the last wave one enemy early.
+func test_a_summon_pending_at_a_jump_never_comes() -> void:
+	var stage: Stage = await _stage(5, 2)
+	stage.skip_break()
+	var maiden := stage.spawn_enemy(&"maiden_of_the_mist", stage.lucian.global_position + Vector2(600, 0))
+	stage._on_summon_requested(maiden, &"ghoul", maiden.global_position + Vector2(80, 0))
+	_press(stage, "Jump to the last wave")
+	await wait_physics_frames(3)
+	var summoned := _enemies().filter(func(node: Node) -> bool: return (node as EnemyUnit).summoned)
+	assert_eq(summoned.size(), 0, "the ghoul never comes")
+	for i in 30:
+		stage.runner.tick(WaveRunner.GROUP_GAP)
+	assert_eq(stage.runner.alive(), _enemies().size(), "the last wave counts what is there")
+
+
 func test_jump_to_the_last_wave_does_nothing_in_training() -> void:
 	var stage: Stage = await _stage(2, 1)
 	stage.runner = null

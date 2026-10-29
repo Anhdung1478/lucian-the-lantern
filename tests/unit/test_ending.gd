@@ -120,6 +120,54 @@ func test_thresh_dissolves_whole_aura_and_bar_too() -> void:
 	scene.skip()
 
 
+## The final review: the souls freed at his fall froze with the world (their
+## fade is a tween of their own, under the frozen $World) and stood at full
+## colour through the scene. They rise and fade as it begins: gone before
+## its first line. The scene runs at 8x speed to that line.
+func test_the_souls_freed_at_the_fall_are_gone_before_the_first_caption() -> void:
+	var stage := await _fight()
+	var thresh := stage.boss_unit as ThreshFinal
+	thresh._drop_lantern(stage.lucian.global_position + Vector2(250, 0))
+	await wait_physics_frames(2)
+	var souls := get_tree().get_nodes_in_group(&"enemies").filter(func(node: Node) -> bool:
+		return (node as EnemyUnit).summoned and (node as EnemyUnit).summoner == thresh)
+	assert_eq(souls.size(), 3, "his souls are out")
+	thresh.take_damage(_lethal())
+	await wait_physics_frames(3)
+	var scene := stage.cutscene as SennaFreed
+	assert_not_null(scene)
+	if scene == null:
+		return
+	Engine.time_scale = 8.0
+	for frame in 600:
+		if scene._caption.text != "":
+			break
+		await wait_process_frames(1)
+	Engine.time_scale = 1.0
+	assert_eq(scene._caption.text, "It ends here.", "the first line")
+	for soul: Variant in souls:
+		assert_true(not is_instance_valid(soul) or (soul as Node2D).modulate.a < 0.05, "freed: risen and faded")
+	scene.skip()
+
+
+## The final review: with Thresh gone before the scene ends (not reachable
+## in play today), the stage still clears and pays its purple.
+func test_the_ending_clears_the_stage_even_with_thresh_gone() -> void:
+	var stage := await _fight()
+	var thresh := stage.boss_unit
+	thresh.take_damage(_lethal())
+	await wait_physics_frames(3)
+	assert_is(stage.cutscene, SennaFreed)
+	thresh.queue_free()
+	await wait_physics_frames(1)
+	stage.cutscene.skip()
+	await wait_physics_frames(2)
+	assert_true(stage.result.visible, "the result is up")
+	assert_true(stage.result.cleared)
+	assert_has(stage.reward_lines, "Senna is free")
+	assert_eq(stage.collected[Essences.PURPLE], 20)
+
+
 func test_a_debug_thresh_plays_no_cutscene() -> void:
 	game.start_stage(StageSetup.new())
 	await wait_process_frames(2)

@@ -49,6 +49,9 @@ const BOX_SLOW_ID := &"the_box"
 const BOX_COOLDOWN := 22.0
 const BOX_COOLDOWN_PHASE_2 := 18.0
 const BOX_FIRST := 6.0
+## One crossing, one hit: a touch this soon after the last one does nothing
+## (its piece still breaks). A crossing at a joint touches both pieces.
+const BOX_TOUCH_GAP := 0.3
 ## Dark Passage: the lantern lands within PASSAGE_REACH of Lucian, behind a
 ## circle warning; it lies there PASSAGE_TIME, and PASSAGE_SOULS Lantern
 ## Souls come out of it.
@@ -95,6 +98,8 @@ var _rise_left := 0.0
 ## This cast's hook has come again already (Phase 2).
 var _hooked_again := false
 var _box_damage := BOX_DAMAGE
+## Seconds until a Box touch hurts again (BOX_TOUCH_GAP).
+var _box_gap_left := 0.0
 ## His warnings, walls, hooks and lanterns: cleared when he rises or falls.
 var _placed: Array[Node] = []
 
@@ -144,6 +149,7 @@ func _die() -> void:
 ## once he is up.
 func _physics_process(delta: float) -> void:
 	super(delta)
+	_box_gap_left = maxf(_box_gap_left - delta, 0.0)
 	if _floored:
 		_floored = false
 		if phase == 1:
@@ -249,10 +255,12 @@ func _raise_box(center: Vector2) -> void:
 
 
 ## A piece touched (once each): the hit, and the slow only when the hit
-## landed (Banshee's Veil blocks both).
+## landed (Banshee's Veil blocks both). One crossing, one hit: a touch within
+## BOX_TOUCH_GAP of the last one (the next piece at a joint) does nothing.
 func _box_touched(_piece: int) -> void:
-	if stopped or not is_instance_valid(target):
+	if stopped or not is_instance_valid(target) or _box_gap_left > 0.0:
 		return
+	_box_gap_left = BOX_TOUCH_GAP
 	if target.take_damage(skill_hit(_box_damage, DamageInfo.Type.MAGIC, &"the_box")):
 		target.add_slow(BOX_SLOW_ID, BOX_SLOW, BOX_SLOW_TIME)
 

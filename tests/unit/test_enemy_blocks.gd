@@ -164,6 +164,8 @@ func test_a_vanished_freeing_enemy_is_freed_too() -> void:
 	unit.vanish()
 	await wait_physics_frames(20)
 	assert_lt(unit.visuals.position.y, -5.0)
+	# The final review's screenshots: a full red bar stayed behind as the soul rose.
+	assert_false(unit.health_bar.visible, "no foe now: its bar goes")
 
 
 func test_other_enemies_keep_the_grey_fade() -> void:

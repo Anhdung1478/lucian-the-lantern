@@ -6,9 +6,10 @@ extends Node2D
 ## frame it takes Lucian's path since the last frame as a segment and checks
 ## it against every piece with his hit radius (Geometry2D only, no physics
 ## query), so a walk, a dash or a Flash across a piece is caught. A piece
-## touches once; with `break_on_touch` it also goes. The wall fades out over
-## its last FADE_TIME, then frees itself. The caller sets `target` and says
-## what a touch does.
+## touches once; with `break_on_touch` it also goes. Nothing touches while
+## Lucian can't be touched (dead, invulnerable, in stasis), and no piece is
+## used up meanwhile. The wall fades out over its last FADE_TIME, then frees
+## itself. The caller sets `target` and says what a touch does.
 
 ## Lucian touched or crossed piece number `piece` (once per piece).
 signal touched(piece: int)
@@ -86,8 +87,10 @@ func _physics_process(delta: float) -> void:
 		var now := target.global_position
 		var from := _last_at if _last_at.is_finite() else now
 		_last_at = now
+		# Untouchable (dead, God mode, a cutscene, stasis): no touch, and no piece used up.
+		var touchable := not target.dead and not target.invulnerable and not target.in_stasis()
 		for piece in _pieces.size():
-			if not _touched[piece] and _crossed(piece, from, now):
+			if touchable and not _touched[piece] and _crossed(piece, from, now):
 				_touched[piece] = true
 				_broken[piece] = break_on_touch
 				touched.emit(piece)

@@ -382,13 +382,17 @@ func _show_hit() -> void:
 
 
 ## A `frees` enemy's end (killed or vanished): it rises, brightens into
-## teal-white light and fades upward, with a soft chime. Others fade grey.
+## teal-white light and fades upward, with a soft chime; no foe now, its bar
+## goes. Others fade grey. The fade runs while the world is frozen (Thresh's
+## fall starts the ending at once: the souls go free as it begins) and stops
+## while the game is paused.
 func _fade_out() -> void:
 	if not data.frees:
 		super()
 		return
 	Sfx.play(&"freed", FREED_CHIME_DB)
-	var fade := create_tween().set_parallel()
+	health_bar.visible = false
+	var fade := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP).set_parallel()
 	fade.tween_property(visuals, "position:y", visuals.position.y - FREED_RISE, FREED_TIME) \
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	fade.tween_property(sprite, "modulate", FREED_COLOR, FREED_TIME * 0.4)

@@ -5,15 +5,17 @@ extends Boss
 ## behind a glowing trail, chasing Lucian; the first contact hurts and knocks
 ## Lucian back (once per cast). Onslaught of Shadows (at or below 80% HP): a
 ## line warning, then he rides along it with four ghost riders beside him; a
-## Lucian in the band as he passes takes a hit and a fear. The fear comes from
-## the warning, which is on the ground for a full second.
+## Lucian in the band as the pack passes takes a hit and a fear, running
+## sideways out of the band. The fear comes from the warning, which is on the
+## ground for a full second, or from the pack he can see.
 ##
 ## The Onslaught hit rule: the band decides, not his body. The ride is
 ## EnemyUnit.charge (through units, stopped by walls and the abyss), and each
 ## frame of it Lucian is hit if he stands in the band (GroundWarning.in_line,
-## the very area the warning drew) and the ride has reached him (he is no
-## further ahead than Hecarim's radius). A step out of the band dodges it; a
-## ride a wall stops short of him does not hit.
+## the very area the warning drew) and the pack is on him (he is no further
+## ahead than Hecarim's radius, and no further behind than RIDE_TAIL, the
+## last ghost's back). A step out of the band dodges it, and so does a step
+## into it behind the pack; a ride a wall stops short of him does not hit.
 
 const CHARGE_TIME := 2.5
 const CHARGE_SPEED := 1.8
@@ -45,6 +47,9 @@ const FLAME_EDGE := Color("36b6e8")
 const RIDERS: Array[Vector2] = [Vector2(40, -105), Vector2(40, 105), Vector2(130, -130), Vector2(130, 130)]
 const RIDER_ART := preload("res://assets/art/enemies/spectral_rider.svg")
 const RIDER_ALPHA := 0.55
+## The pack's tail: how far behind him the ride still hits. The last ghosts
+## ride 130 behind him, and the rider art is 92 long (half of it 46).
+const RIDE_TAIL := 180.0
 ## The charge's trail behind him: its length and half-width.
 const TRAIL_LENGTH := 230.0
 const TRAIL_WIDTH := 44.0
@@ -151,18 +156,29 @@ func _ride(from: Vector2, toward: Vector2) -> void:
 	queue_redraw()
 
 
-## Lucian is hit once if he is in the band and the ride has reached him.
+## Lucian is hit once if he is in the band and the pack is on him: no
+## further ahead than Hecarim's radius, no further behind than RIDE_TAIL.
 func _ride_check() -> void:
 	if _ride_hit or not can_fight():
 		return
 	var ahead := (target.global_position - global_position).dot(_ride_dir)
-	if ahead > radius:
+	if ahead > radius or ahead < -RIDE_TAIL:
 		return
 	if not GroundWarning.in_line(_ride_from, _ride_dir, RIDE_LENGTH, RIDE_WIDTH, target.global_position, Lucian.HIT_RADIUS):
 		return
 	_ride_hit = true
 	if target.take_damage(skill_hit(RIDE_DAMAGE, DamageInfo.Type.MAGIC, &"onslaught_of_shadows")):
-		target.add_cc(CrowdControl.Kind.FEAR, RIDE_FEAR, global_position)
+		target.add_cc(CrowdControl.Kind.FEAR, RIDE_FEAR, _fear_source(target.global_position))
+
+
+## The fear runs from the nearest point on the ride's centre line, so Lucian
+## runs sideways out of the band. Right on the line, he runs to the ride's
+## orthogonal side.
+func _fear_source(at: Vector2) -> Vector2:
+	var on_line := _ride_from + _ride_dir * (at - _ride_from).dot(_ride_dir)
+	if at.distance_to(on_line) > 1.0:
+		return on_line
+	return at - _ride_dir.orthogonal() * radius
 
 
 ## The ride is over (it ran its length or a wall stopped it): its last frame counts.

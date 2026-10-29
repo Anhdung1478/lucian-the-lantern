@@ -197,7 +197,8 @@ func _physics_process(delta: float) -> void:
 func _think(delta: float) -> void:
 	super(delta)
 	# Past the bolt range the base already walked: only the last stretch is his.
-	if revived and busy_left <= 0.0 and can_fight() and distance_to_target() > REVIVED_STOP 			and distance_to_target() <= attack_range + Lucian.HIT_RADIUS:
+	if (revived and busy_left <= 0.0 and can_fight() and distance_to_target() > REVIVED_STOP
+			and distance_to_target() <= attack_range + Lucian.HIT_RADIUS):
 		walk_toward(target.global_position, delta)
 
 
