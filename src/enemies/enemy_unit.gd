@@ -1,11 +1,11 @@
 class_name EnemyUnit
 extends Enemy
 ## A fighting enemy built in code from an EnemyData: body, hurtbox, art and
-## health bar. It walks at Lucian (sliding along walls, sidestepping when
-## stuck), attacks when in range, and stands still while he is dead or
-## can't be hit. With the data's `escape_after` it gets away after that long
-## alive. Subclasses say what an attack does (_attack), and may think
-## differently (_think).
+## health bar. It walks at Lucian (on a path around a wall in the way,
+## sliding along walls, sidestepping when stuck), attacks when in range,
+## and stands still while he is dead or can't be hit. With the data's
+## `escape_after` it gets away after that long alive. Subclasses say what an
+## attack does (_attack), and may think differently (_think).
 
 ## It got away (see escape): no death, no kill.
 signal escaped(unit: EnemyUnit)
@@ -37,6 +37,8 @@ var projectile_parent: Node
 var warning_parent: Node
 var visuals := Node2D.new()
 var health_bar := EnemyHealthBar.new()
+## Its way around walls (see walk_toward).
+var path_follower := PathFollower.new()
 
 var _attack_left := 0.0
 var _stuck_left := 0.0
@@ -180,10 +182,13 @@ func apply_on_hit() -> void:
 		target.add_burn(data.id, data.hit_burn, data.hit_burn_time, data.damage_type, self)
 
 
-## One step toward `point`, sliding along walls. A unit that barely moved
-## sidesteps for a moment.
+## One step toward `point`: straight while no wall is in the way, else along
+## a path around it (see PathFollower), sliding along walls. A unit that
+## barely moved sidesteps for a moment.
 func walk_toward(point: Vector2, delta: float) -> void:
-	var direction := global_position.direction_to(point)
+	var world := get_world_2d()
+	var toward := path_follower.next_point(global_position, point, delta, world.direct_space_state, world.navigation_map)
+	var direction := global_position.direction_to(toward)
 	if _stuck_left > 0.0:
 		_stuck_left -= delta
 		direction = (direction + direction.orthogonal() * _sidestep).normalized()

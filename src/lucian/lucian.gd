@@ -95,6 +95,8 @@ var one_gun := false:
 			_show_body()
 ## Act 1's first play: the HUD says why Q, W and E are locked.
 var tutorial := false
+## His way around walls when he walks (see _step_toward).
+var path_follower := PathFollower.new()
 ## Where spawned shots go. Set by the stage.
 var projectile_parent: Node
 ## Debug: values >= 0 replace Lucian's crit chance.
@@ -1321,15 +1323,20 @@ func _in_range(target: Enemy) -> bool:
 	return global_position.distance_to(target.global_position) <= attack_range() + target.radius
 
 
-## Moves toward `point` this frame. Returns true once Lucian has arrived.
+## Moves toward `point` this frame: straight while no wall is in the way,
+## else along a path around it (see PathFollower). Returns true once Lucian
+## has arrived, or has reached the end of a path that gets him no closer (a
+## click inside a wall ends at the nearest point he can reach).
 func _step_toward(point: Vector2, delta: float) -> bool:
-	var offset := point - global_position
+	var world := get_world_2d()
+	var toward := path_follower.next_point(global_position, point, delta, world.direct_space_state, world.navigation_map)
+	var offset := toward - global_position
 	var step := current_move_speed() * delta
 	if offset.length() <= step:
 		velocity = offset / delta
 		move_and_slide()
 		velocity = Vector2.ZERO
-		return true
+		return toward == point or path_follower.at_path_end()
 	velocity = offset.normalized() * current_move_speed()
 	visuals.face(offset)
 	move_and_slide()

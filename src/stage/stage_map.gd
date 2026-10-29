@@ -1,11 +1,16 @@
 class_name StageMap
 extends Node2D
 ## A stage's ground: its size, its walls on Layers.WORLD (the border, plus
-## polygons and circles inside) and the points the stage uses. Subclasses
-## fill the lists in _init and draw the ground in _draw. The playable area
-## starts at (0, 0); the border walls sit just outside it.
+## polygons and circles inside), the navigation baked around them for
+## PathFollower, and the points the stage uses. Subclasses fill the lists in
+## _init and draw the ground in _draw. The playable area starts at (0, 0);
+## the border walls sit just outside it.
 
 const WALL_THICKNESS := 64.0
+## Paths keep this far from every wall.
+const NAV_AGENT_RADIUS := 36.0
+## A round wall is baked as a polygon with this many sides, just around it.
+const NAV_CIRCLE_SIDES := 16
 
 @export var size := Vector2(4800, 2700)
 
@@ -21,6 +26,8 @@ var camps := {}
 var wall_polygons: Array[PackedVector2Array] = []
 ## Round walls: (x, y, radius).
 var wall_circles: Array[Vector3] = []
+## The walkable ground for paths around the walls, baked in _ready.
+var navigation: NavigationRegion2D
 
 
 func _ready() -> void:
@@ -47,6 +54,7 @@ func _ready() -> void:
 		shape.position = Vector2(circle.x, circle.y)
 		walls.add_child(shape)
 	add_child(walls)
+	_bake_navigation()
 
 
 func get_bounds() -> Rect2:
@@ -74,6 +82,37 @@ func border_rects() -> Array[Rect2]:
 		Rect2(-t, 0, t, size.y),
 		Rect2(size.x, 0, t, size.y),
 	]
+
+
+## The bounds less every wall polygon and circle, kept NAV_AGENT_RADIUS
+## away from them, into the `navigation` region on the world's map.
+func _bake_navigation() -> void:
+	var source := NavigationMeshSourceGeometryData2D.new()
+	var bounds := get_bounds()
+	source.add_traversable_outline(PackedVector2Array([bounds.position, Vector2(bounds.end.x, bounds.position.y),
+		bounds.end, Vector2(bounds.position.x, bounds.end.y)]))
+	for polygon in wall_polygons:
+		source.add_obstruction_outline(polygon)
+	for circle in wall_circles:
+		source.add_obstruction_outline(_circle_outline(circle))
+	var ground := NavigationPolygon.new()
+	ground.agent_radius = NAV_AGENT_RADIUS
+	NavigationServer2D.bake_from_source_geometry_data(ground, source)
+	navigation = NavigationRegion2D.new()
+	navigation.name = "Navigation"
+	navigation.navigation_polygon = ground
+	add_child(navigation)
+
+
+## A round wall (x, y, radius) as a polygon whose sides touch the circle, so
+## it covers the whole wall.
+static func _circle_outline(circle: Vector3) -> PackedVector2Array:
+	var center := Vector2(circle.x, circle.y)
+	var corner := circle.z / cos(PI / NAV_CIRCLE_SIDES)
+	var outline := PackedVector2Array()
+	for i in NAV_CIRCLE_SIDES:
+		outline.append(center + Vector2.from_angle(TAU * i / NAV_CIRCLE_SIDES) * corner)
+	return outline
 
 
 static func _distance_to_edge(point: Vector2, polygon: PackedVector2Array) -> float:
