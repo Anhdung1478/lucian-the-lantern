@@ -425,6 +425,10 @@ func _new_unit(data: EnemyData) -> EnemyUnit:
 			return InfernalDrake.new()
 		&"ocean_drake":
 			return OceanDrake.new()
+		&"maokai":
+			return Maokai.new()
+		&"elise":
+			return Elise.new()
 		&"elder_dragon":
 			return ElderDragon.new()
 		&"dark_lucian":

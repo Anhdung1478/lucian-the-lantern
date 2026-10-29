@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/maokai.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"maokai"
+display_name = "Maokai"
+kind = &"mini_boss"
+behavior = &"maokai"
+art = ExtResource("2_art")
+max_hp = 12000.0
+armor = 60.0
+mr = 40.0
+damage = 90.0
+attack_range = 110.0
+attack_interval = 1.6
+move_speed = 300.0
+radius = 54.0
+gold = 300
+purple_first = 5
+purple_repeat = 1
+camp = &"maokai"

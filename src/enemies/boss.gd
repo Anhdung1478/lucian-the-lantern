@@ -6,6 +6,9 @@ extends EnemyUnit
 ## busy (no walking, no basic attacks). Skill hits are `from_skill`, so
 ## Banshee's Veil blocks them.
 
+## A landing spot in a rock or the rim moves toward the map's middle this
+## far at a time until its body fits (landing_spot).
+const LANDING_STEP := 20.0
 ## A basic bolt flies this far past the attack range.
 const BOLT_OVERREACH := 150.0
 
@@ -23,6 +26,18 @@ var _cooldowns := {}
 func add_skill(id: StringName, cooldown: float, reach: float, first_delay: float, use: Callable) -> void:
 	skills.append({"id": id, "cooldown": cooldown, "range": reach, "use": use})
 	_cooldowns[id] = first_delay
+
+
+## Where it can land for `spot`: there, or moved toward the map's middle
+## (its boss point) until a body of `body_radius` fits on walkable ground
+## (geometry only). Unchanged without a map.
+static func landing_spot(spot: Vector2, map: StageMap, body_radius: float) -> Vector2:
+	if map == null:
+		return spot
+	var middle := map.boss_point
+	while not map.is_walkable(spot, body_radius) and spot.distance_to(middle) > LANDING_STEP:
+		spot = spot.move_toward(middle, LANDING_STEP)
+	return spot if map.is_walkable(spot, body_radius) else middle
 
 
 func skill_hit(amount: float, type: DamageInfo.Type, source: StringName) -> DamageInfo:

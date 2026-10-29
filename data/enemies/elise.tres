@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/elise.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"elise"
+display_name = "Elise"
+kind = &"mini_boss"
+behavior = &"elise"
+art = ExtResource("2_art")
+max_hp = 13000.0
+armor = 30.0
+mr = 50.0
+damage = 70.0
+damage_type = 1
+attack_range = 550.0
+attack_interval = 1.4
+move_speed = 330.0
+radius = 44.0
+gold = 300
+projectile_speed = 900.0
+purple_first = 5
+purple_repeat = 1
+camp = &"elise"

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="116" height="116" viewBox="0 0 116 116">
+  <!-- Maokai: a huge twisted treant seen from above, gnarled bark arms and a crown of leaves, a grim face carved into the bark of its head, facing forward (+X). -->
+  <g transform="translate(58 58)">
+    <ellipse cx="-3" cy="4" rx="50" ry="48" fill="#000000" opacity="0.25"/>
+    <!-- root tangle behind -->
+    <path d="M -18 -8 Q -38 -14 -52 -6 M -18 8 Q -38 14 -52 6 M -14 -14 Q -30 -34 -44 -34 M -14 14 Q -30 34 -44 34" fill="none" stroke="#1a1d24" stroke-width="8" stroke-linecap="round"/>
+    <path d="M -18 -8 Q -38 -14 -52 -6 M -18 8 Q -38 14 -52 6 M -14 -14 Q -30 -34 -44 -34 M -14 14 Q -30 34 -44 34" fill="none" stroke="#4a3320" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- arms: thick twisted branches reaching forward -->
+    <path d="M 0 -22 Q 14 -40 34 -38 Q 42 -36 40 -28 Q 30 -30 20 -20 Q 12 -12 4 -12 Z" fill="#5a3f26" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 0 22 Q 14 40 34 38 Q 42 36 40 28 Q 30 30 20 20 Q 12 12 4 12 Z" fill="#5a3f26" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 36 -37 L 46 -42 M 38 -33 L 48 -32 M 36 37 L 46 42 M 38 33 L 48 32" stroke="#1a1d24" stroke-width="3" stroke-linecap="round"/>
+    <!-- trunk body -->
+    <ellipse cx="-4" cy="0" rx="34" ry="30" fill="#6b4a2c" stroke="#1a1d24" stroke-width="3.5"/>
+    <path d="M -30 -10 Q -20 -4 -26 6 M -20 -22 Q -8 -14 -14 -4 M -18 20 Q -6 12 -12 4" fill="none" stroke="#3c2815" stroke-width="3" stroke-linecap="round"/>
+    <!-- leaf crown -->
+    <g stroke="#1a1d24" stroke-width="2" stroke-linejoin="round">
+      <ellipse cx="-14" cy="-14" rx="12" ry="8" fill="#3f8a3a" transform="rotate(-30 -14 -14)"/>
+      <ellipse cx="-14" cy="14" rx="12" ry="8" fill="#3f8a3a" transform="rotate(30 -14 14)"/>
+      <ellipse cx="-24" cy="0" rx="12" ry="8" fill="#4e9d44"/>
+      <ellipse cx="-6" cy="-24" rx="10" ry="7" fill="#4e9d44" transform="rotate(-60 -6 -24)"/>
+      <ellipse cx="-6" cy="24" rx="10" ry="7" fill="#4e9d44" transform="rotate(60 -6 24)"/>
+    </g>
+    <!-- head with the twisted bark face -->
+    <ellipse cx="20" cy="0" rx="19" ry="17" fill="#7a5632" stroke="#1a1d24" stroke-width="3.5"/>
+    <path d="M 8 -12 Q 16 -6 10 0 Q 16 6 8 12" fill="none" stroke="#3c2815" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- brow, hollow eyes and a jagged mouth -->
+    <path d="M 24 -14 L 34 -6 M 24 14 L 34 6" stroke="#1a1d24" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 26 -9 L 33 -6 L 27 -4 Z M 26 9 L 33 6 L 27 4 Z" fill="#b9f26a" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 33 -3 L 37 -1 L 33 0 L 37 2 L 33 3" fill="none" stroke="#1a1d24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- a purple gleam in the bark -->
+    <circle cx="-2" cy="0" r="5" fill="#9a5cd6" opacity="0.75"/>
+  </g>
+</svg>

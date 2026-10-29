@@ -39,9 +39,6 @@ const DIVE_HP := 0.85
 ## Seconds its art takes to fade as it takes off; it grows as it rises.
 const TAKE_OFF_FADE := 0.3
 const TAKE_OFF_SCALE := 1.3
-## A landing spot in a rock or the rim moves toward the pit's middle this
-## far at a time until its body fits.
-const LANDING_STEP := 20.0
 const MARK_DAMAGE := 130.0
 const MARK_COOLDOWN := 16.0
 const MARK_FIRST := 8.0
@@ -109,18 +106,6 @@ func elder_mark() -> float:
 	face(target.global_position)
 	warning_parent.add_child(ElderMark.create(target, skill_hit(MARK_DAMAGE, DamageInfo.Type.TRUE, &"elder_mark"), self))
 	return MARK_CAST
-
-
-## Where it can land for `spot`: there, or moved toward the map's middle
-## (its boss point) until a body of `body_radius` fits on walkable ground
-## (geometry only). Unchanged without a map.
-static func landing_spot(spot: Vector2, map: StageMap, body_radius: float) -> Vector2:
-	if map == null:
-		return spot
-	var middle := map.boss_point
-	while not map.is_walkable(spot, body_radius) and spot.distance_to(middle) > LANDING_STEP:
-		spot = spot.move_toward(middle, LANDING_STEP)
-	return spot if map.is_walkable(spot, body_radius) else middle
 
 
 func _can_use(id: StringName) -> bool:
