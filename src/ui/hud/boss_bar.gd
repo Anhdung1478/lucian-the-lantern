@@ -6,14 +6,21 @@ extends Control
 
 const SIZE := Vector2(600, 22)
 const FILL := Color("c8312b")
+## The break bar under the health bar while the boss channels something that
+## damage breaks (Soothing Mist, Requiem).
+const BREAK_HEIGHT := 8.0
+const BREAK_GAP := 4.0
+const BREAK_FILL := Color("ffd166")
 
 var boss: EnemyUnit
 var phase_text := ""
+## The boss's Boss.channel() as of the last frame; {} when it has none.
+var channel := {}
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	custom_minimum_size = Vector2(SIZE.x, SIZE.y + 30.0)
+	custom_minimum_size = Vector2(SIZE.x, SIZE.y + 30.0 + BREAK_GAP + BREAK_HEIGHT)
 	visible = false
 
 
@@ -28,6 +35,7 @@ func _process(_delta: float) -> void:
 		if found or not held:
 			boss = found
 	visible = boss != null
+	channel = (boss as Boss).channel() if boss is Boss else {}
 	queue_redraw()
 
 
@@ -51,3 +59,7 @@ func _draw() -> void:
 	var text := "%d / %d" % [roundi(boss.hp), roundi(boss.max_hp)]
 	draw_string_outline(font, bar.position + Vector2(0, 17), text, HORIZONTAL_ALIGNMENT_CENTER, SIZE.x, 15, 4, Color.BLACK)
 	draw_string(font, bar.position + Vector2(0, 17), text, HORIZONTAL_ALIGNMENT_CENTER, SIZE.x, 15, Color.WHITE)
+	if not channel.is_empty():
+		var thin := Rect2(0, bar.end.y + BREAK_GAP, SIZE.x, BREAK_HEIGHT)
+		draw_rect(thin.grow(2.0), Color(0, 0, 0, 0.85))
+		draw_rect(Rect2(thin.position, Vector2(SIZE.x * clampf(channel.done / channel.need, 0.0, 1.0), BREAK_HEIGHT)), BREAK_FILL)

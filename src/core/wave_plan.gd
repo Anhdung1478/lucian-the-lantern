@@ -2,7 +2,7 @@ class_name WavePlan
 extends RefCounted
 ## Which enemies each wave of a stage brings (docs/act1_the_loss.md,
 ## docs/act2_the_sentinels.md, docs/act3_the_jungle.md,
-## docs/act4_the_darkness.md), and each stage's boss. A wave can name a pack
+## docs/act4_the_darkness.md, docs/act5_shadow_isles.md), and each stage's boss. A wave can name a pack
 ## in place of an enemy id: it brings the pack's members, in order.
 
 const MELEE := &"melee_minion"
@@ -21,6 +21,15 @@ const SCUTTLER := &"rift_scuttler"
 ## Act 3's mini bosses, each last in its stage's last wave.
 const INFERNAL_DRAKE := &"infernal_drake"
 const OCEAN_DRAKE := &"ocean_drake"
+## Act 5's enemies: Maokai's saplings, Elise's spiderlings, the Maiden of the
+## Mist and the Broodmother.
+const SAPLING := &"sapling"
+const SPIDERLING := &"spiderling"
+const MAIDEN := &"maiden_of_the_mist"
+const BROODMOTHER := &"broodmother"
+## Act 5's mini bosses, each last in its stage's last wave.
+const MAOKAI := &"maokai"
+const ELISE := &"elise"
 ## Pack id -> its members, in spawn order. They come out of their camp.
 const PACKS := {
 	&"raptors": [&"raptor_big", &"raptor", &"raptor", &"raptor", &"raptor"],
@@ -85,9 +94,47 @@ const STAGES := {
 		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 3], [SHADOW_SUPER, 1]],
 		[[SHADOW_MELEE, 12], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 2]],
 	],
+	"5-1": [
+		[[SPIDERLING, 8], [SAPLING, 4]],
+		[[SPIDERLING, 8], [SAPLING, 6]],
+		[[SPIDERLING, 8], [SAPLING, 6], [MAIDEN, 1]],
+		[[SPIDERLING, 10], [SAPLING, 6], [BROODMOTHER, 1]],
+		[[SPIDERLING, 10], [SAPLING, 8], [MAIDEN, 1]],
+	],
+	"5-2": [
+		[[SPIDERLING, 8], [SAPLING, 6]],
+		[[SPIDERLING, 10], [SAPLING, 6], [MAIDEN, 1]],
+		[[SPIDERLING, 10], [SAPLING, 6], [BROODMOTHER, 1]],
+		[[SPIDERLING, 10], [SAPLING, 8], [MAIDEN, 1]],
+		[[SPIDERLING, 10], [SAPLING, 8], [MAIDEN, 1], [BROODMOTHER, 1], [MAOKAI, 1]],
+	],
+	"5-3": [
+		[[SPIDERLING, 10], [SAPLING, 6]],
+		[[SPIDERLING, 10], [SAPLING, 6], [MAIDEN, 1]],
+		[[SPIDERLING, 10], [SAPLING, 8], [BROODMOTHER, 1]],
+		[[SPIDERLING, 12], [SAPLING, 8], [MAIDEN, 1]],
+		[[SPIDERLING, 12], [SAPLING, 8], [BROODMOTHER, 1]],
+		[[SPIDERLING, 12], [SAPLING, 8], [MAIDEN, 1], [BROODMOTHER, 1]],
+	],
+	"5-4": [
+		[[SPIDERLING, 10], [SAPLING, 8], [MAIDEN, 1]],
+		[[SPIDERLING, 10], [SAPLING, 8], [BROODMOTHER, 1]],
+		[[SPIDERLING, 12], [SAPLING, 8], [MAIDEN, 1]],
+		[[SPIDERLING, 12], [SAPLING, 8], [BROODMOTHER, 2]],
+		[[SPIDERLING, 12], [SAPLING, 10], [MAIDEN, 1], [BROODMOTHER, 1]],
+		[[SPIDERLING, 12], [SAPLING, 10], [MAIDEN, 1], [BROODMOTHER, 1], [ELISE, 1]],
+	],
+	"5-5": [
+		[[SPIDERLING, 10], [SAPLING, 8], [MAIDEN, 1]],
+		[[SPIDERLING, 12], [SAPLING, 8], [BROODMOTHER, 1]],
+		[[SPIDERLING, 12], [SAPLING, 10], [MAIDEN, 1]],
+		[[SPIDERLING, 12], [SAPLING, 10], [MAIDEN, 1], [BROODMOTHER, 1]],
+		[[SPIDERLING, 14], [SAPLING, 10], [MAIDEN, 2]],
+		[[SPIDERLING, 14], [SAPLING, 10], [MAIDEN, 1], [BROODMOTHER, 2]],
+	],
 }
 ## Stage id -> the boss wave's enemy id.
-const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan", "3-5": &"elder_dragon", "4-3": &"dark_lucian"}
+const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan", "3-5": &"elder_dragon", "4-3": &"dark_lucian", "5-5": &"karthus"}
 ## Stage id -> enemy id -> its share of HP in that stage only. Act 1's stage
 ## is gentler: its melee and ranged minions have 20% less HP.
 const HP_SHARES := {"1-1": {MELEE: 0.8, RANGED: 0.8}}

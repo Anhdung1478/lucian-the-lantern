@@ -304,7 +304,10 @@ func test_next_stage_shows_only_when_it_can_be_played() -> void:
 	assert_true(last.result.next_button.visible, "4-1 has waves")
 	var act_4_end: Stage = await _stage(4, 3)
 	act_4_end.show_result(true)
-	assert_false(act_4_end.result.next_button.visible, "5-1 has no waves yet")
+	assert_true(act_4_end.result.next_button.visible, "5-1 has its waves")
+	var act_5_end: Stage = await _stage(5, 5)
+	act_5_end.show_result(true)
+	assert_false(act_5_end.result.next_button.visible, "6-1 has no waves yet")
 
 
 ## Phase 7: camps, splits, escapes, buffs on kill and mini bosses, with
@@ -684,3 +687,11 @@ func test_a_vanish_pays_nothing_shows_no_note_and_the_wave_still_ends() -> void:
 	assert_eq(_notes(stage).size(), notes, "no note")
 	assert_signal_not_emitted(stage, "enemy_died")
 	assert_engine_error_count(0)
+
+
+func test_5_2_pays_maokais_5_purple_on_the_kill() -> void:
+	var stage: Stage = await _stage(5, 2)
+	var data := load("res://data/enemies/maokai.tres") as EnemyData
+	stage.spawn_unit(data, stage.arena.spawn_points[0]).take_damage(_lethal())
+	assert_eq(stage.collected[Essences.PURPLE], 5)
+	assert_has(stage.reward_lines, "+5 purple essence (Maokai, first kill)")

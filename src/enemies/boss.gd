@@ -64,6 +64,13 @@ func _think(delta: float) -> void:
 	super(delta)
 
 
+## While it channels a skill that damage breaks (Soothing Mist, Requiem):
+## {"done": damage so far, "need": damage that breaks it}; else {}. The boss
+## bar draws the break bar from it.
+func channel() -> Dictionary:
+	return {}
+
+
 ## A skill's own condition (Comeuppance waits for 75% HP).
 func _can_use(_id: StringName) -> bool:
 	return true

@@ -92,6 +92,13 @@ func _attack() -> void:
 	fire_bolt(make_hit(), data.projectile_speed, attack_range + BOLT_OVERREACH).color = WATER
 
 
+## {} outside the mist; during it, the damage so far and what interrupts it.
+func channel() -> Dictionary:
+	if not is_channeling() or not is_alive():
+		return {}
+	return {"done": _mist_damage, "need": max_hp * MIST_BREAK}
+
+
 ## Only counts the channel's damage: the interrupt comes in _physics_process.
 func _lose_hp(amount: float) -> void:
 	if is_channeling():

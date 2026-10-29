@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <!-- Karthus: a robed lich seen from above in pale purple, a tattered hooded robe, a bare skull under the hood with glowing eyes, bony hands holding a tall skull-topped staff out front, facing forward (+X). -->
+  <g transform="translate(50 50)">
+    <ellipse cx="-3" cy="4" rx="42" ry="40" fill="#000000" opacity="0.25"/>
+    <!-- tattered robe trailing behind -->
+    <path d="M -8 -26 Q -30 -34 -44 -26 L -38 -16 L -46 -8 L -38 0 L -46 8 L -38 16 L -44 26 Q -30 34 -8 26 Z" fill="#6f5a9c" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -14 -20 Q -30 -22 -38 -14 M -14 20 Q -30 22 -38 14 M -16 0 L -40 0" stroke="#4a3a75" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <!-- shoulders -->
+    <ellipse cx="0" cy="0" rx="22" ry="29" fill="#8d77c4" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -6 -22 Q 6 0 -6 22" stroke="#5d4a92" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- the staff, held out front on the right -->
+    <path d="M -12 20 L 40 20" stroke="#1a1d24" stroke-width="7" stroke-linecap="round"/>
+    <path d="M -12 20 L 40 20" stroke="#cfc4e6" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- skull on the staff -->
+    <circle cx="40" cy="20" r="9" fill="#efe9f7" stroke="#1a1d24" stroke-width="2.5"/>
+    <path d="M 44 15 L 49 17 M 44 25 L 49 23" stroke="#1a1d24" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="42" cy="17" r="2" fill="#b57bff"/>
+    <circle cx="42" cy="23" r="2" fill="#b57bff"/>
+    <!-- bony arms and hands -->
+    <path d="M 8 -8 L 22 -14 L 30 -8 M 8 10 L 20 20 L 28 20" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M 8 -8 L 22 -14 L 30 -8 M 8 10 L 20 20 L 28 20" stroke="#efe9f7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- hood and skull -->
+    <circle cx="6" cy="0" r="16" fill="#5d4a92" stroke="#1a1d24" stroke-width="3"/>
+    <ellipse cx="11" cy="0" rx="9" ry="8" fill="#efe9f7" stroke="#1a1d24" stroke-width="2"/>
+    <path d="M 14 -5 L 19 -3 M 14 5 L 19 3" stroke="#1a1d24" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="13" cy="-4" r="2.2" fill="#b57bff"/>
+    <circle cx="13" cy="4" r="2.2" fill="#b57bff"/>
+    <!-- pale glow of the soul fire -->
+    <circle cx="13" cy="-4" r="3.6" fill="#d8b8ff" opacity="0.35"/>
+    <circle cx="13" cy="4" r="3.6" fill="#d8b8ff" opacity="0.35"/>
+  </g>
+</svg>
