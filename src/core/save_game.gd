@@ -11,6 +11,9 @@ const VERSION := 1
 const SLOTS := 3
 const DEFAULT_PREFIX := "user://save_slot_"
 const CLASSIC := &"classic"
+## The skill Senna teaches in Act 1: its first level is in the tree once Act 1
+## is cleared.
+const ACT_1_SKILL := &"skill_e"
 
 static var _instance: SaveGame
 
@@ -85,7 +88,7 @@ func copy_to(of_slot: int) -> bool:
 func finish_stage(result: StringName, stage_id := "") -> bool:
 	if result == &"cleared" and stage_id != "" and not stage_id in cleared:
 		cleared.append(stage_id)
-		tree.acts_cleared = Journey.acts_cleared(cleared)
+		_update_acts_cleared()
 		changed.emit()
 	return save()
 
@@ -175,8 +178,18 @@ func set_cleared(ids: Array[String]) -> void:
 	for id in ids:
 		if Journey.is_stage_id(id) and not id in cleared:
 			cleared.append(id)
-	tree.acts_cleared = Journey.acts_cleared(cleared)
+	_update_acts_cleared()
 	changed.emit()
+
+
+## Keeps the tree's acts cleared in step. When Act 1 becomes cleared, Lucian
+## knows E (Senna taught him): its first level is put in the tree, free. A
+## tree reset takes it back like any level, and it is free to buy again.
+func _update_acts_cleared() -> void:
+	var before := tree.acts_cleared
+	tree.acts_cleared = Journey.acts_cleared(cleared)
+	if before < 1 and tree.acts_cleared >= 1 and tree.level(ACT_1_SKILL) == 0:
+		tree.buy(ACT_1_SKILL, essences)
 
 
 ## Puts spell `id` on D (0) or F (1); if it was on the other key, they swap.

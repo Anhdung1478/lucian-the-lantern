@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://src/core/skin_data.gd" id="1_data"]
 [ext_resource type="Texture2D" path="res://assets/art/lucian/lucian_portrait.svg" id="2_portrait"]
 [ext_resource type="Texture2D" path="res://assets/art/lucian/lucian_body.svg" id="3_body"]
+[ext_resource type="Texture2D" path="res://assets/art/lucian/lucian_body_one_gun.svg" id="4_one_gun"]
 
 [resource]
 script = ExtResource("1_data")
@@ -11,4 +12,5 @@ display_name = "Classic"
 cost = 0
 portrait = ExtResource("2_portrait")
 body = ExtResource("3_body")
+one_gun_body = ExtResource("4_one_gun")
 playstyle = "Balanced"

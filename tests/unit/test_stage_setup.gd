@@ -17,6 +17,8 @@ func test_a_new_save_gives_almost_nothing() -> void:
 func test_bought_nodes_reach_the_setup() -> void:
 	var save := SaveGame.new("user://test_setup_")
 	save.essences.from_dict({"blue": 99999, "orange": 999, "purple": 0})
+	# Q opens with Act 1 (E's first level is not given here: only clearing Act 1 does that).
+	save.tree.acts_cleared = 1
 	for id in [&"skill_q", &"skill_q", &"stat_ad", &"stat_ad", &"equip_slots", &"merchant_stock", &"refresh_cost", &"flash", &"heal", &"summoner_slot_2", &"heal_upgrade"]:
 		assert_true(save.tree.buy(id, save.essences), String(id))
 	save.set_loadout(0, &"flash")

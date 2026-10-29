@@ -11,6 +11,8 @@ const BORDER_COLOR := Color(0.79, 0.64, 0.36)
 const NAME_COLOR := Color("ffe9a8")
 const SUB_COLOR := Color("9aa3b2")
 const UPGRADE_COLOR := "7fd67f"
+## A locked skill's note ("Locked: clear Act 1 to unlock it…").
+const LOCKED_COLOR := "ff6a5a"
 const KIND_NAMES := {ItemData.Kind.FRAGMENT: "Fragment", ItemData.Kind.LEGENDARY: "Legendary", ItemData.Kind.POTION: "Potion"}
 
 
@@ -70,6 +72,9 @@ static func skill(lucian: Lucian, shown: LucianSkill, icon_texture: Texture2D, k
 	var rank := shown.rank()
 	var rank_text := TooltipText.color("Rank %d/%d" % [rank, data.max_rank], TooltipText.TEXT if rank > 0 else TooltipText.DIM)
 	var card := _card(icon, data.display_name, "[%s]" % key, rank_text)
+	var locked := lucian.skill_lock_note(shown.slot)
+	if locked != "":
+		_body(card, TooltipText.color(locked, LOCKED_COLOR))
 	var costs: PackedStringArray = []
 	if data.mana_cost.any(func(value: float) -> bool: return value > 0.0):
 		costs.append(TooltipText.color("Cost: ", TooltipText.DIM) + TooltipText.ranked(data.mana_cost, rank) + TooltipText.colorize(" [mana]Mana[/mana]"))

@@ -12,7 +12,7 @@ const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots"
 ## (so Act 1 is its first play, the tutorial).
 const ACT_SCENARIOS := {
 	"act1_start": [1, 1], "act1_wave": [1, 1], "act1_shell": [1, 1], "act1_break": [1, 1],
-	"act1_thresh": [1, 1], "act1_cutscene": [1, 1], "act1_result": [1, 1],
+	"act1_lesson": [1, 1], "act1_thresh": [1, 1], "act1_cutscene": [1, 1], "act1_result": [1, 1],
 	"act2_pillars": [2, 3], "act2_super": [2, 1], "akshan_e": [2, 3], "akshan_r": [2, 3],
 	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
 }
@@ -163,6 +163,8 @@ func _run(scenario: String) -> void:
 			await scenario_act1_shell()
 		"act1_break":
 			await scenario_act1_break()
+		"act1_lesson":
+			await scenario_act1_lesson()
 		"act1_thresh":
 			await scenario_act1_thresh()
 		"act1_cutscene":
@@ -1565,7 +1567,8 @@ func kill_all() -> void:
 
 ## Skip (the HUD button) starts the next wave; once all of it has spawned,
 ## Kill all ends it. The tips so far go first, so the break's tip shows.
-func clear_wave() -> void:
+## Senna's lesson (the tutorial's first break) is skipped unless `keep_lesson`.
+func clear_wave(keep_lesson := false) -> void:
 	var game := game_stage()
 	game.skip_break()
 	while game.runner.alive() > get_nodes_in_group(&"enemies").size():
@@ -1573,6 +1576,9 @@ func clear_wave() -> void:
 	flush_tips()
 	kill_all()
 	await wait(0.2)
+	if game.cutscene is SennaTeachesE and not keep_lesson:
+		game.cutscene.skip()
+		await wait(0.1)
 
 
 func info_text() -> String:
@@ -1675,6 +1681,38 @@ func scenario_act1_break() -> void:
 	print("merchant on the map (expect true): ", is_instance_valid(game.merchant),
 		"  gold: ", game.wallet.gold, "  blue collected: ", game.collected[Essences.BLUE])
 	await shot("act1_break_0")
+
+
+## Wave 1 cleared: Senna's lesson. Her first line, her dash with its trail,
+## the last caption, then E learned with its tip.
+func scenario_act1_lesson() -> void:
+	var game := game_stage()
+	var e := ChampionProgress.Slot.E
+	# Up the lane from the map's corner, so the scene has room around them.
+	blink(map_lane().center() - map_lane().along() * 900.0)
+	await clear_wave(true)
+	var lesson := game.cutscene
+	print("lesson playing (expect true): ", lesson is SennaTeachesE, "  E rank (expect 0): ", lucian.progress.ranks[e],
+		"  one gun (expect true): ", lucian.one_gun)
+	var countdown := game.runner.countdown()
+	await wait(1.4)
+	await shot("act1_lesson_0_caption")
+	# Each caption ends early, as a click or Space does in play.
+	lesson._end_step()
+	await wait(0.12)
+	await shot("act1_lesson_1_dash")
+	# Out and back (0.18 + 0.35 + 0.18 s), then her second line.
+	await wait(0.8)
+	lesson._end_step()
+	await wait(0.4)
+	await shot("act1_lesson_2_learned")
+	print("break countdown waited (expect true): ", is_equal_approx(game.runner.countdown(), countdown))
+	# The first kill's tip; in real play it is long gone by the break.
+	flush_tips()
+	lesson._end_step()
+	await wait(0.6)
+	print("E rank (expect 1): ", lucian.progress.ranks[e], "  tip (expect E to dash…): ", game.hud.tips.label.text)
+	await shot("act1_lesson_3_after")
 
 
 ## Both waves cleared, then the boss wave: Thresh rises from the river.

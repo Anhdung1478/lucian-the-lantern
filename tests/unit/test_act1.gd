@@ -206,7 +206,10 @@ func test_skip_takes_senna_and_thresh_away_with_the_rewards() -> void:
 	assert_eq(stage.collected[Essences.BLUE], KillRewards.BOSS_BLUE)
 	assert_eq(stage.collected[Essences.ORANGE], KillRewards.BOSS_ORANGE)
 	assert_has(stage.reward_lines, "Lucian takes Senna's gun: two guns from now on")
-	assert_has(stage.reward_lines, "E – Relentless Pursuit is free in the Evolution Tree")
+	assert_has(stage.reward_lines, "E – Relentless Pursuit: level 1 in the Evolution Tree")
+	assert_has(stage.reward_lines, "Q – Piercing Light and W – Ardent Blaze can now be bought in the Evolution Tree")
+	assert_false(stage.lucian.one_gun, "Senna's gun is his after a skip too")
+	assert_eq(stage.lucian.visuals.body_texture(), Skins.find(&"classic").body)
 
 
 func test_after_the_cutscene_every_wave_counts_as_cleared() -> void:
@@ -218,6 +221,9 @@ func test_after_the_cutscene_every_wave_counts_as_cleared() -> void:
 		for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
 			enemy.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
 		await wait_physics_frames(1)
+		# The first break brings Senna's lesson.
+		if stage.cutscene:
+			stage.cutscene.skip()
 	stage.skip_break()
 	stage.runner.tick(0.1)
 	await wait_physics_frames(1)
@@ -294,3 +300,101 @@ func test_no_cutscene_or_boss_purple_after_a_defeat() -> void:
 	await wait_process_frames(2)
 	assert_null(stage.cutscene)
 	assert_true(SaveGame.instance().bosses.is_empty())
+
+
+## Act 1 up to its next break: the wave spawned and killed.
+func _to_next_break(stage: Stage) -> void:
+	stage.skip_break()
+	for i in 20:
+		stage.runner.tick(WaveRunner.GROUP_GAP)
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		enemy.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	await wait_physics_frames(2)
+
+
+func test_senna_teaches_e_at_the_first_break() -> void:
+	var stage: Stage = await _act1_stage()
+	var e := ChampionProgress.Slot.E
+	assert_eq(stage.lucian.progress.ranks[e], 0)
+	assert_string_contains(stage.lucian.skill_lock_note(e), "Senna teaches it")
+	await _to_next_break(stage)
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK)
+	assert_is(stage.cutscene, SennaTeachesE)
+	stage.cutscene.skip_button.pressed.emit()
+	assert_null(stage.cutscene)
+	assert_eq(stage.lucian.progress.ranks[e], 1)
+	assert_eq(stage.lucian.skill_lock_note(e), "")
+	assert_true(stage.lucian.can_cast(e))
+
+
+func test_the_break_countdown_waits_for_the_lesson() -> void:
+	var stage: Stage = await _act1_stage()
+	await _to_next_break(stage)
+	var left := stage.runner.countdown()
+	await wait_physics_frames(20)
+	assert_eq(stage.runner.countdown(), left)
+	stage.cutscene.skip()
+	await wait_physics_frames(10)
+	assert_lt(stage.runner.countdown(), left)
+
+
+func test_the_lesson_comes_once() -> void:
+	var stage: Stage = await _act1_stage()
+	await _to_next_break(stage)
+	stage.cutscene.skip()
+	await _to_next_break(stage)
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK)
+	assert_null(stage.cutscene)
+
+
+func test_the_lesson_plays_to_its_end() -> void:
+	var stage: Stage = await _act1_stage()
+	await _to_next_break(stage)
+	var lesson := stage.cutscene
+	Engine.time_scale = 20.0
+	var give_up := Time.get_ticks_msec() + 5000
+	while is_instance_valid(lesson) and Time.get_ticks_msec() < give_up:
+		await wait_process_frames(1)
+	Engine.time_scale = 1.0
+	assert_false(is_instance_valid(lesson))
+	assert_eq(stage.lucian.progress.ranks[ChampionProgress.Slot.E], 1)
+	assert_true(stage.hud.visible)
+
+
+func test_a_replay_has_no_lesson() -> void:
+	SaveGame.instance().set_cleared(["1-1"] as Array[String])
+	var stage: Stage = await _act1_stage()
+	await _to_next_break(stage)
+	assert_null(stage.cutscene)
+
+
+func test_the_tutorial_lucian_has_one_gun() -> void:
+	var stage: Stage = await _act1_stage()
+	assert_eq(stage.lucian.visuals.body_texture(), Skins.find(&"classic").one_gun_body)
+
+
+func test_a_replay_shows_both_guns() -> void:
+	SaveGame.instance().set_cleared(["1-1"] as Array[String])
+	var stage: Stage = await _act1_stage()
+	assert_eq(stage.lucian.visuals.body_texture(), Skins.find(&"classic").body)
+
+
+func test_the_tutorial_says_why_q_w_and_r_are_locked() -> void:
+	var stage: Stage = await _act1_stage()
+	var here := stage.lucian
+	assert_string_contains(here.skill_lock_note(ChampionProgress.Slot.Q), "clear Act 1")
+	assert_string_contains(here.skill_lock_note(ChampionProgress.Slot.W), "clear Act 1")
+	assert_string_contains(here.skill_lock_note(ChampionProgress.Slot.R), "buy it in the Evolution Tree")
+	var card := TooltipCard.skill(here, here.skills[ChampionProgress.Slot.Q], null, "Q")
+	assert_string_contains(_all_text(card), "clear Act 1 to unlock it")
+	card.free()
+
+
+## Every Label's and RichTextLabel's text under `node`.
+func _all_text(node: Node) -> String:
+	var text := ""
+	if node is Label or node is RichTextLabel:
+		text += node.text + "\n"
+	for child in node.get_children():
+		text += _all_text(child)
+	return text

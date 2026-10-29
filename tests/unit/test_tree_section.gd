@@ -84,12 +84,21 @@ func _texts(node: Node) -> PackedStringArray:
 	return out
 
 
-func test_a_new_save_shows_q_poor_and_passive_and_e_hidden() -> void:
+func test_a_new_save_hides_q_w_e_and_the_passive() -> void:
 	assert_eq(section.map.views.size(), 31)
-	assert_eq(_state(&"skill_q"), &"poor")
-	assert_eq(_state(&"passive"), &"hidden")
-	assert_eq(_state(&"skill_e"), &"hidden")
+	for id in [&"skill_q", &"skill_w", &"skill_e", &"passive"]:
+		assert_eq(_state(id), &"hidden", str(id))
+	assert_eq(_state(&"stat_ad"), &"poor")
 	assert_false(section.info.visible)
+
+
+func test_clearing_act_1_opens_q_and_w_and_puts_e_at_level_1() -> void:
+	_save().set_cleared(Journey.all_stage_ids(1))
+	assert_eq(_state(&"skill_q"), &"poor")
+	assert_eq(_state(&"skill_w"), &"poor")
+	assert_eq(_save().tree.level(&"skill_e"), 1)
+	assert_eq(_state(&"skill_e"), &"bought")
+	assert_eq(_save().essences.amount(Essences.BLUE), 0, "E's first level is free")
 
 
 func test_nodes_sit_on_their_grid_cells() -> void:
@@ -101,8 +110,9 @@ func test_nodes_sit_on_their_grid_cells() -> void:
 func test_the_badge_reads_the_level_and_hidden_nodes_have_none() -> void:
 	_buy(&"stat_ad", 2)
 	assert_eq(section.map.views[&"stat_ad"].badge.text, "2/5")
-	assert_eq(section.map.views[&"skill_q"].badge.text, "0/5")
+	assert_eq(section.map.views[&"stat_ap"].badge.text, "0/5")
 	assert_false(section.map.views[&"passive"].badge.visible)
+	assert_false(section.map.views[&"skill_q"].badge.visible, "hidden until Act 1 is cleared")
 
 
 func test_a_node_with_a_level_is_never_hidden() -> void:
@@ -115,6 +125,7 @@ func test_a_node_with_a_level_is_never_hidden() -> void:
 
 
 func test_buying_q_with_the_cost_bar() -> void:
+	_save().tree.acts_cleared = 1
 	_save().essences.add(Essences.BLUE, 1000)
 	assert_eq(_state(&"skill_q"), &"open")
 	section.select(&"skill_q")
@@ -128,6 +139,7 @@ func test_buying_q_with_the_cost_bar() -> void:
 
 
 func test_five_buys_max_q_and_the_bar_reads_maxed() -> void:
+	_save().tree.acts_cleared = 1
 	_save().essences.add(Essences.BLUE, 5000)
 	_save().essences.add(Essences.ORANGE, 50)
 	section.select(&"skill_q")
@@ -204,6 +216,8 @@ func test_a_hidden_node_reads_unknown_locked_and_its_requirements() -> void:
 	assert_eq(section.info.cost_bar.status.text, "LOCKED")
 	assert_true(section.info.cost_bar.disabled)
 	section.select(&"skill_q")
+	assert_eq(section.info.requires_label.text, "Requires: Clear Act 1")
+	section.select(&"stat_ad")
 	assert_false(section.info.requires_label.visible)
 
 
@@ -319,6 +333,7 @@ func test_reset_is_disabled_until_something_is_bought_and_purple_is_enough() -> 
 
 
 func test_reset_asks_first_and_yes_refunds_every_node() -> void:
+	_save().tree.acts_cleared = 1
 	var essences := _save().essences
 	essences.add(Essences.BLUE, 1000)
 	essences.add(Essences.PURPLE, 5)
@@ -350,6 +365,7 @@ func test_reset_no_keeps_the_tree() -> void:
 
 
 func test_buying_and_resetting_write_no_file() -> void:
+	_save().tree.acts_cleared = 1
 	_save().essences.add(Essences.BLUE, 1000)
 	_save().essences.add(Essences.PURPLE, 5)
 	section.select(&"skill_q")

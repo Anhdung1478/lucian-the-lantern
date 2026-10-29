@@ -350,3 +350,26 @@ func test_play_time_text() -> void:
 	assert_eq(SaveGame.play_time_text(5025), "1h 23m")
 	assert_eq(SaveGame.play_time_text(59), "0m")
 	assert_eq(SaveGame.play_time_text(600), "10m")
+
+
+func test_clearing_act_1_puts_e_at_level_1_for_free() -> void:
+	save_game.finish_stage(&"cleared", "1-1")
+	assert_eq(save_game.tree.level(&"skill_e"), 1)
+	assert_eq(save_game.essences.amount(Essences.BLUE), 0)
+
+
+func test_e_is_given_only_when_act_1_becomes_cleared() -> void:
+	save_game.finish_stage(&"cleared", "1-1")
+	save_game.tree.clear()
+	save_game.finish_stage(&"cleared", "2-1")
+	assert_eq(save_game.tree.level(&"skill_e"), 0, "after a tree reset it is free to buy again, not given")
+
+
+func test_losing_act_1_gives_nothing() -> void:
+	save_game.finish_stage(&"failed", "1-1")
+	assert_eq(save_game.tree.level(&"skill_e"), 0)
+
+
+func test_debug_acts_cleared_gives_e_too() -> void:
+	save_game.set_cleared(Journey.all_stage_ids(1))
+	assert_eq(save_game.tree.level(&"skill_e"), 1)

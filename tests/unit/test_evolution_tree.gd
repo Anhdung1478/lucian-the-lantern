@@ -12,13 +12,24 @@ func before_each() -> void:
 
 
 func test_buying_spends_and_levels_up() -> void:
+	tree.acts_cleared = 1
 	assert_true(tree.buy(&"skill_q", essences))
 	assert_eq(tree.level(&"skill_q"), 1)
 	assert_eq(essences.amount(Essences.BLUE), 10000 - 100)
 	assert_eq(tree.cost(&"skill_q"), Vector2i(200, 0))
 
 
+func test_q_and_w_open_once_act_1_is_cleared() -> void:
+	assert_false(tree.is_open(&"skill_q"))
+	assert_false(tree.is_open(&"skill_w"))
+	assert_false(tree.buy(&"skill_q", essences))
+	tree.acts_cleared = 1
+	assert_true(tree.is_open(&"skill_q"))
+	assert_true(tree.is_open(&"skill_w"))
+
+
 func test_passive_needs_any_one_basic_skill() -> void:
+	tree.acts_cleared = 1
 	assert_false(tree.is_open(&"passive"))
 	tree.buy(&"skill_w", essences)
 	assert_true(tree.is_open(&"passive"))

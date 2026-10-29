@@ -99,9 +99,9 @@ Clicking a node opens a panel (bottom-right, like the reference):
 
 | Grove | Node (id) | Grid | Levels | Requires |
 |---|---|---|---|---|
-| Skills | Q – Piercing Light (`skill_q`) | (1, 0) | 5 | — |
-| Skills | W – Ardent Blaze (`skill_w`) | (2, 0) | 5 | — |
-| Skills | E – Relentless Pursuit (`skill_e`) | (3, 0) | 5 | Clear Act 1 |
+| Skills | Q – Piercing Light (`skill_q`) | (1, 0) | 5 | Clear Act 1 |
+| Skills | W – Ardent Blaze (`skill_w`) | (2, 0) | 5 | Clear Act 1 |
+| Skills | E – Relentless Pursuit (`skill_e`) | (3, 0) | 5 | Clear Act 1 (level 1 given then) |
 | Skills | Passive – Lightslinger (`passive`) | (0, 1.5) | 1 | Any 1 of Q, W, E |
 | Skills | R – The Culling (`skill_r`) | (2, 2) | 3 | Q, W, E and the passive |
 | Stats | Attack Damage, Ability Power, Health, Armor, Magic Resist, Attack Speed, Mana (`stat_ad` … `stat_mana`) | (5, 0) … (11, 0) | 5 each | — |

@@ -12,6 +12,9 @@ extends Resource
 @export var portrait: Texture2D
 ## Lucian's top-down body sprite.
 @export var body: Texture2D
+## The body with one gun, for Act 1's tutorial (before he takes up Senna's
+## gun). Skins without one show `body`.
+@export var one_gun_body: Texture2D
 ## Card lines shown in green.
 @export var bonuses := PackedStringArray()
 ## Card lines shown in red.

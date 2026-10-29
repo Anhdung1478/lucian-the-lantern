@@ -14,5 +14,6 @@ grid = Vector2(2, 0)
 max_level = 5
 blue = Array[int]([100, 200, 350, 500, 800])
 orange = Array[int]([0, 0, 0, 5, 10])
+requires_act = 1
 per_level = 1.0
 format = "Rank {v}"

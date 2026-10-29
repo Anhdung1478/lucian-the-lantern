@@ -118,7 +118,9 @@ func _play() -> void:
 	await move(lucian, kneel, WALK_TIME)
 	if skipped:
 		return
-	await caption("", "Lucian takes up Senna's gun. Relentless Pursuit (E) is now free in the Evolution Tree.")
+	# Her gun in his other hand: two guns from now on.
+	lucian.one_gun = false
+	await caption("", "Lucian takes up Senna's gun.")
 
 
 func _draw_soul(soul: Node2D) -> void:

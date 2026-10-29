@@ -79,8 +79,15 @@ var barrier: float:
 var dead := false
 ## Cutscenes and the debug God mode: every hit is refused.
 var invulnerable := false
-## Act 1's first play: every shot leaves the left gun.
-var one_gun := false
+## Act 1's first play, until he takes up Senna's gun: every shot leaves the
+## left gun, and his body shows one gun.
+var one_gun := false:
+	set(value):
+		one_gun = value
+		if is_node_ready():
+			_show_body()
+## Act 1's first play: the HUD says why Q, W and E are locked.
+var tutorial := false
 ## Where spawned shots go. Set by the stage.
 var projectile_parent: Node
 ## Debug: values >= 0 replace Lucian's crit chance.
@@ -348,6 +355,7 @@ func apply_setup(setup: StageSetup) -> void:
 	summoners.open_slots = setup.summoner_slots
 	summoners.upgrades = setup.summoner_upgrades.duplicate()
 	tree_bonus = setup.stat_bonus.duplicate()
+	tutorial = setup.tutorial
 	one_gun = setup.tutorial
 	apply_skin(setup.skin)
 	hp = stats.max_hp
@@ -357,8 +365,36 @@ func apply_setup(setup: StageSetup) -> void:
 ## Wears `new_skin`: its body art and stats. Keeps the HP and mana share.
 func apply_skin(new_skin: SkinData) -> void:
 	skin = new_skin
-	($Visuals/Body as Sprite2D).texture = skin.body
+	_show_body()
 	_refresh_stats(true)
+
+
+## Learns rank 1 of `slot` in the middle of a stage (Senna teaches E in Act 1's
+## tutorial): the rank counts as bought and takes a skill point if one is free.
+func teach_skill(slot: ChampionProgress.Slot) -> void:
+	progress.bought[slot] = maxi(progress.bought[slot], 1)
+	if progress.ranks[slot] == 0:
+		progress.rank_up(slot)
+
+
+## Why the skill on `slot` can't be ranked yet, for its HUD card; "" once a
+## rank of it is bought.
+func skill_lock_note(slot: ChampionProgress.Slot) -> String:
+	if progress.bought[slot] > 0:
+		return ""
+	if tutorial:
+		match slot:
+			ChampionProgress.Slot.Q, ChampionProgress.Slot.W:
+				return "Locked: clear Act 1 to unlock it in the Evolution Tree."
+			ChampionProgress.Slot.E:
+				return "Locked: Senna teaches it at the first break."
+	return "Locked: buy it in the Evolution Tree."
+
+
+## The skin's body, or its one-gun body while Lucian has only his own gun.
+func _show_body() -> void:
+	var body := skin.one_gun_body if one_gun and skin.one_gun_body else skin.body
+	($Visuals/Body as Sprite2D).texture = body
 
 
 ## Drinks the potion in inventory cell `index`. False when there is none.

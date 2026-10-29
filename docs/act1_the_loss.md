@@ -9,14 +9,14 @@
 | **Stages** | 1 |
 | **Waves** | 2 waves + boss wave |
 | **Map** | Mid lane (Summoner's Rift style, no turrets) |
-| **Lucian** | Only **one gun**, auto attacks only (no skills yet) |
-| **Teaches** | Moving, attacking, attack-move, dodging warnings |
+| **Lucian** | Only **one gun**, auto attacks only; Senna teaches him **E** at the first break |
+| **Teaches** | Moving, attacking, attack-move, dashing, dodging warnings |
 
 ## Story
 
-Lucian and Senna fight minion waves together. Thresh appears and attacks. When Thresh reaches 50% HP, a cutscene plays: he kills Senna and traps her soul in his lantern. Lucian takes Senna's gun and learns **E (Relentless Pursuit)** from her.
+Lucian and Senna fight minion waves together. At the first break, Senna teaches him **E (Relentless Pursuit)**. Thresh appears and attacks. When Thresh reaches 50% HP, a cutscene plays: he kills Senna and traps her soul in his lantern. Lucian takes up Senna's gun.
 
-**Rewards:** Senna's gun (second gun), **E rank 1** for free, first-time purple essence.
+**Rewards:** Senna's gun (second gun), **E level 1** in the Evolution Tree, **Q and W** open in the Evolution Tree, first-time purple essence.
 
 ## Waves (placeholder)
 
@@ -101,9 +101,11 @@ Numbers at wave 1 (`data/enemies/*.tres`). Each later wave adds **+15% HP and da
 
 ### The tutorial (first play)
 Until 1-1 is cleared, Act 1 is the tutorial:
-- Lucian fires **one gun**: every shot leaves the left one.
-- **No skill ranks, no passive, no summoner spells.** Items, tree stats, equip slots and the skin still apply.
+- Lucian has **one gun**: his body shows only the left pistol (`lucian_body_one_gun.svg`), and every shot leaves it. He shows both guns once he takes up Senna's, in the cutscene.
+- **No skill ranks, no passive, no summoner spells** at the start. Items, tree stats, equip slots and the skin still apply.
+- **Q and W are locked** until Act 1 is cleared. Hovering their HUD slots says "Locked: clear Act 1 to unlock it in the Evolution Tree."
 - **Senna** fights beside him.
+- **Senna teaches E at the first break** (before wave 2), in a short scene: the black bars close in, she dashes to the side and back, and says "Dash, then shoot." Lucian learns E at rank 1 for the rest of the stage. The break's countdown waits for the scene; Skip ends it, and he still learns E. Then the tip "E to dash toward the cursor. Your next shot is ready when you land." shows.
 - **Tips** show under the boss bar, one at a time, 7 s each (only while the game runs). Each shows once; later ones wait their turn. The keys follow the bindings.
 - **Losing it is a game over:** the result panel reads **GAME OVER** and its button **Back to title** returns to the title screen. The essences collected are still saved. Once 1-1 is cleared, losing it is a plain DEFEATED that goes back to the main screen.
 
@@ -113,7 +115,8 @@ Until 1-1 is cleared, Act 1 is the tutorial:
 | "LMB on an enemy to attack it." | The first enemy spawns |
 | "A red circle marks where a shell will land. Step out of it!" | The first siege minion spawns |
 | "Hold A and press LMB to attack the nearest enemy." | The first kill |
-| "RMB on the merchant to buy items with your gold." | The first break |
+| "E to dash toward the cursor. Your next shot is ready when you land." | Senna's lesson ends (the first break) |
+| "RMB on the merchant to buy items with your gold." | The first break, after the lesson |
 | "Thresh's hook flies along the red line. Move sideways!" | The boss wave starts |
 
 ### Senna
@@ -147,10 +150,11 @@ His skill hits count as skills, so Banshee's Veil blocks one (the hook's pull to
 5. Her soul rises and flies into his lantern, which glows green. Thresh: "Your light is mine now."
 6. He sinks into the river, in a widening ring.
 7. The camera goes back to Lucian. He walks to where she fell, and her body fades.
-8. "Lucian takes up Senna's gun. Relentless Pursuit (E) is now free in the Evolution Tree."
+8. He picks up her gun (his body now shows two guns): "Lucian takes up Senna's gun."
 
-- A caption stays 3.5 s. Space or a left-click moves on. **Skip** (top right) ends the scene at once.
-- Then **STAGE CLEARED**, with "Lucian takes Senna's gun: two guns from now on", "E – Relentless Pursuit is free in the Evolution Tree", "+10 purple essence (first clear)" and "Act 2 is open". Thresh's blue and orange rise where he sank.
+- A caption stays 3.5 s. Space or a left-click moves on. **Skip** (top right) ends the scene at once; he still gets her gun.
+- Then **STAGE CLEARED**, with "Lucian takes Senna's gun: two guns from now on", "E – Relentless Pursuit: level 1 in the Evolution Tree", "Q – Piercing Light and W – Ardent Blaze can now be bought in the Evolution Tree", "+10 purple essence (first clear)" and "Act 2 is open". Thresh's blue and orange rise where he sank.
+- The save then has E at level 1 in the Evolution Tree (free, nothing to buy), and Q and W open there.
 - If Lucian dies first, it is GAME OVER: no cutscene and no purple.
 
 ### Replay

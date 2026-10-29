@@ -31,8 +31,15 @@ const TIPS := {
 	&"attack_move": ["Hold %s and press %s to attack the nearest enemy.", [&"attack_move", &"attack"]],
 	&"siege": ["A red circle marks where a shell will land. Step out of it!", []],
 	&"merchant": ["%s on the merchant to buy items with your gold.", [&"move"]],
+	&"dash": ["%s to dash toward the cursor. Your next shot is ready when you land.", [&"skill_e"]],
 	&"hook": ["Thresh's hook flies along the red line. Move sideways!", []],
 }
+## Act 1's reward lines on its first clear.
+const ACT_1_REWARDS: Array[String] = [
+	"Lucian takes Senna's gun: two guns from now on",
+	"E – Relentless Pursuit: level 1 in the Evolution Tree",
+	"Q – Piercing Light and W – Ardent Blaze can now be bought in the Evolution Tree",
+]
 
 var wallet := Wallet.new()
 ## The merchant on the map, or null.
@@ -60,10 +67,12 @@ var elapsed := 0.0
 var senna: Senna
 ## The boss of the boss wave, once spawned.
 var boss_unit: EnemyUnit
-## The scene playing, or null.
+## The scene playing, or null. The wave countdown waits while one plays.
 var cutscene: Cutscene
 
 var _next_spawn := 0
+## Act 1's first play: Senna has taught E (at the first break).
+var _taught_e := false
 
 @onready var arena: StageMap = $Arena
 @onready var lucian: Lucian = $World/Lucian
@@ -131,7 +140,7 @@ func _process(delta: float) -> void:
 	if result.visible:
 		return
 	elapsed += delta
-	if runner and not lucian.dead:
+	if runner and not lucian.dead and cutscene == null:
 		runner.tick(delta)
 
 
@@ -350,14 +359,35 @@ func _new_unit(data: EnemyData) -> EnemyUnit:
 	return Minion.new()
 
 
-## Act 1's first play: Senna fights too, and a tip comes with each new thing.
+## Act 1's first play: Senna fights too, teaches E at the first break, and a
+## tip comes with each new thing.
 func _start_tutorial() -> void:
 	_add_senna()
 	_tip(&"move")
 	runner.spawn_requested.connect(_on_tutorial_spawn)
 	enemy_died.connect(func(_enemy: EnemyUnit) -> void: _tip(&"attack_move"))
-	runner.break_started.connect(func(_seconds: float) -> void: _tip(&"merchant"))
+	## Deferred: a shot's physics callback can end the wave, and the lesson's freeze can't disable bodies mid-flush.
+	runner.break_started.connect(_on_tutorial_break, CONNECT_DEFERRED)
 	runner.boss_wave_started.connect(func(_boss: StringName) -> void: _tip(&"hook"))
+
+
+## The first break: Senna teaches E in a short scene (the countdown waits),
+## then the dash and merchant tips. Later breaks only bring the merchant tip.
+func _on_tutorial_break(_seconds: float) -> void:
+	if _taught_e or lucian.dead or result.visible:
+		_tip(&"merchant")
+		return
+	_taught_e = true
+	cutscene = SennaTeachesE.new()
+	cutscene.done.connect(_on_lesson_done)
+	cutscene.start(self)
+
+
+func _on_lesson_done() -> void:
+	cutscene = null
+	lucian.teach_skill(ChampionProgress.Slot.E)
+	_tip(&"dash")
+	_tip(&"merchant")
 
 
 func _on_tutorial_spawn(id: StringName, _wave: int) -> void:
@@ -399,8 +429,9 @@ func _on_thresh_phase_ended() -> void:
 func _on_cutscene_done() -> void:
 	var reward := KillRewards.roll(boss_unit.data, run.act, run, rng)
 	add_essences(reward.blue, reward.orange, 0, boss_unit.global_position)
-	reward_lines.append("Lucian takes Senna's gun: two guns from now on")
-	reward_lines.append("E – Relentless Pursuit is free in the Evolution Tree")
+	reward_lines.append_array(ACT_1_REWARDS)
+	# He has her gun now (the scene gives it to him; a skip still does).
+	lucian.one_gun = false
 	# Out of "enemies" now, so the radar and the boss bar drop him at once.
 	boss_unit.remove_from_group(&"enemies")
 	for node: Node2D in [boss_unit, senna]:

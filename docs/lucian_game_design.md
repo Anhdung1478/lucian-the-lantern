@@ -165,8 +165,10 @@ Acts 1 and 2 play this way. Training keeps its dummies and has no waves.
 | **R – The Culling** | Fires a stream of bullets in one direction while Lucian can move. |
 
 **Story start:**
-- In Act 1, Lucian has **only one gun**.
-- After Senna is killed, Lucian takes her gun and **learns E** from her. **E rank 1 is given for free** after Act 1.
+- In Act 1, Lucian has **only one gun** (his body art shows one pistol).
+- At Act 1's first break, Senna **teaches him E**: he can use it (rank 1) for the rest of the stage.
+- After Senna is killed, Lucian takes up her gun (two guns from then on).
+- Clearing Act 1 puts **E at level 1** in the Evolution Tree for free, and opens **Q and W** there. Until then Q and W are locked.
 
 **How skills work:**
 - Skill ranks must first be **bought in the Evolution Tree**.
@@ -418,14 +420,14 @@ A node opens once **all of its requirements** are bought (or any 1 / any 2 of th
 **Nodes have levels** (built in Phase 5; 31 nodes, laid out in `main_screen.md`):
 - Q, W and E are one node each with 5 levels, R one node with 3. Equip slots are one node with 5 levels (slots 2–6), Merchant stock one node with 2 (3 and 4 items). Each level costs what the tables below say for that rank, slot or step.
 - A node opens once its requirements have level 1; its later levels need nothing more.
-- **E level 1 is free** and stays hidden until Act 1 is cleared. A reset takes it back like any level, and it is free to buy again.
+- **Q, W and E** stay hidden until Act 1 is cleared. Clearing it puts **E at level 1** for free (Senna taught it). A reset takes it back like any level, and it is free to buy again.
 - In a stage, skill points only go into bought ranks, and the passive only works once bought.
 
 ### Skills
 | Node | Cost | Requires |
 |---|---|---|
-| Q / W rank 1 | 100B each | — |
-| E rank 1 | Free (Act 1 reward) | Clear Act 1 |
+| Q / W rank 1 | 100B each | Clear Act 1 |
+| E rank 1 | Free, given when Act 1 is cleared | Clear Act 1 |
 | Passive | 150B | Any 1 of Q, W, E rank 1 |
 | R rank 1 | 600B + 10O | Q, W, E rank 1 and Passive |
 | Q / W / E rank 2 | 200B | Previous rank |
