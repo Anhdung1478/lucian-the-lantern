@@ -15,8 +15,8 @@
     <circle cx="33" cy="-2.5" r="1.5" fill="#6dd6ff"/>
     <circle cx="33" cy="2.5" r="1.5" fill="#6dd6ff"/>
     <!-- lance -->
-    <path d="M 4 0 L 44 0" fill="none" stroke="#1a1d24" stroke-width="4" stroke-linecap="round"/>
-    <path d="M 4 0 L 44 0" fill="none" stroke="#d8e4ee" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 4 0 L 42 0" fill="none" stroke="#1a1d24" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 4 0 L 42 0" fill="none" stroke="#d8e4ee" stroke-width="1.6" stroke-linecap="round"/>
     <!-- rider: armoured shoulders and a helm -->
     <ellipse cx="-8" cy="0" rx="9" ry="13" fill="#4f6a8a" stroke="#1a1d24" stroke-width="3"/>
     <circle cx="-4" cy="0" r="7" fill="#64809f" stroke="#1a1d24" stroke-width="3"/>

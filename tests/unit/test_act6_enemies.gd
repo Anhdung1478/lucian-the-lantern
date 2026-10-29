@@ -329,3 +329,68 @@ func test_a_freed_soul_pays_like_a_kill_and_plays_the_freed_fade() -> void:
 	assert_true(is_instance_valid(soul), "a slower fade than the grey one")
 	assert_lt(soul.visuals.position.y, -5.0, "it rises")
 	assert_gt(soul.sprite.modulate.g, 1.0, "brighter")
+
+
+# --- fix round: stops, guards, the veil --------------------------------------
+
+
+func test_a_close_pull_stops_in_front_of_the_warden() -> void:
+	lucian.global_position = Vector2(250, 0)
+	var warden := _specter("chain_warden", Vector2.ZERO)
+	warden._pull()
+	await wait_physics_frames(30)
+	# Radius 40 + his 30: he lands 70 in front of the warden, not on it.
+	assert_almost_eq(lucian.global_position.x, warden.radius + Lucian.HIT_RADIUS, 4.0)
+
+
+func test_a_chain_thrown_before_the_warden_died_pulls_nobody() -> void:
+	lucian.global_position = Vector2(600, 0)
+	var warden := _specter("chain_warden", Vector2.ZERO)
+	warden.take_damage(_lethal())
+	warden._pull()
+	await wait_physics_frames(20)
+	assert_eq(lucian.global_position, Vector2(600, 0))
+
+
+func test_a_perched_rider_never_marks_a_line() -> void:
+	_map([LEDGE_ABYSS], true)
+	lucian.global_position = Vector2(1300, 1000)
+	var rider := _specter("spectral_rider", Vector2(1000, 1000))
+	rider.perched = true
+	await wait_physics_frames(60)
+	assert_true(_warnings(effects).is_empty(), "no line that never fires")
+	assert_eq(rider.global_position, Vector2(1000, 1000))
+
+
+## Banshee's Veil only blocks boss skills, so an elite's hit is refused here
+## the way any refused hit is: Lucian cannot be hurt.
+func test_a_refused_chain_hit_does_not_pull() -> void:
+	lucian.global_position = Vector2(600, 0)
+	_specter("chain_warden", Vector2.ZERO)
+	var warning := await _until_warning(effects)
+	assert_not_null(warning)
+	lucian.invulnerable = true
+	await wait_seconds(1.6)
+	assert_true(received.is_empty())
+	assert_almost_eq(lucian.global_position.x, 600.0, 1.0, "no pull")
+
+
+func test_a_refused_charge_hit_does_not_push() -> void:
+	var rider := _specter("spectral_rider", Vector2(-60, 0))
+	lucian.invulnerable = true
+	rider._trample(Vector2.RIGHT)
+	await wait_physics_frames(20)
+	assert_true(received.is_empty())
+	assert_almost_eq(lucian.global_position, Vector2.ZERO, Vector2(1, 1), "refused: no push")
+
+
+func test_a_push_into_the_abyss_stops_at_the_edge() -> void:
+	_map([ABYSS], true)
+	# Lucian 50 short of the strip (x 1250); a full 150 push would end at 1280.
+	lucian.global_position = Vector2(1190, 1000)
+	var rider := _specter("spectral_rider", Vector2(500, 1000))
+	var hit: bool = await wait_until(func() -> bool: return not received.is_empty(), 4.0)
+	assert_true(hit)
+	await wait_physics_frames(40)
+	assert_lt(lucian.global_position.x, 1250.0, "stopped at the edge")
+	assert_gt(lucian.global_position.x, 1190.0, "after being pushed up to it")

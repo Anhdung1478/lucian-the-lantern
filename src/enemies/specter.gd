@@ -22,6 +22,7 @@ const CHARGE_WIDTH := 90.0
 const CHARGE_WARN := 0.8
 const CHARGE_SPEED := 1400.0
 const CHARGE_PUSH := 150.0
+const CHARGE_PUSH_SPEED := 1600.0
 ## Charger: between charges it walks in, but stops this far from Lucian.
 const CHARGE_CLOSE := 250.0
 
@@ -78,6 +79,10 @@ func _charger(delta: float) -> void:
 	if is_instance_valid(_mark):
 		return
 	var distance := distance_to_target()
+	# A perched rider can't charge (charge() refuses), so it never marks.
+	if perched:
+		face(target.global_position)
+		return
 	if _attack_left > 0.0 or distance > attack_range + Lucian.HIT_RADIUS:
 		face(target.global_position)
 		if distance > attack_range + Lucian.HIT_RADIUS or (_attack_left > 0.0 and distance > CHARGE_CLOSE):
@@ -100,7 +105,7 @@ func _run(toward: Vector2) -> void:
 ## The charge reached Lucian: the hit, and (if he took it) a shove along the run.
 func _trample(toward: Vector2) -> void:
 	if target.take_damage(make_hit()):
-		target.displace(target.global_position + toward * CHARGE_PUSH, CHAIN_PULL_SPEED)
+		target.displace(target.global_position + toward * CHARGE_PUSH, CHARGE_PUSH_SPEED)
 
 
 ## Keeps keep_min..keep_max from Lucian like a spitter (a perched warden only
@@ -125,7 +130,7 @@ func _warden(delta: float) -> void:
 		face(target.global_position)
 
 
-## The chain flies along the marked line; a hit (Banshee's Veil blocks it too)
+## The chain flies along the marked line; a hit (a refused hit, Lucian invulnerable, pulls nobody)
 ## pulls Lucian toward the warden.
 func _throw_chain(toward: Vector2) -> void:
 	_mark = null
@@ -136,13 +141,16 @@ func _throw_chain(toward: Vector2) -> void:
 	chain.hit_lucian.connect(_pull)
 
 
-## Lucian slides toward the warden, CHAIN_PULL at most (never past it); the
-## abyss edge or a wall stops him sooner.
+## Lucian slides toward the warden, CHAIN_PULL at most and never closer than
+## the warden's radius plus his own (he stops in front of it, as at Thresh's
+## hook); the abyss edge or a wall stops him sooner. A chain thrown before the
+## warden fell pulls toward nothing.
 func _pull() -> void:
-	if not is_instance_valid(target):
+	if not is_instance_valid(target) or not is_alive():
 		return
-	var toward := target.global_position.direction_to(global_position)
-	target.displace(target.global_position + toward * minf(CHAIN_PULL, distance_to_target()), CHAIN_PULL_SPEED)
+	var stop := radius + Lucian.HIT_RADIUS
+	var slide := minf(CHAIN_PULL, maxf(distance_to_target() - stop, 0.0))
+	target.displace(target.global_position + target.global_position.direction_to(global_position) * slide, CHAIN_PULL_SPEED)
 
 
 ## Killed first: its marks go with it, with no blast or charge. A warning is
