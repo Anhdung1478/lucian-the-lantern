@@ -116,9 +116,13 @@ func wall_of_pain() -> float:
 	return WALL_WARN + RECOVER
 
 
-## He stands and channels for REQUIEM_TIME (see _physics_process).
+## He stands and channels for REQUIEM_TIME (see _physics_process). Every
+## threshold his HP is already at or below is spent with it: a burst past
+## several brings one Requiem, never two in a row.
 func requiem() -> float:
 	_requiems += 1
+	while _requiems < REQUIEM_HP.size() and hp <= max_hp * REQUIEM_HP[_requiems]:
+		_requiems += 1
 	_channel_left = REQUIEM_TIME
 	_channel_damage = 0.0
 	queue_redraw()

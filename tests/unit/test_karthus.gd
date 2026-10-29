@@ -142,6 +142,10 @@ func test_lay_waste_picks_one_spot_on_lucian_and_four_within_300() -> void:
 
 func test_lay_waste_puts_5_circles_0_15_seconds_apart() -> void:
 	var boss := _karthus(Vector2(3000, 0))
+	var laid: Array[Node] = []
+	effects.child_entered_tree.connect(func(node: Node) -> void:
+		if node is GroundWarning:
+			laid.append(node))
 	var busy := boss.lay_waste()
 	assert_almost_eq(busy, 4 * 0.15 + 0.7 + Karthus.RECOVER, 0.001)
 	var warnings := _effects(GroundWarning)
@@ -155,7 +159,7 @@ func test_lay_waste_puts_5_circles_0_15_seconds_apart() -> void:
 	await wait_physics_frames(18)
 	assert_eq(_effects(GroundWarning).size(), 4)
 	await wait_physics_frames(12)
-	assert_gte(_effects(GroundWarning).size(), 3, "all five were laid by 0.6 s")
+	assert_eq(laid.size(), 5, "all five were laid by 0.6 s")
 
 
 func test_lay_waste_hurts_only_inside_its_circles() -> void:
@@ -269,6 +273,46 @@ func test_requiem_waits_for_75_then_45_then_15_percent() -> void:
 	boss.requiem()
 	boss.hp = 1.0
 	assert_false(boss._can_use(&"requiem"), "three times in all")
+
+
+func test_a_burst_past_several_thresholds_brings_one_requiem_then_none_until_15_percent() -> void:
+	var boss := _karthus(Vector2(3000, 0))
+	boss._cooldowns[&"requiem"] = 0.0
+	boss.hp = boss.max_hp * 0.4
+	await wait_physics_frames(2)
+	assert_true(boss.is_channeling(), "one Requiem")
+	boss.take_damage(_true_hit(boss.max_hp * 0.09))
+	await wait_physics_frames(2)
+	assert_false(boss.is_channeling(), "broken")
+	assert_false(boss._can_use(&"requiem"), "the 75% and 45% thresholds are spent")
+	await wait_physics_frames(20)
+	assert_false(boss.is_channeling(), "no second Requiem right behind")
+	boss.hp = boss.max_hp * 0.16
+	assert_false(boss._can_use(&"requiem"))
+	boss.hp = boss.max_hp * 0.15
+	assert_true(boss._can_use(&"requiem"), "the next is 15%")
+
+
+func test_walking_down_the_thresholds_gives_three_requiems() -> void:
+	var boss := _karthus(Vector2(3000, 0))
+	var channels := 0
+	for share in [0.75, 0.45, 0.15]:
+		await wait_physics_frames(25)
+		boss._cooldowns[&"requiem"] = 0.0
+		boss.hp = boss.max_hp * share
+		await wait_physics_frames(2)
+		if boss.is_channeling():
+			channels += 1
+		boss.take_damage(_true_hit(boss.max_hp * 0.01))
+		boss.hp = boss.max_hp * share
+		boss._channel_damage = boss.max_hp * 0.08
+		await wait_physics_frames(2)
+		assert_false(boss.is_channeling())
+	assert_eq(channels, 3)
+	boss._cooldowns[&"requiem"] = 0.0
+	boss.hp = 100.0
+	await wait_physics_frames(2)
+	assert_false(boss.is_channeling(), "no fourth")
 
 
 func test_he_channels_requiem_on_his_own_at_75_percent_and_stands_for_3_seconds() -> void:
