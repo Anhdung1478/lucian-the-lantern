@@ -144,6 +144,7 @@ func test_start_is_disabled_for_locked_and_unbuilt_acts_and_endless() -> void:
 	assert_true(section.act_pages[4].start_button.disabled)
 	assert_eq(section.act_pages[4].start_button.get_meta(&"hover_text"), "Act 5 comes in a later phase")
 	assert_true(section.endless_page.start_button.disabled)
+	assert_eq(section.endless_page.start_button.get_meta(&"hover_text"), "Endless comes in a later phase")
 	assert_eq(section.endless_page.map_buttons.size(), 7)
 	assert_eq(section.endless_page.map_index(), 0)
 

@@ -56,9 +56,88 @@ func test_spawn_melee_adds_one_that_counts_toward_the_wave() -> void:
 	stage.skip_break()
 	var before := _enemies().size()
 	var alive := stage.runner.alive()
-	_press(stage, "Spawn melee")
+	_pick(stage, &"melee_minion")
+	_press(stage, "Spawn")
 	assert_eq(_enemies().size(), before + 1)
 	assert_eq(stage.runner.alive(), alive + 1)
+
+
+func _picker(stage: Stage) -> OptionButton:
+	var found: Array[OptionButton] = []
+	_collect_pickers(stage.debug_table, found)
+	for picker in found:
+		for i in picker.item_count:
+			if picker.get_item_text(i) == "melee_minion":
+				return picker
+	fail_test("no enemy picker")
+	return null
+
+
+func _collect_pickers(node: Node, into: Array[OptionButton]) -> void:
+	if node is OptionButton:
+		into.append(node)
+	for child in node.get_children():
+		_collect_pickers(child, into)
+
+
+func _pick(stage: Stage, id: StringName) -> void:
+	var picker := _picker(stage)
+	for i in picker.item_count:
+		if picker.get_item_text(i) == String(id):
+			picker.select(i)
+			return
+	fail_test("%s not in the list" % id)
+
+
+func test_the_list_holds_every_enemy_id() -> void:
+	var stage: Stage = await _stage(2, 1)
+	var picker := _picker(stage)
+	var ids: Array[String] = []
+	for i in picker.item_count:
+		ids.append(picker.get_item_text(i))
+	var expected: Array[String] = []
+	for file in DirAccess.get_files_at("res://data/enemies"):
+		if file.ends_with(".tres"):
+			expected.append(file.get_basename())
+	expected.sort()
+	assert_eq(ids, expected)
+	for id in ["elder_dragon", "dark_lucian", "raptor", "shadow_melee_minion"]:
+		assert_has(ids, id)
+
+
+func test_spawn_makes_the_selected_enemy() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.skip_break()
+	for id in [&"raptor", &"shadow_melee_minion"]:
+		_pick(stage, id)
+		var before := _enemies().size()
+		_press(stage, "Spawn")
+		assert_eq(_enemies().size(), before + 1, String(id))
+		var last := _enemies().back() as EnemyUnit
+		assert_eq(last.data.id, id)
+
+
+func test_boss_hp_51_on_the_elder_dragon_mid_dive() -> void:
+	var stage: Stage = await _stage(3, 5)
+	var boss := stage.spawn_enemy(&"elder_dragon", stage.lucian.global_position + Vector2(200, 0))
+	stage.boss_unit = boss
+	boss.remove_from_group(&"enemies")  # untargetable mid-dive
+	_press(stage, "Boss HP 51%")
+	assert_almost_eq(boss.hp, boss.max_hp * 0.51, 0.01)
+
+
+func test_boss_hp_51_on_dark_lucian() -> void:
+	var stage: Stage = await _stage(4, 3)
+	var boss := stage.spawn_enemy(&"dark_lucian", stage.lucian.global_position + Vector2(200, 0))
+	_press(stage, "Boss HP 51%")
+	assert_almost_eq(boss.hp, boss.max_hp * 0.51, 0.01)
+
+
+func test_boss_hp_51_leaves_mini_bosses_alone() -> void:
+	var stage: Stage = await _stage(3, 2)
+	var drake := stage.spawn_enemy(&"infernal_drake", stage.lucian.global_position + Vector2(200, 0))
+	_press(stage, "Boss HP 51%")
+	assert_almost_eq(drake.hp, drake.max_hp, 0.01)
 
 
 func test_god_mode_makes_lucian_invulnerable() -> void:

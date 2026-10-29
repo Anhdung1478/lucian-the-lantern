@@ -6,6 +6,7 @@ extends DebugPanel
 ## open backpack.
 
 const LOG_SIZE := 10
+const ENEMY_DIR := "res://data/enemies"
 
 var stage: Stage
 var lucian: Lucian
@@ -22,6 +23,7 @@ var _level_value: SpinBox
 var _crit_toggle: CheckBox
 var _crit_value: SpinBox
 var _item_picker: OptionButton
+var _enemy_picker: OptionButton
 ## The picker's items, A to Z.
 var _picker_items: Array[ItemData] = []
 var _equip_slots: SpinBox
@@ -162,10 +164,33 @@ func _spawn(id: StringName) -> void:
 		stage.runner.enemy_spawned()
 
 
+## Every enemy id in data/enemies, sorted. Exported builds list `.tres.remap` files.
+func _enemy_ids() -> Array[String]:
+	var ids: Array[String] = []
+	for file in DirAccess.get_files_at(ENEMY_DIR):
+		file = file.trim_suffix(".remap")
+		if file.ends_with(".tres"):
+			ids.append(file.get_basename())
+	ids.sort()
+	return ids
+
+
+func _spawn_picked() -> void:
+	if _enemy_picker.selected >= 0:
+		_spawn(StringName(_enemy_picker.get_item_text(_enemy_picker.selected)))
+
+
+## The boss (kind "boss", not a mini boss) goes to 51%. The Elder Dragon leaves the
+## group mid-dive, so stage.boss_unit is checked as well.
 func _boss_to_51() -> void:
+	var units: Array[EnemyUnit] = []
+	if stage.boss_unit:
+		units.append(stage.boss_unit)
 	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
-		var unit := enemy as EnemyUnit
-		if unit and unit.data.kind == &"boss":
+		if enemy is EnemyUnit and not units.has(enemy):
+			units.append(enemy)
+	for unit in units:
+		if unit.data.kind == &"boss":
 			unit.hp = unit.max_hp * 0.51
 			unit.health_bar.set_health(unit.hp, unit.max_hp)
 
@@ -265,8 +290,13 @@ func _build() -> void:
 	_button(row, "Kill all enemies", _kill_all)
 	_button(row, "Jump to boss wave", func() -> void: stage.jump_to_boss_wave())
 	row = _row(box)
-	for id: StringName in [WavePlan.MELEE, WavePlan.RANGED, WavePlan.SIEGE, WavePlan.SUPER]:
-		_button(row, "Spawn %s" % String(id).trim_suffix("_minion"), _spawn.bind(id))
+	_enemy_picker = OptionButton.new()
+	_enemy_picker.focus_mode = Control.FOCUS_NONE
+	_enemy_picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for id in _enemy_ids():
+		_enemy_picker.add_item(id)
+	row.add_child(_enemy_picker)
+	_button(row, "Spawn", _spawn_picked)
 	row = _row(box)
 	_button(row, "Boss HP 51%", _boss_to_51)
 	_check(box, "God mode (no damage)").toggled.connect(func(on: bool) -> void: stage.lucian.invulnerable = on)
