@@ -21,6 +21,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	Engine.time_scale = 1.0
 	get_tree().paused = false
 	_remove_slot_files()
 	SaveGame.instance().prefix = _prefix
@@ -95,6 +96,28 @@ func test_skipping_clears_and_pays_20_then_4_on_a_replay() -> void:
 	assert_eq(replay.collected[Essences.PURPLE], 4)
 	assert_has(replay.reward_lines, "Senna is free")
 	assert_does_not_have(replay.reward_lines, "The story is complete")
+
+
+## The visual pass: Thresh dissolved, but his Phase 2 aura (drawn on the
+## unit, not its art) and his empty health bar stayed floating over the spot
+## while Senna spoke. The scene runs at 8x speed to her line.
+func test_thresh_dissolves_whole_aura_and_bar_too() -> void:
+	var stage := await _fight()
+	var thresh := stage.boss_unit as ThreshFinal
+	stage.boss_unit.take_damage(_lethal())
+	await wait_physics_frames(3)
+	var scene := stage.cutscene as SennaFreed
+	assert_not_null(scene)
+	assert_true(thresh.has_aura(), "Phase 2: the aura is on him")
+	Engine.time_scale = 8.0
+	for frame in 600:
+		if scene._speaker.text == "Senna":
+			break
+		await wait_process_frames(1)
+	Engine.time_scale = 1.0
+	assert_eq(scene._speaker.text, "Senna", "her line, after he dissolved")
+	assert_almost_eq(thresh.modulate.a, 0.0, 0.01, "the unit, aura and bar with it")
+	scene.skip()
 
 
 func test_a_debug_thresh_plays_no_cutscene() -> void:

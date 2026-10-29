@@ -124,6 +124,8 @@ func _play() -> void:
 	rise.tween_property(senna, "modulate:a", 1.0, SENNA_TIME)
 	rise.tween_property(thresh.visuals, "modulate", Color(SMOKE_COLOR, 0.0), DISSOLVE_TIME)
 	rise.tween_property(thresh.visuals, "scale", KNEEL_SCALE * 1.3, DISSOLVE_TIME)
+	# All of him goes: his Phase 2 aura (drawn on the unit) and his health bar too.
+	rise.tween_property(thresh, "modulate:a", 0.0, DISSOLVE_TIME)
 	for i in SMOKE_PUFFS:
 		var puff := Node2D.new()
 		puff.draw.connect(_draw_circles.bind(puff, [[30.0, SMOKE_COLOR]]))

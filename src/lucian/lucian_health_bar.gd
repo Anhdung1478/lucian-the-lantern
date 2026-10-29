@@ -9,7 +9,9 @@ const SIZE := Vector2(90, 10)
 const FILL := Color(0.25, 0.68, 0.29)
 const SHIELD := Color(0.92, 0.94, 0.97, 0.9)
 const CC_COLOR := Color("ff4040")
-const CC_FONT_SIZE := 14
+## Big enough to read at game zoom (at 14 it was a dark smudge under the
+## outline); "Stunned", the longest word, still fits the bar's width.
+const CC_FONT_SIZE := 18
 
 @onready var lucian: Lucian = get_parent()
 

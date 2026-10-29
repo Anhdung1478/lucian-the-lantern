@@ -169,6 +169,9 @@ const RUNE_COLOR := Color(0.45, 1.0, 0.7, 0.45)
 const RUNE_GLOW := Color(0.45, 1.0, 0.7, 0.1)
 const RIM_CHAINS := 16
 const RIM_CHAIN_REACH := 460.0
+## The pale stone heart where Thresh starts: his green-black art (darker
+## still in Phase 2) vanished on a dark one.
+const HEART_COLOR := Color("5f686d")
 const ALTAR_COLOR := Color("5a6064")
 const ALTAR_SIZE := 200.0
 const HOOF_COLOR := Color(0.35, 1.0, 0.65, 0.22)
@@ -582,7 +585,7 @@ func _draw_hoofmarks(at: Vector2) -> void:
 
 
 ## 6-5: the stubs, then the carved disc over their ends: carved rings, the
-## rune ring, a dark heart where Thresh stands, and chains rising at the rim.
+## rune ring, a pale heart where Thresh stands, and chains rising at the rim.
 func _draw_platform() -> void:
 	var middle := PLATFORM_CENTER
 	for i in RIM_CHAINS:
@@ -598,7 +601,7 @@ func _draw_platform() -> void:
 		var direction := Vector2.from_angle(TAU * (i + 0.5) / 24)
 		draw_line(middle + direction * CARVED_RINGS[1], middle + direction * CARVED_RINGS[2], CARVE_COLOR, 4.0, true)
 	_draw_runes(middle)
-	draw_circle(middle, CARVED_RINGS[0] - 30.0, SLATE_DARK)
+	draw_circle(middle, CARVED_RINGS[0] - 30.0, HEART_COLOR)
 	draw_arc(middle, CARVED_RINGS[0] - 30.0, 0.0, TAU, 64, RUNE_COLOR, 3.0, true)
 	for i in RIM_CHAINS:
 		var direction := Vector2.from_angle(TAU * (i + 0.5) / RIM_CHAINS)

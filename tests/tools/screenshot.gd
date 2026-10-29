@@ -7,7 +7,7 @@ extends SceneTree
 const SETTINGS_PATH := "user://screenshot_settings.json"
 const SAVE_PREFIX := "user://screenshot_save_slot_"
 ## Scenarios that start from the game's root scene (the main screen).
-const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots"]
+const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "the_end"]
 ## Scenarios played on a Journey stage: [act, stage], built from the new save
 ## (so Act 1 is its first play, the tutorial).
 const ACT_SCENARIOS := {
@@ -20,7 +20,11 @@ const ACT_SCENARIOS := {
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
 	"infernal_meteor": [3, 2], "ocean_mist": [3, 4], "elder_sky_dive": [3, 5], "elder_mark": [3, 5],
 	"act4_lane": [4, 1], "dark_lucian_q": [4, 3], "dark_lucian_r": [4, 3],
-	"act6_bridges": [6, 3], "act6_platform": [6, 5],
+	"act5_mist": [5, 1], "act5_sapling": [5, 1], "act5_brood": [5, 1], "maokai_grasp": [5, 2], "elise_rappel": [5, 4],
+	"karthus_wall": [5, 5], "karthus_requiem": [5, 5],
+	"act6_bridges": [6, 3], "act6_platform": [6, 5], "act6_rider": [6, 1], "karthus_defile": [6, 2],
+	"hecarim_onslaught": [6, 4], "thresh_box": [6, 5], "thresh_phase2": [6, 5], "thresh_lantern": [6, 5],
+	"ending_cutscene": [6, 5],
 }
 
 var stage: Node
@@ -225,6 +229,36 @@ func _run(scenario: String) -> void:
 			await scenario_act6_bridges()
 		"act6_platform":
 			await scenario_act6_platform()
+		"act5_mist":
+			await scenario_act5_mist()
+		"act5_sapling":
+			await scenario_act5_sapling()
+		"act5_brood":
+			await scenario_act5_brood()
+		"maokai_grasp":
+			await scenario_maokai_grasp()
+		"elise_rappel":
+			await scenario_elise_rappel()
+		"karthus_wall":
+			await scenario_karthus_wall()
+		"karthus_requiem":
+			await scenario_karthus_requiem()
+		"act6_rider":
+			await scenario_act6_rider()
+		"karthus_defile":
+			await scenario_karthus_defile()
+		"hecarim_onslaught":
+			await scenario_hecarim_onslaught()
+		"thresh_box":
+			await scenario_thresh_box()
+		"thresh_phase2":
+			await scenario_thresh_phase2()
+		"thresh_lantern":
+			await scenario_thresh_lantern()
+		"ending_cutscene":
+			await scenario_ending_cutscene()
+		"the_end":
+			await scenario_the_end()
 		"training_setup":
 			await scenario_training_setup()
 		"skins_stage":
@@ -2399,7 +2433,9 @@ func scenario_dark_lucian_r() -> void:
 
 ## 6-3's plateaus over the abyss: the whole map (three bridges, the broken
 ## north-west one, four ledges), then Lucian at the center plateau's north
-## edge with a ledge across the abyss, and at the broken bridge.
+## edge with a ledge across the abyss, and at the broken bridge. Then a Chain
+## Warden comes as a wave's would (the free ledge nearest Lucian, perched):
+## its chain line at him, and the pull that stops him at the abyss's edge.
 func scenario_act6_bridges() -> void:
 	var game := game_stage()
 	game.runner._countdown = 999.0
@@ -2414,6 +2450,24 @@ func scenario_act6_bridges() -> void:
 	blink(Vector2(1640, 1250))
 	await wait(0.4)
 	await shot("act6_bridges_2_broken")
+	var ledge: Vector2 = game.arena.ledge_points[0]
+	blink(ledge + Vector2(0, 560))
+	free_camera(ledge + Vector2(0, 300))
+	game._spawn_wave_enemy(WavePlan.CHAIN_WARDEN, 1)
+	var warden := get_nodes_in_group(&"enemies")[0] as Specter
+	warden._attack_left = 0.0
+	var warning := await wait_for_warning(GroundWarning.Shape.LINE)
+	await wait(0.45)
+	print("warden on the north ledge, perched (expect 0, true): ", roundi(warden.global_position.distance_to(ledge)), ", ", warden.perched,
+		"  chain line (expect 700 x 60, 0.8 s): ", warning.reach, " x ", warning.width, ", ", warning.warn_time)
+	await shot("act6_bridges_3_chain_line")
+	var before := lucian.global_position
+	while lucian.global_position.distance_to(before) < 1.0:
+		await wait(0.02)
+	await wait(0.4)
+	print("pulled (expect up to 300, stopping at the edge): ", roundi(before.distance_to(lucian.global_position)),
+		"  on the ground (expect true): ", game.arena.is_walkable(lucian.global_position, 0.0))
+	await shot("act6_bridges_4_pulled")
 
 
 ## 6-5's final platform: the whole map, then Lucian at the west rim.
@@ -2427,6 +2481,553 @@ func scenario_act6_platform() -> void:
 	game.camera.mode = StageCamera.Mode.FOLLOW
 	await wait(0.4)
 	await shot("act6_platform_1_start")
+
+
+# --- Phase 8: Acts 5 and 6 -------------------------------------------------
+
+
+## `boss` stands where it is: it doesn't walk or shoot, and its skills wait
+## (each scenario lets the one it shows go).
+func hold(boss: Boss) -> void:
+	boss.move_speed = 0.0
+	boss._attack_left = 999.0
+	for skill: StringName in boss._cooldowns:
+		boss._cooldowns[skill] = 60.0
+
+
+## The camera free over `at` at `zoom` (kept inside the map, as play keeps
+## it), with its edge panning off: the OS mouse is shared with whoever uses
+## the machine during the run, and an unfocused window never clamps it.
+func free_camera(at: Vector2, zoom := 1.0) -> void:
+	var camera := game_stage().camera
+	camera.mode = StageCamera.Mode.FREE
+	camera.edge_margin = -INF
+	camera.zoom = Vector2.ONE * zoom
+	camera.global_position = camera._clamped(at)
+
+
+## `near`, or the nearest point round it (rings 20 px apart) at least
+## `margin` clear of walls and the abyss.
+func open_ground(near: Vector2, margin := 40.0) -> Vector2:
+	var arena := game_stage().arena
+	for ring in range(0, 400, 20):
+		for i in 16:
+			var at := near + Vector2.from_angle(TAU * i / 16.0) * ring
+			if arena.is_walkable(at, margin):
+				return at
+	return near
+
+
+## Boss or mini boss `id` standing at `at` (see hold) and facing Lucian, who
+## stands on open ground at or near `lucian_at`; the camera between them at
+## `zoom` (see free_camera); wave 1 waits.
+func to_boss(id: StringName, at: Vector2, lucian_at: Vector2, zoom := 0.8) -> Boss:
+	var game := game_stage()
+	flush_tips()
+	await mouse_move(Vector2(960, 540))
+	game.runner._countdown = 999.0
+	lucian_at = open_ground(lucian_at)
+	blink(lucian_at)
+	free_camera((at + lucian_at) * 0.5, zoom)
+	var boss := game.spawn_enemy(id, at) as Boss
+	hold(boss)
+	boss.face(lucian_at)
+	print("%s on open ground (expect true): %s" % [id, game.arena.is_walkable(at, boss.radius)])
+	return boss
+
+
+## 6-5's boss wave: the final Thresh at the platform's center, standing (see
+## hold), Lucian `offset` from him, the camera between them.
+func to_final_thresh(offset := Vector2(-420, 0), zoom := 0.8) -> ThreshFinal:
+	var game := game_stage()
+	flush_tips()
+	await mouse_move(Vector2(960, 540))
+	var middle := ThreshDomainMap.PLATFORM_CENTER
+	blink(middle + offset)
+	free_camera(middle + offset * 0.5, zoom)
+	game.jump_to_boss_wave()
+	var thresh := await wait_for_boss() as ThreshFinal
+	hold(thresh)
+	return thresh
+
+
+## The SpectralWalls on the ground now.
+func spectral_walls() -> Array:
+	return stage.get_node("Warnings").get_children().filter(func(node: Node) -> bool: return node is SpectralWall)
+
+
+## The buff row's icon for `id` on Lucian, or null.
+func buff_icon(id: StringName) -> BuffIcon:
+	var bar: BuffBar = game_stage().hud._buff_bar
+	for child in bar.get_children():
+		if (child as Control).visible and (child as BuffIcon).buff.get("id") == id:
+			return child
+	return null
+
+
+## 5-1's dead forest: the whole map with its two Black Mist banks; then, wave
+## 1 held, a Maiden of the Mist and two spiderlings standing in the
+## north-west bank, veiled (dark, no health bar) with Lucian far off, and a
+## spiderling outside it as any enemy looks; then Lucian walks up to the bank
+## and the two within 350 of him show, the far one still veiled.
+func scenario_act5_mist() -> void:
+	var game := game_stage()
+	game.runner._countdown = 999.0
+	flush_tips()
+	await mouse_move(Vector2(960, 540))
+	print("mist banks (expect 2): ", game.arena.mist.size(), "  trees (expect 14): ", game.arena.wall_circles.size())
+	await whole_map("act5_mist_0_map")
+	var bank: Vector3 = game.arena.mist[0]
+	var middle := Vector2(bank.x, bank.y)
+	var inside: Array[EnemyUnit] = [
+		stand(WavePlan.MAIDEN, middle + Vector2(-40, 40)),
+		stand(WavePlan.SPIDERLING, middle + Vector2(140, 150)),
+		stand(WavePlan.SPIDERLING, middle + Vector2(-190, -70)),
+	]
+	var outside := stand(WavePlan.SPIDERLING, middle + Vector2(520, 380))
+	for unit: EnemyUnit in inside + [outside]:
+		if not game.arena.is_walkable(unit.global_position, unit.radius):
+			print("  in a tree: ", unit.data.id, " at ", unit.global_position)
+	blink(middle + Vector2(-760, 260))
+	free_camera(middle + Vector2(-330, 110))
+	await wait(0.4)
+	print("veiled in the bank (expect [true, true, true]): ", inside.map(func(unit: EnemyUnit) -> bool: return unit.veiled),
+		"  outside (expect false): ", outside.veiled)
+	await shot("act5_mist_1_veiled")
+	blink(middle + Vector2(-330, 150))
+	await wait(0.4)
+	print("within 350 (expect [true, false, true]): ", inside.map(func(unit: EnemyUnit) -> bool: return unit.global_position.distance_to(lucian.global_position) <= BlackMist.REVEAL_RANGE),
+		"  veiled (expect [false, true, false]): ", inside.map(func(unit: EnemyUnit) -> bool: return unit.veiled))
+	await shot("act5_mist_2_revealed")
+
+
+## A sapling runs at Lucian and, in reach, marks its blast on its own spot:
+## the red circle. He walks out of it; it goes off on nobody and is gone.
+func scenario_act5_sapling() -> void:
+	var game := game_stage()
+	game.runner._countdown = 999.0
+	flush_tips()
+	await mouse_move(Vector2(960, 540))
+	var at := lucian.global_position + Vector2(300, 0)
+	blink(at)
+	free_camera(at + Vector2(200, 0))
+	var sapling := game.spawn_enemy(WavePlan.SAPLING, at + Vector2(560, -160))
+	var warning := await wait_for_warning(GroundWarning.Shape.CIRCLE)
+	var hp := lucian.hp
+	lucian.command_move(at + Vector2(-240, 60))
+	await wait(0.3)
+	print("blast circle: radius (expect 120), seconds (expect 0.6), on the sapling (expect 0): ", warning.reach, ", ",
+		warning.warn_time, ", ", roundi(warning.global_position.distance_to(sapling.global_position)))
+	await shot("act5_sapling_0_warning")
+	while is_instance_valid(warning):
+		await wait(0.02)
+	var gone := sapling.has_escaped
+	# Its fade out.
+	await wait(0.5)
+	print("Lucian's HP (expect unchanged %d): %d  sapling gone (expect true): %s" % [roundi(hp), roundi(lucian.hp), gone])
+	await shot("act5_sapling_1_dodged")
+
+
+## The Broodmother keeps her distance and spits webs: one lands and Lucian
+## is slowed (the slow icon in the row over the skill bar); her spiderlings
+## come out beside her. Then the icon hovered: "Slowed".
+func scenario_act5_brood() -> void:
+	var game := game_stage()
+	game.runner._countdown = 999.0
+	flush_tips()
+	await mouse_move(Vector2(960, 540))
+	var at := lucian.global_position + Vector2(300, 0)
+	blink(at)
+	free_camera(at + Vector2(280, -40))
+	var brood := game.spawn_enemy(WavePlan.BROODMOTHER, at + Vector2(560, -80))
+	brood._attack_left = 0.3
+	brood._summon_left = 0.5
+	while lucian.slow_amount() <= 0.0:
+		await wait(0.02)
+	await wait(0.15)
+	var spiderlings := get_nodes_in_group(&"enemies").filter(func(node: Node) -> bool: return (node as EnemyUnit).summoned)
+	print("slowed (expect 0.3): ", lucian.slow_amount(), "  spiderlings out: ", spiderlings.size(), "  slow icon shown (expect true): ", buff_icon(Lucian.SLOWED) != null)
+	await shot("act5_brood_0_slowed")
+	# The same slow, held long enough for the hover (a web lasts 1.5 s, one comes every 2).
+	lucian.add_slow(WavePlan.BROODMOTHER, brood.data.hit_slow, 20.0)
+	await wait(0.1)
+	var icon := buff_icon(Lucian.SLOWED)
+	await mouse_move(control_center(icon))
+	await wait_for_tooltip(icon)
+	print("hovered icon (expect Slowed): ", icon.buff.get("name"))
+	await shot("act5_brood_1_tooltip")
+
+
+## Maokai in his camp of dead trunks (5-2), Lucian west of him through the
+## ring's gap. Nature's Grasp: the line warning, the green wave of vines
+## along it, and Lucian rooted ("Rooted" under his HP bar, the root icon in
+## the row). Then Twisted Advance: the circle on Lucian, Maokai in the air,
+## bigger, coming down on it.
+func scenario_maokai_grasp() -> void:
+	# In front of the tree west of the gap: the vines stop at trees.
+	var maokai := await to_boss(WavePlan.MAOKAI, DeadForestMap.MAOKAI, DeadForestMap.MAOKAI + Vector2(-450, 0)) as Maokai
+	await wait(0.3)
+	maokai._cooldowns[&"nature_grasp"] = 0.0
+	var warning := await wait_for_warning(GroundWarning.Shape.LINE)
+	await wait(0.5)
+	print("vine line (expect 900 x 140, 0.8 s): ", warning.reach, " x ", warning.width, ", ", warning.warn_time)
+	await shot("maokai_grasp_0_warning")
+	while is_instance_valid(warning):
+		await wait(0.02)
+	await wait(0.4)
+	await shot("maokai_grasp_1_vines")
+	while not lucian.has_cc(CrowdControl.Kind.ROOT):
+		await wait(0.02)
+	await wait(0.25)
+	print("rooted (expect true), root icon (expect true): ", lucian.has_cc(CrowdControl.Kind.ROOT), ", ", buff_icon(Lucian.ROOTED) != null)
+	await shot("maokai_grasp_2_rooted")
+	while lucian.has_cc(CrowdControl.Kind.ROOT):
+		await wait(0.05)
+	maokai._cooldowns[&"twisted_advance"] = 0.0
+	var circle := await wait_for_warning(GroundWarning.Shape.CIRCLE)
+	await wait(0.6)
+	print("advance circle (expect 90, 0.8 s): ", circle.reach, ", ", circle.warn_time)
+	await shot("maokai_grasp_3_advance")
+	while not maokai.is_leaping():
+		await wait(0.01)
+	await wait(0.18)
+	print("in the air, untargetable (expect true): ", maokai.untargetable, "  scale: ", maokai.visuals.scale)
+	await shot("maokai_grasp_4_leap")
+
+
+## Elise at her camp (5-4), Lucian west of her. Cocoon: the web bolt lands
+## and Lucian is stunned ("Stunned" and its icon). Then, hurt below 85%, she
+## rappels: unseen and untargetable (her name stays on the boss bar), the
+## circle following Lucian as he walks; once it locks he steps out of it, and
+## she drops on the empty circle.
+func scenario_elise_rappel() -> void:
+	var elise := await to_boss(WavePlan.ELISE, DeadForestMap.ELISE, DeadForestMap.ELISE + Vector2(-600, 0)) as Elise
+	await wait(0.3)
+	elise._cooldowns[&"cocoon"] = 0.0
+	await wait_for_warning(GroundWarning.Shape.LINE)
+	while not lucian.has_cc(CrowdControl.Kind.STUN):
+		await wait(0.01)
+	await wait(0.2)
+	print("stunned (expect true), stun icon (expect true): ", lucian.has_cc(CrowdControl.Kind.STUN), ", ", buff_icon(Lucian.STUNNED) != null)
+	await shot("elise_rappel_0_stunned")
+	while lucian.has_cc(CrowdControl.Kind.STUN):
+		await wait(0.05)
+	elise.hp = elise.max_hp * 0.8
+	elise.health_bar.set_health(elise.hp, elise.max_hp)
+	elise._cooldowns[&"rappel"] = 0.0
+	while not elise.is_rappelling():
+		await wait(0.01)
+	lucian.command_move(lucian.global_position + Vector2(0, 320))
+	await wait(0.7)
+	print("untargetable (expect true): ", elise.untargetable, "  boss bar on her (expect true): ", game_stage().hud.boss_bar.boss == elise)
+	await shot("elise_rappel_1_up")
+	while elise._rappel_time < Elise.RAPPEL_FOLLOW:
+		await wait(0.01)
+	var hp := lucian.hp
+	lucian.command_move(lucian.global_position + Vector2(-260, 0))
+	while elise.is_rappelling():
+		await wait(0.01)
+	await wait(0.12)
+	print("down on the circle, targetable (expect true): ", Lucian.is_target(elise), "  Lucian out of it, unhurt (expect %d): %d" % [roundi(hp), roundi(lucian.hp)])
+	await shot("elise_rappel_2_dropped")
+
+
+## Karthus in his graveyard (5-5), Lucian west of him. Wall of Pain: the line
+## warning across the way between them, then the spectral wall; Lucian walks
+## through it and is slowed (the slow icon). Then Lay Waste's five circles
+## round him.
+func scenario_karthus_wall() -> void:
+	var karthus := await to_boss(&"karthus", DeadForestMap.GRAVE_BOSS, DeadForestMap.GRAVE_BOSS + Vector2(-700, 0)) as Karthus
+	await wait(0.3)
+	karthus._cooldowns[&"wall_of_pain"] = 0.0
+	var warning := await wait_for_warning(GroundWarning.Shape.LINE)
+	await wait(0.35)
+	print("wall line (expect 900 x 60, 0.6 s): ", warning.reach, " x ", warning.width, ", ", warning.warn_time)
+	await shot("karthus_wall_0_warning")
+	while spectral_walls().is_empty():
+		await wait(0.02)
+	await wait(0.3)
+	await shot("karthus_wall_1_wall")
+	lucian.command_move(karthus.global_position + Vector2(-200, 0))
+	while lucian.slow_amount() <= 0.0:
+		await wait(0.02)
+	# On through it, slowed, then stop past it.
+	await wait(0.9)
+	lucian.command_move(lucian.global_position)
+	print("slowed (expect 0.7): ", lucian.slow_amount(), "  slow icon (expect true): ", buff_icon(Lucian.SLOWED) != null)
+	await shot("karthus_wall_2_slowed")
+	karthus._cooldowns[&"lay_waste"] = 0.0
+	await wait_for_warning(GroundWarning.Shape.CIRCLE)
+	# The fifth is laid 0.6 s after the first, which fires at 0.7 s.
+	var circles := []
+	while circles.size() < Karthus.LAY_COUNT:
+		await process_frame
+		circles = stage.get_node("Warnings").get_children().filter(func(node: Node) -> bool: return node is GroundWarning)
+	print("Lay Waste circles (expect 5): ", circles.size())
+	await shot("karthus_wall_3_lay_waste")
+
+
+## Requiem: Karthus at 75% HP stands and channels; the purple ring pulses on
+## Lucian, the ring round Karthus fills, and the break bar under the boss
+## bar fills as Lucian shoots him (plus a debug hit, as a stronger Lucian's
+## damage). Enough breaks it: "Broken!" over him.
+func scenario_karthus_requiem() -> void:
+	var karthus := await to_boss(&"karthus", DeadForestMap.GRAVE_BOSS, DeadForestMap.GRAVE_BOSS + Vector2(-560, 0)) as Karthus
+	karthus.hp = karthus.max_hp * 0.74
+	karthus.health_bar.set_health(karthus.hp, karthus.max_hp)
+	karthus._cooldowns[&"requiem"] = 0.0
+	while not karthus.is_channeling():
+		await wait(0.02)
+	lucian.command_attack(karthus)
+	karthus.take_damage(lucian.make_damage(karthus.max_hp * Karthus.REQUIEM_BREAK * 0.4, DamageInfo.Type.TRUE, &"debug"))
+	await wait(1.2)
+	var channel := karthus.channel()
+	print("break bar (done / need): ", roundi(channel.done), " / ", roundi(channel.need), "  bar shown (expect true): ", not game_stage().hud.boss_bar.channel.is_empty())
+	await shot("karthus_requiem_0_channel")
+	karthus.take_damage(lucian.make_damage(channel.need - channel.done + 1.0, DamageInfo.Type.TRUE, &"debug"))
+	await wait(0.3)
+	print("broken (expect false): ", karthus.is_channeling())
+	await shot("karthus_requiem_1_broken")
+
+
+## A Spectral Rider on 6-1's west plateau marks its charge line at Lucian;
+## he steps out sideways, and it runs along the line past him.
+func scenario_act6_rider() -> void:
+	var game := game_stage()
+	game.runner._countdown = 999.0
+	flush_tips()
+	await mouse_move(Vector2(960, 540))
+	var at := Vector2(620, 1640)
+	blink(at)
+	free_camera(at + Vector2(300, -80))
+	var rider := game.spawn_enemy(WavePlan.SPECTRAL_RIDER, at + Vector2(620, -200)) as Specter
+	rider._attack_left = 0.0
+	var warning := await wait_for_warning(GroundWarning.Shape.LINE)
+	await wait(0.45)
+	print("charge line (expect 800 x 90, 0.8 s): ", warning.reach, " x ", warning.width, ", ", warning.warn_time)
+	await shot("act6_rider_0_line")
+	var hp := lucian.hp
+	lucian.command_move(at + warning.direction.orthogonal() * 170.0)
+	while not rider.is_charging():
+		await wait(0.01)
+	await wait(0.3)
+	await shot("act6_rider_1_charge")
+	await wait(0.4)
+	print("Lucian's HP after the charge (expect unchanged %d): %d" % [roundi(hp), roundi(lucian.hp)])
+
+
+## The revived Karthus at his broken altar (6-2): Defile's purple ring round
+## him, always on, with Lucian outside it; then Lucian inside it, burning
+## (the burn icon); then Lay Waste's four circles.
+func scenario_karthus_defile() -> void:
+	var karthus := await to_boss(WavePlan.KARTHUS_REVIVED, ThreshDomainMap.KARTHUS_ALTAR, ThreshDomainMap.KARTHUS_ALTAR + Vector2(-560, 0)) as Karthus
+	await wait(0.4)
+	print("revived (expect true), ring radius (expect 350): ", karthus.revived, ", ", karthus.defile_ring_radius())
+	await shot("karthus_defile_0_ring")
+	lucian.command_move(karthus.global_position + Vector2(-240, 30))
+	while not lucian._burns.has(Karthus.DEFILE_ID):
+		await wait(0.02)
+	await wait(0.8)
+	print("burning (expect true), burn icon (expect true): ", lucian._burns.has(Karthus.DEFILE_ID), ", ", buff_icon(Lucian.BURNING) != null)
+	await shot("karthus_defile_1_burning")
+	karthus._cooldowns[&"lay_waste"] = 0.0
+	await wait_for_warning(GroundWarning.Shape.CIRCLE)
+	await wait(0.6)
+	var circles := stage.get_node("Warnings").get_children().filter(func(node: Node) -> bool: return node is GroundWarning)
+	print("Lay Waste circles (expect 4): ", circles.size())
+	await shot("karthus_defile_2_lay_waste")
+
+
+## Hecarim at his camp (6-4), hurt below 80%, Lucian west of him. Onslaught
+## of Shadows: the wide line warning at Lucian, then the ride with four
+## ghost riders beside him; Lucian, a step aside but still in the band, is
+## hit and feared ("Feared", the fear icon). Then Devastating Charge: the
+## glowing trail behind him.
+func scenario_hecarim_onslaught() -> void:
+	var camp := ThreshDomainMap.HECARIM_CAMP
+	var hecarim := await to_boss(WavePlan.HECARIM, camp, camp + Vector2(-680, 0)) as Hecarim
+	hecarim.hp = hecarim.max_hp * 0.7
+	hecarim.health_bar.set_health(hecarim.hp, hecarim.max_hp)
+	await wait(0.3)
+	hecarim._cooldowns[&"onslaught_of_shadows"] = 0.0
+	var warning := await wait_for_warning(GroundWarning.Shape.LINE)
+	await wait(0.6)
+	print("ride line (expect 1100 x 300, 1 s): ", warning.reach, " x ", warning.width, ", ", warning.warn_time)
+	await shot("hecarim_onslaught_0_warning")
+	# Aside, out of his body's way, but still in the band.
+	lucian.command_move(lucian.global_position + warning.direction.orthogonal() * 110.0)
+	while not hecarim.is_riding():
+		await wait(0.01)
+	await wait(0.15)
+	await shot("hecarim_onslaught_1_ride")
+	while not lucian.has_cc(CrowdControl.Kind.FEAR):
+		await wait(0.01)
+	await wait(0.3)
+	print("feared (expect true), fear icon (expect true): ", lucian.has_cc(CrowdControl.Kind.FEAR), ", ", buff_icon(Lucian.FEARED) != null)
+	await shot("hecarim_onslaught_2_feared")
+	while lucian.has_cc(CrowdControl.Kind.FEAR) or hecarim.is_riding():
+		await wait(0.05)
+	hold(hecarim)
+	hecarim.global_position = camp
+	blink(camp + Vector2(-760, 0))
+	free_camera(camp + Vector2(-380, 0), 0.8)
+	hecarim.move_speed = hecarim.data.move_speed
+	hecarim.busy_left = 0.0
+	hecarim._cooldowns[&"devastating_charge"] = 0.0
+	while not hecarim.is_charge_running():
+		await wait(0.01)
+	await wait(0.6)
+	print("charging (expect true): ", hecarim.is_charge_running())
+	await shot("hecarim_onslaught_3_charge")
+
+
+## The Box: the final Thresh (6-5's boss wave), Lucian inside its reach. The
+## ring warning round him, then the ring of 12 spectral pieces; Lucian walks
+## out through one and it breaks: hit and slowed.
+func scenario_thresh_box() -> void:
+	var thresh := await to_final_thresh(Vector2(-300, 0))
+	await wait(0.3)
+	thresh._cooldowns[&"the_box"] = 0.0
+	var warning := await wait_for_warning(GroundWarning.Shape.RING)
+	await wait(0.6)
+	print("box ring (expect 450, band 60, 1 s): ", warning.reach, ", ", warning.width, ", ", warning.warn_time)
+	await shot("thresh_box_0_warning")
+	while spectral_walls().is_empty():
+		await wait(0.02)
+	await wait(0.3)
+	var box: SpectralWall = spectral_walls()[0]
+	print("pieces (expect 12): ", box.piece_count())
+	await shot("thresh_box_1_box")
+	var hp := lucian.hp
+	# Out through the middle of a piece (a piece spans 30°, from 180°).
+	lucian.command_move(thresh.global_position + Vector2.from_angle(deg_to_rad(195.0)) * 700.0)
+	while lucian.slow_amount() <= 0.0:
+		await wait(0.02)
+	await wait(0.4)
+	print("broken pieces (expect 1): ", range(box.piece_count()).filter(func(piece: int) -> bool: return box.is_broken(piece)).size(),
+		"  hit (expect > 0): ", roundi(hp - lucian.hp), "  slowed (expect 0.8): ", lucian.slow_amount())
+	await shot("thresh_box_2_broken")
+
+
+## Phase 1 ends: Thresh at 0 HP rises with full HP, the green aura swelling
+## round him and "Phase 2" on the boss bar, untouchable for the rise; then
+## risen, darker, the aura on him. Then a hook misses (Lucian steps aside)
+## and comes again at once, behind a shorter warning.
+func scenario_thresh_phase2() -> void:
+	var game := game_stage()
+	var thresh := await to_final_thresh(Vector2(-460, 0))
+	await wait(0.3)
+	print("phase text before (expect Phase 1): ", game.hud.boss_bar.phase_text)
+	await shot("thresh_phase2_0_phase1")
+	finish(thresh)
+	await wait(0.5)
+	print("phase (expect 2), rising (expect true), HP (expect full): ", thresh.phase, ", ", thresh.is_rising(), ", ", roundi(thresh.hp), " / ", roundi(thresh.max_hp),
+		"  boss bar (expect Phase 2): ", game.hud.boss_bar.phase_text)
+	await shot("thresh_phase2_1_rising")
+	while thresh.stopped:
+		await wait(0.02)
+	hold(thresh)
+	await wait(0.3)
+	await shot("thresh_phase2_2_risen")
+	thresh._cooldowns[&"death_sentence"] = 0.0
+	var first := await wait_for_warning(GroundWarning.Shape.LINE)
+	lucian.command_move(lucian.global_position + first.direction.orthogonal() * 220.0)
+	var again: GroundWarning = null
+	while again == null:
+		await wait(0.02)
+		for node in stage.get_node("Warnings").get_children():
+			if node is GroundWarning and node != first and (node as GroundWarning).shape == GroundWarning.Shape.LINE:
+				again = node
+	await wait(0.25)
+	print("second hook warning (expect 0.45 s): ", again.warn_time)
+	await shot("thresh_phase2_3_rehook")
+
+
+## Phase 2's Dark Passage: the circle warning near Lucian, then Thresh's
+## lantern on the ground there and three Lantern Souls coming out of it.
+func scenario_thresh_lantern() -> void:
+	var thresh := await to_final_thresh(Vector2(-480, 0))
+	await wait(0.3)
+	finish(thresh)
+	await wait(0.1)
+	while thresh.stopped:
+		await wait(0.02)
+	hold(thresh)
+	thresh._cooldowns[&"dark_passage"] = 0.0
+	var warning := await wait_for_warning(GroundWarning.Shape.CIRCLE)
+	await wait(0.35)
+	print("lantern circle (expect 100, 0.6 s), within 250 of Lucian (expect true): ", warning.reach, ", ", warning.warn_time, ", ",
+		warning.global_position.distance_to(lucian.global_position) <= ThreshFinal.PASSAGE_REACH)
+	await shot("thresh_lantern_0_warning")
+	while is_instance_valid(warning):
+		await wait(0.02)
+	await wait(0.5)
+	var souls := get_nodes_in_group(&"enemies").filter(func(node: Node) -> bool: return (node as EnemyUnit).summoned)
+	print("souls (expect 3): ", souls.size(), "  Thresh's summons (expect 3): ", thresh.summons)
+	await shot("thresh_lantern_1_souls")
+
+
+## The ending: Phase 2's Thresh at 0 HP falls and the scene plays. He kneels
+## and drops his lantern, "It ends here."; Lucian's shot flies to it; it
+## cracks, Senna's soul forms as he dissolves; "Lucian… you came.". Then the
+## stage-end screen (STAGE CLEARED, +20 purple, "The story is complete").
+## Lucian shoots him first, so Damage dealt shows his hits.
+func scenario_ending_cutscene() -> void:
+	var game := game_stage()
+	var thresh := await to_final_thresh(Vector2(-460, 0))
+	await shoot_for(thresh, 3.0)
+	finish(thresh)
+	await wait(0.1)
+	# Risen, and the fight back on (a frame after the rise ends).
+	while thresh.stopped:
+		await wait(0.02)
+	hold(thresh)
+	finish(thresh)
+	while game.cutscene == null:
+		await process_frame
+	var scene := game.cutscene as SennaFreed
+	while scene._caption.text == "":
+		await wait(0.05)
+	await wait(0.3)
+	print("caption: ", scene._speaker.text, ": ", scene._caption.text, "  HUD hidden (expect true): ", not game.hud.visible)
+	await shot("ending_cutscene_0_lantern")
+	await press_key(KEY_SPACE, true)
+	await press_key(KEY_SPACE, false)
+	await wait(0.3)
+	await shot("ending_cutscene_1_shot")
+	# The shot's last 0.2 s, the burst (0.6 s), then the soul rising (1.4 s).
+	await wait(1.6)
+	await shot("ending_cutscene_2_freed")
+	while scene._caption.text == "":
+		await wait(0.05)
+	await wait(0.3)
+	print("caption: ", scene._speaker.text, ": ", scene._caption.text)
+	await shot("ending_cutscene_3_senna")
+	while not game.result.visible:
+		await press_key(KEY_SPACE, true)
+		await press_key(KEY_SPACE, false)
+		await wait(0.3)
+	await wait(0.4)
+	print("result (expect STAGE CLEARED): ", game.result.title.text, "  reward lines: ", game.reward_lines)
+	print("purple (expect 20): ", SaveGame.instance().essences.amount(Essences.PURPLE), "  stats (expect Damage dealt > 0): ", result_rows())
+	await shot("ending_cutscene_4_result")
+	paused = false
+
+
+## The End, as Game shows it after the last stage's first clear (here
+## straight from the main screen): THE END, the lantern, "Senna is free.",
+## the story time (the slot's play time) and the credits; Continue goes to
+## the main screen.
+func scenario_the_end() -> void:
+	SaveGame.instance().add_play_time(6.0 * 3600.0 + 23.0 * 60.0 + 41.0)
+	game_root._show_the_end(&"main", true)
+	await wait(0.4)
+	var end := game_root.screen as TheEndScreen
+	print("story time (expect Story time: 6:23:41): ", end.time_label.text)
+	await shot("the_end_0")
+	end.continue_button.pressed.emit()
+	await wait(0.3)
+	print("Continue: the main screen (expect true): ", game_root.screen is MainScreen)
 
 
 ## A super minion with melee and ranged minions around it: Empower's icon

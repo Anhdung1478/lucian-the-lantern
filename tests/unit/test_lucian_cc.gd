@@ -328,3 +328,14 @@ func test_the_word_under_his_health_bar_is_the_strongest() -> void:
 	assert_eq(bar._cc_word(), "Feared")
 	lucian.add_cc(Kind.STUN, 1.0)
 	assert_eq(bar._cc_word(), "Stunned")
+
+
+## The visual pass: at 14 px the word was a dark smudge under its outline at
+## game zoom. At 18 it reads, and every word still fits the bar's width.
+func test_the_word_reads_at_game_zoom_and_fits_under_the_bar() -> void:
+	assert_gte(LucianHealthBar.CC_FONT_SIZE, 18)
+	var font := ThemeDB.fallback_font
+	for row: Dictionary in Lucian.CC_DEBUFFS.values():
+		var width := font.get_string_size(row.name, HORIZONTAL_ALIGNMENT_LEFT, -1, LucianHealthBar.CC_FONT_SIZE).x
+		assert_gt(width, 0.0, row.name)
+		assert_lte(width, LucianHealthBar.SIZE.x, "%s fits under the bar" % row.name)

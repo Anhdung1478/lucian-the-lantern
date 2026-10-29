@@ -655,6 +655,32 @@ func test_the_forest_has_a_ragged_tree_line_top_and_bottom() -> void:
 	map.free()
 
 
+## The mean luminance of enemy `id`'s art over its solid pixels (alpha over
+## 0.9), each pixel times `shade` first (the art as the game tints it).
+func _art_luminance(id: StringName, shade := Color.WHITE) -> float:
+	var path := (load("res://data/enemies/%s.tres" % id) as EnemyData).art.resource_path
+	var image := Image.new()
+	assert_eq(image.load_svg_from_string(FileAccess.get_file_as_string(path)), OK, path)
+	var total := 0.0
+	var count := 0
+	for y in image.get_height():
+		for x in image.get_width():
+			var pixel := image.get_pixel(x, y)
+			if pixel.a > 0.9:
+				total += (pixel * shade).get_luminance()
+				count += 1
+	return total / maxi(count, 1)
+
+
+## The visual pass: spiderlings, most of every Act 5 wave, were dark grey on
+## the dark forest floor, seen only by their health bars. Their art stands
+## off the floor now; veiled, they are still a dark silhouette.
+func test_a_spiderling_reads_on_the_forest_floor() -> void:
+	var ground := DeadForestMap.FLOOR_COLOR.get_luminance()
+	assert_gt(_art_luminance(WavePlan.SPIDERLING) - ground, 0.08, "lighter than the floor")
+	assert_lt(_art_luminance(WavePlan.SPIDERLING, EnemyUnit.VEIL_SHADE), ground - 0.1, "veiled: a dark silhouette")
+
+
 # --- Act 6: Thresh's domain ----------------------------------------------
 
 const DOMAIN_SIZE := Vector2(5600, 3400)
@@ -1015,3 +1041,12 @@ func test_the_final_platform_is_round_and_open() -> void:
 		if not on_stub:
 			assert_true(_in_abyss(map, point), "%s past the rim" % point)
 	map.free()
+
+
+## The visual pass: the final Thresh starts on the platform's heart. On the
+## old dark heart his green-black art, darker still in Phase 2, vanished; on
+## the pale one he stands out in both phases.
+func test_thresh_reads_on_the_final_platform_heart() -> void:
+	var heart := ThreshDomainMap.HEART_COLOR.get_luminance()
+	assert_gt(heart - _art_luminance(WavePlan.THRESH_FINAL), 0.15, "Phase 1")
+	assert_gt(heart - _art_luminance(WavePlan.THRESH_FINAL, ThreshFinal.PHASE_2_SHADE), 0.2, "Phase 2")
