@@ -4,6 +4,8 @@ const PREFIX := "user://test_main_screen_save_slot_"
 
 var main: MainScreen
 var _prefix := ""
+## What the pop-up called back, in order.
+var _calls: Array[String] = []
 
 
 func before_each() -> void:
@@ -14,6 +16,7 @@ func before_each() -> void:
 	SaveGame.instance().reset()
 	SaveGame.instance().slot = 1
 	_remove_files()
+	_calls.clear()
 	main = MainScreen.new()
 	add_child_autofree(main)
 
@@ -41,6 +44,35 @@ func _esc() -> void:
 	event.action = &"open_menu"
 	event.pressed = true
 	main._input(event)
+
+
+## The pop-up's buttons on screen, in order: "Yes / No / Cancel".
+func _choices(popup: ConfirmPopup) -> String:
+	var labels := PackedStringArray()
+	for button: Button in popup.find_children("*", "Button", true, false):
+		if button.visible:
+			labels.append(button.text)
+	return " / ".join(labels)
+
+
+func _choice(popup: ConfirmPopup, text: String) -> Button:
+	for button: Button in popup.find_children("*", "Button", true, false):
+		if button.visible and button.text == text:
+			return button
+	return null
+
+
+func _record(what: String) -> void:
+	_calls.append(what)
+
+
+## The ESC key, straight to the pop-up.
+func _esc_key(popup: ConfirmPopup) -> void:
+	var key := InputEventKey.new()
+	key.keycode = KEY_ESCAPE
+	key.physical_keycode = KEY_ESCAPE
+	key.pressed = true
+	popup._input(key)
 
 
 func test_opens_on_journey() -> void:
@@ -89,6 +121,94 @@ func test_answer_does_nothing_while_the_popup_is_closed() -> void:
 	main.confirm.answer(true)
 	main.confirm.answer(false)
 	assert_eq(answers, [true] as Array[bool], "no stale answer once closed")
+
+
+func test_cancel_does_nothing_while_closed_or_on_a_yes_no_question() -> void:
+	main.confirm.cancel()
+	main.confirm.ask("Sure?", _record.bind("yes"), _record.bind("no"))
+	main.confirm.cancel()
+	assert_true(main.confirm.is_open(), "Yes / No has no Cancel")
+	main.confirm.answer(false)
+	assert_eq(_calls, ["no"] as Array[String])
+
+
+func _ask_to_save() -> void:
+	main.confirm.ask_or_cancel("Save before leaving?", _record.bind("yes"), _record.bind("no"), _record.bind("cancel"))
+
+
+func _ask_to_exit() -> void:
+	main.confirm.confirm("Exit the game?", "Exit", _record.bind("exit"), _record.bind("cancel"))
+
+
+func test_ask_or_cancel_offers_yes_no_and_cancel() -> void:
+	_ask_to_save()
+	assert_eq(_choices(main.confirm), "Yes / No / Cancel")
+	_choice(main.confirm, "Cancel").pressed.emit()
+	assert_false(main.confirm.is_open())
+	main.confirm.cancel()
+	assert_eq(_calls, ["cancel"] as Array[String], "no stale cancel once closed")
+	_ask_to_save()
+	_choice(main.confirm, "No").pressed.emit()
+	_ask_to_save()
+	_choice(main.confirm, "Yes").pressed.emit()
+	assert_eq(_calls, ["cancel", "no", "yes"] as Array[String])
+
+
+func test_confirm_offers_its_action_and_cancel() -> void:
+	_ask_to_exit()
+	assert_eq(_choices(main.confirm), "Exit / Cancel")
+	main.confirm.answer(false)
+	assert_true(main.confirm.is_open(), "no No to answer")
+	main.confirm.cancel()
+	_ask_to_exit()
+	_choice(main.confirm, "Exit").pressed.emit()
+	assert_eq(_calls, ["cancel", "exit"] as Array[String])
+
+
+func test_the_buttons_are_built_once_and_relabeled() -> void:
+	_ask_to_exit()
+	main.confirm.cancel()
+	main.confirm.ask("Overwrite slot 2?", Callable())
+	assert_eq(_choices(main.confirm), "Yes / No")
+	main.confirm.answer(false)
+	_ask_to_save()
+	assert_eq(_choices(main.confirm), "Yes / No / Cancel")
+	assert_eq(main.confirm.find_children("*", "Button", true, false).size(), 3)
+	main.confirm.cancel()
+
+
+func test_esc_is_cancel_when_the_question_has_one() -> void:
+	_ask_to_save()
+	_esc_key(main.confirm)
+	assert_false(main.confirm.is_open())
+	_ask_to_exit()
+	_esc_key(main.confirm)
+	assert_false(main.confirm.is_open())
+	assert_eq(_calls, ["cancel", "cancel"] as Array[String])
+
+
+func test_esc_on_a_yes_no_question_is_still_no_or_nothing() -> void:
+	main.confirm.ask("Overwrite slot 2?", Callable(), _record.bind("no"))
+	_esc_key(main.confirm)
+	assert_false(main.confirm.is_open())
+	main.confirm.ask("Could not save. Quit anyway?", Callable(), _record.bind("no"), false)
+	_esc_key(main.confirm)
+	assert_true(main.confirm.is_open(), "ESC doesn't answer this one")
+	main.confirm.answer(false)
+	assert_eq(_calls, ["no", "no"] as Array[String])
+
+
+func test_overwrite_and_reset_tree_still_ask_yes_or_no() -> void:
+	SaveGame.instance().copy_to(2)
+	main.gear.show_slots()
+	main.gear.find_button("Slot 2 · 0m · saved %s" % SaveGame.instance().saved_at(2).substr(0, 16)).pressed.emit()
+	assert_true(main.confirm.is_open())
+	assert_eq(_choices(main.confirm), "Yes / No")
+	main.confirm.answer(false)
+	(main.sections[MainScreen.SECTION_TREE] as TreeSection).reset_button.pressed.emit()
+	assert_true(main.confirm.is_open())
+	assert_eq(_choices(main.confirm), "Yes / No")
+	main.confirm.answer(false)
 
 
 func test_the_toast_stays_in_the_top_bar() -> void:

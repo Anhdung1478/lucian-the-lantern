@@ -32,6 +32,26 @@ func _title() -> TitleScreen:
 	return game.screen as TitleScreen
 
 
+## The pop-up's buttons on screen, in order: "Yes / No / Cancel".
+func _choices(popup: ConfirmPopup) -> String:
+	var labels := PackedStringArray()
+	for button: Button in popup.find_children("*", "Button", true, false):
+		if button.visible:
+			labels.append(button.text)
+	return " / ".join(labels)
+
+
+## A real ESC press and release, through the viewport: whoever reads it first wins.
+func _press_esc() -> void:
+	for pressed in [true, false]:
+		var key := InputEventKey.new()
+		key.keycode = KEY_ESCAPE
+		key.physical_keycode = KEY_ESCAPE
+		key.pressed = pressed
+		Input.parse_input_event(key)
+	Input.flush_buffered_events()
+
+
 func test_the_game_opens_on_the_title_screen() -> void:
 	assert_is(game.screen, TitleScreen)
 
@@ -56,6 +76,7 @@ func test_a_new_game_on_a_used_slot_asks_first() -> void:
 	_title().show_slots(false)
 	_title().slot_list.buttons[2].pressed.emit()
 	assert_true(_title().confirm.is_open())
+	assert_eq(_choices(_title().confirm), "Yes / No", "Overwrite stays Yes / No")
 	_title().confirm.answer(false)
 	assert_is(game.screen, TitleScreen)
 
@@ -85,10 +106,43 @@ func test_esc_goes_back_from_the_slot_list() -> void:
 	assert_false(_title().is_showing_slots())
 
 
-func test_exit_and_the_window_close_quit_at_once() -> void:
-	game._notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
+func test_exit_game_asks_and_exit_quits() -> void:
+	_title().find_button("Exit game").pressed.emit()
+	assert_false(quit_called, "not before Exit")
+	assert_true(game.prompt.is_open())
+	assert_eq(game.prompt._message.text, "Exit the game?")
+	assert_eq(_choices(game.prompt), "Exit / Cancel")
+	game.prompt.answer(true)
 	assert_true(quit_called)
+
+
+func test_the_window_close_on_the_title_asks_and_exit_quits() -> void:
+	game._notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
+	assert_false(quit_called, "not before Exit")
+	assert_eq(game.prompt._message.text, "Exit the game?")
+	assert_eq(_choices(game.prompt), "Exit / Cancel")
+	game.prompt.answer(true)
+	assert_true(quit_called)
+
+
+func test_cancel_on_exit_game_stays_on_the_title() -> void:
+	_title().find_button("Exit game").pressed.emit()
+	game.prompt.cancel()
 	assert_false(game.prompt.is_open())
+	assert_false(quit_called)
+	assert_is(game.screen, TitleScreen)
+	game._notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
+	game.prompt.cancel()
+	assert_false(quit_called)
+	assert_is(game.screen, TitleScreen)
+
+
+func test_esc_on_exit_game_is_cancel() -> void:
+	_title().find_button("Exit game").pressed.emit()
+	_press_esc()
+	assert_false(game.prompt.is_open())
+	assert_false(quit_called)
+	assert_is(game.screen, TitleScreen)
 
 
 func test_leave_to_main_menu_asks_then_shows_the_title() -> void:
@@ -100,6 +154,34 @@ func test_leave_to_main_menu_asks_then_shows_the_title() -> void:
 	await wait_process_frames(2)
 	assert_is(game.screen, TitleScreen)
 	assert_true(SaveGame.instance().slot_exists(SaveGame.instance().slot))
+
+
+func test_cancel_on_leave_to_main_menu_keeps_the_gear_menu_open() -> void:
+	game.show_main_screen()
+	await wait_process_frames(1)
+	var main := game.screen as MainScreen
+	main.gear.open()
+	main.gear.find_button("Leave to main menu").pressed.emit()
+	assert_eq(game.prompt._message.text, "Save before leaving?")
+	assert_eq(_choices(game.prompt), "Yes / No / Cancel")
+	game.prompt.cancel()
+	await wait_process_frames(2)
+	assert_false(game.prompt.is_open())
+	assert_eq(game.screen, main)
+	assert_true(main.gear.visible)
+	assert_false(SaveGame.instance().slot_exists(SaveGame.instance().slot), "no save")
+
+
+func test_esc_on_leave_to_main_menu_is_cancel() -> void:
+	game.show_main_screen()
+	await wait_process_frames(1)
+	var main := game.screen as MainScreen
+	main.gear.open()
+	main.gear.find_button("Leave to main menu").pressed.emit()
+	_press_esc()
+	assert_false(game.prompt.is_open())
+	assert_eq(game.screen, main)
+	assert_true(main.gear.visible, "the gear menu didn't read that ESC")
 
 
 func test_play_time_counts_off_the_title_screen_only() -> void:

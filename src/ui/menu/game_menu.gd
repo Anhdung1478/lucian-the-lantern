@@ -1,7 +1,8 @@
 class_name GameMenu
 extends CanvasLayer
 ## The ESC menu: Resume, Settings, Leave this stage, Exit the game. The last
-## two only ask; the stage and the game root act on them.
+## two only emit; under the game root they ask first (Leave / Cancel, Yes /
+## No / Cancel), and Cancel comes back to this menu, still paused.
 
 signal resume_requested
 signal settings_requested

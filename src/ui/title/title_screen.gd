@@ -3,8 +3,8 @@ extends Control
 ## The screen the game opens on: Thresh's lantern, the title, and Start new
 ## game, Load game, Settings and Exit the game. The two game buttons turn
 ## the panel into the slot list. A new game in a used slot asks first and
-## writes the slot at once. Nothing is unsaved here, so Exit and the
-## window's X quit at once.
+## writes the slot at once. Nothing is unsaved here, so Exit (and the
+## window's X) only ask "Exit the game?": Exit / Cancel, from the game root.
 
 signal new_game_started
 signal game_loaded

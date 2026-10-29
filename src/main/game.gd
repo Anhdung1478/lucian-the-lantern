@@ -2,8 +2,10 @@ class_name Game
 extends Node
 ## The root scene. Opens on the title screen; a slot leads to the main screen,
 ## which swaps in a stage and comes back when it ends (the stage-done
-## auto-save). Leaving to the title or the game, from a menu or the window's
-## close button, asks "Save before leaving?" (the title itself has nothing to save).
+## auto-save). Every exit asks first, and Cancel (or ESC) stays: leaving to
+## the title or the game, from a menu or the window's close button, asks
+## "Save before leaving?" Yes / No / Cancel; Leave this stage asks Leave /
+## Cancel; on the title (nothing to save) Exit and the X ask Exit / Cancel.
 
 const STAGE_SCENE := preload("res://src/stage/stage.tscn")
 ## Above the screens' own pop-ups (ConfirmPopup.LAYER), which can be open
@@ -37,11 +39,11 @@ func _process(delta: float) -> void:
 		SaveGame.instance().add_play_time(delta)
 
 
-## The title screen has nothing unsaved: its Exit and the window's X quit at once.
+## The window's X: "Exit the game?" on the title screen, else "Save before leaving?".
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		if screen is TitleScreen:
-			quit_game.call()
+			ask_to_exit()
 		else:
 			ask_to_quit()
 
@@ -50,15 +52,24 @@ func show_title() -> void:
 	var title := TitleScreen.new()
 	title.new_game_started.connect(func() -> void: start_stage(StageSetup.for_stage(SaveGame.instance(), 1, 1)))
 	title.game_loaded.connect(show_main_screen)
-	title.exit_requested.connect(func() -> void: quit_game.call())
+	title.exit_requested.connect(ask_to_exit)
 	_swap(title)
 
 
-## Leave to main menu: "Save before leaving?", then the title screen.
+## The title screen has nothing unsaved: its Exit and the window's X ask
+## "Exit the game?" Exit / Cancel.
+func ask_to_exit() -> void:
+	if prompt.is_open():
+		return
+	prompt.confirm("Exit the game?", "Exit", quit_game)
+
+
+## Leave to main menu: "Save before leaving?" Yes saves and No doesn't, then
+## the title screen; Cancel stays, with the gear menu still open.
 func ask_to_leave() -> void:
 	if prompt.is_open():
 		return
-	prompt.ask("Save before leaving?", _leave.bind(true), _leave.bind(false), false)
+	prompt.ask_or_cancel("Save before leaving?", _leave.bind(true), _leave.bind(false))
 
 
 func _leave(save: bool) -> void:
@@ -83,18 +94,34 @@ func start_stage(run: StageSetup) -> void:
 	stage.setup(run)
 	stage.finished.connect(_on_stage_finished)
 	stage.exit_requested.connect(ask_to_quit)
+	stage.leave_requested.connect(ask_to_leave_stage.bind(stage))
 	_swap(stage)
 
 
+## Leave this stage, from the stage's ESC menu: Leave ends the stage as left
+## (the stage-done auto-save, then the main screen); Cancel goes back to the
+## menu, still paused.
+func ask_to_leave_stage(stage: Stage) -> void:
+	if prompt.is_open():
+		return
+	prompt.confirm(_leave_stage_question(), "Leave", stage.leave)
+
+
+## What Leave this stage asks.
+func _leave_stage_question() -> String:
+	return "Leave this stage? Essences collected so far are kept."
+
+
 ## "Save before leaving?": Yes saves to the current slot (inside a stage
-## that keeps what was collected, as leaving it would), then the game closes.
-## If the save fails, "Could not save. Quit anyway?": No keeps playing.
+## that keeps what was collected, as leaving it would), then the game closes;
+## No closes it without saving; Cancel keeps playing. If the save fails,
+## "Could not save. Quit anyway?": No keeps playing.
 func ask_to_quit() -> void:
 	if prompt.is_open():
 		return
 	_was_paused = get_tree().paused
 	get_tree().paused = true
-	prompt.ask("Save before leaving?", _quit.bind(true), _quit.bind(false), false)
+	prompt.ask_or_cancel("Save before leaving?", _quit.bind(true), _quit.bind(false), _keep_playing)
 
 
 func _quit(save: bool) -> void:

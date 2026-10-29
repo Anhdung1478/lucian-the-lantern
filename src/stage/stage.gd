@@ -13,6 +13,9 @@ const EXTRA_DUMMY_ANGLES := [-PI / 2.0, 0.0, PI, -PI / 4.0]
 signal finished(result: StringName, then: StringName)
 ## Exit the game was chosen in the menu.
 signal exit_requested
+## Leave this stage was chosen in the menu. Whoever runs the stage asks
+## first, then calls leave().
+signal leave_requested
 ## An enemy spawned by the stage died (after its rewards).
 signal enemy_died(enemy: EnemyUnit)
 
@@ -119,9 +122,9 @@ func _ready() -> void:
 	screens.controller = lucian.get_node("Controller")
 	if not Sfx.exists():
 		add_child(Sfx.new())
-	screens.menu.leave_requested.connect(func() -> void: finished.emit(&"left", &"main"))
-	# Game connects `finished` before adding the stage; alone, nobody would act on Leave.
-	screens.menu.set_leave_enabled(not finished.get_connections().is_empty())
+	screens.menu.leave_requested.connect(leave_requested.emit)
+	# Game connects `leave_requested` before adding the stage; alone, nobody would act on Leave.
+	screens.menu.set_leave_enabled(not leave_requested.get_connections().is_empty())
 	screens.menu.exit_requested.connect(_exit)
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	camera.setup(lucian, arena.get_bounds().grow(StageMap.WALL_THICKNESS))
@@ -235,6 +238,11 @@ func show_result(is_cleared: bool) -> void:
 	# Losing the tutorial (Act 1 before its first clear) is a game over.
 	result.show_result(is_cleared, run.display_name, rows, collected, reward_lines, not is_cleared and run.tutorial, can_next)
 	get_tree().paused = true
+
+
+## Ends the stage as left: the essences collected so far are kept.
+func leave() -> void:
+	finished.emit(&"left", &"main")
 
 
 ## Run alone (no Game around it) the stage closes the game itself.
