@@ -153,7 +153,7 @@ func _build() -> void:
 	_toast = UiStyle.label("", 28, UiStyle.TITLE_COLOR)
 	_toast.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	_toast.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	# Inside the top bar, so it never sits on the Journey tabs.
+	# Inside the top bar, so it never sits on the Journey map.
 	_toast.offset_top = 16.0
 	_toast.visible = false
 	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -223,3 +223,15 @@ static func expand(plan: Array) -> Array:
 
 static func boss(stage_id: String) -> StringName:
 	return BOSSES.get(stage_id, &"")
+
+
+## The mini boss of a stage Journey lists as a mini boss stage: the last
+## enemy of its last wave. &"" for any other stage.
+static func mini_boss(stage_id: String) -> StringName:
+	if not Journey.is_stage_id(stage_id) or not STAGES.has(stage_id):
+		return &""
+	var parts := stage_id.split("-")
+	if Journey.boss_kind(parts[0].to_int(), parts[1].to_int()) != &"mini_boss":
+		return &""
+	var last_wave: Array = STAGES[stage_id].back()
+	return last_wave.back()[0]

@@ -1,105 +1,71 @@
 class_name JourneySection
 extends Control
-## The Journey page of the main screen: tabs Act 1 to Act 6, Training and
-## Endless across the top, the open tab's page on the left and the D/F
-## loadout on the right. Tabs unlock along the Journey
-## chain. Nothing here saves.
+## The Journey page of the main screen: a painted world map (JourneyMap) of
+## the six acts on one road, with Training and the Endless portal, and beside
+## it a panel (JourneyPanel) with the picked place, Start and the D/F spells.
+## Places open along the Journey chain; a locked one can't be picked.
+## Nothing here saves.
 
 signal start_training
 signal start_stage(act: int, stage: int)
 ## Endless's Start: `map_choice` is a Journey.ENDLESS_MAPS index (0 is Random).
 signal start_endless(map_choice: int)
 
-const TRAINING_TAB := 6
-const ENDLESS_TAB := 7
-const MARGIN := 32.0
+## In this section (the content area, y 72–992 on screen): the map, and the
+## opaque panel right of it.
+const MAP_RECT := Rect2(32, 8, 1416, 904)
+const PANEL_RECT := Rect2(1448, 8, 440, 904)
 
-## Act 1 to 6, Training, Endless.
-var tabs: Array[JourneyTab] = []
-var act_pages: Array[ActPage] = []
-var training_page := TrainingPage.new()
-var endless_page := EndlessPage.new()
-var loadout := LoadoutPanel.new()
-var current := 0
-## The act just played, which the page opens on (0: none).
+var map := JourneyMap.new()
+var panel := JourneyPanel.new()
+## The D/F spells, at the bottom of the panel.
+var loadout: LoadoutPanel = panel.loadout
+## The place the panel shows and Start plays.
+var picked: JourneyNode
+## The act just played, which the map opens on (0: none).
 var focus_act := 0
-## The page opens on Endless instead (after an Endless run), when it is open.
+## The map opens on Endless instead (after an Endless run), when it is open.
 var focus_endless := false
-
-var _pages: Array[Control] = []
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var tab_row := HBoxContainer.new()
-	tab_row.add_theme_constant_override(&"separation", 8)
-	tab_row.position = Vector2(MARGIN, 20)
-	add_child(tab_row)
-	var names: Array[String] = []
-	for act in range(1, Journey.ACTS.size() + 1):
-		names.append("Act %d" % act)
-	names.append("Training")
-	names.append("Endless")
-	for i in names.size():
-		var tab := JourneyTab.new(names[i])
-		tab.pressed.connect(show_tab.bind(i))
-		tab_row.add_child(tab)
-		tabs.append(tab)
-	var page_area := Control.new()
-	page_area.position = Vector2(MARGIN, 100)
-	page_area.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(page_area)
-	for act in range(1, Journey.ACTS.size() + 1):
-		var page := ActPage.new(act)
-		page.start_pressed.connect(func(stage: int) -> void: start_stage.emit(page.act, stage))
-		page_area.add_child(page)
-		act_pages.append(page)
-		_pages.append(page)
-	training_page.start_pressed.connect(start_training.emit)
-	endless_page.start_pressed.connect(start_endless.emit)
-	page_area.add_child(training_page)
-	page_area.add_child(endless_page)
-	_pages.append(training_page)
-	_pages.append(endless_page)
-	loadout.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	loadout.offset_left = -(LoadoutPanel.WIDTH + MARGIN)
-	loadout.offset_right = -MARGIN
-	loadout.offset_top = 100.0
-	add_child(loadout)
-	var save := SaveGame.instance()
-	save.changed.connect(refresh)
-	save.tree.changed.connect(refresh)
+	map.position = MAP_RECT.position
+	map.node_chosen.connect(pick)
+	add_child(map)
+	panel.position = PANEL_RECT.position
+	panel.start_pressed.connect(_on_start)
+	add_child(panel)
+	SaveGame.instance().changed.connect(refresh)
 	refresh()
-	if focus_endless and not tabs[ENDLESS_TAB].locked:
-		show_tab(ENDLESS_TAB)
+	if focus_endless and not map.endless.locked:
+		pick(map.endless)
 	else:
 		open_on(focus_act)
 
 
-## The tab to open on: `act` (just played) if it is open, else the first
-## playable act with an open stage not cleared yet, else Training.
+## Picks `act`'s first open stage not cleared yet (its last when all are)
+## when `act` (just played) is open; else the next stage; else Training.
 func open_on(act := 0) -> void:
 	var cleared := SaveGame.instance().cleared
-	if act > 0 and Journey.is_act_open(act, cleared):
-		show_tab(act - 1)
+	if act > 0 and act <= Journey.ACTS.size() and Journey.is_act_open(act, cleared):
+		var stage := 1
+		while stage < Journey.stage_count(act) and Journey.stage_id(act, stage) in cleared \
+				and Journey.is_stage_open(act, stage + 1, cleared):
+			stage += 1
+		pick(map.node_for(Journey.stage_id(act, stage)))
 		return
-	for page in act_pages:
-		if page.playable and Journey.is_act_open(page.act, cleared) and page.default_stage(cleared) > 0 \
-				and not Journey.stage_id(page.act, page.default_stage(cleared)) in cleared:
-			show_tab(page.act - 1)
-			return
-	show_tab(TRAINING_TAB)
+	pick(map.token_node if map.token_node else map.training)
 
 
-## Shows tab `index`; a locked tab stays closed.
-func show_tab(index: int) -> void:
-	if index < 0 or index >= tabs.size() or tabs[index].locked:
+## Shows `node` in the panel and outlines it; a locked place stays unpicked.
+func pick(node: JourneyNode) -> void:
+	if node == null or node.locked:
 		return
-	current = index
-	for i in _pages.size():
-		_pages[i].visible = i == index
-		tabs[i].set_selected(i == index)
+	picked = node
+	map.select(node)
+	panel.show_node(node, SaveGame.instance())
 
 
 ## Closes the spell menu if it is open (the main screen's ESC calls this).
@@ -107,14 +73,25 @@ func close_popup() -> bool:
 	return loadout.close_menu()
 
 
-## Locks and opens the tabs and cards from the save.
+## Locks, opens and marks the map from the save, and refills the panel; a
+## pick that has locked falls back as open_on() does.
 func refresh() -> void:
 	var save := SaveGame.instance()
-	for i in act_pages.size():
-		tabs[i].set_locked(not Journey.is_act_open(i + 1, save.cleared), "Clear Act %d first" % i)
-		act_pages[i].refresh(save.cleared)
-	var endless_open := Journey.is_endless_open(save.cleared)
-	tabs[ENDLESS_TAB].set_locked(not endless_open, "Clear Act %d first" % Journey.ENDLESS_ACT)
-	endless_page.refresh(save.endless_best, endless_open)
-	if tabs[current].locked:
-		show_tab(0)
+	map.refresh(save.cleared, save.endless_best, Skins.find(save.skin).portrait)
+	panel.show_best(save.endless_best)
+	if picked == null or picked.locked:
+		open_on()
+	else:
+		pick(picked)
+
+
+func _on_start() -> void:
+	if picked == null or picked.locked:
+		return
+	match picked.kind:
+		JourneyNode.TRAINING:
+			start_training.emit()
+		JourneyNode.ENDLESS:
+			start_endless.emit(panel.map_choice())
+		_:
+			start_stage.emit(picked.act, picked.stage)

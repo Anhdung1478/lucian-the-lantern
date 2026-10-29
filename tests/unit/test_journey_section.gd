@@ -29,85 +29,331 @@ func _save() -> SaveGame:
 	return SaveGame.instance()
 
 
+func _node(stage_id: String) -> JourneyNode:
+	return section.map.node_for(stage_id)
+
+
+## Acts 1..`acts` cleared, plus the stage ids in `more`.
+func _clear(acts: int, more: Array[String] = []) -> void:
+	var ids := Journey.all_stage_ids(acts)
+	ids.append_array(more)
+	_save().set_cleared(ids)
+
+
+func _click() -> InputEventMouseButton:
+	var click := InputEventMouseButton.new()
+	click.pressed = true
+	click.button_index = MOUSE_BUTTON_LEFT
+	return click
+
+
+func _name(node: JourneyNode) -> String:
+	return node.stage_id if node.stage_id != "" else String(node.kind)
+
+
+# --- The map: places, layout, locks ---------------------------------------------
+
+
+func test_the_map_has_22_stages_training_and_endless() -> void:
+	var map := section.map
+	var ids: Array[String] = []
+	for node in map.nodes:
+		ids.append(node.stage_id)
+	assert_eq(ids, Journey.all_stage_ids(6))
+	assert_eq(map.training.kind, JourneyNode.TRAINING)
+	assert_eq(map.endless.kind, JourneyNode.ENDLESS)
+	assert_eq(JourneyMap.NODES.size(), 22)
+	for id: String in JourneyMap.NODES:
+		assert_true(Journey.is_stage_id(id), id)
+
+
+func test_the_map_and_the_panel_share_the_content_area() -> void:
+	assert_eq(section.map.get_rect(), JourneySection.MAP_RECT)
+	assert_eq(section.panel.get_rect(), JourneySection.PANEL_RECT)
+	assert_eq(JourneySection.MAP_RECT.position.x, 32.0)
+	assert_eq(JourneySection.MAP_RECT.end.x, 1448.0)
+	assert_eq(JourneySection.PANEL_RECT.position.x, 1448.0)
+	assert_eq(JourneySection.PANEL_RECT.end.x, 1888.0)
+	assert_lt(JourneySection.MAP_RECT.end.y, 920.0, "inside the content area (y 72–992)")
+
+
+func test_every_place_fits_on_the_map_clear_of_the_panel_and_of_each_other() -> void:
+	var places: Array[JourneyNode] = []
+	places.assign(section.map.nodes)
+	places.append(section.map.training)
+	places.append(section.map.endless)
+	assert_eq(places.size(), 24)
+	var map_rect := section.map.get_global_rect()
+	var panel_rect := section.panel.get_global_rect()
+	for i in places.size():
+		var rect := places[i].get_global_rect()
+		assert_true(map_rect.encloses(rect), "%s inside the map" % _name(places[i]))
+		assert_false(rect.intersects(panel_rect), "%s clear of the panel" % _name(places[i]))
+		for j in range(i + 1, places.size()):
+			assert_false(rect.intersects(places[j].get_global_rect()), "%s overlaps %s" % [_name(places[i]), _name(places[j])])
+
+
 func test_a_new_save_locks_acts_two_to_six_and_endless() -> void:
-	assert_eq(section.tabs.size(), 8)
-	assert_false(section.tabs[0].locked)
-	for i in range(1, 6):
-		assert_true(section.tabs[i].locked, "act %d" % (i + 1))
-		assert_true(section.tabs[i].disabled)
-	assert_false(section.tabs[JourneySection.TRAINING_TAB].locked)
-	assert_true(section.tabs[JourneySection.ENDLESS_TAB].locked)
+	assert_false(_node("1-1").locked)
+	for act in range(2, 7):
+		for stage in Journey.stage_count(act):
+			var node := _node(Journey.stage_id(act, stage + 1))
+			assert_true(node.locked, node.stage_id)
+			assert_true(node.fogged, node.stage_id)
+	assert_false(section.map.training.locked)
+	assert_true(section.map.endless.locked)
 
 
-func test_a_new_game_opens_on_act_one() -> void:
-	assert_eq(section.current, 0)
-	assert_true(section.act_pages[0].visible)
-	assert_false(section.training_page.visible)
+## The fog and chain over a locked act (the old chained tab).
+func test_locked_acts_are_fogged_until_their_act_opens() -> void:
+	for act in range(1, 7):
+		assert_eq(section.map.is_fogged(act), act > 1, "act %d" % act)
+	_clear(3)
+	for act in range(1, 7):
+		assert_eq(section.map.is_fogged(act), act > 4, "act %d" % act)
 
 
-func test_a_locked_tab_label_starts_right_of_its_chain() -> void:
-	var endless := section.tabs[JourneySection.ENDLESS_TAB]
-	assert_eq(endless.get_theme_stylebox(&"disabled").content_margin_left, JourneyTab.CHAIN_ROOM)
-	_save().set_cleared(Journey.all_stage_ids(Journey.ENDLESS_ACT))
-	assert_lt(endless.get_theme_stylebox(&"normal").content_margin_left, JourneyTab.CHAIN_ROOM)
+func test_locked_places_say_what_to_clear() -> void:
+	assert_eq(_node("2-1").get_meta(&"hover_text"), "Clear Act 1 first")
+	assert_eq(_node("3-4").get_meta(&"hover_text"), "Clear Act 2 first")
+	assert_eq(section.map.endless.get_meta(&"hover_text"), "Clear Act 3 first")
+	assert_eq(section.map.regions[1].get_meta(&"hover_text"), "Clear Act 1 first", "the fogged region too")
+	assert_false(section.map.regions[0].has_meta(&"hover_text"), "act 1 is open")
+	_clear(1)
+	assert_false(section.map.regions[1].has_meta(&"hover_text"))
 
 
-func test_locked_tabs_say_what_to_clear() -> void:
-	assert_eq(section.tabs[1].get_meta(&"hover_text"), "Clear Act 1 first")
-	assert_eq(section.tabs[JourneySection.ENDLESS_TAB].get_meta(&"hover_text"), "Clear Act 3 first")
+func test_hover_says_the_stage_and_its_waves() -> void:
+	_clear(2)
+	assert_eq(_node("3-1").get_meta(&"hover_text"), "Stage 3-1 · The Jungle\n3 waves")
+	assert_eq(_node("3-2").get_meta(&"hover_text"), "Stage 3-2 · The Jungle\n4 waves + mini boss\nClear 3-1 first",
+		"a locked stage in an open act")
+	assert_eq(_node("1-1").get_meta(&"hover_text"), "Act 1 · The Loss\n2 waves + boss wave")
 
 
 func test_clearing_three_acts_opens_act_four_and_endless() -> void:
-	_save().set_cleared(Journey.all_stage_ids(3))
-	assert_false(section.tabs[3].locked)
-	assert_true(section.tabs[4].locked)
-	assert_false(section.tabs[JourneySection.ENDLESS_TAB].locked)
-
-
-func test_act_three_shows_skulls_on_stages_two_four_and_five() -> void:
-	var cards := section.act_pages[2].cards
-	assert_eq(cards.size(), 5)
-	var skulls: Array[bool] = []
-	for card in cards:
-		skulls.append(card.skull.visible)
-	assert_eq(skulls, [false, true, false, true, true] as Array[bool])
-	assert_eq(cards[1].skull.modulate, StageCard.MINI_BOSS_COLOR)
-	assert_eq(cards[4].skull.modulate, StageCard.BOSS_COLOR)
-
-
-func test_act_one_stage_one_is_open_and_a_cleared_card_is_marked() -> void:
-	var card: StageCard = section.act_pages[0].cards[0]
-	assert_false(card.locked)
-	assert_false(card.cleared)
-	_save().set_cleared(["1-1"] as Array[String])
-	assert_true(section.act_pages[0].cards[0].cleared)
+	_clear(3)
+	assert_false(_node("4-1").locked)
+	assert_false(_node("4-1").fogged)
+	assert_true(_node("5-1").locked)
+	assert_false(section.map.endless.locked)
+	assert_ne(section.map.endless.get_meta(&"hover_text", ""), "Clear Act 3 first")
 
 
 func test_later_stages_are_locked_until_the_one_before_is_cleared() -> void:
-	var cards := section.act_pages[1].cards
-	assert_true(cards[0].locked)
-	_save().set_cleared(Journey.all_stage_ids(1))
-	cards = section.act_pages[1].cards
-	assert_false(cards[0].locked)
-	assert_true(cards[1].locked)
+	assert_true(_node("2-1").locked)
+	_clear(1)
+	assert_false(_node("2-1").locked)
+	assert_true(_node("2-2").locked)
+	assert_false(_node("2-2").fogged, "locked inside an open act: dim with a lock, no fog")
 
 
-func test_cards_say_their_waves() -> void:
-	assert_eq(section.act_pages[1].cards[0].waves_label.text, "2 waves")
-	assert_eq(section.act_pages[1].cards[2].waves_label.text, "3 waves + boss wave")
+# --- Kinds, art and waves ------------------------------------------------------
+
+
+func test_act_three_has_mini_bosses_on_two_and_four_and_its_boss_on_five() -> void:
+	var kinds: Array[StringName] = []
+	for stage in 5:
+		kinds.append(_node(Journey.stage_id(3, stage + 1)).kind)
+	assert_eq(kinds, [JourneyNode.NORMAL, JourneyNode.MINI_BOSS, JourneyNode.NORMAL, JourneyNode.MINI_BOSS, JourneyNode.BOSS] as Array[StringName])
+	assert_eq(_node("3-2").ring_color(), JourneyNode.MINI_BOSS_COLOR)
+	assert_eq(_node("3-5").ring_color(), JourneyNode.BOSS_COLOR)
+	assert_eq(_node("3-1").diameter(), 56.0)
+	assert_eq(_node("3-2").diameter(), 76.0)
+	assert_eq(_node("3-5").diameter(), 100.0)
+
+
+func test_mini_boss_and_boss_places_show_their_art() -> void:
+	for act in range(1, 7):
+		for stage in range(1, Journey.stage_count(act) + 1):
+			var id := Journey.stage_id(act, stage)
+			var node := _node(id)
+			match Journey.boss_kind(act, stage):
+				&"boss":
+					assert_eq(node.enemy.id, WavePlan.boss(id), id)
+					assert_eq(node.art, node.enemy.art, id)
+				&"mini_boss":
+					assert_eq(node.enemy.id, WavePlan.mini_boss(id), id)
+					assert_eq(node.art, node.enemy.art, id)
+				_:
+					assert_null(node.enemy, id)
+					assert_null(node.art, id)
+	assert_eq(_node("3-2").enemy.display_name, "Infernal Drake")
+	assert_eq(_node("6-5").enemy.id, &"thresh_final")
+
+
+func test_places_say_their_waves() -> void:
+	assert_eq(_node("2-1").waves_text, "2 waves")
+	assert_eq(_node("2-3").waves_text, "3 waves + boss wave")
 
 
 ## A drake comes last in its stage's last wave, not in a wave of its own.
-func test_a_mini_boss_card_puts_it_in_the_last_wave() -> void:
-	var cards := section.act_pages[2].cards
-	assert_eq(cards[1].waves_label.text, "4 waves + mini boss")
-	assert_eq(cards[3].waves_label.text, "5 waves + mini boss")
-	assert_eq(cards[4].waves_label.text, "5 waves + boss wave")
+func test_a_mini_boss_place_puts_it_in_the_last_wave() -> void:
+	assert_eq(_node("3-2").waves_text, "4 waves + mini boss")
+	assert_eq(_node("3-4").waves_text, "5 waves + mini boss")
+	assert_eq(_node("3-5").waves_text, "5 waves + boss wave")
+
+
+# --- Cleared marks, the road and the token ---------------------------------------
+
+
+func test_act_one_stage_one_is_open_and_a_cleared_place_is_marked() -> void:
+	assert_false(_node("1-1").locked)
+	assert_false(_node("1-1").cleared)
+	_clear(1)
+	assert_true(_node("1-1").cleared)
+	assert_false(_node("2-1").cleared)
+
+
+func test_the_road_glows_up_to_the_latest_clear() -> void:
+	var map := section.map
+	assert_eq(map.lit_stage, "")
+	assert_eq(map.lit_offset, 0.0)
+	_clear(1, ["2-1", "2-2"] as Array[String])
+	assert_eq(map.lit_stage, "2-2")
+	assert_almost_eq(map.lit_offset, map.road.get_closest_offset(_node("2-2").center), 1.0)
+	assert_gt(map.lit_offset, map.road.get_closest_offset(_node("2-1").center))
+	assert_lt(map.lit_offset, map.road.get_closest_offset(_node("2-3").center))
+	_clear(6)
+	assert_eq(map.lit_stage, "6-5")
+	assert_almost_eq(map.lit_offset, map.road.get_baked_length(), 1.0, "the whole road")
+
+
+func test_the_road_runs_through_every_stage_in_order() -> void:
+	var road := section.map.road
+	var last := -1.0
+	for node in section.map.nodes:
+		var at := road.get_closest_offset(node.center)
+		assert_lt(road.sample_baked(at).distance_to(node.center), 2.0, node.stage_id)
+		assert_gt(at, last, node.stage_id)
+		last = at
+
+
+func test_lucians_token_sits_on_the_next_stage() -> void:
+	var map := section.map
+	assert_eq(map.token_node, _node("1-1"))
+	assert_true(map.token.visible)
+	_clear(1)
+	assert_eq(map.token_node, _node("2-1"))
+	_clear(2, ["3-1"] as Array[String])
+	assert_eq(map.token_node, _node("3-2"))
+	_clear(6)
+	assert_null(map.token_node, "every stage is cleared")
+	assert_false(map.token.visible)
+
+
+func test_the_token_wears_the_equipped_skin() -> void:
+	assert_eq(section.map.token_texture, Skins.find(SaveGame.CLASSIC).portrait)
+	_save().owned_skins.append(&"high_noon")
+	_save().equip_skin(&"high_noon")
+	assert_eq(section.map.token_texture, Skins.find(&"high_noon").portrait)
+
+
+# --- Picking and the panel ---------------------------------------------------------
+
+
+func test_a_new_game_opens_on_act_one() -> void:
+	assert_eq(section.picked, _node("1-1"))
+	assert_true(_node("1-1").selected)
+	assert_true(section.panel.stage_box.visible)
+	assert_false(section.panel.training_box.visible)
+	assert_false(section.panel.endless_box.visible)
+
+
+func test_act_one_start_is_enabled_on_a_new_game() -> void:
+	var panel := section.panel
+	assert_false(panel.start_button.disabled)
+	assert_eq(panel.start_button.text, "Start", "one stage in the act")
+	assert_eq(panel.act_label.text, "ACT 1 · THE LOSS")
+	assert_eq(panel.title_label.text, "Stage 1-1")
+	assert_eq(panel.boss_name_label.text, "Thresh")
+	assert_eq(panel.tag_label.text, "Boss")
+	assert_eq(panel.purple_label.text, "First kill: +10")
+
+
+func test_act_one_replays_have_no_boss() -> void:
+	_clear(1)
+	_save().bosses.append("thresh_1")
+	section.pick(_node("1-1"))
+	assert_false(section.panel.boss_row.visible)
+	assert_eq(section.panel.purple_label.text, "No boss on replays")
+	assert_eq(section.panel.status_label.text, "Cleared")
+
+
+func test_picking_a_mini_boss_stage_fills_the_panel() -> void:
+	_clear(2, ["3-1", "3-2", "3-3"] as Array[String])
+	section.pick(_node("3-4"))
+	var panel := section.panel
+	assert_eq(section.picked, _node("3-4"))
+	assert_eq(panel.act_label.text, "ACT 3 · THE JUNGLE")
+	assert_eq(panel.title_label.text, "Stage 3-4")
+	assert_true(panel.boss_row.visible)
+	assert_eq(panel.portrait_texture(), _node("3-4").enemy.art)
+	assert_eq(panel.boss_name_label.text, "Ocean Drake")
+	assert_eq(panel.tag_label.text, "Mini boss")
+	assert_eq(panel.waves_label.text, "5 waves + mini boss")
+	assert_eq(panel.story_label.text, Journey.ACTS[2]["story"])
+	assert_eq(panel.status_label.text, "Not cleared yet")
+	assert_eq(panel.purple_label.text, "First kill: +5")
+	assert_eq(panel.start_button.text, "Start stage 4")
+	assert_false(panel.start_button.disabled)
+	assert_false(panel.start_button.has_meta(&"hover_text"))
+	# Beaten once: the panel follows the save.
+	_save().bosses.append("ocean_drake")
+	_clear(2, ["3-1", "3-2", "3-3", "3-4"] as Array[String])
+	assert_eq(section.picked, _node("3-4"), "a refresh keeps an open pick")
+	assert_eq(panel.status_label.text, "Cleared")
+	assert_eq(panel.purple_label.text, "+1 again")
+
+
+func test_picking_a_boss_stage_shows_the_boss() -> void:
+	_clear(1, ["2-1", "2-2"] as Array[String])
+	section.pick(_node("2-3"))
+	var panel := section.panel
+	assert_eq(panel.boss_name_label.text, "Akshan")
+	assert_eq(panel.tag_label.text, "Boss")
+	assert_eq(panel.waves_label.text, "3 waves + boss wave")
+	assert_eq(panel.purple_label.text, "First kill: +10")
+	assert_eq(panel.start_button.text, "Start stage 3")
+
+
+func test_a_normal_stage_has_no_boss_row() -> void:
+	_clear(1)
+	section.pick(_node("2-1"))
+	assert_false(section.panel.boss_row.visible)
+	assert_false(section.panel.purple_row.visible)
+	assert_eq(section.panel.waves_label.text, "2 waves")
+	assert_eq(section.panel.start_button.text, "Start stage 1")
+
+
+## The roster: each enemy of the stage's waves once, in order; the mini boss
+## has the portrait.
+func test_the_panel_lists_the_stages_enemies() -> void:
+	assert_eq(section.panel.enemy_ids, [&"melee_minion", &"ranged_minion", &"siege_minion"] as Array[StringName])
+	_clear(2, ["3-1"] as Array[String])
+	section.pick(_node("3-2"))
+	var ids := section.panel.enemy_ids
+	assert_false(&"infernal_drake" in ids)
+	assert_eq(ids[0], &"raptor_big", "a pack brings its members")
+	assert_eq(ids.size(), section.panel.roster.get_child_count())
+	assert_eq(section.panel.roster.get_child(0).get_meta(&"hover_text"), "Crimson Raptor")
+	assert_no_new_orphans()
+
+
+func test_endless_chips_light_only_the_chosen_map() -> void:
+	_clear(3)
+	section.pick(section.map.endless)
+	section.panel.map_buttons[4].pressed.emit()
+	for i in section.panel.map_buttons.size():
+		assert_eq(section.panel.map_buttons[i].button_pressed, i == 4, Journey.ENDLESS_MAPS[i])
 
 
 func test_start_training_emits_the_signal() -> void:
+	section.pick(section.map.training)
+	assert_true(section.panel.training_box.visible)
+	assert_eq(section.panel.start_button.text, "Start Training")
 	watch_signals(section)
-	section.training_page.start_button.pressed.emit()
+	section.panel.start_button.pressed.emit()
 	assert_signal_emitted(section, "start_training")
 
 
@@ -121,56 +367,58 @@ func test_main_screen_sends_a_setup_with_one_equip_slot() -> void:
 	assert_eq(got[0].equip_slots, 1)
 
 
-func test_tabs_switch_pages_and_never_save() -> void:
-	_save().set_cleared(Journey.all_stage_ids(3))
-	section.show_tab(JourneySection.ENDLESS_TAB)
-	assert_true(section.endless_page.visible)
-	section.show_tab(JourneySection.TRAINING_TAB)
-	assert_true(section.training_page.visible)
-	assert_false(section.endless_page.visible)
+func test_picking_switches_the_panel_and_never_saves() -> void:
+	_clear(3)
+	section.pick(section.map.endless)
+	assert_true(section.panel.endless_box.visible)
+	assert_false(section.panel.stage_box.visible)
+	section.pick(section.map.training)
+	assert_true(section.panel.training_box.visible)
+	assert_false(section.panel.endless_box.visible)
+	assert_true(section.map.training.selected)
+	assert_false(section.map.endless.selected)
 	assert_false(FileAccess.file_exists(_save().path(1)))
 
 
-func test_a_locked_tab_cannot_be_shown() -> void:
-	section.show_tab(3)
-	assert_false(section.act_pages[3].visible)
+func test_a_locked_place_cannot_be_picked() -> void:
+	section.pick(_node("4-1"))
+	assert_eq(section.picked, _node("1-1"))
+	assert_false(_node("4-1").selected)
+	section.pick(section.map.endless)
+	assert_eq(section.picked, _node("1-1"))
 
 
-func test_act_one_start_is_enabled_on_a_new_game() -> void:
-	assert_false(section.act_pages[0].start_button.disabled)
-
-
-func test_start_is_disabled_for_locked_acts() -> void:
-	assert_true(section.act_pages[1].start_button.disabled, "act 2 is locked")
-	_save().set_cleared(Journey.all_stage_ids(2))
-	assert_false(section.act_pages[2].start_button.disabled, "act 3 starts: 3-1 has its waves")
-	assert_false(section.act_pages[2].start_button.has_meta(&"hover_text"))
-	_save().set_cleared(Journey.all_stage_ids(3))
-	assert_false(section.act_pages[3].start_button.disabled, "act 4 starts: 4-1 has its waves")
-	assert_false(section.act_pages[3].start_button.has_meta(&"hover_text"))
-	_save().set_cleared(Journey.all_stage_ids(4))
-	assert_false(section.act_pages[4].start_button.disabled, "act 5 starts: 5-1 has its waves")
-	assert_false(section.act_pages[4].start_button.has_meta(&"hover_text"))
-	assert_true(section.act_pages[5].start_button.disabled, "act 6 is locked")
-	_save().set_cleared(Journey.all_stage_ids(5))
-	assert_false(section.act_pages[5].start_button.disabled, "act 6 starts once acts 1-5 are cleared: 6-1 has its waves")
-	assert_false(section.act_pages[5].start_button.has_meta(&"hover_text"))
+## Each act's first stage starts once its act opens (every act has its waves).
+func test_start_works_once_each_act_opens() -> void:
+	for act in range(2, 7):
+		var first := _node(Journey.stage_id(act, 1))
+		section.pick(first)
+		assert_ne(section.picked, first, "act %d is locked" % act)
+		_clear(act - 1)
+		section.pick(first)
+		assert_eq(section.picked, first, "act %d opens" % act)
+		assert_false(section.panel.start_button.disabled, "act %d starts" % act)
+		assert_false(section.panel.start_button.has_meta(&"hover_text"))
 
 
 func test_endless_start_works_once_act_three_is_cleared_and_starts_the_chosen_map() -> void:
-	var page := section.endless_page
-	assert_eq(page.map_buttons.size(), 7)
-	assert_eq(page.map_index(), 0, "Random")
-	_save().set_cleared(Journey.all_stage_ids(2))
-	assert_true(page.start_button.disabled, "Endless opens with Act 3")
-	_save().set_cleared(Journey.all_stage_ids(3))
-	assert_false(page.start_button.disabled)
-	assert_false(page.start_button.has_meta(&"hover_text"))
-	section.show_tab(JourneySection.ENDLESS_TAB)
-	page.map_buttons[3].pressed.emit()
-	assert_eq(page.map_index(), 3)
+	var panel := section.panel
+	assert_eq(panel.map_buttons.size(), 7)
+	assert_eq(panel.map_choice(), 0, "Random")
+	_clear(2)
+	section.pick(section.map.endless)
+	assert_ne(section.picked, section.map.endless, "Endless opens with Act 3")
+	_clear(3)
+	section.pick(section.map.endless)
+	assert_eq(section.picked, section.map.endless)
+	assert_eq(panel.start_button.text, "Start")
+	assert_false(panel.start_button.disabled)
+	assert_false(panel.start_button.has_meta(&"hover_text"))
+	panel.map_buttons[3].pressed.emit()
+	assert_eq(panel.map_choice(), 3)
+	assert_eq(panel.thumbnail.choice, 3, "the thumbnail follows the chip")
 	watch_signals(section)
-	page.start_button.pressed.emit()
+	panel.start_button.pressed.emit()
 	assert_signal_emitted_with_parameters(section, "start_endless", [3])
 
 
@@ -197,80 +445,150 @@ func test_the_main_screen_can_open_the_journey_on_endless() -> void:
 	main.focus_endless = true
 	add_child_autofree(main)
 	var journey := main.sections[MainScreen.SECTION_JOURNEY] as JourneySection
-	assert_eq(journey.current, JourneySection.ENDLESS_TAB)
-	assert_true(journey.endless_page.visible)
-	assert_false(journey.act_pages[2].visible)
+	assert_eq(journey.picked, journey.map.endless)
+	assert_true(journey.panel.endless_box.visible)
+	assert_false(journey.panel.stage_box.visible)
 
 
 func test_focus_on_a_locked_endless_opens_as_usual() -> void:
 	var journey := JourneySection.new()
 	journey.focus_endless = true
 	add_child_autofree(journey)
-	assert_eq(journey.current, 0, "act 1, where the work is")
-	assert_true(journey.act_pages[0].visible)
+	assert_eq(journey.picked, journey.map.node_for("1-1"), "act 1, where the work is")
+	assert_true(journey.panel.stage_box.visible)
 
 
-func test_a_locked_card_cannot_be_chosen() -> void:
-	_save().set_cleared(["1-1"] as Array[String])
-	var page := section.act_pages[1]
-	assert_eq(page.selected, 1)
-	page.cards[1].chosen.emit()
-	page.select(2)
-	assert_eq(page.selected, 1)
+func test_a_locked_stage_cannot_be_chosen() -> void:
+	_clear(1)
+	assert_eq(section.picked, _node("1-1"), "a refresh keeps an open pick")
+	section.open_on()
+	assert_eq(section.picked, _node("2-1"))
+	_node("2-2").chosen.emit()
+	_node("2-2")._gui_input(_click())
+	section.pick(_node("2-2"))
+	assert_eq(section.picked, _node("2-1"))
 
 
 func test_the_default_stage_is_the_first_open_uncleared_one() -> void:
 	_save().set_cleared(["1-1", "2-1"] as Array[String])
-	assert_eq(section.act_pages[1].selected, 2)
+	section.open_on(2)
+	assert_eq(section.picked, _node("2-2"))
+	section.open_on()
+	assert_eq(section.picked, _node("2-2"))
+
+
+func test_a_pick_that_locks_falls_back_to_the_next_stage() -> void:
+	_clear(3)
+	section.pick(_node("4-1"))
+	_save().reset()
+	assert_eq(section.picked, _node("1-1"))
 
 
 func test_start_emits_the_act_and_stage() -> void:
 	_save().set_cleared(["1-1", "2-1"] as Array[String])
 	watch_signals(section)
-	section.act_pages[1].select(2)
-	section.act_pages[1].start_button.pressed.emit()
+	section.pick(_node("2-2"))
+	section.panel.start_button.pressed.emit()
 	assert_signal_emitted_with_parameters(section, "start_stage", [2, 2])
 
 
-func test_clicking_a_card_selects_it() -> void:
+func test_clicking_a_place_picks_it() -> void:
 	_save().set_cleared(["1-1", "2-1"] as Array[String])
-	var click := InputEventMouseButton.new()
-	click.pressed = true
-	click.button_index = MOUSE_BUTTON_LEFT
-	section.act_pages[1].select(2)
-	section.act_pages[1].cards[0]._gui_input(click)
-	assert_eq(section.act_pages[1].selected, 1)
-	assert_true(section.act_pages[1].cards[0].selected)
+	section.pick(_node("2-2"))
+	_node("2-1")._gui_input(_click())
+	assert_eq(section.picked, _node("2-1"))
+	assert_true(_node("2-1").selected)
+	assert_false(_node("2-2").selected)
+	section.map.training._gui_input(_click())
+	assert_eq(section.picked, section.map.training)
 
 
-func test_it_opens_on_the_first_act_with_work_to_do() -> void:
-	assert_eq(section.current, 0)
+func test_it_opens_on_the_next_stage() -> void:
+	assert_eq(section.picked, _node("1-1"))
 	_save().set_cleared(["1-1"] as Array[String])
 	section.open_on()
-	assert_eq(section.current, 1)
-	_save().set_cleared(Journey.all_stage_ids(2))
+	assert_eq(section.picked, _node("2-1"))
+	for act in range(2, 6):
+		_clear(act)
+		section.open_on()
+		assert_eq(section.picked, _node(Journey.stage_id(act + 1, 1)), "act %d can be played" % (act + 1))
+	_clear(6)
 	section.open_on()
-	assert_eq(section.current, 2, "act 3 can be played")
-	_save().set_cleared(Journey.all_stage_ids(3))
-	section.open_on()
-	assert_eq(section.current, 3, "act 4 can be played")
-	_save().set_cleared(Journey.all_stage_ids(4))
-	section.open_on()
-	assert_eq(section.current, 4, "act 5 can be played")
-	_save().set_cleared(Journey.all_stage_ids(5))
-	section.open_on()
-	assert_eq(section.current, 5, "act 6 can be played")
-	_save().set_cleared(Journey.all_stage_ids(6))
-	section.open_on()
-	assert_eq(section.current, JourneySection.TRAINING_TAB, "the story is done")
+	assert_eq(section.picked, section.map.training, "the story is done")
 	section.open_on(1)
-	assert_eq(section.current, 0)
+	assert_eq(section.picked, _node("1-1"), "the act just played")
+	section.open_on(6)
+	assert_eq(section.picked, _node("6-5"), "an act all cleared: its last stage")
 
 
 func test_endless_shows_the_best_wave() -> void:
 	_save().endless_best = 17
 	_save().changed.emit()
-	assert_eq(section.endless_page.best_label.text, "Best wave: 17")
+	assert_eq(section.panel.best_label.text, "Best wave: 17")
+	assert_eq(section.map.endless.best, 17)
+
+
+# --- The Endless map thumbnail ----------------------------------------------------
+
+
+func test_the_thumbnail_draws_each_map_without_adding_it_to_the_tree() -> void:
+	var thumbnail := MapThumbnail.new()
+	add_child_autofree(thumbnail)
+	assert_eq(thumbnail.size, MapThumbnail.SIZE)
+	assert_eq(MapThumbnail.SIZE, Vector2(400, 180))
+	var nodes_before := Performance.get_monitor(Performance.OBJECT_NODE_COUNT)
+	var navigation_map := get_viewport().world_2d.navigation_map
+	var regions_before := NavigationServer2D.map_get_regions(navigation_map).size()
+	var frame := Rect2(Vector2.ZERO, MapThumbnail.SIZE).grow(0.5)
+	for choice in range(1, Journey.ENDLESS_MAPS.size()):
+		var map_name: String = Journey.ENDLESS_MAPS[choice]
+		thumbnail.show_choice(choice)
+		assert_eq(thumbnail.choice, choice)
+		assert_false(thumbnail.is_random())
+		assert_gt(thumbnail.walls.size() + thumbnail.circles.size() + thumbnail.chasms.size(), 0, map_name)
+		assert_true(frame.encloses(thumbnail.ground), map_name)
+		for polygon: PackedVector2Array in thumbnail.walls + thumbnail.chasms:
+			for point in polygon:
+				assert_true(frame.has_point(point), "%s fits the frame" % map_name)
+	assert_gt(thumbnail.chasms.size(), 0, "Thresh's domain has its abyss")
+	assert_eq(Performance.get_monitor(Performance.OBJECT_NODE_COUNT), nodes_before, "every map freed at once")
+	assert_eq(NavigationServer2D.map_get_regions(navigation_map).size(), regions_before, "no navigation baked")
+	assert_eq(thumbnail.get_child_count(), 0)
+	thumbnail.show_choice(EndlessPlan.RANDOM)
+	assert_true(thumbnail.is_random(), "Random shows a ? card")
+	assert_eq(thumbnail.walls.size(), 0)
+	assert_no_new_orphans()
+
+
+func test_the_endless_panel_starts_on_random() -> void:
+	_clear(3)
+	section.pick(section.map.endless)
+	assert_true(section.panel.thumbnail.is_random())
+	assert_true(section.panel.thumbnail.is_visible_in_tree())
+
+
+# --- The summoner spells -------------------------------------------------------------
+
+
+func test_the_spells_sit_compact_at_the_bottom_of_the_panel() -> void:
+	assert_eq(LoadoutPanel.PICK_SIZE, 64.0)
+	assert_eq(section.loadout, section.panel.loadout)
+	var panel_rect := section.panel.get_global_rect()
+	var loadout_rect := section.loadout.get_global_rect()
+	assert_true(panel_rect.encloses(loadout_rect))
+	assert_gt(loadout_rect.position.y, panel_rect.get_center().y, "in the lower half")
+	assert_lt(section.panel.start_button.get_global_rect().end.y, loadout_rect.position.y, "Start sits above them")
+
+
+func test_the_spell_menu_opens_left_of_the_panel_on_screen() -> void:
+	_save().tree._levels[&"flash"] = 1
+	_save().tree._levels[&"heal"] = 1
+	_save().tree._levels[&"summoner_slot_2"] = 1
+	_save().tree.changed.emit()
+	section.loadout.open_menu(1)
+	var menu := section.loadout.menu.get_global_rect()
+	assert_lt(menu.end.x, section.panel.get_global_rect().position.x)
+	assert_true(get_viewport().get_visible_rect().encloses(menu), "never off the bottom")
 
 
 func test_f_is_chained_until_the_second_slot_is_bought() -> void:

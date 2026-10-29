@@ -26,6 +26,15 @@ static func stage_count(act: int) -> int:
 	return ACTS[act - 1]["waves"].size()
 
 
+## "Act 1 · The Loss" for an act of one stage, else "Stage 3-4 · The Jungle":
+## how the HUD and the Journey map name a stage.
+static func stage_name(act: int, stage: int) -> String:
+	var act_name: String = ACTS[act - 1]["name"]
+	if stage_count(act) == 1:
+		return "Act %d · %s" % [act, act_name]
+	return "Stage %s · %s" % [stage_id(act, stage), act_name]
+
+
 static func is_stage_id(id: String) -> bool:
 	var parts := id.split("-")
 	if parts.size() != 2 or not parts[0].is_valid_int() or not parts[1].is_valid_int():

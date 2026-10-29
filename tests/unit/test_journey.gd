@@ -65,3 +65,20 @@ func test_next_stage() -> void:
 	assert_eq(Journey.next_stage(2, 3), Vector2i(3, 1))
 	assert_eq(Journey.next_stage(3, 2), Vector2i(3, 3))
 	assert_eq(Journey.next_stage(6, 5), Vector2i.ZERO)
+
+
+## The Journey map shows each mini boss stage's mini boss: the last enemy of
+## its last wave.
+func test_mini_boss_is_the_last_enemy_of_a_mini_boss_stage() -> void:
+	var expected := {"3-2": &"infernal_drake", "3-4": &"ocean_drake", "5-2": &"maokai", "5-4": &"elise", "6-2": &"karthus_revived", "6-4": &"hecarim"}
+	for id: String in expected:
+		assert_eq(WavePlan.mini_boss(id), expected[id], id)
+		assert_true(String(expected[id]) in SaveGame.BOSS_IDS, id)
+	for id: String in ["1-1", "2-1", "3-1", "3-5", "6-5", "junk", "7-1"]:
+		assert_eq(WavePlan.mini_boss(id), &"", id)
+
+
+## The HUD's and the Journey map's name for a stage.
+func test_stage_name() -> void:
+	assert_eq(Journey.stage_name(1, 1), "Act 1 · The Loss", "an act of one stage")
+	assert_eq(Journey.stage_name(3, 4), "Stage 3-4 · The Jungle")

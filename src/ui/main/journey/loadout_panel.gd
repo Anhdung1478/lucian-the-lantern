@@ -1,11 +1,18 @@
 class_name LoadoutPanel
 extends PanelContainer
-## The summoner spells on D and F, on every Journey tab. A slot opens the
-## SpellMenu; a pick goes to SaveGame.set_loadout(), which swaps when the
-## spell was on the other key. F stays chained until the 2nd slot is bought.
+## The summoner spells on D and F, compact at the bottom of the Journey's
+## side panel for every pick. A slot opens the SpellMenu, to the left of the
+## panel; a pick goes to SaveGame.set_loadout(), which swaps when the spell
+## was on the other key. F stays chained until the 2nd slot is bought.
 
-const WIDTH := 380.0
-const PICK_SIZE := 72.0
+const WIDTH := 400.0
+const PICK_SIZE := 64.0
+## The panel's inner margin, and the gap between the words and the keys.
+const MARGIN := 12.0
+const SPACING := 14
+## The spell menu's gap from the panel, and from the screen's edges.
+const MENU_GAP := 32.0
+const SCREEN_MARGIN := 8.0
 const CHAIN := preload("res://assets/art/ui/chain.svg")
 const KEYS: Array[StringName] = [&"summoner_d", &"summoner_f"]
 
@@ -19,19 +26,26 @@ var _chains: Array[TextureRect] = []
 
 func _ready() -> void:
 	custom_minimum_size.x = WIDTH
-	add_theme_stylebox_override(&"panel", UiStyle.panel(UiStyle.PANEL_COLOR, UiStyle.BORDER_COLOR, 2, 20.0))
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override(&"separation", 16)
-	add_child(column)
-	column.add_child(UiStyle.label("SUMMONER SPELLS", 24, UiStyle.TITLE_COLOR))
+	add_theme_stylebox_override(&"panel", UiStyle.panel(Color(0.035, 0.042, 0.056), Color(UiStyle.BORDER_COLOR, 0.5), 1, MARGIN, 8))
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 24)
-	column.add_child(row)
+	row.add_theme_constant_override(&"separation", SPACING)
+	add_child(row)
+	var words := VBoxContainer.new()
+	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	words.alignment = BoxContainer.ALIGNMENT_CENTER
+	words.add_theme_constant_override(&"separation", 4)
+	row.add_child(words)
+	words.add_child(UiStyle.label("SUMMONER SPELLS", 18, UiStyle.TITLE_COLOR))
+	var hint := UiStyle.label("Click a key to choose its spell. Spells are bought in the Evolution Tree.", 14, UiStyle.DIM_COLOR)
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# The words take what the two keys leave.
+	hint.custom_minimum_size.x = WIDTH - MARGIN * 2.0 - (SPACING + PICK_SIZE) * 2.0
+	words.add_child(hint)
 	for i in 2:
 		var holder := VBoxContainer.new()
-		holder.add_theme_constant_override(&"separation", 6)
+		holder.add_theme_constant_override(&"separation", 2)
 		row.add_child(holder)
-		var key := UiStyle.label("", 22, UiStyle.GOLD_COLOR)
+		var key := UiStyle.label("", 18, UiStyle.GOLD_COLOR)
 		key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		holder.add_child(key)
 		_key_labels.append(key)
@@ -40,7 +54,7 @@ func _ready() -> void:
 		pick_button.expand_icon = true
 		pick_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		pick_button.pressed.connect(open_menu.bind(i))
-		UiStyle.style_button(pick_button, 18)
+		UiStyle.style_button(pick_button, 16)
 		holder.add_child(pick_button)
 		picks.append(pick_button)
 		var chain := TextureRect.new()
@@ -57,10 +71,6 @@ func _ready() -> void:
 		chain.visible = false
 		pick_button.add_child(chain)
 		_chains.append(chain)
-	var hint := UiStyle.label("Click a key to choose its spell. Spells are bought in the Evolution Tree.", 16, UiStyle.DIM_COLOR)
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.custom_minimum_size.x = WIDTH - 40.0
-	column.add_child(hint)
 	menu.top_level = true
 	menu.z_index = 10
 	menu.picked.connect(_on_picked)
@@ -81,9 +91,14 @@ func open_menu(index: int) -> void:
 		return
 	var save := SaveGame.instance()
 	menu.open(index, save.tree, save.loadout[index])
-	# Beside the slot, to the left of the panel so it never covers it.
+	# Beside the slot, left of the panel so it never covers it; it opens
+	# upward when it would run off the bottom of the screen.
 	var anchor := picks[index].get_global_rect()
-	menu.global_position = Vector2(get_global_rect().position.x - menu.size.x - 12.0, anchor.position.y)
+	var screen := get_viewport_rect().grow(-SCREEN_MARGIN)
+	var top := anchor.position.y
+	if top + menu.size.y > screen.end.y:
+		top = anchor.end.y - menu.size.y
+	menu.global_position = Vector2(get_global_rect().position.x - menu.size.x - MENU_GAP, maxf(top, screen.position.y))
 
 
 ## Closes the menu; true when one was open.

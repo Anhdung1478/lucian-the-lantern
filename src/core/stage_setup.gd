@@ -86,11 +86,7 @@ static func for_stage(save: SaveGame, act_number: int, stage_number: int) -> Sta
 	setup.act = act_number
 	setup.stage = stage_number
 	setup.stage_id = Journey.stage_id(act_number, stage_number)
-	var act_name: String = Journey.ACTS[act_number - 1]["name"]
-	if Journey.stage_count(act_number) == 1:
-		setup.display_name = "Act %d · %s" % [act_number, act_name]
-	else:
-		setup.display_name = "Stage %s · %s" % [setup.stage_id, act_name]
+	setup.display_name = Journey.stage_name(act_number, stage_number)
 	setup.boss = WavePlan.boss(setup.stage_id)
 	if setup.stage_id == TUTORIAL_STAGE:
 		if TUTORIAL_STAGE in save.cleared:

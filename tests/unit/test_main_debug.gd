@@ -99,10 +99,10 @@ func test_orange_and_purple_buttons_and_reset() -> void:
 
 func test_acts_cleared_three_opens_endless() -> void:
 	var journey := main.sections[MainScreen.SECTION_JOURNEY] as JourneySection
-	assert_true(journey.tabs[JourneySection.ENDLESS_TAB].locked)
+	assert_true(journey.map.endless.locked)
 	var spin := _find_spin(table)
 	spin.value = 3
-	assert_false(journey.tabs[JourneySection.ENDLESS_TAB].locked)
+	assert_false(journey.map.endless.locked)
 	assert_eq(SaveGame.instance().tree.acts_cleared, 3)
 
 
