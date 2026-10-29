@@ -4,8 +4,16 @@ extends Node
 ## when run.endless and calls its hooks: start (the runner), scale (each
 ## spawn's strength) and skip_to_boss (debug). It records the best as each
 ## wave is won. After a boss wave it holds the break for the ModifierPick over
-## a paused game, applies the pick and lets the break go. The rest of the run
-## is the story's stage: the merchant in breaks, rewards, loot.
+## a paused game, applies the pick and lets the break go. At the end it adds
+## the run's rows and "New best" to the result (add_result). The rest of the
+## run is the story's stage: the merchant in breaks, rewards, loot.
+
+## The result's title: a run only ends when Lucian falls.
+const RUN_OVER := "RUN OVER"
+## The result's green line, when the run beat the best it started with.
+const NEW_BEST := "New best: %d %s!"
+## The Modifier row with none in effect (none picked yet, or Nothing).
+const NO_MODIFIER := "None"
 
 var stage: Stage
 var runner: EndlessRunner
@@ -14,12 +22,16 @@ var runner: EndlessRunner
 var modifier := EndlessModifiers.NONE
 ## The pick on screen after a boss wave, or null.
 var pick: ModifierPick
+## The save's best when the run started; "New best" beats this one, as the
+## save's own rises with each wave won.
+var start_best := 0
 
 
 ## The run's waves, made up as they come; the Stage wires the rest of the
 ## runner as for the story.
 func start(owner_stage: Stage) -> EndlessRunner:
 	stage = owner_stage
+	start_best = SaveGame.instance().endless_best
 	runner = EndlessRunner.new()
 	runner.break_started.connect(_on_wave_won)
 	runner.boss_cleared.connect(_on_boss_cleared)
@@ -54,6 +66,17 @@ func choose(id: int) -> void:
 	runner.elite_mult = EndlessModifiers.elite_mult(modifier)
 	EndlessModifiers.apply_rewards(stage.run, modifier)
 	stage.lucian.set_run_scale(EndlessModifiers.run_scale(modifier))
+
+
+## The run's parts of the result: Waves cleared on top of `rows` and the
+## modifier's downside at the bottom ([label, value] pairs), and "New best"
+## in `lines` when the run beat the best it started with.
+func add_result(rows: Array, lines: Array[String]) -> void:
+	var waves := runner.waves_cleared
+	rows.push_front(["Waves cleared", str(waves)])
+	rows.append(["Modifier", NO_MODIFIER if modifier == EndlessModifiers.NONE else EndlessModifiers.downside(modifier)])
+	if waves > start_best:
+		lines.append(NEW_BEST % [waves, "wave" if waves == 1 else "waves"])
 
 
 ## Debug: the next boss wave comes next. An open pick closes and a held break

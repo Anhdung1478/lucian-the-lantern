@@ -1,7 +1,11 @@
 class_name EndlessPage
 extends VBoxContainer
 ## The Endless tab: the rules, a map choice (kept here only, not saved yet),
-## the best wave and a Start button for a later phase.
+## the best wave and Start, which runs Endless on the chosen map once it is
+## open (Act 3 cleared).
+
+## Start: `map_choice` is a Journey.ENDLESS_MAPS index (0 is Random).
+signal start_pressed(map_choice: int)
 
 const RULES := "Waves never end. A mini boss comes every 5 waves and an act boss every 10. Every 10 waves you pick a modifier."
 
@@ -42,7 +46,7 @@ func _init() -> void:
 	start_button.text = "Start"
 	start_button.custom_minimum_size = Vector2(320, 64)
 	start_button.disabled = true
-	start_button.set_meta(&"hover_text", "Endless comes in a later phase")
+	start_button.pressed.connect(func() -> void: start_pressed.emit(_selected))
 	UiStyle.style_button(start_button, 28)
 	start_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	add_child(start_button)
@@ -53,9 +57,10 @@ func map_index() -> int:
 	return _selected
 
 
-## Shows the best wave of this save.
-func refresh(best: int) -> void:
+## Shows the best wave of this save; Start works while Endless is `open`.
+func refresh(best: int, open: bool) -> void:
 	best_label.text = "Best wave: %d" % best
+	start_button.disabled = not open
 
 
 func _choose(index: int) -> void:

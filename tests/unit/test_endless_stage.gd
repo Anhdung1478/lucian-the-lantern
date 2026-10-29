@@ -21,9 +21,11 @@ func after_each() -> void:
 	get_tree().paused = false
 
 
-## An Endless run on map `choice`, from a fresh save; Lucian takes no damage.
-func _endless(choice := JUNGLE) -> Stage:
+## An Endless run on map `choice`, from a fresh save whose best is `best`;
+## Lucian takes no damage.
+func _endless(choice := JUNGLE, best := 0) -> Stage:
 	SaveGame.instance().reset()
+	SaveGame.instance().record_endless(best)
 	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
 	stage.setup(StageSetup.for_endless(SaveGame.instance(), choice, RandomNumberGenerator.new()))
 	add_child_autofree(stage)
@@ -230,6 +232,115 @@ func test_final_thresh_falls_with_repeat_purple_and_no_cutscene_and_the_run_goes
 	assert_eq(stage.runner.state, WaveRunner.State.BREAK, "the run goes on")
 	assert_eq(stage.runner.waves_done(), 1)
 	assert_engine_error_count(0)
+
+
+## Ruling (Task 6 review): an Endless final Thresh's fall counts as a kill
+## and pays like the other bosses' kills: gold, XP and a loot roll.
+func test_final_thresh_s_fall_counts_as_a_kill_with_gold_xp_and_loot() -> void:
+	var stage: Stage = await _endless()
+	stage.skip_break()
+	stage.runner.spawn_requested.emit(&"thresh_final", 1)
+	stage.runner.enemy_spawned()
+	var thresh := _unit(&"thresh_final") as ThreshFinal
+	# A copy with some XP (no boss has any), so the XP shows.
+	thresh.data = thresh.data.duplicate() as EnemyData
+	thresh.data.xp = 50
+	var kills := stage.stats.kills
+	var loot := _loot(stage).size()
+	thresh.fell.emit(thresh)
+	await wait_physics_frames(2)
+	assert_false(is_instance_valid(thresh))
+	assert_eq(stage.stats.kills, kills + 1)
+	assert_eq(stage.wallet.gold, 300, "a boss's gold")
+	assert_eq(stage.stats.gold_earned, 300)
+	assert_eq(stage.lucian.progress.xp, 50)
+	assert_gt(_loot(stage).size(), loot, "a boss always drops a fragment")
+	assert_eq(stage.collected[Essences.PURPLE], 4, "and his repeat purple")
+
+
+func _loot(stage: Stage) -> Array[Node]:
+	return stage.get_node("World").get_children().filter(func(node: Node) -> bool: return node is LootDrop)
+
+
+## The result's stats rows as [label, value] texts, in order.
+func _result_rows(stage: Stage) -> Array:
+	var rows := []
+	for row: Node in stage.result._stats.get_children():
+		if not row.is_queued_for_deletion():
+			rows.append([(row.get_child(0) as Label).text, (row.get_child(1) as Label).text])
+	return rows
+
+
+func _row_names(stage: Stage) -> Array:
+	return _result_rows(stage).map(func(row: Array) -> String: return row[0])
+
+
+func test_dying_shows_run_over_with_the_waves_cleared_and_a_new_best() -> void:
+	var stage: Stage = await _endless()
+	stage.skip_break()
+	await _kill_wave(stage)
+	stage.lucian.invulnerable = false
+	stage.lucian.take_damage(_lethal())
+	# Frames, not seconds: the result pauses the tree, and GUT's timer with it.
+	var give_up := Time.get_ticks_msec() + int((Lucian.DEATH_FADE + 3.0) * 1000.0)
+	while not stage.result.visible and Time.get_ticks_msec() < give_up:
+		await wait_process_frames(1)
+	assert_true(stage.result.visible)
+	assert_eq(stage.result.title.text, "RUN OVER")
+	assert_eq(stage.result._stage_label.text, "Endless · Jungle")
+	assert_eq(_row_names(stage), ["Waves cleared", "Time", "Kills", "Damage dealt", "Damage taken", "Gold earned", "Level reached", "Modifier"])
+	assert_eq(_result_rows(stage)[0], ["Waves cleared", "1"])
+	assert_eq(_result_rows(stage)[-1], ["Modifier", "None"], "nothing picked yet")
+	assert_eq(stage.reward_lines, ["New best: 1 wave!"] as Array[String])
+	assert_true(stage.result.retry_button.visible)
+	assert_false(stage.result.next_button.visible)
+	assert_eq(stage.result.main_button.text, "Main screen")
+	watch_signals(stage)
+	stage.result.retry_button.pressed.emit()
+	assert_signal_emitted_with_parameters(stage, "finished", [&"failed", &"retry"])
+
+
+## The save's best rises as each wave is won; "New best" compares with the
+## best the run started with.
+func test_new_best_beats_the_best_the_run_started_with() -> void:
+	var stage: Stage = await _endless(JUNGLE, 1)
+	for i in 2:
+		stage.skip_break()
+		await _kill_wave(stage)
+	assert_eq(SaveGame.instance().endless_best, 2)
+	stage.show_result(false)
+	assert_eq(stage.reward_lines, ["New best: 2 waves!"] as Array[String])
+
+
+func test_no_new_best_when_the_run_is_not_better() -> void:
+	var stage: Stage = await _endless(JUNGLE, 1)
+	stage.skip_break()
+	await _kill_wave(stage)
+	stage.show_result(false)
+	assert_eq(_result_rows(stage)[0], ["Waves cleared", "1"])
+	assert_true(stage.reward_lines.is_empty(), "equal is no new best")
+
+
+func test_the_modifier_row_reads_its_downside_and_none_after_nothing() -> void:
+	var stage: Stage = await _endless()
+	stage.endless.choose(3)
+	stage.show_result(false)
+	assert_eq(_result_rows(stage)[-1], ["Modifier", "−10% max HP"])
+	get_tree().paused = false
+	var again: Stage = await _endless()
+	again.endless.choose(3)
+	again.endless.choose(EndlessModifiers.NOTHING)
+	again.show_result(false)
+	assert_eq(_result_rows(again)[-1], ["Modifier", "None"])
+	assert_false("Waves" in _row_names(again), "no story waves row")
+
+
+func test_the_story_result_keeps_its_waves_row() -> void:
+	var stage: Stage = await _story(2, 1)
+	stage.show_result(false)
+	assert_eq(_result_rows(stage)[1], ["Waves", "0 / 2"])
+	assert_false("Modifier" in _row_names(stage))
+	assert_eq(stage.result.title.text, "DEFEATED")
 
 
 func test_the_merchant_comes_in_breaks() -> void:

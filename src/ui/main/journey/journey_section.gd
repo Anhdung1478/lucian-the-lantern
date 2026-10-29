@@ -7,6 +7,8 @@ extends Control
 
 signal start_training
 signal start_stage(act: int, stage: int)
+## Endless's Start: `map_choice` is a Journey.ENDLESS_MAPS index (0 is Random).
+signal start_endless(map_choice: int)
 
 const TRAINING_TAB := 6
 const ENDLESS_TAB := 7
@@ -21,6 +23,8 @@ var loadout := LoadoutPanel.new()
 var current := 0
 ## The act just played, which the page opens on (0: none).
 var focus_act := 0
+## The page opens on Endless instead (after an Endless run), when it is open.
+var focus_endless := false
 
 var _pages: Array[Control] = []
 
@@ -53,6 +57,7 @@ func _ready() -> void:
 		act_pages.append(page)
 		_pages.append(page)
 	training_page.start_pressed.connect(start_training.emit)
+	endless_page.start_pressed.connect(start_endless.emit)
 	page_area.add_child(training_page)
 	page_area.add_child(endless_page)
 	_pages.append(training_page)
@@ -66,7 +71,10 @@ func _ready() -> void:
 	save.changed.connect(refresh)
 	save.tree.changed.connect(refresh)
 	refresh()
-	open_on(focus_act)
+	if focus_endless and not tabs[ENDLESS_TAB].locked:
+		show_tab(ENDLESS_TAB)
+	else:
+		open_on(focus_act)
 
 
 ## The tab to open on: `act` (just played) if it is open, else the first
@@ -105,7 +113,8 @@ func refresh() -> void:
 	for i in act_pages.size():
 		tabs[i].set_locked(not Journey.is_act_open(i + 1, save.cleared), "Clear Act %d first" % i)
 		act_pages[i].refresh(save.cleared)
-	tabs[ENDLESS_TAB].set_locked(not Journey.is_endless_open(save.cleared), "Clear Act %d first" % Journey.ENDLESS_ACT)
-	endless_page.refresh(save.endless_best)
+	var endless_open := Journey.is_endless_open(save.cleared)
+	tabs[ENDLESS_TAB].set_locked(not endless_open, "Clear Act %d first" % Journey.ENDLESS_ACT)
+	endless_page.refresh(save.endless_best, endless_open)
 	if tabs[current].locked:
 		show_tab(0)

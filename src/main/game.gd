@@ -22,9 +22,12 @@ var quit_game := func() -> void: get_tree().quit()
 
 ## Whether the tree was paused before the prompt paused it.
 var _was_paused := false
+## Rolls an Endless Retry's map when the choice is Random.
+var _rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
+	_rng.randomize()
 	GameSettings.instance().apply()
 	get_tree().auto_accept_quit = false
 	add_child(Sfx.new())
@@ -79,9 +82,12 @@ func _leave(save: bool) -> void:
 	show_title()
 
 
-func show_main_screen(focus_act := 0) -> void:
+## `focus_act`: the act the Journey opens on; `focus_endless`: it opens on
+## Endless instead (after a run).
+func show_main_screen(focus_act := 0, focus_endless := false) -> void:
 	var main := MainScreen.new()
 	main.focus_act = focus_act
+	main.focus_endless = focus_endless
 	main.start_requested.connect(start_stage)
 	main.exit_requested.connect(ask_to_quit)
 	main.leave_requested.connect(ask_to_leave)
@@ -107,8 +113,10 @@ func ask_to_leave_stage(stage: Stage) -> void:
 	prompt.confirm(_leave_stage_question(), "Leave", stage.leave)
 
 
-## What Leave this stage asks.
+## What Leave this stage asks (Endless: leave the run).
 func _leave_stage_question() -> String:
+	if _run.endless:
+		return "Leave this run? Your best wave is kept."
 	return "Leave this stage? Essences collected so far are kept."
 
 
@@ -131,12 +139,15 @@ func _quit(save: bool) -> void:
 	quit_game.call()
 
 
-## Saves the current slot. On a stage's result panel the stage is done
-## first, as Continue would, so a clear is not lost.
+## Saves the current slot (an Endless run's best with it: it is kept in
+## memory as each wave is won). On a stage's result panel the stage is done
+## first, as Continue would, so a clear is not lost; an Endless run has no
+## id to clear, so `cleared` never gets "endless".
 func _save() -> bool:
 	var stage := screen as Stage
 	if stage and stage.result.visible:
-		return SaveGame.instance().finish_stage(&"cleared" if stage.result.cleared else &"failed", _run.stage_id)
+		var id := "" if _run.endless else _run.stage_id
+		return SaveGame.instance().finish_stage(&"cleared" if stage.result.cleared else &"failed", id)
 	return SaveGame.instance().save()
 
 
@@ -149,8 +160,12 @@ func _keep_playing() -> void:
 ## player's choice: retry or next start that stage; the title screen after
 ## losing the tutorial (Act 1 before its first clear); otherwise the main
 ## screen. A failed save sends retry and next to the main screen, where it
-## shows; so does next after the last stage.
+## shows; so does next after the last stage. An Endless run ends its own way
+## (_end_run).
 func _on_stage_finished(result: StringName, then: StringName) -> void:
+	if _run.endless:
+		_end_run(result, then)
+		return
 	var act := _run.act
 	var stage := _run.stage
 	var next := Journey.next_stage(act, stage)
@@ -175,6 +190,21 @@ func _on_stage_finished(result: StringName, then: StringName) -> void:
 			start_stage.call_deferred(StageSetup.for_stage(SaveGame.instance(), next.x, next.y))
 		_:
 			show_main_screen.call_deferred(act)
+	if not saved:
+		_report_save_failed.call_deferred()
+
+
+## An Endless run is over (Lucian fell or the player left): the stage-done
+## auto-save keeps the best, with no stage id, so `cleared` never gets
+## "endless". Retry starts a new run on the same map choice (Random rolls
+## again); otherwise, and when the save failed, the main screen with the
+## Journey on Endless.
+func _end_run(result: StringName, then: StringName) -> void:
+	var saved := SaveGame.instance().finish_stage(result, "")
+	if saved and then == &"retry":
+		start_stage.call_deferred(StageSetup.for_endless(SaveGame.instance(), _run.map_choice, _rng))
+		return
+	show_main_screen.call_deferred(0, true)
 	if not saved:
 		_report_save_failed.call_deferred()
 

@@ -220,7 +220,8 @@ func _remove_every_enemy() -> void:
 		enemy.queue_free()
 
 
-## The result panel over a paused game; ESC and P stop working.
+## The result panel over a paused game; ESC and P stop working. Endless's
+## is RUN OVER with the run's own rows (EndlessDirector.add_result).
 func show_result(is_cleared: bool) -> void:
 	if result.visible:
 		return
@@ -231,7 +232,7 @@ func show_result(is_cleared: bool) -> void:
 	screens.locked = true
 	hud.visible = false
 	var rows := [["Time", StageResult.clock(elapsed)]]
-	if runner:
+	if runner and not endless:
 		rows.append(["Waves", "%d / %d" % [runner.waves_done(), runner.total_waves()]])
 	rows.append_array([
 		["Kills", StageStats.format(stats.kills)],
@@ -240,11 +241,14 @@ func show_result(is_cleared: bool) -> void:
 		["Gold earned", StageStats.format(stats.gold_earned)],
 		["Level reached", str(lucian.progress.level)],
 	])
+	if endless:
+		endless.add_result(rows, reward_lines)
 	Sfx.play(&"victory" if is_cleared else &"defeat")
-	var next := Journey.next_stage(run.act, run.stage) if run.act > 0 else Vector2i.ZERO
+	var next := Journey.next_stage(run.act, run.stage) if run.act > 0 and not endless else Vector2i.ZERO
 	var can_next := is_cleared and next != Vector2i.ZERO and WavePlan.has_stage(Journey.stage_id(next.x, next.y))
 	# Losing the tutorial (Act 1 before its first clear) is a game over.
-	result.show_result(is_cleared, run.display_name, rows, collected, reward_lines, not is_cleared and run.tutorial, can_next)
+	result.show_result(is_cleared, run.display_name, rows, collected, reward_lines, not is_cleared and run.tutorial, can_next,
+			EndlessDirector.RUN_OVER if endless else "")
 	get_tree().paused = true
 
 
@@ -663,12 +667,16 @@ func _on_ending_done() -> void:
 ## kill's do). He leaves the map and the wave counts him out, as a death
 ## would (that may end the wave). The boss wave's Thresh also ends the stage:
 ## finish(), even with other enemies about; his purple comes in _on_cleared.
-## Endless's pays his repeat purple here.
+## Endless's is a kill like any boss's: gold, XP, the kill count, loot and
+## his repeat purple, here.
 func _thresh_leaves(thresh: EnemyUnit) -> void:
-	var reward := KillRewards.roll(thresh.data, _reward_act(thresh), run, rng)
-	add_essences(reward.blue, reward.orange, 0, thresh.global_position)
 	if endless:
+		_pay_kill(thresh)
+		_drop_loot_of(thresh)
 		_award_mini_boss(thresh.data)
+	else:
+		var reward := KillRewards.roll(thresh.data, _reward_act(thresh), run, rng)
+		add_essences(reward.blue, reward.orange, 0, thresh.global_position)
 	# Out of "enemies" now, so the radar and the boss bar drop him at once.
 	thresh.remove_from_group(&"enemies")
 	thresh.queue_free()
@@ -688,22 +696,16 @@ func _thresh_leaves(thresh: EnemyUnit) -> void:
 func _on_enemy_died(enemy: Enemy) -> void:
 	var unit := enemy as EnemyUnit
 	var data := unit.data
-	var reward := KillRewards.roll(data, _reward_act(unit), run, rng, unit.summoned)
-	wallet.add(reward.gold)
-	stats.gold_earned += reward.gold
-	stats.kills += 1
-	lucian.progress.add_xp(reward.xp)
-	add_essences(reward.blue, reward.orange, 0, unit.global_position)
+	_pay_kill(unit)
 	# Its splits join the wave now, so this death never ends it.
 	var splits := data.split_count if data.split_into != &"" else 0
 	if runner:
 		for i in splits:
 			runner.enemy_spawned()
 	# The kill that ends the stage drops nothing: the result comes up at once,
-	# and items don't carry over. A summon drops nothing either (no farming).
-	if not unit.summoned and not (runner and runner.is_last_enemy()):
-		for item in LootTable.roll(data.kind, lucian.item_catalog, rng):
-			drop_loot(item, unit.global_position)
+	# and items don't carry over.
+	if not (runner and runner.is_last_enemy()):
+		_drop_loot_of(unit)
 	if splits > 0:
 		# Deferred: the killing shot can land inside a physics callback, where no body can be added.
 		_spawn_splits.call_deferred(data.split_into, splits, unit.global_position, unit.wave, _jumps)
@@ -713,6 +715,25 @@ func _on_enemy_died(enemy: Enemy) -> void:
 		_award_mini_boss(data)
 	_summon_gone(unit)
 	enemy_died.emit(unit)
+
+
+## A kill's gold, XP and blue and orange (a summon's are small), and its
+## place in the kill count.
+func _pay_kill(unit: EnemyUnit) -> void:
+	var reward := KillRewards.roll(unit.data, _reward_act(unit), run, rng, unit.summoned)
+	wallet.add(reward.gold)
+	stats.gold_earned += reward.gold
+	stats.kills += 1
+	lucian.progress.add_xp(reward.xp)
+	add_essences(reward.blue, reward.orange, 0, unit.global_position)
+
+
+## A kill's loot on the ground; a summon drops none (no farming).
+func _drop_loot_of(unit: EnemyUnit) -> void:
+	if unit.summoned:
+		return
+	for item in LootTable.roll(unit.data.kind, lucian.item_catalog, rng):
+		drop_loot(item, unit.global_position)
 
 
 ## The act whose gold, XP and blue a kill pays: the stage's (the sandbox

@@ -24,6 +24,8 @@ const TOAST_TIME := 1.6
 var sections: Array[Control] = []
 ## The act Journey opens on (the one just played), or 0.
 var focus_act := 0
+## Journey opens on Endless instead (after an Endless run).
+var focus_endless := false
 var essence_bar := EssenceBar.new()
 var section_bar := SectionBar.new()
 var gear := GearMenu.new()
@@ -32,9 +34,12 @@ var confirm := ConfirmPopup.new()
 
 var _toast: Label
 var _toast_tween: Tween
+## Rolls an Endless run's map when the choice is Random.
+var _rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
+	_rng.randomize()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build()
 	show_section(SECTION_JOURNEY)
@@ -119,8 +124,10 @@ func _build() -> void:
 	sections.append(skin_shop)
 	var journey := JourneySection.new()
 	journey.focus_act = focus_act
+	journey.focus_endless = focus_endless
 	journey.start_training.connect(_start_training)
 	journey.start_stage.connect(_start_stage)
+	journey.start_endless.connect(_start_endless)
 	area.add_child(journey)
 	sections.append(journey)
 
@@ -176,6 +183,11 @@ func _start_training() -> void:
 
 func _start_stage(act: int, stage: int) -> void:
 	start_requested.emit(StageSetup.for_stage(SaveGame.instance(), act, stage))
+
+
+## `map_choice` is a Journey.ENDLESS_MAPS index; Random rolls its map here.
+func _start_endless(map_choice: int) -> void:
+	start_requested.emit(StageSetup.for_endless(SaveGame.instance(), map_choice, _rng))
 
 
 func _open_settings() -> void:

@@ -3,6 +3,8 @@ extends GutTest
 const PREFIX := "user://test_game_save_slot_"
 ## A folder that doesn't exist: every save fails.
 const BROKEN_PREFIX := "user://no_such_dir/test_game_save_slot_"
+## The Jungle, a Journey.ENDLESS_MAPS choice.
+const JUNGLE := 3
 
 var game: Game
 var quit_called := false
@@ -400,6 +402,113 @@ func test_a_failed_save_after_a_game_over_shows_on_the_title() -> void:
 	await wait_process_frames(2)
 	assert_is(game.screen, TitleScreen)
 	assert_eq((game.screen as TitleScreen).notice_label.text, "Could not save")
+
+
+## An Endless run under the Game (Act 3 cleared, so Endless is open).
+func _endless_run(choice := JUNGLE) -> Stage:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(Journey.ENDLESS_ACT))
+	game.start_stage(StageSetup.for_endless(SaveGame.instance(), choice, RandomNumberGenerator.new()))
+	await wait_process_frames(2)
+	return game.screen as Stage
+
+
+## Slot 1 as written on disk.
+func _on_disk() -> SaveGame:
+	var saved := SaveGame.new(SaveGame.instance().prefix)
+	saved.load_slot(1)
+	return saved
+
+
+func _journey() -> JourneySection:
+	return (game.screen as MainScreen).sections[MainScreen.SECTION_JOURNEY]
+
+
+func test_retry_starts_a_new_endless_run_on_the_same_map() -> void:
+	var first: Stage = await _endless_run()
+	SaveGame.instance().record_endless(4)
+	first.show_result(false)
+	first.result.retry_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, Stage)
+	assert_ne(game.screen, first)
+	var run := (game.screen as Stage).run
+	assert_true(run.endless)
+	assert_eq(run.map_choice, JUNGLE)
+	assert_eq(run.display_name, "Endless · Jungle")
+	assert_eq(_on_disk().endless_best, 4, "the run's end saved the best")
+	assert_false(get_tree().paused)
+
+
+func test_retry_after_random_keeps_random_so_it_rolls_again() -> void:
+	var first: Stage = await _endless_run(EndlessPlan.RANDOM)
+	first.show_result(false)
+	first.result.retry_button.pressed.emit()
+	await wait_process_frames(2)
+	var run := (game.screen as Stage).run
+	assert_true(run.endless)
+	assert_eq(run.map_choice, EndlessPlan.RANDOM)
+	assert_between(run.act, 1, Journey.ACTS.size(), "a map was rolled")
+
+
+func test_main_screen_after_a_run_opens_the_journey_on_endless() -> void:
+	var stage: Stage = await _endless_run()
+	stage.show_result(false)
+	stage.result.main_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, MainScreen)
+	assert_eq(_journey().current, JourneySection.ENDLESS_TAB)
+	assert_true(FileAccess.file_exists(SaveGame.instance().path(1)))
+
+
+func test_leaving_an_endless_run_asks_its_own_question_and_saves_the_best() -> void:
+	var stage: Stage = await _endless_run()
+	# A wave won records the best in memory.
+	SaveGame.instance().record_endless(7)
+	stage.screens.set_menu_open(true)
+	_leave_button(stage).pressed.emit()
+	assert_eq(game.prompt._message.text, "Leave this run? Your best wave is kept.")
+	assert_eq(_choices(), "Leave / Cancel")
+	_prompt_button("Leave").pressed.emit()
+	await wait_process_frames(2)
+	assert_eq(_on_disk().endless_best, 7)
+	assert_false("endless" in _on_disk().cleared)
+	assert_is(game.screen, MainScreen)
+	assert_eq(_journey().current, JourneySection.ENDLESS_TAB)
+
+
+func test_quitting_with_yes_in_an_endless_run_saves_the_best() -> void:
+	var stage: Stage = await _endless_run()
+	SaveGame.instance().record_endless(9)
+	stage.screens.menu.exit_requested.emit()
+	game.prompt.answer(true)
+	assert_true(quit_called)
+	assert_eq(_on_disk().endless_best, 9)
+
+
+func test_endless_is_never_saved_as_a_cleared_stage() -> void:
+	var stage: Stage = await _endless_run()
+	# A run never clears; even a cleared result never marks it.
+	stage.show_result(true)
+	game.notification(NOTIFICATION_WM_CLOSE_REQUEST)
+	game.prompt.answer(true)
+	assert_true(quit_called)
+	assert_false("endless" in _on_disk().cleared, str(_on_disk().cleared))
+	game._on_stage_finished(&"cleared", &"main")
+	await wait_process_frames(2)
+	assert_false("endless" in SaveGame.instance().cleared)
+	assert_false("endless" in _on_disk().cleared)
+	assert_is(game.screen, MainScreen)
+
+
+func test_a_failed_save_on_endless_retry_lands_on_the_main_screen_with_the_toast() -> void:
+	var stage: Stage = await _endless_run()
+	SaveGame.instance().prefix = BROKEN_PREFIX
+	stage.show_result(false)
+	stage.result.retry_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, MainScreen)
+	assert_eq((game.screen as MainScreen).toast_text(), "Could not save")
+	assert_push_warning_count(1)
 
 
 func test_closing_the_window_on_stage_cleared_keeps_the_clear() -> void:

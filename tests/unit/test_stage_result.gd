@@ -47,6 +47,19 @@ func test_game_over_has_only_back_to_title() -> void:
 	assert_eq(result.main_button.text, "Back to title")
 
 
+## Endless's end: a title of its own over a failed result (red, Retry and
+## Main screen, no Next).
+func test_an_optional_title_replaces_the_outcomes() -> void:
+	result.show_result(false, "Endless · Jungle", [], _essences(), NONE, false, false, "RUN OVER")
+	assert_eq(result.title.text, "RUN OVER")
+	assert_eq(result.title.get_theme_color(&"font_color"), UiStyle.ERROR_COLOR)
+	assert_true(result.retry_button.visible)
+	assert_false(result.next_button.visible)
+	assert_eq(result.main_button.text, "Main screen")
+	result.show_result(false, "Stage 2-1", [], _essences(), NONE)
+	assert_eq(result.title.text, "DEFEATED", "without one, the outcome's")
+
+
 func test_each_button_emits_its_choice() -> void:
 	result.show_result(true, "Stage 2-1", [], _essences(), NONE, false, true)
 	watch_signals(result)

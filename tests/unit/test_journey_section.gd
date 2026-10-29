@@ -140,7 +140,7 @@ func test_act_one_start_is_enabled_on_a_new_game() -> void:
 	assert_false(section.act_pages[0].start_button.disabled)
 
 
-func test_start_is_disabled_for_locked_acts_and_endless() -> void:
+func test_start_is_disabled_for_locked_acts() -> void:
 	assert_true(section.act_pages[1].start_button.disabled, "act 2 is locked")
 	_save().set_cleared(Journey.all_stage_ids(2))
 	assert_false(section.act_pages[2].start_button.disabled, "act 3 starts: 3-1 has its waves")
@@ -155,10 +155,59 @@ func test_start_is_disabled_for_locked_acts_and_endless() -> void:
 	_save().set_cleared(Journey.all_stage_ids(5))
 	assert_false(section.act_pages[5].start_button.disabled, "act 6 starts once acts 1-5 are cleared: 6-1 has its waves")
 	assert_false(section.act_pages[5].start_button.has_meta(&"hover_text"))
-	assert_true(section.endless_page.start_button.disabled)
-	assert_eq(section.endless_page.start_button.get_meta(&"hover_text"), "Endless comes in a later phase")
-	assert_eq(section.endless_page.map_buttons.size(), 7)
-	assert_eq(section.endless_page.map_index(), 0)
+
+
+func test_endless_start_works_once_act_three_is_cleared_and_starts_the_chosen_map() -> void:
+	var page := section.endless_page
+	assert_eq(page.map_buttons.size(), 7)
+	assert_eq(page.map_index(), 0, "Random")
+	_save().set_cleared(Journey.all_stage_ids(2))
+	assert_true(page.start_button.disabled, "Endless opens with Act 3")
+	_save().set_cleared(Journey.all_stage_ids(3))
+	assert_false(page.start_button.disabled)
+	assert_false(page.start_button.has_meta(&"hover_text"))
+	section.show_tab(JourneySection.ENDLESS_TAB)
+	page.map_buttons[3].pressed.emit()
+	assert_eq(page.map_index(), 3)
+	watch_signals(section)
+	page.start_button.pressed.emit()
+	assert_signal_emitted_with_parameters(section, "start_endless", [3])
+
+
+func test_main_screen_starts_endless_on_the_chosen_map() -> void:
+	_save().set_cleared(Journey.all_stage_ids(3))
+	var main := MainScreen.new()
+	add_child_autofree(main)
+	var got: Array[StageSetup] = []
+	main.start_requested.connect(func(run: StageSetup) -> void: got.append(run))
+	main.sections[MainScreen.SECTION_JOURNEY].start_endless.emit(3)
+	main.sections[MainScreen.SECTION_JOURNEY].start_endless.emit(EndlessPlan.RANDOM)
+	assert_eq(got.size(), 2)
+	assert_true(got[0].endless)
+	assert_eq(got[0].map_choice, 3)
+	assert_eq(got[0].stage_id, EndlessPlan.STAGE_ID)
+	assert_eq(got[0].display_name, "Endless · Jungle")
+	assert_eq(got[1].map_choice, EndlessPlan.RANDOM, "kept, so Retry rolls again")
+	assert_between(got[1].act, 1, Journey.ACTS.size(), "Random rolled a map")
+
+
+func test_the_main_screen_can_open_the_journey_on_endless() -> void:
+	_save().set_cleared(Journey.all_stage_ids(3))
+	var main := MainScreen.new()
+	main.focus_endless = true
+	add_child_autofree(main)
+	var journey := main.sections[MainScreen.SECTION_JOURNEY] as JourneySection
+	assert_eq(journey.current, JourneySection.ENDLESS_TAB)
+	assert_true(journey.endless_page.visible)
+	assert_false(journey.act_pages[2].visible)
+
+
+func test_focus_on_a_locked_endless_opens_as_usual() -> void:
+	var journey := JourneySection.new()
+	journey.focus_endless = true
+	add_child_autofree(journey)
+	assert_eq(journey.current, 0, "act 1, where the work is")
+	assert_true(journey.act_pages[0].visible)
 
 
 func test_a_locked_card_cannot_be_chosen() -> void:

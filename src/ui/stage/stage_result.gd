@@ -1,9 +1,10 @@
 class_name StageResult
 extends CanvasLayer
 ## The end of a stage, full screen over a paused game: STAGE CLEARED or
-## DEFEATED (GAME OVER when the tutorial is lost), the stage, a stats column
-## and a rewards column, then Retry, Next stage and Main screen (a single
-## Back to title after a game over).
+## DEFEATED (GAME OVER when the tutorial is lost, or the caller's own title:
+## Endless's RUN OVER), the stage, a stats column and a rewards column, then
+## Retry, Next stage and Main screen (a single Back to title after a game
+## over).
 
 ## The button pressed: &"retry", &"next", &"main" or &"title".
 signal chosen(then: StringName)
@@ -43,11 +44,14 @@ static func clock(seconds: float) -> String:
 
 
 ## `stats` is a list of [label, value] pairs, in order. `can_next`: there is a
-## next stage to play (it only shows after a clear).
-func show_result(is_cleared: bool, stage_name: String, stats: Array, collected: Dictionary, rewards: Array[String], is_game_over := false, can_next := false) -> void:
+## next stage to play (it only shows after a clear). `title_text`, when set,
+## replaces the outcome's title (its color and glow stay the outcome's).
+func show_result(is_cleared: bool, stage_name: String, stats: Array, collected: Dictionary, rewards: Array[String], is_game_over := false, can_next := false, title_text := "") -> void:
 	cleared = is_cleared
 	game_over = is_game_over and not is_cleared
-	if cleared:
+	if title_text != "":
+		title.text = title_text
+	elif cleared:
 		title.text = "STAGE CLEARED"
 	else:
 		title.text = "GAME OVER" if game_over else "DEFEATED"
