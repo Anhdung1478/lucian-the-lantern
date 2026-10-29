@@ -7,7 +7,16 @@ extends SceneTree
 const SETTINGS_PATH := "user://screenshot_settings.json"
 const SAVE_PREFIX := "user://screenshot_save_slot_"
 ## Scenarios that start from the game's root scene (the main screen).
-const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "the_end"]
+const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "the_end",
+	"journey_map", "journey_endless", "endless_wave", "endless_boss", "endless_pick", "endless_run_over",
+	"exit_cancel", "tree_icons"]
+## Endless map choices (Journey.ENDLESS_MAPS indices) for the Endless scenarios.
+const RANDOM_MAP := 0
+const TRAINING_GROUND := 2
+const JUNGLE := 3
+const DARK_MID_LANE := 4
+const DEAD_FOREST := 5
+const THRESH_DOMAIN := 6
 ## Scenarios played on a Journey stage: [act, stage], built from the new save
 ## (so Act 1 is its first play, the tutorial).
 const ACT_SCENARIOS := {
@@ -25,6 +34,7 @@ const ACT_SCENARIOS := {
 	"act6_bridges": [6, 3], "act6_platform": [6, 5], "act6_rider": [6, 1], "karthus_defile": [6, 2],
 	"hecarim_onslaught": [6, 4], "thresh_box": [6, 5], "thresh_phase2": [6, 5], "thresh_lantern": [6, 5],
 	"ending_cutscene": [6, 5],
+	"level_up": [2, 1],
 }
 
 var stage: Node
@@ -263,6 +273,24 @@ func _run(scenario: String) -> void:
 			await scenario_training_setup()
 		"skins_stage":
 			await scenario_skins_stage()
+		"journey_map":
+			await scenario_journey_map()
+		"journey_endless":
+			await scenario_journey_endless()
+		"endless_wave":
+			await scenario_endless_wave()
+		"endless_boss":
+			await scenario_endless_boss()
+		"endless_pick":
+			await scenario_endless_pick()
+		"endless_run_over":
+			await scenario_endless_run_over()
+		"exit_cancel":
+			await scenario_exit_cancel()
+		"tree_icons":
+			await scenario_tree_icons()
+		"level_up":
+			await scenario_level_up()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -1126,7 +1154,8 @@ func scenario_cast_modes() -> void:
 
 
 ## The Phase 5 art: essence, gear and skull icons, then every Evolution Tree
-## node icon, each at 64 px and 32 px with its file name under it.
+## node's icon as its .tres names it (since Phase 9 the skills and the spells
+## use the stage's art), each at 64 px and 32 px with its file under it.
 func scenario_art_sheet() -> void:
 	var paths: Array[String] = []
 	for file in ["essence_blue", "essence_orange", "essence_purple", "gear", "skull"]:
@@ -1139,7 +1168,8 @@ func scenario_art_sheet() -> void:
 		"flash_upgrade", "ghost_upgrade", "barrier_upgrade", "heal_upgrade", "clarity_upgrade", "smite_upgrade",
 		"summoner_slot_2",
 	]:
-		paths.append("res://assets/art/tree/%s.svg" % id)
+		var node: TreeNodeData = load("res://data/tree/%s.tres" % id)
+		paths.append(node.icon.resource_path if node.icon else "res://data/tree/%s.tres" % id)
 	var background := ColorRect.new()
 	background.color = Color("0b0d12")
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1170,7 +1200,7 @@ func scenario_art_sheet() -> void:
 			icons.add_child(rect)
 		box.add_child(icons)
 		var label := Label.new()
-		label.text = path.get_file()
+		label.text = path.get_base_dir().get_file().path_join(path.get_file())
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.add_theme_font_size_override(&"font_size", 13)
 		box.add_child(label)
@@ -1212,8 +1242,13 @@ func find_buttons(node: Node, text: String) -> Array[Button]:
 ## the save. `stage` and `lucian` point at it afterwards.
 func start_training() -> void:
 	main_screen().show_section(MainScreen.SECTION_JOURNEY)
-	journey().show_tab(JourneySection.TRAINING_TAB)
-	journey().training_page.start_button.pressed.emit()
+	journey().pick(journey().map.training)
+	journey().panel.start_button.pressed.emit()
+	await enter_stage()
+
+
+## The stage the Game has just swapped in: `stage` and `lucian` point at it.
+func enter_stage() -> void:
 	stage = game_root.screen
 	lucian = (stage as Stage).lucian
 	# The stage confines the mouse; give it back during automated runs.
@@ -1222,9 +1257,12 @@ func start_training() -> void:
 	await wait(0.4)
 
 
-## ESC menu → Leave this stage: the stage-done auto-save, then the main screen.
+## ESC menu → Leave this stage, then Leave in its prompt: the stage-done
+## auto-save, then the main screen.
 func leave_stage() -> void:
 	(stage as Stage).screens.menu.leave_requested.emit()
+	print("Leave this stage asks first (expect true): ", game_root.prompt.is_open())
+	game_root.prompt.answer(true)
 	await wait(0.2)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	print("left the stage: main screen (expect true): ", game_root.screen is MainScreen,
@@ -1233,21 +1271,29 @@ func leave_stage() -> void:
 	lucian = null
 
 
-func locked_tab_names(section: JourneySection) -> Array:
-	return section.tabs.filter(func(tab: JourneyTab) -> bool: return tab.locked).map(
-		func(tab: JourneyTab) -> String: return tab.text)
+## The map's places under fog or chained: "Act N" per fogged act, then
+## "Endless" when its portal is locked.
+func locked_place_names(section: JourneySection) -> Array:
+	var names := []
+	for act in range(1, Journey.ACTS.size() + 1):
+		if section.map.is_fogged(act):
+			names.append("Act %d" % act)
+	if section.map.endless.locked:
+		names.append("Endless")
+	return names
 
 
-## Journey's Training tab with the loadout on a new save, then with spells
-## bought: the spell menu for F, and a pick that swaps D and F.
+## The Journey on a new save: the map opens on 1-1, with the D/F spells at
+## the bottom of its panel; then with spells bought: the spell menu for F, and
+## a pick that swaps D and F.
 func scenario_main_journey() -> void:
 	var section := journey()
 	var loadout := section.loadout
 	await wait(0.2)
-	print("opens on Journey, Training tab (expect true true): ",
-		main_screen().sections[MainScreen.SECTION_JOURNEY].visible, " ", section.training_page.visible)
+	print("opens on Journey, 1-1 picked (expect true 1-1): ",
+		main_screen().sections[MainScreen.SECTION_JOURNEY].visible, " ", section.picked.stage_id)
 	print("new save: D reads (expect None), F chained (expect true): ", loadout.picks[0].text, " ", loadout.picks[1].disabled)
-	await shot("main_journey_0_training")
+	await shot("main_journey_0_new_save")
 	var save := SaveGame.instance()
 	save.essences.add(Essences.BLUE, 2000)
 	save.essences.add(Essences.ORANGE, 10)
@@ -1267,49 +1313,48 @@ func scenario_main_journey() -> void:
 	await shot("main_journey_2_swapped")
 
 
-## Act 1 on a new save; then the debug table's "Acts cleared" at 2: Act 3
-## with its skulls and chains, and Act 2 cleared.
+## The map on a new save; then the debug table's "Acts cleared" at 2: Act 3
+## open with its mini bosses and boss, and Act 2 cleared.
 func scenario_main_acts() -> void:
 	var section := journey()
-	section.show_tab(0)
 	await wait(0.2)
-	print("locked tabs on a new save (expect Act 2-6 and Endless): ", locked_tab_names(section))
+	print("locked on a new save (expect Act 2-6 and Endless): ", locked_place_names(section))
 	await shot("main_acts_0_act1")
 	var spin: SpinBox = main_debug().find_children("*", "SpinBox", true, false)[0]
 	spin.value = 2
 	print("acts cleared after the debug spin (expect 2): ", Journey.acts_cleared(SaveGame.instance().cleared))
-	print("locked tabs (expect Act 4-6 and Endless): ", locked_tab_names(section))
-	section.show_tab(2)
+	print("locked (expect Act 4-6 and Endless): ", locked_place_names(section))
+	var act3: Array = range(1, 6).map(func(n: int) -> JourneyNode: return section.map.node_for("3-%d" % n))
+	print("Act 3 places locked (expect [false, true, true, true, true]): ",
+		act3.map(func(node: JourneyNode) -> bool: return node.locked))
+	print("Act 3 kinds (expect [normal, mini_boss, normal, mini_boss, boss]): ",
+		act3.map(func(node: JourneyNode) -> StringName: return node.kind))
+	section.pick(act3[0])
 	await wait(0.2)
-	var cards := section.act_pages[2].cards
-	print("Act 3 cards locked (expect [false, true, true, true, true]): ",
-		cards.map(func(card: StageCard) -> bool: return card.locked))
-	print("Act 3 skulls (expect [false, true, false, true, true]): ",
-		cards.map(func(card: StageCard) -> bool: return card.skull.visible))
 	await shot("main_acts_1_act3")
-	section.show_tab(1)
+	section.pick(section.map.node_for("2-3"))
 	await wait(0.2)
-	print("Act 2 cards cleared (expect [true, true, true]): ",
-		section.act_pages[1].cards.map(func(card: StageCard) -> bool: return card.cleared))
+	print("Act 2 places cleared (expect [true, true, true]): ",
+		range(1, 4).map(func(n: int) -> bool: return section.map.node_for("2-%d" % n).cleared))
 	await shot("main_acts_2_act2_cleared")
 
 
-## The Endless tab locked (hovered: what to clear), then open after Act 3.
+## The Endless portal locked (hovered: what to clear), then open after Act 3.
 func scenario_main_endless() -> void:
 	var section := journey()
-	var tab := section.tabs[JourneySection.ENDLESS_TAB]
+	var portal := section.map.endless
 	await wait(0.2)
-	print("Endless locked on a new save (expect true): ", tab.locked,
-		"  hover (expect Clear Act 3 first): ", tab.get_meta(&"hover_text", ""))
-	await mouse_move(control_center(tab))
-	await wait_for_tooltip(tab)
+	print("Endless locked on a new save (expect true): ", portal.locked,
+		"  hover (expect Clear Act 3 first): ", portal.get_meta(&"hover_text", ""))
+	await mouse_move(control_center(portal))
+	await wait_for_tooltip(portal)
 	await shot("main_endless_0_locked")
 	SaveGame.instance().set_cleared(Journey.all_stage_ids(Journey.ENDLESS_ACT))
-	section.show_tab(JourneySection.ENDLESS_TAB)
+	section.pick(portal)
 	await mouse_move(Vector2(960, 1000))
 	await wait(0.2)
-	print("after Act 3: Endless locked, shown (expect false true): ", tab.locked, " ", section.endless_page.visible)
-	print("best wave (expect Best wave: 0): ", section.endless_page.best_label.text)
+	print("after Act 3: Endless locked, shown (expect false true): ", portal.locked, " ", section.panel.endless_box.visible)
+	print("best wave (expect Best wave: 0): ", section.panel.best_label.text)
 	await shot("main_endless_1_open")
 
 
@@ -1546,9 +1591,9 @@ func scenario_training_setup() -> void:
 func scenario_skins_stage() -> void:
 	var save := SaveGame.instance()
 	var expected := {
-		&"classic": "AD 60, AS 0.65, MS 335, HP 600",
+		&"classic": "AD 60, AS 0.65, MS 345, HP 600",
 		&"high_noon": "AD 69, AS 0.5525",
-		&"project": "AD 54, AS 0.78, MS 385.25",
+		&"project": "AD 54, AS 0.78, MS 396.75",
 		&"pulsefire": "AS 0.585, AH 15",
 		&"vampire": "HP 480, LS 0.15",
 	}
@@ -3200,3 +3245,508 @@ func scenario_guardian_angel() -> void:
 	print("revived: HP (expect 300, half his base HP, less any hits since), dead (expect false): ", roundi(lucian.hp), " ", lucian.dead)
 	await wait(0.3)
 	await shot("guardian_angel_1_revived")
+
+
+# --- Phase 9: the world map, Endless, Cancel on every exit, the tree's icons
+# and the level-up burst ----------------------------------------------------
+
+
+## The Journey's world map in three progress states: a new save (Acts 2–6
+## fogged, Endless chained, the token on 1-1); the debug table's "Acts
+## cleared" at 3 with their bosses paid and a best of 14 (Acts 1–3 lit, Act 4
+## open, Acts 5–6 fogged, the portal open), then a boss picked and a fogged
+## stage hovered; then every act cleared (the whole road lit, Training picked).
+func scenario_journey_map() -> void:
+	var section := journey()
+	var map := section.map
+	var save := SaveGame.instance()
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.3)
+	print("new save: locked (expect Act 2-6 and Endless): ", locked_place_names(section),
+		"  token on (expect 1-1): ", map.token_node.stage_id, "  picked (expect 1-1): ", section.picked.stage_id)
+	await shot("journey_map_0_new_save")
+	var spin: SpinBox = main_debug().find_children("*", "SpinBox", true, false)[0]
+	spin.value = 3
+	save.bosses.append_array(["thresh_1", "akshan", "infernal_drake", "ocean_drake", "elder_dragon"])
+	save.record_endless(14)
+	section.open_on()
+	await wait(0.3)
+	print("Acts cleared 3: locked (expect Act 5, Act 6): ", locked_place_names(section),
+		"  token on (expect 4-1): ", map.token_node.stage_id, "  road lit to (expect 3-5): ", map.lit_stage,
+		"  portal best (expect 14): ", map.endless.best)
+	await shot("journey_map_1_mid_game")
+	section.pick(map.node_for("3-5"))
+	await wait(0.3)
+	var panel := section.panel
+	print("3-5 (expect ACT 3 · THE JUNGLE, Stage 3-5, Boss, Elder Dragon, +N again, Cleared): ", ", ".join([
+		panel.act_label.text, panel.title_label.text, panel.tag_label.text, panel.boss_name_label.text,
+		panel.purple_label.text, panel.status_label.text]))
+	await shot("journey_map_2_boss_picked")
+	var fogged := map.node_for("5-3")
+	await mouse_move(control_center(fogged))
+	await wait_for_tooltip(fogged)
+	print("5-3 hover (expect Clear Act 4 first): ", fogged.get_meta(&"hover_text", ""))
+	await shot("journey_map_3_hover_fogged")
+	await mouse_move(Vector2(960, 1000))
+	spin.value = Journey.ACTS.size()
+	section.open_on()
+	await wait(0.3)
+	print("all cleared: locked (expect []): ", locked_place_names(section), "  token (expect none): ", map.token_node,
+		"  picked (expect training): ", section.picked.kind, "  road lit to (expect 6-5): ", map.lit_stage)
+	await shot("journey_map_4_all_cleared")
+
+
+## The Journey's Endless panel once Act 3 is cleared (best 22): its rules,
+## the map chips and the thumbnail of the chosen map: the Jungle, the Dead
+## forest, Thresh's domain, then Random's "?" card.
+func scenario_journey_endless() -> void:
+	var section := journey()
+	var save := SaveGame.instance()
+	save.set_cleared(Journey.all_stage_ids(Journey.ENDLESS_ACT))
+	save.record_endless(22)
+	section.pick(section.map.endless)
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.2)
+	var panel := section.panel
+	print("Endless picked (expect true), best (expect Best wave: 22), chips (expect 7), start (expect Start, enabled): ",
+		section.picked == section.map.endless, " ", panel.best_label.text, " ", panel.map_buttons.size(), " ",
+		panel.start_button.text, " ", not panel.start_button.disabled)
+	var shown := [[JUNGLE, "jungle"], [DEAD_FOREST, "dead_forest"], [THRESH_DOMAIN, "thresh_domain"], [RANDOM_MAP, "random"]]
+	for i in shown.size():
+		var choice: int = shown[i][0]
+		panel.map_buttons[choice].pressed.emit()
+		await wait(0.2)
+		var thumbnail := panel.thumbnail
+		print("%s: map_choice (expect %d) %d, thumbnail walls %d, chasms %d, mist %d, spawns %d, random %s" % [
+			shown[i][1], choice, panel.map_choice(), thumbnail.walls.size(), thumbnail.chasms.size(),
+			thumbnail.mist.size(), thumbnail.spawns.size(), thumbnail.is_random()])
+		await shot("journey_endless_%d_%s" % [i, shown[i][1]])
+
+
+## A player who has cleared Act 3 (Endless is open): the tree maxed, Flash
+## and Heal on D and F, and a best run of `best` waves.
+func endless_save(best: int) -> void:
+	var save := SaveGame.instance()
+	save.set_cleared(Journey.all_stage_ids(Journey.ENDLESS_ACT))
+	save.tree.max_all()
+	save.set_loadout(0, &"flash")
+	save.set_loadout(1, &"heal")
+	save.record_endless(best)
+
+
+## Journey → the Endless portal → map chip `choice` → Start, as the player
+## does it. `stage` and `lucian` point at the run afterwards.
+func start_endless(choice: int) -> void:
+	main_screen().show_section(MainScreen.SECTION_JOURNEY)
+	var section := journey()
+	section.pick(section.map.endless)
+	section.panel.map_buttons[choice].pressed.emit()
+	section.panel.start_button.pressed.emit()
+	await enter_stage()
+	# Off the HUD, so no tooltip shows.
+	await mouse_move(Vector2(960, 300))
+
+
+func endless_runner() -> EndlessRunner:
+	return game_stage().runner as EndlessRunner
+
+
+## The first enemy of `kind` (&"boss", &"mini_boss") on the map, waiting for
+## its spawn.
+func wait_for_kind(kind: StringName, timeout := 20.0) -> EnemyUnit:
+	var left := timeout
+	while left > 0.0:
+		for enemy in get_nodes_in_group(&"enemies"):
+			if enemy is EnemyUnit and (enemy as EnemyUnit).data.kind == kind:
+				return enemy
+		await wait(0.05)
+		left -= 0.05
+	push_error("no %s spawned" % kind)
+	return null
+
+
+## Seeds the run's RNG so the next boss wave brings `id` (it draws the boss
+## first).
+func seed_boss(id: StringName) -> void:
+	var runner := endless_runner()
+	for value in 500:
+		var probe := RandomNumberGenerator.new()
+		probe.seed = value
+		if EndlessPlan.pick_boss(probe, runner.boss) == id:
+			runner._rng.seed = value
+			return
+	push_error("no seed brings " + id)
+
+
+## Every enemy dies (a final Thresh rises at once, then falls) until the
+## boss wave is won and its break starts; then the frame the pick opens.
+func win_boss_wave() -> void:
+	var runner := endless_runner()
+	for step in 300:
+		if runner.state == WaveRunner.State.BREAK:
+			break
+		for enemy in get_nodes_in_group(&"enemies"):
+			if enemy is ThreshFinal:
+				(enemy as ThreshFinal)._rise_left = 0.0
+			if enemy is EnemyUnit and (enemy as EnemyUnit).is_alive():
+				(enemy as EnemyUnit).take_damage(lucian.make_damage(999999.0, DamageInfo.Type.TRUE, &"debug"))
+		await wait(0.1)
+	await wait(0.2)
+
+
+## Lucian on open ground 520 px from `boss`, toward the map's middle.
+func face_boss(boss: EnemyUnit) -> void:
+	var toward := boss.global_position.direction_to(game_stage().arena.get_bounds().get_center())
+	blink(open_ground(boss.global_position + toward * 520.0))
+
+
+## The camera free between Lucian and `unit`, so both are in the shot.
+func frame(unit: EnemyUnit, zoom := 0.85) -> void:
+	free_camera((lucian.global_position + unit.global_position) * 0.5, zoom)
+
+
+## The ids of the enemies alive, each once, in the order met.
+func enemy_ids() -> Array:
+	var ids := []
+	for enemy in get_nodes_in_group(&"enemies"):
+		if enemy is EnemyUnit and not (enemy as EnemyUnit).data.id in ids:
+			ids.append((enemy as EnemyUnit).data.id)
+	return ids
+
+
+## An Endless run on the Jungle (best 14), started from the Journey: waves
+## 1–3 won for real; wave 4's fight (two normal kinds and an elite, "Wave 4",
+## the Best line); its break ("Wave 5 in 0:xx", the merchant); then wave 5,
+## a mini boss wave, with its mini boss last and its bar.
+func scenario_endless_wave() -> void:
+	endless_save(14)
+	await start_endless(JUNGLE)
+	var game := game_stage()
+	flush_tips()
+	print("run (expect Endless · Jungle, act 3 stage 4, endless true): ", game.run.display_name, ", act ", game.run.act,
+		" stage ", game.run.stage, ", endless ", game.run.endless)
+	for i in 3:
+		await clear_wave()
+	game.skip_break()
+	await wait_for_spawns()
+	flush_tips()
+	lucian.command_attack_move(lucian.global_position)
+	await wait(4.0)
+	print("wave 4 (expect Endless · Jungle  Wave 4  Enemies: N  Best 14): ", info_text(), "  ", game.hud.stage_info.best_label.text)
+	print("enemies (expect two normal kinds and an elite): ", enemy_ids(), "  level: ", lucian.progress.level)
+	await shot("endless_wave_0_fight")
+	await kill_wave()
+	flush_tips()
+	blink(game.arena.merchant_point + Vector2(-260, 120))
+	await wait(2.5)
+	print("break (expect Wave 5 in 0:1x  [Skip]): ", info_text(), "  merchant (expect true): ", is_instance_valid(game.merchant),
+		"  best (expect 14): ", SaveGame.instance().endless_best)
+	await shot("endless_wave_1_break")
+	game.skip_break()
+	var mini_boss := await wait_for_kind(&"mini_boss")
+	flush_tips()
+	face_boss(mini_boss)
+	await wait(1.5)
+	frame(mini_boss)
+	await wait(0.1)
+	print("wave 5 (expect Mini boss wave): ", info_text(), "  mini boss: ", mini_boss.data.id,
+		" HP (expect 9000): ", roundi(mini_boss.max_hp), "  boss bar (expect true): ", game.hud.boss_bar.visible)
+	await shot("endless_wave_2_mini_boss")
+
+
+## An Endless boss wave on Thresh's domain: the debug jump to wave 10, the
+## Elder Dragon alone at the boss point, its bar under the Best line; its
+## kill pays the repeat purple; then wave 20 (Nothing picked): a final Thresh,
+## who leaves without a cutscene and pays too.
+func scenario_endless_boss() -> void:
+	endless_save(14)
+	await start_endless(THRESH_DOMAIN)
+	var game := game_stage()
+	flush_tips()
+	game.jump_to_boss_wave()
+	seed_boss(&"elder_dragon")
+	game.skip_break()
+	var boss := await wait_for_kind(&"boss")
+	print("spawned at the boss point (expect 0): ", roundi(boss.global_position.distance_to(game.arena.boss_point)))
+	face_boss(boss)
+	await wait(1.2)
+	frame(boss)
+	await wait(0.1)
+	print("wave 10 (expect Boss wave  Enemies: 1): ", info_text(), "  boss: ", boss.data.id,
+		"  HP (expect 15000): ", roundi(boss.max_hp))
+	print("boss_unit (expect null), run boss (expect empty): ", game.boss_unit, " ", game.run.boss,
+		"  bar (expect true, under Best): ", game.hud.boss_bar.visible, " ", game.hud.boss_bar.offset_top)
+	await shot("endless_boss_0_wave")
+	var purple: int = game.collected[Essences.PURPLE]
+	await win_boss_wave()
+	print("purple paid (expect +%d): +%d  bosses in the save (expect [] unchanged): %s" % [
+		KillRewards.repeat_purple(boss.data, game.run), game.collected[Essences.PURPLE] - purple, SaveGame.instance().bosses])
+	await shot("endless_boss_1_won")
+	if game.endless.pick:
+		game.endless.pick.cards[2].pressed.emit()
+		await wait(0.2)
+	game.jump_to_boss_wave()
+	seed_boss(&"thresh_final")
+	game.skip_break()
+	var thresh := await wait_for_kind(&"boss")
+	face_boss(thresh)
+	await wait(2.5)
+	frame(thresh)
+	await wait(0.1)
+	print("wave 20 (expect Boss wave): ", info_text(), "  boss: ", thresh.data.id, "  HP (expect 19500): ", roundi(thresh.max_hp),
+		"  boss_unit (expect null): ", game.boss_unit)
+	await shot("endless_boss_2_thresh")
+	purple = game.collected[Essences.PURPLE]
+	var data := thresh.data
+	await win_boss_wave()
+	print("Thresh left: cutscene (expect null), result shown (expect false), purple (expect +%d): %s %s +%d" % [
+		KillRewards.repeat_purple(data, game.run), game.cutscene, game.result.visible, game.collected[Essences.PURPLE] - purple])
+
+
+## After an Endless boss wave (wave 10 on the Training ground): the pick's
+## three cards over the paused game; a click on the first: the break counts
+## down and the modifier's row leads the buff bar (hovered: both lines); then
+## a ModifierPick of the three modifiers not offered (not a real pick), so
+## every card is seen.
+func scenario_endless_pick() -> void:
+	endless_save(14)
+	await start_endless(TRAINING_GROUND)
+	var game := game_stage()
+	flush_tips()
+	game.jump_to_boss_wave()
+	game.skip_break()
+	await wait_for_kind(&"boss")
+	await win_boss_wave()
+	var pick := game.endless.pick
+	print("pick open (expect true), paused (expect true), held (expect true): ", pick != null, " ", paused, " ",
+		endless_runner().held)
+	if pick == null:
+		return
+	var offered := pick.ids.duplicate()
+	print("offered (expect two of 1-5 and 6): ", offered, "  ", offered.map(func(id: int) -> String:
+		return "%s / %s" % [EndlessModifiers.downside(id), EndlessModifiers.reward(id)]))
+	print("stage info (expect no countdown, no Skip): ", info_text())
+	await shot("endless_pick_0_cards")
+	pick.cards[0].pressed.emit()
+	await wait(0.3)
+	print("picked: modifier (expect %d) %d, paused (expect false) %s, info (expect Wave 11 in 0:2x  [Skip]): %s" % [
+		offered[0], game.endless.modifier, paused, info_text()])
+	var row := buff_icon(Hud.MODIFIER_ROW)
+	print("buff row shown (expect true): ", row != null)
+	if row:
+		await mouse_move(control_center(row))
+		await wait_for_tooltip(row)
+	await shot("endless_pick_1_picked")
+	await mouse_move(Vector2(960, 300))
+	var rest: Array[int] = []
+	for id in range(1, EndlessModifiers.NOTHING):
+		if not id in offered:
+			rest.append(id)
+	var others := ModifierPick.new(rest)
+	game.add_child(others)
+	await wait(0.2)
+	await shot("endless_pick_2_other_cards")
+	others.queue_free()
+
+
+## The end of an Endless run on the Dark mid lane, as in the design's
+## example: 21 waves skipped with the runner's debug skip and counted as won,
+## the level and clock set to match, modifier #3 picked; wave 22 won for real
+## (a new best: the save's was 14); Lucian falls in wave 23: RUN OVER and
+## "New best: 22 waves!". Then Main screen: the Journey on Endless with the
+## new best, and the save file.
+func scenario_endless_run_over() -> void:
+	endless_save(14)
+	await start_endless(DARK_MID_LANE)
+	var game := game_stage()
+	var runner := endless_runner()
+	flush_tips()
+	runner._skip_to(21)
+	runner._done = 21
+	game.elapsed = 21 * 62.0
+	lucian.progress.set_level(15)
+	game.endless.choose(3)
+	await clear_wave()
+	print("wave 22 won: best (expect 22): ", SaveGame.instance().endless_best, "  info: ", info_text())
+	game.skip_break()
+	await wait_for_spawns()
+	flush_tips()
+	surround(1.0)
+	lucian.command_attack_move(lucian.global_position)
+	while not lucian.dead:
+		await wait(0.05)
+	await wait(1.8)
+	print("result (expect RUN OVER): ", game.result.title.text, "  stats: ", result_rows())
+	print("reward lines (expect New best: 22 waves!): ", game.reward_lines)
+	print("buttons (expect Retry shown, Next hidden, Main screen): ", game.result.retry_button.visible, " ",
+		game.result.next_button.visible, " ", game.result.main_button.text)
+	await shot("endless_run_over_0_result")
+	game.result.main_button.pressed.emit()
+	await wait(0.6)
+	stage = null
+	lucian = null
+	var section := journey()
+	print("main screen, Endless picked (expect true true), best (expect Best wave: 22), map kept (expect %d): " % DARK_MID_LANE,
+		game_root.screen is MainScreen, " ", section.picked == section.map.endless, " ", section.panel.best_label.text, " ",
+		section.panel.map_choice())
+	var file := FileAccess.open(SaveGame.instance().path(1), FileAccess.READ)
+	var data: Dictionary = JSON.parse_string(file.get_as_text()) if file else {}
+	print("save file: endless_best (expect 22) %s, \"endless\" in cleared (expect false) %s, bosses (expect []) %s" % [
+		data.get("endless_best"), "endless" in data.get("cleared", []), data.get("bosses")])
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.2)
+	await shot("endless_run_over_1_journey")
+
+
+## Every exit asks first, and Cancel stays: the gear menu's Leave to main
+## menu and Exit the game ("Save before leaving?" Yes / No / Cancel; ESC is
+## Cancel); Leave this stage in Training's ESC menu (Leave / Cancel), Exit
+## the game from that menu, and Leave in an Endless run (its own line); the
+## title's Exit game and the window's X ("Exit the game?" Exit / Cancel).
+func scenario_exit_cancel() -> void:
+	var main := main_screen()
+	var prompt := game_root.prompt
+	main.gear.open()
+	main.gear.find_button("Leave to main menu").pressed.emit()
+	await wait(0.2)
+	print("Leave to main menu: ", prompt_text())
+	await shot("exit_cancel_0_leave_to_menu")
+	prompt.cancel()
+	await wait(0.2)
+	print("Cancel: prompt, gear menu, main screen (expect false true true): ", prompt.is_open(), " ", main.gear.visible, " ",
+		game_root.screen is MainScreen)
+	await shot("exit_cancel_1_leave_cancelled")
+	main.gear.find_button("Exit the game").pressed.emit()
+	await wait(0.2)
+	print("Exit the game: ", prompt_text(), "  paused (expect true): ", paused)
+	await press_key(KEY_ESCAPE, true)
+	await press_key(KEY_ESCAPE, false)
+	print("ESC: prompt, paused, main screen (expect false false true): ", prompt.is_open(), " ", paused, " ",
+		game_root.screen is MainScreen)
+	main.gear.close()
+	await start_training()
+	# Off the HUD, so no tooltip shows.
+	await mouse_move(Vector2(960, 200))
+	var screens := game_stage().screens
+	screens.set_menu_open(true)
+	await wait(0.2)
+	find_buttons(screens.menu, "Leave this stage")[0].pressed.emit()
+	await wait(0.2)
+	print("Leave this stage: ", prompt_text())
+	await shot("exit_cancel_2_leave_stage")
+	prompt.cancel()
+	await wait(0.2)
+	print("Cancel: prompt, menu, paused, stage (expect false true true true): ", prompt.is_open(), " ", screens.menu.visible, " ",
+		paused, " ", game_root.screen is Stage)
+	await shot("exit_cancel_3_back_in_menu")
+	find_buttons(screens.menu, "Exit the game")[0].pressed.emit()
+	await wait(0.2)
+	print("Exit the game in the stage: ", prompt_text())
+	await shot("exit_cancel_4_exit_in_stage")
+	prompt.cancel()
+	await wait(0.2)
+	print("Cancel: prompt, menu, paused (expect false true true): ", prompt.is_open(), " ", screens.menu.visible, " ", paused)
+	screens.set_menu_open(false)
+	await leave_stage()
+	endless_save(14)
+	await start_endless(JUNGLE)
+	screens = game_stage().screens
+	screens.set_menu_open(true)
+	await wait(0.2)
+	find_buttons(screens.menu, "Leave this stage")[0].pressed.emit()
+	await wait(0.2)
+	print("Leave this stage in Endless: ", prompt_text())
+	await shot("exit_cancel_5_leave_run")
+	prompt.cancel()
+	screens.set_menu_open(false)
+	await leave_stage()
+	game_root.show_title()
+	await wait(0.3)
+	var title := game_root.screen as TitleScreen
+	title.find_button("Exit game").pressed.emit()
+	await wait(0.2)
+	print("title Exit game: ", prompt_text())
+	await shot("exit_cancel_6_title_exit")
+	prompt.cancel()
+	await wait(0.2)
+	print("Cancel: prompt, title (expect false true): ", prompt.is_open(), " ", game_root.screen is TitleScreen)
+	game_root.notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
+	await wait(0.2)
+	print("window X on the title: ", prompt_text())
+	await press_key(KEY_ESCAPE, true)
+	await press_key(KEY_ESCAPE, false)
+	print("ESC: prompt, title (expect false true): ", prompt.is_open(), " ", game_root.screen is TitleScreen)
+
+
+## The Game's prompt: whether it is open, its question and its buttons shown.
+func prompt_text() -> String:
+	var prompt := game_root.prompt
+	var buttons := []
+	for button: Button in [prompt._yes, prompt._no, prompt._cancel]:
+		if button.visible:
+			buttons.append(button.text)
+	return "open %s, \"%s\" %s" % [prompt.is_open(), prompt._message.text, buttons]
+
+
+## The Evolution Tree's icons since Phase 9, after Max tree so every node
+## shows: Q, W, E, R and the passive as the HUD draws them; the six spells
+## and their upgrades (the spell's art with three gold chevrons), at zoom 1
+## and up close at 1.4; then Training with Flash and Heal: the HUD's row.
+func scenario_tree_icons() -> void:
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	var map := section.map
+	find_buttons(main_debug(), "Max tree (free)")[0].pressed.emit()
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.3)
+	var same := []
+	var skills: Array[StringName] = [&"skill_q", &"skill_w", &"skill_e", &"skill_r"]
+	for i in skills.size():
+		same.append((map.views[skills[i]] as TreeNodeView).data.icon == Hud.SKILL_ICONS[i])
+	same.append((map.views[&"passive"] as TreeNodeView).data.icon == Hud.PASSIVE_ICON)
+	for id: StringName in [&"flash", &"ghost", &"barrier", &"heal", &"clarity", &"smite"]:
+		same.append((map.views[id] as TreeNodeView).data.icon == (load("res://data/summoners/%s.tres" % id) as SummonerData).icon)
+	print("tree icons are the stage's (expect 11 x true): ", same)
+	await shot("tree_icons_0_skills")
+	map.pan_by(Vector2(-10000, 0))
+	await wait(0.2)
+	await shot("tree_icons_1_summoners")
+	var upgrade: TreeNodeView = map.views[&"heal_upgrade"]
+	map.zoom_at(control_center(upgrade) - map.global_position, TreeMap.MAX_ZOOM)
+	await wait(0.2)
+	await shot("tree_icons_2_close")
+	var save := SaveGame.instance()
+	save.set_loadout(0, &"flash")
+	save.set_loadout(1, &"heal")
+	await start_training()
+	(stage as Stage).camera.zoom = Vector2(1.4, 1.4)
+	await wait(0.3)
+	await shot("tree_icons_3_hud")
+
+
+## A level gained in stage 2-1, as from a kill: the chime and the gold burst,
+## a ring rising around Lucian with "Level 2" over him; later in its rise;
+## up close (zoom 1.6); and on Low quality, the text alone.
+func scenario_level_up() -> void:
+	var game := game_stage()
+	flush_tips()
+	var progress := lucian.progress
+	progress.add_xp(progress.xp_for_next())
+	await wait(0.15)
+	var bursts := lucian.get_children().filter(func(node: Node) -> bool: return node is LevelUpBurst)
+	print("level (expect 2), bursts (expect 1): ", progress.level, " ", bursts.size())
+	await shot("level_up_0_burst")
+	await wait(0.35)
+	await shot("level_up_1_rising")
+	await wait(1.2)
+	game.camera.zoom = Vector2(1.6, 1.6)
+	await wait(0.2)
+	progress.add_xp(progress.xp_for_next())
+	await wait(0.3)
+	await shot("level_up_2_close")
+	await wait(1.2)
+	GameSettings.instance().set_value(&"quality", "low")
+	progress.add_xp(progress.xp_for_next())
+	await wait(0.3)
+	print("low effects (expect true), level (expect 4): ", GameSettings.instance().low_effects(), " ", progress.level)
+	await shot("level_up_3_low_effects")
