@@ -140,7 +140,7 @@ func test_act_one_start_is_enabled_on_a_new_game() -> void:
 	assert_false(section.act_pages[0].start_button.disabled)
 
 
-func test_start_is_disabled_for_locked_and_unbuilt_acts_and_endless() -> void:
+func test_start_is_disabled_for_locked_acts_and_endless() -> void:
 	assert_true(section.act_pages[1].start_button.disabled, "act 2 is locked")
 	_save().set_cleared(Journey.all_stage_ids(2))
 	assert_false(section.act_pages[2].start_button.disabled, "act 3 starts: 3-1 has its waves")
@@ -151,9 +151,10 @@ func test_start_is_disabled_for_locked_and_unbuilt_acts_and_endless() -> void:
 	_save().set_cleared(Journey.all_stage_ids(4))
 	assert_false(section.act_pages[4].start_button.disabled, "act 5 starts: 5-1 has its waves")
 	assert_false(section.act_pages[4].start_button.has_meta(&"hover_text"))
+	assert_true(section.act_pages[5].start_button.disabled, "act 6 is locked")
 	_save().set_cleared(Journey.all_stage_ids(5))
-	assert_true(section.act_pages[5].start_button.disabled)
-	assert_eq(section.act_pages[5].start_button.get_meta(&"hover_text"), "Act 6 comes in a later phase")
+	assert_false(section.act_pages[5].start_button.disabled, "act 6 starts once acts 1-5 are cleared: 6-1 has its waves")
+	assert_false(section.act_pages[5].start_button.has_meta(&"hover_text"))
 	assert_true(section.endless_page.start_button.disabled)
 	assert_eq(section.endless_page.start_button.get_meta(&"hover_text"), "Endless comes in a later phase")
 	assert_eq(section.endless_page.map_buttons.size(), 7)
@@ -209,7 +210,10 @@ func test_it_opens_on_the_first_act_with_work_to_do() -> void:
 	assert_eq(section.current, 4, "act 5 can be played")
 	_save().set_cleared(Journey.all_stage_ids(5))
 	section.open_on()
-	assert_eq(section.current, JourneySection.TRAINING_TAB, "act 6 can't yet")
+	assert_eq(section.current, 5, "act 6 can be played")
+	_save().set_cleared(Journey.all_stage_ids(6))
+	section.open_on()
+	assert_eq(section.current, JourneySection.TRAINING_TAB, "the story is done")
 	section.open_on(1)
 	assert_eq(section.current, 0)
 

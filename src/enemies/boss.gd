@@ -71,6 +71,12 @@ func channel() -> Dictionary:
 	return {}
 
 
+## Shown after its name on the boss bar ("Phase 2" for Act 6's Thresh); ""
+## for none.
+func phase_label() -> String:
+	return ""
+
+
 ## A skill's own condition (Comeuppance waits for 75% HP).
 func _can_use(_id: StringName) -> bool:
 	return true

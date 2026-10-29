@@ -307,7 +307,25 @@ func test_next_stage_shows_only_when_it_can_be_played() -> void:
 	assert_true(act_4_end.result.next_button.visible, "5-1 has its waves")
 	var act_5_end: Stage = await _stage(5, 5)
 	act_5_end.show_result(true)
-	assert_false(act_5_end.result.next_button.visible, "6-1 has no waves yet")
+	assert_true(act_5_end.result.next_button.visible, "6-1 has its waves")
+	var story_end: Stage = await _stage(6, 5)
+	story_end.show_result(true)
+	assert_false(story_end.result.next_button.visible, "6-5 is the story's last stage")
+
+
+## Act 6 is played: 6-1 runs the Journey's 6 waves, the first one bringing
+## mist walkers and lantern souls.
+func test_6_1_runs_its_waves() -> void:
+	var first: Stage = await _stage(6, 1)
+	assert_eq(first.runner.wave_count(), Journey.waves(6, 1))
+	assert_eq(first.runner.total_waves(), 6, "no boss wave")
+	first.skip_break()
+	for i in 20:
+		first.runner.tick(WaveRunner.GROUP_GAP)
+	var ids := get_tree().get_nodes_in_group(&"enemies").map(func(enemy: EnemyUnit) -> StringName: return enemy.data.id)
+	assert_eq(ids.count(WavePlan.MIST_WALKER), 8)
+	assert_eq(ids.count(WavePlan.LANTERN_SOUL), 4)
+	assert_engine_error_count(0)
 
 
 ## Phase 7: camps, splits, escapes, buffs on kill and mini bosses, with

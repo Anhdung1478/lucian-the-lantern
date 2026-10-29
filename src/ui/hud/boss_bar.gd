@@ -1,8 +1,8 @@
 class_name BossBar
 extends Control
-## Under the stage info while a boss or a mini boss lives: its name over a
-## wide red health bar. It finds the unit itself (a boss before a mini boss).
-## `phase_text` is for Act 6's Thresh ("Phase 1 / 2").
+## Under the stage info while a boss or a mini boss lives: its name, and its
+## Boss.phase_label() after it (Act 6's Thresh: "Phase 1", "Phase 2"), over
+## a wide red health bar. It finds the unit itself (a boss before a mini boss).
 
 const SIZE := Vector2(600, 22)
 const FILL := Color("c8312b")
@@ -13,6 +13,7 @@ const BREAK_GAP := 4.0
 const BREAK_FILL := Color("ffd166")
 
 var boss: EnemyUnit
+## The boss's Boss.phase_label() as of the last frame; "" for none.
 var phase_text := ""
 ## The boss's Boss.channel() as of the last frame; {} when it has none.
 var channel := {}
@@ -36,6 +37,7 @@ func _process(_delta: float) -> void:
 			boss = found
 	visible = boss != null
 	channel = (boss as Boss).channel() if boss is Boss else {}
+	phase_text = (boss as Boss).phase_label() if boss is Boss else ""
 	queue_redraw()
 
 

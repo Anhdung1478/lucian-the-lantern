@@ -2,7 +2,8 @@ class_name WavePlan
 extends RefCounted
 ## Which enemies each wave of a stage brings (docs/act1_the_loss.md,
 ## docs/act2_the_sentinels.md, docs/act3_the_jungle.md,
-## docs/act4_the_darkness.md, docs/act5_shadow_isles.md), and each stage's boss. A wave can name a pack
+## docs/act4_the_darkness.md, docs/act5_shadow_isles.md,
+## docs/act6_the_lantern.md), and each stage's boss. A wave can name a pack
 ## in place of an enemy id: it brings the pack's members, in order.
 
 const MELEE := &"melee_minion"
@@ -30,6 +31,16 @@ const BROODMOTHER := &"broodmother"
 ## Act 5's mini bosses, each last in its stage's last wave.
 const MAOKAI := &"maokai"
 const ELISE := &"elise"
+## Act 6's enemies: Mist Walkers, Lantern Souls (Thresh's Dark Passage calls
+## them too), Spectral Riders and Chain Wardens.
+const MIST_WALKER := &"mist_walker"
+const LANTERN_SOUL := &"lantern_soul"
+const SPECTRAL_RIDER := &"spectral_rider"
+const CHAIN_WARDEN := &"chain_warden"
+## Act 6's mini bosses, each last in its stage's last wave, and its boss.
+const KARTHUS_REVIVED := &"karthus_revived"
+const HECARIM := &"hecarim"
+const THRESH_FINAL := &"thresh_final"
 ## Pack id -> its members, in spawn order. They come out of their camp.
 const PACKS := {
 	&"raptors": [&"raptor_big", &"raptor", &"raptor", &"raptor", &"raptor"],
@@ -132,9 +143,52 @@ const STAGES := {
 		[[SPIDERLING, 14], [SAPLING, 10], [MAIDEN, 2]],
 		[[SPIDERLING, 14], [SAPLING, 10], [MAIDEN, 1], [BROODMOTHER, 2]],
 	],
+	"6-1": [
+		[[MIST_WALKER, 8], [LANTERN_SOUL, 4]],
+		[[MIST_WALKER, 8], [LANTERN_SOUL, 6]],
+		[[MIST_WALKER, 8], [LANTERN_SOUL, 6], [SPECTRAL_RIDER, 1]],
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 6], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1]],
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
+	],
+	"6-2": [
+		[[MIST_WALKER, 8], [LANTERN_SOUL, 6]],
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 6], [SPECTRAL_RIDER, 1]],
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 6], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1], [KARTHUS_REVIVED, 1]],
+	],
+	"6-3": [
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 6]],
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1]],
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [CHAIN_WARDEN, 2]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2], [CHAIN_WARDEN, 1]],
+	],
+	"6-4": [
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1]],
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 10], [CHAIN_WARDEN, 2]],
+		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2], [CHAIN_WARDEN, 1], [HECARIM, 1]],
+	],
+	"6-5": [
+		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2]],
+		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [CHAIN_WARDEN, 2]],
+		[[MIST_WALKER, 14], [LANTERN_SOUL, 12], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 16], [LANTERN_SOUL, 12], [SPECTRAL_RIDER, 2], [CHAIN_WARDEN, 2]],
+	],
 }
 ## Stage id -> the boss wave's enemy id.
-const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan", "3-5": &"elder_dragon", "4-3": &"dark_lucian", "5-5": &"karthus"}
+const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan", "3-5": &"elder_dragon", "4-3": &"dark_lucian", "5-5": &"karthus", "6-5": THRESH_FINAL}
 ## Stage id -> enemy id -> its share of HP in that stage only. Act 1's stage
 ## is gentler: its melee and ranged minions have 20% less HP.
 const HP_SHARES := {"1-1": {MELEE: 0.8, RANGED: 0.8}}

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/thresh.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"thresh_final"
+display_name = "Thresh"
+kind = &"boss"
+behavior = &"thresh_final"
+art = ExtResource("2_art")
+max_hp = 16000.0
+armor = 45.0
+mr = 45.0
+damage = 85.0
+damage_type = 0
+attack_range = 450.0
+attack_interval = 1.6
+move_speed = 320.0
+radius = 48.0
+gold = 300
+projectile_speed = 900.0
+purple_first = 20
+purple_repeat = 4

@@ -365,8 +365,10 @@ func _start_waves() -> void:
 func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 	if id == run.boss:
 		boss_unit = spawn_enemy(id, arena.boss_point)
-		if boss_unit is Thresh:
-			## Deferred: a shot's physics callback can bring him to half HP, and the freeze can't disable bodies mid-flush.
+		## Deferred, both: a shot's physics callback can bring him to half HP or to his fall, and the freeze can't disable bodies mid-flush.
+		if boss_unit is ThreshFinal:
+			(boss_unit as ThreshFinal).fell.connect(_on_thresh_fell, CONNECT_DEFERRED)
+		elif boss_unit is Thresh:
 			(boss_unit as Thresh).phase_ended.connect(_on_thresh_phase_ended, CONNECT_DEFERRED)
 		return
 	var data: EnemyData = load(ENEMY_PATH % id)
@@ -448,6 +450,8 @@ func _new_unit(data: EnemyData) -> EnemyUnit:
 	match data.behavior:
 		&"thresh":
 			return Thresh.new()
+		&"thresh_final":
+			return ThreshFinal.new()
 		&"akshan":
 			return Akshan.new()
 		&"infernal_drake":
@@ -541,25 +545,44 @@ func _on_thresh_phase_ended() -> void:
 	cutscene.start(self)
 
 
-## Thresh is beaten for this act: his blue and orange now, rising where he
-## sank (as a kill's do), his purple over Lucian in _on_cleared. He and
-## Senna leave the map.
+## Act 1's Thresh is beaten for this act: Senna's lessons, and he and
+## Senna leave the map (his rewards: _thresh_leaves).
 func _on_cutscene_done() -> void:
-	var reward := KillRewards.roll(boss_unit.data, run.act, run, rng)
-	add_essences(reward.blue, reward.orange, 0, boss_unit.global_position)
 	reward_lines.append_array(ACT_1_REWARDS)
 	# He has her gun now (the scene gives it to him; a skip still does).
 	lucian.one_gun = false
-	# Out of "enemies" now, so the radar and the boss bar drop him at once.
-	boss_unit.remove_from_group(&"enemies")
-	for node: Node2D in [boss_unit, senna]:
-		if is_instance_valid(node):
-			node.queue_free()
-	boss_unit = null
+	if is_instance_valid(senna):
+		senna.queue_free()
 	senna = null
 	cutscene = null
-	# His leaving ends the boss wave like a death would (all 3 waves cleared);
-	# finish() ends the stage even if other enemies are still about.
+	_thresh_leaves()
+
+
+## Act 6's Thresh falls in Phase 2: the fight stops (warnings and shots go),
+## every soul he summoned goes free (vanish), and he leaves with his rewards.
+func _on_thresh_fell() -> void:
+	if lucian.dead or result.visible or not is_instance_valid(boss_unit):
+		return
+	for node: Node in $Warnings.get_children() + $Projectiles.get_children():
+		node.queue_free()
+	for enemy: Node in get_tree().get_nodes_in_group(&"enemies"):
+		var unit := enemy as EnemyUnit
+		if unit and unit.summoned and unit.data.id == WavePlan.LANTERN_SOUL:
+			unit.vanish()
+	_thresh_leaves()
+
+
+## Thresh is beaten: his blue and orange now, rising where he stands (as a
+## kill's do), his purple over Lucian in _on_cleared. He leaves the map, and
+## his leaving ends the boss wave like a death would; finish() ends the stage
+## even if other enemies are still about.
+func _thresh_leaves() -> void:
+	var reward := KillRewards.roll(boss_unit.data, run.act, run, rng)
+	add_essences(reward.blue, reward.orange, 0, boss_unit.global_position)
+	# Out of "enemies" now, so the radar and the boss bar drop him at once.
+	boss_unit.remove_from_group(&"enemies")
+	boss_unit.queue_free()
+	boss_unit = null
 	runner.enemy_died()
 	runner.finish()
 
