@@ -70,7 +70,7 @@ func alive() -> int:
 
 ## One enemy is left, in the last wave: its death ends the stage.
 func is_last_enemy() -> bool:
-	return state == State.FIGHT and wave >= total_waves() and alive() == 1
+	return state == State.FIGHT and _is_last_wave() and alive() == 1
 
 
 func tick(delta: float) -> void:
@@ -141,13 +141,22 @@ func _start_next() -> void:
 		break_ended.emit()
 	wave += 1
 	state = State.FIGHT
+	_to_spawn.assign(_wave_ids())
 	if is_boss_wave():
-		_to_spawn = [boss]
 		boss_wave_started.emit(boss)
-	else:
-		_to_spawn.assign(_waves[wave - 1])
 	_spawn_left = 0.0
 	wave_started.emit(wave)
+
+
+## The enemy ids of `wave`, just started, in spawn order: the boss wave is the
+## boss alone. EndlessRunner makes them up.
+func _wave_ids() -> Array:
+	return [boss] if is_boss_wave() else _waves[wave - 1]
+
+
+## The wave being fought is the stage's last (never in Endless).
+func _is_last_wave() -> bool:
+	return wave >= total_waves()
 
 
 func _spawn_group() -> void:
@@ -159,9 +168,14 @@ func _spawn_group() -> void:
 
 func _wave_done() -> void:
 	_done += 1
-	if wave >= total_waves():
+	if _is_last_wave():
 		finish()
 	else:
-		state = State.BREAK
-		_countdown = BREAK_TIME
-		break_started.emit(BREAK_TIME)
+		_start_break()
+
+
+## The break before the next wave. EndlessRunner holds it after a boss wave.
+func _start_break() -> void:
+	state = State.BREAK
+	_countdown = BREAK_TIME
+	break_started.emit(BREAK_TIME)

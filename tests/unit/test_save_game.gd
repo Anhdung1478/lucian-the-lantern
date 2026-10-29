@@ -373,3 +373,25 @@ func test_losing_act_1_gives_nothing() -> void:
 func test_debug_acts_cleared_gives_e_too() -> void:
 	save_game.set_cleared(Journey.all_stage_ids(1))
 	assert_eq(save_game.tree.level(&"skill_e"), 1)
+
+
+## Phase 9: Endless's best run, in waves cleared, kept in memory until a save.
+func test_record_endless_keeps_the_best() -> void:
+	assert_true(save_game.record_endless(5), "a first run is a new best")
+	assert_eq(save_game.endless_best, 5)
+	assert_false(save_game.record_endless(3))
+	assert_eq(save_game.endless_best, 5, "a worse run keeps the best")
+	assert_false(save_game.record_endless(5), "a tie is not a new best")
+	assert_true(save_game.record_endless(8))
+	assert_eq(save_game.endless_best, 8)
+	assert_false(save_game.slot_exists(1), "nothing is written by itself")
+
+
+func test_the_endless_best_survives_save_and_load() -> void:
+	save_game.record_endless(12)
+	assert_true(save_game.save())
+	var loaded := SaveGame.new(PREFIX)
+	loaded.load_slot(1)
+	assert_eq(loaded.endless_best, 12)
+	assert_false(loaded.record_endless(11))
+	assert_eq(loaded.endless_best, 12)

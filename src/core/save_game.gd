@@ -146,6 +146,16 @@ func award_boss(id: String, first: int, repeat: int) -> int:
 	return first
 
 
+## An Endless run has cleared `waves`: kept when it beats the best, in memory
+## (the next save writes it). True for a new best.
+func record_endless(waves: int) -> bool:
+	if waves <= endless_best:
+		return false
+	endless_best = waves
+	changed.emit()
+	return true
+
+
 ## Debug: every boss gives its first-time purple again.
 func forget_bosses() -> void:
 	bosses = []

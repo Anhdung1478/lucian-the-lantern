@@ -121,3 +121,66 @@ func test_not_a_summon_by_default() -> void:
 	var plain := KillRewards.roll(SIEGE, 2, StageSetup.new(), rng)
 	rng.seed = 7
 	assert_eq(KillRewards.roll(SIEGE, 2, StageSetup.new(), rng, false), plain)
+
+
+## Phase 9: an Endless modifier's reward multipliers (StageSetup, 1 = none).
+func test_the_reward_multipliers_are_1_by_default() -> void:
+	var run := StageSetup.new()
+	assert_eq(run.gold_mult, 1.0)
+	assert_eq(run.blue_mult, 1.0)
+	assert_eq(run.orange_mult, 1.0)
+	assert_eq(run.purple_mult, 1.0)
+
+
+func test_the_gold_multiplier_raises_the_gold_only() -> void:
+	var run := StageSetup.new()
+	run.gold_mult = 1.3
+	var reward := KillRewards.roll(MELEE, 1, run, rng)
+	assert_eq(reward.gold, 78, "60 x 1.3")
+	assert_eq(reward.xp, 30, "XP is not multiplied")
+	assert_eq(reward.blue, 1)
+
+
+func test_the_gold_multiplier_comes_after_the_tree_bonus() -> void:
+	var run := StageSetup.new()
+	run.gold_bonus = 0.3
+	run.gold_mult = 1.1
+	assert_eq(KillRewards.roll(SIEGE, 1, run, rng).gold, 172, "120 x 1.3 x 1.1 = 171.6")
+
+
+func test_the_blue_multiplier_raises_the_blue() -> void:
+	var run := StageSetup.new()
+	run.blue_mult = 1.15
+	assert_eq(KillRewards.roll(SIEGE, 4, run, rng).blue, 23, "4 x 5 = 20, x 1.15")
+	assert_eq(KillRewards.roll(MELEE, 4, run, rng).gold, KillRewards.roll(MELEE, 4, StageSetup.new(), rng).gold)
+
+
+func test_the_orange_multiplier_raises_the_orange_chance() -> void:
+	var run := StageSetup.new()
+	run.orange_mult = 1.5
+	var base := 0
+	var raised := 0
+	for i in 10000:
+		base += KillRewards.roll(SIEGE, 1, StageSetup.new(), rng).orange
+	rng.seed = 7
+	for i in 10000:
+		raised += KillRewards.roll(SIEGE, 1, run, rng).orange
+	assert_between(base, 900, 1100, "an elite's 10%")
+	assert_between(raised, 1350, 1650, "x 1.5")
+
+
+func test_the_orange_multiplier_leaves_a_bosss_sure_orange() -> void:
+	var run := StageSetup.new()
+	run.orange_mult = 1.5
+	assert_eq(KillRewards.roll(_mini_boss(), 1, run, rng).orange, KillRewards.MINI_BOSS_ORANGE)
+
+
+func test_repeat_purple_is_raised_by_the_purple_multiplier() -> void:
+	var boss := _mini_boss()
+	boss.purple_repeat = 3
+	var run := StageSetup.new()
+	assert_eq(KillRewards.repeat_purple(boss, run), 3)
+	run.purple_mult = 1.5
+	assert_eq(KillRewards.repeat_purple(boss, run), 5, "roundi(4.5)")
+	boss.purple_repeat = 10
+	assert_eq(KillRewards.repeat_purple(boss, run), 15)

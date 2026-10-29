@@ -105,3 +105,50 @@ func test_act_2_stage_3_has_akshan() -> void:
 	var setup := StageSetup.for_stage(SaveGame.new("user://test_setup_"), 2, 3)
 	assert_eq(setup.boss, &"akshan")
 	assert_eq(setup.display_name, "Stage 2-3 · The Sentinels")
+
+
+func test_a_new_setup_is_not_endless() -> void:
+	var setup := StageSetup.new()
+	assert_eq(setup.act, 0)
+	assert_false(setup.endless)
+	assert_eq(setup.map_choice, 0)
+	assert_eq([setup.gold_mult, setup.blue_mult, setup.orange_mult, setup.purple_mult], [1.0, 1.0, 1.0, 1.0])
+
+
+func test_endless_on_a_chosen_map() -> void:
+	var rng := RandomNumberGenerator.new()
+	var save := SaveGame.new("user://test_setup_")
+	var setup := StageSetup.for_endless(save, 3, rng)
+	assert_true(setup.endless)
+	assert_eq(setup.map_choice, 3)
+	assert_eq(setup.act, 3)
+	assert_eq(setup.stage, 4, "the Jungle with water and Honeyfruit")
+	assert_eq(setup.stage_id, "endless")
+	assert_eq(setup.display_name, "Endless · Jungle")
+	assert_eq(setup.boss, &"")
+	assert_false(setup.tutorial)
+	assert_eq(setup.bought, StageSetup.from_save(save).bought, "built on the save's setup")
+
+
+func test_endless_on_each_map() -> void:
+	var rng := RandomNumberGenerator.new()
+	var save := SaveGame.new("user://test_setup_")
+	for choice in range(1, 7):
+		var setup := StageSetup.for_endless(save, choice, rng)
+		assert_eq(Vector2i(setup.act, setup.stage), EndlessPlan.map_for(choice))
+		assert_eq(setup.display_name, "Endless · %s" % Journey.ENDLESS_MAPS[choice])
+
+
+func test_endless_random_rolls_a_real_map_and_keeps_the_choice() -> void:
+	var rng := RandomNumberGenerator.new()
+	var save := SaveGame.new("user://test_setup_")
+	var seen := {}
+	for s in 100:
+		rng.seed = s
+		var setup := StageSetup.for_endless(save, EndlessPlan.RANDOM, rng)
+		assert_eq(setup.map_choice, EndlessPlan.RANDOM, "Retry rolls again")
+		assert_between(setup.act, 1, 6)
+		assert_eq(Vector2i(setup.act, setup.stage), EndlessPlan.map_for(setup.act))
+		assert_eq(setup.display_name, "Endless · %s" % Journey.ENDLESS_MAPS[setup.act])
+		seen[setup.act] = true
+	assert_eq(seen.size(), 6)

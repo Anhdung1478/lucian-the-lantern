@@ -39,6 +39,16 @@ var display_name := "Training"
 var boss := &""
 ## Act 1's first play: one gun, no skills or summoners; Senna fights too.
 var tutorial := false
+## An Endless run, and its map choice (a Journey.ENDLESS_MAPS index; 0 is
+## Random, rolled again on Retry). `act` and `stage` then only pick the map.
+var endless := false
+var map_choice := 0
+## The Endless modifier's reward multipliers (EndlessModifiers.apply_rewards):
+## gold, blue, the orange drop chance and repeat purple. 1 = none.
+var gold_mult := 1.0
+var blue_mult := 1.0
+var orange_mult := 1.0
+var purple_mult := 1.0
 
 
 ## The setup a save's tree, equipped skin and loadout give.
@@ -90,4 +100,20 @@ static func for_stage(save: SaveGame, act_number: int, stage_number: int) -> Sta
 			setup.bought.assign([0, 0, 0, 0])
 			setup.passive = false
 			setup.summoners.assign([&"", &""])
+	return setup
+
+
+## An Endless run: the save's setup on the map `choice` names (Random rolls one
+## with `rng`), with no boss.
+static func for_endless(save: SaveGame, choice: int, rng: RandomNumberGenerator) -> StageSetup:
+	var setup := from_save(save)
+	setup.endless = true
+	setup.map_choice = choice
+	var map := EndlessPlan.resolve_map(choice, rng)
+	var place := EndlessPlan.map_for(map)
+	setup.act = place.x
+	setup.stage = place.y
+	setup.stage_id = EndlessPlan.STAGE_ID
+	setup.display_name = "Endless · %s" % EndlessPlan.map_name(map)
+	setup.boss = &""
 	return setup
