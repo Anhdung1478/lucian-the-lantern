@@ -662,11 +662,13 @@ func is_displaced() -> bool:
 ## walls and enemies, looking bigger at the peak for height. He can't act in
 ## flight and a displacement can't move him. Drops his orders, windup, queued
 ## cast and dash, and stops R. Builds no Energize. The caller picks a
-## walkable `to`.
+## walkable `to`. A throw in flight turns into this one, from where he is.
 func launch(to: Vector2, seconds: float) -> void:
 	if dead or in_stasis():
 		return
 	_order = Order.NONE
+	# Not cut short: the new throw ends somewhere walkable too.
+	_launch_left = 0.0
 	_drop_in_flight()
 	_launch_from = global_position
 	_launch_to = to
@@ -706,8 +708,9 @@ func bonus_armor() -> float:
 
 
 ## Ends whatever Lucian was in the middle of: windup, queued cast, cast lock,
-## R, a dash (its trail finishes), a displacement and a throw (he comes down
-## where he is).
+## R, a dash (its trail finishes), a displacement and a throw. A throw cut
+## short puts him at its walkable destination at once, never mid-air over a
+## wall.
 func _drop_in_flight() -> void:
 	_cancel_windup()
 	_queued_slot = -1
@@ -719,6 +722,7 @@ func _drop_in_flight() -> void:
 	_dash_trail = null
 	_displace_left = 0.0
 	if is_launched():
+		global_position = _launch_to
 		_land()
 	collision_mask = _body_mask()
 

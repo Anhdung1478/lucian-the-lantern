@@ -482,11 +482,40 @@ func test_displace_is_ignored_in_flight() -> void:
 	assert_almost_eq(lucian.global_position, Vector2(300, 0), Vector2(1, 1))
 
 
-func test_stasis_ends_a_launch() -> void:
+func test_stasis_mid_flight_lands_him_on_the_far_side() -> void:
+	_wall(Vector2(150, 0))
+	await wait_physics_frames(1)
 	lucian.launch(Vector2(300, 0), 0.3)
+	await wait_seconds(0.15)
+	assert_true(lucian.is_launched(), "still over the wall")
 	lucian.enter_stasis(0.1, 100.0, 0.0)
 	assert_false(lucian.is_launched())
+	assert_eq(lucian.global_position, Vector2(300, 0), "where he was thrown, not inside the wall")
 	assert_eq(lucian.visuals.scale, Vector2.ONE)
+	await wait_seconds(0.3)
+	assert_false(lucian.in_stasis())
+	assert_eq(lucian.global_position, Vector2(300, 0))
+	assert_true(lucian.fits_at(lucian.global_position))
+
+
+func test_a_second_throw_in_flight_flies_on_from_where_he_is() -> void:
+	lucian.launch(Vector2(300, 0), 0.3)
+	await wait_seconds(0.1)
+	var mid_air := lucian.global_position
+	lucian.launch(Vector2(0, 300), 0.3)
+	assert_eq(lucian.global_position, mid_air, "no jump to the first throw's end")
+	assert_true(lucian.is_launched())
+	await wait_seconds(0.4)
+	assert_almost_eq(lucian.global_position, Vector2(0, 300), Vector2(1, 1))
+
+
+func test_death_mid_flight_lands_him_at_the_destination() -> void:
+	lucian.launch(Vector2(300, 0), 0.3)
+	await wait_seconds(0.1)
+	lucian.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_true(lucian.dead)
+	assert_false(lucian.is_launched())
+	assert_eq(lucian.global_position, Vector2(300, 0))
 
 
 func test_the_throw_builds_no_energize() -> void:
