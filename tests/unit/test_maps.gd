@@ -142,10 +142,18 @@ func test_the_dragon_pit_is_round_with_rocks_in_a_ring() -> void:
 		assert_true(map.is_walkable(middle + direction * (DragonPitMap.FLOOR_RADIUS - 50.0), 0.0), "the floor reaches its rim")
 		assert_false(map.is_walkable(middle + direction * (DragonPitMap.FLOOR_RADIUS + 30.0), 0.0), "rock past the rim")
 	assert_true(map.camps.is_empty())
-	assert_eq(map.spawn_points.size(), 4)
+	assert_eq(map.spawn_points.size(), 3, "north, east and west")
 	assert_eq(map.boss_point, middle)
 	assert_gt(map.lucian_start.y, middle.y, "Lucian starts at the south")
 	assert_gt(map.merchant_point.y, middle.y)
+	map.free()
+
+
+## No wave comes in next to Lucian's start (out of his and Gromp's range).
+func test_the_dragon_pit_spawns_far_from_the_start() -> void:
+	var map := DragonPitMap.new()
+	for point in map.spawn_points:
+		assert_gte(point.distance_to(map.lucian_start), 1000.0, str(point))
 	map.free()
 
 

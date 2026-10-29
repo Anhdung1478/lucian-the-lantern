@@ -3,9 +3,9 @@ extends StageMap
 ## Act 3, stage 5: the Elder Dragon's pit (3600 × 3600). A round stone floor
 ## with rock all round it. The rock is WALL_PIECES arc pieces, so no wall has
 ## a hole, and ROCKS rocks in a ring give cover. There are no camps: waves
-## come in at the north, east, south and west rim, in turn. Lucian starts at
-## the south, the merchant stands south of the middle and the dragon lands
-## in the middle.
+## come in at the north, east and west rim, in turn (never the south, where
+## Lucian starts). The merchant stands south of the middle and the dragon
+## lands in the middle.
 
 const FLOOR_RADIUS := 1650.0
 const WALL_PIECES := 8
@@ -48,7 +48,8 @@ func _init() -> void:
 	lucian_start = middle + LUCIAN_START
 	merchant_point = middle + MERCHANT
 	boss_point = middle
-	for direction in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
+	# Not the south rim: a wave would come in on top of Lucian's start.
+	for direction in [Vector2.UP, Vector2.RIGHT, Vector2.LEFT]:
 		spawn_points.append(middle + direction * SPAWN_RING)
 
 
