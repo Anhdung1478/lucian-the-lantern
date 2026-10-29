@@ -180,9 +180,9 @@ func _spawn_picked() -> void:
 		_spawn(StringName(_enemy_picker.get_item_text(_enemy_picker.selected)))
 
 
-## The boss (kind "boss", not a mini boss) goes to 51%. The Elder Dragon leaves the
-## group mid-dive, so stage.boss_unit is checked as well.
-func _boss_to_51() -> void:
+## The boss (kind "boss", not a mini boss) goes to `share` of its HP. The Elder Dragon
+## leaves the group mid-dive, so stage.boss_unit is checked as well.
+func _boss_to(share: float) -> void:
 	var units: Array[EnemyUnit] = []
 	if stage.boss_unit:
 		units.append(stage.boss_unit)
@@ -191,7 +191,7 @@ func _boss_to_51() -> void:
 			units.append(enemy)
 	for unit in units:
 		if unit.data.kind == &"boss":
-			unit.hp = unit.max_hp * 0.51
+			unit.hp = unit.max_hp * share
 			unit.health_bar.set_health(unit.hp, unit.max_hp)
 
 
@@ -289,6 +289,7 @@ func _build() -> void:
 	_button(row, "Skip break", func() -> void: stage.skip_break())
 	_button(row, "Kill all enemies", _kill_all)
 	_button(row, "Jump to boss wave", func() -> void: stage.jump_to_boss_wave())
+	_button(row, "Jump to the last wave", func() -> void: stage.jump_to_last_wave())
 	row = _row(box)
 	_enemy_picker = OptionButton.new()
 	_enemy_picker.focus_mode = Control.FOCUS_NONE
@@ -298,7 +299,8 @@ func _build() -> void:
 	row.add_child(_enemy_picker)
 	_button(row, "Spawn", _spawn_picked)
 	row = _row(box)
-	_button(row, "Boss HP 51%", _boss_to_51)
+	_button(row, "Boss HP 51%", func() -> void: _boss_to(0.51))
+	_button(row, "Boss HP 5%", func() -> void: _boss_to(0.05))
 	_check(box, "God mode (no damage)").toggled.connect(func(on: bool) -> void: stage.lucian.invulnerable = on)
 
 	box = _tab(tabs, "Dummy")

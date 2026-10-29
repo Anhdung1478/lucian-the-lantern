@@ -107,9 +107,20 @@ func finish() -> void:
 func skip_to_boss() -> void:
 	if boss == &"":
 		return
+	_skip_to(_waves.size())
+
+
+## Debug: the stage's last wave comes next, straight away (the enemies left don't
+## count). In a boss stage that is the boss wave.
+func skip_to_last_wave() -> void:
+	_skip_to(total_waves() - 1)
+
+
+## The wave after number `done` starts next; what was left of this one is dropped.
+func _skip_to(done: int) -> void:
 	_to_spawn.clear()
 	_alive = 0
-	wave = _waves.size()
+	wave = done
 	state = State.BREAK
 	_countdown = 0.0
 

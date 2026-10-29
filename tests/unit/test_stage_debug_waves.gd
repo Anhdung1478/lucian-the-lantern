@@ -210,3 +210,58 @@ func test_freeze_without_god_mode_ends_vulnerable() -> void:
 	assert_true(stage.lucian.invulnerable)
 	stage.freeze(false)
 	assert_false(stage.lucian.invulnerable)
+
+
+func test_boss_hp_5_sets_a_boss_and_leaves_a_mini_boss_alone() -> void:
+	var stage: Stage = await _stage(2, 3)
+	_press(stage, "Jump to boss wave")
+	stage.runner.tick(0.1)
+	stage.runner.tick(0.1)
+	var drake := stage.spawn_enemy(&"infernal_drake", stage.lucian.global_position + Vector2(200, 0))
+	_press(stage, "Boss HP 5%")
+	assert_almost_eq(drake.hp, drake.max_hp, 0.01)
+	var found := false
+	for enemy: Enemy in _enemies():
+		var unit := enemy as EnemyUnit
+		if unit and unit.data.kind == &"boss":
+			found = true
+			assert_almost_eq(unit.hp, unit.max_hp * 0.05, 0.01)
+	assert_true(found, "a boss")
+
+
+func test_boss_hp_5_finds_a_boss_out_of_the_group() -> void:
+	var stage: Stage = await _stage(3, 5)
+	var boss := stage.spawn_enemy(&"elder_dragon", stage.lucian.global_position + Vector2(200, 0))
+	stage.boss_unit = boss
+	boss.remove_from_group(&"enemies")
+	_press(stage, "Boss HP 5%")
+	assert_almost_eq(boss.hp, boss.max_hp * 0.05, 0.01)
+
+
+func test_jump_to_the_last_wave_brings_the_mini_boss_without_rewards() -> void:
+	var stage: Stage = await _stage(5, 2)
+	stage.skip_break()
+	for i in 6:
+		stage.runner.tick(WaveRunner.GROUP_GAP)
+	assert_gt(_enemies().size(), 0)
+	var gold := stage.wallet.gold
+	_press(stage, "Jump to the last wave")
+	assert_eq(stage.wallet.gold, gold, "no rewards")
+	assert_eq(stage.runner.wave, stage.runner.total_waves() - 1)
+	for i in 30:
+		stage.runner.tick(WaveRunner.GROUP_GAP)
+	assert_eq(stage.runner.wave, stage.runner.total_waves())
+	var maokai := false
+	for enemy: Enemy in _enemies():
+		var unit := enemy as EnemyUnit
+		if unit and unit.data.id == &"maokai":
+			maokai = true
+	assert_true(maokai, "Maokai in the last wave")
+	assert_eq(stage.wallet.gold, gold, "still no rewards")
+
+
+func test_jump_to_the_last_wave_does_nothing_in_training() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.runner = null
+	stage.jump_to_last_wave()
+	pass_test("no runner, no crash")

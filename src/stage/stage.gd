@@ -184,10 +184,24 @@ func freeze(on: bool) -> void:
 func jump_to_boss_wave() -> void:
 	if runner == null or run.boss == &"":
 		return
+	_remove_every_enemy()
+	runner.skip_to_boss()
+
+
+## Debug and tests: every enemy goes (no rewards) and the stage's last wave comes next
+## (a mini boss stage's mini boss wave). A summon or split still waiting to spawn
+## may appear in that wave uncounted: debug only.
+func jump_to_last_wave() -> void:
+	if runner == null:
+		return
+	_remove_every_enemy()
+	runner.skip_to_last_wave()
+
+
+func _remove_every_enemy() -> void:
 	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
 		enemy.remove_from_group(&"enemies")
 		enemy.queue_free()
-	runner.skip_to_boss()
 
 
 ## The result panel over a paused game; ESC and P stop working.
