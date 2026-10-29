@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <!-- Dark Lucian: Lucian's silhouette seen from above in black and violet, red eyes, his two dark guns held forward (+X), a violet rim light. -->
+  <defs>
+    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0a0810"/>
+      <stop offset="1" stop-color="#24173c"/>
+    </linearGradient>
+    <radialGradient id="muzzle">
+      <stop offset="0" stop-color="#f0dcff"/>
+      <stop offset="0.4" stop-color="#b57cff" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#7a3fd0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g transform="translate(50 50)">
+    <!-- violet glow, so he stands out on the dark lane -->
+    <circle cx="-2" cy="0" r="41" fill="#8a4fe0" opacity="0.14"/>
+    <circle cx="-2" cy="0" r="41" fill="none" stroke="#8a4fe0" stroke-width="3" opacity="0.5"/>
+    <!-- shadow -->
+    <ellipse cx="-4" cy="3" rx="29" ry="26" fill="#000000" opacity="0.3"/>
+    <!-- long coat flaring out behind him, split in the middle -->
+    <path d="M -3 -19 L -32 -28 Q -40 -14 -38 -3 L -13 -2 Z" fill="url(#coat)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -3 19 L -32 28 Q -40 14 -38 3 L -13 2 Z" fill="url(#coat)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <!-- rim light along the coat's edges -->
+    <path d="M -7 -19.5 L -31 -26 Q -37 -14 -36 -5" fill="none" stroke="#a66bff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -7 19.5 L -31 26 Q -37 14 -36 5" fill="none" stroke="#a66bff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- arms reaching forward -->
+    <path d="M 0 -17 L 17 -13" stroke="#1a1d24" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 0 -17 L 17 -13" stroke="#1d1529" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 0 17 L 17 13" stroke="#1a1d24" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 0 17 L 17 13" stroke="#1d1529" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 3 -18.6 L 15 -15.8" stroke="#a66bff" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M 3 18.6 L 15 15.8" stroke="#a66bff" stroke-width="1.3" stroke-linecap="round"/>
+    <!-- dark relic pistols -->
+    <path d="M 15 -17 L 36 -16 L 38 -13 L 36 -10 L 15 -9 Z" fill="#15101e" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 15 17 L 36 16 L 38 13 L 36 10 L 15 9 Z" fill="#15101e" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 22 -13 L 34 -13" stroke="#b57cff" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 22 13 L 34 13" stroke="#b57cff" stroke-width="2" stroke-linecap="round"/>
+    <!-- hands -->
+    <circle cx="17" cy="-13" r="4" fill="#0e0b14" stroke="#1a1d24" stroke-width="1.5"/>
+    <circle cx="17" cy="13" r="4" fill="#0e0b14" stroke="#1a1d24" stroke-width="1.5"/>
+    <!-- violet muzzle light -->
+    <circle cx="40" cy="-13" r="6" fill="url(#muzzle)"/>
+    <circle cx="40" cy="13" r="6" fill="url(#muzzle)"/>
+    <!-- shoulders and torso, lit from behind -->
+    <ellipse cx="0" cy="0" rx="13" ry="22" fill="#110d18" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -8 -16 Q -14 0 -8 16" fill="none" stroke="#8a4fe0" stroke-width="1.6" stroke-linecap="round"/>
+    <!-- high collar -->
+    <path d="M -6 -13 Q 5 0 -6 13" fill="none" stroke="#9a5cf0" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- head: shadowed skin, black hair, red eyes -->
+    <circle cx="2" cy="0" r="10" fill="#2a1d3a" stroke="#1a1d24" stroke-width="2"/>
+    <circle cx="0" cy="0" r="8.5" fill="#07050b"/>
+    <circle cx="9" cy="-3.5" r="3.2" fill="#ff2a3c" opacity="0.35"/>
+    <circle cx="9" cy="3.5" r="3.2" fill="#ff2a3c" opacity="0.35"/>
+    <circle cx="9" cy="-3.5" r="1.5" fill="#ff4a5a"/>
+    <circle cx="9" cy="3.5" r="1.5" fill="#ff4a5a"/>
+  </g>
+</svg>

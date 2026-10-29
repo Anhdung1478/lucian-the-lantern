@@ -17,6 +17,7 @@ const ACT_SCENARIOS := {
 	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
 	"infernal_meteor": [3, 2], "ocean_mist": [3, 4], "elder_sky_dive": [3, 5], "elder_mark": [3, 5],
+	"act4_lane": [4, 1], "dark_lucian_q": [4, 3], "dark_lucian_r": [4, 3],
 }
 
 var stage: Node
@@ -203,6 +204,12 @@ func _run(scenario: String) -> void:
 			await scenario_elder_sky_dive()
 		"elder_mark":
 			await scenario_elder_mark()
+		"act4_lane":
+			await scenario_act4_lane()
+		"dark_lucian_q":
+			await scenario_dark_lucian_q()
+		"dark_lucian_r":
+			await scenario_dark_lucian_r()
 		"training_setup":
 			await scenario_training_setup()
 		"skins_stage":
@@ -2041,6 +2048,103 @@ func scenario_elder_mark() -> void:
 	print("shield used (expect 390): ", roundi(shield - lucian.total_shield()), "  HP kept (expect true): ", lucian.hp >= lucian.stats.max_hp * 0.2 - 1.0)
 	await wait(0.2)
 	await shot("elder_mark_2_landed")
+
+
+## 4-1's dark lane: the whole map; then wave 1's shadow minions reach Lucian
+## halfway up the lane.
+func scenario_act4_lane() -> void:
+	var game := game_stage()
+	print("stage info (expect Stage 4-1 · The Darkness  Wave 1 in …): ", info_text())
+	await whole_map("act4_lane_0_map")
+	game.camera.zoom = Vector2.ONE
+	game.camera.mode = StageCamera.Mode.FOLLOW
+	game.skip_break()
+	flush_tips()
+	blink(map_lane().center() - map_lane().along() * 300.0)
+	var hits := [0]
+	lucian.damage_received.connect(func(_info: DamageInfo, _amount: float) -> void: hits[0] += 1)
+	while hits[0] < 4:
+		await wait(0.1)
+	lucian.command_attack_move(lucian.global_position)
+	await wait(1.2)
+	print("stage info (expect Stage 4-1 · The Darkness  Wave 1/4  Enemies: N): ", info_text())
+	await shot("act4_lane_1_wave")
+
+
+## Dark Lucian at the river on 4-3's dark lane, Lucian down the lane from
+## him, the camera between them (the mouse in the middle, so it doesn't pan).
+## He doesn't shoot and his skills wait; wave 1 waits too.
+func to_dark_lucian() -> DarkLucian:
+	var game := game_stage()
+	flush_tips()
+	await mouse_move(Vector2(960, 540))
+	game.runner._countdown = 999.0
+	var lane := map_lane()
+	blink(lane.boss_point - lane.along() * 450.0)
+	game.camera.mode = StageCamera.Mode.FREE
+	game.camera.global_position = lane.boss_point - lane.along() * 225.0
+	game.camera.zoom = Vector2(0.8, 0.8)
+	var dark := game.spawn_enemy(&"dark_lucian", lane.boss_point) as DarkLucian
+	dark.move_speed = 0.0
+	dark._attack_left = 999.0
+	for skill: StringName in dark._cooldowns:
+		dark._cooldowns[skill] = 60.0
+	return dark
+
+
+## Piercing Light: the line warning on Lucian, then the dark laser along it;
+## then a close look at Dark Lucian.
+func scenario_dark_lucian_q() -> void:
+	var game := game_stage()
+	var dark := await to_dark_lucian()
+	await wait(0.3)
+	dark._cooldowns[&"piercing_light"] = 0.0
+	var warning := await wait_for_warning(GroundWarning.Shape.LINE)
+	await wait(0.45)
+	print("Q line (expect 1100 x 70, 0.7 s): ", warning.reach, " x ", warning.width, ", ", warning.warn_time)
+	await shot("dark_lucian_q_0_warning")
+	var hp := lucian.hp
+	while stage.get_node("Warnings").get_children().all(func(node: Node) -> bool: return not node is LaserBeam):
+		await wait(0.01)
+	await wait(0.03)
+	print("hit (expect 170 less armor): ", roundi(hp - lucian.hp))
+	await shot("dark_lucian_q_1_laser")
+	game.camera.global_position = dark.global_position
+	game.camera.zoom = Vector2(2.0, 2.0)
+	await wait(0.4)
+	await shot("dark_lucian_q_2_close")
+
+
+## The Culling: the wide line warning; Lucian steps out of it, away from
+## the strafe, as the stream fires along the line; then Relentless Pursuit
+## takes Dark Lucian aside after a burst of damage, half seen, a violet trail
+## behind him.
+func scenario_dark_lucian_r() -> void:
+	var dark := await to_dark_lucian()
+	dark.hp = dark.max_hp * 0.75
+	dark.health_bar.set_health(dark.hp, dark.max_hp)
+	await wait(0.3)
+	var culled := [0]
+	lucian.damage_received.connect(func(info: DamageInfo, _amount: float) -> void: culled[0] += 1 if info.source == &"the_culling" else 0)
+	dark._cooldowns[&"the_culling"] = 0.0
+	var warning := await wait_for_warning(GroundWarning.Shape.LINE)
+	lucian.command_move(lucian.global_position - dark.strafe_direction * 260.0)
+	await wait(0.5)
+	print("R line (expect 1200 x 120, 0.8 s): ", warning.reach, " x ", warning.width, ", ", warning.warn_time)
+	await shot("dark_lucian_r_0_warning")
+	await wait(1.4)
+	await shot("dark_lucian_r_1_stream")
+	while dark.is_culling():
+		await wait(0.05)
+	print("bullets on Lucian after his step (expect 0): ", culled[0])
+	dark._attack_left = 999.0
+	dark._cooldowns[&"relentless_pursuit"] = 0.0
+	dark.take_damage(lucian.make_damage(1100.0, DamageInfo.Type.TRUE, &"debug"))
+	while not dark.is_dashing():
+		await wait(0.01)
+	await wait(0.1)
+	print("untargetable mid-dash (expect true): ", dark.untargetable)
+	await shot("dark_lucian_r_2_dash")
 
 
 ## A super minion with melee and ranged minions around it: Empower's icon

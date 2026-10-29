@@ -180,7 +180,7 @@ func test_every_act_3_enemy_has_its_data() -> void:
 
 
 ## Act 4's waves as the design's table writes them: m shadow melee, r shadow
-## ranged, S shadow siege, U shadow super. No boss yet.
+## ranged, S shadow siege, U shadow super. Dark Lucian follows 4-3's last wave.
 func test_act_4_waves_follow_the_table() -> void:
 	var letters := {WavePlan.SHADOW_MELEE: "m", WavePlan.SHADOW_RANGED: "r", WavePlan.SHADOW_SIEGE: "S", WavePlan.SHADOW_SUPER: "U"}
 	var table := {

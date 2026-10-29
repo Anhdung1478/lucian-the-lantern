@@ -418,6 +418,8 @@ func _new_unit(data: EnemyData) -> EnemyUnit:
 			return OceanDrake.new()
 		&"elder_dragon":
 			return ElderDragon.new()
+		&"dark_lucian":
+			return DarkLucian.new()
 		&"swarm", &"flank", &"brute", &"spit", &"flee":
 			return Monster.new()
 	return Minion.new()

@@ -1,9 +1,9 @@
 class_name WavePlan
 extends RefCounted
 ## Which enemies each wave of a stage brings (docs/act1_the_loss.md,
-## docs/act2_the_sentinels.md, docs/act3_the_jungle.md), and each stage's
-## boss. A wave can name a pack in place of an enemy id: it brings the
-## pack's members, in order.
+## docs/act2_the_sentinels.md, docs/act3_the_jungle.md,
+## docs/act4_the_darkness.md), and each stage's boss. A wave can name a pack
+## in place of an enemy id: it brings the pack's members, in order.
 
 const MELEE := &"melee_minion"
 const RANGED := &"ranged_minion"
@@ -87,7 +87,7 @@ const STAGES := {
 	],
 }
 ## Stage id -> the boss wave's enemy id.
-const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan", "3-5": &"elder_dragon"}
+const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan", "3-5": &"elder_dragon", "4-3": &"dark_lucian"}
 ## Stage id -> enemy id -> its share of HP in that stage only. Act 1's stage
 ## is gentler: its melee and ranged minions have 20% less HP.
 const HP_SHARES := {"1-1": {MELEE: 0.8, RANGED: 0.8}}
