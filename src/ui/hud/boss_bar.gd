@@ -17,8 +17,10 @@ func _ready() -> void:
 	visible = false
 
 
+## Keeps the boss it holds while it lives, even untargetable (out of the
+## enemies group).
 func _process(_delta: float) -> void:
-	if not Lucian.is_target(boss):
+	if not (is_instance_valid(boss) and boss.is_alive()):
 		boss = null
 		for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
 			if enemy is EnemyUnit and (enemy as EnemyUnit).data.kind == &"boss":

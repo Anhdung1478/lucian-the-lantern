@@ -10,8 +10,6 @@ const HIT_FLASH := Color(1.8, 1.8, 1.8)
 ## Moving less than this share of its speed in a frame counts as stuck.
 const STUCK_SHARE := 0.25
 const STUCK_TIME := 0.4
-## Gunblade's slow.
-const SLOW_AMOUNT := 0.4
 const ELITE_BAR := Vector2(110, 12)
 const BOSS_BAR := Vector2(140, 14)
 ## A super minion's Empower on the minions around it: +15% damage.
@@ -100,8 +98,9 @@ func distance_to_target() -> float:
 	return global_position.distance_to(target.global_position)
 
 
+## Move speed after the strongest slow.
 func current_speed() -> float:
-	return move_speed * (1.0 - SLOW_AMOUNT if has_status(Enemy.SLOW) else 1.0)
+	return move_speed * (1.0 - slow_amount())
 
 
 ## A hit from this unit (Empower included): its basic attack by default.
@@ -113,14 +112,27 @@ func make_hit(amount := -1.0, source := &"basic") -> DamageInfo:
 
 
 ## A straight shot from this unit, at Lucian unless `toward` is given; walls
-## stop it.
+## stop it. A basic attack's bolt carries the data's on-hit slow and burn.
 func fire_bolt(hit: DamageInfo, speed: float, reach: float, toward := Vector2.ZERO) -> EnemyProjectile:
 	var bolt := EnemyProjectile.new()
 	bolt.launch(global_position, toward if toward != Vector2.ZERO else global_position.direction_to(target.global_position), hit, target)
 	bolt.speed = speed
 	bolt.max_range = reach
+	if hit.source == &"basic":
+		bolt.hit_lucian.connect(apply_on_hit)
 	projectile_parent.add_child(bolt)
 	return bolt
+
+
+## A basic attack landed on Lucian: the data's slow and burn (its damage
+## type), each under the data's id so one kind of enemy refreshes its own.
+func apply_on_hit() -> void:
+	if not is_instance_valid(target):
+		return
+	if data.hit_slow > 0.0:
+		target.add_slow(data.id, data.hit_slow, data.hit_slow_time)
+	if data.hit_burn > 0.0:
+		target.add_burn(data.id, data.hit_burn, data.hit_burn_time, data.damage_type, self)
 
 
 ## One step toward `point`, sliding along walls. A unit that barely moved
@@ -157,14 +169,19 @@ func _think(delta: float) -> void:
 		_attack()
 
 
-## One attack: by default a hit on Lucian at once (melee).
+## One attack: by default a hit on Lucian at once (melee), with the data's
+## on-hit effects when he takes it.
 func _attack() -> void:
-	target.take_damage(make_hit())
+	if target.take_damage(make_hit()):
+		apply_on_hit()
 
 
 func _lose_hp(amount: float) -> void:
 	super(amount)
 	health_bar.set_health(hp, max_hp)
+
+
+func _show_hit() -> void:
 	visuals.modulate = HIT_FLASH
 	if _flash_tween:
 		_flash_tween.kill()

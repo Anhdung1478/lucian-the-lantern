@@ -18,6 +18,9 @@ var magic_pen := 0.0
 var procs: Array[StringName] = []
 ## A boss or mini boss skill (Banshee's Veil blocks it).
 var from_skill := false
+## A burn or poison tick (DamageOverTime): no hit sound and no flash, and the
+## attacker's on-hit effects don't fire on it.
+var over_time := false
 
 
 static func create(amount: float, type: Type, source: StringName, attacker: Node = null, is_crit := false) -> DamageInfo:

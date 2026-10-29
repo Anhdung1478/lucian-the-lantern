@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Burn: an orange-red flame (Lucian is burning) -->
+  <rect width="64" height="64" fill="#26140f"/>
+  <path d="M 32 6 C 36 16 46 22 46 36 C 46 48 40 56 32 58 C 24 56 18 48 18 36 C 18 28 22 24 24 18 C 26 24 28 26 30 26 C 30 18 30 12 32 6 Z" fill="#ff4a1c" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M 32 28 C 35 34 40 38 40 45 C 40 51 36 55 32 55 C 28 55 24 51 24 45 C 24 40 28 36 32 28 Z" fill="#ffb02e"/>
+  <path d="M 32 40 C 34 43 35 45 35 48 C 35 51 34 52 32 52 C 30 52 29 51 29 48 C 29 45 30 43 32 40 Z" fill="#fff0a0"/>
+</svg>

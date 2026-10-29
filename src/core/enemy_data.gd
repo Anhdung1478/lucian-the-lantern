@@ -40,6 +40,13 @@ const WAVE_GROWTH := 0.15
 @export var warn_time := 0.0
 ## Super: how far Empower reaches.
 @export var empower_radius := 0.0
+## What a basic attack that lands (a melee hit or a bolt) leaves on Lucian:
+## a slow (a fraction) for `hit_slow_time` seconds, and a burn of its damage
+## type (damage per second) for `hit_burn_time` seconds. 0 = none.
+@export var hit_slow := 0.0
+@export var hit_slow_time := 0.0
+@export var hit_burn := 0.0
+@export var hit_burn_time := 0.0
 ## Bosses: purple essence the first time, and on every later clear.
 @export var purple_first := 0
 @export var purple_repeat := 0

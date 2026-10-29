@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Burn status: a small orange flame over an enemy's health bar. -->
+  <path d="M 32 4 C 37 16 50 24 50 38 C 50 52 42 60 32 60 C 22 60 14 52 14 38 C 14 29 19 24 22 17 C 25 24 27 27 29 27 C 29 18 29 11 32 4 Z" fill="#ff6a1a" stroke="#1a1d24" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 32 28 C 36 35 41 39 41 46 C 41 53 37 57 32 57 C 27 57 23 53 23 46 C 23 40 28 35 32 28 Z" fill="#ffd04a"/>
+</svg>

@@ -33,6 +33,13 @@ const GUN_REACH := 44.0
 const HEALTH_BAR_HEIGHT := 62.0
 const MOVE_SPEED_ICON := preload("res://assets/art/ui/buff_move_speed.svg")
 const SHIELD_ICON := preload("res://assets/art/ui/buff_shield.svg")
+const SLOW_ICON := preload("res://assets/art/ui/debuff_slow.svg")
+const BURN_ICON := preload("res://assets/art/ui/debuff_burn.svg")
+## Buff row ids: the strongest slow on Lucian, and his burns together.
+const SLOWED := &"slowed"
+const BURNING := &"burning"
+## A throw (launch) makes Lucian look this much bigger at its peak, for height.
+const LAUNCH_RISE := 0.25
 const SPEED_BUFF_NAMES := {
 	&"ardent_blaze": "Ardent Blaze", &"fervor": "Fervor", &"stormrazor": "Bolt",
 	&"ghost": "Ghost", &"heal": "Heal",
@@ -146,6 +153,17 @@ var _displace_left := 0.0
 var _stasis_left := 0.0
 var _revive := Vector2.ZERO
 var _hurt_tween: Tween
+## Slow id -> {pct, left, duration}. The strongest one counts.
+var _slows := {}
+var _burns := DamageOverTime.new()
+## Stat buff id -> {bonus, left, duration}; bonus is keyed like
+## UnitStats.at_level's.
+var _stat_buffs := {}
+## A throw (launch): from, to, its seconds and the seconds left.
+var _launch_from := Vector2.ZERO
+var _launch_to := Vector2.ZERO
+var _launch_time := 0.0
+var _launch_left := 0.0
 
 @onready var visuals: LucianVisuals = $Visuals
 @onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
@@ -300,8 +318,11 @@ func before_damage(target: Enemy, info: DamageInfo) -> void:
 
 ## Called by an enemy after it takes damage from Lucian. Life steal works on
 ## basic attacks (and the passive's second shot); omnivamp on every hit. With
-## Bloodthirster, life steal healing past full HP becomes a shield.
+## Bloodthirster, life steal healing past full HP becomes a shield. Burn
+## ticks (`over_time`) trigger nothing.
 func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> void:
+	if info.over_time:
+		return
 	if stats.omnivamp > 0.0:
 		heal(final_amount * stats.omnivamp)
 	if stats.lifesteal > 0.0 and (info.source == &"basic" or info.source == &"lightslinger"):
@@ -315,6 +336,18 @@ func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> vo
 	if info.source != &"w" and target.has_mark(ArdentBlaze.MARK):
 		var blaze := skills[ChampionProgress.Slot.W] as ArdentBlaze
 		add_move_speed_bonus(blaze.current_move_speed_bonus(), blaze.move_speed_duration)
+	if has_stat_buff(JungleBuffs.RED):
+		_red_on_hit(target, info)
+
+
+## The Red buff: basic attacks burn the target, basic attacks and skills slow
+## it. Item damage carries neither.
+func _red_on_hit(target: Enemy, info: DamageInfo) -> void:
+	var attack := ItemPassives.ATTACK_SOURCES.has(info.source)
+	if attack:
+		target.add_burn(JungleBuffs.RED, JungleBuffs.RED_BURN, JungleBuffs.RED_BURN_TIME, DamageInfo.Type.TRUE, self)
+	if attack or ItemPassives.SKILL_SOURCES.has(info.source):
+		target.add_slow(JungleBuffs.RED, JungleBuffs.RED_SLOW, JungleBuffs.RED_SLOW_TIME)
 
 
 ## Called once by an enemy Lucian killed: the skin's kill heal, E's max
@@ -329,9 +362,9 @@ func on_kill(enemy: Enemy) -> void:
 	enemy_killed.emit(enemy)
 
 
-## An enemy still worth aiming at: there, and not dead.
+## An enemy still worth aiming at: there, not dead and not untargetable.
 static func is_target(enemy: Variant) -> bool:
-	return is_instance_valid(enemy) and enemy.is_alive()
+	return is_instance_valid(enemy) and enemy.is_alive() and not enemy.untargetable
 
 
 ## Heals, made stronger by heal and shield power. Returns the HP gained
@@ -521,7 +554,7 @@ func add_shield(id: StringName, amount: float, seconds: float, magic_only := fal
 
 ## A hit from an enemy. False when it is refused: Lucian is dead, in stasis
 ## or untouchable. Armor or magic resist lower it, then the shields and HP
-## take it.
+## take it. A burn tick (`over_time`) makes no hurt sound and no flash.
 func take_damage(info: DamageInfo) -> bool:
 	if dead or invulnerable or in_stasis():
 		return false
@@ -531,7 +564,57 @@ func take_damage(info: DamageInfo) -> bool:
 	damage_received.emit(info, amount)
 	lose_hp(passives.delay_damage(amount), info.type)
 	passives.on_damage_taken(info, amount)
-	_flash_hurt()
+	if not info.over_time:
+		_flash_hurt()
+	return true
+
+
+## A slow of `pct` (0.3 = 30%) for `seconds` (an enemy's hit, shallow water).
+## The same id replaces the old one; the strongest slow counts. Tenacity
+## doesn't shorten it, as in LoL. Ignored while dead.
+func add_slow(id: StringName, pct: float, seconds: float) -> void:
+	if dead:
+		return
+	_slows[id] = {"pct": pct, "left": seconds, "duration": maxf(seconds, 0.01)}
+
+
+## The strongest slow on Lucian, 0 when none.
+func slow_amount() -> float:
+	var strongest := 0.0
+	for slow: Dictionary in _slows.values():
+		strongest = maxf(strongest, slow.pct)
+	return strongest
+
+
+## A burn of `dps` damage of `type` per second for `seconds` (lava, poison),
+## credited to `attacker`. It ticks every 0.5 s through take_damage, so magic
+## resist lowers a magic burn. The same id refreshes it. Ignored while dead.
+func add_burn(id: StringName, dps: float, seconds: float, type: DamageInfo.Type, attacker: Node = null) -> void:
+	if dead:
+		return
+	_burns.add(id, dps, seconds, type, attacker)
+
+
+## Raises stats by `bonus` (keyed like UnitStats.at_level's bonus, regen per
+## second) for `seconds`. The same id replaces the old one. Keeps the HP and
+## mana share. Ignored while dead.
+func add_stat_buff(id: StringName, bonus: Dictionary, seconds: float) -> void:
+	if dead:
+		return
+	_stat_buffs[id] = {"bonus": bonus, "left": seconds, "duration": maxf(seconds, 0.01)}
+	_refresh_stats(true)
+
+
+func has_stat_buff(id: StringName) -> bool:
+	return _stat_buffs.has(id)
+
+
+## A jungle buff by id (JungleBuffs.BLUE or RED) for its full time; another
+## one refreshes it. False for an unknown id.
+func add_jungle_buff(id: StringName) -> bool:
+	if not JungleBuffs.is_jungle_buff(id):
+		return false
+	add_stat_buff(id, JungleBuffs.bonus(id), JungleBuffs.DURATION)
 	return true
 
 
@@ -557,9 +640,10 @@ func restore_for(seconds: float) -> void:
 
 ## Forced movement (Thresh's hook, Flay): Lucian slides to `to` and can't
 ## move, attack or cast until he lands. Walls stop him. Drops his orders,
-## windup and queued cast, and stops R. No trail, no Energize.
+## windup and queued cast, and stops R. No trail, no Energize. Ignored while
+## he is thrown (launch).
 func displace(to: Vector2, speed: float) -> void:
-	if dead or in_stasis():
+	if dead or in_stasis() or is_launched():
 		return
 	var offset := to - global_position
 	_order = Order.NONE
@@ -572,6 +656,28 @@ func displace(to: Vector2, speed: float) -> void:
 
 func is_displaced() -> bool:
 	return _displace_left > 0.0
+
+
+## Thrown (a Blast Cone): Lucian flies straight to `to` in `seconds`, over
+## walls and enemies, looking bigger at the peak for height. He can't act in
+## flight and a displacement can't move him. Drops his orders, windup, queued
+## cast and dash, and stops R. Builds no Energize. The caller picks a
+## walkable `to`.
+func launch(to: Vector2, seconds: float) -> void:
+	if dead or in_stasis():
+		return
+	_order = Order.NONE
+	_drop_in_flight()
+	_launch_from = global_position
+	_launch_to = to
+	_launch_time = maxf(seconds, 0.01)
+	_launch_left = _launch_time
+	collision_mask = _body_mask()
+	move_dropped.emit()
+
+
+func is_launched() -> bool:
+	return _launch_left > 0.0
 
 
 ## Guardian Angel: `seconds` of stasis, then back with these HP and mana.
@@ -591,7 +697,7 @@ func in_stasis() -> bool:
 
 ## Lucian can take orders and cast.
 func can_act() -> bool:
-	return not dead and not in_stasis() and not is_displaced()
+	return not dead and not in_stasis() and not is_displaced() and not is_launched()
 
 
 ## Armor above what his level alone gives (Thornmail).
@@ -600,7 +706,8 @@ func bonus_armor() -> float:
 
 
 ## Ends whatever Lucian was in the middle of: windup, queued cast, cast lock,
-## R, a dash (its trail finishes) and a displacement.
+## R, a dash (its trail finishes), a displacement and a throw (he comes down
+## where he is).
 func _drop_in_flight() -> void:
 	_cancel_windup()
 	_queued_slot = -1
@@ -611,13 +718,21 @@ func _drop_in_flight() -> void:
 		_dash_trail.finish()
 	_dash_trail = null
 	_displace_left = 0.0
+	if is_launched():
+		_land()
 	collision_mask = _body_mask()
 
 
+## Death ends his slows, burns and stat buffs.
 func _die() -> void:
 	dead = true
 	_order = Order.NONE
 	_drop_in_flight()
+	_slows.clear()
+	_burns.clear()
+	if not _stat_buffs.is_empty():
+		_stat_buffs.clear()
+		_refresh_stats(true)
 	collision_layer = 0
 	_stop_hurt_flash()
 	visuals.modulate = DEATH_TINT
@@ -650,6 +765,27 @@ func _displace_step(delta: float) -> void:
 	if _displace_left <= 0.0 or get_slide_collision_count() > 0:
 		_displace_left = 0.0
 		collision_mask = _body_mask()
+
+
+## A throw's frame: along the straight line, growing to 1 + LAUNCH_RISE at
+## the middle and back. Nothing stops him.
+func _launch_step(delta: float) -> void:
+	_launch_left = maxf(_launch_left - delta, 0.0)
+	var t := 1.0 - _launch_left / _launch_time
+	global_position = _launch_from.lerp(_launch_to, t)
+	visuals.scale = Vector2.ONE * (1.0 + LAUNCH_RISE * sin(PI * t))
+	_last_position = global_position
+	if _launch_left <= 0.0:
+		_land()
+
+
+## A throw ends: his normal size and mask, and the distance flown builds no
+## Energize.
+func _land() -> void:
+	_launch_left = 0.0
+	visuals.scale = Vector2.ONE
+	_last_position = global_position
+	collision_mask = _body_mask()
 
 
 ## Ghost: Lucian passes through enemies (walls still stop him) for `seconds`.
@@ -745,7 +881,8 @@ func enemy_near_cursor(aim: Vector2, reach: float) -> Enemy:
 	return best
 
 
-## HUD buff icons: potions, move speed, shields and item passives. Each is
+## HUD buff icons: potions, stat buffs (the jungle buffs), move speed,
+## shields, item passives, then the strongest slow and the burns. Each is
 ## {id, name, icon, text, count, left, duration, ready}.
 func buffs() -> Array[Dictionary]:
 	var found: Array[Dictionary] = []
@@ -756,6 +893,12 @@ func buffs() -> Array[Dictionary]:
 				found.append({"id": potion.id, "name": potion.display_name, "icon": potion.icon,
 					"text": TooltipCard.potion_text(potion), "count": str(drinks) if drinks > 1 else "",
 					"left": restores.time_left(potion.id), "duration": restores.duration(potion.id), "ready": false})
+	for id: StringName in _stat_buffs:
+		var stat_buff: Dictionary = _stat_buffs[id]
+		var jungle := JungleBuffs.is_jungle_buff(id)
+		found.append({"id": id, "name": JungleBuffs.display_name(id) if jungle else String(id).capitalize(),
+			"icon": JungleBuffs.icon(id) if jungle else null, "text": JungleBuffs.text(id) if jungle else "Raised stats.",
+			"count": "", "left": stat_buff.left, "duration": stat_buff.duration, "ready": false})
 	for id: StringName in _speed_buffs:
 		var buff: Dictionary = _speed_buffs[id]
 		var text := "+%d move speed" % roundi(buff.flat) if buff.flat > 0.0 else "+%d%% move speed" % roundi(buff.pct * 100.0)
@@ -774,7 +917,27 @@ func buffs() -> Array[Dictionary]:
 			"count": str(roundi(barrier)), "left": shields.time_left(&"barrier"),
 			"duration": shields.duration(&"barrier"), "ready": false})
 	found.append_array(passives.buffs())
+	var strongest := _strongest_slow()
+	if strongest != &"":
+		var slow: Dictionary = _slows[strongest]
+		found.append({"id": SLOWED, "name": "Slowed", "icon": SLOW_ICON,
+			"text": TooltipText.colorize("[ms]-%d%% move speed[/ms]." % roundi(slow.pct * 100.0)), "count": "",
+			"left": slow.left, "duration": slow.duration, "ready": false})
+	if not _burns.is_empty():
+		var longest := _burns.longest()
+		found.append({"id": BURNING, "name": "Burning", "icon": BURN_ICON,
+			"text": "Taking %s damage per second." % TooltipText.number(snappedf(_burns.total_dps(), 0.1)), "count": "",
+			"left": _burns.time_left(longest), "duration": _burns.duration(longest), "ready": false})
 	return found
+
+
+## The id of the strongest slow on Lucian, or &"" when none.
+func _strongest_slow() -> StringName:
+	var best := &""
+	for id: StringName in _slows:
+		if best == &"" or _slows[id].pct > _slows[best].pct:
+			best = id
+	return best
 
 
 ## Every enemy whose hurtbox overlaps `shape` placed at `xform`, found instantly.
@@ -827,14 +990,15 @@ func set_range_ring_visible(value: bool) -> void:
 	queue_redraw()
 
 
-## Base move speed plus every flat bonus, then times every percent bonus.
+## Base move speed plus every flat bonus, then times every percent bonus,
+## then lowered by the strongest slow.
 func current_move_speed() -> float:
 	var flat := 0.0
 	var pct := 0.0
 	for buff: Dictionary in _speed_buffs.values():
 		flat += buff.flat
 		pct += buff.pct * (buff.left / buff.duration if buff.fade else 1.0)
-	return (stats.move_speed + flat) * (1.0 + pct)
+	return (stats.move_speed + flat) * (1.0 + pct) * (1.0 - slow_amount())
 
 
 ## A flat move speed bonus for `duration` seconds (W's); a new one replaces
@@ -930,11 +1094,19 @@ func _physics_process(delta: float) -> void:
 		restore_mana(restored.y)
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	_tick_buffs(delta)
+	if not _burns.is_empty():
+		for hit in _burns.tick(delta):
+			take_damage(hit)
+			if dead or in_stasis():
+				return
 	if passives.shows_rfc_ring() != _rfc_ring_shown:
 		_rfc_ring_shown = not _rfc_ring_shown
 		queue_redraw()
 	var was_dashing := is_dashing()
 	velocity = Vector2.ZERO
+	if _launch_left > 0.0:
+		_launch_step(delta)
+		return
 	if _displace_left > 0.0:
 		_displace_step(delta)
 		_last_position = global_position
@@ -958,7 +1130,8 @@ func _physics_process(delta: float) -> void:
 			if _step_toward(_move_point, delta):
 				_order = Order.NONE
 		Order.ATTACK:
-			if is_target(_target):
+			# An untargetable target keeps the order: he follows it and waits.
+			if is_instance_valid(_target) and _target.is_alive():
 				_pursue(_target, delta)
 			else:
 				_order = Order.NONE
@@ -991,6 +1164,18 @@ func _tick_buffs(delta: float) -> void:
 		_speed_buffs[id].left -= delta
 		if _speed_buffs[id].left <= 0.0:
 			_speed_buffs.erase(id)
+	for id in _slows.keys():
+		_slows[id].left -= delta
+		if _slows[id].left <= 0.0:
+			_slows.erase(id)
+	var expired := false
+	for id in _stat_buffs.keys():
+		_stat_buffs[id].left -= delta
+		if _stat_buffs[id].left <= 0.0:
+			_stat_buffs.erase(id)
+			expired = true
+	if expired:
+		_refresh_stats(true)
 	for cooldown: Cooldown in item_cooldowns.values():
 		cooldown.reduce(delta)
 	if shield > 0.0 and not passives.in_combat():
@@ -1011,10 +1196,14 @@ func _track_movement(dashing: bool) -> void:
 		passives.on_moved(moved, dashing)
 
 
-## Items, tree and skin flat stats together, for UnitStats.at_level().
+## Items, tree, skin and stat buff flat stats together, for
+## UnitStats.at_level().
 func _stat_bonus() -> Dictionary:
 	var total := inventory.equipped_bonus()
-	for source: Dictionary in [tree_bonus, skin.flat]:
+	var sources: Array[Dictionary] = [tree_bonus, skin.flat]
+	for stat_buff: Dictionary in _stat_buffs.values():
+		sources.append(stat_buff.bonus)
+	for source in sources:
 		for key: StringName in source:
 			total[key] = total.get(key, 0.0) + source[key]
 	return total
@@ -1082,11 +1271,16 @@ func _start_dash_trail(color: Color) -> void:
 	spawn(_dash_trail)
 
 
-## Dashing or ghosted, Lucian passes through enemies; walls always stop him.
+## Dashing or ghosted, Lucian passes through enemies; walls stop him unless
+## he is thrown (launch), when nothing does.
 func _body_mask() -> int:
+	if is_launched():
+		return 0
 	return Layers.WORLD if is_dashing() or is_ghosted() else Layers.WORLD | Layers.ENEMY_BODY
 
 
+## A target gone dead or untargetable cancels the windup (the attack is
+## refunded); the attack order itself carries on while it lives.
 func _process_windup(delta: float) -> void:
 	if not is_target(_target):
 		_cancel_windup()
@@ -1099,13 +1293,14 @@ func _process_windup(delta: float) -> void:
 
 
 ## Walks into range of `target`, then attacks whenever the attack is ready.
-## No attacks while R is firing.
+## No attacks while R is firing, nor while the target is untargetable: he
+## stays by it and shoots once it is back.
 func _pursue(target: Enemy, delta: float) -> void:
 	if not _in_range(target):
 		_step_toward(target.global_position, delta)
 		return
 	visuals.face(target.global_position - global_position)
-	if _attack_cooldown <= 0.0 and not (skills[ChampionProgress.Slot.R] as TheCulling).is_channeling():
+	if is_target(target) and _attack_cooldown <= 0.0 and not (skills[ChampionProgress.Slot.R] as TheCulling).is_channeling():
 		var period := stats.attack_period()
 		_attack_cooldown = period
 		_windup_left = period * WINDUP_RATIO

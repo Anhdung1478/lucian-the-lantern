@@ -30,6 +30,9 @@ func _lose_hp(amount: float) -> void:
 	hp = maxf(hp - amount, 1.0)
 	_since_hit = 0.0
 	health_bar.set_health(hp, max_hp)
+
+
+func _show_hit() -> void:
 	_play_hit()
 
 

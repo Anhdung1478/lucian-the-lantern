@@ -72,6 +72,7 @@ func test_gunblade_bolts_the_enemy_near_the_cursor() -> void:
 	assert_true(lucian.use_equip_slot(0, dummy.position))
 	assert_eq(sources, [&"hextech_gunblade"])
 	assert_true(dummy.has_status(Enemy.SLOW))
+	assert_almost_eq(dummy.slow_amount(), 0.4, 0.001, "Gunblade still slows 40%")
 	assert_almost_eq(lucian.item_cooldown(&"hextech_gunblade").remaining, 60.0, 0.01)
 
 

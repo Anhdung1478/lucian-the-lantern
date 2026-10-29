@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Blue buff: a blue crest with a glowing rune -->
+  <rect width="64" height="64" fill="#101a2a"/>
+  <path d="M 32 4 L 54 16 L 50 42 L 32 60 L 14 42 L 10 16 Z" fill="#2a6ad8" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M 32 10 L 48 19 L 45 40 L 32 53 Z" fill="#1d4fae"/>
+  <circle cx="32" cy="30" r="13" fill="#7fdcff" opacity="0.35"/>
+  <path d="M 32 18 L 32 42 M 24 24 L 32 30 L 40 24 M 26 38 L 38 38" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 32 18 L 32 42 M 24 24 L 32 30 L 40 24 M 26 38 L 38 38" fill="none" stroke="#dff6ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

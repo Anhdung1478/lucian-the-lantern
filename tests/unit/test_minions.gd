@@ -109,8 +109,8 @@ func test_empower_reaches_small_minions_not_elites() -> void:
 
 func test_a_slow_cuts_move_speed() -> void:
 	var minion := _minion("melee_minion", Vector2(2000, 0))
-	minion.add_status(Enemy.SLOW, 2.0)
-	assert_almost_eq(minion.current_speed(), minion.move_speed * (1.0 - EnemyUnit.SLOW_AMOUNT), 0.01)
+	minion.add_slow(&"test", 0.4, 2.0)
+	assert_almost_eq(minion.current_speed(), minion.move_speed * 0.6, 0.01)
 
 
 func test_numbers_scale_with_act_and_wave() -> void:

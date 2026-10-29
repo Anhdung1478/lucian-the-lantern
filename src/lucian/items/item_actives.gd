@@ -9,6 +9,8 @@ extends Node
 const GUNBLADE_RANGE := 700.0
 const GUNBLADE_BASE := 175.0
 const GUNBLADE_AP := 0.3
+## Lightning Bolt's slow, and its seconds.
+const GUNBLADE_SLOW_AMOUNT := 0.4
 const GUNBLADE_SLOW := 2.0
 const GALEFORCE_DASH := 200.0
 const GALEFORCE_DASH_SPEED := 1260.0
@@ -95,7 +97,7 @@ func _gunblade(aim: Vector2) -> bool:
 	if target == null:
 		return false
 	lucian.visuals.face(target.global_position - lucian.global_position)
-	target.add_status(Enemy.SLOW, GUNBLADE_SLOW, 1, _icon(&"hextech_gunblade"))
+	target.add_slow(Enemy.SLOW, GUNBLADE_SLOW_AMOUNT, GUNBLADE_SLOW, _icon(&"hextech_gunblade"))
 	lucian.passives.on_enemy_slowed()
 	target.take_damage(lucian.make_damage(GUNBLADE_BASE + GUNBLADE_AP * lucian.stats.ap, DamageInfo.Type.MAGIC, &"hextech_gunblade"))
 	var bolt := ChainLightning.new()

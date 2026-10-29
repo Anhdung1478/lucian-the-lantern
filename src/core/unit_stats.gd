@@ -35,14 +35,15 @@ static func growth_factor(level: int) -> float:
 
 
 ## `bonus` holds item stats keyed like ItemStats. Bonus attack speed goes
-## through the AS ratio like level growth does.
+## through the AS ratio like level growth does. The `hp_regen` and
+## `mana_regen` bonus keys (stat buffs) are per second.
 func at_level(level: int, bonus: Dictionary = {}) -> StatBlock:
 	var g := growth_factor(level)
 	var block := StatBlock.new()
 	block.max_hp = max_hp + max_hp_growth * g + bonus.get(&"max_hp", 0.0)
-	block.hp_regen = (hp_regen_per_5 + hp_regen_per_5_growth * g) / 5.0
+	block.hp_regen = (hp_regen_per_5 + hp_regen_per_5_growth * g) / 5.0 + bonus.get(&"hp_regen", 0.0)
 	block.max_mana = max_mana + max_mana_growth * g + bonus.get(&"max_mana", 0.0)
-	block.mana_regen = (mana_regen_per_5 + mana_regen_per_5_growth * g) / 5.0
+	block.mana_regen = (mana_regen_per_5 + mana_regen_per_5_growth * g) / 5.0 + bonus.get(&"mana_regen", 0.0)
 	block.ad = ad + ad_growth * g + bonus.get(&"ad", 0.0)
 	block.ap = bonus.get(&"ap", 0.0)
 	var bonus_attack_speed: float = attack_speed_growth * g + bonus.get(&"attack_speed", 0.0)

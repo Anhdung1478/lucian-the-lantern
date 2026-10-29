@@ -1,18 +1,23 @@
 class_name Enemy
 extends CharacterBody2D
-## Anything Lucian can attack: resists, damage intake, skill marks and
-## statuses from items (armor shred, Grievous Wounds, slow, MR shred).
+## Anything Lucian can attack: resists, damage intake, skill marks, statuses
+## from items (armor shred, Grievous Wounds, MR shred), slows and burns. An
+## untargetable enemy (Sky Dive) is out of every hitbox and takes no damage.
 
 signal damage_taken(info: DamageInfo, final_amount: float)
 ## The enemy died (once). Lucian's kill hooks run from it too.
 signal died(enemy: Enemy)
 
 const MARK_RING_COLOR := Color(1.0, 0.55, 0.15, 0.85)
-## Statuses with a combat effect.
+## Statuses with a combat effect. SLOW and BURN are kept by add_slow and
+## add_burn, for the health bar.
 const CARVE := &"carve"
 const GRIEVOUS_WOUNDS := &"grievous_wounds"
 const SLOW := &"slow"
+const BURN := &"burn"
 const HATEFOG := &"hatefog"
+const SLOW_ICON := preload("res://assets/art/ui/debuff_slow.svg")
+const BURN_ICON := preload("res://assets/art/ui/status_burn.svg")
 ## Armor lost per Carve stack, and magic resist lost in Hatefog.
 const CARVE_ARMOR_SHRED := 0.05
 const HATEFOG_MR_SHRED := 10.0
@@ -32,12 +37,20 @@ var hp := 0.0
 ## (set before damage_taken is emitted).
 var hp_lost := 0.0
 var dead := false
+## Out of the enemies group and every hitbox, and takes no damage (see
+## set_untargetable). Still alive.
+var untargetable := false
 ## Whoever hit this enemy last: the kill is theirs.
 var last_attacker: Node
 ## Mark id -> seconds left.
 var _marks := {}
 ## Status id -> {stacks, left, duration, icon}.
 var _statuses := {}
+## Slow id -> {pct, left}. The strongest one counts.
+var _slows := {}
+var _burns := DamageOverTime.new()
+## The body's and each hurtbox's layer from before going untargetable.
+var _layers := {}
 
 
 func _ready() -> void:
@@ -50,10 +63,11 @@ func is_alive() -> bool:
 
 
 ## The attacker may scale the hit first (before_damage), then armor or magic
-## resist, after any shred, lowers it. A dead enemy takes nothing. It dies
+## resist, after any shred, lowers it. A dead or untargetable enemy takes
+## nothing. A burn tick (`over_time`) makes no sound and no flash. It dies
 ## after the attacker's on-hit effects, so they still see the target.
 func take_damage(info: DamageInfo) -> float:
-	if dead:
+	if dead or untargetable:
 		return 0.0
 	var attacker: Node = info.attacker if is_instance_valid(info.attacker) else null
 	if attacker and attacker.has_method(&"before_damage"):
@@ -64,7 +78,9 @@ func take_damage(info: DamageInfo) -> float:
 	var hp_before := hp
 	_lose_hp(final_amount)
 	hp_lost = hp_before - hp
-	Sfx.play(&"hit", -12.0)
+	if not info.over_time:
+		Sfx.play(&"hit", -12.0)
+		_show_hit()
 	damage_taken.emit(info, final_amount)
 	if attacker and attacker.has_method(&"on_damage_dealt"):
 		attacker.on_damage_dealt(self, info, final_amount)
@@ -73,8 +89,62 @@ func take_damage(info: DamageInfo) -> float:
 	return final_amount
 
 
+## Sky Dive and the like: the enemy leaves the enemies group, its body's
+## layer and every hurtbox's, so attacks, homing shots, clicks, Senna and
+## the radar drop it, and it takes no damage. Turning it off puts the old
+## layers back. Does nothing on a dead enemy.
+func set_untargetable(on: bool) -> void:
+	if dead or on == untargetable:
+		return
+	untargetable = on
+	if on:
+		remove_from_group(&"enemies")
+		_layers = {self: collision_layer}
+		collision_layer = 0
+		for child in get_children():
+			if child is Hurtbox:
+				_layers[child] = (child as Hurtbox).collision_layer
+				(child as Hurtbox).collision_layer = 0
+	else:
+		add_to_group(&"enemies")
+		for node: Variant in _layers:
+			if is_instance_valid(node):
+				(node as CollisionObject2D).collision_layer = _layers[node]
+		_layers.clear()
+
+
+## A slow of `pct` (0.3 = 30%) for `seconds`. The same id replaces the old
+## one; the strongest slow counts. Shown over the health bar as SLOW.
+func add_slow(id: StringName, pct: float, seconds: float, icon: Texture2D = SLOW_ICON) -> void:
+	if dead:
+		return
+	_slows[id] = {"pct": pct, "left": seconds}
+	var longest := 0.0
+	for slow: Dictionary in _slows.values():
+		longest = maxf(longest, slow.left)
+	_set_status(SLOW, longest, icon)
+
+
+## The strongest slow on this enemy, 0 when none.
+func slow_amount() -> float:
+	var strongest := 0.0
+	for slow: Dictionary in _slows.values():
+		strongest = maxf(strongest, slow.pct)
+	return strongest
+
+
+## A burn of `dps` damage of `type` per second for `seconds`, ticking every
+## 0.5 s through take_damage and credited to `attacker`. The same id
+## refreshes. Shown over the health bar as BURN.
+func add_burn(id: StringName, dps: float, seconds: float, type: DamageInfo.Type, attacker: Node = null, icon: Texture2D = BURN_ICON) -> void:
+	if dead:
+		return
+	_burns.add(id, dps, seconds, type, attacker)
+	_set_status(BURN, _burns.time_left(_burns.longest()), icon)
+
+
 ## Once: out of the enemies group and every hitbox, the kill credit, then a
-## short fade before the node goes.
+## short fade before the node goes. Its slows and burns end.
 func _die() -> void:
 	if dead:
 		return
@@ -84,6 +154,10 @@ func _die() -> void:
 	for child in get_children():
 		if child is Hurtbox:
 			(child as Hurtbox).collision_layer = 0
+	_slows.clear()
+	_burns.clear()
+	_statuses.erase(SLOW)
+	_statuses.erase(BURN)
 	died.emit(self)
 	if is_instance_valid(last_attacker) and last_attacker.has_method(&"on_kill"):
 		last_attacker.on_kill(self)
@@ -150,6 +224,16 @@ func _lose_hp(amount: float) -> void:
 	hp = maxf(hp - amount, 0.0)
 
 
+## A hit landed (not a burn tick): subclasses flash.
+func _show_hit() -> void:
+	pass
+
+
+## Shows status `id` (one stack) for `seconds`, the longest slow or burn.
+func _set_status(id: StringName, seconds: float, icon: Texture2D) -> void:
+	_statuses[id] = {"stacks": 1, "left": seconds, "duration": seconds, "icon": icon}
+
+
 func _physics_process(delta: float) -> void:
 	for id in _marks.keys():
 		_marks[id] -= delta
@@ -160,6 +244,15 @@ func _physics_process(delta: float) -> void:
 		_statuses[id].left -= delta
 		if _statuses[id].left <= 0.0:
 			_statuses.erase(id)
+	for id in _slows.keys():
+		_slows[id].left -= delta
+		if _slows[id].left <= 0.0:
+			_slows.erase(id)
+	if not _burns.is_empty():
+		for hit in _burns.tick(delta):
+			if dead:
+				break
+			take_damage(hit)
 
 
 func _draw() -> void:
