@@ -49,6 +49,7 @@
   - Spellblade ready, Spear of Shojin stacks, Jak'Sho stacks, Archangel's mana charge.
 - A dark sweep shows the time that has run out; a number shows stacks, charge or shield.
 - **Hover** the cursor over an icon to see its effect.
+- **Built in Phase 8:** three crowd-control debuffs, in the style of `debuff_slow.svg` (64 × 64, a tinted dark backdrop, `#1a1d24` outlines): **Rooted** (a boot bound by green vines), **Stunned** (yellow stars circling a head) and **Feared** (a frightened purple ghost). Each has a sweep for its time and a one-line text on hover. They sit after "Slowed", the strongest first (stun, fear, root).
 - **Enemy statuses** (Carve stacks, Grievous Wounds, slow, Hatefog) show as tiny icons above the enemy's HP bar.
 - **Built in Phase 7:** the **Blue** and **Red** jungle buffs (a blue rune shield, a red flame shield) with their 60 s sweep; **Slowed** (the strongest slow on Lucian) and **Burning** while a burn ticks on him. Over an enemy's bar, slow and burn icons.
 - A shield (Ichorshield and Barrier together) shows as a white segment after the HP on Lucian's HP bar, and as "(+N)" in its text.
@@ -97,6 +98,10 @@ Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 - Only Skip takes clicks; the rest lets right-clicks through to the battlefield.
 - **Boss bar** under it while a boss lives: the boss's name over a 600 × 22 red bar with "HP / max". It finds the boss by itself and hides when the boss dies or leaves. The phase text is for Act 6's Thresh.
 - **Phase 7:** the boss bar also shows a mini boss while no boss is out (a boss takes it over). It keeps a boss that is untargetable for a moment (Sky Dive, Dark Lucian's dash).
+- **Phase 8:**
+  - **The break bar:** while a boss channels something that damage breaks (the Ocean Drake's Soothing Mist, Karthus's Requiem), a thin yellow bar (`#ffd166`, 8 px, 4 px under the HP bar) fills with the damage done against the damage needed. It goes when the channel ends. The bar's height grows by 12 px for every boss.
+  - **The phase text:** `Boss.phase_label()` after the name, in the same line: "Thresh   Phase 1", then "Thresh   Phase 2" from the rise on. Other bosses show none.
+  - **Elise's Rappel:** while she is up her art and bar fade out, but her name and bar stay on the boss bar.
 
 ### Top right – Loot
 - Stage gold: a coin and the amount, in the HUD panel style (Phase 3).
@@ -166,6 +171,37 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 - **Terrain:** lava pools (a molten orange glow with a dark crust), shallow water (pale blue with ripples), Honeyfruit (golden fruit; an empty stalk while it regrows), Blast Cones (a yellow-green bulb, 108 px, glowing while ripe; a bud swelling back while it regrows).
 - **A + Left-click:** pressing A shows Lucian's attack range as a ring and turns the cursor into a cross until the click.
 
+**Built in Phase 8:**
+- **The red word under Lucian's health bar:** "Rooted", "Stunned" or "Feared" while it lasts, in red (`#ff4040`) at 18 px with a thick black outline, so it reads over any floor (the visual pass raised it from 14 px). The strongest shows: stun, then fear, then root.
+- **More ground warnings**, in the same red style: a **ring** band (The Box), a thin line (Wall of Pain, a rider's charge, a warden's chain, Maokai's vine line, Elise's Cocoon), the wide Onslaught band (300), circles (Lay Waste, Twisted Advance, Rappel, Dark Passage, the sapling's blast on its own spot) and the Defile ring, a purple ring that stays on Karthus.
+- **Spectral walls** (Wall of Pain, The Box): pale, glowing slabs that fade out at the end. A Box piece that Lucian breaks goes at once.
+- **The vine wave** is a wide green front, as the Tidal Wave is blue.
+- **The Black Mist:** pale green-grey banks under the units that breathe slowly. A veiled enemy is a black silhouette with no bar and no radar dot.
+- **Karthus's Requiem:** a pulsing purple ring on Lucian and a filling ring round Karthus, with the break bar on the boss bar. "Broken!" rises in gold over him.
+- **Freed souls** rise and brighten into teal-white and fade upward; the dissolve of Thresh's body at the ending also fades his aura and bar.
+- **The abyss** is near-black with slow green swirls; the Chain Warden ledges are rock islands with chains.
+- **Hecarim's charge** has a glowing teal trail, and his ride shows four ghost riders beside him.
+
+### The End screen (`TheEndScreen`)
+Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the stage-end screen's button, then it goes where that button said.
+
+```
+                    [ title lantern, 200 px, green glow ]
+                              THE END
+                         Senna is free.
+                      Story time: 6:23:41
+                        Lucian: The Lantern
+                          Made with Godot 4
+      A fan game. League of Legends characters belong to Riot Games.
+                           [ Continue ]
+```
+
+- A near-black background. **THE END** in gold at 84 px, "Senna is free." in green (`#8fe3b0`) at 34, "Story time" at 28 in the text color, the three credit lines small and dim. **Continue** is 420 × 64.
+- **Story time** is the slot's play time as H:MM:SS (the stage-end screen's clock is M:SS and rounds up, so it isn't reused).
+- **Continue:** Main screen → the main screen on Act 6; Retry → 6-5 again. If the save failed, the main screen shows the "Could not save" toast.
+- **ESC does nothing here** (it is consumed). The window's close button still asks to quit.
+- The first two credit lines ("Lucian: The Lantern", "Made with Godot 4") are placeholders.
+
 ### Stage result: the end screen
 *(Phase 6 had a 560 px panel with one Continue button over the HUD. Phase 7 replaced it with this full-screen summary.)*
 
@@ -206,6 +242,7 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 - Black bars (120 px) at the top and bottom; the HUD hides.
 - The speaker's name in gold over the caption, in the bottom bar.
 - **Skip** at the top right. Space or a left-click moves to the next caption.
+- **Built in Phase 8:** `SennaFreed`, the ending (`act6_the_lantern.md`), uses the same bars, captions and Skip; a white fade follows it.
 
 ---
 

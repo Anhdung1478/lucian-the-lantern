@@ -643,3 +643,128 @@ $godot = "$env:LOCALAPPDATA\Programs\Godot"
 - **Thresh's refactor:** Act 1's cutscene must still fire only for `thresh_1`. Keep `test_act1.gd` green at every step.
 - **Walking in the forest:** trees are convex and apart; test a walker crossing a tree cluster on a path.
 - **The veil and the hit flash** both color the enemy; the veil must not be undone by a flash.
+
+
+---
+
+## Implementation notes (Phase 8 done)
+
+Everything in the plan is in place, one commit per task (Tasks 0–12), plus a fix commit after the Task 1, 6, 7, 8 and 10 reviews (Task 6 had two). Task 13 is two commits: the visual pass, then the screenshots, docs and report (`docs/report/phase8.md`). **The final whole-branch review follows this commit;** its fixes will be added below, as Phase 7's were. The numbers in *Design* were placeholders; `act5_shadow_isles.md` and `act6_the_lantern.md` give the built ones ("Built in Phase 8"). Changes and details settled while building:
+
+| Task | Commits |
+|---|---|
+| 0 Plan | `9680b70`..`c1cb75c` |
+| 1 Root, stun, fear | `c374eb6`, fix `1ea4126` |
+| 2 Enemy building blocks | `70ceff0` |
+| 3 Act 5 map, the Black Mist | `be37fdc` |
+| 4 Act 5 enemies | `e1ff88d` |
+| 5 Maokai and Elise | `08114da` |
+| 6 Karthus, Act 5 playable | `e092743`, fixes `7ea14e8`, `0de8730` |
+| 7 Act 6 map | `c837caa`, fix `b9a7ff9` |
+| 8 Act 6 enemies | `1dc7a31`, fix `cccad60` |
+| 9 Karthus revived, Hecarim | `a173fa1` |
+| 10 Final Thresh | `8a221ba`, fix `df80915` |
+| 11 The ending | `0ff2a40` |
+| 12 Debug | `b2ad250` |
+| 13a Visual pass | `b1f87a7` |
+
+### Deviations and rulings
+The plan's own *Rulings from the revision* 1–10 stand. The controller's rulings while building, each with its reason:
+
+- **Work on `main`**, as the plan's constraints say and as Phases 1–7 did. A new check before every dispatch that `git status` was clean, because another session had committed to `main` just before Phase 8 first started. Nothing is pushed.
+- **Proceed without a new approval round** on the revised plan: the user had approved it and chosen "revise now, run after 7", and the revision keeps all three of the user's decisions.
+- **Pre-flight rulings:**
+  - RV1: Task 2 also tests a summon requested on the frame its summoner dies (the plan's *Risks*).
+  - RV2: Task 3 tests "a mini boss is never veiled" with an in-memory mini boss, since no Act 5 mini boss data existed yet.
+  - RV3: Task 4 routes `bomber`, `charger` and `warden` to `Specter` at once; until Task 8 the last two fall back to `EnemyUnit`'s default think (no data used them).
+- **A rooted Lucian can't use item dashes** (Galeforce, Rocketbelt), as well as E and Flash (Task 1 fix). The plan's "items still work" means actives that don't move him; a root an item dash escapes isn't a root.
+- **Flash may cross an abyss strip narrower than its range** (Task 2). It can't land on the abyss or a ledge, since those are abyss, so it can't soft-lock him; the Act 6 gaps are 600 wide, over Flash's 400.
+- **A summon whose spot is in a wall, the abyss or off the map appears on its summoner** (Task 2). Every counted summon must be reachable, or the wave never ends.
+- **Perching is generic** (Task 6 ruling): the stage marks a unit placed on a ledge as `perched`, and a perched unit never walks. A body on a ledge sits inside the abyss shape, and `move_and_slide` would push it out. The warden adds only its chain.
+- **Maokai's and Elise's first-use delays** (3 s and 2 s; Cocoon 3 s) and Maokai's attack range 110 are accepted placeholders: the plan gave none, and gentle starts fit the early-difficulty note.
+- **One Requiem per burst** (Task 6, two rulings): if Karthus's HP passes more than one threshold before he can channel, he uses one Requiem and the skipped thresholds are spent; and when a Requiem ends (broken or landed), every threshold his HP is at or below is spent too. Two 900-magic Requiems back to back break the fairness rule.
+- **6-5 spawns from three stubs** (N, E, S), not the west stub behind Lucian's start (Task 7). Phase 7 ruled the dragon pit's start-side spawn out for the same reason.
+- **6-4's `boss_point` stays on the east plateau** while Hecarim's camp is the east end (Task 7): `boss_point` is unused on a mini boss stage.
+- **A perched warden takes the free ledge nearest Lucian** (Task 7 review): taking the lowest index meant the east ledges in 6-3 and 6-4 were never used. Wardens are there to chain him (Thresh-hook practice), and the fight moves east.
+- **The rider's charge and the warden's chain are basic hits** (Task 8): Banshee's Veil blocks boss skills only (`from_skill`), the house rule since Phase 6, so it doesn't block them. The refusal is tested with an invulnerable Lucian. `CHARGE_CLOSE` (250) and the push and pull speed (1600; above the 1400 charge, so Lucian stays ahead of the rider) are placeholders.
+- **Hecarim's knockback lands only with its hit** (Banshee's Veil blocks both), and **Devastating Charge starts only from 300 or more away** so it can be seen (Task 9). Fairness; Hecarim is a little gentler.
+- **Dark Passage brings souls only while fewer than 6 of his souls are alive** (Task 10). The plan names no cap, and an uncapped 3-per-16 s stream could swamp a slow player.
+- **Any `ThreshFinal` has `fell` wired, in `spawn_unit`** (Task 10), and `_on_thresh_fell` acts on the unit that fell. A debug-spawned Thresh otherwise sits at 0 HP for good.
+- **Task 10's chosen numbers are placeholders:** the Box's first use at 6 s and its ring band at 60, Phase 2's first uses 1, 3 and 6 s after the rise, Dark Passage's range 1000, souls 60 px from the lantern, all three souls at landing, and Thresh targetable but undamageable while rising.
+- **Task 13 is two dispatches and two commits**, as Phase 7's was.
+- **The visual pass's look changes stand:** a dark spiderling with pale legs and a pale dais at 6-5's heart. They read on their ground in the screenshots.
+- **Commit lines:** each commit ends with the `Claude-Session:` line, then `Co-Authored-By:` (the user's memory rule keeps the Co-Authored-By line last).
+
+Other calls made by the implementers and accepted in review:
+- **`Lucian.add_cc(kind, seconds, from)`** is the only entry. The plan's pre-flight draft said `apply_cc(kind, seconds, amount, from)`; the revised plan and the code use `add_cc`.
+- **CC details:** a stun or fear during a pull lets the pull finish and holds him after it. Fear builds no Energize (like a displacement or a throw). A root doesn't end a dash under way. `lucian_controller.gd` is unchanged: its `can_act()` gates already cover stun and fear. An E queued before a root is dropped if the root still holds when it would fire. `CrowdControl` freezes in stasis, like the slows.
+- **`EnemyUnit` pieces:** `leap_to` and `charge` are untargetable-in-the-air and wall-stopped, and `landed` is emitted after the mask is restored. The summon timer counts down only while the unit thinks. `escape_note` is "" for a vanish.
+- **`EnemyProjectile.missed`** at its range end, or on a wall (deferred, so a listener can throw a new projectile at once). A boomerang's miss is decided at the turnaround.
+- **`Layers.CHASM` (32):** in `Lucian._body_mask()` (so `fits_at` and Flash follow), in `displace()`'s mask, in `PathFollower`'s ray, and in the enemy body mask. `_carve`, `_rect_polygon` and `_piece` moved up into `StageMap`, byte for byte.
+- **The Black Mist** sets `veiled` every physics frame in `BlackMist`; `EnemyUnit.sprite` is kept as a member so the veil and `tint` live on `sprite.modulate`, away from the hit flash. The tree seed is `6000 + stage` (5000 left 5-4's spawn path 2.29 px short of its target).
+- **Sapling:** the mark is on its own spot. **Elise's Rappel:** the circle is moved to Lucian each frame (a smaller change than teaching `GroundWarning` to follow). **Karthus's Defile** is an invisible `HazardZone` kept on him; Karthus draws the ring.
+- **Hecarim's Onslaught hits by band** (`GroundWarning.in_line`), not by his body; his four ghost riders are the rider art at 55% alpha.
+- **`Boss.phase_label()`** is virtual like `channel()`; the boss bar reads both each frame.
+- **Thresh:** `ThreshFinal._die()` only sets a flag (no `died`, no on-kill), so he never dies before the stage takes him away. His rise and fall run in `_physics_process` (the flush rule). `hp` is set directly at the rise, so Grievous Wounds can't cut it. `stopped` is reused for the down, rising and fallen states.
+- **The ending:** `Game` works out `story_ends` (cleared, no next stage, not yet in `cleared`) before the save, then shows `TheEndScreen` deferred. A failed save puts the toast on the main screen after Continue.
+- **Debug:** `Stage.jump_to_last_wave()` shares `_remove_every_enemy()` with `jump_to_boss_wave()`. A deferred summon pending at the jump is accepted and documented.
+
+### Visual pass (Task 13a)
+Every Phase 8 scenario was run in a window (three rounds) and every PNG looked at. Four fixes:
+- **The CC word:** "Rooted" was a dark smudge. `LucianHealthBar.CC_FONT_SIZE` 18 (was 14) with a 4 px black outline. Test: the word's size and outline in `test_lucian_cc.gd`.
+- **Thresh on 6-5's heart:** a dark Thresh on a dark heart disappeared. The heart is a pale dais (`ThreshDomainMap.HEART_COLOR` `#5f686d`). Tests: `test_maps.gd` pins Thresh's art luminance against the heart: margins 0.15 (Phase 1) and 0.2 (Phase 2).
+- **Spiderlings on the forest floor** were nearly invisible: bone-pale legs (`#a9a392`) and a pale mark (`#d8d1bc`). Test: the spiderling's luminance against the floor.
+- **Thresh in the ending:** his aura and boss bar now fade with him (an empty bar hung over the kneeling Thresh, and the dissolve left the aura). The dissolve fades the whole unit over `DISSOLVE_TIME` (1.4 s). Test: `test_ending.gd`.
+
+Two gameplay problems were found by looking and are **not fixed** (they need a ruling, and are queued for the final review's fix wave); see the report's *Known limits*:
+- A feared Lucian is carried along Hecarim's Onslaught.
+- A Box crossing at a joint between two pieces touches both.
+
+### Screenshot harness (Task 13a)
+- **Scenarios:** `act5_mist`, `act5_sapling`, `act5_brood`, `maokai_grasp`, `elise_rappel`, `karthus_wall`, `karthus_requiem`, `act6_rider`, `karthus_defile`, `hecarim_onslaught`, `thresh_box`, `thresh_phase2`, `thresh_lantern`, `ending_cutscene` and `the_end` are new; `act6_bridges` and `act6_platform` came with Task 7 and `act6_bridges` gained the Chain Warden and its pull. 52 PNGs in all (`docs/report/phase8/`).
+- **Helpers:** `hold(boss)` (stands, no shots, skills wait), `free_camera(at, zoom)` (a free camera clamped as play clamps it, edge panning off, so another mouse or a window without focus can't move it), `open_ground(near)`, `to_boss(id, at, lucian_at, zoom)` (the boss faces Lucian), `to_final_thresh(offset, zoom)` (6-5's real boss wave through `jump_to_boss_wave`), `spectral_walls()` and `buff_icon(id)`.
+- **Framing fixes (harness, not game):** Maokai's Lucian stands in front of the tree west of the gap; Elise's Lucian steps out after the lock; the Box walk goes through a piece's middle; Lay Waste waits for all its circles; Phase 2 waits for `stopped` to clear before the next hit.
+- Some Phase 7 scenarios and `whole_map` keep the old camera handling: keep the mouse off the window while they run. The stage info "Wave 1 in 16:38" and "Waves 1 / 8" on the ending's result are harness artifacts, as in Phase 7.
+
+### Fixes from reviews
+- **Task 1:** an item dash (Galeforce, Rocketbelt) escaped a root; `CastRange.landing` now refuses it (`1ea4126`).
+- **Task 6:** Karthus's Requiems could chain when a burst passed two thresholds, and a break that passed the next threshold fired a second one straight away. `_spend_thresholds()` is shared by `requiem()`, `_break()` and `_finish_requiem()` (`7ea14e8`, `0de8730`). Tests: a burst past several thresholds brings one Requiem; a break that passes a threshold spends it.
+- **Task 7:** the lowest-index ledge choice meant some ledges were never used (nearest to Lucian now); the 6-5 west stub is out of the spawns; a perched unit refuses `leap_to` and `charge` (documented); bridge spawns get a jitter of 50 with a 45 px body margin; perched units face Lucian; path tests assert end distances (`b9a7ff9`).
+- **Task 8:** `chain_warden.svg`'s hook was clipped by its canvas (fixed and rendered to check); the rider has its own `CHARGE_PUSH_SPEED`; the pull stops at the warden's radius plus Lucian's hit radius (never past it); a dead warden's late chain pulls nobody; a perched rider never marks a line. Tests for refused hits (Banshee-like via invulnerable) and a push into the abyss edge (`cccad60`).
+- **Task 10:** the 6-soul cap; `fell` wired for any `ThreshFinal`; `_box_touched` guards `stopped`; a `_clear_fight` helper; `REHOOK_SLACK` 0.15 s so a hook that just landed or was blocked isn't answered at once (`df80915`).
+
+### Left as is (small, from the reviews)
+- **Summons and enemy blocks (Task 2):**
+  - A summoned mini boss would still pay purple and `buff_on_kill` (unlikely config, untested).
+  - Leap and charge don't cancel each other. A vanish or death mid-leap never emits `landed` (don't `await` it) and fades at the enlarged scale. The charge hit uses the end-of-frame position, not a swept segment.
+  - Generic code comments name Act 5–6 content. `WORLD | CHASM` is spelled out in four places (a shared constant would be better). `enemy_unit.gd` grew from 261 to 460 lines.
+  - A boomerang can emit both `missed` and `hit_lucian` (documented, untested).
+- **Crowd control (Task 1):** fear with the source on top of him runs backward from his facing (untested). A move or attack command given during a stun is held and runs after it (the controller prevents it today). `use_summoner` hard-codes `&"flash"`. `add_cc` re-drops orders on every call during a stun or fear. A stunned or feared Lucian doesn't pick up loot or Honeyfruit (they check `can_act()`).
+- **Act 5 map and enemies (Tasks 3–5):**
+  - `BlackMist` redraws every frame (a modulate tween would do); `DeadForestMap._draw` re-runs the tree sampling.
+  - Only Maokai's camp jitter is checked walkable; the mist-clear test skips spawn points; "a veiled enemy is still hit" calls `take_damage` directly.
+  - No test for a vanish mid-warning on a sapling; the bomber has no invalid-target guard (as the base).
+  - Tight real-time margins in `test_elise.gd` and `test_maokai.gd`; no test with a landing spot in a tree. **Elise's art could stay at alpha 0 if she is killed out of band while up** (not reachable in play).
+- **Karthus and the boss bar (Task 6):** loose Lay Waste tests; the boss bar's minimum height grows 12 px for every boss; `Karthus.is_channeling()` ignores `is_alive`; Lay Waste lays one frame early; Wall of Pain's direction is `ZERO` if the two overlap.
+- **Act 6 map and enemies (Tasks 7–8):** the warden's art body sits 4 px off-centre (not visible at game zoom); the abyss push test's lower bound is weak; no tests for a rider dying mid-charge or Lucian dying mid-warning.
+- **Hecarim and Karthus, revived (Task 9):**
+  - **Fairness, for the final review:** Onslaught still hits a Lucian who steps into the band **behind** Hecarim mid-ride (`hecarim.gd`, the `ahead` check is negative there), with no cue after the warning fired.
+  - A multi-line condition in `karthus.gd` continues by tabs (wrap in parentheses). Hecarim's `move_speed` isn't restored if he dies mid-charge (harmless). No tests for a death mid-charge or mid-ride, the Veil blocking the knockback, or the fear's direction. A filler assert in the Defile tick test. Defile's look depends on Karthus's `_draw`.
+- **Thresh (Task 10):** a debug Thresh's fall runs `_clear_fight` (it clears every warning and shot on the stage). `REHOOK_SLACK` adds 0.15 s idle after a landed or blocked hook. Test gaps: a soul pending at the fall, a risen Box at the fall, Lucian dying during the rise.
+- **The ending (Task 11):** thin scene coverage (only a skip at the start; no full play-through or late-skip prop check); the failed-save toast after Continue is untested; `play_time` keeps growing on `TheEndScreen` (the label is fixed when built, accepted); credits lines 1–2 are placeholders; `test_act4`'s unfreed-children count varies 2–3 between runs.
+- **Debug (Task 12):** `skip_to_last_wave` on a 0-wave stage with no boss gives wave -1 (no such content); the training test only asserts no crash; the no-reward check is gold only; the "mini boss left alone" test relies on the data's kind.
+- **Visual pass (13a):** `_art_luminance` ignores `data.tint`; the CC font test pins the literal; `senna_freed` fades `thresh.modulate:a` (could fight a hit flash); `free_camera` calls the private `camera._clamped`; Phase 7's scenarios keep the old camera handling.
+- **Plan checklists:** the task checklists in this file are left unticked; the commits above are the record.
+- **Tests:** GUT's 2 warnings are test scripts that leave a node or two unfreed (`test_act4`, `test_lucian_skills`), as in Phase 7. Several Phase 8 tests wait on real time, as Phase 7's do.
+
+### Running the checks
+
+```
+godot_console --headless --path . --import
+godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
+godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+```
+
+Phase 8's scenarios (each in `ACT_SCENARIOS`, which starts `stage.tscn` set up for a Journey stage from a scratch new save; `the_end` runs the `Game` root):
+`act5_mist`, `act5_sapling`, `act5_brood`, `maokai_grasp`, `elise_rappel`, `karthus_wall`, `karthus_requiem`, `act6_bridges`, `act6_platform`, `act6_rider`, `karthus_defile`, `hecarim_onslaught`, `thresh_box`, `thresh_phase2`, `thresh_lantern`, `ending_cutscene`, `the_end`.
+Run `--import` first: the spiderling SVG changed in the visual pass.

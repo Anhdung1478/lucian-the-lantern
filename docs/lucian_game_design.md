@@ -185,6 +185,37 @@ Acts 3 and 4 play this way too (`act3_the_jungle.md`, `act4_the_darkness.md`): p
 
 **Mini bosses** come last in their stage's last wave (`kind = mini_boss`). They don't scale. Their purple is paid on the kill.
 
+### Built in Phase 8
+Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). **All 22 stages can be played.** Only Endless waits.
+
+**Crowd control on Lucian.** Root, stun and fear come from Maokai, Elise, Hecarim and nothing else. One entry point, `Lucian.add_cc`; the timers live in `CrowdControl`.
+
+| Kind | Effect |
+|---|---|
+| Root | He can't walk, use E, Flash or an item dash (Galeforce, Rocketbelt). A move order waits and runs when the root ends. Attacks in range, Q, W, R and items that don't move him still work. |
+| Stun | He can't act. It drops the windup, the queued cast, a dash and R, as a displacement does. |
+| Fear | He can't act. It drops the same, and he runs straight away from the source at 60% of his speed, sliding along walls. It builds no Energize. |
+
+- **Tenacity** shortens root, stun and fear (a time × (1 − tenacity)); the same kind keeps the longer time. **Slows are not shortened**, as before.
+- A stun or fear during a pull lets the pull finish and holds him after it. A root doesn't end a dash already under way.
+- Dead, in stasis, `invulnerable` or thrown over a wall: he refuses CC. Death clears it.
+- **A skill's CC lands only when its hit lands:** Banshee's Veil blocks the damage and the CC with it.
+- **Fairness:** every root, stun or fear comes from a warning of 0.7 s or more, or from a bolt or wave he can see, and lasts 1.5 s at most (1.0, 1.25 and 1.25 s are the built values). It shows in the buff row ("Rooted", "Stunned", "Feared", with icons) and as a short red word under his health bar (the strongest: stun, then fear, then root).
+
+**Summons** (the Maiden's ghouls, the Broodmother's spiderlings, Thresh's Lantern Souls): the wave counts one the moment it is asked for and waits for it. Each summoner has a cap on its live summons. A summoner's death leaves them. A summon pays 25% (§9).
+
+**Vanishing:** a sapling that explodes and Thresh's souls at his fall leave with no rewards at all, no note and no kill. It is the Scuttler's escape without "Escaped!". **Freed:** a Lantern Soul that dies (or vanishes) rises and fades as teal-white light with a soft chime, and pays like any kill.
+
+**The Black Mist** (Act 5): a normal or elite enemy in a mist bank, more than 350 from Lucian, is veiled: a dark silhouette with no health bar and no radar dot. It can still be targeted and hit, and its warnings show. Bosses and mini bosses are never veiled.
+
+**The abyss** (Act 6) blocks walking, dashes, Flash, pulls and enemy bodies, but not bolts, chains or Lucian's shots. A pull stops at its edge. Chain Warden ledges are abyss for physics.
+
+**Final Thresh** never dies at 0 HP in Phase 1: he rises (2.5 s, no damage, full HP, darker, "Phase 2"). At 0 HP in Phase 2 the ending plays. **Karthus's Requiem** shows a break bar under the boss bar; 8% of his max HP in damage breaks it.
+
+**The ending:** the cutscene (skippable), STAGE CLEARED with "Senna is free" and "The story is complete", then, on the first clear only, `TheEndScreen` with the slot's story time. Replays skip it.
+
+**Debug:** the stage debug table gains "Boss HP 5%" and "Jump to the last wave" (every enemy goes, no rewards, and the last wave comes next).
+
 ---
 
 ## 4. Stats & Leveling
@@ -449,6 +480,24 @@ Every kill pays out at once, Senna's kills too:
 
 - As before, the kill that ends the stage drops nothing.
 
+### Built in Phase 8
+- **Blue per kill:** 5 in Act 5 and 6 in Act 6 (elites 25 and 30), as the table says.
+- **Summons pay 25% of their gold and XP, and no blue, no orange and no loot** (so they can't be farmed). The ghouls, the Broodmother's spiderlings and Thresh's Lantern Souls are summons when a summoner calls them; a Lantern Soul that comes from a wave pays in full.
+- **Vanished enemies pay nothing** (a sapling that explodes, Thresh's souls at his fall).
+- **Mini bosses and bosses of Acts 5–6** (all in the save's `"bosses"` list):
+
+| Boss | Where | Gold | Blue | Orange | Purple (first / repeat) |
+|---|---|---|---|---|---|
+| Maokai (mini boss) | 5-2 | 300 | 50 | 3 | 5 / 1 |
+| Elise (mini boss) | 5-4 | 300 | 50 | 3 | 5 / 1 |
+| Karthus (boss) | 5-5 | 300 | 100 | 5 | 10 / 2 |
+| Karthus, revived (mini boss) | 6-2 | 300 | 50 | 3 | 5 / 1 |
+| Hecarim (mini boss) | 6-4 | 300 | 50 | 3 | 5 / 1 |
+| Thresh (boss) | 6-5 | — (his fall pays essences only, as in Act 1) | 100 | 5 | 20 / 4 |
+
+- A mini boss's purple is paid on the kill; a boss's at the stage's clear. Thresh's blue and orange are paid where he fell, as his fall ends the fight; his clear adds "Senna is free" and, the first time, "The story is complete".
+- Mini bosses drop a fragment for sure plus 8% a legendary. The kill that ends the stage (Thresh's fall) drops nothing.
+
 ---
 
 ## 10. Skins
@@ -557,7 +606,7 @@ Stage gold, bonus XP and essence drops work since Phase 6: +10% gold, XP or blue
 | 5 | Shadow Isles | 5 | Maokai's saplings, Elise's spiderlings | Maiden of the Mist, Broodmother | Maokai (stage 2), Elise (stage 4) | Karthus |
 | 6 | The Lantern | 5 | Mist Walkers, Lantern Souls | Spectral Riders, Chain Wardens | Karthus – revived (stage 2), Hecarim (stage 4) | Thresh (2 phases) |
 
-**Built so far:** Acts 1–2 (Phase 6) and Acts 3–4 (Phase 7) can be played, 12 of the 22 stages. Acts 5–6 and Endless come in a later phase.
+**Built so far:** Acts 1–2 (Phase 6), Acts 3–4 (Phase 7) and Acts 5–6 (Phase 8) can be played: **all 22 stages**. Endless comes in a later phase.
 
 ### Story summary
 - **Act 1 – The Loss:** Lucian and Senna fight together until Thresh kills Senna and traps her soul in his lantern.
@@ -607,7 +656,7 @@ Maps are drawn in code. Walls (jungle, rocks, pillars, the border) block Lucian,
 | 2 | Training ground | 4600 × 2800 | Stone tiles, three gates, 6 decorative dummies by the walls, and 6, 8 or 10 pillars by stage (a ring of 10 in stage 3). See `act2_the_sentinels.md`. |
 | — | Training | 4800 × 2700 | The Phase 3 test arena, with its dummy and no waves |
 
-The radar takes the map's shape. Acts 5–6 have no map yet. *(Phase 6 said Acts 3–6; Acts 3 and 4 came in Phase 7.)*
+The radar takes the map's shape. Acts 5–6 have no map yet. *(Phase 6 said Acts 3–6; Acts 3 and 4 came in Phase 7, Acts 5 and 6 in Phase 8.)*
 
 ### Built in Phase 7
 Every map now bakes a navigation mesh from its walls (agent radius 36), so enemies and Lucian walk around them (§3).
@@ -619,6 +668,15 @@ Every map now bakes a navigation mesh from its walls (agent radius 36), so enemi
 | 4 | Dark mid lane | 5200 × 3200 | Act 1's layout in black and purple. Dark Lucian rises from the river. |
 
 No wall polygon has a hole: a hole would collide as solid wall. The jungle keeps each loop's inner jungle as a wall of its own, and the pit's rock is 8 arc pieces. Maps draw under the units, at `StageMap.FLOOR_Z`. Details and terrain numbers are in `act3_the_jungle.md` and `act4_the_darkness.md`.
+
+### Built in Phase 8
+| Act | Map | Size | Details |
+|---|---|---|---|
+| 5 | Dead forest (`DeadForestMap`) | 5400 × 3400 | A dark grey-teal clearing between two ragged walls of black trees. 14, 16, 18, 18 and 10 twisted trees (r 45–90) as cover, 2 to 4 Black Mist banks (r 420–500) that veil enemies, a spider nest in the east from 5-3, Maokai's ring of six trunks in 5-2 and Elise's camp in 5-4. 5-5 keeps its trees west of x 3450 and ends in Karthus's ruined graveyard (flagstones, 8 tombstones, a broken crypt wall). The start is in the west, the merchant at the center, and four spawn points in the tree lines. |
+| 6, stages 1–4 | Thresh's domain (`ThreshDomainMap`) | 5600 × 3400 | Three slate plateaus (west, center, east) over an abyss, joined by stone bridges with soul lanterns: 4 × 280 wide in 6-1 and 6-2, 3 × 200 wide in 6-3 and 6-4 (the north-west bridge broken). 11 rock spikes as cover. 2 ledges for Chain Wardens (4 from 6-3). The revived Karthus's altar in 6-2 and Hecarim's east end in 6-4. |
+| 6, stage 5 | The final platform | 5600 × 3400 | A round carved disc (r 1400) with a rune ring, no walls, a pale dais at its heart for Thresh, and four bridge stubs; waves come from the north, east and south stubs. |
+
+The abyss is several polygons on its own physics layer (no polygon has a hole). Details and numbers are in `act5_shadow_isles.md` and `act6_the_lantern.md`.
 
 ---
 

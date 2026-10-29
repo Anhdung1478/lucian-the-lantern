@@ -242,3 +242,11 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
   - **Main screen** opens the main screen on the act just played, as Continue did.
   - Each saves first. If the save fails, Retry and Next land on the main screen instead, with the red "Could not save" toast.
 - After Retry or Next, the next end screen leads back here the same way, so the main screen only shows when the player asks for it.
+
+### Built in Phase 8
+**Acts 5 and 6 start.** An act's Start works as soon as `WavePlan` has the act's first stage (5-1, 6-1) and the act is open: Act 5 once Act 4 is cleared, Act 6 once Act 5 is cleared. All 22 stages can now be played.
+- **Act 5's cards:** "5 waves", "5 waves + mini boss" (grey skull), "6 waves", "6 waves + mini boss" (grey skull), "6 waves + boss wave" (red skull).
+- **Act 6's cards:** "6 waves", "6 waves + mini boss", "7 waves", "7 waves + mini boss", "7 waves + boss wave".
+- **The first clear of 6-5** shows `TheEndScreen` after the stage-end screen's button (`ui_design.md`), then the main screen on Act 6 (or 6-5 again after Retry). Next stage after 6-5 goes to the main screen as before.
+- **Which tab opens** when every act is cleared: Training.
+- **Endless** still opens once Act 3 is cleared, and its Start stays disabled ("Endless comes in a later phase").
