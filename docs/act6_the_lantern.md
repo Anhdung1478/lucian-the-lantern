@@ -89,3 +89,15 @@ Lucian reaches Thresh for the final fight. When Thresh falls, Lucian shoots thro
 
 - **Ending:** when Thresh reaches 0 HP in Phase 2, Lucian shoots through the lantern and frees Senna.
 - **Purple essence:** 20 on first kill, 4 on repeat.
+
+## Waves
+
+Enemies come in packs. Each wave lists how many of each. w is a mist walker, l a lantern soul, R a rider and C a warden.
+
+| Stage | Waves | Mini boss / boss |
+|---|---|---|
+| 6-1 | 8w 4l · 8w 6l · 8w 6l 1R · 10w 6l 1C · 10w 8l 1R · 10w 8l 1R 1C | — |
+| 6-2 | 8w 6l · 10w 6l 1R · 10w 6l 1C · 10w 8l 1R · 12w 8l 1C · 12w 8l 1R 1C | **Karthus, revived** last in wave 6 |
+| 6-3 | 10w 6l · 10w 8l 1R · 10w 8l 1C · 12w 8l 1R · 12w 8l 2C · 12w 10l 1R 1C · 14w 10l 2R 1C | — |
+| 6-4 | 10w 8l 1R · 10w 8l 1C · 12w 8l 1R 1C · 12w 10l 2R · 12w 10l 2C · 14w 10l 1R 1C · 14w 10l 2R 1C | **Hecarim** last in wave 7 |
+| 6-5 | 10w 8l 1R · 12w 8l 1C · 12w 10l 1R 1C · 14w 10l 2R · 14w 10l 2C · 14w 12l 1R 1C · 16w 12l 2R 2C | boss wave: **Thresh** alone |

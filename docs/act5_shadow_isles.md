@@ -79,3 +79,15 @@ No passive, no E.
 | **Requiem (R)** | Channels for 3 seconds, then deals huge damage to Lucian. Enough damage during the channel cancels it. |
 
 - **Purple essence:** 10 on first kill, 2 on repeat.
+
+## Waves
+
+Enemies come in packs. Each wave lists how many of each. p is a sapling, s a spiderling, M a Maiden and B a Broodmother.
+
+| Stage | Waves | Mini boss / boss |
+|---|---|---|
+| 5-1 | 8s 4p · 8s 6p · 8s 6p 1M · 10s 6p 1B · 10s 8p 1M | — |
+| 5-2 | 8s 6p · 10s 6p 1M · 10s 6p 1B · 10s 8p 1M · 10s 8p 1M 1B | **Maokai** last in wave 5 |
+| 5-3 | 10s 6p · 10s 6p 1M · 10s 8p 1B · 12s 8p 1M · 12s 8p 1B · 12s 8p 1M 1B | — |
+| 5-4 | 10s 8p 1M · 10s 8p 1B · 12s 8p 1M · 12s 8p 2B · 12s 10p 1M 1B · 12s 10p 1M 1B | **Elise** last in wave 6 |
+| 5-5 | 10s 8p 1M · 12s 8p 1B · 12s 10p 1M · 12s 10p 1M 1B · 14s 10p 2M · 14s 10p 1M 2B | boss wave: **Karthus** alone |
