@@ -2007,8 +2007,8 @@ func scenario_elder_sky_dive() -> void:
 	await wait(1.2)
 	await shot("elder_sky_dive_1_shadow")
 	var circle := await wait_for_warning(GroundWarning.Shape.CIRCLE)
-	await wait(0.5)
-	print("landing circle r (expect 260): ", circle.reach if circle else 0.0)
+	await wait(0.75)
+	print("landing circle r, seconds (expect 260, 1.2): ", circle.reach if circle else 0.0, ", ", circle.warn_time if circle else 0.0)
 	await shot("elder_sky_dive_2_landing")
 	var hp := lucian.hp
 	var at := lucian.global_position

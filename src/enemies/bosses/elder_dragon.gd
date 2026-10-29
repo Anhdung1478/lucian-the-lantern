@@ -9,8 +9,10 @@ extends Boss
 ## after a few seconds, three times as much if he is low by then.
 ##
 ## Lucian keeps his attack order on it while it is up (see Lucian), so he
-## shoots again once it lands. It takes off and lands in _physics_process
-## and the warning's `fired`, never inside a damage path.
+## shoots again once it lands. It takes off and lands in _physics_process,
+## never inside a damage path. The landing runs on its own fall timer: the
+## circle warning only shows it, so the dragon lands even if the warning is
+## gone.
 
 enum Dive { NONE, FOLLOW, FALL }
 
@@ -24,7 +26,9 @@ const BREATH_FIRST := 2.0
 const DIVE_FOLLOW := 2.4
 const DIVE_SPEED := 300.0
 const DIVE_RADIUS := 260.0
-const DIVE_WARN := 0.8
+## Seconds the landing's circle fills before it lands: long enough for a
+## Lucian under the shadow to walk out (260 + his hit radius at base speed).
+const DIVE_WARN := 1.2
 const DIVE_DAMAGE := 240.0
 ## A landing on Lucian pushes him this far from the circle's middle, at PUSH_SPEED.
 const DIVE_PUSH := 200.0
@@ -134,7 +138,8 @@ func _attack() -> void:
 	fire_bolt(make_hit(), data.projectile_speed, attack_range + BOLT_OVERREACH).color = ELDER
 
 
-## The dive goes on whether or not Lucian can be fought, so it always lands.
+## The dive goes on whether or not Lucian can be fought, so it always lands:
+## DIVE_WARN after the fall starts, warning or none.
 func _physics_process(delta: float) -> void:
 	super(delta)
 	if not is_alive() or not is_diving():
@@ -143,6 +148,8 @@ func _physics_process(delta: float) -> void:
 		_follow(delta)
 	else:
 		_fall_time += delta
+		if _fall_time >= DIVE_WARN:
+			_land()
 	queue_redraw()
 
 
@@ -158,19 +165,18 @@ func _follow(delta: float) -> void:
 
 
 ## The shadow stops where its body fits (see landing_spot), and the landing's
-## circle warning fills there.
+## circle warning fills there: only a sight, as the landing has its own timer.
 func _start_fall() -> void:
 	_dive = Dive.FALL
+	_fall_time = 0.0
 	global_position = landing_spot(global_position, arena, radius)
-	var warning := GroundWarning.circle(global_position, DIVE_RADIUS, DIVE_WARN)
-	warning.fired.connect(_land.bind(warning))
-	warning_parent.add_child(warning)
+	warning_parent.add_child(GroundWarning.circle(global_position, DIVE_RADIUS, DIVE_WARN))
 
 
-## It lands, seen and targetable again: a hit on Lucian inside the circle,
-## which pushes him away from its middle. Nothing for a dead dragon.
-func _land(warning: GroundWarning) -> void:
-	if not is_alive():
+## It lands where it fell, once, seen and targetable again: a hit on Lucian
+## inside the circle, which pushes him away from its middle.
+func _land() -> void:
+	if not is_alive() or _dive != Dive.FALL:
 		return
 	_dive = Dive.NONE
 	set_untargetable(false)
@@ -180,10 +186,10 @@ func _land(warning: GroundWarning) -> void:
 	visuals.scale = Vector2.ONE
 	health_bar.modulate.a = 1.0
 	queue_redraw()
-	if not (is_instance_valid(target) and warning.covers(target.global_position, Lucian.HIT_RADIUS)):
+	if not (is_instance_valid(target) and GroundWarning.in_circle(global_position, DIVE_RADIUS, target.global_position, Lucian.HIT_RADIUS)):
 		return
 	if target.take_damage(skill_hit(DIVE_DAMAGE, DamageInfo.Type.MAGIC, &"sky_dive")):
-		var away := warning.global_position.direction_to(target.global_position)
+		var away := global_position.direction_to(target.global_position)
 		if away == Vector2.ZERO:
 			away = Vector2.from_angle(visuals.rotation)
 		target.displace(target.global_position + away * DIVE_PUSH, PUSH_SPEED)

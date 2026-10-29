@@ -226,14 +226,14 @@ func test_the_dragon_dives_on_its_own_at_85_percent() -> void:
 	await wait_physics_frames(2)
 	assert_true(dragon.is_diving())
 	assert_almost_eq(dragon._cooldowns[&"sky_dive"], 18.0, 0.1)
-	assert_gte(dragon.busy_left, 3.0, "busy for the whole dive")
+	assert_gte(dragon.busy_left, 3.5, "busy for the whole dive")
 
 
 func test_sky_dive_takes_it_up_untargetable_and_unseen() -> void:
 	var dragon := _elder(Vector2.ZERO)
 	lucian.global_position = Vector2(400, 0)
 	await wait_physics_frames(1)
-	assert_gte(_dive(dragon), 3.2, "busy for the whole dive")
+	assert_gte(_dive(dragon), 3.6, "busy for the whole dive")
 	assert_true(dragon.is_diving())
 	assert_true(dragon.untargetable)
 	assert_false(Lucian.is_target(dragon))
@@ -276,7 +276,7 @@ func test_a_circle_warning_fills_where_the_shadow_stops_then_it_lands_with_a_hit
 	var warning: GroundWarning = _effects(GroundWarning)[0]
 	assert_eq(warning.shape, GroundWarning.Shape.CIRCLE)
 	assert_eq(warning.reach, 260.0)
-	assert_almost_eq(warning.warn_time, 0.8, 0.0001)
+	assert_almost_eq(warning.warn_time, 1.2, 0.0001)
 	var spot := warning.global_position
 	assert_eq(dragon.global_position, spot, "on its shadow")
 	assert_true(dragon.untargetable, "still up while it falls")
@@ -285,6 +285,8 @@ func test_a_circle_warning_fills_where_the_shadow_stops_then_it_lands_with_a_hit
 	await wait_seconds(0.3)
 	assert_eq(dragon.global_position, spot, "the shadow has stopped")
 	assert_eq(_hits(&"sky_dive").size(), 0, "not yet")
+	await wait_seconds(0.5)
+	assert_eq(_hits(&"sky_dive").size(), 0, "still falling at 0.8 s")
 	var hit: bool = await wait_until(func() -> bool: return not _hits(&"sky_dive").is_empty(), 1.0)
 	assert_true(hit, "it lands on him")
 	if not hit:
@@ -300,18 +302,19 @@ func test_a_circle_warning_fills_where_the_shadow_stops_then_it_lands_with_a_hit
 	assert_eq(dragon.health_bar.modulate.a, 1.0)
 	await wait_seconds(0.35)
 	assert_almost_eq(lucian.global_position, spot + Vector2(300, 0), Vector2(6, 6), "pushed 200 away from the middle")
+	assert_eq(_hits(&"sky_dive").size(), 1, "it lands once")
 	assert_gt(dragon.take_damage(DamageInfo.create(10.0, DamageInfo.Type.TRUE, &"test")), 0.0, "it can be hit")
 
 
-func test_up_for_about_3_2_seconds() -> void:
+func test_up_for_about_3_6_seconds() -> void:
 	var dragon := _elder(Vector2.ZERO)
 	lucian.global_position = Vector2(2000, 0)
 	await wait_physics_frames(1)
 	_dive(dragon)
-	await wait_seconds(3.0)
-	assert_true(dragon.untargetable, "up at 3.0 s")
+	await wait_seconds(3.4)
+	assert_true(dragon.untargetable, "up at 3.4 s")
 	await wait_seconds(0.4)
-	assert_false(dragon.untargetable, "down by 3.4 s")
+	assert_false(dragon.untargetable, "down by 3.8 s")
 
 
 func test_the_landing_misses_lucian_outside_the_circle() -> void:
@@ -323,10 +326,36 @@ func test_the_landing_misses_lucian_outside_the_circle() -> void:
 	assert_true(warned)
 	var spot := dragon.global_position
 	lucian.global_position = spot + Vector2(400, 0)
-	await wait_seconds(1.0)
+	await wait_seconds(1.4)
 	assert_eq(_hits(&"sky_dive").size(), 0)
 	assert_eq(lucian.global_position, spot + Vector2(400, 0), "no push")
 	assert_false(dragon.untargetable, "it lands all the same")
+
+
+func test_it_lands_on_its_own_timer_even_if_its_warning_is_gone() -> void:
+	var dragon := _elder(Vector2.ZERO)
+	lucian.global_position = Vector2(400, 0)
+	await wait_physics_frames(1)
+	_dive(dragon)
+	var warned: bool = await wait_until(func() -> bool: return _effects(GroundWarning).size() == 1, 3.0)
+	assert_true(warned)
+	if not warned:
+		return
+	var spot := dragon.global_position
+	lucian.global_position = spot + Vector2(100, 0)
+	# Clean-up code clearing the warnings' layer mid-fall.
+	_effects(GroundWarning)[0].free()
+	var landed: bool = await wait_until(func() -> bool: return not dragon.is_diving(), 1.6)
+	assert_true(landed, "it lands all the same")
+	assert_false(dragon.untargetable)
+	assert_true(Lucian.is_target(dragon))
+	assert_eq(dragon.visuals.modulate.a, 1.0, "seen again")
+	assert_eq(dragon.health_bar.modulate.a, 1.0)
+	assert_eq(dragon.global_position, spot, "where it fell")
+	assert_eq(_hits(&"sky_dive").size(), 1, "the hit still lands on him in the circle")
+	await wait_seconds(0.3)
+	assert_eq(_hits(&"sky_dive").size(), 1, "once")
+	assert_engine_error_count(0)
 
 
 func test_the_boss_bar_keeps_it_through_the_dive() -> void:
@@ -364,7 +393,7 @@ func test_lucians_attack_order_holds_through_the_dive_and_he_shoots_once_it_land
 	assert_eq(lucian._order, Lucian.Order.ATTACK, "the order holds")
 	assert_eq(lucian._target, dragon)
 	assert_eq(dragon.hp, hp)
-	var landed: bool = await wait_until(func() -> bool: return not dragon.untargetable, 2.5)
+	var landed: bool = await wait_until(func() -> bool: return not dragon.untargetable, 3.0)
 	assert_true(landed)
 	var hit_again: bool = await wait_until(func() -> bool: return dragon.hp < hp, 2.0)
 	assert_true(hit_again, "he shoots again once it lands")
@@ -606,7 +635,7 @@ func test_a_dragon_killed_mid_dive_never_lands_and_nothing_breaks() -> void:
 	_shoot(stage, dragon, 99999.0)
 	await wait_physics_frames(3)
 	assert_true(dragon.dead, "killed mid-dive")
-	await wait_seconds(0.8)
+	await wait_seconds(1.2)
 	assert_eq(hits.filter(func(info: DamageInfo) -> bool: return info.source == &"sky_dive").size(), 0, "it never lands")
 	assert_engine_error_count(0)
 
@@ -636,7 +665,7 @@ func test_a_dive_in_the_pit_lands_clear_of_the_rocks() -> void:
 	stage.lucian.global_position = rock + Vector2(130, 0)
 	await wait_physics_frames(1)
 	_dive(dragon)
-	var landed: bool = await wait_until(func() -> bool: return not dragon.is_diving(), 4.0)
+	var landed: bool = await wait_until(func() -> bool: return not dragon.is_diving(), 5.0)
 	assert_true(landed)
 	assert_true(stage.arena.is_walkable(dragon.global_position, dragon.radius), "on open ground")
 	assert_lt(dragon.global_position.distance_to(stage.arena.boss_point), DragonPitMap.FLOOR_RADIUS, "inside the pit")
