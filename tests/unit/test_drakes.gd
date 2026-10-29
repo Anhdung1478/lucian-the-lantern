@@ -337,6 +337,25 @@ func test_the_wave_is_wide() -> void:
 	assert_true(hit)
 
 
+## Drawn as a 180-wide wave front, not a ball; it still hits within 90 of
+## its center. The water shot stays a ball.
+func test_the_wave_is_drawn_as_a_wide_front() -> void:
+	var drake := _ocean(Vector2.ZERO)
+	lucian.global_position = Vector2(900, 0)
+	await wait_physics_frames(1)
+	drake._attack()
+	var shots := _effects(EnemyProjectile)
+	assert_eq(shots.size(), 1)
+	assert_eq(shots[0].front_width, 0.0, "the water shot is a ball")
+	drake.tidal_wave()
+	var waves := []
+	await wait_until(func() -> bool:
+		waves.assign(_effects(EnemyProjectile).filter(func(bolt: EnemyProjectile) -> bool: return bolt.info.source == &"tidal_wave"))
+		return not waves.is_empty(), 1.5)
+	assert_eq(waves.size(), 1, "the wave is out")
+	assert_eq([waves[0].front_width, waves[0].hit_radius], [180.0, 90.0])
+
+
 func test_soothing_mist_waits_for_70_percent_hp() -> void:
 	var drake := _ocean(Vector2(3000, 0))
 	assert_false(drake._can_use(&"soothing_mist"), "full HP")

@@ -135,6 +135,7 @@ func _send_wave(toward: Vector2) -> void:
 		return
 	var wave := fire_bolt(skill_hit(WAVE_DAMAGE, DamageInfo.Type.MAGIC, &"tidal_wave"), WAVE_SPEED, WAVE_LENGTH, toward)
 	wave.hit_radius = WAVE_WIDTH * 0.5
+	wave.front_width = WAVE_WIDTH
 	wave.color = WATER
 	wave.hit_lucian.connect(_wave_hit.bind(toward))
 

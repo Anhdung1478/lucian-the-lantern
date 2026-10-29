@@ -45,10 +45,11 @@ const RIVERBED_TOP := 900.0
 const RIVERBED_BOTTOM := 2530.0
 const LAVA_STAGE := 2
 const WATER_STAGE := 4
-## Stage 2: lava pools (x, y, radius) in the pit, the center clearing, on the
-## middle path and the river; Blast Cones on the middle and low paths, each
-## 260 from the 480-thick jungle of a loop it throws Lucian over.
-const LAVA_POOLS: Array[Vector3] = [Vector3(2600, 620, 160), Vector3(3020, 760, 150), Vector3(3000, 1680, 150), Vector3(2480, 1800, 150), Vector3(2870, 1300, 140)]
+## Stage 2: lava pools (x, y, radius) at the back of the pit (behind the
+## drake, leaving the floor in front of it open), in the center clearing, on
+## the middle path and the river; Blast Cones on the middle and low paths,
+## each 260 from the 480-thick jungle of a loop it throws Lucian over.
+const LAVA_POOLS: Array[Vector3] = [Vector3(2580, 480, 140), Vector3(3020, 480, 140), Vector3(3000, 1680, 150), Vector3(2480, 1800, 150), Vector3(2870, 1300, 140)]
 const BLAST_CONES: Array[Vector2] = [Vector2(1950, 1800), Vector2(2250, 2800), Vector2(3650, 1800), Vector2(3350, 2800)]
 ## Stage 4: Honeyfruit on the side and low paths.
 const HONEYFRUITS: Array[Vector2] = [Vector2(1500, 1300), Vector2(4100, 1300), Vector2(2150, 2750), Vector2(3450, 2750)]

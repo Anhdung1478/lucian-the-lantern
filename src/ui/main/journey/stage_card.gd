@@ -39,7 +39,8 @@ func _init(stage: int, waves: int, kind: StringName) -> void:
 	if kind == &"boss":
 		text += " + boss wave"
 	elif kind == &"mini_boss":
-		text += " + mini boss wave"
+		# The mini boss comes last in the last wave, not in a wave of its own.
+		text += " + mini boss"
 	waves_label = UiStyle.label(text, 18, UiStyle.TEXT_COLOR)
 	waves_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	waves_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

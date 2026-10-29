@@ -238,6 +238,16 @@ func test_it_regrows_at_20_s() -> void:
 	assert_false(lucian.is_launched(), "the first pop was out of reach")
 
 
+## Its art is 108 px wide: a click on a leaf tip, 46 from its middle, picks
+## it; one just past the leaves doesn't.
+func test_a_click_on_a_leaf_tip_picks_it() -> void:
+	var cone := _cone(_map())
+	assert_eq(BlastCone.ART.get_width(), 108)
+	assert_eq(lucian.enemy_at(cone.global_position + Vector2(46, 0)), cone)
+	assert_eq(lucian.enemy_at(cone.global_position + Vector2(0, -46)), cone)
+	assert_null(lucian.enemy_at(cone.global_position + Vector2(60, 0)))
+
+
 func test_a_burn_tick_does_not_pop_it() -> void:
 	var cone := _cone(_map())
 	var tick := _hit()

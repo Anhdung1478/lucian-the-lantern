@@ -97,6 +97,14 @@ func test_cards_say_their_waves() -> void:
 	assert_eq(section.act_pages[1].cards[2].waves_label.text, "3 waves + boss wave")
 
 
+## A drake comes last in its stage's last wave, not in a wave of its own.
+func test_a_mini_boss_card_puts_it_in_the_last_wave() -> void:
+	var cards := section.act_pages[2].cards
+	assert_eq(cards[1].waves_label.text, "4 waves + mini boss")
+	assert_eq(cards[3].waves_label.text, "5 waves + mini boss")
+	assert_eq(cards[4].waves_label.text, "5 waves + boss wave")
+
+
 func test_start_training_emits_the_signal() -> void:
 	watch_signals(section)
 	section.training_page.start_button.pressed.emit()

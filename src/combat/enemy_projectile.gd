@@ -7,6 +7,14 @@ extends Area2D
 ## The shot hit Lucian and he took it (not blocked).
 signal hit_lucian
 
+## A wave front: how far its crest bows forward at the middle, its depth
+## behind the crest, the trailing wake's extra depth, and the points along it.
+const FRONT_BOW := 22.0
+const FRONT_DEPTH := 58.0
+const WAKE_DEPTH := 56.0
+const FRONT_POINTS := 18
+const FOAM := Color("eafcff")
+
 var info: DamageInfo
 var target: Lucian
 var direction := Vector2.RIGHT
@@ -14,6 +22,10 @@ var speed := 450.0
 var max_range := 600.0
 var hit_radius := 12.0
 var color := Color("c47cff")
+## Drawn as a wave front this wide across its travel (the Ocean Drake's Tidal
+## Wave), a crest of foam bowing forward, instead of a ball. 0 = a ball. The
+## look only: it still hits within hit_radius of its center.
+var front_width := 0.0
 ## Boomerang: flies back to this node after max_range.
 var return_to: Node2D
 ## Draws a chain back to this node (Thresh's hook).
@@ -77,5 +89,37 @@ func _physics_process(delta: float) -> void:
 func _draw() -> void:
 	if is_instance_valid(tether):
 		draw_line(Vector2.ZERO, to_local(tether.global_position), color, 4.0)
+	if front_width > 0.0:
+		_draw_front()
+		return
 	draw_circle(Vector2.ZERO, hit_radius, Color(color, 0.35))
 	draw_circle(Vector2.ZERO, hit_radius * 0.55, color)
+
+
+## A crescent across its travel (+X here): a faint wake, the water fading
+## back from the crest, then the foam along the crest. Its ends taper to a
+## point at front_width / 2 each side.
+func _draw_front() -> void:
+	var half := front_width * 0.5
+	var crest := PackedVector2Array()
+	for i in FRONT_POINTS + 1:
+		var t := lerpf(-1.0, 1.0, float(i) / FRONT_POINTS)
+		crest.append(Vector2(FRONT_BOW * (1.0 - t * t), half * t))
+	for layer: Array in [[FRONT_DEPTH + WAKE_DEPTH, 0.3, 0.0], [FRONT_DEPTH, 0.9, 0.2]]:
+		var depth: float = layer[0]
+		var crest_alpha: float = layer[1]
+		var back_alpha: float = layer[2]
+		var points := crest.duplicate()
+		var colors := PackedColorArray()
+		colors.resize(points.size())
+		colors.fill(Color(color, crest_alpha))
+		# Back along the inside, end to end, skipping the tips (already in).
+		for i in range(FRONT_POINTS - 1, 0, -1):
+			var bow := 1.0 - crest[i].y * crest[i].y / (half * half)
+			points.append(crest[i] - Vector2(depth * sqrt(bow), 0.0))
+			colors.append(Color(color.darkened(0.35), back_alpha))
+		draw_polygon(points, colors)
+	draw_polyline(crest, Color(color.lightened(0.45), 0.6), 14.0, true)
+	draw_polyline(crest, FOAM, 5.0, true)
+	for i in range(2, FRONT_POINTS - 1, 3):
+		draw_circle(crest[i] - Vector2(10.0, 0.0), 3.5, Color(FOAM, 0.8))

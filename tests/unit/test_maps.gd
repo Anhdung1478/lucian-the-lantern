@@ -201,6 +201,20 @@ func test_terrain_sits_on_the_floor() -> void:
 		map.free()
 
 
+## 3-2's pit keeps its lava at the back, behind the drake: the middle of the
+## pit and the floor in front of it stay open for the fight.
+func test_the_pit_lava_stays_behind_the_drake() -> void:
+	var in_pit := 0
+	for pool in JungleMap.LAVA_POOLS:
+		var at := Vector2(pool.x, pool.y)
+		if at.distance_to(JungleMap.PIT) >= JungleMap.PIT_RADIUS:
+			continue
+		in_pit += 1
+		assert_lt(at.y, JungleMap.PIT.y, "%s is behind the pit's middle" % at)
+		assert_gt(at.distance_to(JungleMap.PIT) - pool.z, 150.0, "%s leaves the middle open" % at)
+	assert_eq(in_pit, 2)
+
+
 func test_lava_is_40_magic_a_second_and_water_slows_25_percent() -> void:
 	for stage in [2, 4]:
 		var map := JungleMap.new(stage)
@@ -276,14 +290,30 @@ func test_act_4_is_the_dark_mid_lane() -> void:
 		var map := StageMaps.create(4, stage)
 		assert_is(map, DarkMidLaneMap, str(stage))
 		assert_eq(map.wall_polygons.size(), 2)
-		assert_eq(map.lane_color, Color("2a2633"))
+		assert_eq(map.lane_color, Color("37313f"))
 		assert_eq(map.jungle_color, Color("120f1a"))
-		assert_eq(map.jungle_edge, Color("3b2a52"))
+		assert_eq(map.jungle_edge, Color("5e4285"))
 		assert_eq(map.tree_color, Color("0c0a12"))
-		assert_eq(map.river_color, Color("1d1630"))
-		assert_eq(map.river_edge, Color("7a4fb0"))
-		assert_eq(map.rock_color, Color("3a3742"))
+		assert_eq(map.river_color, Color("2a1f45"))
+		assert_eq(map.river_edge, Color("9467d0"))
+		assert_eq(map.rock_color, Color("4a4554"))
 		map.free()
+
+
+## Still dark (each color darker than Act 1's lane), but the lane and the
+## river stand apart from the jungle, and the rocks from the lane, so the
+## dark units have something to show on.
+func test_the_dark_lane_reads_against_its_jungle() -> void:
+	var map := DarkMidLaneMap.new()
+	var light := MidLaneMap.new()
+	for color: Color in [map.lane_color, map.river_color, map.rock_color, map.jungle_edge]:
+		assert_lt(color.get_luminance(), light.lane_color.get_luminance(), "%s stays dark" % color.to_html(false))
+	assert_gt(map.lane_color.get_luminance() - map.jungle_color.get_luminance(), 0.12, "lane vs jungle")
+	assert_gt(map.river_color.get_luminance() - map.jungle_color.get_luminance(), 0.07, "river vs jungle")
+	assert_gt(map.rock_color.get_luminance() - map.lane_color.get_luminance(), 0.05, "rocks vs lane")
+	assert_gt(map.jungle_edge.get_luminance() - map.jungle_color.get_luminance(), 0.15, "the jungle's edge")
+	map.free()
+	light.free()
 
 
 func test_the_dark_lane_keeps_act_1s_layout_and_act_1_keeps_its_colors() -> void:

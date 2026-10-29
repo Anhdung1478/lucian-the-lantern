@@ -14,10 +14,12 @@ extends Enemy
 ##
 ## Set `lucian` and `arena` (the map, for walkable ground) before adding it.
 
+## Drawn 108 px wide (its leaves reach about 46 from the middle).
 const ART := preload("res://assets/art/stage/blast_cone.svg")
 const GROUP := &"plants"
-## For clicks and attack range.
-const RADIUS := 32.0
+## For clicks and attack range: a click on a leaf tip (RADIUS +
+## Lucian.CLICK_SLACK) still picks it.
+const RADIUS := 36.0
 ## Lucian is thrown only this close to the plant.
 const REACH := 350.0
 const THROW_DISTANCE := 800.0
@@ -32,11 +34,17 @@ const REGROW_TIME := 20.0
 const STALK := Color("4f8a2e")
 const BUD := Color("8fa628")
 const OUTLINE := Color("1a1d24")
+## Ripe, a soft yellow glow under it, breathing GLOW_PULSE times a second.
+const GLOW := Color("f2f56a")
+const GLOW_RADIUS := 66.0
+const GLOW_PULSE := 0.6
 
 var lucian: Lucian
 var arena: StageMap
 
 var _regrow_left := 0.0
+## Seconds ripe, for the glow's breathing.
+var _ripe_time := 0.0
 ## Built in _ready (a cone freed unadded leaves nothing behind).
 var _hurtbox: Hurtbox
 var _bulb: Sprite2D
@@ -105,6 +113,9 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 		if _regrow_left <= 0.0:
 			_regrow()
+	else:
+		_ripe_time += delta
+		queue_redraw()
 
 
 func _pop() -> void:
@@ -143,6 +154,10 @@ func _regrow() -> void:
 func _draw() -> void:
 	super()
 	if not dead:
+		# Rings fading out from the bulb, under the art.
+		var breath := 0.8 + 0.2 * sin(_ripe_time * TAU * GLOW_PULSE)
+		for i in 5:
+			draw_circle(Vector2.ZERO, GLOW_RADIUS * breath * (1.0 - i * 0.16), Color(GLOW, 0.09))
 		return
 	# Regrowing: a stem with a bud swelling back.
 	var grown := 1.0 - _regrow_left / REGROW_TIME

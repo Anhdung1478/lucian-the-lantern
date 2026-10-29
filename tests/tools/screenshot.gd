@@ -15,6 +15,8 @@ const ACT_SCENARIOS := {
 	"act1_lesson": [1, 1], "act1_thresh": [1, 1], "act1_cutscene": [1, 1], "act1_result": [1, 1], "game_over": [1, 1],
 	"act2_pillars": [2, 3], "act2_super": [2, 1], "akshan_e": [2, 3], "akshan_r": [2, 3],
 	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
+	"attack_pick": [2, 1],
+	"act3_packs": [3, 1], "act3_elites": [3, 1], "act3_result": [3, 2],
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
 	"infernal_meteor": [3, 2], "ocean_mist": [3, 4], "elder_sky_dive": [3, 5], "elder_mark": [3, 5],
 	"act4_lane": [4, 1], "dark_lucian_q": [4, 3], "dark_lucian_r": [4, 3],
@@ -190,6 +192,14 @@ func _run(scenario: String) -> void:
 			await scenario_loot()
 		"guardian_angel":
 			await scenario_guardian_angel()
+		"attack_pick":
+			await scenario_attack_pick()
+		"act3_packs":
+			await scenario_act3_packs()
+		"act3_elites":
+			await scenario_act3_elites()
+		"act3_result":
+			await scenario_act3_result()
 		"act3_jungle":
 			await scenario_act3_jungle()
 		"act3_water":
@@ -1591,17 +1601,32 @@ func kill_all() -> void:
 
 
 ## Skip (the HUD button) starts the next wave; once all of it has spawned,
-## Kill all ends it, again every 0.1 s until the runner has nobody left:
-## splits waiting for their spawn, a Scuttler on its way out, and an
-## untargetable boss (through boss_unit). Gives up after 30 s. The tips so
-## far go first, so the break's tip shows. Senna's lesson (the tutorial's
-## first break) is skipped unless `keep_lesson`.
+## kill_wave ends it. The tips so far go first, so the break's tip shows.
+## Senna's lesson (the tutorial's first break) is skipped unless
+## `keep_lesson`.
 func clear_wave(keep_lesson := false) -> void:
 	var game := game_stage()
 	game.skip_break()
-	while not game.runner._to_spawn.is_empty():
-		await wait(0.1)
+	await wait_for_spawns()
 	flush_tips()
+	await kill_wave()
+	await wait(0.1)
+	if game.cutscene is SennaTeachesE and not keep_lesson:
+		game.cutscene.skip()
+		await wait(0.1)
+
+
+## Until the wave in progress has spawned all of it.
+func wait_for_spawns() -> void:
+	while not game_stage().runner._to_spawn.is_empty():
+		await wait(0.1)
+
+
+## Kill all, again every 0.1 s until the runner has nobody left: splits
+## waiting for their spawn, a Scuttler on its way out, and an untargetable
+## boss (through boss_unit). Gives up after 30 s.
+func kill_wave() -> void:
+	var game := game_stage()
 	for step in 300:
 		if game.runner.alive() == 0:
 			break
@@ -1611,10 +1636,22 @@ func clear_wave(keep_lesson := false) -> void:
 			boss.set_untargetable(false)
 			boss.take_damage(lucian.make_damage(999999.0, DamageInfo.Type.TRUE, &"debug"))
 		await wait(0.1)
-	await wait(0.1)
-	if game.cutscene is SennaTeachesE and not keep_lesson:
-		game.cutscene.skip()
-		await wait(0.1)
+
+
+## Lucian really shoots `enemy` for `seconds`, so the end screen's Damage
+## dealt shows his hits (the debug kills don't count).
+func shoot_for(enemy: Enemy, seconds: float) -> void:
+	lucian.command_attack(enemy)
+	await wait(seconds)
+	print("Lucian's damage dealt so far: ", roundi(game_stage().stats.damage_dealt))
+
+
+## The end screen's stats column, as "Label value" pairs.
+func result_rows() -> String:
+	var rows := []
+	for row in game_stage().result._stats.get_children():
+		rows.append("%s %s" % [(row.get_child(0) as Label).text, (row.get_child(1) as Label).text])
+	return ", ".join(rows)
 
 
 func info_text() -> String:
@@ -1807,33 +1844,41 @@ func scenario_act1_cutscene() -> void:
 
 
 ## The cutscene skipped: STAGE CLEARED, first-clear purple, the E line and
-## "Act 2 is open".
+## "Act 2 is open". Lucian shoots Thresh for a while first, so Damage dealt
+## and Damage taken show real numbers.
 func scenario_act1_result() -> void:
 	var game := game_stage()
 	var thresh := await to_thresh()
-	await wait(0.5)
+	await shoot_for(thresh, 4.0)
 	thresh.take_damage(lucian.make_damage(thresh.max_hp, DamageInfo.Type.TRUE, &"debug"))
 	await wait(1.0)
 	game.cutscene.skip_button.pressed.emit()
 	await wait(0.4)
 	print("result (expect STAGE CLEARED): ", game.result.title.text, "  paused (expect true): ", paused)
 	print("reward lines: ", game.reward_lines)
+	print("stats (expect Damage dealt > 0): ", result_rows())
 	print("purple (expect 10), bosses (expect [thresh_1]): ", SaveGame.instance().essences.amount(Essences.PURPLE),
 		" ", SaveGame.instance().bosses, "  waves (expect 3 / 3): ", game.runner.waves_done(), " / ", game.runner.total_waves())
-	print("buttons (expect retry, next hidden and main lit): ", game.result.retry_button.visible, " ", game.result.next_button.visible, " ", game.result.main_button.text,
+	print("buttons (expect retry, next to 2-1 and main lit): ", game.result.retry_button.visible, " ", game.result.next_button.visible, " ", game.result.main_button.text,
 		"  HUD hidden (expect true): ", not game.hud.visible)
 	await shot("act1_result_0")
 	paused = false
 
 
-## Losing the tutorial: GAME OVER with a single Back to title.
+## Losing the tutorial: minions bring Lucian down as he shoots back, then
+## GAME OVER with a single Back to title.
 func scenario_game_over() -> void:
 	var game := game_stage()
-	await wait(0.5)
-	game.show_result(false)
-	await wait(0.2)
+	flush_tips()
+	surround(160.0)
+	# A + Left-click on open ground: the weakest in range.
+	lucian.command_attack_move(lucian.global_position)
+	while not lucian.dead:
+		await wait(0.05)
+	await wait(1.8)
 	print("result (expect GAME OVER): ", game.result.title.text, "  retry shown (expect false): ", game.result.retry_button.visible,
 		"  main button (expect Back to title): ", game.result.main_button.text)
+	print("stats (expect Damage dealt > 0): ", result_rows())
 	await shot("game_over_0")
 	paused = false
 
@@ -1849,6 +1894,182 @@ func scenario_act2_pillars() -> void:
 	game.camera.zoom = Vector2(0.42, 0.42)
 	await wait(0.2)
 	await shot("act2_pillars_1_ring")
+
+
+## Enemy `id` standing where it is put, at `share` of its HP; it never walks
+## or attacks. Outside the wave (the wave's countdown is held).
+func stand(id: StringName, at: Vector2, share := 1.0) -> EnemyUnit:
+	var unit := game_stage().spawn_enemy(id, at)
+	unit.move_speed = 0.0
+	unit._attack_left = 999.0
+	unit.hp = unit.max_hp * share
+	unit.health_bar.set_health(unit.hp, unit.max_hp)
+	return unit
+
+
+## A + Left-click, through the real keys and mouse. A pressed: the range
+## ring, the cursor on a minion beyond it. The click: Lucian walks past the
+## nearer, weaker minions to shoot that one. Then A + Left-click on open
+## ground: he shoots the lowest HP % in range (40%), not the nearest.
+func scenario_attack_pick() -> void:
+	var game := game_stage()
+	flush_tips()
+	game.runner._countdown = 999.0
+	var at := lucian.global_position + Vector2(0, -150)
+	blink(at)
+	var nearest := stand(WavePlan.MELEE, at + Vector2(-240, -170))
+	var weakest := stand(WavePlan.MELEE, at + Vector2(230, -330), 0.4)
+	var middle := stand(WavePlan.RANGED, at + Vector2(-10, -420), 0.7)
+	# Up and to the right, clear of the pillars, out of his range.
+	var far := stand(WavePlan.MELEE, at + Vector2(720, -560))
+	game.camera.mode = StageCamera.Mode.FREE
+	game.camera.zoom = Vector2(0.8, 0.8)
+	game.camera.global_position = at + Vector2(240, -300)
+	await wait(0.3)
+	await press_key(KEY_A, true)
+	await press_key(KEY_A, false)
+	await mouse_move(world_to_canvas(far.global_position))
+	await wait(0.2)
+	print("in range (expect nearest, weakest, middle yes; far no): ", [nearest, weakest, middle, far].map(func(unit: EnemyUnit) -> bool: return lucian._in_range(unit)))
+	await shot("attack_pick_0_armed")
+	await mouse_button(world_to_canvas(far.global_position), true)
+	await mouse_button(world_to_canvas(far.global_position), false)
+	print("hovered target (expect the far one): ", lucian._target == far, "  order ATTACK: ", lucian._order == Lucian.Order.ATTACK)
+	while not lucian._in_range(far):
+		await wait(0.05)
+	await wait(1.2)
+	print("far hit (expect < 100%%): %d%%  the others untouched (expect 100, 40, 70): %s" % [roundi(100.0 * far.hp / far.max_hp),
+		[nearest, weakest, middle].map(func(unit: EnemyUnit) -> int: return roundi(100.0 * unit.hp / unit.max_hp))])
+	await shot("attack_pick_1_hovered")
+	# Gone without a kill (no loot on the floor), and Lucian back in place.
+	far.remove_from_group(&"enemies")
+	far.queue_free()
+	lucian.command_move(at)
+	blink(at)
+	await wait(0.4)
+	# The cursor on open ground, left of Lucian, away from every minion.
+	var ground := world_to_canvas(at + Vector2(-420, -60))
+	await press_key(KEY_A, true)
+	await press_key(KEY_A, false)
+	await mouse_move(ground)
+	await mouse_button(ground, true)
+	await mouse_button(ground, false)
+	print("weakest in range picked (expect true): ", lucian._target == weakest, "  nearest is nearer (expect true): ",
+		at.distance_to(nearest.global_position) < at.distance_to(weakest.global_position))
+	await wait(1.6)
+	print("weakest now (expect < 40%%): %d%%" % roundi(100.0 * weakest.hp / weakest.max_hp))
+	await shot("attack_pick_2_weakest")
+
+
+## 3-1's first wave: the raptors and the wolves come out of their camps at
+## the left and walk the jungle paths to Lucian; then the raptors wrap round
+## him and the wolves come in from his side.
+func scenario_act3_packs() -> void:
+	var game := game_stage()
+	print("stage info (expect Stage 3-1 · The Jungle  Wave 1 in …): ", info_text())
+	# On the middle path, at its crossing with the left side path.
+	blink(Vector2(JungleMap.LEFT_X, JungleMap.MID_Y))
+	game.skip_break()
+	flush_tips()
+	await wait_for_spawns()
+	await wait(1.2)
+	game.camera.mode = StageCamera.Mode.FREE
+	game.camera.zoom = Vector2(0.5, 0.5)
+	game.camera.global_position = Vector2(1250, 1400)
+	await wait(0.1)
+	var camps := {}
+	for enemy: Node in get_nodes_in_group(&"enemies"):
+		var data := (enemy as EnemyUnit).data
+		camps[data.camp] = camps.get(data.camp, 0) + 1
+	print("stage info (expect Wave 1/3  Enemies: 8): ", info_text(), "  by camp (expect raptors 5, wolves 3): ", camps)
+	await shot("act3_packs_0_camps")
+	var hits := [0]
+	lucian.damage_received.connect(func(_info: DamageInfo, _amount: float) -> void: hits[0] += 1)
+	while hits[0] < 6:
+		await wait(0.1)
+	game.camera.zoom = Vector2.ONE
+	game.camera.global_position = lucian.global_position
+	await wait(0.5)
+	var near := get_nodes_in_group(&"enemies").filter(func(enemy: Node2D) -> bool: return enemy.global_position.distance_to(lucian.global_position) < 260.0)
+	print("around Lucian (within 260): ", near.size(), "  HP: ", roundi(lucian.hp))
+	await shot("act3_packs_1_wrap")
+
+
+## Act 3's elites, with wave 1 held: Blue and Red die (a debug kill) and
+## leave their buffs in the HUD's row; Lucian's attacks with Red burn and
+## slow a raptor. A big Krug splits into two. The Rift Scuttler runs and
+## gets away: "Escaped!".
+func scenario_act3_elites() -> void:
+	var game := game_stage()
+	flush_tips()
+	game.runner._countdown = 999.0
+	var at := lucian.global_position
+	game.camera.mode = StageCamera.Mode.FREE
+	game.camera.global_position = at + Vector2(0, -170)
+	var blue := stand(&"blue_sentinel", at + Vector2(-320, -220))
+	var red := stand(&"red_brambleback", at + Vector2(320, -220))
+	await wait(0.3)
+	for elite: EnemyUnit in [blue, red]:
+		finish(elite)
+	await wait(0.3)
+	var raptor := stand(&"raptor_big", at + Vector2(40, -320))
+	await shoot_for(raptor, 1.6)
+	print("buffs (expect blue_buff, red_buff): ", lucian.buffs().map(func(buff: Dictionary) -> StringName: return buff.id),
+		"  raptor burning and slowed (expect true, true): ", raptor.has_status(Enemy.BURN), " ", raptor.has_status(Enemy.SLOW))
+	await shot("act3_elites_0_buffs")
+	finish(raptor)
+	var krug := stand(&"krug_big", at + Vector2(0, -330))
+	await wait(0.6)
+	finish(krug)
+	await wait(0.25)
+	var krugs := get_nodes_in_group(&"enemies").filter(func(enemy: Node) -> bool: return (enemy as EnemyUnit).data.id == &"krug")
+	print("small Krugs from the split (expect 2): ", krugs.size())
+	await shot("act3_elites_1_split")
+	for small: EnemyUnit in krugs:
+		finish(small)
+	var scuttler := game.spawn_enemy(&"rift_scuttler", at + Vector2(0, -220))
+	await wait(1.6)
+	print("Scuttler ran (expect > 300 away): ", roundi(scuttler.global_position.distance_to(at)))
+	game.camera.global_position = (at + scuttler.global_position) * 0.5
+	await wait(0.05)
+	await shot("act3_elites_2_scuttler")
+	while not scuttler.has_escaped:
+		await wait(0.05)
+	# It fades out in 0.4 s, then is gone: look now.
+	print("escaped after 15 s (expect true): ", scuttler.has_escaped, "  enemies left (expect 0): ", get_nodes_in_group(&"enemies").size())
+	game.camera.global_position = scuttler.global_position + Vector2(0, -60)
+	await wait(0.12)
+	await shot("act3_elites_3_escaped")
+
+
+## Ends `unit` with a debug hit of exactly its HP left (a kill, with its
+## rewards and its death's effects).
+func finish(unit: EnemyUnit) -> void:
+	unit.take_damage(lucian.make_damage(ceilf(unit.hp) + 1.0, DamageInfo.Type.TRUE, &"debug"))
+
+
+## 3-2 cleared: the Infernal Drake's first-kill purple, "Stage 3-3 is open"
+## and Next stage. Lucian shoots the drake for real before the debug kills,
+## so Damage dealt shows his hits.
+func scenario_act3_result() -> void:
+	var game := game_stage()
+	for i in 3:
+		await clear_wave()
+	game.skip_break()
+	await wait_for_spawns()
+	flush_tips()
+	var drakes := get_nodes_in_group(&"enemies").filter(func(enemy: Node) -> bool: return enemy is InfernalDrake)
+	var drake: InfernalDrake = drakes[0]
+	blink(drake.global_position + Vector2(0, 520))
+	await shoot_for(drake, 5.0)
+	await kill_wave()
+	await wait(0.6)
+	print("result (expect STAGE CLEARED): ", game.result.title.text, "  waves (expect 4 / 4): ", game.runner.waves_done(), " / ", game.runner.total_waves())
+	print("reward lines (expect +5 purple … first kill, Stage 3-3 is open): ", game.reward_lines)
+	print("stats (expect Damage dealt > 0): ", result_rows())
+	print("buttons (expect retry, next and main): ", game.result.retry_button.visible, " ", game.result.next_button.visible, " ", game.result.main_button.text)
+	await shot("act3_result_0")
+	paused = false
 
 
 ## The whole of an Act 3 map, the camera zoomed out over it.
@@ -1887,7 +2108,8 @@ func scenario_act3_jungle() -> void:
 
 
 ## 3-4's jungle: the riverbed of shallow water and the Honeyfruit; Lucian
-## wading in the river, slowed.
+## wading in the river, slowed. Then, hurt, he walks onto a Honeyfruit: it
+## heals him and is an empty stalk until it regrows.
 func scenario_act3_water() -> void:
 	var game := game_stage()
 	await whole_map("act3_water_0_map")
@@ -1897,6 +2119,24 @@ func scenario_act3_water() -> void:
 	await wait(0.3)
 	print("slowed in the water (expect 0.25): ", lucian.slow_amount())
 	await shot("act3_water_1_wading")
+	var fruit_at := JungleMap.HONEYFRUITS[2]
+	var fruit: Honeyfruit = stage.get_node("World").get_children().filter(func(node: Node) -> bool:
+		return node is Honeyfruit and node.position.distance_to(fruit_at) < 1.0)[0]
+	blink(fruit_at + Vector2(-260, 0))
+	lucian.hp = lucian.stats.max_hp * 0.35
+	game.camera.zoom = Vector2(1.4, 1.4)
+	await wait(0.3)
+	await shot("act3_water_2_honeyfruit")
+	var hp := lucian.hp
+	# Over it and on, so the empty stalk shows behind him.
+	game.camera.mode = StageCamera.Mode.FREE
+	game.camera.global_position = fruit_at + Vector2(60, 0)
+	lucian.command_move(fruit_at + Vector2(240, 0))
+	while fruit.is_ripe():
+		await wait(0.02)
+	await wait(0.4)
+	print("healed (expect 100 + 6%% of %d = %d): %d" % [roundi(lucian.stats.max_hp), roundi(100.0 + 0.06 * lucian.stats.max_hp), roundi(lucian.hp - hp)])
+	await shot("act3_water_3_eaten")
 
 
 ## 3-5's pit: the round floor, its rock ring in 8 pieces and 6 rocks; then
@@ -1911,15 +2151,16 @@ func scenario_act3_pit() -> void:
 	await shot("act3_pit_1_start")
 
 
-## A drake in the jungle's pit, Lucian below it, the camera between them.
+## A drake where it comes out (the middle of the jungle's pit), Lucian in
+## the pit's mouth below it, the camera between them.
 func to_drake(id: StringName) -> Boss:
 	var game := game_stage()
 	flush_tips()
-	blink(JungleMap.PIT + Vector2(0, 250))
+	blink(JungleMap.PIT + Vector2(0, 420))
 	game.camera.mode = StageCamera.Mode.FREE
-	game.camera.global_position = JungleMap.PIT + Vector2(0, 60)
+	game.camera.global_position = JungleMap.PIT + Vector2(0, 190)
 	game.camera.zoom = Vector2(0.8, 0.8)
-	var drake := game.spawn_enemy(id, JungleMap.PIT + Vector2(0, -180)) as Boss
+	var drake := game.spawn_enemy(id, JungleMap.PIT) as Boss
 	drake.move_speed = 0.0
 	for skill: StringName in drake._cooldowns:
 		drake._cooldowns[skill] = 60.0
@@ -2072,17 +2313,18 @@ func scenario_act4_lane() -> void:
 
 
 ## Dark Lucian at the river on 4-3's dark lane, Lucian down the lane from
-## him, the camera between them (the mouse in the middle, so it doesn't pan).
-## He doesn't shoot and his skills wait; wave 1 waits too.
+## him, past the rock there, the camera between them (the mouse in the
+## middle, so it doesn't pan). He doesn't shoot and his skills wait; wave 1
+## waits too.
 func to_dark_lucian() -> DarkLucian:
 	var game := game_stage()
 	flush_tips()
 	await mouse_move(Vector2(960, 540))
 	game.runner._countdown = 999.0
 	var lane := map_lane()
-	blink(lane.boss_point - lane.along() * 450.0)
+	blink(lane.boss_point - lane.along() * 600.0)
 	game.camera.mode = StageCamera.Mode.FREE
-	game.camera.global_position = lane.boss_point - lane.along() * 225.0
+	game.camera.global_position = lane.boss_point - lane.along() * 300.0
 	game.camera.zoom = Vector2(0.8, 0.8)
 	var dark := game.spawn_enemy(&"dark_lucian", lane.boss_point) as DarkLucian
 	dark.move_speed = 0.0
@@ -2120,6 +2362,7 @@ func scenario_dark_lucian_q() -> void:
 ## takes Dark Lucian aside after a burst of damage, half seen, a violet trail
 ## behind him.
 func scenario_dark_lucian_r() -> void:
+	var game := game_stage()
 	var dark := await to_dark_lucian()
 	dark.hp = dark.max_hp * 0.75
 	dark.health_bar.set_health(dark.hp, dark.max_hp)
@@ -2138,6 +2381,8 @@ func scenario_dark_lucian_r() -> void:
 		await wait(0.05)
 	print("bullets on Lucian after his step (expect 0): ", culled[0])
 	dark._attack_left = 999.0
+	# Over him: the dodge goes sideways, toward the top of the view.
+	game.camera.global_position = dark.global_position
 	dark._cooldowns[&"relentless_pursuit"] = 0.0
 	dark.take_damage(lucian.make_damage(1100.0, DamageInfo.Type.TRUE, &"debug"))
 	while not dark.is_dashing():
@@ -2234,13 +2479,14 @@ func surround(hp: float) -> void:
 	lucian.hp = hp
 
 
-## Lucian dies to minions in stage 2-1's second wave: grey and fading, then
-## DEFEATED.
+## Lucian dies to minions in stage 2-1's second wave, shooting back: grey
+## and fading, then DEFEATED.
 func scenario_defeat() -> void:
 	var game := game_stage()
 	await clear_wave()
 	game.skip_break()
-	surround(30.0)
+	surround(220.0)
+	lucian.command_attack_move(lucian.global_position)
 	while not lucian.dead:
 		await wait(0.05)
 	await wait(0.6)
@@ -2251,6 +2497,7 @@ func scenario_defeat() -> void:
 	print("result (expect DEFEATED): ", game.result.title.text, "  waves (expect 1 / 2): ", game.runner.waves_done(), " / ", game.runner.total_waves())
 	print("blue kept in the save (expect %d): %d" % [blue, SaveGame.instance().essences.amount(Essences.BLUE)])
 	print("buttons (expect Retry shown, Next hidden): ", game.result.retry_button.visible, " ", game.result.next_button.visible)
+	print("stats (expect Damage dealt > 0): ", result_rows())
 	await shot("defeat_1_result")
 	paused = false
 
