@@ -26,6 +26,8 @@ var picked: JourneyNode
 var focus_act := 0
 ## The map opens on Endless instead (after an Endless run), when it is open.
 var focus_endless := false
+## Endless's chosen map when the section opens (the last run's choice).
+var endless_map := EndlessPlan.RANDOM
 
 
 func _ready() -> void:
@@ -37,6 +39,7 @@ func _ready() -> void:
 	panel.position = PANEL_RECT.position
 	panel.start_pressed.connect(_on_start)
 	add_child(panel)
+	panel.choose_map(endless_map)
 	SaveGame.instance().changed.connect(refresh)
 	refresh()
 	if focus_endless and not map.endless.locked:

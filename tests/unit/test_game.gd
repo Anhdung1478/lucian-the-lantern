@@ -460,6 +460,18 @@ func test_main_screen_after_a_run_opens_the_journey_on_endless() -> void:
 	assert_true(FileAccess.file_exists(SaveGame.instance().path(1)))
 
 
+func test_main_screen_after_a_run_keeps_its_map_chosen() -> void:
+	var stage: Stage = await _endless_run()
+	stage.show_result(false)
+	stage.result.main_button.pressed.emit()
+	await wait_process_frames(2)
+	var panel := _journey().panel
+	assert_eq(panel.map_choice(), JUNGLE)
+	assert_eq(panel.thumbnail.choice, JUNGLE)
+	assert_true(panel.map_buttons[JUNGLE].button_pressed)
+	assert_false(panel.map_buttons[EndlessPlan.RANDOM].button_pressed)
+
+
 func test_leaving_an_endless_run_asks_its_own_question_and_saves_the_best() -> void:
 	var stage: Stage = await _endless_run()
 	# A wave won records the best in memory.

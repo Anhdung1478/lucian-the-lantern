@@ -312,7 +312,7 @@ func _build_endless() -> void:
 		chip.button_group = group
 		chip.button_pressed = i == 0
 		chip.custom_minimum_size = Vector2(0, CHIP_HEIGHT)
-		chip.pressed.connect(_choose.bind(i))
+		chip.pressed.connect(choose_map.bind(i))
 		chips.add_child(chip)
 		map_buttons.append(chip)
 	_style_chips()
@@ -320,7 +320,9 @@ func _build_endless() -> void:
 	endless_box.add_child(thumbnail)
 
 
-func _choose(index: int) -> void:
+## Endless's map chip `index` (a Journey.ENDLESS_MAPS index) is the chosen
+## one, with its thumbnail, as a click on it does.
+func choose_map(index: int) -> void:
 	_choice = index
 	for i in map_buttons.size():
 		map_buttons[i].set_pressed_no_signal(i == index)
