@@ -464,6 +464,12 @@ func _new_unit(data: EnemyData) -> EnemyUnit:
 			return DarkLucian.new()
 		&"karthus":
 			return Karthus.new()
+		&"karthus_revived":
+			var revived := Karthus.new()
+			revived.revived = true
+			return revived
+		&"hecarim":
+			return Hecarim.new()
 		&"swarm", &"flank", &"brute", &"spit", &"flee":
 			return Monster.new()
 		&"bomber", &"charger", &"warden":

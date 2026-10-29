@@ -32,7 +32,7 @@ var cleared: Array[String] = []
 var endless_best := 0
 ## Bosses and mini bosses with a first-time purple reward, by id (some
 ## before their data files exist).
-const BOSS_IDS: Array[String] = ["thresh_1", "akshan", "infernal_drake", "ocean_drake", "elder_dragon", "dark_lucian", "maokai", "elise", "karthus"]
+const BOSS_IDS: Array[String] = ["thresh_1", "akshan", "infernal_drake", "ocean_drake", "elder_dragon", "dark_lucian", "maokai", "elise", "karthus", "karthus_revived", "hecarim"]
 
 ## Boss ids that already gave their first-time purple.
 var bosses: Array[String] = []

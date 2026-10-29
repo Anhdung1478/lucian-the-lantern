@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/karthus.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"karthus_revived"
+display_name = "Karthus, Revived"
+kind = &"mini_boss"
+behavior = &"karthus_revived"
+art = ExtResource("2_art")
+tint = Color(0.62, 0.95, 0.92, 1)
+max_hp = 16000.0
+armor = 30.0
+mr = 60.0
+damage = 85.0
+damage_type = 1
+attack_range = 600.0
+attack_interval = 1.5
+move_speed = 250.0
+radius = 46.0
+gold = 300
+projectile_speed = 900.0
+purple_first = 5
+purple_repeat = 1
+camp = &"karthus_revived"

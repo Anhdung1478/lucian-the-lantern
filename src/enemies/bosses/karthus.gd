@@ -8,6 +8,11 @@ extends Boss
 ## damage during it breaks it, else Lucian takes a heavy hit. The damage is
 ## counted in _lose_hp and acted on in _physics_process, never inside a damage
 ## path. The circles after the first are laid from _physics_process too.
+##
+## The revived Karthus (Act 6, 6-2; `revived`) has Lay Waste with fewer, harder
+## circles and Defile, an aura always on him, and neither Wall of Pain nor
+## Requiem. Defile reaches only DEFILE_RADIUS, so he keeps walking at Lucian
+## while he fires, until he is REVIVED_STOP away.
 
 const LAY_COUNT := 5
 const LAY_RADIUS := 110.0
@@ -37,6 +42,19 @@ const REQUIEM_TIME := 3.0
 ## The share of max HP in damage during the channel that breaks it.
 const REQUIEM_BREAK := 0.08
 const REQUIEM_DAMAGE := 900.0
+## The revived Karthus: four circles of 120.
+const REVIVED_LAY_COUNT := 4
+const REVIVED_LAY_DAMAGE := 120.0
+## Defile: an aura round him, always on. It burns Lucian inside it for
+## DEFILE_DPS magic a second (a tick every 0.5 s: BurnSet).
+const DEFILE_RADIUS := 350.0
+const DEFILE_DPS := 80.0
+## Lucian's burn id for it (apart from lava's burning_ground).
+const DEFILE_ID := &"defile"
+const DEFILE_COLOR := Color("a45bd6")
+## He walks in until Lucian is this far away: inside Defile, with a margin so
+## he does not have to stand on him.
+const REVIVED_STOP := 280.0
 ## Seconds it stands after a skill's warning ends.
 const RECOVER := 0.3
 const BROKEN_COLOR := Color("ffd166")
@@ -48,7 +66,7 @@ const RING_MIN := 60.0
 const RING_MAX := 90.0
 const PULSE_RATE := 2.0
 
-## The revived Karthus of a later act; nothing reads it yet.
+## The revived Karthus of Act 6: Lay Waste and Defile (the stage sets it).
 var revived := false
 
 var _channel_left := 0.0
@@ -58,14 +76,24 @@ var _channel_damage := 0.0
 var _requiems := 0
 ## Circles still to lay: {"at": Vector2, "wait": seconds}.
 var _lay_queue: Array[Dictionary] = []
+## Defile's burn zone, under warning_parent; made on his first frame.
+var _defile: HazardZone
 
 
 func _ready() -> void:
 	super()
+	if revived:
+		add_skill(&"lay_waste", LAY_COOLDOWN, LAY_REACH, LAY_FIRST, lay_waste)
+		return
 	# Tried first: at its HP, Requiem comes before anything else.
 	add_skill(&"requiem", 0.0, INF, 0.0, requiem)
 	add_skill(&"lay_waste", LAY_COOLDOWN, LAY_REACH, LAY_FIRST, lay_waste)
 	add_skill(&"wall_of_pain", WALL_COOLDOWN, WALL_LENGTH, WALL_FIRST, wall_of_pain)
+
+
+## The radius of Defile's ring on him: 0 for the Act 5 Karthus.
+func defile_ring_radius() -> float:
+	return DEFILE_RADIUS if revived else 0.0
 
 
 func is_channeling() -> bool:
@@ -94,7 +122,7 @@ func lay_waste() -> float:
 ## `center`, after LAY_TRIES misses).
 func lay_spots(center: Vector2) -> Array[Vector2]:
 	var spots: Array[Vector2] = [center]
-	for i in LAY_COUNT - 1:
+	for i in (REVIVED_LAY_COUNT if revived else LAY_COUNT) - 1:
 		var spot := center
 		for attempt in LAY_TRIES:
 			var tried := center + Vector2.from_angle(randf() * TAU) * LAY_SPREAD * sqrt(randf())
@@ -151,6 +179,7 @@ func _physics_process(delta: float) -> void:
 	super(delta)
 	if not is_alive():
 		return
+	_keep_defile()
 	_lay_due(delta)
 	if not is_channeling():
 		return
@@ -161,6 +190,46 @@ func _physics_process(delta: float) -> void:
 	queue_redraw()
 	if _channel_left <= 0.0:
 		_finish_requiem()
+
+
+## The revived Karthus walks on while he fires: past his bolt range, in to
+## REVIVED_STOP. (The base walks only to its attack range, then stands.)
+func _think(delta: float) -> void:
+	super(delta)
+	# Past the bolt range the base already walked: only the last stretch is his.
+	if revived and busy_left <= 0.0 and can_fight() and distance_to_target() > REVIVED_STOP 			and distance_to_target() <= attack_range + Lucian.HIT_RADIUS:
+		walk_toward(target.global_position, delta)
+
+
+## Defile, on every frame: the zone is made on the first (a sibling can't be
+## added while the stage is still adding him) and kept on him.
+func _keep_defile() -> void:
+	if not revived:
+		return
+	if _defile == null:
+		_defile = HazardZone.burning(DEFILE_DPS, DamageInfo.Type.MAGIC)
+		_defile.id = DEFILE_ID
+		_defile.lucian = target
+		# Invisible: the ring is drawn by Karthus (_draw), so it needs no look option.
+		_defile.visible = false
+		_defile.set_circle(global_position, DEFILE_RADIUS)
+		warning_parent.add_child(_defile)
+	_defile.position = global_position
+
+
+func _die() -> void:
+	_end_defile()
+	super()
+
+
+func _exit_tree() -> void:
+	_end_defile()
+
+
+func _end_defile() -> void:
+	if is_instance_valid(_defile):
+		_defile.queue_free()
+	_defile = null
 
 
 ## Lays every queued circle whose wait has run out, `delta` after the last call.
@@ -177,7 +246,7 @@ func _lay_due(delta: float) -> void:
 
 func _lay_circle(at: Vector2) -> void:
 	var warning := GroundWarning.circle(at, LAY_RADIUS, LAY_WARN)
-	warning.strike(skill_hit(LAY_DAMAGE, DamageInfo.Type.MAGIC, &"lay_waste"), target)
+	warning.strike(skill_hit(REVIVED_LAY_DAMAGE if revived else LAY_DAMAGE, DamageInfo.Type.MAGIC, &"lay_waste"), target)
 	warning_parent.add_child(warning)
 
 
@@ -220,6 +289,9 @@ func _wall_touched(_piece: int) -> void:
 
 func _draw() -> void:
 	super()
+	if revived:
+		draw_circle(Vector2.ZERO, DEFILE_RADIUS, Color(DEFILE_COLOR, 0.06))
+		draw_arc(Vector2.ZERO, DEFILE_RADIUS, 0.0, TAU, 96, Color(DEFILE_COLOR, 0.75), 4.0, true)
 	if is_channeling() and is_instance_valid(target):
 		# A ring pulsing on Lucian, and one round Karthus filling as the channel goes on.
 		var pulse := 0.5 + 0.5 * sin(_channel_left * TAU * PULSE_RATE)

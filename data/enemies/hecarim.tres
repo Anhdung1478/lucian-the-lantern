@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/hecarim.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"hecarim"
+display_name = "Hecarim"
+kind = &"mini_boss"
+behavior = &"hecarim"
+art = ExtResource("2_art")
+max_hp = 18000.0
+armor = 50.0
+mr = 40.0
+damage = 100.0
+damage_type = 0
+attack_range = 110.0
+attack_interval = 1.3
+move_speed = 360.0
+radius = 56.0
+gold = 300
+purple_first = 5
+purple_repeat = 1
+camp = &"hecarim"

@@ -498,3 +498,159 @@ func test_5_5_clears_and_pays_10_purple_then_2() -> void:
 	assert_has(again.reward_lines, "+2 purple essence (repeat)")
 	assert_eq(again.collected[Essences.PURPLE], 2)
 	assert_engine_error_count(0)
+
+
+# --- the revived Karthus (Act 6, 6-2) ------------------------------------------
+
+
+func _revived(at: Vector2) -> Karthus:
+	var boss := Karthus.new()
+	boss.revived = true
+	boss.setup(_data("karthus_revived"), 6, 2, lucian)
+	boss.position = at
+	boss.projectile_parent = effects
+	boss.warning_parent = effects
+	add_child_autofree(boss)
+	_quiet(boss)
+	return boss
+
+
+func _zones() -> Array:
+	return _effects(HazardZone)
+
+
+func test_the_revived_data_file_matches_the_plan() -> void:
+	var data := _data("karthus_revived")
+	assert_not_null(data)
+	if data == null:
+		return
+	assert_eq([data.id, data.kind, data.behavior, data.camp], [&"karthus_revived", &"mini_boss", &"karthus_revived", &"karthus_revived"])
+	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [16000.0, 30.0, 60.0, 85.0, DamageInfo.Type.MAGIC])
+	assert_eq([data.attack_range, data.attack_interval, data.move_speed, data.projectile_speed], [600.0, 1.5, 250.0, 900.0])
+	assert_eq([data.purple_first, data.purple_repeat, data.gold], [5, 1, 300])
+	assert_ne(data.tint, Color.WHITE, "a pale teal tint")
+	assert_eq(data.art.resource_path, "res://assets/art/enemies/karthus.svg")
+	assert_has(SaveGame.BOSS_IDS, "karthus_revived")
+
+
+func test_the_stage_builds_a_revived_karthus_unscaled() -> void:
+	SaveGame.instance().reset()
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	stage.setup(StageSetup.for_stage(SaveGame.instance(), 6, 2))
+	add_child_autofree(stage)
+	await wait_process_frames(2)
+	var boss := stage.spawn_enemy(&"karthus_revived", Vector2(1000, 1000), 4)
+	assert_is(boss, Karthus)
+	assert_true((boss as Karthus).revived)
+	assert_eq(boss.max_hp, 16000.0, "no scaling")
+	assert_false((stage.spawn_enemy(&"karthus", Vector2(1200, 1000), 4) as Karthus).revived)
+
+
+func test_the_revived_mode_has_lay_waste_only() -> void:
+	var boss := _revived(Vector2.ZERO)
+	var ids := boss.skills.map(func(skill: Dictionary) -> StringName: return skill.id)
+	assert_eq(ids, [&"lay_waste"], "no Wall of Pain, no Requiem")
+	boss.hp = boss.max_hp * 0.1
+	assert_false(boss.is_channeling())
+	var full := _karthus(Vector2(3000, 0))
+	assert_eq(full.skills.size(), 3, "the Act 5 Karthus keeps all three")
+
+
+func test_the_revived_lay_waste_is_four_circles_of_120() -> void:
+	var boss := _revived(Vector2(500, 0))
+	lucian.global_position = Vector2.ZERO
+	assert_eq(boss.lay_spots(Vector2.ZERO).size(), 4)
+	boss.lay_waste()
+	await wait_seconds(0.5)
+	assert_eq(_effects(GroundWarning).size(), 4, "all four are laid")
+	await wait_seconds(0.9)
+	var hits := _hits(&"lay_waste")
+	assert_gt(hits.size(), 0, "the first circle is on Lucian")
+	for hit: Array in hits:
+		assert_eq([hit[0].amount, hit[0].type, hit[0].from_skill], [120.0, DamageInfo.Type.MAGIC, true])
+
+
+func test_the_act_5_lay_waste_is_unchanged() -> void:
+	var boss := _karthus(Vector2(500, 0))
+	assert_eq(boss.lay_spots(Vector2.ZERO).size(), 5)
+	boss.lay_waste()
+	await wait_seconds(1.5)
+	for hit: Array in _hits(&"lay_waste"):
+		assert_eq(hit[0].amount, 110.0)
+
+
+func test_defile_is_a_purple_ring_aura_burning_inside_350() -> void:
+	var boss := _revived(Vector2.ZERO)
+	await wait_physics_frames(2)
+	assert_eq(_zones().size(), 1)
+	var zone: HazardZone = _zones()[0]
+	assert_eq([zone.radius, zone.dps, zone.damage_type, zone.effect], [350.0, 80.0, DamageInfo.Type.MAGIC, HazardZone.Effect.BURN])
+	assert_ne(zone.id, HazardZone.BURN_ID, "its own id, apart from lava")
+	assert_false(zone.visible, "the ring is drawn by Karthus, not the lava look")
+	assert_gt(boss.defile_ring_radius(), 0.0)
+	assert_eq(boss.defile_ring_radius(), 350.0)
+
+
+func test_defile_hurts_only_inside_350_every_half_second() -> void:
+	var boss := _revived(Vector2.ZERO)
+	lucian.global_position = Vector2(340, 0)
+	await wait_seconds(1.3)
+	var burns := received.filter(func(hit: Array) -> bool: return hit[0].amount == 40.0 and hit[0].type == DamageInfo.Type.MAGIC)
+	assert_between(burns.size(), 2, 3, "40 a tick, a tick every 0.5 s")
+	received.clear()
+	lucian.global_position = Vector2(380, 0)
+	await wait_seconds(1.3)
+	var more := received.filter(func(hit: Array) -> bool: return hit[0].amount == 40.0)
+	assert_lte(more.size(), 1, "only the burn's last tick after he steps out")
+	assert_not_null(boss)
+
+
+func test_defile_moves_with_him_and_goes_when_he_dies() -> void:
+	var boss := _revived(Vector2.ZERO)
+	await wait_physics_frames(2)
+	var zone: HazardZone = _zones()[0]
+	boss.global_position = Vector2(1000, 500)
+	await wait_physics_frames(2)
+	assert_almost_eq(zone.position, Vector2(1000, 500), Vector2(0.5, 0.5), "kept on him each frame")
+	lucian.global_position = Vector2(1200, 500)
+	await wait_seconds(0.7)
+	assert_gt(received.size(), 0, "burning where he stands")
+	boss.take_damage(_true_hit(1.0e9))
+	await wait_physics_frames(2)
+	assert_eq(_zones().size(), 0, "gone with him")
+
+
+func test_defile_goes_when_he_leaves_the_tree() -> void:
+	var boss := _revived(Vector2.ZERO)
+	await wait_physics_frames(2)
+	assert_eq(_zones().size(), 1)
+	boss.free()
+	await wait_physics_frames(2)
+	assert_eq(_zones().size(), 0)
+
+
+func test_the_revived_karthus_walks_in_past_his_bolt_range() -> void:
+	var boss := _revived(Vector2(900, 0))
+	boss.move_speed = 250.0
+	lucian.global_position = Vector2.ZERO
+	await wait_seconds(1.0)
+	assert_lt(boss.global_position.x, 700.0, "past 600 and still walking")
+	await wait_seconds(2.5)
+	assert_almost_eq(boss.global_position.distance_to(lucian.global_position), Karthus.REVIVED_STOP, 30.0)
+	assert_lt(Karthus.REVIVED_STOP, 350.0, "inside Defile")
+
+
+func test_the_act_5_karthus_stops_at_his_bolt_range() -> void:
+	var boss := _karthus(Vector2(900, 0))
+	boss.move_speed = 280.0
+	await wait_seconds(2.5)
+	assert_gt(boss.global_position.distance_to(lucian.global_position), 580.0)
+
+
+func test_the_revived_karthus_fires_while_he_walks() -> void:
+	var boss := _revived(Vector2(500, 0))
+	boss.move_speed = 250.0
+	boss._attack_left = 0.0
+	await wait_physics_frames(3)
+	assert_gt(_effects(EnemyProjectile).size(), 0, "a bolt from 500, still far from his stop")
+	assert_gt(boss.distance_to_target(), Karthus.REVIVED_STOP)
