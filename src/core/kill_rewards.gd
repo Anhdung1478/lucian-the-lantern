@@ -11,16 +11,22 @@ const BOSS_BLUE := 100
 const BOSS_ORANGE := 5
 const MINI_BOSS_BLUE := 50
 const MINI_BOSS_ORANGE := 3
+## A summon's share of its gold and XP (a Maiden's ghoul): no farming.
+const SUMMON_SHARE := 0.25
 
 
-static func roll(data: EnemyData, act: int, run: StageSetup, rng: RandomNumberGenerator) -> Dictionary:
-	var scale := data.reward_scale(act)
+## A `summoned` enemy pays SUMMON_SHARE of its gold and XP, rounded, and no
+## essence at all (its kind's and its data's extra included).
+static func roll(data: EnemyData, act: int, run: StageSetup, rng: RandomNumberGenerator, summoned := false) -> Dictionary:
+	var scale := data.reward_scale(act) * (SUMMON_SHARE if summoned else 1.0)
 	var reward := {
 		"gold": roundi(data.gold * scale * (1.0 + run.gold_bonus)),
 		"xp": roundi(data.xp * scale * (1.0 + run.xp_bonus)),
 		"blue": 0,
 		"orange": 0,
 	}
+	if summoned:
+		return reward
 	var blue := act
 	if data.kind == &"boss":
 		blue = BOSS_BLUE

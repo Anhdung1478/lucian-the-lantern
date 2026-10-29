@@ -73,6 +73,24 @@ const BOSS_KINDS: Array[StringName] = [&"mini_boss", &"boss"]
 @export var extra_orange := 0
 ## The jungle buff (JungleBuffs.BLUE or RED) Lucian gets when it dies. &"" = none.
 @export var buff_on_kill := &""
+## Its sprite's color (EnemyUnit); white = the art as drawn.
+@export var tint := Color.WHITE
+## It stands on a ledge over the abyss when the map has a free one, and
+## never moves (Act 6's Chain Warden).
+@export var perch := false
+## Summons: every `summon_every` seconds of fighting it calls up to
+## `summon_count` enemies of id `summon_id` beside it, never more than
+## `summon_cap` of them alive at once (those on their way included). A summon
+## counts in the wave and pays a quarter of its gold and XP, no essence and
+## no loot. &"" (or a cap of 0) = none.
+@export var summon_id := &""
+@export var summon_every := 0.0
+@export var summon_count := 0
+@export var summon_cap := 0
+## Its end is "freed": it rises and brightens into teal-white light and
+## fades upward with a soft chime, in place of the grey fade (Act 6's
+## Lantern Souls). Its rewards are unchanged.
+@export var frees := false
 
 
 ## A boss or a mini boss.

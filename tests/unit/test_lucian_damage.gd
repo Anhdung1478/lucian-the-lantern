@@ -145,4 +145,4 @@ func test_stasis_clears_a_displacement_in_flight() -> void:
 	await wait_seconds(0.3)
 	assert_false(lucian.in_stasis())
 	assert_false(lucian.is_displaced())
-	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY)
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM)

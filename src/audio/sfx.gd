@@ -94,6 +94,10 @@ static func _generate(sound: StringName) -> AudioStreamWAV:
 			samples = _tone(0.3, 140.0, 50.0, 0.9, 0.2, 7.0)
 		&"buff":
 			samples = _tone(0.18, 600.0, 1200.0, 0.0, 0.0, 10.0)
+		&"freed":
+			# A soft rising chime, each note ringing out (a soul set free).
+			for note in [659.3, 987.8, 1318.5]:
+				samples.append_array(_tone(0.22, note, note * 1.01, 0.0, 0.0, 7.0))
 		_:
 			samples = _tone(0.05, 440.0, 440.0, 0.0, 0.0, 30.0)
 	var bytes := PackedByteArray()

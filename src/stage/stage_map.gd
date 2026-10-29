@@ -1,12 +1,13 @@
 class_name StageMap
 extends Node2D
 ## A stage's ground: its size, its walls on Layers.WORLD (the border, plus
-## polygons and circles inside), the navigation baked around them for
-## PathFollower, and the points the stage uses. Subclasses fill the lists in
-## _init and draw the ground in _draw. The playable area starts at (0, 0);
-## the border walls sit just outside it. A map may also have terrain (lava,
-## water, plants): build_terrain makes it, and the stage adds it to its
-## world. The map is drawn at FLOOR_Z, under everything else on the stage.
+## polygons and circles inside), its abyss on Layers.CHASM (Act 6), the
+## navigation baked around both for PathFollower, and the points the stage
+## uses. Subclasses fill the lists in _init and draw the ground in _draw.
+## The playable area starts at (0, 0); the border walls sit just outside
+## it. A map may also have terrain (lava, water, plants): build_terrain
+## makes it, and the stage adds it to its world. The map is drawn at
+## FLOOR_Z, under everything else on the stage.
 
 const WALL_THICKNESS := 64.0
 ## Under ground zones (HazardZone.Z) and the units.
@@ -30,6 +31,14 @@ var camps := {}
 var wall_polygons: Array[PackedVector2Array] = []
 ## Round walls: (x, y, radius).
 var wall_circles: Array[Vector3] = []
+## The abyss (Act 6), on its own body on Layers.CHASM: walking, dashing,
+## Flash and pulls stop at it, paths go round it, shots fly over it. Several
+## polygons, none with holes.
+var chasm_polygons: Array[PackedVector2Array] = []
+## Ledges inside the abyss (abyss for physics) where perched enemies stand.
+var ledge_points: Array[Vector2] = []
+## Black Mist banks (Act 5): (x, y, radius).
+var mist: Array[Vector3] = []
 ## The walkable ground for paths around the walls, baked in _ready.
 var navigation: NavigationRegion2D
 
@@ -59,6 +68,16 @@ func _ready() -> void:
 		shape.position = Vector2(circle.x, circle.y)
 		walls.add_child(shape)
 	add_child(walls)
+	if not chasm_polygons.is_empty():
+		var chasm := StaticBody2D.new()
+		chasm.name = "Chasm"
+		chasm.collision_layer = Layers.CHASM
+		chasm.collision_mask = 0
+		for polygon in chasm_polygons:
+			var drop := CollisionPolygon2D.new()
+			drop.polygon = polygon
+			chasm.add_child(drop)
+		add_child(chasm)
 	_bake_navigation()
 
 
@@ -73,11 +92,11 @@ func build_terrain(_lucian: Lucian) -> Array[Node2D]:
 	return []
 
 
-## Inside the area and at least `margin` away from every wall.
+## Inside the area and at least `margin` away from every wall and the abyss.
 func is_walkable(point: Vector2, margin := 40.0) -> bool:
 	if not get_bounds().grow(-margin).has_point(point):
 		return false
-	for polygon in wall_polygons:
+	for polygon in wall_polygons + chasm_polygons:
 		if Geometry2D.is_point_in_polygon(point, polygon) or _distance_to_edge(point, polygon) < margin:
 			return false
 	for circle in wall_circles:
@@ -96,14 +115,15 @@ func border_rects() -> Array[Rect2]:
 	]
 
 
-## The bounds less every wall polygon and circle, kept NAV_AGENT_RADIUS
-## away from them, into the `navigation` region on the world's map.
+## The bounds less every wall polygon and circle and the abyss, kept
+## NAV_AGENT_RADIUS away from them, into the `navigation` region on the
+## world's map.
 func _bake_navigation() -> void:
 	var source := NavigationMeshSourceGeometryData2D.new()
 	var bounds := get_bounds()
 	source.add_traversable_outline(PackedVector2Array([bounds.position, Vector2(bounds.end.x, bounds.position.y),
 		bounds.end, Vector2(bounds.position.x, bounds.end.y)]))
-	for polygon in wall_polygons:
+	for polygon in wall_polygons + chasm_polygons:
 		source.add_obstruction_outline(polygon)
 	for circle in wall_circles:
 		source.add_obstruction_outline(_circle_outline(circle))

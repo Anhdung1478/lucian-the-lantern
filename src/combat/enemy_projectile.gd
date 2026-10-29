@@ -2,10 +2,16 @@ class_name EnemyProjectile
 extends Area2D
 ## An enemy's shot: flies straight and ends on Lucian (by distance, taken or
 ## blocked) or on a wall or pillar. A boomerang flies `max_range` out, then
-## back to its thrower, and may hit once each way.
+## back to its thrower, and may hit once each way. It flies over the abyss.
 
 ## The shot hit Lucian and he took it (not blocked).
 signal hit_lucian
+## The shot ended without reaching Lucian: at its range, or on a wall. One
+## that reached him is no miss, even when Banshee's Veil blocked it. A
+## boomerang misses (once, as it turns back) only when it never reached him
+## on its way out. Never emitted inside a physics callback, so a listener
+## may throw again at once (Thresh's re-hook).
+signal missed
 
 ## A wave front: how far its crest bows forward at the middle, its depth
 ## behind the crest, the trailing wake's extra depth, and the points along it.
@@ -34,6 +40,9 @@ var tether: Node2D
 var _travelled := 0.0
 var _returning := false
 var _hit_this_pass := false
+## It reached Lucian on its way out (taken or blocked): never a miss.
+var _reached := false
+var _missed := false
 
 
 func launch(from: Vector2, toward: Vector2, hit: DamageInfo, foe: Lucian) -> void:
@@ -52,7 +61,7 @@ func _ready() -> void:
 	circle.radius = 6.0
 	shape.shape = circle
 	add_child(shape)
-	body_entered.connect(func(_body: Node2D) -> void: queue_free())
+	body_entered.connect(_on_wall)
 
 
 func _physics_process(delta: float) -> void:
@@ -73,17 +82,34 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 	if not _hit_this_pass and is_instance_valid(target) and global_position.distance_to(target.global_position) <= hit_radius + Lucian.HIT_RADIUS:
 		_hit_this_pass = true
+		_reached = _reached or not _returning
 		if target.take_damage(info):
 			hit_lucian.emit()
 		if not return_to:
 			queue_free()
 			return
 	if not _returning and _travelled >= max_range:
+		_miss()
 		if return_to:
 			_returning = true
 			_hit_this_pass = false
 		else:
 			queue_free()
+
+
+## A wall or pillar stops it. The miss waits for the end of the physics
+## callback this comes from.
+func _on_wall(_body: Node2D) -> void:
+	_miss.call_deferred()
+	queue_free()
+
+
+## Once, and only when it never reached Lucian on its way out.
+func _miss() -> void:
+	if _reached or _missed:
+		return
+	_missed = true
+	missed.emit()
 
 
 func _draw() -> void:

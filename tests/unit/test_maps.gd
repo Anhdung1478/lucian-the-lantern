@@ -328,3 +328,181 @@ func test_the_dark_lane_keeps_act_1s_layout_and_act_1_keeps_its_colors() -> void
 	assert_eq(light.river_edge, Color("6fb4d8"))
 	light.free()
 	dark.free()
+
+
+# --- Act 6's abyss (Layers.CHASM), on small maps built here ---------------
+
+const CHASM_MAP := Vector2(3000, 2000)
+## Across the whole height: nothing on foot gets from one side to the other.
+const CHASM_STRIP := [Vector2(1400, 0), Vector2(1600, 0), Vector2(1600, 2000), Vector2(1400, 2000)]
+## A block in the middle that paths go around.
+const CHASM_BLOCK := [Vector2(1400, 400), Vector2(1600, 400), Vector2(1600, 1600), Vector2(1400, 1600)]
+
+
+func _chasm_map(chasm: Array) -> StageMap:
+	var map := StageMap.new()
+	map.size = CHASM_MAP
+	map.chasm_polygons.append(PackedVector2Array(chasm))
+	add_child_autofree(map)
+	return map
+
+
+func _lucian_at(at: Vector2) -> Lucian:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	lucian.position = at
+	add_child_autofree(lucian)
+	return lucian
+
+
+## Waits until the navigation map has taken in `map`'s region around `at`.
+func _synced(map: StageMap, at: Vector2) -> void:
+	var nav_map := map.get_world_2d().navigation_map
+	for frame in SYNC_FRAMES:
+		if NavigationServer2D.map_get_iteration_id(nav_map) > 0 \
+				and NavigationServer2D.map_get_closest_point_owner(nav_map, at) == map.navigation.get_rid():
+			return
+		await wait_physics_frames(1)
+	fail_test("the navigation map never took in the abyss")
+
+
+func test_the_chasm_layer_is_named() -> void:
+	assert_eq(Layers.CHASM, 32)
+	assert_eq(ProjectSettings.get_setting("layer_names/2d_physics/layer_6"), "chasm")
+
+
+func test_maps_have_no_abyss_ledges_or_mist_by_default() -> void:
+	for act_stage in STAGES:
+		var map := StageMaps.create(act_stage[0], act_stage[1])
+		assert_true(map.chasm_polygons.is_empty(), str(act_stage))
+		assert_true(map.ledge_points.is_empty(), str(act_stage))
+		assert_true(map.mist.is_empty(), str(act_stage))
+		map.free()
+
+
+func test_the_abyss_is_a_body_on_its_own_layer_and_not_walkable() -> void:
+	var map := _chasm_map(CHASM_BLOCK)
+	var chasm: StaticBody2D = map.get_node("Chasm")
+	assert_eq(chasm.collision_layer, Layers.CHASM)
+	assert_eq(chasm.collision_mask, 0)
+	assert_eq(chasm.get_child_count(), 1)
+	assert_eq((map.get_node("Walls") as StaticBody2D).collision_layer, Layers.WORLD, "the walls keep theirs")
+	assert_false(map.is_walkable(Vector2(1500, 1000), 0.0), "in it")
+	assert_false(map.is_walkable(Vector2(1380, 1000)), "within the margin of its edge")
+	assert_true(map.is_walkable(Vector2(1380, 1000), 10.0), "past a small margin")
+	assert_true(map.is_walkable(Vector2(1000, 1000)))
+
+
+func test_lucian_cannot_walk_into_the_abyss() -> void:
+	var map := _chasm_map(CHASM_STRIP)
+	var lucian := _lucian_at(Vector2(1000, 1000))
+	await _synced(map, Vector2(1000, 1000))
+	lucian.command_move(Vector2(2000, 1000))
+	await wait_seconds(2.0)
+	assert_lt(lucian.global_position.x, 1400.0 - Lucian.HIT_RADIUS + 1.0, "at its edge at most")
+	assert_gt(lucian.global_position.x, 1250.0, "he walked up to it")
+
+
+func test_a_displacement_stops_at_the_abyss() -> void:
+	_chasm_map(CHASM_STRIP)
+	var lucian := _lucian_at(Vector2(1000, 1000))
+	await wait_physics_frames(2)
+	lucian.displace(Vector2(2000, 1000), 1500.0)
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.CHASM)
+	await wait_seconds(0.9)
+	assert_false(lucian.is_displaced())
+	assert_lt(lucian.global_position.x, 1400.0 - Lucian.HIT_RADIUS + 1.0, "pulled to its edge, not into it")
+	assert_gt(lucian.global_position.x, 1300.0)
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM)
+
+
+func test_a_dash_stops_at_the_abyss() -> void:
+	_chasm_map(CHASM_STRIP)
+	var lucian := _lucian_at(Vector2(1200, 1000))
+	await wait_physics_frames(2)
+	lucian.start_dash(Vector2.RIGHT, 425.0, 1500.0)
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.CHASM, "through enemies, not over the abyss")
+	await wait_seconds(0.5)
+	assert_false(lucian.is_dashing())
+	assert_lt(lucian.global_position.x, 1400.0 - Lucian.HIT_RADIUS + 1.0)
+	assert_gt(lucian.global_position.x, 1300.0)
+
+
+func test_flash_cannot_land_on_the_abyss() -> void:
+	_chasm_map(CHASM_STRIP)
+	var lucian := _lucian_at(Vector2(1200, 1000))
+	await wait_physics_frames(2)
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM, "his walking mask")
+	assert_false(lucian.fits_at(Vector2(1500, 1000)))
+	assert_true(lucian.use_summoner(0, Vector2(1500, 1000)))
+	assert_lt(lucian.global_position.x, 1400.0 - Lucian.HIT_RADIUS + 0.5, "it stepped back to the edge")
+	assert_gt(lucian.global_position.x, 1300.0, "it still blinked")
+
+
+func test_an_enemy_bolt_flies_over_the_abyss() -> void:
+	_chasm_map(CHASM_STRIP)
+	var lucian := _lucian_at(Vector2(2000, 1000))
+	await wait_physics_frames(2)
+	var bolt := EnemyProjectile.new()
+	bolt.launch(Vector2(1000, 1000), Vector2.RIGHT, DamageInfo.create(20.0, DamageInfo.Type.MAGIC, &"test"), lucian)
+	bolt.speed = 1500.0
+	bolt.max_range = 1500.0
+	var hit := [0]
+	bolt.hit_lucian.connect(func() -> void: hit[0] += 1)
+	add_child_autofree(bolt)
+	await wait_physics_frames(50)
+	assert_eq(hit[0], 1, "over the abyss to Lucian")
+
+
+func test_an_enemy_body_stops_at_the_abyss() -> void:
+	_chasm_map(CHASM_STRIP)
+	var lucian := _lucian_at(Vector2(2000, 1000))
+	await wait_physics_frames(2)
+	# Untouchable, so the minion thinks nothing: it walks only where told,
+	# straight in, with no path to stop it short.
+	lucian.invulnerable = true
+	var minion := Minion.new()
+	minion.setup(load("res://data/enemies/melee_minion.tres"), 1, 1, lucian)
+	minion.position = Vector2(1250, 1000)
+	add_child_autofree(minion)
+	await wait_physics_frames(1)
+	for frame in 60:
+		minion.walk(Vector2.RIGHT, 1.0 / 60.0)
+		await wait_physics_frames(1)
+	assert_lt(minion.global_position.x, 1400.0, "its body stops at the edge")
+	assert_gt(minion.global_position.x, 1300.0, "it walked up to it")
+
+
+func test_a_path_goes_around_the_abyss() -> void:
+	var map := _chasm_map(CHASM_BLOCK)
+	await _synced(map, Vector2(1100, 1000))
+	var path := NavigationServer2D.map_get_path(map.get_world_2d().navigation_map, Vector2(1100, 1000), Vector2(1900, 1000), true)
+	assert_gt(path.size(), 2, "around, not straight")
+	if path.is_empty():
+		return
+	assert_lt(path[path.size() - 1].distance_to(Vector2(1900, 1000)), 2.0)
+	for i in path.size() - 1:
+		var leg := PackedVector2Array([path[i], path[i + 1]])
+		assert_true(Geometry2D.intersect_polyline_with_polygon(leg, PackedVector2Array(CHASM_BLOCK)).is_empty(), "leg %d stays off it" % i)
+
+
+func test_an_enemy_walks_around_the_abyss_to_lucian() -> void:
+	var map := _chasm_map(CHASM_BLOCK)
+	var lucian := _lucian_at(Vector2(1100, 1000))
+	await _synced(map, Vector2(1100, 1000))
+	var minion := Minion.new()
+	minion.setup(load("res://data/enemies/melee_minion.tres"), 1, 1, lucian)
+	minion.position = Vector2(1900, 1000)
+	add_child_autofree(minion)
+	var block := PackedVector2Array(CHASM_BLOCK)
+	var entered := false
+	var reached := false
+	for frame in 600:
+		await wait_physics_frames(1)
+		lucian.hp = lucian.stats.max_hp
+		entered = entered or Geometry2D.is_point_in_polygon(minion.global_position, block)
+		if minion.distance_to_target() <= minion.attack_range + Lucian.HIT_RADIUS + 5.0:
+			reached = true
+			break
+	assert_true(reached, "it reached Lucian within 10 s")
+	assert_false(entered, "never on the abyss")
+	assert_gt(minion.path_follower.queries, 0, "the abyss blocked its line: it took a path")

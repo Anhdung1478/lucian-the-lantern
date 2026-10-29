@@ -31,6 +31,9 @@ const SPAWN_JITTER := 70.0
 const CAMP_JITTER := 90.0
 ## How far from where the parent died its splits appear.
 const SPLIT_SPREAD := 40.0
+## A summon's spot must be this clear of walls and the abyss, else it comes
+## out on its summoner.
+const SUMMON_MARGIN := 30.0
 const ESCAPED_COLOR := Color("d8dde6")
 ## Act 1's tips: id -> [the text, the actions whose keys it names].
 const TIPS := {
@@ -273,7 +276,7 @@ func set_dummy_count(count: int) -> void:
 
 
 ## Puts an enemy of type `id` on the map at `at`, wired for damage numbers,
-## the debug meter, rewards and escapes.
+## the debug meter, rewards, escapes and summons.
 func spawn_enemy(id: StringName, at: Vector2, wave := 1) -> EnemyUnit:
 	return spawn_unit(load(ENEMY_PATH % id), at, wave)
 
@@ -293,6 +296,7 @@ func spawn_unit(data: EnemyData, at: Vector2, wave := 1) -> EnemyUnit:
 	unit.damage_taken.connect(_count_damage_dealt.bind(unit))
 	unit.died.connect(_on_enemy_died)
 	unit.escaped.connect(_on_enemy_escaped)
+	unit.summon_requested.connect(_on_summon_requested)
 	debug_table.watch(unit)
 	return unit
 
@@ -512,12 +516,13 @@ func _on_cutscene_done() -> void:
 	runner.finish()
 
 
-## A kill: its rewards; its splits (counted at once, spawned deferred); its
-## loot; its buff for Lucian; a mini boss's purple. Then `enemy_died`.
+## A kill: its rewards (a summon's are small); its splits (counted at once,
+## spawned deferred); its loot (none from a summon); its buff for Lucian; a
+## mini boss's purple; its summoner told. Then `enemy_died`.
 func _on_enemy_died(enemy: Enemy) -> void:
 	var unit := enemy as EnemyUnit
 	var data := unit.data
-	var reward := KillRewards.roll(data, maxi(run.act, 1), run, rng)
+	var reward := KillRewards.roll(data, maxi(run.act, 1), run, rng, unit.summoned)
 	wallet.add(reward.gold)
 	stats.gold_earned += reward.gold
 	stats.kills += 1
@@ -529,8 +534,8 @@ func _on_enemy_died(enemy: Enemy) -> void:
 		for i in splits:
 			runner.enemy_spawned()
 	# The kill that ends the stage drops nothing: the result comes up at once,
-	# and items don't carry over.
-	if not (runner and runner.is_last_enemy()):
+	# and items don't carry over. A summon drops nothing either (no farming).
+	if not unit.summoned and not (runner and runner.is_last_enemy()):
 		for item in LootTable.roll(data.kind, lucian.item_catalog, rng):
 			drop_loot(item, unit.global_position)
 	if splits > 0:
@@ -540,6 +545,7 @@ func _on_enemy_died(enemy: Enemy) -> void:
 		lucian.add_jungle_buff(data.buff_on_kill)
 	if data.kind == &"mini_boss":
 		_award_mini_boss(data)
+	_summon_gone(unit)
 	enemy_died.emit(unit)
 
 
@@ -561,11 +567,41 @@ func _award_mini_boss(data: EnemyData) -> void:
 		reward_lines.append("+%d purple essence (%s, %s)" % [purple, data.display_name, "first kill" if first_time else "repeat"])
 
 
-## An enemy got away: "Escaped!" and it is done for the wave. No rewards,
-## no kill and no `enemy_died` (the kill count and the tutorial).
+## An enemy got away: its note ("Escaped!", none after a vanish) and it is
+## done for the wave; its summoner is told. No rewards, no kill and no
+## `enemy_died` (the kill count and the tutorial).
 func _on_enemy_escaped(unit: EnemyUnit) -> void:
-	var note := FloatingText.new("Escaped!", ESCAPED_COLOR)
-	note.position = unit.global_position + Vector2(0, -unit.radius - 40.0)
-	damage_numbers.add_child(note)
+	if unit.escape_note != "":
+		var note := FloatingText.new(unit.escape_note, ESCAPED_COLOR)
+		note.position = unit.global_position + Vector2(0, -unit.radius - 40.0)
+		damage_numbers.add_child(note)
+	_summon_gone(unit)
 	if runner:
 		runner.enemy_died()
+
+
+## A summoner calls a summon: counted in the wave at once, as a split is, so
+## its summoner's death (even on this frame) never ends the wave before it
+## comes; spawned deferred beside it, or on the summoner when that spot is in
+## a wall, in the abyss or off the map.
+func _on_summon_requested(unit: EnemyUnit, id: StringName, at: Vector2) -> void:
+	if runner:
+		runner.enemy_spawned()
+	var spot := at if arena.is_walkable(at, SUMMON_MARGIN) else unit.global_position
+	# Deferred, like splits: a summon called from a physics callback can't add
+	# its body there. A weak ref: the deferred call never holds a freed node.
+	_spawn_summon.call_deferred(weakref(unit), id, spot, unit.wave)
+
+
+## A summon comes, in its summoner's wave (already counted in it).
+func _spawn_summon(from: WeakRef, id: StringName, at: Vector2, wave: int) -> void:
+	var summon := spawn_enemy(id, at, wave)
+	summon.summoned = true
+	summon.summoner = from.get_ref() as EnemyUnit
+
+
+## A summon died or vanished: its summoner, while it is still there, may
+## call another.
+func _summon_gone(unit: EnemyUnit) -> void:
+	if unit.summoned and is_instance_valid(unit.summoner):
+		unit.summoner.summon_gone()

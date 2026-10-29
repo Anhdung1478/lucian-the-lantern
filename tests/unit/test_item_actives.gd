@@ -106,7 +106,7 @@ func test_galeforce_and_rocketbelt_dash_only_as_far_as_the_cursor() -> void:
 	assert_true(lucian.use_equip_slot(1, lucian.global_position), "aimed right on him")
 	await wait_physics_frames(3)
 	assert_almost_eq(lucian.global_position, Vector2(0, -100), Vector2(1, 1), "no dash")
-	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY)
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM)
 
 
 func test_an_active_on_cooldown_is_refused() -> void:

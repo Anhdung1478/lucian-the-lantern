@@ -194,7 +194,7 @@ func test_a_stun_ends_a_dash_where_he_is() -> void:
 	assert_true(lucian.is_dashing())
 	lucian.add_cc(Kind.STUN, 0.3)
 	assert_false(lucian.is_dashing())
-	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY, "his walking mask is back")
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM, "his walking mask is back")
 	var stopped := lucian.global_position
 	await wait_physics_frames(10)
 	assert_eq(lucian.global_position, stopped)

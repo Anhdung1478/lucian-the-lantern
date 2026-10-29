@@ -1,7 +1,8 @@
 class_name PathFollower
 extends RefCounted
 ## Walking around walls, for enemies and Lucian alike. A walker heads
-## straight for its goal while a ray on Layers.WORLD to it hits nothing.
+## straight for its goal while a ray on Layers.WORLD and Layers.CHASM (the
+## abyss) to it hits nothing.
 ## When a wall is in the way it follows a path on the world's navigation map
 ## (baked by StageMap), asked again every REPATH_TIME, as soon as the goal
 ## has moved REPATH_MOVE, and as soon as the walker itself jumped (a dash, a
@@ -32,7 +33,7 @@ var _last_from := Vector2.INF
 
 
 func _init() -> void:
-	_ray.collision_mask = Layers.WORLD
+	_ray.collision_mask = Layers.WORLD | Layers.CHASM
 
 
 ## Where a walker at `from` heads this frame on its way to `goal`: the goal

@@ -218,6 +218,8 @@ func _ready() -> void:
 	hp = stats.max_hp
 	mana = stats.max_mana
 	_last_position = global_position
+	# Walls, enemies and the abyss.
+	collision_mask = _body_mask()
 	if projectile_parent == null:
 		projectile_parent = get_parent()
 	inventory.catalog = item_catalog
@@ -694,9 +696,9 @@ func restore_for(seconds: float) -> void:
 
 
 ## Forced movement (Thresh's hook, Flay): Lucian slides to `to` and can't
-## move, attack or cast until he lands. Walls stop him. Drops his orders,
-## windup and queued cast, and stops R. No trail, no Energize. Ignored while
-## he is thrown (launch).
+## move, attack or cast until he lands. Walls and the abyss stop him. Drops
+## his orders, windup and queued cast, and stops R. No trail, no Energize.
+## Ignored while he is thrown (launch).
 func displace(to: Vector2, speed: float) -> void:
 	if dead or in_stasis() or is_launched():
 		return
@@ -705,7 +707,7 @@ func displace(to: Vector2, speed: float) -> void:
 	_drop_in_flight()
 	_displace_velocity = offset.normalized() * speed if offset.length() > 1.0 else Vector2.ZERO
 	_displace_left = offset.length() / speed
-	collision_mask = Layers.WORLD
+	collision_mask = Layers.WORLD | Layers.CHASM
 	move_dropped.emit()
 
 
@@ -878,8 +880,8 @@ func is_ghosted() -> bool:
 	return _ghost_left > 0.0
 
 
-## Lucian's body would fit at `point` without touching a wall (or an enemy,
-## unless he is ghosted).
+## Lucian's body would fit at `point` without touching a wall or the abyss
+## (or an enemy, unless he is ghosted).
 func fits_at(point: Vector2) -> bool:
 	var query := PhysicsShapeQueryParameters2D.new()
 	query.shape = ($CollisionShape2D as CollisionShape2D).shape
@@ -1053,9 +1055,9 @@ func is_cast_locked() -> bool:
 	return _cast_lock_left > 0.0
 
 
-## Dashes through enemies (walls still stop him), leaving a trail in
-## `trail_color`. A move ordered before the dash ends here (see _drop_move),
-## and the attack timer resets.
+## Dashes through enemies (walls and the abyss still stop him), leaving a
+## trail in `trail_color`. A move ordered before the dash ends here (see
+## _drop_move), and the attack timer resets.
 func start_dash(direction: Vector2, distance: float, speed: float, trail_color := DashTrail.LIGHT) -> void:
 	_cancel_windup()
 	_dash_velocity = direction * speed
@@ -1064,7 +1066,7 @@ func start_dash(direction: Vector2, distance: float, speed: float, trail_color :
 	# A dash aimed right on Lucian goes nowhere, but still counts as one.
 	if _dash_left > 0.0:
 		_start_dash_trail(trail_color)
-		collision_mask = Layers.WORLD
+		collision_mask = _body_mask()
 	_drop_move()
 	visuals.face(direction)
 
@@ -1365,12 +1367,13 @@ func _start_dash_trail(color: Color) -> void:
 	spawn(_dash_trail)
 
 
-## Dashing or ghosted, Lucian passes through enemies; walls stop him unless
-## he is thrown (launch), when nothing does.
+## Dashing or ghosted, Lucian passes through enemies; walls and the abyss
+## stop him unless he is thrown (launch), when nothing does.
 func _body_mask() -> int:
 	if is_launched():
 		return 0
-	return Layers.WORLD if is_dashing() or is_ghosted() else Layers.WORLD | Layers.ENEMY_BODY
+	var solid := Layers.WORLD | Layers.CHASM
+	return solid if is_dashing() or is_ghosted() else solid | Layers.ENEMY_BODY
 
 
 ## A target gone dead or untargetable cancels the windup (the attack is

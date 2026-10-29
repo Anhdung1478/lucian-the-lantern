@@ -449,7 +449,7 @@ func test_a_launch_passes_a_wall_and_lands_on_the_far_side() -> void:
 	assert_false(lucian.is_launched())
 	assert_almost_eq(lucian.global_position, Vector2(400, 0), Vector2(1, 1))
 	assert_eq(lucian.visuals.scale, Vector2.ONE)
-	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY)
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM)
 
 
 func test_no_acting_in_flight() -> void:
@@ -472,7 +472,7 @@ func test_ghost_ending_mid_flight_does_not_reset_the_mask() -> void:
 	assert_false(lucian.is_ghosted())
 	assert_eq(lucian.collision_mask, 0)
 	await wait_seconds(0.3)
-	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY)
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM)
 
 
 func test_displace_is_ignored_in_flight() -> void:

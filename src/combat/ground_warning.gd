@@ -1,20 +1,24 @@
 class_name GroundWarning
 extends Node2D
 ## A red mark on the ground before an enemy attack lands: a circle, a line
-## (from the origin along `direction`), a cone, or a lock line that follows
-## a node. Its fill grows over `warn_time`; then `fired` and it goes. With
-## a strike set, Lucian takes the hit if he is inside when it fires.
+## (from the origin along `direction`), a cone, a lock line that follows a
+## node, or a ring (a band round a circle). Its fill grows over `warn_time`;
+## then `fired` and it goes. With a strike set, Lucian takes the hit if he
+## is inside when it fires.
 
 signal fired
 
-enum Shape { CIRCLE, LINE, CONE, LOCK }
+enum Shape { CIRCLE, LINE, CONE, LOCK, RING }
 
 const EDGE := Color(1.0, 0.25, 0.2, 0.9)
 const FILL := Color(1.0, 0.2, 0.15, 0.3)
+## Points round a ring's arcs.
+const RING_POINTS := 96
 
 var shape := Shape.CIRCLE
-## The circle's radius, or the line's or cone's length.
+## The circle's or ring's radius, or the line's or cone's length.
 var reach := 100.0
+## The line's width, or the ring's band (half inside its radius, half out).
 var width := 60.0
 ## The cone's angle, in radians.
 var spread := deg_to_rad(70.0)
@@ -71,6 +75,18 @@ static func lock(from: Vector2, onto: Node2D, seconds: float) -> GroundWarning:
 	return warning
 
 
+## A band `band_width` wide round the circle of `radius` (The Box's walls
+## rise on it): half of it inside the circle, half outside.
+static func ring(at: Vector2, radius: float, band_width: float, seconds: float) -> GroundWarning:
+	var warning := GroundWarning.new()
+	warning.shape = Shape.RING
+	warning.position = at
+	warning.reach = radius
+	warning.width = band_width
+	warning.warn_time = seconds
+	return warning
+
+
 ## Lucian takes `hit` if he is inside when the warning fires.
 func strike(hit: DamageInfo, victim: Lucian) -> void:
 	_hit = hit
@@ -91,6 +107,8 @@ func covers(point: Vector2, radius := 0.0) -> bool:
 			return in_line(global_position, direction, reach, width, point, radius)
 		Shape.CONE:
 			return in_cone(global_position, direction, reach, spread, point, radius)
+		Shape.RING:
+			return in_ring(global_position, reach, width, point, radius)
 	return false
 
 
@@ -119,6 +137,11 @@ static func in_line(from: Vector2, toward: Vector2, length: float, line_width: f
 	return local.x >= -point_radius and local.x <= length + point_radius and absf(local.y) <= line_width * 0.5 + point_radius
 
 
+## On the band `band_width` wide centered on the circle of `radius`.
+static func in_ring(center: Vector2, radius: float, band_width: float, point: Vector2, point_radius := 0.0) -> bool:
+	return absf(center.distance_to(point) - radius) <= band_width * 0.5 + point_radius
+
+
 static func in_cone(from: Vector2, toward: Vector2, length: float, angle: float, point: Vector2, point_radius := 0.0) -> bool:
 	var offset := point - from
 	if offset.length() > length + point_radius:
@@ -144,3 +167,9 @@ func _draw() -> void:
 			draw_colored_polygon(points, fill)
 			points.append(Vector2.ZERO)
 			draw_polyline(points, EDGE, 3.0, true)
+		Shape.RING:
+			# The band fills out from its middle line, between its two edges.
+			if progress() > 0.0:
+				draw_arc(Vector2.ZERO, reach, 0.0, TAU, RING_POINTS, fill, width * progress())
+			for edge: float in [reach - width * 0.5, reach + width * 0.5]:
+				draw_arc(Vector2.ZERO, maxf(edge, 0.0), 0.0, TAU, RING_POINTS, EDGE, 3.0, true)

@@ -72,10 +72,10 @@ func test_ghost_speeds_up_and_passes_through_enemies() -> void:
 	var speed := lucian.current_move_speed()
 	assert_true(lucian.use_summoner(0, Vector2.ZERO))
 	assert_almost_eq(lucian.current_move_speed(), speed * 1.4, 0.01)
-	assert_eq(lucian.collision_mask, Layers.WORLD)
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.CHASM)
 	lucian.set_ghosted(0.1)
 	await wait_seconds(0.2)
-	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY)
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM)
 
 
 func test_barrier_heal_and_clarity() -> void:

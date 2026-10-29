@@ -78,3 +78,46 @@ func test_extra_essence_comes_on_top_of_the_kind() -> void:
 	assert_eq(reward.blue, base.blue + 45)
 	assert_eq(reward.orange, base.orange + 4)
 	assert_eq(reward.gold, base.gold)
+
+
+## Phase 8: a summon (a Maiden's ghoul, a Broodmother's spiderling) pays a
+## quarter of its gold and XP, rounded, and no essence at all.
+func test_a_summon_pays_a_quarter_of_its_gold_and_xp() -> void:
+	# A melee minion pays 60 gold and 30 XP in Act 1, x1.25 in Act 2.
+	var reward := KillRewards.roll(MELEE, 2, StageSetup.new(), rng, true)
+	assert_eq(reward.gold, 19, "75 x 25% = 18.75")
+	assert_eq(reward.xp, 9, "37.5 x 25% = 9.375")
+	assert_eq(reward.blue, 0)
+	assert_eq(reward.orange, 0)
+
+
+func test_a_summon_pays_its_quarter_after_the_tree_bonuses() -> void:
+	var run := StageSetup.new()
+	run.gold_bonus = 0.3
+	run.xp_bonus = 0.2
+	run.essence_bonus = 0.5
+	var reward := KillRewards.roll(SIEGE, 1, run, rng, true)
+	assert_eq(reward.gold, 39, "156 x 25%")
+	assert_eq(reward.xp, 18, "72 x 25%")
+	assert_eq(reward.blue, 0)
+
+
+func test_a_summon_never_pays_essence_whatever_its_kind_or_extras() -> void:
+	var summon: EnemyData = SIEGE.duplicate()
+	summon.extra_blue = 45
+	summon.extra_orange = 4
+	for kind in [&"normal", &"elite", &"mini_boss", &"boss"]:
+		summon.kind = kind
+		var essence := 0
+		# Enough rolls for an elite's 10% orange to come up if it could.
+		for i in 200:
+			var reward := KillRewards.roll(summon, 3, StageSetup.new(), rng, true)
+			essence += reward.blue + reward.orange
+		assert_eq(essence, 0, String(kind))
+
+
+func test_not_a_summon_by_default() -> void:
+	rng.seed = 7
+	var plain := KillRewards.roll(SIEGE, 2, StageSetup.new(), rng)
+	rng.seed = 7
+	assert_eq(KillRewards.roll(SIEGE, 2, StageSetup.new(), rng, false), plain)

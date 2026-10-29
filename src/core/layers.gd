@@ -7,3 +7,6 @@ const PLAYER_BODY := 2
 const ENEMY_BODY := 4
 const PLAYER_HURTBOX := 8
 const ENEMY_HURTBOX := 16
+## Act 6's abyss (StageMap.chasm_polygons): bodies that walk, dash, blink or
+## are pushed stop at it, and paths go round it; shots fly over it.
+const CHASM := 32

@@ -483,3 +483,204 @@ func test_the_jungle_behaviors_come_as_monsters_and_minions_stay_minions() -> vo
 	for id in [WavePlan.MELEE, WavePlan.RANGED, WavePlan.SIEGE, WavePlan.SUPER]:
 		var unit := stage.spawn_enemy(id, at)
 		assert_true(unit is Minion and not (unit is Monster), String(id))
+
+
+## Phase 8: summons and vanish. The summon's data is registered under its id,
+## so the stage loads it like a file, and kept here so the path stays cached.
+## It has a boss's kind: paid like a kill, it would drop loot for sure and
+## 100 blue.
+var _summon: EnemyData
+
+
+func _summon_data() -> EnemyData:
+	_summon = _data(&"test_summon", &"boss")
+	_summon.take_over_path(Stage.ENEMY_PATH % _summon.id)
+	return _summon
+
+
+func _summoner_data(every: float, count: int, cap: int) -> EnemyData:
+	var data := _data(&"test_summoner", &"elite")
+	data.summon_id = &"test_summon"
+	data.summon_every = every
+	data.summon_count = count
+	data.summon_cap = cap
+	return data
+
+
+func _units(id: StringName) -> Array[Node]:
+	return get_tree().get_nodes_in_group(&"enemies").filter(func(enemy: Node) -> bool:
+		return enemy is EnemyUnit and (enemy as EnemyUnit).data.id == id)
+
+
+func _notes(stage: Stage) -> Array[Node]:
+	return stage.damage_numbers.get_children().filter(func(node: Node) -> bool: return node is FloatingText)
+
+
+func test_a_summon_joins_the_wave_and_pays_a_quarter_with_no_essence_or_loot() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.skip_break()
+	_summon_data()
+	var summoner := _alone_in_wave(stage, _summoner_data(0.1, 1, 1))
+	var counted: Array[int] = []
+	summoner.summon_requested.connect(func(_unit: EnemyUnit, _id: StringName, _at: Vector2) -> void: counted.append(stage.runner.alive()))
+	# Summoners call only while Lucian can be fought.
+	stage.lucian.invulnerable = false
+	for frame in 30:
+		if not counted.is_empty():
+			break
+		await wait_physics_frames(1)
+	stage.lucian.invulnerable = true
+	assert_eq(counted, [2] as Array[int], "counted in the wave at the request")
+	await wait_physics_frames(1)
+	var summons := _units(&"test_summon")
+	assert_eq(summons.size(), 1, "spawned (deferred)")
+	var summon: EnemyUnit = summons[0]
+	assert_true(summon.summoned)
+	assert_false(summoner.summoned)
+	assert_eq(summon.summoner, summoner)
+	assert_eq(summon.wave, summoner.wave)
+	assert_lt(summon.global_position.distance_to(summoner.global_position), 150.0, "beside it")
+	var gold := stage.wallet.gold
+	var blue: int = stage.collected[Essences.BLUE]
+	var orange: int = stage.collected[Essences.ORANGE]
+	var drops := _drops(stage).size()
+	var kills := stage.stats.kills
+	stage.lucian.progress.xp = 0
+	summon.take_damage(_lethal())
+	assert_eq(stage.wallet.gold - gold, 10, "a quarter of 40")
+	assert_eq(stage.lucian.progress.xp, 5, "a quarter of 20")
+	assert_eq(stage.collected[Essences.BLUE], blue, "no essence")
+	assert_eq(stage.collected[Essences.ORANGE], orange)
+	assert_eq(_drops(stage).size(), drops, "no loot, though its kind always drops some")
+	assert_eq(stage.stats.kills, kills + 1, "still a kill")
+	assert_eq(summoner.summons, 0, "its summoner was told")
+	assert_eq(stage.runner.state, WaveRunner.State.FIGHT, "the summoner is left")
+	summoner.take_damage(_lethal())
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK)
+	assert_engine_error_count(0)
+
+
+func test_the_cap_holds_and_a_summon_gone_makes_room() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.skip_break()
+	_summon_data()
+	var summoner := _alone_in_wave(stage, _summoner_data(0.1, 2, 3))
+	stage.lucian.invulnerable = false
+	await wait_physics_frames(45)
+	var summons := _units(&"test_summon")
+	assert_eq(summons.size(), 3, "2, then 1: the cap")
+	assert_eq(stage.runner.alive(), 4)
+	(summons[0] as EnemyUnit).take_damage(_lethal())
+	(summons[1] as EnemyUnit).vanish()
+	assert_eq(summoner.summons, 1, "told of a kill and of a vanish")
+	await wait_physics_frames(15)
+	stage.lucian.invulnerable = true
+	assert_eq(_units(&"test_summon").size(), 3, "two more, up to the cap again")
+	assert_eq(stage.runner.alive(), 4)
+	await _kill_wave(stage)
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK)
+	assert_engine_error_count(0)
+
+
+func test_a_summoners_death_leaves_its_summons_in_the_wave() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.skip_break()
+	_summon_data()
+	var summoner := _alone_in_wave(stage, _summoner_data(0.1, 2, 2))
+	stage.lucian.invulnerable = false
+	await wait_physics_frames(12)
+	stage.lucian.invulnerable = true
+	var summons := _units(&"test_summon")
+	assert_eq(summons.size(), 2)
+	summoner.take_damage(_lethal())
+	assert_eq(stage.runner.state, WaveRunner.State.FIGHT, "the wave waits for them")
+	assert_eq(stage.runner.alive(), 2)
+	# They outlive it, even once it has left the tree.
+	await wait_seconds(Enemy.DEATH_FADE + 0.2)
+	assert_false(is_instance_valid(summoner))
+	for summon: EnemyUnit in summons:
+		assert_true(summon.is_alive())
+		summon.take_damage(_lethal())
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK)
+	assert_engine_error_count(0)
+
+
+## Ruling RV1: a summon asked for on the very frame its summoner dies still
+## comes (it is counted already), and the wave ends only with it.
+func test_a_summon_asked_for_as_its_summoner_dies_still_comes_and_the_wave_waits() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.skip_break()
+	_summon_data()
+	var summoner := _alone_in_wave(stage, _summoner_data(0.1, 1, 1))
+	var at_death := {}
+	# Killed the moment it asks: after the stage counted the summon, before
+	# the summon's deferred spawn.
+	summoner.summon_requested.connect(func(_unit: EnemyUnit, _id: StringName, _at: Vector2) -> void:
+		summoner.take_damage(_lethal())
+		at_death.state = stage.runner.state
+		at_death.alive = stage.runner.alive()
+		at_death.here = _units(&"test_summon").size())
+	stage.lucian.invulnerable = false
+	for frame in 30:
+		if summoner.dead:
+			break
+		await wait_physics_frames(1)
+	stage.lucian.invulnerable = true
+	assert_true(summoner.dead)
+	assert_eq(at_death, {"state": WaveRunner.State.FIGHT, "alive": 1, "here": 0}, "dead, its summon counted and on its way")
+	await wait_physics_frames(1)
+	var summons := _units(&"test_summon")
+	assert_eq(summons.size(), 1, "it still comes")
+	assert_eq(stage.runner.state, WaveRunner.State.FIGHT)
+	(summons[0] as EnemyUnit).take_damage(_lethal())
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK, "and the wave ends with it")
+	assert_engine_error_count(0)
+
+
+func test_summons_come_in_the_sandbox_and_never_in_a_wall() -> void:
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	add_child_autofree(stage)
+	await wait_process_frames(2)
+	assert_null(stage.runner)
+	_summon_data()
+	var summoner := stage.spawn_unit(_summoner_data(0.1, 1, 1), stage.lucian.global_position + Vector2(700, 0))
+	await wait_physics_frames(12)
+	var summons := _units(&"test_summon")
+	assert_eq(summons.size(), 1)
+	(summons[0] as EnemyUnit).take_damage(_lethal())
+	assert_eq(summoner.summons, 0)
+	# A spot off the map: it comes out on its summoner instead.
+	stage.lucian.invulnerable = true
+	summoner.summon_requested.emit(summoner, &"test_summon", Vector2(-500, -500))
+	await wait_physics_frames(1)
+	summons = _units(&"test_summon")
+	assert_eq(summons.size(), 1)
+	assert_lt((summons[0] as EnemyUnit).global_position.distance_to(summoner.global_position), 60.0)
+	assert_engine_error_count(0)
+
+
+func test_a_vanish_pays_nothing_shows_no_note_and_the_wave_still_ends() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.skip_break()
+	var data := _data(&"test_sapling", &"elite")
+	data.extra_blue = 45
+	var sapling := _alone_in_wave(stage, data)
+	var gold := stage.wallet.gold
+	var xp := stage.lucian.progress.xp
+	var blue: int = stage.collected[Essences.BLUE]
+	var kills := stage.stats.kills
+	var drops := _drops(stage).size()
+	var notes := _notes(stage).size()
+	watch_signals(stage)
+	sapling.vanish()
+	assert_false(sapling.is_alive())
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK, "done for the wave")
+	assert_eq(stage.runner.waves_done(), 1)
+	assert_eq(stage.wallet.gold, gold)
+	assert_eq(stage.lucian.progress.xp, xp)
+	assert_eq(stage.collected[Essences.BLUE], blue)
+	assert_eq(stage.stats.kills, kills)
+	assert_eq(_drops(stage).size(), drops)
+	assert_eq(_notes(stage).size(), notes, "no note")
+	assert_signal_not_emitted(stage, "enemy_died")
+	assert_engine_error_count(0)

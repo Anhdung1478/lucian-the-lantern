@@ -110,6 +110,24 @@ func test_the_last_enemy_is_the_last_of_the_last_wave() -> void:
 	assert_false(runner.is_last_enemy(), "done")
 
 
+## Phase 8: a summon is counted the moment it is asked for, so its
+## summoner's death (even as the last of the wave) never ends the wave.
+func test_a_summon_counted_at_the_request_keeps_the_wave_open() -> void:
+	var runner := _runner([[WavePlan.MELEE]])
+	runner.skip()
+	_spawn_all(runner)
+	assert_true(runner.is_last_enemy(), "the summoner, alone")
+	runner.enemy_spawned()
+	assert_false(runner.is_last_enemy(), "its summon on the way")
+	runner.enemy_died()
+	assert_eq(runner.state, WaveRunner.State.FIGHT, "the summoner's death")
+	assert_eq(runner.alive(), 1)
+	assert_true(runner.is_last_enemy())
+	watch_signals(runner)
+	runner.enemy_died()
+	assert_signal_emitted(runner, "cleared", "the summon's death ends it")
+
+
 func test_the_packs() -> void:
 	assert_eq(WavePlan.PACKS[&"raptors"], [&"raptor_big", &"raptor", &"raptor", &"raptor", &"raptor"])
 	assert_eq(WavePlan.PACKS[&"wolves"], [&"murkwolf_big", &"murkwolf", &"murkwolf"])

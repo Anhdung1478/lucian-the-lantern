@@ -176,7 +176,7 @@ func test_e_dashes_as_far_as_the_cursor_even_zero() -> void:
 	await wait_physics_frames(3)
 	assert_almost_eq(lucian.position.x, 50.0, 0.5, "no move")
 	assert_false(lucian.is_dashing())
-	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY, "solid again")
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM, "solid again")
 	await wait_seconds(0.4)
 	assert_eq(effects.get_child_count(), 0, "no trail left behind")
 
