@@ -121,12 +121,17 @@ func wall_of_pain() -> float:
 ## several brings one Requiem, never two in a row.
 func requiem() -> float:
 	_requiems += 1
-	while _requiems < REQUIEM_HP.size() and hp <= max_hp * REQUIEM_HP[_requiems]:
-		_requiems += 1
+	_spend_thresholds()
 	_channel_left = REQUIEM_TIME
 	_channel_damage = 0.0
 	queue_redraw()
 	return REQUIEM_TIME
+
+
+## Spends every threshold his HP is at or below now: one crossing, one Requiem.
+func _spend_thresholds() -> void:
+	while _requiems < REQUIEM_HP.size() and hp <= max_hp * REQUIEM_HP[_requiems]:
+		_requiems += 1
 
 
 func _can_use(id: StringName) -> bool:
@@ -181,6 +186,7 @@ func _break() -> void:
 	_channel_left = 0.0
 	_channel_damage = 0.0
 	busy_left = RECOVER
+	_spend_thresholds()
 	var note := FloatingText.new("Broken!", BROKEN_COLOR)
 	note.position = global_position + BROKEN_AT
 	warning_parent.add_child(note)
@@ -191,6 +197,7 @@ func _break() -> void:
 func _finish_requiem() -> void:
 	_channel_damage = 0.0
 	busy_left = RECOVER
+	_spend_thresholds()
 	if is_instance_valid(target):
 		target.take_damage(skill_hit(REQUIEM_DAMAGE, DamageInfo.Type.MAGIC, &"requiem"))
 	queue_redraw()

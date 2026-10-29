@@ -293,6 +293,22 @@ func test_a_burst_past_several_thresholds_brings_one_requiem_then_none_until_15_
 	assert_true(boss._can_use(&"requiem"), "the next is 15%")
 
 
+func test_a_burst_that_breaks_the_channel_and_passes_a_threshold_spends_it() -> void:
+	var boss := _karthus(Vector2(3000, 0))
+	boss._cooldowns[&"requiem"] = 0.0
+	boss.hp = boss.max_hp * 0.74
+	await wait_physics_frames(2)
+	assert_true(boss.is_channeling())
+	boss.take_damage(_true_hit(boss.max_hp * 0.44))
+	await wait_physics_frames(2)
+	assert_false(boss.is_channeling(), "broken")
+	await wait_physics_frames(25)
+	assert_false(boss.is_channeling(), "no Requiem right behind the broken one")
+	assert_false(boss._can_use(&"requiem"), "the 45% threshold is spent")
+	boss.hp = boss.max_hp * 0.15
+	assert_true(boss._can_use(&"requiem"), "the next is 15%")
+
+
 func test_walking_down_the_thresholds_gives_three_requiems() -> void:
 	var boss := _karthus(Vector2(3000, 0))
 	var channels := 0
