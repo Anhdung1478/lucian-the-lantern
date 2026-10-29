@@ -69,6 +69,17 @@ static func is_stage_open(act: int, stage: int, cleared: Array[String]) -> bool:
 	return stage <= 1 or stage_id(act, stage - 1) in cleared
 
 
+## The stage after `stage` of `act`: the next in the act, else the first of
+## the next act, as Vector2i(act, stage). Vector2i.ZERO when it is the last
+## stage of the last act.
+static func next_stage(act: int, stage: int) -> Vector2i:
+	if stage < stage_count(act):
+		return Vector2i(act, stage + 1)
+	if act < ACTS.size():
+		return Vector2i(act + 1, 1)
+	return Vector2i.ZERO
+
+
 static func is_endless_open(cleared: Array[String]) -> bool:
 	return acts_cleared(cleared) >= ENDLESS_ACT
 

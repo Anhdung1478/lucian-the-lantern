@@ -8,8 +8,9 @@ const EXTRA_DUMMY_RING := 300.0
 ## Up, right, left and up-right of the first dummy: never toward the merchant.
 const EXTRA_DUMMY_ANGLES := [-PI / 2.0, 0.0, PI, -PI / 4.0]
 
-## The stage is over: &"left" now; &"cleared" and &"failed" come with waves.
-signal finished(result: StringName)
+## The stage is over: `result` is &"left", &"cleared" or &"failed"; `then` is
+## where the player chose to go: &"main", &"retry", &"next" or &"title".
+signal finished(result: StringName, then: StringName)
 ## Exit the game was chosen in the menu.
 signal exit_requested
 ## An enemy spawned by the stage died (after its rewards).
@@ -59,6 +60,8 @@ var runner: WaveRunner
 ## Lucian's invulnerable flag as a cutscene found it (debug God mode survives).
 var _invulnerable_before_freeze := false
 var result := StageResult.new()
+## Kills, damage and gold, for the end screen.
+var stats := StageStats.new()
 ## First-clear rewards, for the result panel.
 var reward_lines: Array[String] = []
 ## Seconds played in this stage (the stage only processes while unpaused).
@@ -101,7 +104,7 @@ func _ready() -> void:
 	screens.controller = lucian.get_node("Controller")
 	if not Sfx.exists():
 		add_child(Sfx.new())
-	screens.menu.leave_requested.connect(func() -> void: finished.emit(&"left"))
+	screens.menu.leave_requested.connect(func() -> void: finished.emit(&"left", &"main"))
 	# Game connects `finished` before adding the stage; alone, nobody would act on Leave.
 	screens.menu.set_leave_enabled(not finished.get_connections().is_empty())
 	screens.menu.exit_requested.connect(_exit)
@@ -114,9 +117,10 @@ func _ready() -> void:
 	shop_slots = run.shop_slots
 	debug_table.setup(self)
 	add_child(result)
-	result.continue_pressed.connect(func() -> void: finished.emit(&"cleared" if result.cleared else &"failed"))
+	result.chosen.connect(func(then: StringName) -> void: finished.emit(&"cleared" if result.cleared else &"failed", then))
 	lucian.died.connect(_on_lucian_died)
 	lucian.damage_received.connect(damage_numbers.spawn.bind(lucian, LUCIAN_NUMBER_SCALE))
+	lucian.damage_received.connect(func(_info: DamageInfo, amount: float) -> void: stats.damage_taken += amount)
 	screens.backpack.setup(lucian.inventory)
 	screens.backpack.potion_used.connect(lucian.use_item)
 	screens.backpack_toggled.connect(debug_table.set_docked_right)
@@ -183,10 +187,21 @@ func show_result(is_cleared: bool) -> void:
 		screens.set_backpack_open(false)
 	screens.set_menu_open(false)
 	screens.locked = true
-	var waves_text := "Waves cleared: %d / %d   ·   " % [runner.waves_done(), runner.total_waves()] if runner else ""
+	hud.visible = false
+	var rows := [["Time", StageResult.clock(elapsed)]]
+	if runner:
+		rows.append(["Waves", "%d / %d" % [runner.waves_done(), runner.total_waves()]])
+	rows.append_array([
+		["Kills", StageStats.format(stats.kills)],
+		["Damage dealt", StageStats.format(stats.damage_dealt)],
+		["Damage taken", StageStats.format(stats.damage_taken)],
+		["Gold earned", StageStats.format(stats.gold_earned)],
+		["Level reached", str(lucian.progress.level)],
+	])
+	var next := Journey.next_stage(run.act, run.stage) if run.act > 0 else Vector2i.ZERO
+	var can_next := is_cleared and next != Vector2i.ZERO and WavePlan.has_stage(Journey.stage_id(next.x, next.y))
 	# Losing the tutorial (Act 1 before its first clear) is a game over.
-	result.show_result(is_cleared, run.display_name, waves_text + "Time %s" % StageResult.clock(elapsed), collected, reward_lines,
-		not is_cleared and run.tutorial)
+	result.show_result(is_cleared, run.display_name, rows, collected, reward_lines, not is_cleared and run.tutorial, can_next)
 	get_tree().paused = true
 
 
@@ -259,6 +274,7 @@ func spawn_enemy(id: StringName, at: Vector2, wave := 1) -> EnemyUnit:
 	unit.position = at
 	$World.add_child(unit)
 	unit.damage_taken.connect(damage_numbers.spawn.bind(unit))
+	unit.damage_taken.connect(_count_damage_dealt.bind(unit))
 	unit.died.connect(_on_enemy_died)
 	debug_table.watch(unit)
 	return unit
@@ -328,6 +344,12 @@ func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 
 
 ## The boss's purple (first-time or repeat) and the first-clear lines, then the result.
+## Damage dealt is the HP Lucian's hits took; debug damage doesn't count.
+func _count_damage_dealt(info: DamageInfo, _final_amount: float, enemy: Enemy) -> void:
+	if info.attacker == lucian and info.source != &"debug":
+		stats.damage_dealt += enemy.hp_lost
+
+
 func _on_cleared() -> void:
 	if lucian.dead or result.visible:
 		return
@@ -339,8 +361,11 @@ func _on_cleared() -> void:
 		if purple > 0:
 			add_essences(0, 0, purple, lucian.global_position)
 			reward_lines.append("+%d purple essence (%s)" % [purple, "first clear" if first_time else "repeat"])
-	if not run.stage_id in save.cleared and run.stage == Journey.stage_count(run.act) and run.act < Journey.ACTS.size():
-		reward_lines.append("Act %d is open" % (run.act + 1))
+	if not run.stage_id in save.cleared:
+		if run.stage < Journey.stage_count(run.act):
+			reward_lines.append("Stage %s is open" % Journey.stage_id(run.act, run.stage + 1))
+		elif run.act < Journey.ACTS.size():
+			reward_lines.append("Act %d is open" % (run.act + 1))
 	show_result(true)
 
 
@@ -450,6 +475,8 @@ func _on_enemy_died(enemy: Enemy) -> void:
 	var unit := enemy as EnemyUnit
 	var reward := KillRewards.roll(unit.data, maxi(run.act, 1), run, rng)
 	wallet.add(reward.gold)
+	stats.gold_earned += reward.gold
+	stats.kills += 1
 	lucian.progress.add_xp(reward.xp)
 	add_essences(reward.blue, reward.orange, 0, unit.global_position)
 	# The kill that ends the stage drops nothing: the result comes up at once,

@@ -12,7 +12,7 @@ const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots"
 ## (so Act 1 is its first play, the tutorial).
 const ACT_SCENARIOS := {
 	"act1_start": [1, 1], "act1_wave": [1, 1], "act1_shell": [1, 1], "act1_break": [1, 1],
-	"act1_lesson": [1, 1], "act1_thresh": [1, 1], "act1_cutscene": [1, 1], "act1_result": [1, 1],
+	"act1_lesson": [1, 1], "act1_thresh": [1, 1], "act1_cutscene": [1, 1], "act1_result": [1, 1], "game_over": [1, 1],
 	"act2_pillars": [2, 3], "act2_super": [2, 1], "akshan_e": [2, 3], "akshan_r": [2, 3],
 	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
 }
@@ -171,6 +171,8 @@ func _run(scenario: String) -> void:
 			await scenario_act1_cutscene()
 		"act1_result":
 			await scenario_act1_result()
+		"game_over":
+			await scenario_game_over()
 		"act2_pillars":
 			await scenario_act2_pillars()
 		"act2_super":
@@ -1784,7 +1786,21 @@ func scenario_act1_result() -> void:
 	print("reward lines: ", game.reward_lines)
 	print("purple (expect 10), bosses (expect [thresh_1]): ", SaveGame.instance().essences.amount(Essences.PURPLE),
 		" ", SaveGame.instance().bosses, "  waves (expect 3 / 3): ", game.runner.waves_done(), " / ", game.runner.total_waves())
+	print("buttons (expect retry, next hidden and main lit): ", game.result.retry_button.visible, " ", game.result.next_button.visible, " ", game.result.main_button.text,
+		"  HUD hidden (expect true): ", not game.hud.visible)
 	await shot("act1_result_0")
+	paused = false
+
+
+## Losing the tutorial: GAME OVER with a single Back to title.
+func scenario_game_over() -> void:
+	var game := game_stage()
+	await wait(0.5)
+	game.show_result(false)
+	await wait(0.2)
+	print("result (expect GAME OVER): ", game.result.title.text, "  retry shown (expect false): ", game.result.retry_button.visible,
+		"  main button (expect Back to title): ", game.result.main_button.text)
+	await shot("game_over_0")
 	paused = false
 
 
@@ -1904,6 +1920,7 @@ func scenario_defeat() -> void:
 	var blue: int = game.collected[Essences.BLUE]
 	print("result (expect DEFEATED): ", game.result.title.text, "  waves (expect 1 / 2): ", game.runner.waves_done(), " / ", game.runner.total_waves())
 	print("blue kept in the save (expect %d): %d" % [blue, SaveGame.instance().essences.amount(Essences.BLUE)])
+	print("buttons (expect Retry shown, Next hidden): ", game.result.retry_button.visible, " ", game.result.next_button.visible)
 	await shot("defeat_1_result")
 	paused = false
 

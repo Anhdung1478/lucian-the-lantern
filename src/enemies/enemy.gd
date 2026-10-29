@@ -28,6 +28,9 @@ const DEATH_FADE := 0.4
 @export var radius := 40.0
 
 var hp := 0.0
+## The HP the last hit really took: its final amount, capped at the HP left
+## (set before damage_taken is emitted).
+var hp_lost := 0.0
 var dead := false
 ## Whoever hit this enemy last: the kill is theirs.
 var last_attacker: Node
@@ -58,7 +61,9 @@ func take_damage(info: DamageInfo) -> float:
 	var final_amount := DamageCalc.mitigate(info.amount, info.type, effective_armor(), effective_mr(), info.armor_pen, info.magic_pen)
 	if attacker:
 		last_attacker = attacker
+	var hp_before := hp
 	_lose_hp(final_amount)
+	hp_lost = hp_before - hp
 	Sfx.play(&"hit", -12.0)
 	damage_taken.emit(info, final_amount)
 	if attacker and attacker.has_method(&"on_damage_dealt"):

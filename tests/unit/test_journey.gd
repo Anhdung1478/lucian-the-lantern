@@ -55,3 +55,10 @@ func test_the_wave_plan_matches_the_journey() -> void:
 			var id := Journey.stage_id(act + 1, stage + 1)
 			assert_eq(Journey.waves(act + 1, stage + 1), WavePlan.waves(id).size(), id)
 			assert_eq(Journey.boss_kind(act + 1, stage + 1) == &"boss", WavePlan.boss(id) != &"", id)
+
+
+func test_next_stage() -> void:
+	assert_eq(Journey.next_stage(1, 1), Vector2i(2, 1))
+	assert_eq(Journey.next_stage(2, 3), Vector2i(3, 1))
+	assert_eq(Journey.next_stage(3, 2), Vector2i(3, 3))
+	assert_eq(Journey.next_stage(6, 5), Vector2i.ZERO)

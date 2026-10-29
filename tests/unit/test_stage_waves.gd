@@ -113,8 +113,8 @@ func test_clearing_every_wave_shows_stage_cleared() -> void:
 	assert_eq(stage.result.title.text, "STAGE CLEARED")
 	assert_true(get_tree().paused)
 	watch_signals(stage)
-	stage.result.continue_button.pressed.emit()
-	assert_signal_emitted_with_parameters(stage, "finished", [&"cleared"])
+	stage.result.next_button.pressed.emit()
+	assert_signal_emitted_with_parameters(stage, "finished", [&"cleared", &"next"])
 
 
 func test_dying_shows_defeated() -> void:
@@ -126,10 +126,11 @@ func test_dying_shows_defeated() -> void:
 	while not stage.result.visible and Time.get_ticks_msec() < give_up:
 		await wait_process_frames(1)
 	assert_eq(stage.result.title.text, "DEFEATED")
-	assert_eq(stage.result.continue_button.text, "Continue")
+	assert_eq(stage.result.main_button.text, "Main screen")
+	assert_false(stage.result.next_button.visible)
 	watch_signals(stage)
-	stage.result.continue_button.pressed.emit()
-	assert_signal_emitted_with_parameters(stage, "finished", [&"failed"])
+	stage.result.main_button.pressed.emit()
+	assert_signal_emitted_with_parameters(stage, "finished", [&"failed", &"main"])
 
 
 func test_losing_the_tutorial_is_game_over() -> void:
@@ -137,10 +138,11 @@ func test_losing_the_tutorial_is_game_over() -> void:
 	assert_true(stage.run.tutorial)
 	stage.show_result(false)
 	assert_eq(stage.result.title.text, "GAME OVER")
-	assert_eq(stage.result.continue_button.text, "Back to title")
+	assert_eq(stage.result.main_button.text, "Back to title")
+	assert_false(stage.result.retry_button.visible)
 	watch_signals(stage)
-	stage.result.continue_button.pressed.emit()
-	assert_signal_emitted_with_parameters(stage, "finished", [&"failed"])
+	stage.result.main_button.pressed.emit()
+	assert_signal_emitted_with_parameters(stage, "finished", [&"failed", &"title"])
 
 
 func test_losing_act_1_after_its_first_clear_is_only_defeated() -> void:
@@ -185,9 +187,96 @@ func test_the_result_shows_the_stage_time() -> void:
 	stage.show_result(true)
 	assert_gt(stage.elapsed, 0.4)
 	var texts := stage.result.find_children("*", "Label", true, false).map(func(label: Label) -> String: return label.text)
-	assert_true(texts.any(func(text: String) -> bool: return text.contains("Time 0:01")), str(texts))
+	assert_true("Time" in texts and "0:01" in texts, str(texts))
 
 
 func test_the_clock() -> void:
 	assert_eq(StageResult.clock(17.2), "0:18")
 	assert_eq(StageResult.clock(65.0), "1:05")
+
+
+func _melee(stage: Stage) -> EnemyUnit:
+	return stage.spawn_enemy(WavePlan.MELEE, stage.arena.spawn_points[0])
+
+
+func test_the_stage_counts_kills_and_gold() -> void:
+	var stage: Stage = await _stage(2, 1)
+	for i in 3:
+		_melee(stage).take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_eq(stage.stats.kills, 3)
+	assert_eq(stage.stats.gold_earned, stage.wallet.gold)
+
+
+func test_damage_dealt_is_lucians_hits_capped_at_the_hp_lost() -> void:
+	var stage: Stage = await _stage(2, 1)
+	var enemy := _melee(stage)
+	var hp := enemy.hp
+	enemy.take_damage(stage.lucian.make_damage(100.0, DamageInfo.Type.TRUE, &"attack"))
+	assert_almost_eq(stage.stats.damage_dealt, 100.0, 0.01)
+	enemy.take_damage(stage.lucian.make_damage(99999.0, DamageInfo.Type.TRUE, &"attack"))
+	assert_almost_eq(stage.stats.damage_dealt, hp, 0.01)
+	assert_eq(stage.stats.kills, 1)
+
+
+func test_other_attackers_and_debug_damage_add_nothing_to_damage_dealt() -> void:
+	var stage: Stage = await _stage(2, 1)
+	var enemy := _melee(stage)
+	enemy.take_damage(DamageInfo.create(100.0, DamageInfo.Type.TRUE, &"test"))
+	assert_eq(stage.stats.damage_dealt, 0.0)
+	enemy.take_damage(stage.lucian.make_damage(99999.0, DamageInfo.Type.TRUE, &"debug"))
+	assert_eq(stage.stats.damage_dealt, 0.0)
+	assert_eq(stage.stats.kills, 1)
+
+
+func test_damage_taken_counts_after_armor() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.lucian.invulnerable = false
+	stage.lucian.take_damage(DamageInfo.create(50.0, DamageInfo.Type.TRUE, &"test"))
+	assert_almost_eq(stage.stats.damage_taken, 50.0, 0.01)
+
+
+func test_the_hud_hides_on_the_result() -> void:
+	var stage: Stage = await _stage(2, 1)
+	assert_true(stage.hud.visible)
+	stage.show_result(true)
+	assert_false(stage.hud.visible)
+
+
+func test_the_result_lists_the_stats() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.stats.kills = 87
+	stage.stats.damage_dealt = 41234.0
+	stage.show_result(true)
+	var texts := stage.result.find_children("*", "Label", true, false).map(func(label: Label) -> String: return label.text)
+	for text in ["Kills", "87", "Damage dealt", "41.2k", "Gold earned", "Level reached", "Waves", "0 / 2"]:
+		assert_true(text in texts, "%s in %s" % [text, texts])
+
+
+func test_stage_is_open_shows_on_a_first_clear_only() -> void:
+	var stage: Stage = await _stage(2, 1)
+	for wave in 2:
+		stage.skip_break()
+		_kill_wave(stage)
+		await wait_process_frames(1)
+	assert_true("Stage 2-2 is open" in stage.reward_lines, str(stage.reward_lines))
+	SaveGame.instance().set_cleared(["2-1"] as Array[String])
+	var again: Stage = load("res://src/stage/stage.tscn").instantiate()
+	again.setup(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	add_child_autofree(again)
+	await wait_process_frames(2)
+	again.lucian.invulnerable = true
+	for wave in 2:
+		again.skip_break()
+		_kill_wave(again)
+		await wait_process_frames(1)
+	assert_true(again.result.visible)
+	assert_false("Stage 2-2 is open" in again.reward_lines, str(again.reward_lines))
+
+
+func test_next_stage_shows_only_when_it_can_be_played() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.show_result(true)
+	assert_true(stage.result.next_button.visible, "2-2 has waves")
+	var last: Stage = await _stage(2, 3)
+	last.show_result(true)
+	assert_false(last.result.next_button.visible, "3-1 has no waves yet")

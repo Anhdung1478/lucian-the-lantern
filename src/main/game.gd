@@ -118,15 +118,28 @@ func _keep_playing() -> void:
 	get_tree().paused = _was_paused
 
 
-## Deferred: the stage is still inside its own menu's signal here. Losing the
-## tutorial (Act 1 before its first clear) is a game over: back to the title
-## screen; otherwise the main screen. A failed save shows on the new screen.
-func _on_stage_finished(result: StringName) -> void:
+## Deferred: the stage is still inside its own signal here. `then` is the
+## player's choice: retry or next start that stage; the title screen after
+## losing the tutorial (Act 1 before its first clear); otherwise the main
+## screen. A failed save sends retry and next to the main screen, where it shows.
+func _on_stage_finished(result: StringName, then: StringName) -> void:
 	var saved := SaveGame.instance().finish_stage(result, _run.stage_id)
+	var act := _run.act
+	var stage := _run.stage
 	if result == &"failed" and _run.tutorial:
-		show_title.call_deferred()
-	else:
-		show_main_screen.call_deferred(_run.act)
+		then = &"title"
+	if not saved and then in [&"retry", &"next"]:
+		then = &"main"
+	match then:
+		&"title":
+			show_title.call_deferred()
+		&"retry":
+			start_stage.call_deferred(StageSetup.for_stage(SaveGame.instance(), act, stage))
+		&"next":
+			var next := Journey.next_stage(act, stage)
+			start_stage.call_deferred(StageSetup.for_stage(SaveGame.instance(), next.x, next.y))
+		_:
+			show_main_screen.call_deferred(act)
 	if not saved:
 		_report_save_failed.call_deferred()
 

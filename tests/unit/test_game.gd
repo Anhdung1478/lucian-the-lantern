@@ -176,7 +176,7 @@ func test_a_cleared_act_stage_is_saved_as_cleared() -> void:
 	await wait_process_frames(2)
 	var stage := game.screen as Stage
 	stage.show_result(true)
-	stage.result.continue_button.pressed.emit()
+	stage.result.main_button.pressed.emit()
 	await wait_process_frames(2)
 	assert_true("2-1" in SaveGame.instance().cleared)
 	assert_is(game.screen, MainScreen)
@@ -184,12 +184,55 @@ func test_a_cleared_act_stage_is_saved_as_cleared() -> void:
 	assert_eq(journey.current, 1)
 
 
+func test_retry_starts_the_same_stage_again_saved() -> void:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_process_frames(2)
+	var first := game.screen as Stage
+	first.show_result(true)
+	first.result.retry_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, Stage)
+	assert_ne(game.screen, first)
+	assert_eq((game.screen as Stage).run.stage_id, "2-1")
+	assert_true("2-1" in SaveGame.instance().cleared)
+	assert_true(FileAccess.file_exists(SaveGame.instance().path(1)))
+	assert_false(get_tree().paused)
+
+
+func test_next_stage_starts_the_one_after() -> void:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_process_frames(2)
+	var stage := game.screen as Stage
+	stage.show_result(true)
+	stage.result.next_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, Stage)
+	assert_eq((game.screen as Stage).run.stage_id, "2-2")
+	assert_true("2-1" in SaveGame.instance().cleared)
+
+
+func test_a_failed_save_on_retry_lands_on_the_main_screen_with_the_toast() -> void:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_process_frames(2)
+	SaveGame.instance().prefix = BROKEN_PREFIX
+	var stage := game.screen as Stage
+	stage.show_result(false)
+	stage.result.retry_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, MainScreen)
+	assert_eq((game.screen as MainScreen).toast_text(), "Could not save")
+	assert_push_warning_count(1)
+
+
 func test_losing_the_tutorial_goes_back_to_the_title() -> void:
 	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 1, 1))
 	await wait_process_frames(2)
 	var stage := game.screen as Stage
 	stage.show_result(false)
-	stage.result.continue_button.pressed.emit()
+	stage.result.main_button.pressed.emit()
 	await wait_process_frames(2)
 	assert_is(game.screen, TitleScreen)
 	assert_false("1-1" in SaveGame.instance().cleared)
@@ -203,7 +246,7 @@ func test_losing_a_later_stage_goes_to_the_main_screen() -> void:
 	await wait_process_frames(2)
 	var stage := game.screen as Stage
 	stage.show_result(false)
-	stage.result.continue_button.pressed.emit()
+	stage.result.main_button.pressed.emit()
 	await wait_process_frames(2)
 	assert_is(game.screen, MainScreen)
 
@@ -214,7 +257,7 @@ func test_a_failed_save_after_a_game_over_shows_on_the_title() -> void:
 	SaveGame.instance().prefix = BROKEN_PREFIX
 	var stage := game.screen as Stage
 	stage.show_result(false)
-	stage.result.continue_button.pressed.emit()
+	stage.result.main_button.pressed.emit()
 	await wait_process_frames(2)
 	assert_is(game.screen, TitleScreen)
 	assert_eq((game.screen as TitleScreen).notice_label.text, "Could not save")
