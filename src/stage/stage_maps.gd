@@ -14,4 +14,6 @@ static func create(act: int, stage: int) -> StageMap:
 			if stage == Journey.stage_count(3):
 				return DragonPitMap.new()
 			return JungleMap.new(stage)
+		4:
+			return DarkMidLaneMap.new()
 	return TestArena.new()

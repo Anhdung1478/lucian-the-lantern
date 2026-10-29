@@ -13,14 +13,15 @@ const LANE_HALF := 450.0
 const RIVER_HALF := 260.0
 const RIVER_REACH := 1100.0
 const ROCK_RADIUS := 70.0
-const LANE_COLOR := Color("5b5244")
-const JUNGLE_COLOR := Color("1d3a24")
-const JUNGLE_EDGE := Color("2f5a35")
-const TREE_COLOR := Color("16301d")
-const RIVER_COLOR := Color("2e5f86")
-const RIVER_EDGE := Color("6fb4d8")
-const ROCK_COLOR := Color("6b6660")
 
+## The palette; a subclass sets its own in _init.
+var lane_color := Color("5b5244")
+var jungle_color := Color("1d3a24")
+var jungle_edge := Color("2f5a35")
+var tree_color := Color("16301d")
+var river_color := Color("2e5f86")
+var river_edge := Color("6fb4d8")
+var rock_color := Color("6b6660")
 var _river: PackedVector2Array
 
 
@@ -65,27 +66,27 @@ func _band(from: Vector2, to: Vector2, half: float) -> PackedVector2Array:
 func _draw() -> void:
 	# The jungle runs on past the edges, where the camera still sees.
 	for rect in border_rects():
-		draw_rect(rect, JUNGLE_COLOR)
-	draw_rect(get_bounds(), LANE_COLOR)
-	draw_colored_polygon(_river, RIVER_COLOR)
+		draw_rect(rect, jungle_color)
+	draw_rect(get_bounds(), lane_color)
+	draw_colored_polygon(_river, river_color)
 	var ripples := RandomNumberGenerator.new()
 	ripples.seed = 3
 	for i in 40:
 		var at := center() + across() * ripples.randf_range(-RIVER_REACH, RIVER_REACH) + along() * ripples.randf_range(-RIVER_HALF + 30.0, RIVER_HALF - 30.0)
-		draw_arc(at, ripples.randf_range(18.0, 40.0), PI * 1.1, PI * 1.9, 12, Color(RIVER_EDGE, 0.35), 2.0, true)
+		draw_arc(at, ripples.randf_range(18.0, 40.0), PI * 1.1, PI * 1.9, 12, Color(river_edge, 0.35), 2.0, true)
 	var trees := RandomNumberGenerator.new()
 	trees.seed = 7
 	for polygon in wall_polygons:
-		draw_colored_polygon(polygon, JUNGLE_COLOR)
+		draw_colored_polygon(polygon, jungle_color)
 		var box := _bounds_of(polygon)
 		for i in 70:
 			var at := Vector2(trees.randf_range(box.position.x, box.end.x), trees.randf_range(box.position.y, box.end.y))
 			if Geometry2D.is_point_in_polygon(at, polygon) and _distance_to_edge(at, polygon) > 80.0:
-				draw_circle(at, trees.randf_range(40.0, 80.0), TREE_COLOR)
+				draw_circle(at, trees.randf_range(40.0, 80.0), tree_color)
 		var outline := polygon.duplicate()
 		outline.append(polygon[0])
-		draw_polyline(outline, JUNGLE_EDGE, 8.0, true)
+		draw_polyline(outline, jungle_edge, 8.0, true)
 	for rock in wall_circles:
-		draw_circle(Vector2(rock.x, rock.y), rock.z, ROCK_COLOR)
-		draw_arc(Vector2(rock.x, rock.y), rock.z, 0.0, TAU, 32, ROCK_COLOR.lightened(0.3), 4.0, true)
-	draw_rect(get_bounds(), JUNGLE_EDGE, false, 4.0)
+		draw_circle(Vector2(rock.x, rock.y), rock.z, rock_color)
+		draw_arc(Vector2(rock.x, rock.y), rock.z, 0.0, TAU, 32, rock_color.lightened(0.3), 4.0, true)
+	draw_rect(get_bounds(), jungle_edge, false, 4.0)

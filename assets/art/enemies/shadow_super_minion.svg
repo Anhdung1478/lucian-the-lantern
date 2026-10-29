@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112">
+  <!-- Shadow Super Minion: the super minion in black-purple with violet glows, same shape and facing (+X). -->
+  <g transform="translate(56 56)">
+    <circle cx="0" cy="0" r="46" fill="none" stroke="#8a4fe0" stroke-width="3" opacity="0.45"/>
+    <ellipse cx="0" cy="5" rx="44" ry="40" fill="#000000" opacity="0.25"/>
+    <!-- arms and fists -->
+    <path d="M 4 -30 L 38 -24" stroke="#1a1d24" stroke-width="20" stroke-linecap="round"/>
+    <path d="M 4 -30 L 38 -24" stroke="#2a1a3d" stroke-width="14" stroke-linecap="round"/>
+    <path d="M 4 30 L 38 24" stroke="#1a1d24" stroke-width="20" stroke-linecap="round"/>
+    <path d="M 4 30 L 38 24" stroke="#2a1a3d" stroke-width="14" stroke-linecap="round"/>
+    <circle cx="44" cy="-23" r="12" fill="#3d2660" stroke="#1a1d24" stroke-width="3"/>
+    <circle cx="44" cy="23" r="12" fill="#3d2660" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M 40 -29 v 12 M 47 -29 v 12 M 40 17 v 12 M 47 17 v 12" stroke="#150d22" stroke-width="2" stroke-linecap="round"/>
+    <!-- armored body -->
+    <ellipse cx="-4" cy="0" rx="26" ry="42" fill="#241a38" stroke="#1a1d24" stroke-width="3"/>
+    <ellipse cx="-2" cy="-33" rx="14" ry="11" fill="#33204a" stroke="#1a1d24" stroke-width="3"/>
+    <ellipse cx="-2" cy="33" rx="14" ry="11" fill="#33204a" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -18 -18 Q -22 0 -18 18" fill="none" stroke="#120b1e" stroke-width="4" stroke-linecap="round"/>
+    <!-- glowing runes -->
+    <g stroke="#b46cff" stroke-width="3" stroke-linecap="round" fill="none">
+      <path d="M -14 -14 L -8 -4 L -14 6"/>
+      <path d="M -2 -12 L 4 -4 L -2 4"/>
+      <path d="M -14 14 L -8 20"/>
+    </g>
+    <!-- helmet -->
+    <circle cx="6" cy="0" r="14" fill="#2a1a3d" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -6 0 L 18 0" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 12 -6 L 18 0 L 12 6" fill="none" stroke="#b46cff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

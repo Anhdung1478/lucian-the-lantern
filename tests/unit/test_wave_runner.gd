@@ -177,3 +177,31 @@ func test_every_act_3_enemy_has_its_data() -> void:
 		for wave: Array in WavePlan.waves(Journey.stage_id(3, stage)):
 			for id: StringName in wave:
 				assert_true(ResourceLoader.exists(Stage.ENEMY_PATH % id), String(id))
+
+
+## Act 4's waves as the design's table writes them: m shadow melee, r shadow
+## ranged, S shadow siege, U shadow super. No boss yet.
+func test_act_4_waves_follow_the_table() -> void:
+	var letters := {WavePlan.SHADOW_MELEE: "m", WavePlan.SHADOW_RANGED: "r", WavePlan.SHADOW_SIEGE: "S", WavePlan.SHADOW_SUPER: "U"}
+	var table := {
+		"4-1": "8m 6r 1S · 8m 6r 2S · 8m 8r 1S 1U · 10m 8r 2S 1U",
+		"4-2": "8m 6r 2S · 8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 10m 10r 3S 1U",
+		"4-3": "8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 10m 10r 3S 1U · 12m 10r 2S 2U",
+	}
+	for id: String in table:
+		assert_true(WavePlan.has_stage(id), id)
+		var waves: Array[String] = []
+		for wave: Array in WavePlan.waves(id):
+			var counts := {}
+			for enemy: StringName in wave:
+				counts[letters.get(enemy, "?")] = counts.get(letters.get(enemy, "?"), 0) + 1
+			var written: Array[String] = []
+			for letter: String in ["m", "r", "S", "U"]:
+				if counts.has(letter):
+					written.append("%d%s" % [counts[letter], letter])
+			waves.append(" ".join(written))
+		assert_eq(" · ".join(waves), table[id], id)
+		assert_eq(WavePlan.waves(id).size(), Journey.waves(4, id.right(1).to_int()), "%s: the Journey's wave count" % id)
+		for wave: Array in WavePlan.waves(id):
+			for enemy: StringName in wave:
+				assert_true(ResourceLoader.exists(Stage.ENEMY_PATH % enemy), String(enemy))

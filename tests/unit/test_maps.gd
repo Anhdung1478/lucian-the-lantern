@@ -1,6 +1,6 @@
 extends GutTest
 
-const STAGES := [[1, 1], [2, 1], [2, 2], [2, 3], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5]]
+const STAGES := [[1, 1], [2, 1], [2, 2], [2, 3], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [4, 1], [4, 2], [4, 3]]
 ## The navigation map may sync on a background thread: poll it, at most this
 ## many physics frames.
 const SYNC_FRAMES := 180
@@ -269,3 +269,32 @@ func _jungle_along(map: StageMap, from: Vector2, to: Vector2) -> float:
 		if not map.is_walkable(from.lerp(to, (i + 0.5) / steps), 0.0):
 			length += from.distance_to(to) / steps
 	return length
+
+
+func test_act_4_is_the_dark_mid_lane() -> void:
+	for stage in range(1, 4):
+		var map := StageMaps.create(4, stage)
+		assert_is(map, DarkMidLaneMap, str(stage))
+		assert_eq(map.wall_polygons.size(), 2)
+		assert_eq(map.lane_color, Color("2a2633"))
+		assert_eq(map.jungle_color, Color("120f1a"))
+		assert_eq(map.jungle_edge, Color("3b2a52"))
+		assert_eq(map.tree_color, Color("0c0a12"))
+		assert_eq(map.river_color, Color("1d1630"))
+		assert_eq(map.river_edge, Color("7a4fb0"))
+		assert_eq(map.rock_color, Color("3a3742"))
+		map.free()
+
+
+func test_the_dark_lane_keeps_act_1s_layout_and_act_1_keeps_its_colors() -> void:
+	var light := MidLaneMap.new()
+	var dark := DarkMidLaneMap.new()
+	assert_eq(dark.boss_point, light.boss_point)
+	assert_eq(dark.lucian_start, light.lucian_start)
+	assert_eq(dark.spawn_points, light.spawn_points)
+	assert_eq(dark.wall_polygons, light.wall_polygons)
+	assert_eq(light.lane_color, Color("5b5244"))
+	assert_eq(light.jungle_color, Color("1d3a24"))
+	assert_eq(light.river_edge, Color("6fb4d8"))
+	light.free()
+	dark.free()

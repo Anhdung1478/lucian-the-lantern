@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/shadow_siege_minion.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"shadow_siege_minion"
+display_name = "Shadow Siege Minion"
+kind = &"elite"
+behavior = &"siege"
+art = ExtResource("2_art")
+max_hp = 700.0
+armor = 20.0
+mr = 10.0
+damage = 40.0
+attack_range = 700.0
+attack_interval = 3.0
+move_speed = 220.0
+radius = 36.0
+gold = 120
+xp = 60
+area_radius = 110.0
+warn_time = 1.0

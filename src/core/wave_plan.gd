@@ -9,6 +9,11 @@ const MELEE := &"melee_minion"
 const RANGED := &"ranged_minion"
 const SIEGE := &"siege_minion"
 const SUPER := &"super_minion"
+## Act 4's shadow minions: the same four, in dark art.
+const SHADOW_MELEE := &"shadow_melee_minion"
+const SHADOW_RANGED := &"shadow_ranged_minion"
+const SHADOW_SIEGE := &"shadow_siege_minion"
+const SHADOW_SUPER := &"shadow_super_minion"
 ## Act 3's elites, one at a time.
 const BLUE_SENTINEL := &"blue_sentinel"
 const RED_BRAMBLEBACK := &"red_brambleback"
@@ -59,6 +64,26 @@ const STAGES := {
 		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
 		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
 		[[&"raptors", 2], [&"wolves", 1], [&"krugs", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+	],
+	"4-1": [
+		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 6], [SHADOW_SIEGE, 1]],
+		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 6], [SHADOW_SIEGE, 2]],
+		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 8], [SHADOW_SIEGE, 1], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 8], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
+	],
+	"4-2": [
+		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 6], [SHADOW_SIEGE, 2]],
+		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 8], [SHADOW_SIEGE, 1], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 8], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 3], [SHADOW_SUPER, 1]],
+	],
+	"4-3": [
+		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 8], [SHADOW_SIEGE, 1], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 8], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 3], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 12], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 2]],
 	],
 }
 ## Stage id -> the boss wave's enemy id.
