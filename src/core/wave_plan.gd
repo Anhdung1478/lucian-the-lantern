@@ -62,7 +62,7 @@ const STAGES := {
 	],
 }
 ## Stage id -> the boss wave's enemy id.
-const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan"}
+const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan", "3-5": &"elder_dragon"}
 ## Stage id -> enemy id -> its share of HP in that stage only. Act 1's stage
 ## is gentler: its melee and ranged minions have 20% less HP.
 const HP_SHARES := {"1-1": {MELEE: 0.8, RANGED: 0.8}}

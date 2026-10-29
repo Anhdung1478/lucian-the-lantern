@@ -16,7 +16,7 @@ const ACT_SCENARIOS := {
 	"act2_pillars": [2, 3], "act2_super": [2, 1], "akshan_e": [2, 3], "akshan_r": [2, 3],
 	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
-	"infernal_meteor": [3, 2], "ocean_mist": [3, 4],
+	"infernal_meteor": [3, 2], "ocean_mist": [3, 4], "elder_sky_dive": [3, 5], "elder_mark": [3, 5],
 }
 
 var stage: Node
@@ -199,6 +199,10 @@ func _run(scenario: String) -> void:
 			await scenario_infernal_meteor()
 		"ocean_mist":
 			await scenario_ocean_mist()
+		"elder_sky_dive":
+			await scenario_elder_sky_dive()
+		"elder_mark":
+			await scenario_elder_mark()
 		"training_setup":
 			await scenario_training_setup()
 		"skins_stage":
@@ -1964,6 +1968,79 @@ func scenario_ocean_mist() -> void:
 	await wait(0.3)
 	print("interrupted (expect false, true): ", drake.is_channeling(), " ", drake.is_dazed())
 	await shot("ocean_mist_3_interrupted")
+
+
+## The Elder Dragon in the middle of the pit, Lucian below it, the camera
+## between them. It doesn't shoot and its skills wait; wave 1 waits too.
+func to_elder() -> ElderDragon:
+	var game := game_stage()
+	flush_tips()
+	game.runner._countdown = 999.0
+	var middle := game.arena.boss_point
+	blink(middle + Vector2(0, 300))
+	game.camera.mode = StageCamera.Mode.FREE
+	game.camera.global_position = middle + Vector2(0, 80)
+	game.camera.zoom = Vector2(0.8, 0.8)
+	var dragon := game.spawn_enemy(&"elder_dragon", middle + Vector2(0, -150)) as ElderDragon
+	dragon.move_speed = 0.0
+	dragon._attack_left = 999.0
+	for skill: StringName in dragon._cooldowns:
+		dragon._cooldowns[skill] = 60.0
+	return dragon
+
+
+## Sky Dive: up and unseen (only its shadow, the boss bar still on it); the
+## shadow after Lucian as he walks; the landing's circle filling; then down
+## on him, and the push.
+func scenario_elder_sky_dive() -> void:
+	var game := game_stage()
+	var dragon := to_elder()
+	dragon.hp = dragon.max_hp * 0.8
+	dragon.health_bar.set_health(dragon.hp, dragon.max_hp)
+	dragon._cooldowns[&"sky_dive"] = 0.0
+	while not dragon.is_diving():
+		await wait(0.05)
+	await wait(0.4)
+	print("untargetable (expect true): ", dragon.untargetable, "  boss bar on it (expect true): ", game.hud.boss_bar.boss == dragon)
+	await shot("elder_sky_dive_0_up")
+	lucian.command_move(lucian.global_position + Vector2(450, 0))
+	await wait(1.2)
+	await shot("elder_sky_dive_1_shadow")
+	var circle := await wait_for_warning(GroundWarning.Shape.CIRCLE)
+	await wait(0.5)
+	print("landing circle r (expect 260): ", circle.reach if circle else 0.0)
+	await shot("elder_sky_dive_2_landing")
+	var hp := lucian.hp
+	var at := lucian.global_position
+	while dragon.is_diving():
+		await wait(0.02)
+	await wait(0.3)
+	print("hit (expect about 240 less MR): ", roundi(hp - lucian.hp), "  pushed (expect up to 200): ", roundi(at.distance_to(lucian.global_position)), "  targetable (expect true): ", Lucian.is_target(dragon))
+	await shot("elder_sky_dive_3_landed")
+
+
+## Elder's Mark: the ring counting down over Lucian; red once he is under
+## 25% HP; then a shield takes the tripled hit.
+func scenario_elder_mark() -> void:
+	var dragon := to_elder()
+	dragon._cooldowns[&"elder_mark"] = 0.0
+	var marks := []
+	while marks.is_empty():
+		await wait(0.05)
+		marks = stage.get_node("Warnings").get_children().filter(func(node: Node) -> bool: return node is ElderMark)
+	await wait(1.0)
+	await shot("elder_mark_0_ring")
+	lucian.hp = lucian.stats.max_hp * 0.2
+	await wait(1.5)
+	print("tripled (expect true): ", (marks[0] as ElderMark).is_boosted())
+	await shot("elder_mark_1_low")
+	lucian.add_shield(&"barrier", 500.0, 10.0)
+	var shield := lucian.total_shield()
+	while is_instance_valid(marks[0]):
+		await wait(0.02)
+	print("shield used (expect 390): ", roundi(shield - lucian.total_shield()), "  HP kept (expect true): ", lucian.hp >= lucian.stats.max_hp * 0.2 - 1.0)
+	await wait(0.2)
+	await shot("elder_mark_2_landed")
 
 
 ## A super minion with melee and ranged minions around it: Empower's icon

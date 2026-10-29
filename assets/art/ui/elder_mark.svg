@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Elder's Mark: a violet draconic sigil over Lucian, a slit dragon eye in a horned ring with white-violet flame above it. -->
+  <!-- horns -->
+  <path d="M 16 18 L 5 3 L 24 12 Z M 48 18 L 59 3 L 40 12 Z" fill="#d8ccef" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- flame on the brow -->
+  <path d="M 32 3 C 35 8 39 10 38 15 C 37 18 34 19 32 19 C 30 19 27 18 26 15 C 25 10 29 8 32 3 Z" fill="#9a6cff" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 32 9 C 34 12 35 13 35 15 C 35 17 33 17 32 17 C 31 17 29 17 29 15 C 29 13 30 12 32 9 Z" fill="#efe6ff"/>
+  <!-- the ring -->
+  <circle cx="32" cy="38" r="23" fill="#241634" stroke="#1a1d24" stroke-width="4"/>
+  <circle cx="32" cy="38" r="18.5" fill="none" stroke="#a87cff" stroke-width="3"/>
+  <path d="M 32 15 v 5 M 32 56 v 5 M 9 38 h 5 M 50 38 h 5" stroke="#efe6ff" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- the eye -->
+  <path d="M 16 38 Q 32 24 48 38 Q 32 52 16 38 Z" fill="#c9a8ff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 21 38 Q 32 29 43 38 Q 32 47 21 38 Z" fill="#efe6ff"/>
+  <path d="M 32 28 Q 37 38 32 48 Q 27 38 32 28 Z" fill="#3a1a6e"/>
+  <circle cx="29" cy="34" r="1.6" fill="#ffffff"/>
+</svg>

@@ -49,8 +49,9 @@ func test_endless_needs_every_act() -> void:
 	assert_false(Journey.is_endless_open(Journey.all_stage_ids(2)))
 
 
+## Acts 1 to 3 so far: Act 4's waves come later.
 func test_the_wave_plan_matches_the_journey() -> void:
-	for act in 2:
+	for act in 3:
 		for stage in Journey.stage_count(act + 1):
 			var id := Journey.stage_id(act + 1, stage + 1)
 			assert_eq(Journey.waves(act + 1, stage + 1), WavePlan.waves(id).size(), id)
