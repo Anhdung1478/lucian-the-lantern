@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="88" viewBox="0 0 88 88">
+  <!-- Chain Warden: a hooded jailer seen from above, broad dark-green cowl and shoulders, a heavy chain looped across the back and a hooked end held out forward (+X). -->
+  <g transform="translate(44 44)">
+    <ellipse cx="-2" cy="3" rx="37" ry="33" fill="#000000" opacity="0.25"/>
+    <!-- shoulders and cowl -->
+    <ellipse cx="-4" cy="0" rx="22" ry="31" fill="#2f4a3c" stroke="#1a1d24" stroke-width="3.5"/>
+    <path d="M -22 -14 Q -8 -22 4 -10 M -22 14 Q -8 22 4 10" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linecap="round"/>
+    <!-- chain looped across the back -->
+    <path d="M -10 -24 Q -28 0 -10 24" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-dasharray="6 3"/>
+    <path d="M -10 -24 Q -28 0 -10 24" fill="none" stroke="#aab4be" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 3"/>
+    <!-- arms out forward holding the chain -->
+    <path d="M 6 -18 L 22 -12 L 30 -4 M 6 18 L 22 12 L 30 4" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 6 -18 L 22 -12 L 30 -4 M 6 18 L 22 12 L 30 4" fill="none" stroke="#3f6350" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- chain to the hook -->
+    <path d="M 30 0 L 42 0" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round" stroke-dasharray="5 3"/>
+    <path d="M 30 0 L 42 0" fill="none" stroke="#aab4be" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="5 3"/>
+    <!-- hook -->
+    <path d="M 40 -2 L 48 -2 Q 56 -2 54 7 Q 52 12 46 10" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 40 -2 L 48 -2 Q 56 -2 54 7 Q 52 12 46 10" fill="none" stroke="#c9d2da" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- hood and a lantern-blue glint of an eye -->
+    <circle cx="2" cy="0" r="13" fill="#233a2d" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -9 0 L 6 -6 M -9 0 L 6 6" fill="none" stroke="#1a1d24" stroke-width="1.6" stroke-linecap="round"/>
+    <circle cx="9" cy="-3.5" r="1.8" fill="#6dffb0"/>
+    <circle cx="9" cy="3.5" r="1.8" fill="#6dffb0"/>
+  </g>
+</svg>

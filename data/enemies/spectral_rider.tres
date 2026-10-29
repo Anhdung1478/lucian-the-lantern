@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/spectral_rider.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"spectral_rider"
+display_name = "Spectral Rider"
+kind = &"elite"
+behavior = &"charger"
+art = ExtResource("2_art")
+max_hp = 1300.0
+armor = 40.0
+mr = 20.0
+damage = 60.0
+attack_range = 800.0
+attack_interval = 4.0
+move_speed = 280.0
+radius = 42.0
+gold = 140
+xp = 80
+damage_type = 0

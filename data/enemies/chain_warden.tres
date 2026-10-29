@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/chain_warden.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"chain_warden"
+display_name = "Chain Warden"
+kind = &"elite"
+behavior = &"warden"
+art = ExtResource("2_art")
+max_hp = 1200.0
+armor = 35.0
+mr = 35.0
+damage = 45.0
+attack_range = 700.0
+attack_interval = 3.5
+move_speed = 220.0
+radius = 40.0
+gold = 150
+xp = 90
+damage_type = 0
+keep_min = 500.0
+keep_max = 700.0
+perch = true

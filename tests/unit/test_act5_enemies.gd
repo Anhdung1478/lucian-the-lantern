@@ -157,7 +157,7 @@ func test_a_sapling_killed_before_its_warning_fires_never_blasts() -> void:
 
 func test_an_unknown_specter_behavior_walks_in_and_hits_like_any_enemy() -> void:
 	var data := _data("ghoul").duplicate() as EnemyData
-	data.behavior = &"charger"
+	data.behavior = &"unwritten"
 	var specter := Specter.new()
 	specter.setup(data, 1, 1, lucian)
 	specter.position = Vector2(300, 0)

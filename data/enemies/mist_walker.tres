@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/mist_walker.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"mist_walker"
+display_name = "Mist Walker"
+kind = &"normal"
+behavior = &"brute"
+art = ExtResource("2_art")
+max_hp = 220.0
+armor = 10.0
+mr = 10.0
+damage = 14.0
+attack_range = 100.0
+attack_interval = 0.9
+move_speed = 360.0
+radius = 26.0
+gold = 55
+xp = 28
+damage_type = 0

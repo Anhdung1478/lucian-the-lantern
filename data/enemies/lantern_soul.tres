@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/lantern_soul.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"lantern_soul"
+display_name = "Lantern Soul"
+kind = &"normal"
+behavior = &"spit"
+art = ExtResource("2_art")
+max_hp = 150.0
+armor = 0.0
+mr = 20.0
+damage = 22.0
+attack_range = 550.0
+attack_interval = 1.6
+move_speed = 280.0
+radius = 24.0
+gold = 45
+xp = 25
+damage_type = 1
+keep_min = 420.0
+keep_max = 550.0
+projectile_speed = 500.0
+frees = true

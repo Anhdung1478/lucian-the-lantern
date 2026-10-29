@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56">
+  <!-- Mist Walker: a lean grey ghoul seen from above, narrow hunched shoulders, long thin arms reaching forward (+X) and a wide wake of pale mist trailing behind. -->
+  <g transform="translate(28 28)">
+    <ellipse cx="-1" cy="2" rx="24" ry="20" fill="#000000" opacity="0.25"/>
+    <!-- trailing mist -->
+    <path d="M -6 -12 Q -22 -22 -26 -12 Q -20 -8 -27 -2 Q -20 2 -27 8 Q -20 12 -26 16 Q -22 24 -6 12 Z" fill="#c9d1d6" opacity="0.55"/>
+    <path d="M -12 -6 L -24 -4 M -12 0 L -26 1 M -12 6 L -24 5" fill="none" stroke="#eef2f4" stroke-width="1.6" stroke-linecap="round" opacity="0.7"/>
+    <!-- long arms -->
+    <path d="M 2 -9 L 14 -12 L 23 -8 M 2 9 L 14 12 L 23 8" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2 -9 L 14 -12 L 23 -8 M 2 9 L 14 12 L 23 8" fill="none" stroke="#8d969c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- hunched body -->
+    <ellipse cx="-2" cy="0" rx="11" ry="13" fill="#8d969c" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -8 -6 L -2 0 L -8 6" fill="none" stroke="#5d666c" stroke-width="1.6" stroke-linecap="round"/>
+    <!-- head and hollow eyes -->
+    <circle cx="8" cy="0" r="6.5" fill="#a9b2b8" stroke="#1a1d24" stroke-width="2.5"/>
+    <circle cx="10.5" cy="-2.5" r="1.6" fill="#1a1d24"/>
+    <circle cx="10.5" cy="2.5" r="1.6" fill="#1a1d24"/>
+  </g>
+</svg>
