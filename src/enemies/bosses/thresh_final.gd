@@ -11,16 +11,16 @@ extends Thresh
 ##
 ## Phase 2 (Q, W, R): a hook that misses comes again at once (once per cast),
 ## Dark Passage (his lantern thrown near Lucian; Lantern Souls come out of it
-## as his summons), and a harder Box. At 0 HP he falls: `fell`, once. The
-## stage frees his souls and ends the fight.
+## as his summons, PASSAGE_CAP of them at most), and a harder Box. At 0 HP he
+## falls: `fell`, once. The stage frees his souls and takes him away.
 ##
 ## 0 HP is only noted in _die (a shot's physics callback can bring it); the
 ## rise and the fall come in _physics_process. `stopped` (Thresh's) holds
 ## while he is down, rising or fallen: he takes no damage, thinks nothing and
 ## throws nothing then.
 
-## At 0 HP in Phase 2 (once): the fight is over.
-signal fell
+## At 0 HP in Phase 2 (once): his fight is over.
+signal fell(thresh: ThreshFinal)
 
 const FINAL_HOOK_DAMAGE := 160.0
 const FINAL_HOOK_WARN := 0.8
@@ -30,6 +30,9 @@ const FINAL_FLAY_PUSH := 300.0
 ## Phase 2: a missed hook comes again behind this shorter warning (a pull,
 ## not a CC).
 const REHOOK_WARN := 0.45
+## Phase 2: Death Sentence keeps him busy this long past the chain's flight,
+## so its miss (and the second throw) comes before any other skill can start.
+const REHOOK_SLACK := 0.15
 ## The Box: used when Lucian is within BOX_RADIUS, centered on Thresh.
 const BOX_RADIUS := 450.0
 ## The ring warning's band: the pieces rise on its middle line.
@@ -54,6 +57,9 @@ const PASSAGE_RADIUS := 100.0
 const PASSAGE_WARN := 0.6
 const PASSAGE_TIME := 6.0
 const PASSAGE_SOULS := 3
+## His summoned souls alive or on their way stay at or under this: at 4, a
+## Dark Passage brings 2.
+const PASSAGE_CAP := 6
 const PASSAGE_COOLDOWN := 16.0
 const PASSAGE_FIRST := 3.0
 ## He throws it at Lucian from this far at most.
@@ -152,10 +158,11 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 
 
-## A new cast: its hook may come again, once (Phase 2).
+## A new cast: its hook may come again, once (Phase 2), and he stays busy
+## until a miss has brought it again (REHOOK_SLACK).
 func death_sentence() -> float:
 	_hooked_again = false
-	return super()
+	return super() + (REHOOK_SLACK if phase == 2 else 0.0)
 
 
 ## The Box: a ring warning round him, then the pieces rise on it (_raise_box).
@@ -244,15 +251,16 @@ func _raise_box(center: Vector2) -> void:
 ## A piece touched (once each): the hit, and the slow only when the hit
 ## landed (Banshee's Veil blocks both).
 func _box_touched(_piece: int) -> void:
-	if not is_instance_valid(target):
+	if stopped or not is_instance_valid(target):
 		return
 	if target.take_damage(skill_hit(_box_damage, DamageInfo.Type.MAGIC, &"the_box")):
 		target.add_slow(BOX_SLOW_ID, BOX_SLOW, BOX_SLOW_TIME)
 
 
-## The lantern lands: it lies there PASSAGE_TIME, and PASSAGE_SOULS Lantern
-## Souls come out round it as his summons (counted in `summons`; the stage
-## spawns them deferred).
+## The lantern lands: it lies there PASSAGE_TIME, and up to PASSAGE_SOULS
+## Lantern Souls come out round it as his summons, never more than
+## PASSAGE_CAP of them alive or on their way (`summons`, which summon_gone
+## lowers; the stage spawns them deferred).
 func _drop_lantern(spot: Vector2) -> void:
 	if stopped:
 		return
@@ -265,10 +273,11 @@ func _drop_lantern(spot: Vector2) -> void:
 	stay.tween_interval(PASSAGE_TIME - LANTERN_FADE)
 	stay.tween_property(lantern, "modulate:a", 0.0, LANTERN_FADE)
 	stay.tween_callback(lantern.queue_free)
+	var count := mini(PASSAGE_SOULS, PASSAGE_CAP - summons)
 	var turn := randf() * TAU
-	for i in PASSAGE_SOULS:
+	for i in count:
 		summons += 1
-		summon_requested.emit(self, WavePlan.LANTERN_SOUL, spot + Vector2.from_angle(turn + TAU * i / PASSAGE_SOULS) * SOUL_GAP)
+		summon_requested.emit(self, WavePlan.LANTERN_SOUL, spot + Vector2.from_angle(turn + TAU * i / count) * SOUL_GAP)
 		# A listener may have ended the fight.
 		if stopped:
 			return
@@ -299,7 +308,7 @@ func _fall() -> void:
 	_fallen = true
 	_clear_placed()
 	queue_redraw()
-	fell.emit()
+	fell.emit(self)
 
 
 func _clear_placed() -> void:

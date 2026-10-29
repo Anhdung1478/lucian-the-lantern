@@ -304,6 +304,9 @@ func spawn_unit(data: EnemyData, at: Vector2, wave := 1) -> EnemyUnit:
 	unit.died.connect(_on_enemy_died)
 	unit.escaped.connect(_on_enemy_escaped)
 	unit.summon_requested.connect(_on_summon_requested)
+	if unit is ThreshFinal:
+		## Deferred: a shot's physics callback can bring his fall. Any final Thresh, the debug list's too.
+		(unit as ThreshFinal).fell.connect(_on_thresh_fell, CONNECT_DEFERRED)
 	debug_table.watch(unit)
 	return unit
 
@@ -365,10 +368,9 @@ func _start_waves() -> void:
 func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 	if id == run.boss:
 		boss_unit = spawn_enemy(id, arena.boss_point)
-		## Deferred, both: a shot's physics callback can bring him to half HP or to his fall, and the freeze can't disable bodies mid-flush.
-		if boss_unit is ThreshFinal:
-			(boss_unit as ThreshFinal).fell.connect(_on_thresh_fell, CONNECT_DEFERRED)
-		elif boss_unit is Thresh:
+		# Act 1's cutscene, for a plain Thresh only (spawn_unit wires a final one's fall).
+		if boss_unit is Thresh and not (boss_unit is ThreshFinal):
+			## Deferred: a shot's physics callback can bring him to half HP, and the freeze can't disable bodies mid-flush.
 			(boss_unit as Thresh).phase_ended.connect(_on_thresh_phase_ended, CONNECT_DEFERRED)
 		return
 	var data: EnemyData = load(ENEMY_PATH % id)
@@ -538,8 +540,7 @@ func _tip(id: StringName) -> void:
 func _on_thresh_phase_ended() -> void:
 	if lucian.dead or result.visible:
 		return
-	for node: Node in $Warnings.get_children() + $Projectiles.get_children():
-		node.queue_free()
+	_clear_fight()
 	cutscene = ThreshTakesSenna.new()
 	cutscene.done.connect(_on_cutscene_done)
 	cutscene.start(self)
@@ -555,36 +556,47 @@ func _on_cutscene_done() -> void:
 		senna.queue_free()
 	senna = null
 	cutscene = null
-	_thresh_leaves()
+	_thresh_leaves(boss_unit)
 
 
-## Act 6's Thresh falls in Phase 2: the fight stops (warnings and shots go),
-## every soul he summoned goes free (vanish), and he leaves with his rewards.
-func _on_thresh_fell() -> void:
-	if lucian.dead or result.visible or not is_instance_valid(boss_unit):
-		return
+## Every warning on the ground and every shot in the air goes: a Thresh's
+## fight has stopped.
+func _clear_fight() -> void:
 	for node: Node in $Warnings.get_children() + $Projectiles.get_children():
 		node.queue_free()
+
+
+## A final Thresh falls in Phase 2 (the boss wave's, or one from the debug
+## list): the fight stops, every soul he summoned goes free (vanish), and he
+## leaves with his rewards.
+func _on_thresh_fell(thresh: ThreshFinal) -> void:
+	if lucian.dead or result.visible or not is_instance_valid(thresh):
+		return
+	_clear_fight()
 	for enemy: Node in get_tree().get_nodes_in_group(&"enemies"):
 		var unit := enemy as EnemyUnit
-		if unit and unit.summoned and unit.data.id == WavePlan.LANTERN_SOUL:
+		if unit and unit.summoned and unit.summoner == thresh:
 			unit.vanish()
-	_thresh_leaves()
+	_thresh_leaves(thresh)
 
 
-## Thresh is beaten: his blue and orange now, rising where he stands (as a
-## kill's do), his purple over Lucian in _on_cleared. He leaves the map, and
-## his leaving ends the boss wave like a death would; finish() ends the stage
-## even if other enemies are still about.
-func _thresh_leaves() -> void:
-	var reward := KillRewards.roll(boss_unit.data, run.act, run, rng)
-	add_essences(reward.blue, reward.orange, 0, boss_unit.global_position)
+## A Thresh is beaten: his blue and orange now, rising where he stands (as a
+## kill's do). He leaves the map and the wave counts him out, as a death
+## would (that may end the wave). The boss wave's Thresh also ends the stage:
+## finish(), even with other enemies about; his purple comes in _on_cleared.
+func _thresh_leaves(thresh: EnemyUnit) -> void:
+	var reward := KillRewards.roll(thresh.data, maxi(run.act, 1), run, rng)
+	add_essences(reward.blue, reward.orange, 0, thresh.global_position)
 	# Out of "enemies" now, so the radar and the boss bar drop him at once.
-	boss_unit.remove_from_group(&"enemies")
-	boss_unit.queue_free()
-	boss_unit = null
-	runner.enemy_died()
-	runner.finish()
+	thresh.remove_from_group(&"enemies")
+	thresh.queue_free()
+	var was_boss := thresh == boss_unit
+	if was_boss:
+		boss_unit = null
+	if runner:
+		runner.enemy_died()
+		if was_boss:
+			runner.finish()
 
 
 ## A kill: its rewards (a summon's are small); its splits (counted at once,

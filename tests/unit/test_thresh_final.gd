@@ -302,6 +302,29 @@ func test_a_box_touch_banshees_veil_blocks_does_not_slow() -> void:
 	assert_true(wall.is_broken(0), "the piece still breaks")
 
 
+## Fix round 1: a touch on the frame he is floored (before the rise clears
+## the Box) or after his fall hurts nobody.
+func test_a_box_touch_once_he_is_down_hurts_nobody() -> void:
+	lucian.global_position = Vector2(200, 0)
+	var boss := _thresh(Vector2.ZERO)
+	var wall := await _raised_box(boss)
+	if wall == null:
+		return
+	boss.take_damage(_lethal())
+	boss._box_touched(0)
+	assert_eq(_hits(&"the_box").size(), 0, "floored")
+	assert_eq(lucian.slow_amount(), 0.0)
+	await wait_physics_frames(2)
+	boss._rise_left = 0.0
+	await wait_physics_frames(2)
+	assert_false(boss.stopped, "up again")
+	boss.take_damage(_lethal())
+	await wait_physics_frames(2)
+	boss._box_touched(1)
+	assert_eq(_hits(&"the_box").size(), 0, "fallen")
+	assert_eq(lucian.slow_amount(), 0.0)
+
+
 func test_the_phase_2_box_hits_for_220_every_18_seconds() -> void:
 	lucian.global_position = Vector2(200, 0)
 	var boss := _thresh(Vector2.ZERO)
@@ -468,6 +491,31 @@ func test_a_dodged_hook_in_phase_2_comes_again_at_once_with_a_0_45_second_warnin
 	assert_eq(_hits(&"death_sentence").size(), 0)
 
 
+## Fix round 1: a dodged Phase 2 hook keeps him busy until it comes again.
+## Dark Passage and The Box, both ready and Lucian in reach, wait until the
+## second line is down, then come.
+func test_no_other_skill_starts_between_a_dodged_hook_and_its_second_throw() -> void:
+	lucian.global_position = Vector2(300, 0)
+	var boss := _thresh(Vector2.ZERO)
+	await _to_phase_2(boss)
+	# As in a stage, the chain flies under a node processed after him
+	# ($Projectiles after $World): its miss comes after his thinking that frame.
+	var shots := Node2D.new()
+	add_child_autofree(shots)
+	boss.projectile_parent = shots
+	var warnings := _watch(GroundWarning)
+	# As his thinking casts it: busy for what it returns.
+	boss.busy_left = boss.death_sentence()
+	boss._cooldowns[&"dark_passage"] = 0.0
+	boss._cooldowns[&"the_box"] = 0.0
+	# Off the line, still within 450 of him.
+	lucian.global_position = Vector2(300, 200)
+	assert_true(await wait_until(func() -> bool: return warnings.size() >= 2, 3.0))
+	assert_eq((warnings[1] as GroundWarning).shape, GroundWarning.Shape.LINE, "the second throw comes first")
+	assert_true(await wait_until(func() -> bool: return warnings.size() >= 3, 3.0), "then his next skill")
+	assert_ne((warnings[2] as GroundWarning).shape, GroundWarning.Shape.LINE)
+
+
 func test_a_hook_banshees_veil_blocks_is_no_miss() -> void:
 	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"banshees_veil"))
 	lucian.global_position = Vector2(700, 0)
@@ -586,6 +634,32 @@ func test_the_lantern_lies_6_seconds_and_3_lantern_souls_come_out() -> void:
 	assert_eq(_effects(Sprite2D).size(), 1, "still there")
 	await wait_seconds(0.8)
 	assert_eq(_effects(Sprite2D).size(), 0, "gone after 6 s")
+
+
+## Fix round 1 (ruling): his summoned souls alive or on their way stay at
+## or under 6. At 4, a Dark Passage brings 2; at 6, none (the lantern still
+## lands); one gone, one more.
+func test_dark_passage_stops_at_6_souls_alive_or_on_their_way() -> void:
+	assert_eq(ThreshFinal.PASSAGE_CAP, 6)
+	lucian.global_position = Vector2(300, 0)
+	var boss := _thresh(Vector2(-400, 0))
+	await _to_phase_2(boss)
+	var calls := []
+	boss.summon_requested.connect(func(_unit: EnemyUnit, _id: StringName, _at: Vector2) -> void: calls.append(true))
+	boss.summons = 4
+	boss.dark_passage()
+	await wait_seconds(ThreshFinal.PASSAGE_WARN + 0.1)
+	assert_eq(calls.size(), 2, "4 out: 2 more")
+	assert_eq(boss.summons, 6)
+	boss.dark_passage()
+	await wait_seconds(ThreshFinal.PASSAGE_WARN + 0.1)
+	assert_eq(calls.size(), 2, "6 out: none")
+	assert_eq(_effects(Sprite2D).size(), 2, "the lantern still lands")
+	boss.summon_gone()
+	boss.dark_passage()
+	await wait_seconds(ThreshFinal.PASSAGE_WARN + 0.1)
+	assert_eq(calls.size(), 3, "one gone: one more")
+	assert_eq(boss.summons, 6)
 
 
 # --- the fall: Phase 2 at 0 HP ----------------------------------------------------------
@@ -710,10 +784,11 @@ func test_his_fall_frees_every_summoned_soul_and_6_5_pays_20_purple_then_4() -> 
 	var kills := stage.stats.kills
 	# Counted here: he is freed before the asserts.
 	var fell := []
-	boss.fell.connect(func() -> void: fell.append(true))
+	boss.fell.connect(func(thresh: ThreshFinal) -> void: fell.append(thresh))
 	_shoot(stage, boss, 999999.0)
 	await wait_physics_frames(4)
 	assert_eq(fell.size(), 1, "fell, once")
+	assert_eq(fell[0], boss, "and says who fell")
 	for soul: EnemyUnit in souls:
 		assert_true(soul.has_escaped, "freed")
 		assert_eq(soul.escape_note, "", "quietly")
@@ -741,6 +816,119 @@ func test_his_fall_frees_every_summoned_soul_and_6_5_pays_20_purple_then_4() -> 
 	assert_true(again.result.visible)
 	assert_has(again.reward_lines, "+4 purple essence (repeat)")
 	assert_eq(again.collected[Essences.PURPLE], 4)
+	assert_engine_error_count(0)
+
+
+## Fix round 1 (ruling): in 6-5, the stage's own bookkeeping (a soul's
+## death tells him) keeps the cap: 3, then 6, then still 6; one killed, one
+## more. The wave counts each one.
+func test_in_6_5_his_souls_stop_at_6_and_a_place_freed_is_filled_again() -> void:
+	var stage: Stage = await _stage()
+	var boss := await _boss_wave(stage)
+	await _to_phase_2(boss)
+	assert_eq((await _souls(stage, boss)).size(), 3)
+	var souls := await _souls(stage, boss)
+	assert_eq(souls.size(), 6)
+	assert_eq(stage.runner.alive(), 7)
+	souls = await _souls(stage, boss)
+	assert_eq(souls.size(), 6, "the cap holds")
+	assert_eq(stage.runner.alive(), 7)
+	(souls[0] as EnemyUnit).take_damage(_lethal())
+	assert_eq(boss.summons, 5, "he is told")
+	souls = await _souls(stage, boss)
+	assert_eq(souls.size(), 6, "one more fills the place")
+	assert_eq(stage.runner.alive(), 7)
+	assert_eq(boss.summons, 6)
+	assert_engine_error_count(0)
+
+
+## A final Thresh from the debug list: spawned and counted in the wave (as
+## DebugTable._spawn does), quiet.
+func _debug_thresh(stage: Stage) -> ThreshFinal:
+	var thresh := stage.spawn_enemy(&"thresh_final", Vector2(2800, 1500)) as ThreshFinal
+	stage.runner.enemy_spawned()
+	_quiet(thresh)
+	await wait_physics_frames(1)
+	return thresh
+
+
+func _summoned_by(thresh: ThreshFinal) -> Array:
+	return get_tree().get_nodes_in_group(&"enemies").filter(func(enemy: Node) -> bool:
+		return enemy is EnemyUnit and (enemy as EnemyUnit).summoner == thresh)
+
+
+## 6-1, wave 1 all out (8 walkers, 4 souls).
+func _6_1_wave_1() -> Stage:
+	SaveGame.instance().reset()
+	var stage: Stage = await _stage_keep_save(6, 1)
+	stage.skip_break()
+	for i in 20:
+		stage.runner.tick(WaveRunner.GROUP_GAP)
+	return stage
+
+
+## Fix round 1 (ruling): a debug Thresh's fall is wired too. Mid-wave in 6-1
+## his souls go free, he pays and leaves, and he and they are counted out;
+## the wave's own souls stay and the stage goes on.
+func test_a_debug_thresh_falls_too_and_the_wave_goes_on() -> void:
+	var stage: Stage = await _6_1_wave_1()
+	var thresh := await _debug_thresh(stage)
+	await _to_phase_2(thresh)
+	await _souls(stage, thresh)
+	var his := _summoned_by(thresh)
+	assert_eq(his.size(), 3)
+	var alive := stage.runner.alive()
+	_shoot(stage, thresh, 999999.0)
+	await wait_physics_frames(4)
+	assert_false(is_instance_valid(thresh), "he leaves the map")
+	for soul: EnemyUnit in his:
+		assert_true(soul.has_escaped, "his souls go free")
+	var wave_souls := get_tree().get_nodes_in_group(&"enemies").filter(func(enemy: Node) -> bool:
+		return enemy is EnemyUnit and (enemy as EnemyUnit).data.id == &"lantern_soul")
+	assert_eq(wave_souls.size(), 4, "the wave's own souls stay")
+	assert_eq(stage.runner.alive(), alive - 4, "he and his 3 souls are counted out")
+	assert_eq(stage.runner.state, WaveRunner.State.FIGHT)
+	assert_false(stage.result.visible)
+	assert_eq(stage.collected[Essences.BLUE], KillRewards.BOSS_BLUE)
+	assert_eq(stage.collected[Essences.PURPLE], 0, "no boss purple: 6-1 has no boss")
+	assert_engine_error_count(0)
+
+
+## Fix round 1 (ruling): the last one in his wave, his fall ends the wave
+## (as a death would), not the stage.
+func test_a_debug_thresh_last_in_his_wave_ends_the_wave_not_the_stage() -> void:
+	var stage: Stage = await _6_1_wave_1()
+	var thresh := await _debug_thresh(stage)
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		if enemy != thresh:
+			enemy.take_damage(_lethal())
+	assert_eq(stage.runner.alive(), 1, "only he is left")
+	await _to_phase_2(thresh)
+	_shoot(stage, thresh, 999999.0)
+	await wait_physics_frames(4)
+	assert_false(is_instance_valid(thresh))
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK, "his wave is done")
+	assert_eq(stage.runner.waves_done(), 1)
+	assert_false(stage.result.visible, "6-1 goes on")
+	assert_engine_error_count(0)
+
+
+## Fix round 1 (ruling): in the sandbox (no waves) he falls and goes too.
+func test_a_final_thresh_falls_in_the_sandbox_too() -> void:
+	SaveGame.instance().reset()
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	add_child_autofree(stage)
+	await wait_process_frames(2)
+	assert_null(stage.runner)
+	stage.lucian.invulnerable = true
+	var thresh := stage.spawn_enemy(&"thresh_final", stage.lucian.global_position + Vector2(700, 0)) as ThreshFinal
+	_quiet(thresh)
+	await wait_physics_frames(1)
+	await _to_phase_2(thresh)
+	thresh.take_damage(_lethal())
+	await wait_physics_frames(3)
+	assert_false(is_instance_valid(thresh), "he goes")
+	assert_eq(stage.collected[Essences.BLUE], KillRewards.BOSS_BLUE)
 	assert_engine_error_count(0)
 
 
