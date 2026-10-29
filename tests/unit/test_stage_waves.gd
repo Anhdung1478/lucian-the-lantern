@@ -1,5 +1,8 @@
 extends GutTest
 
+## Enough frames for any wave: its groups, then splits and escapes.
+const KILL_FRAMES := 120
+
 
 func before_each() -> void:
 	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
@@ -21,18 +24,31 @@ func _stage(act: int, stage_number: int) -> Stage:
 	return stage
 
 
+func _lethal() -> DamageInfo:
+	return DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test")
+
+
+## Kills the wave until the runner has nobody left in it: groups still to
+## come, splits waiting for their deferred spawn, an untargetable boss
+## (through boss_unit) and a unit on its way out. Gives up after KILL_FRAMES.
 func _kill_wave(stage: Stage) -> void:
-	for i in 20:
+	for frame in KILL_FRAMES:
+		if stage.runner.alive() == 0:
+			return
 		stage.runner.tick(WaveRunner.GROUP_GAP)
-	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
-		enemy.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+		for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+			enemy.take_damage(_lethal())
+		if is_instance_valid(stage.boss_unit) and stage.boss_unit.is_alive():
+			stage.boss_unit.set_untargetable(false)
+			stage.boss_unit.take_damage(_lethal())
+		await wait_physics_frames(1)
 
 
 func test_the_merchant_comes_only_for_the_break() -> void:
 	var stage: Stage = await _stage(2, 1)
 	assert_null(stage.merchant)
 	stage.skip_break()
-	_kill_wave(stage)
+	await _kill_wave(stage)
 	await wait_process_frames(1)
 	assert_eq(stage.runner.state, WaveRunner.State.BREAK)
 	assert_not_null(stage.merchant)
@@ -107,7 +123,7 @@ func test_clearing_every_wave_shows_stage_cleared() -> void:
 	var stage: Stage = await _stage(2, 1)
 	for wave in 2:
 		stage.skip_break()
-		_kill_wave(stage)
+		await _kill_wave(stage)
 		await wait_process_frames(1)
 	assert_true(stage.result.visible)
 	assert_eq(stage.result.title.text, "STAGE CLEARED")
@@ -256,7 +272,7 @@ func test_stage_is_open_shows_on_a_first_clear_only() -> void:
 	var stage: Stage = await _stage(2, 1)
 	for wave in 2:
 		stage.skip_break()
-		_kill_wave(stage)
+		await _kill_wave(stage)
 		await wait_process_frames(1)
 	assert_true("Stage 2-2 is open" in stage.reward_lines, str(stage.reward_lines))
 	SaveGame.instance().set_cleared(["2-1"] as Array[String])
@@ -267,7 +283,7 @@ func test_stage_is_open_shows_on_a_first_clear_only() -> void:
 	again.lucian.invulnerable = true
 	for wave in 2:
 		again.skip_break()
-		_kill_wave(again)
+		await _kill_wave(again)
 		await wait_process_frames(1)
 	assert_true(again.result.visible)
 	assert_false("Stage 2-2 is open" in again.reward_lines, str(again.reward_lines))
@@ -280,3 +296,171 @@ func test_next_stage_shows_only_when_it_can_be_played() -> void:
 	var last: Stage = await _stage(2, 3)
 	last.show_result(true)
 	assert_false(last.result.next_button.visible, "3-1 has no waves yet")
+
+
+## Phase 7: camps, splits, escapes, buffs on kill and mini bosses, with
+## enemy data built in code (the Act 3 files come later).
+func _data(id: StringName, kind := &"normal") -> EnemyData:
+	var data := EnemyData.new()
+	data.id = id
+	data.display_name = String(id).capitalize()
+	data.kind = kind
+	data.max_hp = 500.0
+	data.gold = 40
+	data.xp = 20
+	return data
+
+
+## A big Krug: its death brings 2 melee minions.
+func _krug(kind := &"normal") -> EnemyData:
+	var data := _data(&"test_krug_big", kind)
+	data.split_into = WavePlan.MELEE
+	data.split_count = 2
+	return data
+
+
+func _drops(stage: Stage) -> Array[Node]:
+	return stage.get_node("World").get_children().filter(func(node: Node) -> bool: return node is LootDrop)
+
+
+func _melees() -> Array[Node]:
+	return get_tree().get_nodes_in_group(&"enemies").filter(func(enemy: Node) -> bool: return (enemy as EnemyUnit).data.id == WavePlan.MELEE)
+
+
+## The current wave all spawned, plus `data` counted in it; every other
+## enemy is killed, so `data`'s unit is the only one left.
+func _alone_in_wave(stage: Stage, data: EnemyData) -> EnemyUnit:
+	for i in 20:
+		stage.runner.tick(WaveRunner.GROUP_GAP)
+	var unit := stage.spawn_unit(data, stage.arena.spawn_points[0], stage.runner.wave)
+	stage.runner.enemy_spawned()
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		if enemy != unit:
+			enemy.take_damage(_lethal())
+	assert_eq(stage.runner.alive(), 1)
+	return unit
+
+
+func test_a_split_brings_2_units_where_it_died_and_the_wave_waits_for_them() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.skip_break()
+	var krug := _alone_in_wave(stage, _krug())
+	var kills := stage.stats.kills
+	_shoot(stage, krug, 99999.0)
+	await wait_physics_frames(3)
+	assert_false(krug.is_alive())
+	var splits := _melees()
+	assert_eq(splits.size(), 2)
+	for split: EnemyUnit in splits:
+		assert_lt(split.global_position.distance_to(krug.global_position), 100.0)
+	assert_eq(stage.runner.state, WaveRunner.State.FIGHT, "the wave waits for the splits")
+	assert_eq(stage.runner.alive(), 2)
+	for split: EnemyUnit in splits:
+		split.take_damage(_lethal())
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK)
+	assert_eq(stage.stats.kills, kills + 3, "the Krug and its 2 splits")
+	assert_engine_error_count(0)
+
+
+func test_a_split_on_the_last_wave_never_ends_the_stage() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.skip_break()
+	await _kill_wave(stage)
+	stage.skip_break()
+	# A boss's kind, so its loot is sure.
+	var krug := _alone_in_wave(stage, _krug(&"boss"))
+	assert_true(stage.runner.is_last_enemy())
+	krug.take_damage(_lethal())
+	assert_false(stage.result.visible)
+	assert_eq(stage.runner.alive(), 2)
+	assert_gt(_drops(stage).size(), 0, "not the stage-ending kill: it drops its loot")
+	await wait_physics_frames(1)
+	assert_eq(_melees().size(), 2)
+	await _kill_wave(stage)
+	assert_true(stage.result.visible)
+	assert_engine_error_count(0)
+
+
+func test_an_escape_is_done_for_the_wave_with_no_reward_and_no_kill() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.skip_break()
+	var data := _data(&"test_scuttler", &"elite")
+	data.escape_after = 0.3
+	data.extra_blue = 45
+	var scuttler := _alone_in_wave(stage, data)
+	var gold := stage.wallet.gold
+	var xp := stage.lucian.progress.xp
+	var blue: int = stage.collected[Essences.BLUE]
+	var kills := stage.stats.kills
+	watch_signals(stage)
+	for frame in 60:
+		if scuttler.has_escaped:
+			break
+		await wait_physics_frames(1)
+	assert_true(scuttler.has_escaped)
+	assert_false(scuttler.is_alive())
+	assert_false(scuttler.is_in_group(&"enemies"))
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK, "done for the wave")
+	assert_eq(stage.runner.waves_done(), 1)
+	# A shot in flight, and a direct hit, can't kill it now.
+	_shoot(stage, scuttler, 99999.0)
+	assert_eq(scuttler.take_damage(_lethal()), 0.0)
+	await wait_physics_frames(3)
+	assert_false(scuttler.dead)
+	assert_eq(stage.stats.kills, kills)
+	assert_eq(stage.wallet.gold, gold)
+	assert_eq(stage.lucian.progress.xp, xp)
+	assert_eq(stage.collected[Essences.BLUE], blue)
+	assert_eq(stage.runner.waves_done(), 1)
+	assert_signal_not_emitted(stage, "enemy_died")
+	var texts := stage.damage_numbers.get_children().filter(func(node: Node) -> bool: return node is FloatingText).map(func(note: FloatingText) -> String: return note.text)
+	assert_has(texts, "Escaped!")
+	assert_engine_error_count(0)
+
+
+func test_a_mini_boss_pays_its_purple_on_the_kill_then_the_repeat() -> void:
+	var stage: Stage = await _stage(2, 1)
+	var data := _data(&"infernal_drake", &"mini_boss")
+	data.display_name = "Infernal Drake"
+	data.purple_first = 5
+	data.purple_repeat = 1
+	var at := stage.arena.spawn_points[0]
+	stage.spawn_unit(data, at).take_damage(_lethal())
+	assert_eq(stage.collected[Essences.PURPLE], 5)
+	assert_eq(SaveGame.instance().essences.amount(Essences.PURPLE), 5)
+	assert_has(stage.reward_lines, "+5 purple essence (Infernal Drake, first kill)")
+	stage.spawn_unit(data, at).take_damage(_lethal())
+	assert_eq(stage.collected[Essences.PURPLE], 6)
+	assert_has(stage.reward_lines, "+1 purple essence (Infernal Drake, repeat)")
+
+
+func test_buff_on_kill_gives_lucian_the_buff() -> void:
+	var stage: Stage = await _stage(2, 1)
+	var data := _data(&"test_blue_sentinel", &"elite")
+	data.buff_on_kill = JungleBuffs.BLUE
+	assert_false(stage.lucian.has_stat_buff(JungleBuffs.BLUE))
+	stage.spawn_unit(data, stage.arena.spawn_points[0]).take_damage(_lethal())
+	assert_true(stage.lucian.has_stat_buff(JungleBuffs.BLUE))
+
+
+func test_units_with_a_camp_spawn_at_it() -> void:
+	var stage: Stage = await _stage(2, 1)
+	var camp := Vector2(2400, 900)
+	stage.arena.camps = {&"krugs": camp}
+	var data := _data(&"test_camp_krug")
+	data.camp = &"krugs"
+	# Registered under its id, so the stage loads it like a file.
+	data.take_over_path(Stage.ENEMY_PATH % data.id)
+	for i in 6:
+		stage.runner.spawn_requested.emit(data.id, 1)
+	stage.runner.spawn_requested.emit(WavePlan.MELEE, 1)
+	var found := 0
+	for enemy: EnemyUnit in get_tree().get_nodes_in_group(&"enemies"):
+		if enemy.data == data:
+			found += 1
+			assert_lte(absf(enemy.global_position.x - camp.x), 90.0)
+			assert_lte(absf(enemy.global_position.y - camp.y), 90.0)
+		else:
+			var near_a_spawn_point := stage.arena.spawn_points.any(func(point: Vector2) -> bool: return enemy.global_position.distance_to(point) <= 70.0 * sqrt(2.0) + 0.1)
+			assert_true(near_a_spawn_point, "no camp: the spawn points")
+	assert_eq(found, 6)

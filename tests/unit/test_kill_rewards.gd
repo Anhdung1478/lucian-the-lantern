@@ -43,3 +43,38 @@ func test_orange_is_rare_from_normal_enemies() -> void:
 	for i in 10000:
 		orange += KillRewards.roll(MELEE, 1, StageSetup.new(), rng).orange
 	assert_between(orange, 60, 140)
+
+
+func _mini_boss() -> EnemyData:
+	var data := EnemyData.new()
+	data.kind = &"mini_boss"
+	data.gold = 400
+	data.xp = 200
+	return data
+
+
+func test_a_mini_boss_gives_50_blue_and_3_orange_in_any_act() -> void:
+	for act in [1, 3]:
+		var reward := KillRewards.roll(_mini_boss(), act, StageSetup.new(), rng)
+		assert_eq(reward.blue, 50, "act %d" % act)
+		assert_eq(reward.orange, 3, "act %d" % act)
+
+
+func test_a_mini_boss_reward_does_not_scale_by_act() -> void:
+	assert_eq(KillRewards.roll(_mini_boss(), 3, StageSetup.new(), rng).gold, 400)
+	assert_eq(_mini_boss().hp_scale(3, 4), 1.0)
+	assert_eq(_mini_boss().damage_scale(3, 4), 1.0)
+
+
+## The Rift Scuttler: an elite's rewards, plus 45 blue and 4 orange.
+func test_extra_essence_comes_on_top_of_the_kind() -> void:
+	var scuttler: EnemyData = SIEGE.duplicate()
+	scuttler.extra_blue = 45
+	scuttler.extra_orange = 4
+	rng.seed = 3
+	var base := KillRewards.roll(SIEGE, 1, StageSetup.new(), rng)
+	rng.seed = 3
+	var reward := KillRewards.roll(scuttler, 1, StageSetup.new(), rng)
+	assert_eq(reward.blue, base.blue + 45)
+	assert_eq(reward.orange, base.orange + 4)
+	assert_eq(reward.gold, base.gold)

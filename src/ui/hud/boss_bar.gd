@@ -1,7 +1,7 @@
 class_name BossBar
 extends Control
-## Under the stage info while a boss lives: its name over a wide red health
-## bar. It finds the boss itself (the enemy whose kind is &"boss").
+## Under the stage info while a boss or a mini boss lives: its name over a
+## wide red health bar. It finds the unit itself (a boss before a mini boss).
 ## `phase_text` is for Act 6's Thresh ("Phase 1 / 2").
 
 const SIZE := Vector2(600, 22)
@@ -17,16 +17,25 @@ func _ready() -> void:
 	visible = false
 
 
-## Keeps the boss it holds while it lives, even untargetable (out of the
-## enemies group).
+## Keeps the unit it holds while it lives, even untargetable (out of the
+## enemies group), except that a boss takes the bar from a mini boss.
 func _process(_delta: float) -> void:
-	if not (is_instance_valid(boss) and boss.is_alive()):
-		boss = null
-		for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
-			if enemy is EnemyUnit and (enemy as EnemyUnit).data.kind == &"boss":
-				boss = enemy
+	var held := is_instance_valid(boss) and boss.is_alive()
+	if not (held and boss.data.kind == &"boss"):
+		var found := _find(&"boss")
+		if found == null and not held:
+			found = _find(&"mini_boss")
+		if found or not held:
+			boss = found
 	visible = boss != null
 	queue_redraw()
+
+
+func _find(kind: StringName) -> EnemyUnit:
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		if enemy is EnemyUnit and (enemy as EnemyUnit).data.kind == kind:
+			return enemy
+	return null
 
 
 func _draw() -> void:

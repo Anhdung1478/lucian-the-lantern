@@ -1568,16 +1568,27 @@ func kill_all() -> void:
 
 
 ## Skip (the HUD button) starts the next wave; once all of it has spawned,
-## Kill all ends it. The tips so far go first, so the break's tip shows.
-## Senna's lesson (the tutorial's first break) is skipped unless `keep_lesson`.
+## Kill all ends it, again every 0.1 s until the runner has nobody left:
+## splits waiting for their spawn, a Scuttler on its way out, and an
+## untargetable boss (through boss_unit). Gives up after 30 s. The tips so
+## far go first, so the break's tip shows. Senna's lesson (the tutorial's
+## first break) is skipped unless `keep_lesson`.
 func clear_wave(keep_lesson := false) -> void:
 	var game := game_stage()
 	game.skip_break()
-	while game.runner.alive() > get_nodes_in_group(&"enemies").size():
+	while not game.runner._to_spawn.is_empty():
 		await wait(0.1)
 	flush_tips()
-	kill_all()
-	await wait(0.2)
+	for step in 300:
+		if game.runner.alive() == 0:
+			break
+		kill_all()
+		var boss := game.boss_unit
+		if is_instance_valid(boss) and boss.is_alive():
+			boss.set_untargetable(false)
+			boss.take_damage(lucian.make_damage(999999.0, DamageInfo.Type.TRUE, &"debug"))
+		await wait(0.1)
+	await wait(0.1)
 	if game.cutscene is SennaTeachesE and not keep_lesson:
 		game.cutscene.skip()
 		await wait(0.1)

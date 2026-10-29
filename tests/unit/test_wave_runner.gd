@@ -108,3 +108,32 @@ func test_the_last_enemy_is_the_last_of_the_last_wave() -> void:
 	assert_true(runner.is_last_enemy())
 	runner.enemy_died()
 	assert_false(runner.is_last_enemy(), "done")
+
+
+func test_the_packs() -> void:
+	assert_eq(WavePlan.PACKS[&"raptors"], [&"raptor_big", &"raptor", &"raptor", &"raptor", &"raptor"])
+	assert_eq(WavePlan.PACKS[&"wolves"], [&"murkwolf_big", &"murkwolf", &"murkwolf"])
+	assert_eq(WavePlan.PACKS[&"krugs"], [&"krug_big", &"krug", &"krug"])
+	assert_eq(WavePlan.PACKS[&"gromp"], [&"gromp"])
+
+
+func test_a_pack_expands_into_its_members_in_order() -> void:
+	var waves := WavePlan.expand([[[&"krugs", 2], [WavePlan.MELEE, 1]], [[&"gromp", 1], [&"wolves", 1]]])
+	assert_eq(waves.size(), 2)
+	assert_eq(Array(waves[0]), [&"krug_big", &"krug", &"krug", &"krug_big", &"krug", &"krug", WavePlan.MELEE])
+	assert_eq(Array(waves[1]), [&"gromp", &"murkwolf_big", &"murkwolf", &"murkwolf"])
+
+
+func test_a_packs_members_spawn_in_groups_of_3_in_order() -> void:
+	var runner := _runner(WavePlan.expand([[[&"raptors", 1]]]))
+	runner.skip()
+	runner.tick(0.01)
+	assert_eq(spawned, [&"raptor_big", &"raptor", &"raptor"] as Array[StringName])
+	_spawn_all(runner)
+	assert_eq(spawned.size(), 5)
+	assert_eq(runner.alive(), 5)
+
+
+func test_waves_without_packs_are_unchanged() -> void:
+	assert_eq(WavePlan.waves("1-1"), WavePlan.expand(WavePlan.STAGES["1-1"]))
+	assert_eq(WavePlan.waves("1-1")[0].size(), 10)

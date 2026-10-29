@@ -113,3 +113,21 @@ func test_a_boss_that_doesnt_end_the_stage_still_drops() -> void:
 	var boss := stage.spawn_enemy(&"akshan", Vector2(1700, 600))
 	boss.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
 	assert_gt(_drops().size(), 0)
+
+
+func test_a_mini_boss_always_drops_a_fragment_and_sometimes_a_legendary() -> void:
+	var catalog: ItemCatalog = load("res://data/items/catalog.tres")
+	var without_fragment := 0
+	var legendaries := 0
+	for i in 5000:
+		var has_fragment := false
+		for item in LootTable.roll(&"mini_boss", catalog, rng):
+			if item.kind == ItemData.Kind.LEGENDARY:
+				legendaries += 1
+			else:
+				has_fragment = true
+		if not has_fragment:
+			without_fragment += 1
+	assert_eq(without_fragment, 0)
+	# 8% of 5000 is 400.
+	assert_between(legendaries, 320, 480)

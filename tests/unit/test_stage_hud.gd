@@ -103,6 +103,52 @@ func test_the_boss_bar_shows_only_while_a_boss_lives() -> void:
 	assert_false(bar.visible)
 
 
+func test_a_mini_boss_is_a_12_px_skull() -> void:
+	assert_eq(Radar.dot_size(&"mini_boss"), 12.0)
+	assert_lt(Radar.dot_size(&"mini_boss"), Radar.dot_size(&"boss"))
+	assert_gt(Radar.dot_size(&"mini_boss"), Radar.dot_size(&"elite"))
+
+
+## A unit of `kind` far from Lucian, built in code.
+func _unit(kind: StringName, shown_name: String, lucian: Lucian) -> EnemyUnit:
+	var data := EnemyData.new()
+	data.kind = kind
+	data.display_name = shown_name
+	data.max_hp = 1000.0
+	var unit := Minion.new()
+	unit.setup(data, 1, 1, lucian)
+	unit.position = Vector2(3000, 0)
+	add_child_autofree(unit)
+	return unit
+
+
+func test_a_mini_boss_has_a_boss_size_health_bar() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	assert_eq(_unit(&"mini_boss", "Test Drake", lucian).health_bar.size, EnemyUnit.BOSS_BAR)
+
+
+func test_the_boss_bar_shows_a_mini_boss_and_prefers_a_boss() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var bar := BossBar.new()
+	add_child_autofree(bar)
+	var drake := _unit(&"mini_boss", "Test Drake", lucian)
+	await wait_physics_frames(3)
+	assert_true(bar.visible)
+	assert_eq(bar.boss, drake)
+	var boss := _unit(&"boss", "Test Boss", lucian)
+	await wait_physics_frames(3)
+	assert_eq(bar.boss, boss, "a boss takes the bar")
+	_unit(&"mini_boss", "Another Drake", lucian)
+	await wait_physics_frames(3)
+	assert_eq(bar.boss, boss, "a boss keeps it")
+	boss.take_damage(DamageInfo.create(5000.0, DamageInfo.Type.TRUE, &"test"))
+	await wait_physics_frames(3)
+	assert_true(bar.visible)
+	assert_eq(bar.boss.data.kind, &"mini_boss", "back to a mini boss")
+
+
 func test_fps_sits_top_left() -> void:
 	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
 	add_child_autofree(hud)

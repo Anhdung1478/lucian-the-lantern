@@ -1,7 +1,7 @@
 class_name EnemyData
 extends Resource
 ## One enemy type, with its numbers at Act 1, wave 1. EnemyUnit scales them
-## by act and wave; bosses never scale.
+## by act and wave; bosses and mini bosses never scale.
 
 ## HP, damage and reward growth per act after the first; HP and damage
 ## growth per wave after the first.
@@ -9,10 +9,13 @@ const ACT_HP := 0.6
 const ACT_DAMAGE := 0.25
 const ACT_REWARD := 0.25
 const WAVE_GROWTH := 0.15
+## The kinds with a boss-size health bar, a skull on the radar, the boss
+## bar, no scaling and a first-time purple reward.
+const BOSS_KINDS: Array[StringName] = [&"mini_boss", &"boss"]
 
 @export var id: StringName
 @export var display_name := ""
-## &"normal", &"elite" or &"boss".
+## &"normal", &"elite", &"mini_boss" or &"boss".
 @export var kind := &"normal"
 ## How it fights: &"melee", &"ranged", &"siege", &"super", or a boss id.
 @export var behavior := &"melee"
@@ -47,22 +50,42 @@ const WAVE_GROWTH := 0.15
 @export var hit_slow_time := 0.0
 @export var hit_burn := 0.0
 @export var hit_burn_time := 0.0
-## Bosses: purple essence the first time, and on every later clear.
+## Bosses and mini bosses: purple essence the first time, and on every
+## later clear (a boss) or kill (a mini boss).
 @export var purple_first := 0
 @export var purple_repeat := 0
+## The map's camp (StageMap.camps) it spawns from in a wave; &"" (or a map
+## without that camp) = the spawn points in turn.
+@export var camp := &""
+## Its death brings `split_count` enemies of id `split_into` where it died.
+@export var split_into := &""
+@export var split_count := 0
+## Seconds alive before it escapes: no rewards, done for the wave. 0 = never.
+@export var escape_after := 0.0
+## Essence on top of what its kind gives: blue (raised by Essence Drops like
+## the rest), and orange for sure.
+@export var extra_blue := 0
+@export var extra_orange := 0
+## The jungle buff (JungleBuffs.BLUE or RED) Lucian gets when it dies. &"" = none.
+@export var buff_on_kill := &""
+
+
+## A boss or a mini boss.
+func is_boss_kind() -> bool:
+	return kind in BOSS_KINDS
 
 
 func hp_scale(act: int, wave: int) -> float:
-	if kind == &"boss":
+	if is_boss_kind():
 		return 1.0
 	return (1.0 + ACT_HP * (act - 1)) * (1.0 + WAVE_GROWTH * (wave - 1))
 
 
 func damage_scale(act: int, wave: int) -> float:
-	if kind == &"boss":
+	if is_boss_kind():
 		return 1.0
 	return (1.0 + ACT_DAMAGE * (act - 1)) * (1.0 + WAVE_GROWTH * (wave - 1))
 
 
 func reward_scale(act: int) -> float:
-	return 1.0 if kind == &"boss" else 1.0 + ACT_REWARD * (act - 1)
+	return 1.0 if is_boss_kind() else 1.0 + ACT_REWARD * (act - 1)

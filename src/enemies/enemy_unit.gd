@@ -3,8 +3,12 @@ extends Enemy
 ## A fighting enemy built in code from an EnemyData: body, hurtbox, art and
 ## health bar. It walks at Lucian (sliding along walls, sidestepping when
 ## stuck), attacks when in range, and stands still while he is dead or
-## can't be hit. Subclasses say what an attack does (_attack), and may
-## think differently (_think).
+## can't be hit. With the data's `escape_after` it gets away after that long
+## alive. Subclasses say what an attack does (_attack), and may think
+## differently (_think).
+
+## It got away (see escape): no death, no kill.
+signal escaped(unit: EnemyUnit)
 
 const HIT_FLASH := Color(1.8, 1.8, 1.8)
 ## Moving less than this share of its speed in a frame counts as stuck.
@@ -19,6 +23,11 @@ const EMPOWER_ICON := preload("res://assets/art/ui/status_empower.svg")
 
 var data: EnemyData
 var target: Lucian
+## The wave it came with (its scaling); its splits come with the same one.
+var wave := 1
+## It got away: out of the group and every hitbox, it can't take damage or
+## die, and it is fading out.
+var has_escaped := false
 ## This unit's numbers, after the act and wave scaling.
 var damage := 0.0
 var attack_range := 0.0
@@ -33,12 +42,15 @@ var _attack_left := 0.0
 var _stuck_left := 0.0
 var _sidestep := 1.0
 var _flash_tween: Tween
+## Seconds alive, for `escape_after`.
+var _alive_time := 0.0
 
 
 ## Call before adding the unit to the tree.
-func setup(enemy_data: EnemyData, act: int, wave: int, foe: Lucian) -> void:
+func setup(enemy_data: EnemyData, act: int, of_wave: int, foe: Lucian) -> void:
 	data = enemy_data
 	target = foe
+	wave = of_wave
 	max_hp = data.max_hp * data.hp_scale(act, wave)
 	armor = data.armor
 	mr = data.mr
@@ -64,7 +76,7 @@ func _ready() -> void:
 	var sprite := Sprite2D.new()
 	sprite.texture = data.art
 	visuals.add_child(sprite)
-	if data.kind == &"boss":
+	if data.is_boss_kind():
 		health_bar.size = BOSS_BAR
 	elif data.kind == &"elite":
 		health_bar.size = ELITE_BAR
@@ -82,11 +94,44 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	super(delta)
-	if dead:
+	if not is_alive():
 		return
+	if data.escape_after > 0.0:
+		_alive_time += delta
+		if _alive_time >= data.escape_after:
+			escape()
+			return
 	_attack_left = maxf(_attack_left - delta, 0.0)
 	if can_fight():
 		_think(delta)
+
+
+## Alive and still here (not escaped).
+func is_alive() -> bool:
+	return super() and not has_escaped
+
+
+## An escaped unit takes nothing: a shot already in flight can't kill it.
+func take_damage(info: DamageInfo) -> float:
+	return 0.0 if has_escaped else super(info)
+
+
+## Gets away, once: it leaves the enemies group and every hitbox first (so
+## `_die` and damage do nothing from here), says so through `escaped`, then
+## fades out. Nothing for a dead unit.
+func escape() -> void:
+	if dead or has_escaped:
+		return
+	has_escaped = true
+	_leave_fight()
+	escaped.emit(self)
+	_fade_out()
+
+
+func _die() -> void:
+	if has_escaped:
+		return
+	super()
 
 
 ## Lucian is there to fight: alive, not in stasis, not untouchable.

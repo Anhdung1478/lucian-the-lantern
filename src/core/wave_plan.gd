@@ -1,13 +1,21 @@
 class_name WavePlan
 extends RefCounted
 ## Which enemies each wave of a stage brings (docs/act1_the_loss.md,
-## docs/act2_the_sentinels.md), and each stage's boss.
+## docs/act2_the_sentinels.md), and each stage's boss. A wave can name a
+## pack in place of an enemy id: it brings the pack's members, in order.
 
 const MELEE := &"melee_minion"
 const RANGED := &"ranged_minion"
 const SIEGE := &"siege_minion"
 const SUPER := &"super_minion"
-## Stage id -> waves; each wave lists [enemy id, count] in spawn order.
+## Pack id -> its members, in spawn order. They come out of their camp.
+const PACKS := {
+	&"raptors": [&"raptor_big", &"raptor", &"raptor", &"raptor", &"raptor"],
+	&"wolves": [&"murkwolf_big", &"murkwolf", &"murkwolf"],
+	&"krugs": [&"krug_big", &"krug", &"krug"],
+	&"gromp": [&"gromp"],
+}
+## Stage id -> waves; each wave lists [enemy or pack id, count] in spawn order.
 const STAGES := {
 	"1-1": [[[MELEE, 6], [RANGED, 4]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1]]],
 	"2-1": [[[MELEE, 6], [RANGED, 4], [SIEGE, 1]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]]],
@@ -32,12 +40,18 @@ static func hp_share(stage_id: String, id: StringName) -> float:
 
 ## Each wave as the enemy ids to spawn, in order.
 static func waves(stage_id: String) -> Array:
+	return expand(STAGES.get(stage_id, []))
+
+
+## Waves of [enemy or pack id, count] groups as flat lists of enemy ids, in
+## order. [pack, n] brings the pack's members n times.
+static func expand(plan: Array) -> Array:
 	var found := []
-	for wave: Array in STAGES.get(stage_id, []):
+	for wave: Array in plan:
 		var ids: Array[StringName] = []
 		for group: Array in wave:
 			for i in group[1]:
-				ids.append(group[0])
+				ids.append_array(PACKS.get(group[0], [group[0]]))
 		found.append(ids)
 	return found
 

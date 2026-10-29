@@ -16,7 +16,7 @@ var _pulse_left := 0.0
 
 func _physics_process(delta: float) -> void:
 	super(delta)
-	if dead or data.behavior != &"super":
+	if not is_alive() or data.behavior != &"super":
 		return
 	_pulse_left -= delta
 	if _pulse_left <= 0.0:

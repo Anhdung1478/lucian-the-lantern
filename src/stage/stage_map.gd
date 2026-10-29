@@ -16,6 +16,8 @@ var merchant_point := Vector2.ZERO
 var boss_point := Vector2.ZERO
 ## Where wave enemies come from, taken in turn.
 var spawn_points: Array[Vector2] = []
+## Camp id -> point: wave enemies whose data names a camp here come out of it.
+var camps := {}
 var wall_polygons: Array[PackedVector2Array] = []
 ## Round walls: (x, y, radius).
 var wall_circles: Array[Vector3] = []

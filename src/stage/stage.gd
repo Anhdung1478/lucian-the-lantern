@@ -25,6 +25,13 @@ const ESSENCE_ICONS := {
 	Essences.PURPLE: preload("res://assets/art/ui/essence_purple.svg"),
 }
 const ESSENCE_COLORS := {Essences.BLUE: Color("5aa9ff"), Essences.ORANGE: Color("ffa040"), Essences.PURPLE: Color("b46cff")}
+## How far from its spawn point (each way) a wave enemy appears, and from
+## its camp's point.
+const SPAWN_JITTER := 70.0
+const CAMP_JITTER := 90.0
+## How far from where the parent died its splits appear.
+const SPLIT_SPREAD := 40.0
+const ESCAPED_COLOR := Color("d8dde6")
 ## Act 1's tips: id -> [the text, the actions whose keys it names].
 const TIPS := {
 	&"move": ["%s to move. Hold it to keep walking.", [&"move"]],
@@ -263,12 +270,16 @@ func set_dummy_count(count: int) -> void:
 
 
 ## Puts an enemy of type `id` on the map at `at`, wired for damage numbers,
-## the debug meter and rewards.
+## the debug meter, rewards and escapes.
 func spawn_enemy(id: StringName, at: Vector2, wave := 1) -> EnemyUnit:
-	var data: EnemyData = load(ENEMY_PATH % id)
+	return spawn_unit(load(ENEMY_PATH % id), at, wave)
+
+
+## spawn_enemy for data in hand (tests build it in code).
+func spawn_unit(data: EnemyData, at: Vector2, wave := 1) -> EnemyUnit:
 	var unit := _new_unit(data)
 	unit.setup(data, maxi(run.act, 1), wave, lucian)
-	unit.max_hp *= WavePlan.hp_share(run.stage_id, id)
+	unit.max_hp *= WavePlan.hp_share(run.stage_id, data.id)
 	unit.projectile_parent = $Projectiles
 	unit.warning_parent = $Warnings
 	unit.position = at
@@ -276,6 +287,7 @@ func spawn_enemy(id: StringName, at: Vector2, wave := 1) -> EnemyUnit:
 	unit.damage_taken.connect(damage_numbers.spawn.bind(unit))
 	unit.damage_taken.connect(_count_damage_dealt.bind(unit))
 	unit.died.connect(_on_enemy_died)
+	unit.escaped.connect(_on_enemy_escaped)
 	debug_table.watch(unit)
 	return unit
 
@@ -338,18 +350,31 @@ func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 			## Deferred: a shot's physics callback can bring him to half HP, and the freeze can't disable bodies mid-flush.
 			(boss_unit as Thresh).phase_ended.connect(_on_thresh_phase_ended, CONNECT_DEFERRED)
 		return
+	var data: EnemyData = load(ENEMY_PATH % id)
+	spawn_unit(data, _spawn_point(data), wave)
+
+
+## A wave enemy comes out of its camp when this map has it, else from the
+## spawn points in turn.
+func _spawn_point(data: EnemyData) -> Vector2:
+	if arena.camps.has(data.camp):
+		return arena.camps[data.camp] + _jitter(CAMP_JITTER)
 	var at := arena.spawn_points[_next_spawn % arena.spawn_points.size()]
 	_next_spawn += 1
-	spawn_enemy(id, at + Vector2(rng.randf_range(-70, 70), rng.randf_range(-70, 70)), wave)
+	return at + _jitter(SPAWN_JITTER)
 
 
-## The boss's purple (first-time or repeat) and the first-clear lines, then the result.
+func _jitter(reach: float) -> Vector2:
+	return Vector2(rng.randf_range(-reach, reach), rng.randf_range(-reach, reach))
+
+
 ## Damage dealt is the HP Lucian's hits took; debug damage doesn't count.
 func _count_damage_dealt(info: DamageInfo, _final_amount: float, enemy: Enemy) -> void:
 	if info.attacker == lucian and info.source != &"debug":
 		stats.damage_dealt += enemy.hp_lost
 
 
+## The boss's purple (first-time or repeat) and the first-clear lines, then the result.
 func _on_cleared() -> void:
 	if lucian.dead or result.visible:
 		return
@@ -471,17 +496,60 @@ func _on_cutscene_done() -> void:
 	runner.finish()
 
 
+## A kill: its rewards; its splits (counted at once, spawned deferred); its
+## loot; its buff for Lucian; a mini boss's purple. Then `enemy_died`.
 func _on_enemy_died(enemy: Enemy) -> void:
 	var unit := enemy as EnemyUnit
-	var reward := KillRewards.roll(unit.data, maxi(run.act, 1), run, rng)
+	var data := unit.data
+	var reward := KillRewards.roll(data, maxi(run.act, 1), run, rng)
 	wallet.add(reward.gold)
 	stats.gold_earned += reward.gold
 	stats.kills += 1
 	lucian.progress.add_xp(reward.xp)
 	add_essences(reward.blue, reward.orange, 0, unit.global_position)
+	# Its splits join the wave now, so this death never ends it.
+	var splits := data.split_count if data.split_into != &"" else 0
+	if runner:
+		for i in splits:
+			runner.enemy_spawned()
 	# The kill that ends the stage drops nothing: the result comes up at once,
 	# and items don't carry over.
 	if not (runner and runner.is_last_enemy()):
-		for item in LootTable.roll(unit.data.kind, lucian.item_catalog, rng):
+		for item in LootTable.roll(data.kind, lucian.item_catalog, rng):
 			drop_loot(item, unit.global_position)
+	if splits > 0:
+		# Deferred: the killing shot can land inside a physics callback, where no body can be added.
+		_spawn_splits.call_deferred(data.split_into, splits, unit.global_position, unit.wave)
+	if data.buff_on_kill != &"":
+		lucian.add_jungle_buff(data.buff_on_kill)
+	if data.kind == &"mini_boss":
+		_award_mini_boss(data)
 	enemy_died.emit(unit)
+
+
+## `count` enemies of `id` around where their parent died, in its wave
+## (already counted in it).
+func _spawn_splits(id: StringName, count: int, at: Vector2, wave: int) -> void:
+	for i in count:
+		spawn_enemy(id, at + Vector2.from_angle(TAU * i / count) * SPLIT_SPREAD, wave)
+
+
+## A mini boss's purple, paid on the kill: first-time or repeat, rising over
+## Lucian (as a boss's does), with a line for the result.
+func _award_mini_boss(data: EnemyData) -> void:
+	var save := SaveGame.instance()
+	var first_time := not String(data.id) in save.bosses
+	var purple := save.award_boss(String(data.id), data.purple_first, data.purple_repeat)
+	if purple > 0:
+		add_essences(0, 0, purple, lucian.global_position)
+		reward_lines.append("+%d purple essence (%s, %s)" % [purple, data.display_name, "first kill" if first_time else "repeat"])
+
+
+## An enemy got away: "Escaped!" and it is done for the wave. No rewards,
+## no kill and no `enemy_died` (the kill count and the tutorial).
+func _on_enemy_escaped(unit: EnemyUnit) -> void:
+	var note := FloatingText.new("Escaped!", ESCAPED_COLOR)
+	note.position = unit.global_position + Vector2(0, -unit.radius - 40.0)
+	damage_numbers.add_child(note)
+	if runner:
+		runner.enemy_died()

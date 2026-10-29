@@ -149,6 +149,15 @@ func _die() -> void:
 	if dead:
 		return
 	dead = true
+	_leave_fight()
+	died.emit(self)
+	if is_instance_valid(last_attacker) and last_attacker.has_method(&"on_kill"):
+		last_attacker.on_kill(self)
+	_fade_out()
+
+
+## For good: out of the enemies group and every hitbox; its slows and burns end.
+func _leave_fight() -> void:
 	remove_from_group(&"enemies")
 	collision_layer = 0
 	for child in get_children():
@@ -158,9 +167,10 @@ func _die() -> void:
 	_burns.clear()
 	_statuses.erase(SLOW)
 	_statuses.erase(BURN)
-	died.emit(self)
-	if is_instance_valid(last_attacker) and last_attacker.has_method(&"on_kill"):
-		last_attacker.on_kill(self)
+
+
+## A short fade, then the node goes.
+func _fade_out() -> void:
 	var fade := create_tween()
 	fade.tween_property(self, "modulate:a", 0.0, DEATH_FADE)
 	fade.tween_callback(queue_free)

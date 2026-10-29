@@ -30,8 +30,9 @@ var loadout: Array[StringName] = [&"", &""]
 ## Stage ids ("1-1" ... "6-5") cleared at least once.
 var cleared: Array[String] = []
 var endless_best := 0
-## Bosses with a first-time purple reward, by id.
-const BOSS_IDS: Array[String] = ["thresh_1", "akshan"]
+## Bosses and mini bosses with a first-time purple reward, by id (some
+## before their data files exist).
+const BOSS_IDS: Array[String] = ["thresh_1", "akshan", "infernal_drake", "ocean_drake", "elder_dragon", "dark_lucian"]
 
 ## Boss ids that already gave their first-time purple.
 var bosses: Array[String] = []
@@ -132,8 +133,8 @@ func any_slot_exists() -> bool:
 	return false
 
 
-## A boss was beaten: the purple due (`first` the first time, `repeat`
-## after), and the boss is marked as paid. The caller adds the essence.
+## A boss (or mini boss) was beaten: the purple due (`first` the first time,
+## `repeat` after), and it is marked as paid. The caller adds the essence.
 ## A boss missing from BOSS_IDS warns: loading drops it from `bosses`.
 func award_boss(id: String, first: int, repeat: int) -> int:
 	if not id in BOSS_IDS:

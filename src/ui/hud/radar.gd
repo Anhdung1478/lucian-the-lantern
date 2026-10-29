@@ -1,15 +1,16 @@
 class_name Radar
 extends Control
 ## Bottom right: the map as a dark panel with dots, no terrain. Lucian is a
-## blue dot, an enemy red (an elite bigger), a boss a red skull; Senna a
-## small pale-blue dot and the merchant gold. Never takes clicks, so
-## right-clicks under it still move Lucian.
+## blue dot, an enemy red (an elite bigger), a boss a red skull (a mini boss
+## a smaller one); Senna a small pale-blue dot and the merchant gold. Never
+## takes clicks, so right-clicks under it still move Lucian.
 
 const WIDTH := 260.0
 const SKULL := preload("res://assets/art/ui/skull.svg")
 const DOT := 4.0
 const ELITE_DOT := 7.0
 const SKULL_SIZE := 16.0
+const MINI_BOSS_SKULL_SIZE := 12.0
 const LUCIAN_DOT := 6.0
 const LUCIAN_COLOR := Color("4fa8ff")
 const ENEMY_COLOR := Color("e0475a")
@@ -40,6 +41,8 @@ static func dot_size(kind: StringName) -> float:
 	match kind:
 		&"boss":
 			return SKULL_SIZE
+		&"mini_boss":
+			return MINI_BOSS_SKULL_SIZE
 		&"elite":
 			return ELITE_DOT
 	return DOT
@@ -58,8 +61,9 @@ func _draw() -> void:
 	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
 		var kind := (enemy as EnemyUnit).data.kind if enemy is EnemyUnit else &"normal"
 		var at := to_radar(enemy.global_position)
-		if kind == &"boss":
-			draw_texture_rect(SKULL, Rect2(at - Vector2.ONE * SKULL_SIZE * 0.5, Vector2.ONE * SKULL_SIZE), false, ENEMY_COLOR)
+		if kind in EnemyData.BOSS_KINDS:
+			var skull := dot_size(kind)
+			draw_texture_rect(SKULL, Rect2(at - Vector2.ONE * skull * 0.5, Vector2.ONE * skull), false, ENEMY_COLOR)
 		else:
 			draw_circle(at, dot_size(kind), ENEMY_COLOR)
 	if is_instance_valid(lucian):
