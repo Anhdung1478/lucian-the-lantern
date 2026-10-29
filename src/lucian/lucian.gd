@@ -20,7 +20,7 @@ signal died
 ## A hit landed, after armor and before shields (the number shown).
 signal damage_received(info: DamageInfo, amount: float)
 
-enum Order { NONE, MOVE, ATTACK, ATTACK_MOVE, VISIT, CAST }
+enum Order { NONE, MOVE, ATTACK, VISIT, CAST }
 
 ## Share of the attack period spent winding up before the shot leaves the gun.
 const WINDUP_RATIO := 0.15
@@ -202,11 +202,14 @@ func command_attack(target: Enemy) -> void:
 	_target = target
 
 
+## A + Left-click: attacks `attack_move_target(point)`, or just walks to
+## `point` when there is no enemy at all.
 func command_attack_move(point: Vector2) -> void:
-	_cancel_windup()
-	_order = Order.ATTACK_MOVE
-	_move_point = point
-	_target = null
+	var target := attack_move_target(point)
+	if target:
+		command_attack(target)
+	else:
+		command_move(point)
 
 
 ## Walks to `merchant`; merchant_reached fires once he is in range (right
@@ -698,6 +701,35 @@ func enemy_at(point: Vector2) -> Enemy:
 	return best
 
 
+## Who A + Left-click at `point` attacks: the enemy under it, else the lowest
+## HP % among those in range (the nearer on a tie), else the nearest enemy on
+## the map. Null when there is none.
+func attack_move_target(point: Vector2) -> Enemy:
+	var hovered := enemy_at(point)
+	if is_target(hovered):
+		return hovered
+	var weakest: Enemy = null
+	var weakest_fraction := INF
+	var weakest_distance := INF
+	var nearest: Enemy = null
+	var nearest_distance := INF
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		if not is_target(enemy):
+			continue
+		var distance := global_position.distance_to(enemy.global_position)
+		if distance < nearest_distance:
+			nearest = enemy
+			nearest_distance = distance
+		if not _in_range(enemy):
+			continue
+		var fraction := enemy.hp / enemy.max_hp
+		if fraction < weakest_fraction or (fraction == weakest_fraction and distance < weakest_distance):
+			weakest = enemy
+			weakest_fraction = fraction
+			weakest_distance = distance
+	return weakest if weakest else nearest
+
+
 ## The enemy nearest the cursor among those within `reach` of Lucian
 ## (Gunblade, Smite), or null.
 func enemy_near_cursor(aim: Vector2, reach: float) -> Enemy:
@@ -930,13 +962,6 @@ func _physics_process(delta: float) -> void:
 				_pursue(_target, delta)
 			else:
 				_order = Order.NONE
-		Order.ATTACK_MOVE:
-			if not is_target(_target) or not _in_range(_target):
-				_target = _nearest_enemy_in_range()
-			if _target:
-				_pursue(_target, delta)
-			elif _step_toward(_move_point, delta):
-				_order = Order.NONE
 		Order.CAST:
 			if not is_target(_cast_target):
 				_order = Order.NONE
@@ -1095,17 +1120,6 @@ func _cancel_windup() -> void:
 
 func _in_range(target: Enemy) -> bool:
 	return global_position.distance_to(target.global_position) <= attack_range() + target.radius
-
-
-func _nearest_enemy_in_range() -> Enemy:
-	var best: Enemy = null
-	var best_distance := INF
-	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
-		var distance := global_position.distance_to(enemy.global_position)
-		if distance < best_distance and _in_range(enemy):
-			best = enemy
-			best_distance = distance
-	return best
 
 
 ## Moves toward `point` this frame. Returns true once Lucian has arrived.

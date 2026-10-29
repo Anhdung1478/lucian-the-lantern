@@ -28,7 +28,7 @@ const ESSENCE_COLORS := {Essences.BLUE: Color("5aa9ff"), Essences.ORANGE: Color(
 const TIPS := {
 	&"move": ["%s to move. Hold it to keep walking.", [&"move"]],
 	&"attack": ["%s on an enemy to attack it.", [&"attack"]],
-	&"attack_move": ["Hold %s and press %s to attack the nearest enemy.", [&"attack_move", &"attack"]],
+	&"attack_move": ["Press %s, then %s: attack the enemy under the cursor, or the weakest one in range.", [&"attack_move", &"attack"]],
 	&"siege": ["A red circle marks where a shell will land. Step out of it!", []],
 	&"merchant": ["%s on the merchant to buy items with your gold.", [&"move"]],
 	&"dash": ["%s to dash toward the cursor. Your next shot is ready when you land.", [&"skill_e"]],
