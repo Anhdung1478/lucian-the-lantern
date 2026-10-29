@@ -267,14 +267,6 @@ func test_clearing_a_wave_never_lowers_the_best() -> void:
 	assert_eq(SaveGame.instance().endless_best, 5)
 
 
-func test_the_break_after_a_boss_wave_counts_down_for_now() -> void:
-	var stage: Stage = await _endless()
-	var runner := stage.runner as EndlessRunner
-	runner.held = true
-	runner.boss_cleared.emit(10)
-	assert_false(runner.held, "released at once until the modifier pick comes")
-
-
 func test_the_stage_info_reads_endless_waves_and_the_best() -> void:
 	SaveGame.instance().reset()
 	SaveGame.instance().record_endless(3)

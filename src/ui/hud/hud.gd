@@ -28,6 +28,10 @@ const TIP_MARGIN := 14.0
 const BUFF_GAP := 8.0
 ## Space between R and the summoner spells.
 const SUMMONER_GAP := 10.0
+## Endless's modifier in the buff row: its id and name. No timer; its card
+## gives both lines.
+const MODIFIER_ROW := &"endless_modifier"
+const MODIFIER_NAME := "Endless modifier"
 
 var lucian: Lucian
 var wallet: Wallet
@@ -152,7 +156,7 @@ func _process(_delta: float) -> void:
 	if lucian.total_shield() > 0.0:
 		hp_label.text += "  (+%d)" % roundi(lucian.total_shield())
 	_shield_overlay.queue_redraw()
-	_buff_bar.show_buffs(lucian.buffs())
+	_buff_bar.show_buffs(_buffs())
 	mana_bar.value = lucian.mana / stats.max_mana
 	mana_label.text = "%d / %d" % [roundi(lucian.mana), roundi(stats.max_mana)]
 	hp_regen_label.text = "+%s/s" % TooltipText.number(snappedf(stats.hp_regen, 0.1))
@@ -181,6 +185,24 @@ static func hover_range_of(control: Control) -> CastRange:
 			return control.hover_range()
 		control = control.get_parent() as Control
 	return null
+
+
+## The buff row: Endless's modifier first (it stays, so it never moves),
+## then Lucian's buffs.
+func _buffs() -> Array[Dictionary]:
+	var shown := lucian.buffs()
+	var modifier := stage.endless.modifier if stage and stage.endless else EndlessModifiers.NONE
+	if modifier != EndlessModifiers.NONE:
+		shown.push_front(modifier_buff(modifier))
+	return shown
+
+
+## Modifier `id`'s buff row: its icon, no timer, its downside and reward.
+static func modifier_buff(id: int) -> Dictionary:
+	var downside := TooltipText.color(EndlessModifiers.downside(id), ModifierPick.DOWNSIDE_COLOR.to_html(false))
+	var reward := TooltipText.color(EndlessModifiers.reward(id), ModifierPick.REWARD_COLOR.to_html(false))
+	return {"id": MODIFIER_ROW, "name": MODIFIER_NAME, "icon": EndlessModifiers.icon(id), "text": "%s\n%s" % [downside, reward],
+		"count": "", "left": 0.0, "duration": 0.0, "ready": false}
 
 
 func _add_skill_slot(skill: LucianSkill, icon: Texture2D, key: String, icon_size := SkillSlot.ICON_SIZE) -> void:

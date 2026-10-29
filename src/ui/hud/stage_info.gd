@@ -65,10 +65,13 @@ func best_height() -> float:
 func refresh() -> void:
 	var waiting := runner != null and runner.is_waiting()
 	var endless := runner is EndlessRunner
+	# Endless's break after a boss wave waits for the modifier pick: no
+	# countdown, no Skip.
+	var held := endless and (runner as EndlessRunner).held
 	wave_label.visible = runner != null and not waiting
 	enemies_label.visible = runner != null and not waiting
-	timer_label.visible = waiting
-	skip_button.visible = waiting
+	timer_label.visible = waiting and not held
+	skip_button.visible = waiting and not held
 	best_label.visible = endless
 	if runner == null:
 		return

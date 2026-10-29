@@ -142,6 +142,9 @@ var queue_casts := true
 var skin: SkinData = Skins.ALL[0]
 ## Flat stats from the Evolution Tree's stat nodes, keyed like ItemStats.
 var tree_bonus := {}
+## Endless's modifier (#3, #4): stat multipliers keyed like a skin's scale,
+## applied with it (set_run_scale).
+var run_scale := {}
 
 var _order := Order.NONE
 var _move_point := Vector2.ZERO
@@ -437,6 +440,13 @@ func apply_setup(setup: StageSetup) -> void:
 func apply_skin(new_skin: SkinData) -> void:
 	skin = new_skin
 	_show_body()
+	_refresh_stats(true)
+
+
+## Endless's modifier: `stat_scale` multiplies his stats next to the skin's
+## scale, replacing the last one ({} clears it). Keeps the HP and mana share.
+func set_run_scale(stat_scale: Dictionary) -> void:
+	run_scale = stat_scale.duplicate()
 	_refresh_stats(true)
 
 
@@ -1316,10 +1326,12 @@ func _stat_bonus() -> Dictionary:
 	return total
 
 
-## Skin multipliers (AD, AP, max HP), after item passives.
+## Skin multipliers (AD, AP, max HP), after item passives; then Endless's
+## (run_scale).
 func _scale_by_skin(block: StatBlock) -> void:
-	for key: StringName in skin.scale:
-		block.set(key, block.get(key) * skin.scale[key])
+	for multipliers: Dictionary in [skin.scale, run_scale]:
+		for key: StringName in multipliers:
+			block.set(key, block.get(key) * multipliers[key])
 
 
 ## Recomputes stats from the level, the equipped items, the tree and the
