@@ -7,6 +7,8 @@ extends CharacterBody2D
 
 ## Clicks this close to an enemy's edge count as clicking it.
 const CLICK_SLACK := 10.0
+## What a click can attack: enemies, and plants (Blast Cones, never enemies).
+const CLICKABLE_GROUPS: Array[StringName] = [&"enemies", &"plants"]
 
 ## Lucian walked into range of the merchant he was sent to.
 signal merchant_reached(merchant: Merchant)
@@ -831,21 +833,23 @@ func _drop_move() -> void:
 	move_dropped.emit()
 
 
-## The enemy under `point` (a click), or null.
+## The enemy, or the plant (a Blast Cone), under `point` (a click or A +
+## Left-click's hover), or null.
 func enemy_at(point: Vector2) -> Enemy:
 	var best: Enemy = null
 	var best_distance := INF
-	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
-		var distance := point.distance_to(enemy.global_position)
-		if distance <= enemy.radius + CLICK_SLACK and distance < best_distance:
-			best = enemy
-			best_distance = distance
+	for group: StringName in CLICKABLE_GROUPS:
+		for enemy: Enemy in get_tree().get_nodes_in_group(group):
+			var distance := point.distance_to(enemy.global_position)
+			if distance <= enemy.radius + CLICK_SLACK and distance < best_distance:
+				best = enemy
+				best_distance = distance
 	return best
 
 
-## Who A + Left-click at `point` attacks: the enemy under it, else the lowest
-## HP % among those in range (the nearer on a tie), else the nearest enemy on
-## the map. Null when there is none.
+## Who A + Left-click at `point` attacks: the enemy (or plant) under it, else
+## the lowest HP % among the enemies in range (the nearer on a tie), else the
+## nearest enemy on the map; never a plant it isn't on. Null when there is none.
 func attack_move_target(point: Vector2) -> Enemy:
 	var hovered := enemy_at(point)
 	if is_target(hovered):

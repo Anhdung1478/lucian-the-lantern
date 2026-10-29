@@ -89,10 +89,3 @@ func _draw() -> void:
 		draw_circle(Vector2(rock.x, rock.y), rock.z, ROCK_COLOR)
 		draw_arc(Vector2(rock.x, rock.y), rock.z, 0.0, TAU, 32, ROCK_COLOR.lightened(0.3), 4.0, true)
 	draw_rect(get_bounds(), JUNGLE_EDGE, false, 4.0)
-
-
-static func _bounds_of(polygon: PackedVector2Array) -> Rect2:
-	var box := Rect2(polygon[0], Vector2.ZERO)
-	for point in polygon:
-		box = box.expand(point)
-	return box

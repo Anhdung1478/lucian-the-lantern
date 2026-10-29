@@ -141,7 +141,7 @@ func test_before_the_first_sync_everyone_walks_straight() -> void:
 
 
 func test_every_map_bakes_walkable_ground() -> void:
-	for act_stage in [[0, 0], [1, 1], [2, 1], [2, 2], [2, 3]]:
+	for act_stage in [[0, 0], [1, 1], [2, 1], [2, 2], [2, 3], [3, 1], [3, 2], [3, 4], [3, 5]]:
 		var stage_map := StageMaps.create(act_stage[0], act_stage[1])
 		add_child_autofree(stage_map)
 		assert_gt(stage_map.navigation.navigation_polygon.get_polygon_count(), 0, str(act_stage))

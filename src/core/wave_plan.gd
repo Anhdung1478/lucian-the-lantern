@@ -1,13 +1,18 @@
 class_name WavePlan
 extends RefCounted
 ## Which enemies each wave of a stage brings (docs/act1_the_loss.md,
-## docs/act2_the_sentinels.md), and each stage's boss. A wave can name a
-## pack in place of an enemy id: it brings the pack's members, in order.
+## docs/act2_the_sentinels.md, docs/act3_the_jungle.md), and each stage's
+## boss. A wave can name a pack in place of an enemy id: it brings the
+## pack's members, in order.
 
 const MELEE := &"melee_minion"
 const RANGED := &"ranged_minion"
 const SIEGE := &"siege_minion"
 const SUPER := &"super_minion"
+## Act 3's elites, one at a time.
+const BLUE_SENTINEL := &"blue_sentinel"
+const RED_BRAMBLEBACK := &"red_brambleback"
+const SCUTTLER := &"rift_scuttler"
 ## Pack id -> its members, in spawn order. They come out of their camp.
 const PACKS := {
 	&"raptors": [&"raptor_big", &"raptor", &"raptor", &"raptor", &"raptor"],
@@ -21,6 +26,37 @@ const STAGES := {
 	"2-1": [[[MELEE, 6], [RANGED, 4], [SIEGE, 1]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]]],
 	"2-2": [[[MELEE, 6], [RANGED, 6], [SIEGE, 1]], [[MELEE, 6], [RANGED, 6], [SIEGE, 2]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]]],
 	"2-3": [[[MELEE, 6], [RANGED, 6], [SIEGE, 2]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]], [[MELEE, 8], [RANGED, 6], [SIEGE, 2], [SUPER, 1]]],
+	"3-1": [
+		[[&"raptors", 1], [&"wolves", 1]],
+		[[&"raptors", 2], [&"gromp", 1], [BLUE_SENTINEL, 1]],
+		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+	],
+	"3-2": [
+		[[&"raptors", 1], [&"wolves", 1], [&"gromp", 1]],
+		[[&"raptors", 1], [&"krugs", 1], [&"wolves", 1], [BLUE_SENTINEL, 1]],
+		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1]],
+	],
+	"3-3": [
+		[[&"raptors", 2], [&"wolves", 1], [&"gromp", 1]],
+		[[&"krugs", 1], [&"wolves", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
+		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+		[[&"raptors", 2], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
+	],
+	"3-4": [
+		[[&"raptors", 1], [&"wolves", 1], [&"gromp", 1], [&"krugs", 1]],
+		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [BLUE_SENTINEL, 1]],
+		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+		[[&"raptors", 2], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
+		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1]],
+	],
+	"3-5": [
+		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1]],
+		[[&"raptors", 2], [&"wolves", 1], [BLUE_SENTINEL, 1]],
+		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
+		[[&"raptors", 2], [&"wolves", 1], [&"krugs", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+	],
 }
 ## Stage id -> the boss wave's enemy id.
 const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan"}

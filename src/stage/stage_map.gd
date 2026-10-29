@@ -4,9 +4,13 @@ extends Node2D
 ## polygons and circles inside), the navigation baked around them for
 ## PathFollower, and the points the stage uses. Subclasses fill the lists in
 ## _init and draw the ground in _draw. The playable area starts at (0, 0);
-## the border walls sit just outside it.
+## the border walls sit just outside it. A map may also have terrain (lava,
+## water, plants): build_terrain makes it, and the stage adds it to its
+## world. The map is drawn at FLOOR_Z, under everything else on the stage.
 
 const WALL_THICKNESS := 64.0
+## Under ground zones (HazardZone.Z) and the units.
+const FLOOR_Z := -10
 ## Paths keep this far from every wall.
 const NAV_AGENT_RADIUS := 36.0
 ## A round wall is baked as a polygon with this many sides, just around it.
@@ -31,6 +35,7 @@ var navigation: NavigationRegion2D
 
 
 func _ready() -> void:
+	z_index = FLOOR_Z
 	var walls := StaticBody2D.new()
 	walls.name = "Walls"
 	walls.collision_layer = Layers.WORLD
@@ -59,6 +64,13 @@ func _ready() -> void:
 
 func get_bounds() -> Rect2:
 	return Rect2(Vector2.ZERO, size)
+
+
+## The map's terrain (HazardZone, Honeyfruit, BlastCone), made new and wired
+## to `lucian` and this map, positioned in the map's space, for the stage to
+## add to its world. None by default.
+func build_terrain(_lucian: Lucian) -> Array[Node2D]:
+	return []
 
 
 ## Inside the area and at least `margin` away from every wall.
@@ -113,6 +125,14 @@ static func _circle_outline(circle: Vector3) -> PackedVector2Array:
 	for i in NAV_CIRCLE_SIDES:
 		outline.append(center + Vector2.from_angle(TAU * i / NAV_CIRCLE_SIDES) * corner)
 	return outline
+
+
+## The smallest box holding `polygon`, for scattering trees over a wall.
+static func _bounds_of(polygon: PackedVector2Array) -> Rect2:
+	var box := Rect2(polygon[0], Vector2.ZERO)
+	for point in polygon:
+		box = box.expand(point)
+	return box
 
 
 static func _distance_to_edge(point: Vector2, polygon: PackedVector2Array) -> float:

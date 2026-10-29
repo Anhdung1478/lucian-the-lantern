@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
+  <!-- Blast Cone: a yellow-green bulb plant seen from above, a ribbed bulb swollen with seeds on a rosette of pointed leaves, ready to pop. -->
+  <g transform="translate(36 37)">
+    <ellipse cx="1" cy="3" rx="30" ry="27" fill="#000000" opacity="0.25"/>
+    <!-- rosette of leaves -->
+    <path d="M 0 -6 L -9 -31 L 6 -12 Z" fill="#4f8a2e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 4 -3 L 31 -12 L 12 4 Z" fill="#4f8a2e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 4 4 L 22 27 L -2 12 Z" fill="#4f8a2e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M -3 4 L -26 22 L -12 1 Z" fill="#4f8a2e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M -4 -3 L -31 -9 L -9 -12 Z" fill="#4f8a2e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M -6 -27 L 2 -12 M 26 -10 L 10 -2 M 18 22 L 2 8 M -22 18 L -8 4 M -27 -9 L -10 -8" stroke="#7cbc45" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- the bulb -->
+    <circle cx="0" cy="-1" r="17" fill="#c3d83a" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -16 -6 Q 0 -12 16 -6 M -17 2 Q 0 -4 17 2 M -14 10 Q 0 5 14 10" fill="none" stroke="#8fa628" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 0 -18 Q -7 -1 0 16 M 0 -18 Q 7 -1 0 16" fill="none" stroke="#8fa628" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="-6" cy="-8" rx="5" ry="3.5" fill="#f1f7a6" opacity="0.8"/>
+    <!-- the tip, glowing -->
+    <circle cx="0" cy="-1" r="4.5" fill="#f6e04a" stroke="#1a1d24" stroke-width="2"/>
+    <circle cx="-1" cy="-2" r="1.6" fill="#fffbe0"/>
+  </g>
+</svg>

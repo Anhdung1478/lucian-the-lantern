@@ -293,9 +293,12 @@ func test_next_stage_shows_only_when_it_can_be_played() -> void:
 	var stage: Stage = await _stage(2, 1)
 	stage.show_result(true)
 	assert_true(stage.result.next_button.visible, "2-2 has waves")
-	var last: Stage = await _stage(2, 3)
+	var act_end: Stage = await _stage(2, 3)
+	act_end.show_result(true)
+	assert_true(act_end.result.next_button.visible, "3-1 has waves")
+	var last: Stage = await _stage(3, 5)
 	last.show_result(true)
-	assert_false(last.result.next_button.visible, "3-1 has no waves yet")
+	assert_false(last.result.next_button.visible, "4-1 has no waves yet")
 
 
 ## Phase 7: camps, splits, escapes, buffs on kill and mini bosses, with

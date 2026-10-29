@@ -15,6 +15,7 @@ const ACT_SCENARIOS := {
 	"act1_lesson": [1, 1], "act1_thresh": [1, 1], "act1_cutscene": [1, 1], "act1_result": [1, 1], "game_over": [1, 1],
 	"act2_pillars": [2, 3], "act2_super": [2, 1], "akshan_e": [2, 3], "akshan_r": [2, 3],
 	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
+	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
 }
 
 var stage: Node
@@ -187,6 +188,12 @@ func _run(scenario: String) -> void:
 			await scenario_loot()
 		"guardian_angel":
 			await scenario_guardian_angel()
+		"act3_jungle":
+			await scenario_act3_jungle()
+		"act3_water":
+			await scenario_act3_water()
+		"act3_pit":
+			await scenario_act3_pit()
 		"training_setup":
 			await scenario_training_setup()
 		"skins_stage":
@@ -1826,6 +1833,66 @@ func scenario_act2_pillars() -> void:
 	game.camera.zoom = Vector2(0.42, 0.42)
 	await wait(0.2)
 	await shot("act2_pillars_1_ring")
+
+
+## The whole of an Act 3 map, the camera zoomed out over it.
+func whole_map(file_name: String) -> void:
+	var game := game_stage()
+	game.camera.mode = StageCamera.Mode.FREE
+	var view := game.camera.get_viewport_rect().size
+	var fit := minf(view.x / game.arena.size.x, view.y / game.arena.size.y)
+	game.camera.zoom = Vector2.ONE * fit
+	game.camera.global_position = game.arena.size * 0.5
+	await wait(0.3)
+	await shot(file_name)
+
+
+## 3-2's jungle: the whole map with its lava and Blast Cones; then Lucian
+## shoots a cone beside a loop and flies over its jungle.
+func scenario_act3_jungle() -> void:
+	var game := game_stage()
+	print("stage info (expect Stage 3-2 · The Jungle  Wave 1 in …): ", info_text())
+	print("walls (expect 4): ", game.arena.wall_polygons.size(), "  plants (expect 4): ", get_nodes_in_group(&"plants").size())
+	await whole_map("act3_jungle_0_map")
+	var cone: BlastCone = get_nodes_in_group(&"plants")[0]
+	blink(cone.global_position + Vector2(0, 160))
+	game.camera.zoom = Vector2(0.6, 0.6)
+	game.camera.mode = StageCamera.Mode.FOLLOW
+	await wait(0.3)
+	await shot("act3_jungle_1_cone")
+	lucian.command_attack(cone)
+	while not lucian.is_launched():
+		await wait(0.02)
+	await wait(0.25)
+	await shot("act3_jungle_2_thrown")
+	await wait(0.6)
+	print("landed walkable (expect true): ", game.arena.is_walkable(lucian.global_position), " at ", lucian.global_position)
+	await shot("act3_jungle_3_landed")
+
+
+## 3-4's jungle: the riverbed of shallow water and the Honeyfruit; Lucian
+## wading in the river, slowed.
+func scenario_act3_water() -> void:
+	var game := game_stage()
+	await whole_map("act3_water_0_map")
+	blink(Vector2(JungleMap.RIVER_X, 1600))
+	game.camera.zoom = Vector2(0.8, 0.8)
+	game.camera.mode = StageCamera.Mode.FOLLOW
+	await wait(0.3)
+	print("slowed in the water (expect 0.25): ", lucian.slow_amount())
+	await shot("act3_water_1_wading")
+
+
+## 3-5's pit: the round floor, its rock ring in 8 pieces and 6 rocks; then
+## Lucian at the start with the radar.
+func scenario_act3_pit() -> void:
+	var game := game_stage()
+	print("walls (expect 8): ", game.arena.wall_polygons.size(), "  rocks (expect 6): ", game.arena.wall_circles.size())
+	await whole_map("act3_pit_0_map")
+	game.camera.zoom = Vector2.ONE
+	game.camera.mode = StageCamera.Mode.FOLLOW
+	await wait(0.3)
+	await shot("act3_pit_1_start")
 
 
 ## A super minion with melee and ranged minions around it: Empower's icon

@@ -137,3 +137,35 @@ func test_a_packs_members_spawn_in_groups_of_3_in_order() -> void:
 func test_waves_without_packs_are_unchanged() -> void:
 	assert_eq(WavePlan.waves("1-1"), WavePlan.expand(WavePlan.STAGES["1-1"]))
 	assert_eq(WavePlan.waves("1-1")[0].size(), 10)
+
+
+## Act 3's waves as the design's table writes them: R raptors, W wolves,
+## K krugs, G gromp; B Blue, D Red (Brambleback), S the Scuttler.
+func test_act_3_waves_follow_the_table() -> void:
+	var letters := {&"raptors": "R", &"wolves": "W", &"krugs": "K", &"gromp": "G",
+		WavePlan.BLUE_SENTINEL: "B", WavePlan.RED_BRAMBLEBACK: "D", WavePlan.SCUTTLER: "S"}
+	var table := {
+		"3-1": "R W · R R G B · W K G D S",
+		"3-2": "R W G · R K W B · W K G D S · R W K G",
+		"3-3": "R R W G · K W G B · R W K D S · R R W K G B",
+		"3-4": "R W G K · R W K B · W K G D S · R R K G B · R W K G D",
+		"3-5": "R W K G · R R W B · W K G D S · R W K G B · R R W K D S",
+	}
+	for id: String in table:
+		assert_true(WavePlan.has_stage(id), id)
+		var waves: Array[String] = []
+		for wave: Array in WavePlan.STAGES.get(id, []):
+			var written: Array[String] = []
+			for group: Array in wave:
+				for i in group[1]:
+					written.append(letters.get(group[0], "?"))
+			waves.append(" ".join(written))
+		assert_eq(" · ".join(waves), table[id], id)
+		assert_eq(WavePlan.waves(id).size(), Journey.waves(3, id.right(1).to_int()), "%s: the Journey's wave count" % id)
+
+
+func test_every_act_3_enemy_has_its_data() -> void:
+	for stage in range(1, 6):
+		for wave: Array in WavePlan.waves(Journey.stage_id(3, stage)):
+			for id: StringName in wave:
+				assert_true(ResourceLoader.exists(Stage.ENEMY_PATH % id), String(id))

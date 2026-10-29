@@ -241,7 +241,8 @@ func remove_merchant() -> void:
 	merchant = null
 
 
-## An act's map in place of the sandbox arena; the training dummy goes too.
+## An act's map in place of the sandbox arena, its terrain (lava, water,
+## plants) added to the world; the training dummy goes.
 func _use_map(map: StageMap) -> void:
 	remove_child(arena)
 	arena.queue_free()
@@ -249,6 +250,8 @@ func _use_map(map: StageMap) -> void:
 	add_child(map)
 	move_child(map, 0)
 	arena = map
+	for node in map.build_terrain(lucian):
+		$World.add_child(node)
 	$World.remove_child(dummy)
 	dummy.queue_free()
 	dummy = null
