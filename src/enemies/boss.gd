@@ -6,9 +6,15 @@ extends EnemyUnit
 ## busy (no walking, no basic attacks). Skill hits are `from_skill`, so
 ## Banshee's Veil blocks them.
 
+## A basic bolt flies this far past the attack range.
+const BOLT_OVERREACH := 150.0
+
 var skills: Array[Dictionary] = []
 ## Seconds the boss is busy with a skill.
 var busy_left := 0.0
+## The map it fights on, for skills that need walkable ground; null outside
+## a stage.
+var arena: StageMap
 
 var _cooldowns := {}
 
@@ -50,6 +56,6 @@ func _can_use(_id: StringName) -> bool:
 
 func _attack() -> void:
 	if data.projectile_speed > 0.0:
-		fire_bolt(make_hit(), data.projectile_speed, attack_range + 150.0)
+		fire_bolt(make_hit(), data.projectile_speed, attack_range + BOLT_OVERREACH)
 	else:
 		super()

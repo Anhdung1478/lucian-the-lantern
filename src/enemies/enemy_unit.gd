@@ -235,6 +235,12 @@ func _lose_hp(amount: float) -> void:
 	health_bar.set_health(hp, max_hp)
 
 
+## Heals, and the bar shows it.
+func heal(amount: float) -> void:
+	super(amount)
+	health_bar.set_health(hp, max_hp)
+
+
 func _show_hit() -> void:
 	visuals.modulate = HIT_FLASH
 	if _flash_tween:

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/ocean_drake.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"ocean_drake"
+display_name = "Ocean Drake"
+kind = &"mini_boss"
+behavior = &"ocean_drake"
+art = ExtResource("2_art")
+max_hp = 10000.0
+armor = 40.0
+mr = 50.0
+damage = 55.0
+damage_type = 1
+attack_range = 600.0
+attack_interval = 1.5
+move_speed = 260.0
+radius = 70.0
+gold = 300
+projectile_speed = 800.0
+purple_first = 5
+purple_repeat = 1
+camp = &"drake"

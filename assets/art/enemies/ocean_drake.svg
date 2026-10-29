@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150">
+  <!-- Ocean Drake: a teal drake seen from above, fin-like wings ribbed like a fish's, a fluked tail, water drops falling round it, head forward (+X). -->
+  <g transform="translate(75 75)">
+    <ellipse cx="-4" cy="4" rx="56" ry="60" fill="#000000" opacity="0.22"/>
+    <!-- fin wings -->
+    <g stroke="#1a1d24" stroke-width="3" stroke-linejoin="round">
+      <path d="M 8 -15 Q 28 -48 -4 -68 Q -24 -64 -34 -46 Q -36 -30 -22 -13 Z" fill="#3fb5b0"/>
+      <path d="M 8 15 Q 28 48 -4 68 Q -24 64 -34 46 Q -36 30 -22 13 Z" fill="#3fb5b0"/>
+    </g>
+    <path d="M 2 -20 Q 12 -44 -6 -58 Q -20 -56 -26 -42 Q -26 -30 -18 -18 Z" fill="#7ee0d8" opacity="0.45"/>
+    <path d="M 2 20 Q 12 44 -6 58 Q -20 56 -26 42 Q -26 30 -18 18 Z" fill="#7ee0d8" opacity="0.45"/>
+    <!-- fin rays -->
+    <path d="M 4 -15 L 8 -58 M 4 -15 L -6 -66 M 4 -15 L -18 -62 M 4 -15 L -28 -52 M 4 -15 L -33 -38 M 4 15 L 8 58 M 4 15 L -6 66 M 4 15 L -18 62 M 4 15 L -28 52 M 4 15 L -33 38" stroke="#1b6b6e" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <!-- fluked tail -->
+    <path d="M -24 -9 Q -46 -6 -58 0 Q -46 6 -24 9 Z" fill="#2a9d9a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -54 0 L -72 -16 Q -64 0 -72 16 Z" fill="#3fb5b0" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- body -->
+    <ellipse cx="-6" cy="0" rx="30" ry="19" fill="#2a9d9a" stroke="#1a1d24" stroke-width="3"/>
+    <ellipse cx="-8" cy="0" rx="20" ry="11" fill="#1f8582"/>
+    <!-- scales -->
+    <path d="M -24 -8 Q -20 -4 -16 -8 Q -12 -4 -8 -8 Q -4 -4 0 -8 M -24 8 Q -20 4 -16 8 Q -12 4 -8 8 Q -4 4 0 8" stroke="#6fd6cf" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    <!-- dorsal fin down the back -->
+    <path d="M -34 0 Q -20 -5 -6 -2 Q 4 -3 12 0 Q 4 3 -6 2 Q -20 5 -34 0 Z" fill="#9ff0e8" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- neck and head, with gill frills -->
+    <path d="M 14 -9 L 34 -7 L 34 7 L 14 9 Z" fill="#2a9d9a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 34 -9 Q 26 -22 18 -18 Q 26 -12 30 -6 Z M 34 9 Q 26 22 18 18 Q 26 12 30 6 Z" fill="#7ee0d8" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <ellipse cx="42" cy="0" rx="14" ry="11" fill="#35aaa6" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M 50 -7 Q 62 -5 65 0 Q 62 5 50 7 Z" fill="#35aaa6" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="46" cy="-6" r="2.4" fill="#e8fbff"/>
+    <circle cx="46" cy="6" r="2.4" fill="#e8fbff"/>
+    <circle cx="61" cy="-2.5" r="1.2" fill="#1a1d24"/>
+    <circle cx="61" cy="2.5" r="1.2" fill="#1a1d24"/>
+    <!-- water drops -->
+    <g fill="#9fe8ff" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round">
+      <path d="M 30 -38 Q 35 -31 30 -28 Q 25 -31 30 -38 Z"/>
+      <path d="M 34 36 Q 39 43 34 46 Q 29 43 34 36 Z"/>
+      <path d="M -48 -30 Q -43 -23 -48 -20 Q -53 -23 -48 -30 Z"/>
+      <path d="M -46 24 Q -41 31 -46 34 Q -51 31 -46 24 Z"/>
+      <path d="M 58 -20 Q 62 -14 58 -12 Q 54 -14 58 -20 Z"/>
+    </g>
+  </g>
+</svg>

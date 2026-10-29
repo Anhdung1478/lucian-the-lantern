@@ -285,6 +285,8 @@ func spawn_unit(data: EnemyData, at: Vector2, wave := 1) -> EnemyUnit:
 	unit.max_hp *= WavePlan.hp_share(run.stage_id, data.id)
 	unit.projectile_parent = $Projectiles
 	unit.warning_parent = $Warnings
+	if unit is Boss:
+		(unit as Boss).arena = arena
 	unit.position = at
 	$World.add_child(unit)
 	unit.damage_taken.connect(damage_numbers.spawn.bind(unit))
@@ -402,14 +404,18 @@ func _on_lucian_died() -> void:
 	show_result(false)
 
 
-## A boss has its own script; a jungle monster is a Monster; every other
-## enemy is a minion.
+## A boss or mini boss has its own script; a jungle monster is a Monster;
+## every other enemy is a minion.
 func _new_unit(data: EnemyData) -> EnemyUnit:
 	match data.behavior:
 		&"thresh":
 			return Thresh.new()
 		&"akshan":
 			return Akshan.new()
+		&"infernal_drake":
+			return InfernalDrake.new()
+		&"ocean_drake":
+			return OceanDrake.new()
 		&"swarm", &"flank", &"brute", &"spit", &"flee":
 			return Monster.new()
 	return Minion.new()

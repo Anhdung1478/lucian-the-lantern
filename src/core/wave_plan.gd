@@ -13,6 +13,9 @@ const SUPER := &"super_minion"
 const BLUE_SENTINEL := &"blue_sentinel"
 const RED_BRAMBLEBACK := &"red_brambleback"
 const SCUTTLER := &"rift_scuttler"
+## Act 3's mini bosses, each last in its stage's last wave.
+const INFERNAL_DRAKE := &"infernal_drake"
+const OCEAN_DRAKE := &"ocean_drake"
 ## Pack id -> its members, in spawn order. They come out of their camp.
 const PACKS := {
 	&"raptors": [&"raptor_big", &"raptor", &"raptor", &"raptor", &"raptor"],
@@ -35,7 +38,7 @@ const STAGES := {
 		[[&"raptors", 1], [&"wolves", 1], [&"gromp", 1]],
 		[[&"raptors", 1], [&"krugs", 1], [&"wolves", 1], [BLUE_SENTINEL, 1]],
 		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
-		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1]],
+		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [INFERNAL_DRAKE, 1]],
 	],
 	"3-3": [
 		[[&"raptors", 2], [&"wolves", 1], [&"gromp", 1]],
@@ -48,7 +51,7 @@ const STAGES := {
 		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [BLUE_SENTINEL, 1]],
 		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
 		[[&"raptors", 2], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
-		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1]],
+		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [OCEAN_DRAKE, 1]],
 	],
 	"3-5": [
 		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1]],

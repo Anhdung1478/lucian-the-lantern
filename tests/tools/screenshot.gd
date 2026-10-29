@@ -16,6 +16,7 @@ const ACT_SCENARIOS := {
 	"act2_pillars": [2, 3], "act2_super": [2, 1], "akshan_e": [2, 3], "akshan_r": [2, 3],
 	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
+	"infernal_meteor": [3, 2], "ocean_mist": [3, 4],
 }
 
 var stage: Node
@@ -194,6 +195,10 @@ func _run(scenario: String) -> void:
 			await scenario_act3_water()
 		"act3_pit":
 			await scenario_act3_pit()
+		"infernal_meteor":
+			await scenario_infernal_meteor()
+		"ocean_mist":
+			await scenario_ocean_mist()
 		"training_setup":
 			await scenario_training_setup()
 		"skins_stage":
@@ -1893,6 +1898,72 @@ func scenario_act3_pit() -> void:
 	game.camera.mode = StageCamera.Mode.FOLLOW
 	await wait(0.3)
 	await shot("act3_pit_1_start")
+
+
+## A drake in the jungle's pit, Lucian below it, the camera between them.
+func to_drake(id: StringName) -> Boss:
+	var game := game_stage()
+	flush_tips()
+	blink(JungleMap.PIT + Vector2(0, 250))
+	game.camera.mode = StageCamera.Mode.FREE
+	game.camera.global_position = JungleMap.PIT + Vector2(0, 60)
+	game.camera.zoom = Vector2(0.8, 0.8)
+	var drake := game.spawn_enemy(id, JungleMap.PIT + Vector2(0, -180)) as Boss
+	drake.move_speed = 0.0
+	for skill: StringName in drake._cooldowns:
+		drake._cooldowns[skill] = 60.0
+	return drake
+
+
+## The Infernal Drake: Meteor Fall's four circles round Lucian, then the
+## burning ground they leave; then Fire Breath's cone and its fire.
+func scenario_infernal_meteor() -> void:
+	var drake := to_drake(&"infernal_drake") as InfernalDrake
+	drake._cooldowns[&"meteor_fall"] = 0.0
+	await wait_for_warning(GroundWarning.Shape.CIRCLE)
+	await wait(0.8)
+	var circles := stage.get_node("Warnings").get_children().filter(func(node: Node) -> bool: return node is GroundWarning)
+	print("meteor circles (expect 4): ", circles.size())
+	await shot("infernal_meteor_0_warnings")
+	await wait(0.6)
+	var zones := stage.get_node("Warnings").get_children().filter(func(node: Node) -> bool: return node is HazardZone)
+	print("burning circles (expect 4): ", zones.size(), "  Lucian burning (expect true): ", lucian._burns.has(HazardZone.BURN_ID))
+	await shot("infernal_meteor_1_burning")
+	drake._cooldowns[&"fire_breath"] = 0.0
+	await wait_for_warning(GroundWarning.Shape.CONE)
+	await wait(0.6)
+	await shot("infernal_meteor_2_breath")
+	await wait(0.5)
+	await shot("infernal_meteor_3_fire")
+
+
+## The Ocean Drake: Tidal Wave's line and the wave pushing Lucian back;
+## then Soothing Mist's ring, and an interrupt with the drake dazed.
+func scenario_ocean_mist() -> void:
+	var drake := to_drake(&"ocean_drake") as OceanDrake
+	drake._cooldowns[&"tidal_wave"] = 0.0
+	await wait_for_warning(GroundWarning.Shape.LINE)
+	await wait(0.6)
+	var before := lucian.global_position
+	await shot("ocean_mist_0_wave_warning")
+	await wait(0.4)
+	await shot("ocean_mist_1_wave")
+	await wait(0.5)
+	print("pushed (expect about 300): ", before.distance_to(lucian.global_position), "  slowed (expect 0.3): ", lucian.slow_amount())
+	# Back where he stood, before the mist.
+	blink(before)
+	drake.hp = drake.max_hp * 0.6
+	drake.health_bar.set_health(drake.hp, drake.max_hp)
+	drake._cooldowns[&"soothing_mist"] = 0.0
+	while not drake.is_channeling():
+		await wait(0.05)
+	await wait(1.5)
+	print("healed from 60%% to %d%%" % roundi(100.0 * drake.hp / drake.max_hp))
+	await shot("ocean_mist_2_channel")
+	drake.take_damage(DamageInfo.create(drake.max_hp * 0.09, DamageInfo.Type.TRUE, &"test"))
+	await wait(0.3)
+	print("interrupted (expect false, true): ", drake.is_channeling(), " ", drake.is_dazed())
+	await shot("ocean_mist_3_interrupted")
 
 
 ## A super minion with melee and ranged minions around it: Empower's icon

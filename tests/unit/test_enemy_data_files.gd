@@ -3,7 +3,7 @@ extends GutTest
 const IDS := [
 	"melee_minion", "ranged_minion", "siege_minion", "super_minion", "thresh_1", "akshan",
 	"raptor", "raptor_big", "murkwolf", "murkwolf_big", "krug", "krug_big", "gromp",
-	"blue_sentinel", "red_brambleback", "rift_scuttler",
+	"blue_sentinel", "red_brambleback", "rift_scuttler", "infernal_drake", "ocean_drake",
 ]
 ## Act 3's monsters (docs/implementation/phase7.md): id -> [kind, behavior,
 ## camp, HP, armor, MR, damage, attack range, attack interval, speed, radius,

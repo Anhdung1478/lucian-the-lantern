@@ -140,7 +140,8 @@ func test_waves_without_packs_are_unchanged() -> void:
 
 
 ## Act 3's waves as the design's table writes them: R raptors, W wolves,
-## K krugs, G gromp; B Blue, D Red (Brambleback), S the Scuttler.
+## K krugs, G gromp; B Blue, D Red (Brambleback), S the Scuttler. The table
+## names a stage's mini boss apart: one, last in the last wave.
 func test_act_3_waves_follow_the_table() -> void:
 	var letters := {&"raptors": "R", &"wolves": "W", &"krugs": "K", &"gromp": "G",
 		WavePlan.BLUE_SENTINEL: "B", WavePlan.RED_BRAMBLEBACK: "D", WavePlan.SCUTTLER: "S"}
@@ -151,16 +152,23 @@ func test_act_3_waves_follow_the_table() -> void:
 		"3-4": "R W G K · R W K B · W K G D S · R R K G B · R W K G D",
 		"3-5": "R W K G · R R W B · W K G D S · R W K G B · R R W K D S",
 	}
+	var mini_bosses := {"3-2": WavePlan.INFERNAL_DRAKE, "3-4": WavePlan.OCEAN_DRAKE}
 	for id: String in table:
 		assert_true(WavePlan.has_stage(id), id)
+		var plan: Array = WavePlan.STAGES.get(id, [])
+		var mini_boss: StringName = mini_bosses.get(id, &"")
 		var waves: Array[String] = []
-		for wave: Array in WavePlan.STAGES.get(id, []):
+		for wave: Array in plan:
 			var written: Array[String] = []
 			for group: Array in wave:
+				if group[0] == mini_boss:
+					continue
 				for i in group[1]:
 					written.append(letters.get(group[0], "?"))
 			waves.append(" ".join(written))
 		assert_eq(" · ".join(waves), table[id], id)
+		if mini_boss != &"" and not plan.is_empty():
+			assert_eq(plan.back().back(), [mini_boss, 1], "%s: its mini boss, last in the last wave" % id)
 		assert_eq(WavePlan.waves(id).size(), Journey.waves(3, id.right(1).to_int()), "%s: the Journey's wave count" % id)
 
 
