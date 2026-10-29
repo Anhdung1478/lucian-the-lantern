@@ -174,14 +174,6 @@ static func _circle(center: Vector2, circle_radius: float) -> PackedVector2Array
 	return points
 
 
-## Every wall less `open`; a wall may split in two.
-static func _carve(walls: Array[PackedVector2Array], open: PackedVector2Array) -> Array[PackedVector2Array]:
-	var pieces: Array[PackedVector2Array] = []
-	for wall in walls:
-		pieces.append_array(Geometry2D.clip_polygons(wall, open))
-	return pieces
-
-
 func _draw() -> void:
 	# The jungle runs on past the edges, where the camera still sees.
 	for rect in border_rects():

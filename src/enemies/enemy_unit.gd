@@ -61,6 +61,9 @@ var summoned := false
 var summoner: EnemyUnit
 ## Its own summons alive or on their way (called, not spawned yet).
 var summons := 0
+## On a ledge in the abyss (the stage sets it): it never walks, since a walk
+## would push its body out of the abyss's shape. It still faces and attacks.
+var perched := false
 ## Black Mist: a dark silhouette with no health bar. Still a target.
 var veiled := false:
 	set(on):
@@ -304,7 +307,10 @@ func apply_on_hit() -> void:
 ## a path around it (see PathFollower), as walk does. Within a step of a path
 ## point that isn't `point` itself (the path's end, when `point` is inside a
 ## wall) it stands: a full step would take it past that point and back.
+## Perched, it stands.
 func walk_toward(point: Vector2, delta: float) -> void:
+	if perched:
+		return
 	var world := get_world_2d()
 	var toward := path_follower.next_point(global_position, point, delta, world.direct_space_state, world.navigation_map)
 	if toward != point and global_position.distance_to(toward) <= current_speed() * delta:
@@ -313,8 +319,10 @@ func walk_toward(point: Vector2, delta: float) -> void:
 
 
 ## One step in `direction`, with no path, sliding along walls. A unit that
-## barely moved sidesteps for a moment.
+## barely moved sidesteps for a moment. Perched, it stands.
 func walk(direction: Vector2, delta: float) -> void:
+	if perched:
+		return
 	if _stuck_left > 0.0:
 		_stuck_left -= delta
 		direction = (direction + direction.orthogonal() * _sidestep).normalized()

@@ -205,17 +205,6 @@ static func tombstones() -> Array[Rect2]:
 	return found
 
 
-static func _rect_polygon(rect: Rect2) -> PackedVector2Array:
-	return _piece(PackedVector2Array([rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)]))
-
-
-## `points` wound the way wall polygons are (not clockwise).
-static func _piece(points: PackedVector2Array) -> PackedVector2Array:
-	if Geometry2D.is_polygon_clockwise(points):
-		points.reverse()
-	return points
-
-
 func _draw() -> void:
 	for rect in border_rects():
 		draw_rect(rect, TREE_LINE_COLOR)

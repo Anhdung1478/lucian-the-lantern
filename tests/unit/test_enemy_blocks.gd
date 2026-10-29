@@ -280,6 +280,32 @@ func test_no_thinking_while_charging() -> void:
 	assert_eq(lucian.hp, hp, "no attack while it charges")
 
 
+# --- Perched (a ledge in the abyss) --------------------------------------
+
+
+## A perched unit stands inside the abyss's shape: it never walks (a walk
+## would push its body out of it), but still faces Lucian and attacks.
+func test_a_perched_unit_never_walks_but_faces_and_attacks() -> void:
+	_map(PackedVector2Array([Vector2(900, 900), Vector2(1100, 900), Vector2(1100, 1100), Vector2(900, 1100)]))
+	lucian.global_position = Vector2(2200, 1000)
+	var data := _data()
+	data.attack_interval = 0.2
+	var unit := _unit(data, Vector2(1000, 1000))
+	assert_false(unit.perched, "not by default")
+	unit.perched = true
+	await wait_physics_frames(20)
+	assert_eq(unit.global_position, Vector2(1000, 1000), "Lucian out of reach: it stays")
+	unit.walk(Vector2.RIGHT, 0.1)
+	unit.walk_toward(Vector2(1800, 1000), 0.1)
+	assert_eq(unit.global_position, Vector2(1000, 1000), "walk and walk_toward do nothing")
+	lucian.global_position = Vector2(1000, 1135)
+	var hp := lucian.hp
+	await wait_physics_frames(20)
+	assert_lt(lucian.hp, hp, "in reach, it attacks")
+	assert_almost_eq(unit.visuals.rotation, PI / 2.0, 0.01, "facing him")
+	assert_eq(unit.global_position, Vector2(1000, 1000))
+
+
 # --- The veil and the tint -----------------------------------------------
 
 

@@ -155,6 +155,26 @@ static func _bounds_of(polygon: PackedVector2Array) -> Rect2:
 	return box
 
 
+## Every piece less `open`; a piece may split in two (or more). `open` must
+## cross a piece's edge or overlap what was cut before, else it leaves a hole.
+static func _carve(pieces: Array[PackedVector2Array], open: PackedVector2Array) -> Array[PackedVector2Array]:
+	var left: Array[PackedVector2Array] = []
+	for piece in pieces:
+		left.append_array(Geometry2D.clip_polygons(piece, open))
+	return left
+
+
+static func _rect_polygon(rect: Rect2) -> PackedVector2Array:
+	return _piece(PackedVector2Array([rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)]))
+
+
+## `points` wound the way wall polygons are (not clockwise).
+static func _piece(points: PackedVector2Array) -> PackedVector2Array:
+	if Geometry2D.is_polygon_clockwise(points):
+		points.reverse()
+	return points
+
+
 static func _distance_to_edge(point: Vector2, polygon: PackedVector2Array) -> float:
 	var best := INF
 	for i in polygon.size():

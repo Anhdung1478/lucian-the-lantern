@@ -1,6 +1,7 @@
 extends GutTest
 
-const STAGES := [[1, 1], [2, 1], [2, 2], [2, 3], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [4, 1], [4, 2], [4, 3], [5, 1], [5, 2], [5, 3], [5, 4], [5, 5]]
+const STAGES := [[1, 1], [2, 1], [2, 2], [2, 3], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [4, 1], [4, 2], [4, 3], [5, 1], [5, 2], [5, 3], [5, 4], [5, 5],
+	[6, 1], [6, 2], [6, 3], [6, 4], [6, 5]]
 ## The navigation map may sync on a background thread: poll it, at most this
 ## many physics frames.
 const SYNC_FRAMES := 180
@@ -370,13 +371,39 @@ func test_the_chasm_layer_is_named() -> void:
 	assert_eq(ProjectSettings.get_setting("layer_names/2d_physics/layer_6"), "chasm")
 
 
+## Only Act 6 has an abyss and ledges, only Act 5 the mist.
 func test_maps_have_no_abyss_ledges_or_mist_by_default() -> void:
 	for act_stage in STAGES:
 		var map := StageMaps.create(act_stage[0], act_stage[1])
-		assert_true(map.chasm_polygons.is_empty(), str(act_stage))
-		assert_true(map.ledge_points.is_empty(), str(act_stage))
+		assert_eq(map.chasm_polygons.is_empty(), act_stage[0] != 6, str(act_stage))
+		if act_stage[0] != 6:
+			assert_true(map.ledge_points.is_empty(), str(act_stage))
 		assert_eq(map.mist.is_empty(), act_stage[0] != 5, str(act_stage))
 		map.free()
+
+
+## A collision polygon or a nav obstruction can't have a hole, nor cross
+## itself: the abyss is several simple polygons.
+func test_no_chasm_polygon_is_a_hole_or_crosses_itself() -> void:
+	for act_stage in STAGES:
+		var map := StageMaps.create(act_stage[0], act_stage[1])
+		for polygon in map.chasm_polygons:
+			assert_gte(polygon.size(), 3, str(act_stage))
+			assert_false(Geometry2D.is_polygon_clockwise(polygon), "%s: a hole of %d points" % [act_stage, polygon.size()])
+			assert_false(_crosses_itself(polygon), "%s: a polygon of %d points crosses itself" % [act_stage, polygon.size()])
+		map.free()
+
+
+## Two edges of `polygon` that aren't neighbors meet.
+func _crosses_itself(polygon: PackedVector2Array) -> bool:
+	var count := polygon.size()
+	for i in count:
+		for j in range(i + 2, count):
+			if i == 0 and j == count - 1:
+				continue
+			if Geometry2D.segment_intersects_segment(polygon[i], polygon[(i + 1) % count], polygon[j], polygon[(j + 1) % count]) != null:
+				return true
+	return false
 
 
 func test_the_abyss_is_a_body_on_its_own_layer_and_not_walkable() -> void:
@@ -625,4 +652,355 @@ func test_the_forest_has_a_ragged_tree_line_top_and_bottom() -> void:
 	assert_false(map.is_walkable(Vector2(2000, 100)))
 	assert_false(map.is_walkable(Vector2(2000, 3300)))
 	assert_true(map.is_walkable(Vector2(2000, 700)))
+	map.free()
+
+
+# --- Act 6: Thresh's domain ----------------------------------------------
+
+const DOMAIN_SIZE := Vector2(5600, 3400)
+const PLATFORM_MIDDLE := Vector2(2800, 1700)
+const PLATFORM_RADIUS := 1400.0
+
+
+func _domain(stage: int) -> ThreshDomainMap:
+	return StageMaps.create(6, stage) as ThreshDomainMap
+
+
+func _in_abyss(map: StageMap, point: Vector2) -> bool:
+	for polygon in map.chasm_polygons:
+		if Geometry2D.is_point_in_polygon(point, polygon):
+			return true
+	return false
+
+
+func _in_any(point: Vector2, polygons: Array[PackedVector2Array]) -> bool:
+	for polygon in polygons:
+		if Geometry2D.is_point_in_polygon(point, polygon):
+			return true
+	return false
+
+
+## The whole bridges of a stage: those whose middle is walkable.
+func _whole_bridges(map: StageMap) -> Array[Vector3]:
+	var whole: Array[Vector3] = []
+	for bridge in ThreshDomainMap.BRIDGES:
+		if map.is_walkable(Vector2((bridge.x + bridge.y) * 0.5, bridge.z), 0.0):
+			whole.append(bridge)
+	return whole
+
+
+func test_act_6_stages_are_thresh_domain() -> void:
+	for stage in range(1, 6):
+		var map := _domain(stage)
+		assert_not_null(map, str(stage))
+		assert_eq(map.size, DOMAIN_SIZE)
+		assert_eq(map.stage, stage)
+		assert_false(map.chasm_polygons.is_empty(), "%d has an abyss" % stage)
+		map.free()
+	for stage in range(1, 5):
+		var map := _domain(stage)
+		assert_eq(map.merchant_point, Vector2(2800, 1700))
+		assert_eq(map.boss_point, Vector2(4700, 1700))
+		map.free()
+
+
+## West (the start, x 200 to 1700), center (the merchant) and east (the boss
+## spot and the two east spawn points).
+func test_the_three_plateaus_hold_their_points() -> void:
+	var plateaus := ThreshDomainMap.plateaus()
+	assert_eq(plateaus.size(), 3)
+	var west := StageMap._bounds_of(plateaus[0])
+	assert_eq(west.position.x, 200.0)
+	assert_eq(west.end.x, 1700.0)
+	for stage in range(1, 5):
+		var map := _domain(stage)
+		assert_true(Geometry2D.is_point_in_polygon(map.lucian_start, plateaus[0]), "%d: the start" % stage)
+		assert_true(Geometry2D.is_point_in_polygon(map.merchant_point, plateaus[1]), "%d: the merchant" % stage)
+		for point: Vector2 in [map.boss_point, Vector2(5250, 1250), Vector2(5250, 2150)]:
+			assert_true(Geometry2D.is_point_in_polygon(point, plateaus[2]), "%d: %s" % [stage, point])
+		map.free()
+
+
+## Two bridges in each gap, 280 wide; from 6-3, 200 wide and the north-west
+## one broken. A gap is wider than Flash reaches.
+func test_act_6_bridges_by_stage() -> void:
+	var expected := {1: [4, 280.0], 2: [4, 280.0], 3: [3, 200.0], 4: [3, 200.0]}
+	for stage: int in expected:
+		var map := _domain(stage)
+		var whole := _whole_bridges(map)
+		assert_eq(whole.size(), expected[stage][0], "%d: bridges" % stage)
+		var half: float = expected[stage][1] * 0.5
+		for bridge in whole:
+			var middle := Vector2((bridge.x + bridge.y) * 0.5, bridge.z)
+			assert_true(map.is_walkable(middle + Vector2(0, half - 5.0), 0.0), "%d: %s is %d wide" % [stage, middle, expected[stage][1]])
+			assert_true(map.is_walkable(middle - Vector2(0, half - 5.0), 0.0))
+			assert_false(map.is_walkable(middle + Vector2(0, half + 5.0), 0.0), "%d: %s is no wider" % [stage, middle])
+			assert_false(map.is_walkable(middle - Vector2(0, half + 5.0), 0.0))
+		var north_west: Vector3 = ThreshDomainMap.BRIDGES[0]
+		assert_lt(north_west.z, 1700.0, "north")
+		assert_eq(north_west.x, 1700.0, "west: it leaves the west plateau")
+		assert_eq(whole.has(north_west), stage < 3, "%d: the north-west bridge is broken from 6-3" % stage)
+		map.free()
+	for bridge in ThreshDomainMap.BRIDGES:
+		assert_gt(bridge.y - bridge.x, SummonerSpells.FLASH_RANGE, "Flash can't skip a bridge")
+
+
+## The east end of the east plateau, and the far (east) end of every whole
+## bridge; in 6-5, the four stubs. Each on the ground, with room for the
+## stage's spawn jitter.
+func test_act_6_spawn_points_stand_on_the_ground_with_room_for_their_jitter() -> void:
+	var jitter := Stage.SPAWN_JITTER
+	for stage in range(1, 6):
+		var map := _domain(stage)
+		for point in map.spawn_points:
+			assert_true(_in_any(point, map.ground), "%d: %s on a plateau, a bridge or a stub" % [stage, point])
+			for corner: Vector2 in [Vector2(jitter, jitter), Vector2(-jitter, jitter), Vector2(jitter, -jitter), Vector2(-jitter, -jitter)]:
+				assert_true(map.is_walkable(point + corner, 0.0), "%d: %s's jitter %s" % [stage, point, corner])
+		if stage < 5:
+			assert_has(map.spawn_points, Vector2(5250, 1250))
+			assert_has(map.spawn_points, Vector2(5250, 2150))
+			var whole := _whole_bridges(map)
+			assert_eq(map.spawn_points.size(), 2 + whole.size(), str(stage))
+			for bridge in whole:
+				var far_end := Vector2(bridge.y, bridge.z)
+				var near := map.spawn_points.filter(func(point: Vector2) -> bool: return point.distance_to(far_end) < 100.0)
+				assert_eq(near.size(), 1, "%d: a spawn point at %s" % [stage, far_end])
+		map.free()
+
+
+func test_act_6_camps_by_stage() -> void:
+	var expected := {1: {}, 2: {&"karthus_revived": Vector2(4700, 1700)}, 3: {}, 4: {&"hecarim": Vector2(5200, 1700)}, 5: {}}
+	for stage: int in expected:
+		var map := _domain(stage)
+		assert_eq(map.camps, expected[stage], str(stage))
+		for point: Vector2 in map.camps.values():
+			assert_true(Geometry2D.is_point_in_polygon(point, ThreshDomainMap.plateaus()[2]), "on the east plateau")
+			for corner: Vector2 in [Vector2(90, 90), Vector2(-90, -90), Vector2(90, -90), Vector2(-90, 90)]:
+				assert_true(map.is_walkable(point + corner), "%d: the camp's jitter %s" % [stage, corner])
+		map.free()
+	assert_gt(Vector2(5200, 1700).x, Vector2(4700, 1700).x, "Hecarim rides in from the east end")
+
+
+## Rock spikes (r 50 to 70) stand on the plateaus, clear of every point.
+func test_the_rock_spikes_give_cover_on_the_plateaus() -> void:
+	var plateaus := ThreshDomainMap.plateaus()
+	for stage in range(1, 5):
+		var map := _domain(stage)
+		assert_gte(map.wall_circles.size(), 6, str(stage))
+		var counts := [0, 0, 0]
+		for spike in map.wall_circles:
+			var at := Vector2(spike.x, spike.y)
+			assert_between(spike.z, 50.0, 70.0)
+			for i in plateaus.size():
+				if Geometry2D.is_point_in_polygon(at, plateaus[i]):
+					counts[i] += 1
+			for i in 16:
+				assert_false(_in_abyss(map, at + Vector2.from_angle(TAU * i / 16) * (spike.z + 100.0)), "%d: %s keeps off the edge" % [stage, at])
+			var points: Array[Vector2] = [map.lucian_start, map.merchant_point, map.boss_point]
+			points.append_array(map.spawn_points)
+			points.append_array(map.camps.values())
+			for point in points:
+				assert_gt(point.distance_to(at) - spike.z, 150.0, "%d: %s by %s" % [stage, at, point])
+		for count in counts:
+			assert_gte(count, 2, "%d: cover on every plateau" % stage)
+		map.free()
+
+
+## Ledges: 2 in 6-1 and 6-2 (north and south of the center plateau), 4 in
+## 6-3 and 6-4 (the east plateau's too), none in 6-5. Each is a small island
+## in the abyss (abyss for physics), its center about 260 off its edge.
+func test_act_6_ledges_by_stage() -> void:
+	var plateaus := ThreshDomainMap.plateaus()
+	var expected := {1: [[1, -1], [1, 1]], 2: [[1, -1], [1, 1]], 3: [[1, -1], [1, 1], [2, -1], [2, 1]], 4: [[1, -1], [1, 1], [2, -1], [2, 1]], 5: []}
+	for stage: int in expected:
+		var map := _domain(stage)
+		assert_eq(map.ledge_points.size(), expected[stage].size(), str(stage))
+		var found := []
+		for ledge in map.ledge_points:
+			assert_false(map.is_walkable(ledge, 0.0), "%d: %s is abyss" % [stage, ledge])
+			assert_true(_in_abyss(map, ledge))
+			for i in 16:
+				var rim := ledge + Vector2.from_angle(TAU * i / 16) * ThreshDomainMap.LEDGE_RADIUS
+				assert_true(_in_abyss(map, rim), "%d: the island %s lies in the abyss" % [stage, ledge])
+			# Straight toward the map's middle row, to the plateau's edge.
+			var toward := 1.0 if ledge.y < 1700.0 else -1.0
+			var step := 0.0
+			while step < 600.0 and not map.is_walkable(ledge + Vector2(0, toward * step), 0.0):
+				step += 2.0
+			assert_almost_eq(step, 260.0, 4.0, "%d: %s off its edge" % [stage, ledge])
+			for i in plateaus.size():
+				if Geometry2D.is_point_in_polygon(ledge + Vector2(0, toward * (step + 5.0)), plateaus[i]):
+					found.append([i, int(-toward)])
+		assert_eq(found, expected[stage], "%d: [plateau, north -1 / south 1]" % stage)
+		map.free()
+
+
+## A warden on a ledge can be shot from the edge: walkable ground for
+## Lucian's body lies within his attack range of every ledge.
+func test_every_ledge_is_within_lucians_attack_range_of_walkable_ground() -> void:
+	var reach: float = (load("res://data/lucian_stats.tres") as UnitStats).attack_range
+	assert_eq(reach, 500.0)
+	for stage in range(1, 5):
+		var map := _domain(stage)
+		for ledge in map.ledge_points:
+			var closest := INF
+			for i in 180:
+				var direction := Vector2.from_angle(TAU * i / 180)
+				var distance := 150.0
+				while distance <= reach:
+					if map.is_walkable(ledge + direction * distance, Lucian.HIT_RADIUS):
+						closest = minf(closest, distance)
+						break
+					distance += 5.0
+			assert_lte(closest, reach, "%d: %s" % [stage, ledge])
+			assert_lt(closest, 350.0, "%d: %s in easy reach from the edge" % [stage, ledge])
+		map.free()
+
+
+## Every spot of the map is on the ground or in the abyss, never both: the
+## abyss pieces are the map less the plateaus and bridges (or the platform).
+func test_the_abyss_is_everything_but_the_ground() -> void:
+	for stage in range(1, 6):
+		var map := _domain(stage)
+		var wrong := 0
+		# Offsets that fall on no edge of the plateaus, bridges or seams.
+		var x := 37.0
+		while x < DOMAIN_SIZE.x:
+			var y := 61.0
+			while y < DOMAIN_SIZE.y:
+				var point := Vector2(x, y)
+				if _in_abyss(map, point) == _in_any(point, map.ground):
+					wrong += 1
+				y += 100.0
+			x += 100.0
+		assert_eq(wrong, 0, "%d: spots both or neither" % stage)
+		map.free()
+
+
+## The navigation never reaches a ledge (its path ends at the plateau's
+## edge), and a path from the start to the merchant or the boss spot never
+## crosses the abyss: it takes a bridge.
+func test_the_ledges_are_out_of_reach_on_foot_and_paths_keep_to_the_bridges() -> void:
+	for stage in range(1, 6):
+		var map := _domain(stage)
+		add_child(map)
+		await _synced(map, map.lucian_start)
+		var nav_map := map.get_world_2d().navigation_map
+		for ledge in map.ledge_points:
+			var path := NavigationServer2D.map_get_path(nav_map, map.lucian_start, ledge, true)
+			assert_false(path.is_empty(), "%d: a path toward %s" % [stage, ledge])
+			if not path.is_empty():
+				assert_gt(path[path.size() - 1].distance_to(ledge), ThreshDomainMap.LEDGE_RADIUS, "%d: %s can't be reached" % [stage, ledge])
+		for goal: Vector2 in [map.merchant_point, map.boss_point]:
+			var path := NavigationServer2D.map_get_path(nav_map, map.lucian_start, goal, true)
+			assert_false(path.is_empty())
+			var over := 0
+			for i in path.size() - 1:
+				var steps := ceili(path[i].distance_to(path[i + 1]) / SAMPLE_STEP)
+				for s in steps + 1:
+					if _in_abyss(map, path[i].lerp(path[i + 1], float(s) / maxi(steps, 1))):
+						over += 1
+			assert_eq(over, 0, "%d: the path to %s keeps off the abyss" % [stage, goal])
+		map.free()
+		await wait_physics_frames(1)
+
+
+## Ordered across the abyss to a ledge, Lucian walks to the plateau's edge
+## and never stands on the abyss.
+func test_the_abyss_stops_lucian_at_the_edge_on_act_6() -> void:
+	var map := _domain(1)
+	add_child_autofree(map)
+	var ledge := map.ledge_points[0]
+	var edge_y := ledge.y + 260.0
+	var lucian := _lucian_at(Vector2(ledge.x, edge_y + 300.0))
+	await _synced(map, lucian.global_position)
+	lucian.command_move(ledge)
+	var entered := false
+	for frame in 90:
+		await wait_physics_frames(1)
+		entered = entered or _in_abyss(map, lucian.global_position)
+	assert_false(entered, "never on the abyss")
+	assert_lt(lucian.global_position.y, edge_y + 80.0, "he walked up to the edge")
+	assert_gt(lucian.global_position.y, edge_y, "and stopped there")
+
+
+## A bolt from a ledge flies over the abyss to Lucian on the plateau.
+func test_an_enemy_bolt_flies_over_the_act_6_abyss() -> void:
+	var map := _domain(1)
+	add_child_autofree(map)
+	var ledge := map.ledge_points[0]
+	var lucian := _lucian_at(ledge + Vector2(0, 400))
+	await wait_physics_frames(2)
+	var bolt := EnemyProjectile.new()
+	bolt.launch(ledge, Vector2.DOWN, DamageInfo.create(20.0, DamageInfo.Type.MAGIC, &"test"), lucian)
+	bolt.speed = 1200.0
+	bolt.max_range = 700.0
+	var hit := [0]
+	bolt.hit_lucian.connect(func() -> void: hit[0] += 1)
+	add_child_autofree(bolt)
+	await wait_physics_frames(40)
+	assert_eq(hit[0], 1, "over the abyss to Lucian")
+
+
+## Flash from the west plateau's edge, between the bridges, falls short of
+## the center plateau.
+func test_flash_cannot_cross_a_gap() -> void:
+	var map := _domain(1)
+	add_child_autofree(map)
+	var lucian := _lucian_at(Vector2(1700.0 - Lucian.HIT_RADIUS - 2.0, 1700))
+	# Flash's sparks go with the map.
+	lucian.projectile_parent = map
+	await wait_physics_frames(2)
+	assert_true(lucian.use_summoner(0, Vector2(2500, 1700)))
+	assert_lt(lucian.global_position.x, 1700.0, "still on the west plateau")
+
+
+## From 6-3, Flash from the broken bridge's stub falls short of the other.
+func test_flash_cannot_cross_the_broken_bridge() -> void:
+	var map := _domain(3)
+	add_child_autofree(map)
+	var bridge: Vector3 = ThreshDomainMap.BRIDGES[0]
+	var stub_end := bridge.x
+	while map.is_walkable(Vector2(stub_end + 2.0, bridge.z), 0.0):
+		stub_end += 2.0
+	assert_between(stub_end, bridge.x + 50.0, bridge.x + 200.0, "a stub is left of it")
+	var lucian := _lucian_at(Vector2(stub_end - Lucian.HIT_RADIUS - 2.0, bridge.z))
+	lucian.projectile_parent = map
+	await wait_physics_frames(2)
+	assert_true(lucian.use_summoner(0, Vector2(bridge.y + 200.0, bridge.z)))
+	assert_lt(lucian.global_position.x, stub_end, "still on the stub")
+
+
+## 6-5: a round platform (r 1400) with no walls on it, Thresh at its center,
+## the merchant south of him, Lucian at the west rim, and a bridge stub at
+## north, east, south and west, each a spawn point. The rest is abyss.
+func test_the_final_platform_is_round_and_open() -> void:
+	var map := _domain(5)
+	assert_true(map.wall_polygons.is_empty(), "no walls")
+	assert_true(map.wall_circles.is_empty(), "no rocks")
+	assert_true(map.ledge_points.is_empty())
+	assert_true(map.camps.is_empty())
+	assert_eq(map.boss_point, PLATFORM_MIDDLE)
+	assert_eq(map.merchant_point, Vector2(2800, 1950))
+	for ring: float in [0.0, 350.0, 700.0, 1050.0, PLATFORM_RADIUS - 10.0]:
+		for i in 48:
+			var point := PLATFORM_MIDDLE + Vector2.from_angle(TAU * i / 48) * ring
+			assert_true(map.is_walkable(point, 0.0), "%s on the platform" % point)
+	var west := map.lucian_start - PLATFORM_MIDDLE
+	assert_lt(absf(west.angle_to(Vector2.LEFT)), 0.2, "west")
+	assert_between(west.length(), PLATFORM_RADIUS - 400.0, PLATFORM_RADIUS - 100.0, "near the rim")
+	assert_eq(map.spawn_points.size(), 4)
+	for direction: Vector2 in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
+		var stubs := map.spawn_points.filter(func(point: Vector2) -> bool:
+			return (point - PLATFORM_MIDDLE).normalized().dot(direction) > 0.99 and point.distance_to(PLATFORM_MIDDLE) > PLATFORM_RADIUS)
+		assert_eq(stubs.size(), 1, "a stub at %s" % direction)
+	# Past the rim: the abyss, but for the stubs.
+	for i in 72:
+		var direction := Vector2.from_angle(TAU * i / 72)
+		var point := PLATFORM_MIDDLE + direction * (PLATFORM_RADIUS + 30.0)
+		var on_stub := false
+		for axis: Vector2 in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
+			on_stub = on_stub or absf(direction.cross(axis)) * (PLATFORM_RADIUS + 30.0) < 200.0 and direction.dot(axis) > 0.0
+		if not on_stub:
+			assert_true(_in_abyss(map, point), "%s past the rim" % point)
 	map.free()

@@ -695,3 +695,93 @@ func test_5_2_pays_maokais_5_purple_on_the_kill() -> void:
 	stage.spawn_unit(data, stage.arena.spawn_points[0]).take_damage(_lethal())
 	assert_eq(stage.collected[Essences.PURPLE], 5)
 	assert_has(stage.reward_lines, "+5 purple essence (Maokai, first kill)")
+
+
+## Act 6: an enemy whose data says `perch` stands on a free ledge of the map
+## (exactly on it, no jitter) and never walks; with none free it comes like
+## any other. Its data is registered under its id and kept here.
+var _percher: EnemyData
+
+
+func _perch_data() -> EnemyData:
+	_percher = _data(&"test_percher", &"elite")
+	_percher.perch = true
+	_percher.take_over_path(Stage.ENEMY_PATH % _percher.id)
+	return _percher
+
+
+func _near_a_spawn_point(stage: Stage, unit: EnemyUnit) -> bool:
+	return stage.arena.spawn_points.any(func(point: Vector2) -> bool:
+		return unit.global_position.distance_to(point) <= Stage.SPAWN_JITTER * sqrt(2.0) + 0.1)
+
+
+func test_a_perched_enemy_takes_a_free_ledge_and_the_next_one_the_other() -> void:
+	var stage: Stage = await _stage(6, 1)
+	var data := _perch_data()
+	var ledges := stage.arena.ledge_points
+	assert_eq(ledges.size(), 2)
+	for i in 3:
+		stage.runner.spawn_requested.emit(data.id, 1)
+	var units := _units(data.id)
+	assert_eq(units.size(), 3)
+	var first := units[0] as EnemyUnit
+	var second := units[1] as EnemyUnit
+	var third := units[2] as EnemyUnit
+	assert_eq(first.global_position, ledges[0], "exactly on the first ledge")
+	assert_true(first.perched)
+	assert_eq(second.global_position, ledges[1], "the next one on the other")
+	assert_true(second.perched)
+	assert_false(third.perched, "no ledge free")
+	assert_true(_near_a_spawn_point(stage, third), "it comes from the spawn points")
+	# The fight on: the perched ones never move; the other walks.
+	stage.lucian.invulnerable = false
+	var from := third.global_position
+	for frame in 30:
+		stage.lucian.hp = stage.lucian.stats.max_hp
+		await wait_physics_frames(1)
+	stage.lucian.invulnerable = true
+	assert_eq(first.global_position, ledges[0], "it never moves")
+	assert_eq(second.global_position, ledges[1])
+	assert_gt(third.global_position.distance_to(from), 10.0, "with no ledge free it walks")
+	assert_engine_error_count(0)
+
+
+func test_a_ledge_is_free_again_once_its_enemy_is_gone() -> void:
+	var stage: Stage = await _stage(6, 3)
+	var data := _perch_data()
+	var ledges := stage.arena.ledge_points
+	assert_eq(ledges.size(), 4)
+	for i in 2:
+		stage.runner.spawn_requested.emit(data.id, 1)
+	var units := _units(data.id)
+	(units[0] as EnemyUnit).take_damage(_lethal())
+	(units[1] as EnemyUnit).vanish()
+	stage.runner.spawn_requested.emit(data.id, 1)
+	units = _units(data.id)
+	assert_eq(units.size(), 1, "the dead one and the vanished one are out of the group")
+	assert_eq((units[0] as EnemyUnit).global_position, ledges[0], "the first ledge is free again")
+	assert_true((units[0] as EnemyUnit).perched)
+	await wait_physics_frames(30)
+	# Freed now: still free, and the third ledge after the first two.
+	for i in 2:
+		stage.runner.spawn_requested.emit(data.id, 1)
+	var spots := _units(data.id).map(func(unit: EnemyUnit) -> Vector2: return unit.global_position)
+	assert_eq(spots, [ledges[0], ledges[1], ledges[2]])
+	assert_engine_error_count(0)
+
+
+func test_with_no_ledges_a_perched_enemy_comes_from_a_stub_and_walks() -> void:
+	var stage: Stage = await _stage(6, 5)
+	var data := _perch_data()
+	assert_true(stage.arena.ledge_points.is_empty())
+	stage.runner.spawn_requested.emit(data.id, 1)
+	var unit := _units(data.id)[0] as EnemyUnit
+	assert_false(unit.perched)
+	assert_true(_near_a_spawn_point(stage, unit))
+	stage.lucian.invulnerable = false
+	var from := unit.global_position
+	for frame in 30:
+		stage.lucian.hp = stage.lucian.stats.max_hp
+		await wait_physics_frames(1)
+	stage.lucian.invulnerable = true
+	assert_gt(unit.global_position.distance_to(from), 10.0, "it walks")

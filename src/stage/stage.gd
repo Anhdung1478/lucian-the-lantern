@@ -84,6 +84,9 @@ var boss_unit: EnemyUnit
 var cutscene: Cutscene
 
 var _next_spawn := 0
+## The map's ledges taken: ledge index -> the perched unit put on it (it may
+## be dead or freed since; see _free_ledge).
+var _perched := {}
 ## Act 1's first play: Senna has taught E (at the first break).
 var _taught_e := false
 
@@ -357,6 +360,9 @@ func _start_waves() -> void:
 	enemy_died.connect(func(_enemy: EnemyUnit) -> void: runner.enemy_died())
 
 
+## The boss comes at the boss point. A perched enemy (data.perch) stands on a
+## free ledge of the map and is marked perched; with none free, it comes like
+## any other, from its camp or the spawn points (_spawn_point).
 func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 	if id == run.boss:
 		boss_unit = spawn_enemy(id, arena.boss_point)
@@ -365,7 +371,24 @@ func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 			(boss_unit as Thresh).phase_ended.connect(_on_thresh_phase_ended, CONNECT_DEFERRED)
 		return
 	var data: EnemyData = load(ENEMY_PATH % id)
-	spawn_unit(data, _spawn_point(data), wave)
+	var ledge := _free_ledge() if data.perch else -1
+	if ledge < 0:
+		spawn_unit(data, _spawn_point(data), wave)
+		return
+	# Exactly on the ledge, with no jitter: it stands there for good.
+	var unit := spawn_unit(data, arena.ledge_points[ledge], wave)
+	unit.perched = true
+	_perched[ledge] = unit
+
+
+## The first of the map's ledges with no perched unit alive on it, or -1.
+func _free_ledge() -> int:
+	for i in arena.ledge_points.size():
+		# Untyped: the unit may have been freed.
+		var on: Variant = _perched.get(i)
+		if not is_instance_valid(on) or not (on as EnemyUnit).is_alive():
+			return i
+	return -1
 
 
 ## A wave enemy comes out of its camp when this map has it, else from the

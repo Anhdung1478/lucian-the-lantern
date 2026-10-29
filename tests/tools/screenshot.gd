@@ -20,6 +20,7 @@ const ACT_SCENARIOS := {
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
 	"infernal_meteor": [3, 2], "ocean_mist": [3, 4], "elder_sky_dive": [3, 5], "elder_mark": [3, 5],
 	"act4_lane": [4, 1], "dark_lucian_q": [4, 3], "dark_lucian_r": [4, 3],
+	"act6_bridges": [6, 3], "act6_platform": [6, 5],
 }
 
 var stage: Node
@@ -220,6 +221,10 @@ func _run(scenario: String) -> void:
 			await scenario_dark_lucian_q()
 		"dark_lucian_r":
 			await scenario_dark_lucian_r()
+		"act6_bridges":
+			await scenario_act6_bridges()
+		"act6_platform":
+			await scenario_act6_platform()
 		"training_setup":
 			await scenario_training_setup()
 		"skins_stage":
@@ -2390,6 +2395,38 @@ func scenario_dark_lucian_r() -> void:
 	await wait(0.1)
 	print("untargetable mid-dash (expect true): ", dark.untargetable)
 	await shot("dark_lucian_r_2_dash")
+
+
+## 6-3's plateaus over the abyss: the whole map (three bridges, the broken
+## north-west one, four ledges), then Lucian at the center plateau's north
+## edge with a ledge across the abyss, and at the broken bridge.
+func scenario_act6_bridges() -> void:
+	var game := game_stage()
+	game.runner._countdown = 999.0
+	print("abyss pieces (expect 5): ", game.arena.chasm_polygons.size(), "  ledges (expect 4): ", game.arena.ledge_points.size())
+	await whole_map("act6_bridges_0_map")
+	flush_tips()
+	game.camera.zoom = Vector2(0.8, 0.8)
+	game.camera.mode = StageCamera.Mode.FOLLOW
+	blink(game.arena.ledge_points[0] + Vector2(0, 330))
+	await wait(0.4)
+	await shot("act6_bridges_1_ledge")
+	blink(Vector2(1640, 1250))
+	await wait(0.4)
+	await shot("act6_bridges_2_broken")
+
+
+## 6-5's final platform: the whole map, then Lucian at the west rim.
+func scenario_act6_platform() -> void:
+	var game := game_stage()
+	game.runner._countdown = 999.0
+	print("walls (expect 0): ", game.arena.wall_polygons.size() + game.arena.wall_circles.size(), "  spawn points (expect 4): ", game.arena.spawn_points.size())
+	await whole_map("act6_platform_0_map")
+	flush_tips()
+	game.camera.zoom = Vector2(0.8, 0.8)
+	game.camera.mode = StageCamera.Mode.FOLLOW
+	await wait(0.4)
+	await shot("act6_platform_1_start")
 
 
 ## A super minion with melee and ranged minions around it: Empower's icon
