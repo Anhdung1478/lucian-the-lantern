@@ -22,6 +22,7 @@ const BLUE_ICON := preload("res://assets/art/ui/buff_blue.svg")
 const RED_ICON := preload("res://assets/art/ui/buff_red.svg")
 
 
+## `id` is Blue or Red.
 static func is_jungle_buff(id: StringName) -> bool:
 	return id == BLUE or id == RED
 
@@ -36,10 +37,12 @@ static func bonus(id: StringName) -> Dictionary:
 	return {}
 
 
+## The buff row's name: Blue's, else Red's.
 static func display_name(id: StringName) -> String:
 	return "Crest of Insight" if id == BLUE else "Crest of Cinders"
 
 
+## The buff row's icon: Blue's, else Red's.
 static func icon(id: StringName) -> Texture2D:
 	return BLUE_ICON if id == BLUE else RED_ICON
 

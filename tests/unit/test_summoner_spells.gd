@@ -171,6 +171,21 @@ func test_smite_on_an_enemy_out_of_reach_walks_over_then_casts() -> void:
 	assert_almost_eq(lucian.global_position.x, 900.0 - SummonerSpells.SMITE_RANGE - dummy.radius, 10.0, "walked only until in reach")
 
 
+## A Blast Cone is clickable (enemy_at) but no Smite target: no walk to it.
+func test_smite_aimed_at_a_blast_cone_out_of_reach_does_not_walk() -> void:
+	var cone := BlastCone.new()
+	cone.lucian = lucian
+	cone.position = Vector2(900, 0)
+	add_child_autofree(cone)
+	await wait_physics_frames(2)
+	lucian.summoners.set_spell(0, &"smite")
+	assert_false(lucian.use_summoner(0, cone.position))
+	assert_eq(lucian._order, Lucian.Order.NONE, "no walk order")
+	await wait_seconds(0.3)
+	assert_eq(lucian.global_position, Vector2.ZERO, "no walking")
+	assert_true(lucian.summoners.cooldown(&"smite").is_ready())
+
+
 func test_a_new_order_drops_the_walk_to_smite() -> void:
 	dummy.position = Vector2(900, 0)
 	await wait_physics_frames(2)

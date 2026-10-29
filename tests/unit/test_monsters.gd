@@ -95,9 +95,10 @@ func test_gromp_stands_still_when_it_spits() -> void:
 	await wait_physics_frames(1)
 	var at := gromp.global_position
 	assert_eq(effects.get_children().filter(func(node: Node) -> bool: return node is EnemyProjectile).size(), 1, "it spat")
-	await wait_seconds(Monster.SPIT_STAND - 0.1)
+	# Physics frames, not real time: it stands SPIT_STAND of physics time.
+	await wait_physics_frames(roundi((Monster.SPIT_STAND - 0.1) * Engine.physics_ticks_per_second))
 	assert_almost_eq(gromp.global_position, at, Vector2(1, 1), "it stands while it spits, though he is too close")
-	await wait_seconds(0.4)
+	await wait_physics_frames(roundi(0.4 * Engine.physics_ticks_per_second))
 	assert_gt(gromp.distance_to_target(), at.length() + 20.0, "then backs off")
 
 

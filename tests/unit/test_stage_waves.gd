@@ -30,7 +30,8 @@ func _lethal() -> DamageInfo:
 
 ## Kills the wave until the runner has nobody left in it: groups still to
 ## come, splits waiting for their deferred spawn, an untargetable boss
-## (through boss_unit) and a unit on its way out. Gives up after KILL_FRAMES.
+## (through boss_unit) and a unit on its way out. Fails the test if some are
+## still left after KILL_FRAMES.
 func _kill_wave(stage: Stage) -> void:
 	for frame in KILL_FRAMES:
 		if stage.runner.alive() == 0:
@@ -42,6 +43,8 @@ func _kill_wave(stage: Stage) -> void:
 			stage.boss_unit.set_untargetable(false)
 			stage.boss_unit.take_damage(_lethal())
 		await wait_physics_frames(1)
+	if stage.runner.alive() > 0:
+		fail_test("%d still in the wave after %d frames" % [stage.runner.alive(), KILL_FRAMES])
 
 
 func test_the_merchant_comes_only_for_the_break() -> void:

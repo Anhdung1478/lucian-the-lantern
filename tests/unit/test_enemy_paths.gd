@@ -12,6 +12,10 @@ const FAR_BEHIND := Vector2(2400, 1000)
 ## The navigation map may sync on a background thread: poll it, at most this
 ## many physics frames.
 const SYNC_FRAMES := 180
+## A ranged minion backing off is watched this many physics frames (3 s); how
+## far it walks counts only after the first KITE_SETTLE (it reaches the wall).
+const KITE_FRAMES := 180
+const KITE_SETTLE := 60
 
 var lucian: Lucian
 var map: StageMap
@@ -44,13 +48,40 @@ func _build_synced() -> void:
 	fail_test("the navigation map never took in the walls")
 
 
-func _minion(at: Vector2, parent: Node = null) -> Minion:
+func _minion(at: Vector2, parent: Node = null, id := "melee_minion") -> Minion:
 	var minion := Minion.new()
-	minion.setup(load("res://data/enemies/melee_minion.tres"), 1, 1, lucian)
+	minion.setup(load("res://data/enemies/%s.tres" % id), 1, 1, lucian)
 	minion.position = at
 	(parent if parent else self).add_child(minion)
 	autofree(minion)
 	return minion
+
+
+## A turn of more than a quarter turn in one frame: the unit turned right round.
+func _turned_round(before: float, after: float) -> bool:
+	return absf(angle_difference(before, after)) > PI * 0.5
+
+
+## A ranged minion at `at` backing away from Lucian, who stands at
+## `lucian_at` and never dies, for KITE_FRAMES: {minion, flips (times it
+## turned right round), walked (px after KITE_SETTLE frames)}.
+func _kite(at: Vector2, lucian_at: Vector2) -> Dictionary:
+	lucian.global_position = lucian_at
+	var minion := _minion(at, null, "ranged_minion")
+	var flips := 0
+	var walked := 0.0
+	var last_turn := minion.visuals.rotation
+	var last_at := minion.global_position
+	for frame in KITE_FRAMES:
+		await get_tree().physics_frame
+		lucian.hp = lucian.stats.max_hp
+		if frame > 0 and _turned_round(last_turn, minion.visuals.rotation):
+			flips += 1
+		last_turn = minion.visuals.rotation
+		if frame >= KITE_SETTLE:
+			walked += minion.global_position.distance_to(last_at)
+		last_at = minion.global_position
+	return {"minion": minion, "flips": flips, "walked": walked}
 
 
 func test_a_melee_minion_walks_around_the_wall_to_lucian() -> void:
@@ -95,6 +126,43 @@ func test_a_click_inside_the_wall_ends_at_the_closest_reachable_point() -> void:
 	var arrived: bool = await wait_until(func() -> bool: return lucian._order == Lucian.Order.NONE, 4.0)
 	assert_true(arrived, "he doesn't push against the wall forever")
 	assert_lt(lucian.global_position.distance_to(Vector2(1424, 1000)), 10.0)
+
+
+func test_a_walker_headed_inside_the_wall_stands_at_the_paths_end() -> void:
+	await _build_synced()
+	# Lucian can't be fought, so the minion walks only where the test sends it.
+	lucian.invulnerable = true
+	# Not a whole number of its 4 px steps from the path's end, (1424, 1000).
+	var minion := _minion(Vector2(1201, 1000))
+	var flips := 0
+	var last_turn := minion.visuals.rotation
+	for frame in 120:
+		await get_tree().physics_frame
+		minion.walk_toward(Vector2(1480, 1000), get_physics_process_delta_time())
+		if _turned_round(last_turn, minion.visuals.rotation):
+			flips += 1
+		last_turn = minion.visuals.rotation
+	assert_lt(minion.global_position.distance_to(Vector2(1424, 1000)), 10.0, "at the closest reachable point")
+	assert_eq(flips, 0, "it stands there, not stepping past and back")
+
+
+## Backing off straight away from Lucian, as the Scuttler flees: with no path,
+## a wall it backs into can't turn it round.
+func test_a_ranged_minion_backed_into_a_corner_stands() -> void:
+	await _build_synced()
+	var kite: Dictionary = await _kite(Vector2(45, 45), Vector2(300, 300))
+	assert_lte(kite.flips, 2, "it doesn't keep turning round")
+	assert_lt(kite.walked, 20.0, "it stands in the corner")
+
+
+func test_a_ranged_minion_backed_straight_into_a_wall_slides_along_it() -> void:
+	await _build_synced()
+	var kite: Dictionary = await _kite(Vector2(40, 1000), Vector2(330, 1000))
+	var minion: Minion = kite.minion
+	assert_lte(kite.flips, 2, "it doesn't keep turning round")
+	assert_lt(minion.global_position.x, 60.0, "against the wall")
+	assert_gt(absf(minion.global_position.y - 1000.0), 150.0, "it slid along it")
+	assert_gte(minion.distance_to_target(), minion.data.keep_min - 5.0, "out to its distance")
 
 
 func test_attack_move_chases_the_nearest_enemy_around_the_wall() -> void:

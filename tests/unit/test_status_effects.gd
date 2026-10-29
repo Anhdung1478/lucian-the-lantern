@@ -88,9 +88,10 @@ func test_the_strongest_of_two_slows_wins_and_speed_returns_when_they_expire() -
 	assert_almost_eq(lucian.slow_amount(), 0.4, 0.001)
 	assert_almost_eq(lucian.current_move_speed(), speed * 0.6, 0.01, "not 0.25 + 0.4")
 	assert_true(_buff_ids().has(Lucian.SLOWED), "shows in the buff row")
-	await wait_seconds(0.3)
+	# Physics frames (60 a second), not real time: the slows tick in physics.
+	await wait_physics_frames(18)
 	assert_almost_eq(lucian.current_move_speed(), speed * 0.75, 0.01, "the weaker one is left")
-	await wait_seconds(0.2)
+	await wait_physics_frames(12)
 	assert_almost_eq(lucian.current_move_speed(), speed, 0.01)
 	assert_false(_buff_ids().has(Lucian.SLOWED))
 

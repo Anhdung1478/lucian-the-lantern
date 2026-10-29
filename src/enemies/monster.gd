@@ -20,8 +20,6 @@ const FLANK_SIDE := 160.0
 const FLANK_CLOSE := 250.0
 ## Spit: seconds Gromp stands still each time it spits.
 const SPIT_STAND := 0.4
-## Spit: how far it steps back at a time when Lucian is too close.
-const BACK_OFF := 100.0
 
 ## Raptors spawned so far, for each one's spot.
 static var _swarmed := 0
@@ -107,6 +105,7 @@ func _spit(delta: float) -> void:
 	elif distance > data.keep_max:
 		walk_toward(target.global_position, delta)
 	elif distance < data.keep_min:
-		walk_toward(global_position + target.global_position.direction_to(global_position) * BACK_OFF, delta)
+		# Straight away, no path, as a ranged minion backs off.
+		walk(target.global_position.direction_to(global_position), delta)
 	else:
 		face(target.global_position)

@@ -479,11 +479,12 @@ func use_summoner(slot: int, aim: Vector2) -> bool:
 
 
 ## A targeted cast (Gunblade, Smite) aimed at an enemy out of reach: Lucian
-## walks over and casts once it is in reach.
+## walks over and casts once it is in reach. Never at a plant: the cast
+## (enemy_near_cursor) only finds enemies.
 func _walk_into_reach(aim: Vector2, shape: CastRange, cast: Callable) -> void:
 	if shape == null or not shape.targets_enemy:
 		return
-	var target := enemy_at(aim)
+	var target := enemy_at(aim, [&"enemies"])
 	if target and global_position.distance_to(target.global_position) > shape.reach + target.radius:
 		command_cast_on(target, shape.reach, cast)
 
@@ -609,6 +610,7 @@ func add_stat_buff(id: StringName, bonus: Dictionary, seconds: float) -> void:
 	_refresh_stats(true)
 
 
+## A stat buff `id` (add_stat_buff) is on him.
 func has_stat_buff(id: StringName) -> bool:
 	return _stat_buffs.has(id)
 
@@ -682,6 +684,7 @@ func launch(to: Vector2, seconds: float) -> void:
 	move_dropped.emit()
 
 
+## In flight from a throw (launch).
 func is_launched() -> bool:
 	return _launch_left > 0.0
 
@@ -834,11 +837,12 @@ func _drop_move() -> void:
 
 
 ## The enemy, or the plant (a Blast Cone), under `point` (a click or A +
-## Left-click's hover), or null.
-func enemy_at(point: Vector2) -> Enemy:
+## Left-click's hover), or null. `groups` narrows the search (enemies only,
+## for Smite and Gunblade).
+func enemy_at(point: Vector2, groups := CLICKABLE_GROUPS) -> Enemy:
 	var best: Enemy = null
 	var best_distance := INF
-	for group: StringName in CLICKABLE_GROUPS:
+	for group: StringName in groups:
 		for enemy: Enemy in get_tree().get_nodes_in_group(group):
 			var distance := point.distance_to(enemy.global_position)
 			if distance <= enemy.radius + CLICK_SLACK and distance < best_distance:

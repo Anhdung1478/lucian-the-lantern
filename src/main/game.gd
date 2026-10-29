@@ -121,14 +121,18 @@ func _keep_playing() -> void:
 ## Deferred: the stage is still inside its own signal here. `then` is the
 ## player's choice: retry or next start that stage; the title screen after
 ## losing the tutorial (Act 1 before its first clear); otherwise the main
-## screen. A failed save sends retry and next to the main screen, where it shows.
+## screen. A failed save sends retry and next to the main screen, where it
+## shows; so does next after the last stage.
 func _on_stage_finished(result: StringName, then: StringName) -> void:
 	var saved := SaveGame.instance().finish_stage(result, _run.stage_id)
 	var act := _run.act
 	var stage := _run.stage
+	var next := Journey.next_stage(act, stage)
 	if result == &"failed" and _run.tutorial:
 		then = &"title"
 	if not saved and then in [&"retry", &"next"]:
+		then = &"main"
+	if then == &"next" and next == Vector2i.ZERO:
 		then = &"main"
 	match then:
 		&"title":
@@ -136,7 +140,6 @@ func _on_stage_finished(result: StringName, then: StringName) -> void:
 		&"retry":
 			start_stage.call_deferred(StageSetup.for_stage(SaveGame.instance(), act, stage))
 		&"next":
-			var next := Journey.next_stage(act, stage)
 			start_stage.call_deferred(StageSetup.for_stage(SaveGame.instance(), next.x, next.y))
 		_:
 			show_main_screen.call_deferred(act)

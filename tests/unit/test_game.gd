@@ -213,6 +213,15 @@ func test_next_stage_starts_the_one_after() -> void:
 	assert_true("2-1" in SaveGame.instance().cleared)
 
 
+func test_next_after_the_last_stage_goes_to_the_main_screen() -> void:
+	var last_act := Journey.ACTS.size()
+	game._run = StageSetup.for_stage(SaveGame.instance(), last_act, Journey.stage_count(last_act))
+	assert_eq(Journey.next_stage(game._run.act, game._run.stage), Vector2i.ZERO, "no stage after it")
+	game._on_stage_finished(&"cleared", &"next")
+	await wait_process_frames(2)
+	assert_is(game.screen, MainScreen)
+
+
 func test_a_failed_save_on_retry_lands_on_the_main_screen_with_the_toast() -> void:
 	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
 	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))

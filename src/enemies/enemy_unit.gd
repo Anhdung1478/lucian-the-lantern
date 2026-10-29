@@ -183,10 +183,14 @@ func apply_on_hit() -> void:
 
 
 ## One step toward `point`: straight while no wall is in the way, else along
-## a path around it (see PathFollower), as walk does.
+## a path around it (see PathFollower), as walk does. Within a step of a path
+## point that isn't `point` itself (the path's end, when `point` is inside a
+## wall) it stands: a full step would take it past that point and back.
 func walk_toward(point: Vector2, delta: float) -> void:
 	var world := get_world_2d()
 	var toward := path_follower.next_point(global_position, point, delta, world.direct_space_state, world.navigation_map)
+	if toward != point and global_position.distance_to(toward) <= current_speed() * delta:
+		return
 	walk(global_position.direction_to(toward), delta)
 
 

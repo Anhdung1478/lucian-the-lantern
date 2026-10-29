@@ -32,7 +32,9 @@ func _think(delta: float) -> void:
 	if distance > data.keep_max:
 		walk_toward(target.global_position, delta)
 	elif distance < data.keep_min:
-		walk_toward(global_position + target.global_position.direction_to(global_position) * 100.0, delta)
+		# Straight away, no path (a path's goal would be inside the wall it
+		# backs into): it slides along a wall, and stands in a corner.
+		walk(target.global_position.direction_to(global_position), delta)
 	else:
 		face(target.global_position)
 	if distance <= attack_range + Lucian.HIT_RADIUS and _attack_left <= 0.0:

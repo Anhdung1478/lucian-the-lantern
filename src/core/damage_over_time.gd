@@ -44,6 +44,7 @@ func tick(delta: float) -> Array[DamageInfo]:
 	return hits
 
 
+## `id` is burning.
 func has(id: StringName) -> bool:
 	return _running.has(id)
 
@@ -75,10 +76,12 @@ func longest() -> StringName:
 	return best
 
 
+## Nothing burns.
 func is_empty() -> bool:
 	return _running.is_empty()
 
 
+## Puts out every burn at once, with no last tick.
 func clear() -> void:
 	_running.clear()
 

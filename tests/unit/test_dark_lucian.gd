@@ -162,9 +162,10 @@ func test_a_basic_attack_is_two_40_physical_shots_at_1400_0_15_s_apart() -> void
 	assert_eq(_launched(&"basic").size(), 1, "the first gun at once")
 	var first: EnemyProjectile = _effects(EnemyProjectile)[0]
 	assert_eq(first.color, DarkLucian.SHOT_COLOR)
-	await wait_seconds(0.1)
+	# Physics frames (60 a second), not real time: SHOT_GAP is 9 of them.
+	await wait_physics_frames(6)
 	assert_eq(_launched(&"basic").size(), 1, "the second waits")
-	await wait_seconds(0.1)
+	await wait_physics_frames(6)
 	var shots := _launched(&"basic")
 	assert_eq(shots.size(), 2, "the second gun 0.15 s later")
 	for shot: Dictionary in shots:
