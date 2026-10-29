@@ -658,6 +658,9 @@ func test_the_forest_has_a_ragged_tree_line_top_and_bottom() -> void:
 # --- Act 6: Thresh's domain ----------------------------------------------
 
 const DOMAIN_SIZE := Vector2(5600, 3400)
+## A spawn's jitter keeps a body this far off the abyss: the plan's Act 6
+## wave enemies are r 42 at most.
+const BODY_MARGIN := 45.0
 const PLATFORM_MIDDLE := Vector2(2800, 1700)
 const PLATFORM_RADIUS := 1400.0
 
@@ -746,16 +749,18 @@ func test_act_6_bridges_by_stage() -> void:
 
 
 ## The east end of the east plateau, and the far (east) end of every whole
-## bridge; in 6-5, the four stubs. Each on the ground, with room for the
-## stage's spawn jitter.
+## bridge; in 6-5, the north, east and south stubs. Each on the ground, its
+## spawn jitter keeping the biggest body (r 42) BODY_MARGIN off the abyss,
+## even on a 200 bridge.
 func test_act_6_spawn_points_stand_on_the_ground_with_room_for_their_jitter() -> void:
-	var jitter := Stage.SPAWN_JITTER
 	for stage in range(1, 6):
 		var map := _domain(stage)
+		var jitter := map.spawn_jitter
+		assert_lt(jitter, StageMap.SPAWN_JITTER, "less than the usual spread")
 		for point in map.spawn_points:
 			assert_true(_in_any(point, map.ground), "%d: %s on a plateau, a bridge or a stub" % [stage, point])
 			for corner: Vector2 in [Vector2(jitter, jitter), Vector2(-jitter, jitter), Vector2(jitter, -jitter), Vector2(-jitter, -jitter)]:
-				assert_true(map.is_walkable(point + corner, 0.0), "%d: %s's jitter %s" % [stage, point, corner])
+				assert_true(map.is_walkable(point + corner, BODY_MARGIN), "%d: %s's jitter %s" % [stage, point, corner])
 		if stage < 5:
 			assert_has(map.spawn_points, Vector2(5250, 1250))
 			assert_has(map.spawn_points, Vector2(5250, 2150))
@@ -776,7 +781,7 @@ func test_act_6_camps_by_stage() -> void:
 		for point: Vector2 in map.camps.values():
 			assert_true(Geometry2D.is_point_in_polygon(point, ThreshDomainMap.plateaus()[2]), "on the east plateau")
 			for corner: Vector2 in [Vector2(90, 90), Vector2(-90, -90), Vector2(90, -90), Vector2(-90, 90)]:
-				assert_true(map.is_walkable(point + corner), "%d: the camp's jitter %s" % [stage, corner])
+				assert_true(map.is_walkable(point + corner, BODY_MARGIN), "%d: the camp's jitter %s" % [stage, corner])
 		map.free()
 	assert_gt(Vector2(5200, 1700).x, Vector2(4700, 1700).x, "Hecarim rides in from the east end")
 
@@ -894,6 +899,8 @@ func test_the_ledges_are_out_of_reach_on_foot_and_paths_keep_to_the_bridges() ->
 		for goal: Vector2 in [map.merchant_point, map.boss_point]:
 			var path := NavigationServer2D.map_get_path(nav_map, map.lucian_start, goal, true)
 			assert_false(path.is_empty())
+			if not path.is_empty():
+				assert_lt(path[path.size() - 1].distance_to(goal), 2.0, "%d: the path reaches %s" % [stage, goal])
 			var over := 0
 			for i in path.size() - 1:
 				var steps := ceili(path[i].distance_to(path[i + 1]) / SAMPLE_STEP)
@@ -973,7 +980,8 @@ func test_flash_cannot_cross_the_broken_bridge() -> void:
 
 ## 6-5: a round platform (r 1400) with no walls on it, Thresh at its center,
 ## the merchant south of him, Lucian at the west rim, and a bridge stub at
-## north, east, south and west, each a spawn point. The rest is abyss.
+## north, east, south and west. Waves come from the north, east and south
+## stubs, far from Lucian's start; not the west one. The rest is abyss.
 func test_the_final_platform_is_round_and_open() -> void:
 	var map := _domain(5)
 	assert_true(map.wall_polygons.is_empty(), "no walls")
@@ -989,11 +997,14 @@ func test_the_final_platform_is_round_and_open() -> void:
 	var west := map.lucian_start - PLATFORM_MIDDLE
 	assert_lt(absf(west.angle_to(Vector2.LEFT)), 0.2, "west")
 	assert_between(west.length(), PLATFORM_RADIUS - 400.0, PLATFORM_RADIUS - 100.0, "near the rim")
-	assert_eq(map.spawn_points.size(), 4)
+	assert_eq(map.spawn_points.size(), 3)
 	for direction: Vector2 in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
 		var stubs := map.spawn_points.filter(func(point: Vector2) -> bool:
 			return (point - PLATFORM_MIDDLE).normalized().dot(direction) > 0.99 and point.distance_to(PLATFORM_MIDDLE) > PLATFORM_RADIUS)
-		assert_eq(stubs.size(), 1, "a stub at %s" % direction)
+		assert_eq(stubs.size(), 0 if direction == Vector2.LEFT else 1, "a spawn point on the stub at %s" % direction)
+	for point in map.spawn_points:
+		assert_gte(point.distance_to(map.lucian_start), 1000.0, "%s far from the start" % point)
+	assert_true(map.is_walkable(ThreshDomainMap.stub_end(3) + Vector2(110, 0)), "the west stub is still there")
 	# Past the rim: the abyss, but for the stubs.
 	for i in 72:
 		var direction := Vector2.from_angle(TAU * i / 72)

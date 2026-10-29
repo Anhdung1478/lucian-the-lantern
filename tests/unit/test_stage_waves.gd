@@ -697,9 +697,10 @@ func test_5_2_pays_maokais_5_purple_on_the_kill() -> void:
 	assert_has(stage.reward_lines, "+5 purple essence (Maokai, first kill)")
 
 
-## Act 6: an enemy whose data says `perch` stands on a free ledge of the map
-## (exactly on it, no jitter) and never walks; with none free it comes like
-## any other. Its data is registered under its id and kept here.
+## Act 6: an enemy whose data says `perch` stands on the free ledge of the
+## map nearest Lucian (exactly on it, no jitter) and never walks; with none
+## free it comes like any other. Its data is registered under its id and kept
+## here.
 var _percher: EnemyData
 
 
@@ -712,11 +713,17 @@ func _perch_data() -> EnemyData:
 
 func _near_a_spawn_point(stage: Stage, unit: EnemyUnit) -> bool:
 	return stage.arena.spawn_points.any(func(point: Vector2) -> bool:
-		return unit.global_position.distance_to(point) <= Stage.SPAWN_JITTER * sqrt(2.0) + 0.1)
+		return unit.global_position.distance_to(point) <= stage.arena.spawn_jitter * sqrt(2.0) + 0.1)
 
 
-func test_a_perched_enemy_takes_a_free_ledge_and_the_next_one_the_other() -> void:
+## Lucian by the center plateau's south edge: the south ledge (1) is the
+## nearest, then the north one (0).
+const BY_THE_SOUTH_LEDGE := Vector2(2800, 2400)
+
+
+func test_a_perched_enemy_takes_the_free_ledge_nearest_lucian_and_the_next_one_the_other() -> void:
 	var stage: Stage = await _stage(6, 1)
+	stage.lucian.blink_to(BY_THE_SOUTH_LEDGE)
 	var data := _perch_data()
 	var ledges := stage.arena.ledge_points
 	assert_eq(ledges.size(), 2)
@@ -727,9 +734,9 @@ func test_a_perched_enemy_takes_a_free_ledge_and_the_next_one_the_other() -> voi
 	var first := units[0] as EnemyUnit
 	var second := units[1] as EnemyUnit
 	var third := units[2] as EnemyUnit
-	assert_eq(first.global_position, ledges[0], "exactly on the first ledge")
+	assert_eq(first.global_position, ledges[1], "exactly on the ledge nearest Lucian")
 	assert_true(first.perched)
-	assert_eq(second.global_position, ledges[1], "the next one on the other")
+	assert_eq(second.global_position, ledges[0], "the next one on the other")
 	assert_true(second.perched)
 	assert_false(third.perched, "no ledge free")
 	assert_true(_near_a_spawn_point(stage, third), "it comes from the spawn points")
@@ -740,14 +747,16 @@ func test_a_perched_enemy_takes_a_free_ledge_and_the_next_one_the_other() -> voi
 		stage.lucian.hp = stage.lucian.stats.max_hp
 		await wait_physics_frames(1)
 	stage.lucian.invulnerable = true
-	assert_eq(first.global_position, ledges[0], "it never moves")
-	assert_eq(second.global_position, ledges[1])
+	assert_eq(first.global_position, ledges[1], "it never moves")
+	assert_eq(second.global_position, ledges[0])
 	assert_gt(third.global_position.distance_to(from), 10.0, "with no ledge free it walks")
 	assert_engine_error_count(0)
 
 
 func test_a_ledge_is_free_again_once_its_enemy_is_gone() -> void:
 	var stage: Stage = await _stage(6, 3)
+	# Nearest first: center south (1), center north (0), east south (3), east north (2).
+	stage.lucian.blink_to(BY_THE_SOUTH_LEDGE)
 	var data := _perch_data()
 	var ledges := stage.arena.ledge_points
 	assert_eq(ledges.size(), 4)
@@ -759,15 +768,31 @@ func test_a_ledge_is_free_again_once_its_enemy_is_gone() -> void:
 	stage.runner.spawn_requested.emit(data.id, 1)
 	units = _units(data.id)
 	assert_eq(units.size(), 1, "the dead one and the vanished one are out of the group")
-	assert_eq((units[0] as EnemyUnit).global_position, ledges[0], "the first ledge is free again")
+	assert_eq((units[0] as EnemyUnit).global_position, ledges[1], "the nearest ledge is free again")
 	assert_true((units[0] as EnemyUnit).perched)
 	await wait_physics_frames(30)
-	# Freed now: still free, and the third ledge after the first two.
+	# Freed now: still free, and the east south ledge after the center ones.
 	for i in 2:
 		stage.runner.spawn_requested.emit(data.id, 1)
 	var spots := _units(data.id).map(func(unit: EnemyUnit) -> Vector2: return unit.global_position)
-	assert_eq(spots, [ledges[0], ledges[1], ledges[2]])
+	assert_eq(spots, [ledges[1], ledges[0], ledges[3]])
 	assert_engine_error_count(0)
+
+
+## 6-3 with the fight on the east plateau: the wardens stand off it, on its
+## ledges, not on the center plateau's.
+func test_with_lucian_on_the_east_plateau_a_perched_enemy_takes_an_east_ledge() -> void:
+	var stage: Stage = await _stage(6, 3)
+	var data := _perch_data()
+	var ledges := stage.arena.ledge_points
+	stage.lucian.blink_to(Vector2(4700, 2100))
+	stage.runner.spawn_requested.emit(data.id, 1)
+	stage.lucian.blink_to(Vector2(4700, 1300))
+	stage.runner.spawn_requested.emit(data.id, 1)
+	var spots := _units(data.id).map(func(unit: EnemyUnit) -> Vector2: return unit.global_position)
+	assert_eq(spots, [ledges[3], ledges[2]], "east south by Lucian, then east north")
+	for spot: Vector2 in spots:
+		assert_true(Geometry2D.is_point_in_polygon(spot + Vector2(0, -300 if spot.y > 1700.0 else 300), ThreshDomainMap.plateaus()[2]), "%s is off the east plateau" % spot)
 
 
 func test_with_no_ledges_a_perched_enemy_comes_from_a_stub_and_walks() -> void:

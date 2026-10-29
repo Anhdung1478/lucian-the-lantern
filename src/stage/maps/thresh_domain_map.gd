@@ -9,11 +9,13 @@ extends StageMap
 ## on the plateaus give cover. Chain Wardens stand on small rock ledges in the
 ## abyss off the center plateau's north and south edges (from 6-3 the east
 ## plateau's too): abyss for physics, so only a perched enemy is ever there.
-## Waves come from the east end of the east plateau and the far ends of the
-## bridges. 6-2 has the revived Karthus's broken altar on the east plateau,
-## 6-4 Hecarim's camp at its east end. 6-5 is the final platform: a carved
-## stone disc with a rune ring and chains at its rim, Thresh at its center,
-## four bridge stubs (the spawn points) and no walls.
+## A perched one takes the free ledge nearest Lucian. Waves come from the
+## east end of the east plateau and the far ends of the bridges, spread only
+## SPAWN_SPREAD so they stay on a bridge. 6-2 has the revived Karthus's broken
+## altar on the east plateau, 6-4 Hecarim's camp at its east end. 6-5 is the
+## final platform: a carved stone disc with a rune ring and chains at its rim,
+## Thresh at its center, four bridge stubs and no walls; waves come from the
+## north, east and south stubs (not the west one, by Lucian's start).
 ## The abyss is the map less the ground, cut in two along MID_Y first, so no
 ## piece of it has a hole (see abyss). The mist turns by rotating its
 ## swirls, drawn once: no frame redraws anything.
@@ -47,6 +49,9 @@ const BRIDGE_OVERLAP := 60.0
 const BROKEN_STUB := 100.0
 ## A wave's spawn point at a bridge's far (east) end: this far out on it.
 const BRIDGE_END_SPAWN := 60.0
+## How far (each way) a wave enemy appears from a spawn point here, not the
+## usual 70: on a 200 bridge its body (r 42 at most) keeps 50 from the abyss.
+const SPAWN_SPREAD := 50.0
 ## The ledges: center north, center south, east north, east south, each 260
 ## off its plateau's edge; how many each stage has.
 const LEDGES: Array[Vector2] = [Vector2(2800, 540), Vector2(2800, 2860), Vector2(4700, 640), Vector2(4700, 2760)]
@@ -73,6 +78,10 @@ const PLATFORM_MERCHANT := Vector2(2800, 1950)
 const STUB_DIRECTIONS: Array[Vector2] = [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]
 const STUB_LENGTHS: Array[float] = [260.0, 500.0, 260.0, 500.0]
 const STUB_WIDTH := 280.0
+## The stubs waves come from: north, east and south. Not the west one: a
+## wave would come in behind Lucian's start (as the dragon pit leaves out its
+## south rim).
+const SPAWN_STUBS: Array[int] = [0, 1, 2]
 ## A stub's spawn point: this far back from its broken end.
 const STUB_SPAWN_BACK := 110.0
 
@@ -175,6 +184,7 @@ var _swirls: Array[Node2D] = []
 func _init(stage_number := 1) -> void:
 	stage = clampi(stage_number, 1, FINAL_STAGE)
 	size = MAP_SIZE
+	spawn_jitter = SPAWN_SPREAD
 	if stage == FINAL_STAGE:
 		ground = platform()
 		lucian_start = PLATFORM_START
@@ -296,10 +306,10 @@ static func stub_end(i: int) -> Vector2:
 	return PLATFORM_CENTER + STUB_DIRECTIONS[i] * (PLATFORM_RADIUS + STUB_LENGTHS[i])
 
 
-## 6-5's spawn points: one on each stub, back from its broken end.
+## 6-5's spawn points: one on each of SPAWN_STUBS, back from its broken end.
 static func stub_spawns() -> Array[Vector2]:
 	var points: Array[Vector2] = []
-	for i in STUB_DIRECTIONS.size():
+	for i in SPAWN_STUBS:
 		points.append(stub_end(i) - STUB_DIRECTIONS[i] * STUB_SPAWN_BACK)
 	return points
 

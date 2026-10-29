@@ -2420,7 +2420,7 @@ func scenario_act6_bridges() -> void:
 func scenario_act6_platform() -> void:
 	var game := game_stage()
 	game.runner._countdown = 999.0
-	print("walls (expect 0): ", game.arena.wall_polygons.size() + game.arena.wall_circles.size(), "  spawn points (expect 4): ", game.arena.spawn_points.size())
+	print("walls (expect 0): ", game.arena.wall_polygons.size() + game.arena.wall_circles.size(), "  spawn points (expect 3): ", game.arena.spawn_points.size())
 	await whole_map("act6_platform_0_map")
 	flush_tips()
 	game.camera.zoom = Vector2(0.8, 0.8)

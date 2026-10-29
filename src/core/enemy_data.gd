@@ -75,8 +75,10 @@ const BOSS_KINDS: Array[StringName] = [&"mini_boss", &"boss"]
 @export var buff_on_kill := &""
 ## Its sprite's color (EnemyUnit); white = the art as drawn.
 @export var tint := Color.WHITE
-## It stands on a ledge over the abyss when the map has a free one, and
-## never moves (Act 6's Chain Warden).
+## It stands on the free ledge over the abyss nearest Lucian when the map
+## has one, and never walks, leaps or charges there (Act 6's Chain Warden);
+## with none free it comes and walks like any other. Perch data shouldn't
+## summon or split: the spot beside it would be in the abyss.
 @export var perch := false
 ## Summons: every `summon_every` seconds of fighting it calls up to
 ## `summon_count` enemies of id `summon_id` beside it, never more than

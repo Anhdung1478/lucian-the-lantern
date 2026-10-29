@@ -283,27 +283,56 @@ func test_no_thinking_while_charging() -> void:
 # --- Perched (a ledge in the abyss) --------------------------------------
 
 
+## A small abyss square, and a perched unit in its middle.
+const PERCH := Vector2(1000, 1000)
+
+
+func _perched_unit(data: EnemyData) -> EnemyUnit:
+	_map(PackedVector2Array([Vector2(900, 900), Vector2(1100, 900), Vector2(1100, 1100), Vector2(900, 1100)]))
+	var unit := _unit(data, PERCH)
+	assert_false(unit.perched, "not by default")
+	unit.perched = true
+	return unit
+
+
 ## A perched unit stands inside the abyss's shape: it never walks (a walk
 ## would push its body out of it), but still faces Lucian and attacks.
 func test_a_perched_unit_never_walks_but_faces_and_attacks() -> void:
-	_map(PackedVector2Array([Vector2(900, 900), Vector2(1100, 900), Vector2(1100, 1100), Vector2(900, 1100)]))
-	lucian.global_position = Vector2(2200, 1000)
+	lucian.global_position = Vector2(1000, 1900)
 	var data := _data()
 	data.attack_interval = 0.2
-	var unit := _unit(data, Vector2(1000, 1000))
-	assert_false(unit.perched, "not by default")
-	unit.perched = true
+	var unit := _perched_unit(data)
 	await wait_physics_frames(20)
 	assert_eq(unit.global_position, Vector2(1000, 1000), "Lucian out of reach: it stays")
+	assert_almost_eq(unit.visuals.rotation, PI / 2.0, 0.01, "and faces him")
 	unit.walk(Vector2.RIGHT, 0.1)
 	unit.walk_toward(Vector2(1800, 1000), 0.1)
-	assert_eq(unit.global_position, Vector2(1000, 1000), "walk and walk_toward do nothing")
-	lucian.global_position = Vector2(1000, 1135)
+	assert_eq(unit.global_position, Vector2(1000, 1000), "walk and walk_toward don't move it")
+	lucian.global_position = Vector2(1000, 865)
 	var hp := lucian.hp
 	await wait_physics_frames(20)
 	assert_lt(lucian.hp, hp, "in reach, it attacks")
-	assert_almost_eq(unit.visuals.rotation, PI / 2.0, 0.01, "facing him")
+	assert_almost_eq(unit.visuals.rotation, -PI / 2.0, 0.01, "facing him")
 	assert_eq(unit.global_position, Vector2(1000, 1000))
+
+
+## Nor does it leap or charge off its ledge.
+func test_a_perched_unit_never_leaps_or_charges() -> void:
+	lucian.global_position = Vector2(2200, 1000)
+	lucian.invulnerable = true
+	var unit := _perched_unit(_data())
+	await wait_physics_frames(1)
+	var landed := [0]
+	unit.landed.connect(func() -> void: landed[0] += 1)
+	unit.charge(Vector2.RIGHT, 600.0, 1500.0)
+	assert_false(unit.is_charging())
+	assert_eq(unit.collision_mask, EnemyUnit.BODY_MASK, "its walking mask")
+	unit.leap_to(Vector2(1600, 1000), 0.2)
+	assert_false(unit.is_leaping())
+	assert_false(unit.untargetable)
+	await wait_physics_frames(20)
+	assert_eq(unit.global_position, PERCH, "still on its ledge")
+	assert_eq(landed[0], 0)
 
 
 # --- The veil and the tint -----------------------------------------------

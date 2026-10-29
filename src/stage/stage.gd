@@ -25,9 +25,8 @@ const ESSENCE_ICONS := {
 	Essences.PURPLE: preload("res://assets/art/ui/essence_purple.svg"),
 }
 const ESSENCE_COLORS := {Essences.BLUE: Color("5aa9ff"), Essences.ORANGE: Color("ffa040"), Essences.PURPLE: Color("b46cff")}
-## How far from its spawn point (each way) a wave enemy appears, and from
-## its camp's point.
-const SPAWN_JITTER := 70.0
+## How far from its camp's point (each way) a wave enemy appears (from a
+## spawn point: the map's spawn_jitter).
 const CAMP_JITTER := 90.0
 ## How far from where the parent died its splits appear.
 const SPLIT_SPREAD := 40.0
@@ -360,9 +359,9 @@ func _start_waves() -> void:
 	enemy_died.connect(func(_enemy: EnemyUnit) -> void: runner.enemy_died())
 
 
-## The boss comes at the boss point. A perched enemy (data.perch) stands on a
-## free ledge of the map and is marked perched; with none free, it comes like
-## any other, from its camp or the spawn points (_spawn_point).
+## The boss comes at the boss point. A perched enemy (data.perch) stands on
+## the map's free ledge nearest Lucian and is marked perched; with none free,
+## it comes like any other, from its camp or the spawn points (_spawn_point).
 func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 	if id == run.boss:
 		boss_unit = spawn_enemy(id, arena.boss_point)
@@ -381,14 +380,21 @@ func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 	_perched[ledge] = unit
 
 
-## The first of the map's ledges with no perched unit alive on it, or -1.
+## The map's ledge nearest Lucian with no perched unit alive on it, or -1:
+## a warden stands where the fight is (on a tie, the first ledge).
 func _free_ledge() -> int:
+	var best := -1
+	var best_distance := INF
 	for i in arena.ledge_points.size():
 		# Untyped: the unit may have been freed.
 		var on: Variant = _perched.get(i)
-		if not is_instance_valid(on) or not (on as EnemyUnit).is_alive():
-			return i
-	return -1
+		if is_instance_valid(on) and (on as EnemyUnit).is_alive():
+			continue
+		var distance := lucian.global_position.distance_to(arena.ledge_points[i])
+		if distance < best_distance:
+			best = i
+			best_distance = distance
+	return best
 
 
 ## A wave enemy comes out of its camp when this map has it, else from the
@@ -398,7 +404,7 @@ func _spawn_point(data: EnemyData) -> Vector2:
 		return arena.camps[data.camp] + _jitter(CAMP_JITTER)
 	var at := arena.spawn_points[_next_spawn % arena.spawn_points.size()]
 	_next_spawn += 1
-	return at + _jitter(SPAWN_JITTER)
+	return at + _jitter(arena.spawn_jitter)
 
 
 func _jitter(reach: float) -> Vector2:

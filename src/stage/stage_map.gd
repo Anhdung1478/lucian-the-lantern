@@ -14,6 +14,9 @@ const WALL_THICKNESS := 64.0
 const FLOOR_Z := -10
 ## Paths keep this far from every wall.
 const NAV_AGENT_RADIUS := 36.0
+## How far from a spawn point (each way) a wave enemy appears, unless the map
+## says less (spawn_jitter).
+const SPAWN_JITTER := 70.0
 ## A round wall is baked as a polygon with this many sides, just around it.
 const NAV_CIRCLE_SIDES := 16
 
@@ -26,6 +29,8 @@ var merchant_point := Vector2.ZERO
 var boss_point := Vector2.ZERO
 ## Where wave enemies come from, taken in turn.
 var spawn_points: Array[Vector2] = []
+## How far from its spawn point (each way) a wave enemy appears.
+var spawn_jitter := SPAWN_JITTER
 ## Camp id -> point: wave enemies whose data names a camp here come out of it.
 var camps := {}
 var wall_polygons: Array[PackedVector2Array] = []

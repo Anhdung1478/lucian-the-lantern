@@ -61,8 +61,9 @@ var summoned := false
 var summoner: EnemyUnit
 ## Its own summons alive or on their way (called, not spawned yet).
 var summons := 0
-## On a ledge in the abyss (the stage sets it): it never walks, since a walk
-## would push its body out of the abyss's shape. It still faces and attacks.
+## On a ledge in the abyss (the stage sets it): it never walks, leaps or
+## charges, since a move would push its body out of the abyss's shape (or
+## off its ledge). It still turns toward Lucian and attacks.
 var perched := false
 ## Black Mist: a dark silhouette with no health bar. Still a target.
 var veiled := false:
@@ -213,9 +214,9 @@ func summon_gone() -> void:
 ## Jumps to `point` in `seconds`: straight there over anything (walls, the
 ## abyss, units), looking bigger at the top of the arc, untargetable in the
 ## air, landing exactly on `point`. Then `landed`. Nothing is thought in the
-## air. The caller picks a spot it can stand on.
+## air. The caller picks a spot it can stand on. Perched, it stays.
 func leap_to(point: Vector2, seconds: float) -> void:
-	if not is_alive():
+	if not is_alive() or perched:
 		return
 	_leap_from = global_position
 	_leap_to = point
@@ -233,9 +234,9 @@ func is_leaping() -> bool:
 ## CHARGE_MASK meanwhile); a wall or the abyss stops it short. `on_hit` is
 ## called once at most, the first frame Lucian (while he can be fought) is
 ## within its radius plus his hit radius. Then `landed`, with its walking
-## mask back. Nothing is thought while it runs.
+## mask back. Nothing is thought while it runs. Perched, it stays.
 func charge(direction: Vector2, distance: float, speed: float, on_hit := Callable()) -> void:
-	if not is_alive():
+	if not is_alive() or perched:
 		return
 	if not _charging:
 		_walk_mask = collision_mask
@@ -307,9 +308,10 @@ func apply_on_hit() -> void:
 ## a path around it (see PathFollower), as walk does. Within a step of a path
 ## point that isn't `point` itself (the path's end, when `point` is inside a
 ## wall) it stands: a full step would take it past that point and back.
-## Perched, it stands.
+## Perched, it only turns toward `point`.
 func walk_toward(point: Vector2, delta: float) -> void:
 	if perched:
+		face(point)
 		return
 	var world := get_world_2d()
 	var toward := path_follower.next_point(global_position, point, delta, world.direct_space_state, world.navigation_map)
