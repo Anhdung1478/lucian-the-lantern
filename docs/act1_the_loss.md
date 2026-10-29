@@ -90,10 +90,11 @@ Numbers at wave 1 (`data/enemies/*.tres`). Each later wave adds **+15% HP and da
 
 | Enemy | Kind | HP | Armor / MR | Attack | Range | Every | Speed | Gold | XP |
 |---|---|---|---|---|---|---|---|---|---|
-| Melee minion | normal | 240 | 10 / 0 | 12 physical, melee | 110 | 1.25 s | 300 | 60 | 30 |
-| Ranged minion | normal | 160 | 0 / 10 | 18 magic bolt (450 px/s, aimed where Lucian stands); keeps 420–550 away | 550 | 1.6 s | 300 | 45 | 25 |
+| Melee minion | normal | 240 | 10 / 0 | 12 physical, melee | 110 | 1.25 s | 240 | 60 | 30 |
+| Ranged minion | normal | 160 | 0 / 10 | 18 magic bolt (450 px/s, aimed where Lucian stands); keeps 420–550 away | 550 | 1.6 s | 240 | 45 | 25 |
 | Siege minion | elite | 700 | 20 / 10 | Cannon Shell: a red circle (r 110) on Lucian, 40 physical 1 s later | 700 | 3.0 s | 220 | 120 | 60 |
 
+- In this stage (1-1), melee and ranged minions have **20% less HP**: 192 and 128 at wave 1. Other stages use the table (scaled by act and wave).
 - Walls stop the ranged bolts. Stepping out of the circle in time dodges the shell.
 - Elites have a small gold diamond at the left end of their HP bar.
 - A kill gives 1 blue (5 for the siege minion) and a small chance of orange and an item (game design doc §9).
@@ -104,6 +105,7 @@ Until 1-1 is cleared, Act 1 is the tutorial:
 - **No skill ranks, no passive, no summoner spells.** Items, tree stats, equip slots and the skin still apply.
 - **Senna** fights beside him.
 - **Tips** show under the boss bar, one at a time, 7 s each (only while the game runs). Each shows once; later ones wait their turn. The keys follow the bindings.
+- **Losing it is a game over:** the result panel reads **GAME OVER** and its button **Back to title** returns to the title screen. The essences collected are still saved. Once 1-1 is cleared, losing it is a plain DEFEATED that goes back to the main screen.
 
 | Tip | When |
 |---|---|
@@ -149,7 +151,7 @@ His skill hits count as skills, so Banshee's Veil blocks one (the hook's pull to
 
 - A caption stays 3.5 s. Space or a left-click moves on. **Skip** (top right) ends the scene at once.
 - Then **STAGE CLEARED**, with "Lucian takes Senna's gun: two guns from now on", "E – Relentless Pursuit is free in the Evolution Tree", "+10 purple essence (first clear)" and "Act 2 is open". Thresh's blue and orange rise where he sank.
-- If Lucian dies first, it is DEFEATED: no cutscene and no purple.
+- If Lucian dies first, it is GAME OVER: no cutscene and no purple.
 
 ### Replay
 After the first clear: the full kit, no Senna, no Thresh and no tips. The stage ends after wave 2 and gives no purple.

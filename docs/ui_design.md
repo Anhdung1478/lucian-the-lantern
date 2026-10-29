@@ -151,9 +151,9 @@ Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 - Essences rise over a kill as "+1" with their icon.
 
 ### Stage result
-- At the end of a stage, over a dimmed and paused game: **STAGE CLEARED** in gold or **DEFEATED** in red.
+- At the end of a stage, over a dimmed and paused game: **STAGE CLEARED** in gold or **DEFEATED** in red. Losing Act 1 before its first clear reads **GAME OVER** in red.
 - Then the stage's name, "Waves cleared: 3 / 3 · Time 0:11", the essences collected (icon and "+127"; "No essences" if none) and the first-clear lines in green ("+10 purple essence (first clear)", "Act 2 is open").
-- **Continue** goes back to the main screen (auto-save). ESC and P do nothing while it shows.
+- **Continue** goes back to the main screen (auto-save). After a game over the button reads **Back to title** and goes to the title screen (still auto-saved). ESC and P do nothing while it shows.
 
 ### Cutscenes
 - Black bars (120 px) at the top and bottom; the HUD hides.

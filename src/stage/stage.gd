@@ -175,7 +175,9 @@ func show_result(is_cleared: bool) -> void:
 	screens.set_menu_open(false)
 	screens.locked = true
 	var waves_text := "Waves cleared: %d / %d   ·   " % [runner.waves_done(), runner.total_waves()] if runner else ""
-	result.show_result(is_cleared, run.display_name, waves_text + "Time %s" % StageResult.clock(elapsed), collected, reward_lines)
+	# Losing the tutorial (Act 1 before its first clear) is a game over.
+	result.show_result(is_cleared, run.display_name, waves_text + "Time %s" % StageResult.clock(elapsed), collected, reward_lines,
+		not is_cleared and run.tutorial)
 	get_tree().paused = true
 
 
@@ -242,6 +244,7 @@ func spawn_enemy(id: StringName, at: Vector2, wave := 1) -> EnemyUnit:
 	var data: EnemyData = load(ENEMY_PATH % id)
 	var unit := _new_unit(data)
 	unit.setup(data, maxi(run.act, 1), wave, lucian)
+	unit.max_hp *= WavePlan.hp_share(run.stage_id, id)
 	unit.projectile_parent = $Projectiles
 	unit.warning_parent = $Warnings
 	unit.position = at

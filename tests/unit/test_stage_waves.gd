@@ -126,9 +126,47 @@ func test_dying_shows_defeated() -> void:
 	while not stage.result.visible and Time.get_ticks_msec() < give_up:
 		await wait_process_frames(1)
 	assert_eq(stage.result.title.text, "DEFEATED")
+	assert_eq(stage.result.continue_button.text, "Continue")
 	watch_signals(stage)
 	stage.result.continue_button.pressed.emit()
 	assert_signal_emitted_with_parameters(stage, "finished", [&"failed"])
+
+
+func test_losing_the_tutorial_is_game_over() -> void:
+	var stage: Stage = await _stage(1, 1)
+	assert_true(stage.run.tutorial)
+	stage.show_result(false)
+	assert_eq(stage.result.title.text, "GAME OVER")
+	assert_eq(stage.result.continue_button.text, "Back to title")
+	watch_signals(stage)
+	stage.result.continue_button.pressed.emit()
+	assert_signal_emitted_with_parameters(stage, "finished", [&"failed"])
+
+
+func test_losing_act_1_after_its_first_clear_is_only_defeated() -> void:
+	SaveGame.instance().reset()
+	SaveGame.instance().set_cleared(["1-1"] as Array[String])
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	stage.setup(StageSetup.for_stage(SaveGame.instance(), 1, 1))
+	add_child_autofree(stage)
+	await wait_process_frames(2)
+	stage.show_result(false)
+	assert_eq(stage.result.title.text, "DEFEATED")
+
+
+func test_act_1_melee_and_ranged_minions_have_20_percent_less_hp() -> void:
+	var stage: Stage = await _stage(1, 1)
+	var at := stage.arena.spawn_points[0]
+	var melee := stage.spawn_enemy(WavePlan.MELEE, at)
+	assert_almost_eq(melee.max_hp, 240.0 * 0.8, 0.01)
+	assert_almost_eq(melee.hp, melee.max_hp, 0.01)
+	assert_almost_eq(stage.spawn_enemy(WavePlan.RANGED, at).max_hp, 160.0 * 0.8, 0.01)
+	assert_almost_eq(stage.spawn_enemy(WavePlan.SIEGE, at).max_hp, 700.0, 0.01)
+
+
+func test_act_2_minions_keep_their_hp() -> void:
+	var stage: Stage = await _stage(2, 1)
+	assert_almost_eq(stage.spawn_enemy(WavePlan.MELEE, stage.arena.spawn_points[0]).max_hp, 240.0 * 1.6, 0.01)
 
 
 func test_esc_does_nothing_on_the_result() -> void:

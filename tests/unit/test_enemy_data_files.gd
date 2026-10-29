@@ -16,6 +16,11 @@ func test_every_enemy_file_is_complete() -> void:
 		assert_true(data.kind in [&"normal", &"elite", &"boss"], "%s kind" % id)
 
 
+func test_melee_and_ranged_minions_walk_at_240() -> void:
+	assert_eq(_data("melee_minion").move_speed, 240.0)
+	assert_eq(_data("ranged_minion").move_speed, 240.0)
+
+
 func test_the_ranged_minion_is_a_magic_kiter() -> void:
 	var data := _data("ranged_minion")
 	assert_eq(data.damage_type, DamageInfo.Type.MAGIC)

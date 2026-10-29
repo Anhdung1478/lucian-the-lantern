@@ -184,6 +184,42 @@ func test_a_cleared_act_stage_is_saved_as_cleared() -> void:
 	assert_eq(journey.current, 1)
 
 
+func test_losing_the_tutorial_goes_back_to_the_title() -> void:
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 1, 1))
+	await wait_process_frames(2)
+	var stage := game.screen as Stage
+	stage.show_result(false)
+	stage.result.continue_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, TitleScreen)
+	assert_false("1-1" in SaveGame.instance().cleared)
+	assert_true(FileAccess.file_exists(SaveGame.instance().path(1)), "a lost stage still auto-saves")
+	assert_false(get_tree().paused)
+
+
+func test_losing_a_later_stage_goes_to_the_main_screen() -> void:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_process_frames(2)
+	var stage := game.screen as Stage
+	stage.show_result(false)
+	stage.result.continue_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, MainScreen)
+
+
+func test_a_failed_save_after_a_game_over_shows_on_the_title() -> void:
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 1, 1))
+	await wait_process_frames(2)
+	SaveGame.instance().prefix = BROKEN_PREFIX
+	var stage := game.screen as Stage
+	stage.show_result(false)
+	stage.result.continue_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, TitleScreen)
+	assert_eq((game.screen as TitleScreen).notice_label.text, "Could not save")
+
+
 func test_closing_the_window_on_stage_cleared_keeps_the_clear() -> void:
 	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
 	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))

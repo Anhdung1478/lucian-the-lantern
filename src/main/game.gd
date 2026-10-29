@@ -118,17 +118,24 @@ func _keep_playing() -> void:
 	get_tree().paused = _was_paused
 
 
-## Deferred: the stage is still inside its own menu's signal here. A failed
-## save shows on the new main screen.
+## Deferred: the stage is still inside its own menu's signal here. Losing the
+## tutorial (Act 1 before its first clear) is a game over: back to the title
+## screen; otherwise the main screen. A failed save shows on the new screen.
 func _on_stage_finished(result: StringName) -> void:
 	var saved := SaveGame.instance().finish_stage(result, _run.stage_id)
-	show_main_screen.call_deferred(_run.act)
+	if result == &"failed" and _run.tutorial:
+		show_title.call_deferred()
+	else:
+		show_main_screen.call_deferred(_run.act)
 	if not saved:
 		_report_save_failed.call_deferred()
 
 
 func _report_save_failed() -> void:
-	(screen as MainScreen).show_toast("Could not save", true)
+	if screen is MainScreen:
+		(screen as MainScreen).show_toast("Could not save", true)
+	elif screen is TitleScreen:
+		(screen as TitleScreen).notice_label.text = "Could not save"
 
 
 ## The old screen goes at once; the prompt stays last so it gets input first.

@@ -18,6 +18,8 @@ var confirm := ConfirmPopup.new()
 var slot_list := SlotList.new()
 var load_button: Button
 var error_label := UiStyle.label("", 20, UiStyle.ERROR_COLOR)
+## Under the title, in red: "Could not save" after a game over whose save failed.
+var notice_label := UiStyle.label("", 22, UiStyle.ERROR_COLOR)
 
 var _menu: VBoxContainer
 var _slots_page: VBoxContainer
@@ -121,6 +123,8 @@ func _build() -> void:
 	var subtitle := UiStyle.label("THE LANTERN", 34, Color("8fe3b0"))
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(subtitle)
+	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(notice_label)
 	_menu = VBoxContainer.new()
 	_menu.add_theme_constant_override(&"separation", 14)
 	column.add_child(_menu)

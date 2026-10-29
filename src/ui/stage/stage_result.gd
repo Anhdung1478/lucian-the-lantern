@@ -1,8 +1,9 @@
 class_name StageResult
 extends CanvasLayer
-## The end of a stage, over a paused game: STAGE CLEARED or DEFEATED, the
-## stage, the waves cleared, the essences collected and any first-clear
-## reward, then Continue.
+## The end of a stage, over a paused game: STAGE CLEARED or DEFEATED (GAME
+## OVER when the tutorial is lost), the stage, the waves cleared, the
+## essences collected and any first-clear reward, then Continue (Back to
+## title after a game over).
 
 signal continue_pressed
 
@@ -10,6 +11,8 @@ const LAYER := 42
 const REWARD_COLOR := Color("5ad07a")
 
 var cleared := false
+## The tutorial was lost: Continue goes back to the title screen.
+var game_over := false
 var title: Label
 var continue_button: Button
 
@@ -29,9 +32,14 @@ static func clock(seconds: float) -> String:
 	return "%d:%02d" % [whole / 60, whole % 60]
 
 
-func show_result(is_cleared: bool, stage_name: String, waves_text: String, collected: Dictionary, rewards: Array[String]) -> void:
+func show_result(is_cleared: bool, stage_name: String, waves_text: String, collected: Dictionary, rewards: Array[String], is_game_over := false) -> void:
 	cleared = is_cleared
-	title.text = "STAGE CLEARED" if cleared else "DEFEATED"
+	game_over = is_game_over and not is_cleared
+	if cleared:
+		title.text = "STAGE CLEARED"
+	else:
+		title.text = "GAME OVER" if game_over else "DEFEATED"
+	continue_button.text = "Back to title" if game_over else "Continue"
 	title.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if cleared else UiStyle.ERROR_COLOR)
 	for child in _lines.get_children():
 		child.queue_free()

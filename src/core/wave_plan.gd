@@ -16,10 +16,18 @@ const STAGES := {
 }
 ## Stage id -> the boss wave's enemy id.
 const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan"}
+## Stage id -> enemy id -> its share of HP in that stage only. Act 1's stage
+## is gentler: its melee and ranged minions have 20% less HP.
+const HP_SHARES := {"1-1": {MELEE: 0.8, RANGED: 0.8}}
 
 
 static func has_stage(stage_id: String) -> bool:
 	return STAGES.has(stage_id)
+
+
+## Enemy `id`'s share of HP in stage `stage_id` (1.0 unless listed).
+static func hp_share(stage_id: String, id: StringName) -> float:
+	return HP_SHARES.get(stage_id, {}).get(id, 1.0)
 
 
 ## Each wave as the enemy ids to spawn, in order.
