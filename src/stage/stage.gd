@@ -255,6 +255,11 @@ func _use_map(map: StageMap) -> void:
 	arena = map
 	for node in map.build_terrain(lucian):
 		$World.add_child(node)
+	if not map.mist.is_empty():
+		var black_mist := BlackMist.new()
+		black_mist.banks = map.mist
+		black_mist.lucian = lucian
+		$World.add_child(black_mist)
 	$World.remove_child(dummy)
 	dummy.queue_free()
 	dummy = null

@@ -1,6 +1,6 @@
 extends GutTest
 
-const STAGES := [[1, 1], [2, 1], [2, 2], [2, 3], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [4, 1], [4, 2], [4, 3]]
+const STAGES := [[1, 1], [2, 1], [2, 2], [2, 3], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [4, 1], [4, 2], [4, 3], [5, 1], [5, 2], [5, 3], [5, 4], [5, 5]]
 ## The navigation map may sync on a background thread: poll it, at most this
 ## many physics frames.
 const SYNC_FRAMES := 180
@@ -375,7 +375,7 @@ func test_maps_have_no_abyss_ledges_or_mist_by_default() -> void:
 		var map := StageMaps.create(act_stage[0], act_stage[1])
 		assert_true(map.chasm_polygons.is_empty(), str(act_stage))
 		assert_true(map.ledge_points.is_empty(), str(act_stage))
-		assert_true(map.mist.is_empty(), str(act_stage))
+		assert_eq(map.mist.is_empty(), act_stage[0] != 5, str(act_stage))
 		map.free()
 
 
@@ -506,3 +506,123 @@ func test_an_enemy_walks_around_the_abyss_to_lucian() -> void:
 	assert_true(reached, "it reached Lucian within 10 s")
 	assert_false(entered, "never on the abyss")
 	assert_gt(minion.path_follower.queries, 0, "the abyss blocked its line: it took a path")
+
+
+# --- Act 5: the dead forest ---------------------------------------------
+
+
+func _forest(stage: int) -> DeadForestMap:
+	return StageMaps.create(5, stage) as DeadForestMap
+
+
+func test_act_5_stages_are_the_dead_forest() -> void:
+	for stage in range(1, 6):
+		var map := _forest(stage)
+		assert_not_null(map, str(stage))
+		assert_eq(map.size, Vector2(5400, 3400))
+		assert_eq(map.lucian_start, Vector2(500, 1700))
+		assert_eq(map.merchant_point, Vector2(2500, 1700))
+		assert_eq(map.spawn_points.size(), 4)
+		map.free()
+
+
+func test_the_forest_camps_and_boss_spots_come_stage_by_stage() -> void:
+	var expected := {
+		1: {}, 2: {&"maokai": Vector2(3900, 1700)}, 3: {&"nest": Vector2(5000, 900)},
+		4: {&"elise": Vector2(3900, 1400), &"nest": Vector2(5000, 2500)}, 5: {&"nest": Vector2(5000, 900)},
+	}
+	for stage in range(1, 6):
+		var map := _forest(stage)
+		assert_eq(map.camps, expected[stage], str(stage))
+		map.free()
+	for pair in [[5, Vector2(4300, 1700)], [2, Vector2(3900, 1700)], [4, Vector2(3900, 1400)]]:
+		var map := _forest(pair[0])
+		assert_eq(map.boss_point, pair[1], str(pair[0]))
+		map.free()
+
+
+func test_the_forest_has_the_planned_tree_and_mist_counts() -> void:
+	var trees := [14, 16, 18, 18, 10]
+	var mist := [2, 3, 3, 4, 2]
+	for stage in range(1, 6):
+		assert_eq(DeadForestMap.trees(stage).size(), trees[stage - 1], "trees %d" % stage)
+		var map := _forest(stage)
+		assert_eq(map.mist.size(), mist[stage - 1], "mist %d" % stage)
+		for bank in map.mist:
+			assert_between(bank.z, 380.0, 520.0)
+		map.free()
+
+
+func test_the_forest_trees_keep_their_gaps() -> void:
+	for stage in range(1, 6):
+		var trees := DeadForestMap.trees(stage)
+		var clear := DeadForestMap.keep_clear(stage)
+		var ring := DeadForestMap.trunks(stage)
+		assert_eq(trees, DeadForestMap.trees(stage), "a fixed list")
+		for i in trees.size():
+			var tree := trees[i]
+			var at := Vector2(tree.x, tree.y)
+			assert_between(tree.z, 45.0, 90.0)
+			for point in clear:
+				assert_gte(at.distance_to(point) - tree.z, 220.0, "%d: tree %s near %s" % [stage, at, point])
+			for j in range(i + 1, trees.size()):
+				assert_gte(at.distance_to(Vector2(trees[j].x, trees[j].y)) - tree.z - trees[j].z, 160.0, "%d: trees %d and %d" % [stage, i, j])
+			for trunk in ring:
+				assert_gte(at.distance_to(Vector2(trunk.x, trunk.y)) - tree.z - trunk.z, 160.0, "%d: a tree by the dead tree" % stage)
+
+
+func test_the_forest_mist_stays_off_every_point() -> void:
+	for stage in range(1, 6):
+		var map := _forest(stage)
+		var points: Array[Vector2] = [map.lucian_start, map.merchant_point, map.boss_point]
+		points.append_array(map.camps.values())
+		for point in points:
+			for bank in map.mist:
+				assert_gt(point.distance_to(Vector2(bank.x, bank.y)), bank.z, "%d: %s in mist" % [stage, point])
+		map.free()
+
+
+func test_maokais_dead_tree_is_a_ring_open_to_the_west() -> void:
+	var ring := DeadForestMap.trunks(2)
+	assert_eq(ring.size(), 6)
+	for stage in [1, 3, 4, 5]:
+		assert_true(DeadForestMap.trunks(stage).is_empty(), str(stage))
+	var map := _forest(2)
+	for trunk in ring:
+		assert_true(map.wall_circles.has(trunk))
+	# The camp and its jitter stay walkable, and the west side is open.
+	for jitter in [Vector2.ZERO, Vector2(90, 90), Vector2(-90, -90), Vector2(90, -90), Vector2(-90, 90)]:
+		assert_true(map.is_walkable(Vector2(3900, 1700) + jitter), str(jitter))
+	var west := Vector2(3900, 1700) + Vector2(-DeadForestMap.TRUNK_RING, 0)
+	assert_true(map.is_walkable(west), "the gap")
+	var east := Vector2(3900, 1700) + Vector2(DeadForestMap.TRUNK_RING, 0)
+	assert_false(map.is_walkable(east), "a trunk")
+	map.free()
+
+
+func test_the_graveyard_and_the_nest_exist_only_when_planned() -> void:
+	for stage in range(1, 6):
+		var map := _forest(stage)
+		assert_eq(DeadForestMap.has_graveyard(stage), stage == 5)
+		assert_eq(map.camps.has(&"nest"), stage >= 3, str(stage))
+		var graves := DeadForestMap.graves()
+		var in_map := 0
+		for grave in graves:
+			if map.wall_polygons.has(grave):
+				in_map += 1
+		assert_eq(in_map, graves.size() if stage == 5 else 0, "graves in %d" % stage)
+		map.free()
+	for rect in DeadForestMap.tombstones():
+		assert_eq(rect.size, Vector2(40, 70))
+		assert_gt(rect.position.x, DeadForestMap.GRAVEYARD_X)
+	assert_eq(DeadForestMap.CRYPT_SLABS.size(), 2)
+	for tree in DeadForestMap.trees(5):
+		assert_lt(tree.x + tree.z, DeadForestMap.GRAVEYARD_X, "5-5's trees stand west of the graveyard")
+
+
+func test_the_forest_has_a_ragged_tree_line_top_and_bottom() -> void:
+	var map := _forest(1)
+	assert_false(map.is_walkable(Vector2(2000, 100)))
+	assert_false(map.is_walkable(Vector2(2000, 3300)))
+	assert_true(map.is_walkable(Vector2(2000, 700)))
+	map.free()

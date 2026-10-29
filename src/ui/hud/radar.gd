@@ -48,6 +48,11 @@ static func dot_size(kind: StringName) -> float:
 	return DOT
 
 
+## An enemy gets a dot unless the Black Mist veils it.
+static func shows(enemy: Enemy) -> bool:
+	return not (enemy is EnemyUnit and (enemy as EnemyUnit).veiled)
+
+
 func _process(_delta: float) -> void:
 	queue_redraw()
 
@@ -59,6 +64,8 @@ func _draw() -> void:
 	for ally: Node2D in get_tree().get_nodes_in_group(&"allies"):
 		draw_circle(to_radar(ally.global_position), DOT, ALLY_COLOR)
 	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		if not shows(enemy):
+			continue
 		var kind := (enemy as EnemyUnit).data.kind if enemy is EnemyUnit else &"normal"
 		var at := to_radar(enemy.global_position)
 		if kind in EnemyData.BOSS_KINDS:

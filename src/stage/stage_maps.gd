@@ -16,4 +16,6 @@ static func create(act: int, stage: int) -> StageMap:
 			return JungleMap.new(stage)
 		4:
 			return DarkMidLaneMap.new()
+		5:
+			return DeadForestMap.new(stage)
 	return TestArena.new()
