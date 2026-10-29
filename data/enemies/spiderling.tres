@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/spiderling.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"spiderling"
+display_name = "Spiderling"
+kind = &"normal"
+behavior = &"brute"
+art = ExtResource("2_art")
+max_hp = 130.0
+armor = 5.0
+mr = 5.0
+damage = 8.0
+attack_range = 90.0
+attack_interval = 0.9
+move_speed = 380.0
+radius = 20.0
+gold = 25
+xp = 12
+damage_type = 0
+camp = &"nest"

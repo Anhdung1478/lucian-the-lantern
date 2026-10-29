@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/sapling.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"sapling"
+display_name = "Sapling"
+kind = &"normal"
+behavior = &"bomber"
+art = ExtResource("2_art")
+max_hp = 110.0
+armor = 0.0
+mr = 10.0
+damage = 30.0
+attack_range = 80.0
+attack_interval = 0.0
+move_speed = 340.0
+radius = 22.0
+gold = 30
+xp = 15
+damage_type = 1

@@ -5,6 +5,7 @@ const IDS := [
 	"raptor", "raptor_big", "murkwolf", "murkwolf_big", "krug", "krug_big", "gromp",
 	"blue_sentinel", "red_brambleback", "rift_scuttler", "infernal_drake", "ocean_drake", "elder_dragon",
 	"shadow_melee_minion", "shadow_ranged_minion", "shadow_siege_minion", "shadow_super_minion",
+	"sapling", "spiderling", "ghoul", "maiden_of_the_mist", "broodmother",
 ]
 ## Act 3's monsters (docs/implementation/phase7.md): id -> [kind, behavior,
 ## camp, HP, armor, MR, damage, attack range, attack interval, speed, radius,
@@ -20,6 +21,15 @@ const ACT_3 := {
 	"blue_sentinel": [&"elite", &"brute", &"blue", 1700.0, 35.0, 35.0, 42.0, 150.0, 1.6, 240.0, 50.0, 160, 90],
 	"red_brambleback": [&"elite", &"brute", &"red", 1700.0, 35.0, 35.0, 40.0, 150.0, 1.5, 240.0, 50.0, 160, 90],
 	"rift_scuttler": [&"elite", &"flee", &"scuttle", 600.0, 20.0, 20.0, 0.0, 0.0, 1.25, 250.0, 34.0, 120, 60],
+}
+## Act 5's enemies (the Phase 8 plan), the same columns. Act 5 scales them
+## itself, so these are the base numbers.
+const ACT_5 := {
+	"sapling": [&"normal", &"bomber", &"", 110.0, 0.0, 10.0, 30.0, 80.0, 0.0, 340.0, 22.0, 30, 15],
+	"spiderling": [&"normal", &"brute", &"nest", 130.0, 5.0, 5.0, 8.0, 90.0, 0.9, 380.0, 20.0, 25, 12],
+	"ghoul": [&"normal", &"brute", &"", 90.0, 0.0, 0.0, 8.0, 90.0, 1.0, 320.0, 20.0, 20, 10],
+	"maiden_of_the_mist": [&"elite", &"brute", &"", 1500.0, 35.0, 35.0, 40.0, 130.0, 1.5, 220.0, 42.0, 140, 80],
+	"broodmother": [&"elite", &"spit", &"", 1100.0, 20.0, 40.0, 30.0, 600.0, 2.0, 200.0, 48.0, 150, 90],
 }
 
 
@@ -100,6 +110,27 @@ func test_the_act_3_monsters_match_the_table() -> void:
 		var data := _data(id)
 		for i in fields.size():
 			assert_eq(data.get(fields[i]), ACT_3[id][i], "%s %s" % [id, fields[i]])
+
+
+func test_the_act_5_enemies_match_the_table() -> void:
+	var fields := ["kind", "behavior", "camp", "max_hp", "armor", "mr", "damage", "attack_range", "attack_interval", "move_speed", "radius", "gold", "xp"]
+	for id: String in ACT_5:
+		var data := _data(id)
+		for i in fields.size():
+			assert_eq(data.get(fields[i]), ACT_5[id][i], "%s %s" % [id, fields[i]])
+
+
+func test_the_act_5_specials() -> void:
+	for id in ["sapling", "broodmother"]:
+		assert_eq(_data(id).damage_type, DamageInfo.Type.MAGIC, id)
+	for id in ["spiderling", "ghoul", "maiden_of_the_mist"]:
+		assert_eq(_data(id).damage_type, DamageInfo.Type.PHYSICAL, id)
+	var brood := _data("broodmother")
+	assert_eq([brood.projectile_speed, brood.hit_slow, brood.hit_slow_time], [600.0, 0.3, 1.5])
+	assert_eq([brood.keep_min, brood.keep_max], [450.0, 600.0])
+	assert_eq([brood.summon_id, brood.summon_every, brood.summon_count, brood.summon_cap], [&"spiderling", 3.5, 1, 5])
+	var maiden := _data("maiden_of_the_mist")
+	assert_eq([maiden.summon_id, maiden.summon_every, maiden.summon_count, maiden.summon_cap], [&"ghoul", 7.0, 2, 6])
 
 
 func test_the_act_3_on_hits_and_specials() -> void:

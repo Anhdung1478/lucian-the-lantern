@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/core/enemy_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/enemies/ghoul.svg" id="2_art"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"ghoul"
+display_name = "Ghoul"
+kind = &"normal"
+behavior = &"brute"
+art = ExtResource("2_art")
+max_hp = 90.0
+armor = 0.0
+mr = 0.0
+damage = 8.0
+attack_range = 90.0
+attack_interval = 1.0
+move_speed = 320.0
+radius = 20.0
+gold = 20
+xp = 10
+damage_type = 0

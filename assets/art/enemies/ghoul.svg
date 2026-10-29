@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
+  <!-- Ghoul: a hunched pale ghost seen from above, rounded shoulders, long dangling arms reaching forward (+X), a tattered trailing hem and dark hollow eyes. -->
+  <g transform="translate(22 22)">
+    <ellipse cx="-1" cy="2" rx="19" ry="17" fill="#000000" opacity="0.25"/>
+    <!-- tattered hem trailing behind -->
+    <path d="M -8 -9 L -20 -7 L -15 -3 L -21 0 L -15 3 L -20 7 L -8 9 Z" fill="#aeb8bd" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- arms -->
+    <path d="M 0 -9 L 12 -12 L 19 -8 M 0 9 L 12 12 L 19 8" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 0 -9 L 12 -12 L 19 -8 M 0 9 L 12 12 L 19 8" fill="none" stroke="#d6dde0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- hunched body -->
+    <ellipse cx="-3" cy="0" rx="13" ry="12" fill="#d6dde0" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -10 -5 Q -4 0 -10 5" fill="none" stroke="#9aa5ab" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- head -->
+    <circle cx="7" cy="0" r="6.5" fill="#e6ecee" stroke="#1a1d24" stroke-width="2.5"/>
+    <ellipse cx="9.5" cy="-2.5" rx="1.8" ry="2.2" fill="#1a1d24"/>
+    <ellipse cx="9.5" cy="2.5" rx="1.8" ry="2.2" fill="#1a1d24"/>
+  </g>
+</svg>

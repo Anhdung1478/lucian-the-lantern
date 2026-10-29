@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="92" height="92" viewBox="0 0 92 92">
+  <!-- Maiden of the Mist: a tall veiled ghost woman seen from above in a teal shroud, a long flowing hem trailing behind, pale hands reaching forward (+X), a veiled face with two cold glowing eyes. -->
+  <g transform="translate(46 46)">
+    <ellipse cx="-2" cy="4" rx="40" ry="35" fill="#000000" opacity="0.25"/>
+    <!-- flowing shroud trailing behind -->
+    <path d="M -10 -24 Q -34 -34 -42 -20 Q -36 -12 -44 -6 Q -36 0 -44 6 Q -36 12 -42 20 Q -34 34 -10 24 Z" fill="#2f7f86" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -14 -18 Q -30 -22 -36 -14 M -14 0 L -38 0 M -14 18 Q -30 22 -36 14" fill="none" stroke="#5fc0c4" stroke-width="2" stroke-linecap="round"/>
+    <!-- arms, long and thin -->
+    <path d="M 4 -16 L 22 -20 L 34 -12 M 4 16 L 22 20 L 34 12" fill="none" stroke="#1a1d24" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 4 -16 L 22 -20 L 34 -12 M 4 16 L 22 20 L 34 12" fill="none" stroke="#3f9aa0" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="35" cy="-12" r="4.5" fill="#dff1f0" stroke="#1a1d24" stroke-width="2.5"/>
+    <circle cx="35" cy="12" r="4.5" fill="#dff1f0" stroke="#1a1d24" stroke-width="2.5"/>
+    <!-- shoulders and body -->
+    <ellipse cx="-2" cy="0" rx="22" ry="25" fill="#3f9aa0" stroke="#1a1d24" stroke-width="3.5"/>
+    <path d="M -14 -14 Q -4 0 -14 14" fill="none" stroke="#2f7f86" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- veiled head -->
+    <circle cx="10" cy="0" r="13" fill="#bfe6e6" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -2 -10 Q -8 0 -2 10" fill="none" stroke="#7fc4c6" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="15" cy="-4.5" rx="2.2" ry="3" fill="#8ffcff"/>
+    <ellipse cx="15" cy="4.5" rx="2.2" ry="3" fill="#8ffcff"/>
+  </g>
+</svg>

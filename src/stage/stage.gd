@@ -431,6 +431,8 @@ func _new_unit(data: EnemyData) -> EnemyUnit:
 			return DarkLucian.new()
 		&"swarm", &"flank", &"brute", &"spit", &"flee":
 			return Monster.new()
+		&"bomber", &"charger", &"warden":
+			return Specter.new()
 	return Minion.new()
 
 

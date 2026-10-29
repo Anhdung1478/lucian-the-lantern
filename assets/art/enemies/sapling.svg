@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!-- Sapling: a little walking dead tree seen from above, bare twisted branches spread round a cracked trunk with a glowing green core, a stubby root-foot forward (+X). -->
+  <g transform="translate(24 24)">
+    <ellipse cx="-1" cy="2" rx="21" ry="19" fill="#000000" opacity="0.25"/>
+    <!-- twisted branches -->
+    <path d="M -2 -4 L -10 -14 L -8 -20 M -10 -14 L -17 -15 M -2 4 L -10 14 L -8 20 M -10 14 L -17 15 M -4 0 L -18 0 L -21 -5" fill="none" stroke="#1a1d24" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -2 -4 L -10 -14 L -8 -20 M -10 -14 L -17 -15 M -2 4 L -10 14 L -8 20 M -10 14 L -17 15 M -4 0 L -18 0 L -21 -5" fill="none" stroke="#5a4632" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- root feet -->
+    <path d="M 8 -6 L 17 -9 M 8 6 L 17 9" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 8 -6 L 17 -9 M 8 6 L 17 9" fill="none" stroke="#6b5640" stroke-width="2.4" stroke-linecap="round"/>
+    <!-- trunk, cut across -->
+    <circle cx="0" cy="0" r="12" fill="#6b5640" stroke="#1a1d24" stroke-width="3"/>
+    <circle cx="0" cy="0" r="8.5" fill="#4a3a2a"/>
+    <path d="M -6 -3 L 0 0 L -5 5 M 0 0 L 6 -2" fill="none" stroke="#1a1d24" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- glowing green core -->
+    <circle cx="1" cy="0" r="5.5" fill="#6dff8a" opacity="0.35"/>
+    <circle cx="1" cy="0" r="3.4" fill="#b8ffc6" stroke="#2f9a4a" stroke-width="1.2"/>
+  </g>
+</svg>
