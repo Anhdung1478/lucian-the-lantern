@@ -202,6 +202,24 @@ static func _recipe(sound: StringName) -> PackedFloat32Array:
 		&"shot_pulsefire":
 			# A soft high pulse with a flutter.
 			samples = _as_loud_as(&"shot", _tone(0.08, 1800.0, 1200.0, 0.05, 0.1, 25.0, 70.0))
+		# --- V1.1 skin sounds: Vampire, dark and wet ---
+		&"cast_q_vampire":
+			# A low, wet, falling zap.
+			samples = _as_loud_as(&"cast_q", _tone(0.22, 900.0, 220.0, 0.35, 0.4, 11.0, 25.0))
+		&"cast_w_vampire":
+			# A low splash thump.
+			var splash := _tone(0.1, 180.0, 70.0, 0.5, 0.4, 20.0)
+			splash.append_array(_tone(0.1, 900.0, 300.0, 0.9, 0.0, 22.0))
+			samples = _as_loud_as(&"cast_w", splash)
+		&"cast_e_vampire":
+			# Three quick wing flaps.
+			var flaps := PackedFloat32Array()
+			for i in 3:
+				flaps.append_array(_tone(0.07, 300.0, 200.0, 0.9, 0.0, 30.0))
+			samples = _as_loud_as(&"cast_e", flaps)
+		&"shot_vampire":
+			# A muffled low crack.
+			samples = _as_loud_as(&"shot", _tone(0.1, 420.0, 150.0, 0.45, 0.5, 28.0))
 	return samples
 
 
