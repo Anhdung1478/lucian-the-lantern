@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="28" viewBox="0 0 56 28">
+  <!-- On/off switch, off and disabled: the navy track and knob, faded -->
+  <g opacity="0.45">
+    <rect x="1.5" y="3" width="53" height="22" rx="11" fill="#0d1118" stroke="#5c6678" stroke-width="2"/>
+    <circle cx="41" cy="14" r="4" fill="none" stroke="#5c6678" stroke-width="2"/>
+    <circle cx="14.5" cy="14" r="9" fill="#7d8594" stroke="#1a1d24" stroke-width="1.5"/>
+  </g>
+</svg>

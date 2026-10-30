@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="28" viewBox="0 0 56 28">
+  <!-- On/off switch, on: a gold track with a check, the knob on the right -->
+  <defs>
+    <linearGradient id="track" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffcf5a"/><stop offset="1" stop-color="#a8822f"/></linearGradient>
+    <radialGradient id="knob" cx="40%" cy="35%" r="65%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#fff1c8"/><stop offset="1" stop-color="#d9c08a"/></radialGradient>
+  </defs>
+  <rect x="1.5" y="3" width="53" height="22" rx="11" fill="url(#track)" stroke="#1a1d24" stroke-width="2"/>
+  <path d="M 10.5 14 L 14 17.5 L 20.5 10.5" fill="none" stroke="#3a2a14" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="41.5" cy="14" r="9" fill="url(#knob)" stroke="#5e4a2a" stroke-width="1.5"/>
+</svg>

@@ -7,7 +7,7 @@ extends SceneTree
 const SETTINGS_PATH := "user://screenshot_settings.json"
 const SAVE_PREFIX := "user://screenshot_save_slot_"
 ## Scenarios that start from the game's root scene (the main screen).
-const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "the_end",
+const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "title_settings", "the_end",
 	"journey_map", "journey_endless", "endless_wave", "endless_boss", "endless_pick", "endless_run_over",
 	"exit_cancel", "tree_icons", "tree_free"]
 ## Endless map choices (Journey.ENDLESS_MAPS indices) for the Endless scenarios.
@@ -177,6 +177,8 @@ func _run(scenario: String) -> void:
 			await scenario_title()
 		"title_slots":
 			await scenario_title_slots()
+		"title_settings":
+			await scenario_title_settings()
 		"act1_start":
 			await scenario_act1_start()
 		"act1_wave":
@@ -876,6 +878,10 @@ func scenario_settings() -> void:
 	await click(screen._tab_buttons[2])
 	await wait(0.1)
 	await shot("settings_3_graphics")
+	screen._resolution.show_popup()
+	await wait(0.2)
+	await shot("settings_3_graphics_dropdown")
+	screen._resolution.get_popup().hide()
 	await click(screen._tab_buttons[3])
 	await wait(0.1)
 	await shot("settings_4_gameplay")
@@ -1648,6 +1654,63 @@ func scenario_title() -> void:
 	await mouse_move(control_center(title.load_button))
 	await wait_for_tooltip(title.load_button)
 	await shot("title_1_load_disabled")
+
+
+## Settings over the title screen: each tab, a hovered row card, a
+## dropdown's pop-up list open, a binding waiting for a key, and the end of
+## the Controls list.
+func scenario_title_settings() -> void:
+	var title := game_root.screen as TitleScreen
+	var screen := title.settings
+	title._open_settings()
+	await wait(0.3)
+	var names := ["audio", "controls", "graphics", "gameplay"]
+	for i in names.size():
+		await click(screen._tab_buttons[i])
+		await mouse_move(Vector2(8, 8))
+		await wait(0.2)
+		await shot("title_settings_%d_%s" % [i, names[i]])
+	await click(screen._tab_buttons[0])
+	var slider: HSlider = screen._pages[0].find_children("*", "HSlider", true, false)[1]
+	await hover(slider)
+	var card := slider.get_parent().get_parent() as PanelContainer
+	print("card border alpha when hovered (expect 0.6): ", (card.get_theme_stylebox(&"panel") as StyleBoxFlat).border_color.a)
+	await shot("title_settings_4_hover")
+	await click(screen._tab_buttons[2])
+	var fps: OptionButton = screen._pages[2].find_children("*", "OptionButton", true, false)[2]
+	await click(fps)
+	await wait(0.3)
+	var popup := fps.get_popup()
+	print("dropdown list open (expect true): ", popup.visible)
+	# A synthetic motion doesn't reach the embedded list; light an entry as a hover would.
+	popup.set_focused_item(1)
+	await wait(0.2)
+	await shot("title_settings_5_dropdown")
+	popup.hide()
+	await click(screen._tab_buttons[1])
+	await mouse_move(Vector2(8, 8))
+	screen.listen(&"skill_e")
+	await wait(0.2)
+	await shot("title_settings_6_listening")
+	screen.close()
+	title._open_settings()
+	await click(screen._tab_buttons[1])
+	await mouse_move(Vector2(8, 8))
+	var scroll: ScrollContainer = screen._pages[1].find_children("*", "ScrollContainer", true, false)[0]
+	scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
+	await wait(0.2)
+	await shot("title_settings_7_controls_end")
+
+
+## Rests the mouse on `control` until it is the hovered one (a stray OS
+## motion event can move the hover off it).
+func hover(control: Control, timeout := 2.0) -> void:
+	var start := Time.get_ticks_msec()
+	while root.gui_get_hovered_control() != control and Time.get_ticks_msec() - start < timeout * 1000.0:
+		await mouse_move(control_center(control))
+		await wait(0.05)
+	print("%s hovered: " % control.get_class(), root.gui_get_hovered_control() == control)
+	await wait(0.1)
 
 
 ## Slot 2 saved (with some play time): Start new game lists it, picking it

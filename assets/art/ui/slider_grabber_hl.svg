@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+  <!-- Slider grabber, hovered: the gold diamond, brighter, with a light rim -->
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6d8"/><stop offset="0.5" stop-color="#ffcf5a"/><stop offset="1" stop-color="#c9a45c"/></linearGradient>
+  </defs>
+  <path d="M 14 0.5 L 27.5 14 L 14 27.5 L 0.5 14 Z" fill="#fff1c2" opacity="0.45"/>
+  <path d="M 14 2.5 L 25.5 14 L 14 25.5 L 2.5 14 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 14 8 L 20 14 L 14 20 L 8 14 Z" fill="#ffffff" stroke="#c9a45c" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M 14 4 L 14 8 M 24 14 L 20 14 M 14 24 L 14 20 M 4 14 L 8 14" stroke="#c9a45c" stroke-width="1" opacity="0.9"/>
+</svg>

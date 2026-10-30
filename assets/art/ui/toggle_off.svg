@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="28" viewBox="0 0 56 28">
+  <!-- On/off switch, off: a dark navy track, a steel knob on the left -->
+  <defs>
+    <radialGradient id="knob" cx="40%" cy="35%" r="65%"><stop offset="0" stop-color="#e6ebf2"/><stop offset="0.6" stop-color="#a3acbb"/><stop offset="1" stop-color="#5a6272"/></radialGradient>
+  </defs>
+  <rect x="1.5" y="3" width="53" height="22" rx="11" fill="#0d1118" stroke="#5c6678" stroke-width="2"/>
+  <circle cx="41" cy="14" r="4" fill="none" stroke="#5c6678" stroke-width="2"/>
+  <circle cx="14.5" cy="14" r="9" fill="url(#knob)" stroke="#1a1d24" stroke-width="1.5"/>
+</svg>

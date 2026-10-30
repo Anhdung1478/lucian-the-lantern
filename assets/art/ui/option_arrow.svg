@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="10" viewBox="0 0 16 10">
+  <!-- Dropdown arrow: a gold chevron, drawn at this size -->
+  <path d="M 2.5 2.5 L 8 7.5 L 13.5 2.5" fill="none" stroke="#ffcf5a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

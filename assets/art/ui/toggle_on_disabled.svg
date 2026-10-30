@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="28" viewBox="0 0 56 28">
+  <!-- On/off switch, on but disabled: the gold track faded toward grey -->
+  <g opacity="0.45">
+    <rect x="1.5" y="3" width="53" height="22" rx="11" fill="#8a7a55" stroke="#1a1d24" stroke-width="2"/>
+    <path d="M 10.5 14 L 14 17.5 L 20.5 10.5" fill="none" stroke="#3a2a14" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="41.5" cy="14" r="9" fill="#c9c3b4" stroke="#5e4a2a" stroke-width="1.5"/>
+  </g>
+</svg>
