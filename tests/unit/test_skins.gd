@@ -56,8 +56,8 @@ func test_every_skin_has_art_the_same_size_as_classic() -> void:
 		assert_eq(skin.body.get_size(), classic.body.get_size(), str(skin.id))
 
 
-## Every body SVG draws Lucian's own gun's muzzle at (46, -15) and Senna's at
-## (46, 15); shots and muzzle flashes leave from these markers.
+## The muzzle markers in lucian.tscn sit at the gun tips: Lucian's own gun at
+## (46, -15) and Senna's at (46, 15); shots and muzzle flashes leave from them.
 func test_muzzle_markers_sit_at_the_gun_tips() -> void:
 	assert_eq((lucian.get_node("Visuals/MuzzleLeft") as Marker2D).position, Vector2(46, -15))
 	assert_eq((lucian.get_node("Visuals/MuzzleRight") as Marker2D).position, Vector2(46, 15))

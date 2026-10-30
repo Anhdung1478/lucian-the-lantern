@@ -331,10 +331,12 @@ func test_a_picked_node_lists_each_level_with_its_value_and_cost() -> void:
 
 
 func test_r_shows_its_q_w_e_ranks() -> void:
+	# R is hidden (and shows no sum) until it opens: the passive and 5 ranks.
+	_save().tree.from_dict({"skill_q": 3, "skill_w": 2, "passive": 1})
 	section.select(&"skill_r")
 	var info := section.info
 	assert_true(info.sum_label.visible)
-	assert_eq(info.sum_label.text, "Q + W + E ranks: 0 / 5")
+	assert_eq(info.sum_label.text, "Q + W + E ranks: 5 / 5")
 	_save().tree.from_dict({"skill_q": 3, "skill_w": 2, "skill_e": 2, "passive": 1, "skill_r": 1})
 	assert_eq(info.sum_label.text, "Q + W + E ranks: 7 / 9")
 	assert_eq(info.requires_label.text, "Requires: 9 levels in Q + W + E (now 7)")
@@ -428,6 +430,38 @@ func test_a_hidden_node_reads_unknown_locked_and_its_requirements() -> void:
 	assert_eq(section.info.requires_label.text, "Requires: Clear Act 1")
 	section.select(&"stat_ad")
 	assert_false(section.info.requires_label.visible)
+
+
+func test_a_hidden_node_shows_no_value_description_or_ladder() -> void:
+	section.select(&"passive")
+	var info := section.info
+	assert_eq(info.name_label.text, "???")
+	assert_eq(info.value_label.text, "")
+	assert_eq(info.description.text, "")
+	assert_false(info.sum_label.visible)
+	assert_eq(info.ladder.get_child_count(), 0, "no ladder rows")
+	assert_true(info.requires_label.visible, "the requirement still shows")
+	section.select(&"stat_ad")
+	assert_gt(info.ladder.get_child_count(), 0, "a visible node has its ladder")
+	assert_ne(info.description.text, "")
+
+
+## The info column's content must fit its panel for every branch and every node.
+func test_the_info_column_fits_its_panel_for_every_branch_and_node() -> void:
+	await wait_process_frames(2)
+	var limit := TreeSection.PANEL_RECT.size.y
+	for state in ["fresh", "max"]:
+		if state == "max":
+			_save().tree.max_all()
+			section.refresh()
+		for branch: StringName in EvolutionTree.BRANCHES:
+			section.show_branch(branch)
+			await wait_process_frames(2)
+			assert_lte(section.info.get_combined_minimum_size().y, limit, "%s %s" % [state, branch])
+		for data in EvolutionTree.new().nodes():
+			section.select(data.id)
+			await wait_process_frames(2)
+			assert_lte(section.info.get_combined_minimum_size().y, limit, "%s %s" % [state, data.id])
 
 
 func test_requirement_lines_for_all_any_two_and_an_act() -> void:

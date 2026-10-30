@@ -60,6 +60,8 @@ var _branch_box := VBoxContainer.new()
 var _list := VBoxContainer.new()
 ## The branch the list was built for.
 var _list_branch: StringName
+## The "LEVELS" caption over the ladder; both hide for a hidden node.
+var _ladder_caption: Label
 ## The node the ladder was built for.
 var _ladder_id: StringName
 var _node_box := VBoxContainer.new()
@@ -134,7 +136,8 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	requires_label = _wrapped(UiStyle.label("", 19, UiStyle.ERROR_COLOR))
 	_node_box.add_child(requires_label)
 	_node_box.add_child(JourneyPanel.divider())
-	_node_box.add_child(UiStyle.label("LEVELS", 16, JourneyPanel.CAPTION_COLOR))
+	_ladder_caption = UiStyle.label("LEVELS", 16, JourneyPanel.CAPTION_COLOR)
+	_node_box.add_child(_ladder_caption)
 	ladder.add_theme_constant_override(&"separation", 4)
 	_node_box.add_child(ladder)
 
@@ -189,14 +192,17 @@ func _show_node() -> void:
 	caption_label.text = String(TreePage.NAMES[branch]).to_upper()
 	name_label.text = "???" if hidden else data.display_name
 	level_label.text = "LVL %d / %d" % [level, data.max_level]
-	if tree.is_maxed(id):
+	if hidden:
+		value_label.text = ""
+		value_label.add_theme_color_override(&"font_color", UiStyle.TEXT_COLOR)
+	elif tree.is_maxed(id):
 		value_label.text = data.value_text(level)
 		value_label.add_theme_color_override(&"font_color", TreeNodeView.MAXED_COLOR)
 	else:
 		value_label.text = "%s → %s" % [data.value_text(level), data.value_text(level + 1)]
 		value_label.add_theme_color_override(&"font_color", UiStyle.TEXT_COLOR)
-	description.text = TooltipText.colorize(data.description)
-	sum_label.visible = not data.level_sum_ids.is_empty()
+	description.text = "" if hidden else TooltipText.colorize(data.description)
+	sum_label.visible = not hidden and not data.level_sum_ids.is_empty()
 	if sum_label.visible:
 		var names: PackedStringArray = []
 		for summed in data.level_sum_ids:
@@ -207,21 +213,23 @@ func _show_node() -> void:
 	var needs := tree.next_requirement_text(id)
 	requires_label.visible = needs != ""
 	requires_label.text = needs
-	_fill_ladder()
+	_ladder_caption.visible = not hidden
+	_fill_ladder(hidden)
 	cost_bar.refresh()
 	_portrait.queue_redraw()
 
 
 ## The picked node's levels: built when the node changes, recoloured every
 ## time (bought, next, later).
-func _fill_ladder() -> void:
+func _fill_ladder(hidden: bool) -> void:
 	var data := tree.node(id)
-	if _ladder_id != id:
-		_ladder_id = id
+	var wanted: StringName = &"" if hidden else id
+	if _ladder_id != wanted:
+		_ladder_id = wanted
 		for child in ladder.get_children():
 			ladder.remove_child(child)
 			child.free()
-		for i in data.max_level:
+		for i in (0 if hidden else data.max_level):
 			ladder.add_child(_ladder_row(data, i))
 	var level := tree.level(id)
 	for i in ladder.get_child_count():

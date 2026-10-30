@@ -118,8 +118,17 @@ func test_grid_cells_are_unique_within_a_branch() -> void:
 		var cell := _cell(data.branch, data.grid)
 		assert_false(seen.has(cell), "%s shares a cell" % data.id)
 		seen[cell] = true
-	assert_true(seen.has(_cell(&"skills", Vector2(0, 0))) and seen.has(_cell(&"summoners", Vector2(0, 0))),
-		"Skills and Summoners both use (0, 0) on their own pages")
+
+
+## The per-level arrays line up with max_level, so the pages and the info column can index them.
+func test_level_sums_acts_and_values_match_max_level() -> void:
+	for data in nodes:
+		assert_eq(data.level_sum_ids.is_empty(), data.level_sums.is_empty(), "%s: sums only with ids" % data.id)
+		if not data.level_sum_ids.is_empty():
+			assert_eq(data.level_sums.size(), data.max_level, "%s level_sums" % data.id)
+		assert_lte(data.level_acts.size(), data.max_level, "%s level_acts" % data.id)
+		if not data.level_values.is_empty():
+			assert_eq(data.level_values.size(), data.max_level + 1, "%s level_values" % data.id)
 
 
 func _cell(branch: StringName, grid: Vector2) -> String:

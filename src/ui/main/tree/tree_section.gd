@@ -10,7 +10,7 @@ extends Control
 ## In this section (the content area, y 72–992 on screen): the pages, the tabs
 ## hanging under them, and the info column right of both.
 const PAGE_RECT := Rect2(Vector2(32, 8), TreePage.SIZE)
-const TABS_RECT := Rect2(32, 848, 1416, BranchTabs.HEIGHT)
+const TABS_RECT := Rect2(PAGE_RECT.position.x, 848, PAGE_RECT.size.x, BranchTabs.HEIGHT)
 const PANEL_RECT := Rect2(Vector2(1448, 8), JourneyPanel.SIZE)
 const MARGIN := 24.0
 ## How far in from the page's sides the tabs start.

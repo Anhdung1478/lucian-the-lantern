@@ -206,7 +206,20 @@ func test_the_grid_has_9_columns_and_54_cells() -> void:
 	assert_eq(grid.get_child_count(), 54)
 
 
+## The text of the first Label under `node`.
+func _label_text(node: Node) -> String:
+	if node is Label:
+		return node.text
+	for child in node.get_children():
+		var text := _label_text(child)
+		if text != "":
+			return text
+	return ""
+
+
 func test_a_locked_backpack_cell_points_to_the_evolution_tree() -> void:
 	inventory.unlocked_backpack = 10
-	assert_not_null(screen._cells[20].tooltip_content())
+	var card: Control = screen._cells[20].tooltip_content()
+	assert_eq(_label_text(card), "Buy Backpack Slots in the Evolution Tree")
+	card.free()
 	assert_null(screen._cells[5].tooltip_content())

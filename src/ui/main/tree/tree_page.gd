@@ -60,7 +60,7 @@ const SLOT_SIZE := 42.0
 const SLOT_GAP := 8.0
 const MINI_CELL := 22.0
 const MINI_GAP := 4.0
-const MINI_COLUMNS := 9
+const MINI_COLUMNS := BackpackScreen.COLUMNS
 const EQUIP_ID := &"equip_slots"
 const BACKPACK_ID := &"backpack_slots"
 ## Light motes drifting up: how many, how fast.
