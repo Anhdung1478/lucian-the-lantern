@@ -1216,6 +1216,36 @@ func scenario_art_sheet() -> void:
 	print("art icons: ", paths.size() - missing, " / ", paths.size())
 	await wait(0.3)
 	await shot("art_sheet_0")
+	grid.queue_free()
+	await art_sheet_bodies()
+
+
+## The second art sheet: each skin's body at 2x and at its game size (128 px),
+## facing right. Lucian's own gun is the upper one, Senna's the lower one.
+func art_sheet_bodies() -> void:
+	var row := HBoxContainer.new()
+	row.position = Vector2(16, 16)
+	row.add_theme_constant_override(&"separation", 24)
+	root.add_child(row)
+	for skin in Skins.ALL:
+		var box := VBoxContainer.new()
+		box.add_theme_constant_override(&"separation", 12)
+		for side in [256, 128]:
+			var rect := TextureRect.new()
+			rect.texture = skin.body
+			rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			rect.custom_minimum_size = Vector2(side, side)
+			rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			box.add_child(rect)
+		var label := Label.new()
+		label.text = skin.display_name
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override(&"font_size", 13)
+		box.add_child(label)
+		row.add_child(box)
+	await wait(0.3)
+	await shot("art_sheet_1_bodies")
 
 
 # --- Phase 5: the main screen, and Training started from it ---------------

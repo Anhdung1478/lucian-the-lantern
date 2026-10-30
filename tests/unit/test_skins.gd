@@ -50,9 +50,17 @@ func test_costs_and_card_lines_match_the_doc() -> void:
 func test_every_skin_has_art_the_same_size_as_classic() -> void:
 	var classic := Skins.find(&"classic")
 	assert_eq(classic.portrait.get_size(), Vector2(384, 384))
+	assert_eq(classic.body.get_size(), Vector2(128, 128))
 	for skin in Skins.ALL:
 		assert_eq(skin.portrait.get_size(), classic.portrait.get_size(), str(skin.id))
 		assert_eq(skin.body.get_size(), classic.body.get_size(), str(skin.id))
+
+
+## Every body SVG draws Lucian's own gun's muzzle at (46, -15) and Senna's at
+## (46, 15); shots and muzzle flashes leave from these markers.
+func test_muzzle_markers_sit_at_the_gun_tips() -> void:
+	assert_eq((lucian.get_node("Visuals/MuzzleLeft") as Marker2D).position, Vector2(46, -15))
+	assert_eq((lucian.get_node("Visuals/MuzzleRight") as Marker2D).position, Vector2(46, 15))
 
 
 func test_find_unknown_is_classic() -> void:

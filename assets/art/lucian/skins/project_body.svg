@@ -1,10 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <!-- PROJECT Lucian, top-down, facing +X: black armor with cyan neon lines, a visor, chrome guns. Center of the image = center of his body. -->
+  <!-- PROJECT Lucian, top-down, facing +X: black armor with cyan neon lines, a visor, his chrome gun and Senna's boxy gunmetal one. Center of the image = center of his body. -->
   <defs>
     <radialGradient id="muzzle">
       <stop offset="0" stop-color="#f0ffff"/>
       <stop offset="0.4" stop-color="#7ff4ff" stop-opacity="0.95"/>
       <stop offset="1" stop-color="#2ee6ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="senna_muzzle">
+      <stop offset="0" stop-color="#f0ffff"/>
+      <stop offset="0.4" stop-color="#38e8ff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#1aa8ff" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="coat" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#0c0e13"/>
@@ -29,17 +34,22 @@
     <path d="M 0 20 L 20 15" stroke="#15181f" stroke-width="10" stroke-linecap="round"/>
     <path d="M 4 -21 L 18 -17" stroke="#38e8ff" stroke-width="1.5" stroke-linecap="round"/>
     <path d="M 4 21 L 18 17" stroke="#38e8ff" stroke-width="1.5" stroke-linecap="round"/>
-    <!-- chrome guns -->
+    <!-- his own chrome gun (left) -->
     <path d="M 18 -19 L 42 -18 L 44 -15 L 42 -12 L 18 -11 Z" fill="url(#chrome)" stroke="#2a3038" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M 18 19 L 42 18 L 44 15 L 42 12 L 18 11 Z" fill="url(#chrome)" stroke="#2a3038" stroke-width="1.5" stroke-linejoin="round"/>
     <path d="M 26 -15 L 40 -15" stroke="#38e8ff" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 26 15 L 40 15" stroke="#38e8ff" stroke-width="2" stroke-linecap="round"/>
+    <!-- Senna's relic gun (right): boxy black gunmetal. A square stock, a thick barrel, two cyan neon rings, a square muzzle cap -->
+    <rect x="25" y="6.5" width="16" height="17" rx="5" fill="#38e8ff" opacity="0.2"/>
+    <path d="M 13 7.5 L 25 7.5 L 25 22.5 L 13 22.5 L 10.5 20 L 10.5 10 Z" fill="#2e3540" stroke="#1c6c7c" stroke-width="1.5" stroke-linejoin="miter"/>
+    <rect x="24" y="10" width="19" height="10" fill="#3d4654" stroke="#1c6c7c" stroke-width="1.5"/>
+    <rect x="27.5" y="7.5" width="3.5" height="15" fill="#7ff4ff" stroke="#1c6c7c" stroke-width="1"/>
+    <rect x="35" y="7.5" width="3.5" height="15" fill="#7ff4ff" stroke="#1c6c7c" stroke-width="1"/>
+    <rect x="42" y="9" width="4" height="12" fill="#1a1e25" stroke="#1c6c7c" stroke-width="1.2"/>
     <!-- gloves -->
     <circle cx="20" cy="-15" r="4.5" fill="#1c2029" stroke="#38e8ff" stroke-width="1"/>
     <circle cx="20" cy="15" r="4.5" fill="#1c2029" stroke="#38e8ff" stroke-width="1"/>
     <!-- muzzle light -->
     <circle cx="46" cy="-15" r="7" fill="url(#muzzle)"/>
-    <circle cx="46" cy="15" r="7" fill="url(#muzzle)"/>
+    <circle cx="46" cy="15" r="7" fill="url(#senna_muzzle)"/>
     <!-- shoulders and torso, a neon spine -->
     <ellipse cx="0" cy="0" rx="15" ry="26" fill="#15181f" stroke="#38e8ff" stroke-width="1.5"/>
     <path d="M -10 -21 L -10 21" stroke="#38e8ff" stroke-width="1.5" opacity="0.7"/>
