@@ -10,15 +10,16 @@ var glow_color := Color(1.0, 0.8, 0.35, 0.35)
 var core_color := Color(1.0, 0.95, 0.75, 0.85)
 var center_color := Color.WHITE
 
-var _length := 0.0
-var _width := 0.0
+## The beam's size: along its rotation, and across.
+var length := 0.0
+var width := 0.0
 
 
-func setup(from: Vector2, direction: Vector2, length: float, width: float) -> void:
+func setup(from: Vector2, direction: Vector2, beam_length: float, beam_width: float) -> void:
 	position = from
 	rotation = direction.angle()
-	_length = length
-	_width = width
+	length = beam_length
+	width = beam_width
 
 
 func _ready() -> void:
@@ -28,6 +29,6 @@ func _ready() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(0, -_width * 0.5, _length, _width), glow_color)
-	draw_rect(Rect2(0, -_width * 0.22, _length, _width * 0.44), core_color)
-	draw_rect(Rect2(0, -_width * 0.08, _length, _width * 0.16), center_color)
+	draw_rect(Rect2(0, -width * 0.5, length, width), glow_color)
+	draw_rect(Rect2(0, -width * 0.22, length, width * 0.44), core_color)
+	draw_rect(Rect2(0, -width * 0.08, length, width * 0.16), center_color)

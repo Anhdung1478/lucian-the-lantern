@@ -2,6 +2,7 @@ class_name LinearProjectile
 extends Area2D
 ## A straight-flying shot (W missile, R bullets). Reports every enemy it
 ## touches; stops at the first one unless it pierces, or at max range.
+## Lucian's shots show their skin's ShotLook.
 
 signal hit_enemy(enemy: Enemy, prior_hits: int)
 ## Emitted once, where the shot ended. Connect deferred to run physics queries.
@@ -13,6 +14,8 @@ var streak_length := 26.0
 var streak_width := 4.0
 ## Above 0, a round glowing head is drawn (the W fireball).
 var head_radius := 0.0
+## Drawn instead of the plain streak when set (see set_look).
+var look: ShotLook
 
 var _velocity := Vector2.ZERO
 var _range_left := 0.0
@@ -38,6 +41,15 @@ func launch(from: Vector2, direction: Vector2, speed: float, max_range: float, r
 	area_entered.connect(_on_area_entered)
 
 
+## Shows `new_look` instead of the plain streak; null keeps what it has.
+func set_look(new_look: ShotLook) -> void:
+	if new_look == null:
+		return
+	look = new_look
+	add_child(new_look)
+	queue_redraw()
+
+
 func _physics_process(delta: float) -> void:
 	if _stopped:
 		return
@@ -49,12 +61,9 @@ func _physics_process(delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_line(Vector2(-streak_length * 1.4, 0), Vector2.ZERO, glow_color, streak_width * 2.6)
-	draw_line(Vector2(-streak_length, 0), Vector2(streak_width * 0.5, 0), color, streak_width)
-	if head_radius > 0.0:
-		draw_circle(Vector2.ZERO, head_radius * 1.6, glow_color)
-		draw_circle(Vector2.ZERO, head_radius, color)
-		draw_circle(Vector2.ZERO, head_radius * 0.5, Color.WHITE)
+	if look:
+		return
+	ShotLook.draw_streak(self, color, glow_color, streak_length, streak_width, head_radius)
 
 
 func _on_area_entered(area: Area2D) -> void:

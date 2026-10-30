@@ -8,6 +8,8 @@ const SPEED := 2800.0
 var speed := SPEED
 var color := Color("fffbe8")
 var glow_color := Color(1.0, 0.85, 0.45, 0.5)
+## Drawn instead of the plain bolt when set (see set_look).
+var look: ShotLook
 
 var _target: Enemy
 var _info: DamageInfo
@@ -18,6 +20,15 @@ func launch(from: Vector2, target: Enemy, info: DamageInfo) -> void:
 	rotation = (target.global_position - from).angle()
 	_target = target
 	_info = info
+
+
+## Shows `new_look` instead of the plain bolt; null keeps what it has.
+func set_look(new_look: ShotLook) -> void:
+	if new_look == null:
+		return
+	look = new_look
+	add_child(new_look)
+	queue_redraw()
 
 
 func _physics_process(delta: float) -> void:
@@ -35,5 +46,6 @@ func _physics_process(delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_line(Vector2(-30, 0), Vector2.ZERO, glow_color, 8.0)
-	draw_line(Vector2(-20, 0), Vector2(2, 0), color, 3.0)
+	if look:
+		return
+	ShotLook.draw_bolt(self, color, glow_color)
