@@ -214,7 +214,7 @@ func _build_stage() -> void:
 	stage_box.add_child(act_label)
 	title_label = UiStyle.label("", 40, UiStyle.TITLE_COLOR)
 	stage_box.add_child(title_label)
-	stage_box.add_child(_divider())
+	stage_box.add_child(divider())
 	boss_row = HBoxContainer.new()
 	boss_row.add_theme_constant_override(&"separation", 18)
 	stage_box.add_child(boss_row)
@@ -254,7 +254,7 @@ func _build_stage() -> void:
 	_status_mark.custom_minimum_size = Vector2.ONE * ICON_SIZE
 	_status_mark.draw.connect(_draw_status_mark)
 	stage_box.add_child(_icon_row(_status_mark, status_label))
-	stage_box.add_child(_divider())
+	stage_box.add_child(divider())
 	stage_box.add_child(UiStyle.label("ENEMIES", 16, CAPTION_COLOR))
 	roster.add_theme_constant_override(&"h_separation", 8)
 	roster.add_theme_constant_override(&"v_separation", 8)
@@ -265,7 +265,7 @@ func _build_stage() -> void:
 func _build_training() -> void:
 	training_box.add_child(UiStyle.label("PRACTICE", 16, CAPTION_COLOR))
 	training_box.add_child(UiStyle.label("TRAINING", 40, UiStyle.TITLE_COLOR))
-	training_box.add_child(_divider())
+	training_box.add_child(divider())
 	var dummy := Control.new()
 	dummy.custom_minimum_size = Vector2(CONTENT_WIDTH, PORTRAIT_SIZE)
 	dummy.draw.connect(func() -> void:
@@ -283,7 +283,7 @@ func _build_endless() -> void:
 	endless_box.add_child(UiStyle.label("ENDLESS", 40, UiStyle.TITLE_COLOR))
 	best_label = UiStyle.label("Best wave: 0", 24, UiStyle.GOLD_COLOR)
 	endless_box.add_child(best_label)
-	endless_box.add_child(_divider())
+	endless_box.add_child(divider())
 	var rules := VBoxContainer.new()
 	rules.add_theme_constant_override(&"separation", 6)
 	endless_box.add_child(rules)
@@ -340,8 +340,9 @@ func _style_chips() -> void:
 			style.set_corner_radius_all(16)
 
 
-## A thin gold rule with a diamond in its middle.
-func _divider() -> Control:
+## A thin gold rule with a diamond in its middle (the Evolution Tree's info
+## column uses it too).
+static func divider() -> Control:
 	var line := Control.new()
 	line.custom_minimum_size = Vector2(CONTENT_WIDTH, 12)
 	line.draw.connect(func() -> void:

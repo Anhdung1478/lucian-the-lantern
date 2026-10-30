@@ -109,16 +109,16 @@ func test_acts_cleared_three_opens_endless() -> void:
 func test_max_tree_maxes_every_node() -> void:
 	_press("Max tree (free)")
 	var tree_section := main.sections[MainScreen.SECTION_TREE] as TreeSection
-	for id in tree_section.map.views:
-		assert_eq(tree_section.map.views[id].state(), &"maxed", str(id))
+	for id in tree_section.views:
+		assert_eq(tree_section.views[id].state(), &"maxed", str(id))
 
 
 func test_clear_tree_empties_it() -> void:
 	SaveGame.instance().tree.max_all()
 	_press("Clear tree (no refund)")
 	var tree_section := main.sections[MainScreen.SECTION_TREE] as TreeSection
-	for id in tree_section.map.views:
-		assert_ne(tree_section.map.views[id].state(), &"maxed", str(id))
+	for id in tree_section.views:
+		assert_ne(tree_section.views[id].state(), &"maxed", str(id))
 
 
 func test_reset_progress_is_a_new_game_in_memory() -> void:

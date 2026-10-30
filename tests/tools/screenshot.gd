@@ -1359,16 +1359,19 @@ func scenario_main_endless() -> void:
 
 
 ## The Evolution Tree on a new save; then with essence, some nodes bought and
-## the info panel open; a drag that starts on a node; zoomed out to 0.6.
+## the info column on one; R's requirements; a real click and a hover; then
+## every branch page from its tab.
 func scenario_main_tree() -> void:
 	main_screen().show_section(MainScreen.SECTION_TREE)
 	var section := tree_section()
-	var map := section.map
+	var views := section.views
 	await wait(0.3)
-	print("new save: Q, passive, E (expect poor hidden hidden): ",
-		[map.views[&"skill_q"].state(), map.views[&"passive"].state(), map.views[&"skill_e"].state()])
+	print("new save: Q, passive, E (expect hidden hidden hidden): ",
+		[views[&"skill_q"].state(), views[&"passive"].state(), views[&"skill_e"].state()])
 	await shot("main_tree_0_new_save")
 	var save := SaveGame.instance()
+	# Act 1 cleared: Q and W open, E is put in the tree, Ghost is free.
+	save.set_cleared(Journey.all_stage_ids(1))
 	save.essences.add(Essences.BLUE, 10000)
 	save.essences.add(Essences.ORANGE, 100)
 	for id: StringName in [&"skill_q", &"skill_q", &"skill_w", &"passive", &"stat_ad", &"stat_ad",
@@ -1377,7 +1380,7 @@ func scenario_main_tree() -> void:
 		section.info.cost_bar.buy()
 	section.select(&"stat_ad")
 	await wait(0.2)
-	print("Q level, state (expect 2 bought): ", save.tree.level(&"skill_q"), " ", map.views[&"skill_q"].state())
+	print("Q level, state (expect 2 bought): ", save.tree.level(&"skill_q"), " ", views[&"skill_q"].state())
 	print("stat_ad panel (expect LVL 2 / 5, +8 AD → +12 AD): ", section.info.level_label.text, ", ", section.info.value_label.text)
 	print("blue left (expect 10000 - 1050 = 8950): ", save.essences.amount(Essences.BLUE))
 	await shot("main_tree_1_bought_info")
@@ -1387,31 +1390,21 @@ func scenario_main_tree() -> void:
 	print("R requires: ", section.info.requires_label.text)
 	await shot("main_tree_2_hidden_info")
 	section.close_popup()
-	# A drag that starts on top of a node pans the map (real input routing).
-	var start := control_center(map.views[&"skill_w"])
-	var before := map.layer.position.x
-	await mouse_move(start)
-	await mouse_button(start, true)
-	for step in 6:
-		await mouse_move(start + Vector2(-40.0 * (step + 1), 0.0), true)
-	await mouse_button(start + Vector2(-240.0, 0.0), false)
-	print("drag from a node: moved (expect -240), panel shown (expect false): ",
-		roundi(map.layer.position.x - before), " ", section.info.visible)
-	await click(map.views[&"stat_hp"])
+	section.show_branch(&"stats")
+	await wait(0.1)
+	await click(views[&"stat_hp"])
 	print("click on a node selects it (expect stat_hp): ", section.info.id)
-	section.close_popup()
+	section.show_branch(&"skills")
 	await mouse_move(Vector2(960, 140))
-	await hover_node(map.views[&"skill_q"])
+	await hover_node(views[&"skill_q"])
 	await shot("main_tree_3_hover")
-	await mouse_move(Vector2(960, 140))
-	map.zoom_at(Vector2.ZERO, 0.6)
-	map.pan_by(Vector2(10000, 0))
-	await wait(0.2)
-	print("zoom (expect 0.6): ", map.zoom)
-	await shot("main_tree_4_zoom_06")
-	map.pan_by(Vector2(-10000, 0))
-	await wait(0.2)
-	await shot("main_tree_5_zoom_06_right")
+	await mouse_move(Vector2(960, 1060))
+	for branch: StringName in EvolutionTree.BRANCHES:
+		await click(section.tabs.buttons[EvolutionTree.BRANCHES.find(branch)])
+		await mouse_move(Vector2(960, 1060))
+		await wait(0.2)
+		print("tab ", branch, " shows its page (expect true): ", section.pages[branch].visible)
+		await shot("main_tree_4_%s" % branch)
 
 
 func hover_node(view: TreeNodeView) -> void:
@@ -1419,28 +1412,24 @@ func hover_node(view: TreeNodeView) -> void:
 	await wait_for_tooltip(view)
 
 
-## Debug Max tree: every node maxed and every line lit, at zoom 0.6 from
-## both ends, then the Summoners grove at zoom 1 with a node chosen.
+## Debug Max tree: every node maxed and every vine lit, on every branch
+## page; then the Summoners page with a node chosen.
 func scenario_main_tree_max() -> void:
 	main_screen().show_section(MainScreen.SECTION_TREE)
 	var section := tree_section()
-	var map := section.map
 	find_buttons(main_debug(), "Max tree (free)")[0].pressed.emit()
+	await mouse_move(Vector2(960, 1060))
 	await wait(0.2)
-	var maxed := map.views.values().filter(func(view: TreeNodeView) -> bool: return view.state() == &"maxed").size()
-	print("maxed nodes (expect 31): ", maxed)
-	map.zoom_at(Vector2.ZERO, 0.6)
-	await wait(0.2)
-	await shot("main_tree_max_0_left")
-	map.pan_by(Vector2(-10000, 0))
-	await wait(0.2)
-	await shot("main_tree_max_1_right")
-	map.zoom_at(map.size, 1.0)
-	map.pan_by(Vector2(-10000, 0))
+	var maxed := section.views.values().filter(func(view: TreeNodeView) -> bool: return view.state() == &"maxed").size()
+	print("maxed nodes (expect 34): ", maxed)
+	for i in EvolutionTree.BRANCHES.size():
+		section.show_branch(EvolutionTree.BRANCHES[i])
+		await wait(0.2)
+		await shot("main_tree_max_%d_%s" % [i, EvolutionTree.BRANCHES[i]])
 	section.select(&"heal_upgrade")
 	await wait(0.2)
 	print("heal_upgrade (expect +45% healing, MAXED): ", section.info.value_label.text, ", ", section.info.cost_bar.status.text)
-	await shot("main_tree_max_2_summoners")
+	await shot("main_tree_max_5_summoners_picked")
 
 
 ## The Skin Shop with 0 purple, then with 100 purple: Vampire bought and
@@ -3690,31 +3679,31 @@ func prompt_text() -> String:
 
 ## The Evolution Tree's icons since Phase 9, after Max tree so every node
 ## shows: Q, W, E, R and the passive as the HUD draws them; the six spells
-## and their upgrades (the spell's art with three gold chevrons), at zoom 1
-## and up close at 1.4; then Training with Flash and Heal: the HUD's row.
+## and their upgrades (the spell's art with three gold chevrons), with an
+## upgrade picked; then Training with Flash and Heal: the HUD's row.
 func scenario_tree_icons() -> void:
 	main_screen().show_section(MainScreen.SECTION_TREE)
 	var section := tree_section()
-	var map := section.map
+	var views := section.views
 	find_buttons(main_debug(), "Max tree (free)")[0].pressed.emit()
-	await mouse_move(Vector2(960, 1000))
+	section.show_branch(&"skills")
+	await mouse_move(Vector2(960, 1060))
 	await wait(0.3)
 	var same := []
 	var skills: Array[StringName] = [&"skill_q", &"skill_w", &"skill_e", &"skill_r"]
 	for i in skills.size():
-		same.append((map.views[skills[i]] as TreeNodeView).data.icon == Hud.SKILL_ICONS[i])
-	same.append((map.views[&"passive"] as TreeNodeView).data.icon == Hud.PASSIVE_ICON)
+		same.append((views[skills[i]] as TreeNodeView).data.icon == Hud.SKILL_ICONS[i])
+	same.append((views[&"passive"] as TreeNodeView).data.icon == Hud.PASSIVE_ICON)
 	for id: StringName in [&"flash", &"ghost", &"barrier", &"heal", &"clarity", &"smite"]:
-		same.append((map.views[id] as TreeNodeView).data.icon == (load("res://data/summoners/%s.tres" % id) as SummonerData).icon)
+		same.append((views[id] as TreeNodeView).data.icon == (load("res://data/summoners/%s.tres" % id) as SummonerData).icon)
 	print("tree icons are the stage's (expect 11 x true): ", same)
 	await shot("tree_icons_0_skills")
-	map.pan_by(Vector2(-10000, 0))
+	section.show_branch(&"summoners")
 	await wait(0.2)
 	await shot("tree_icons_1_summoners")
-	var upgrade: TreeNodeView = map.views[&"heal_upgrade"]
-	map.zoom_at(control_center(upgrade) - map.global_position, TreeMap.MAX_ZOOM)
+	section.select(&"heal_upgrade")
 	await wait(0.2)
-	await shot("tree_icons_2_close")
+	await shot("tree_icons_2_picked")
 	var save := SaveGame.instance()
 	save.set_loadout(0, &"flash")
 	save.set_loadout(1, &"heal")

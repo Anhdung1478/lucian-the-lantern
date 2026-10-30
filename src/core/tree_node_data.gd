@@ -11,7 +11,8 @@ extends Resource
 @export var icon: Texture2D
 ## The grove: &"skills", &"stats", &"backpack", &"economy" or &"summoners".
 @export var branch: StringName
-## (column, row up from the ground); one cell is 150 px.
+## (column, row up from the ground) on its branch's page; TreePage centres
+## the branch on the page.
 @export var grid := Vector2.ZERO
 @export var max_level := 1
 ## Blue essence to buy each level (one entry per level).

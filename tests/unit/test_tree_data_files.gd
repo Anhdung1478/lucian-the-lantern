@@ -111,11 +111,19 @@ func test_regen_nodes_give_half_and_six_tenths_a_second_per_level() -> void:
 	assert_eq(mana.value_text(5), "+3/s Mana Regen")
 
 
-func test_grid_cells_are_unique() -> void:
+## Each branch has a page of its own, so a cell is unique within its branch.
+func test_grid_cells_are_unique_within_a_branch() -> void:
 	var seen := {}
 	for data in nodes:
-		assert_false(seen.has(data.grid), "%s shares a cell" % data.id)
-		seen[data.grid] = true
+		var cell := _cell(data.branch, data.grid)
+		assert_false(seen.has(cell), "%s shares a cell" % data.id)
+		seen[cell] = true
+	assert_true(seen.has(_cell(&"skills", Vector2(0, 0))) and seen.has(_cell(&"summoners", Vector2(0, 0))),
+		"Skills and Summoners both use (0, 0) on their own pages")
+
+
+func _cell(branch: StringName, grid: Vector2) -> String:
+	return "%s %s" % [branch, grid]
 
 
 func test_backpack_slots_values_and_text() -> void:
