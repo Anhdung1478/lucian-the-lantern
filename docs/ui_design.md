@@ -39,6 +39,7 @@
 - **Item slots 1–6:** in a 3 × 2 grid right of the HP / mana bars. Only unlocked slots are shown, with cooldowns for active items (sweep and seconds) and a potion stack's count. Hovering one shows the item's card.
 - **Range on hover:** hovering a learned skill, an item with an aimed active (Galeforce, Rocketbelt, Gunblade) or Flash / Smite shows its range around Lucian at once, pointing where he faces: a ray for Q, W (ending in its cross), E and the item dashes (ending in a ring where Lucian lands), two dashed rays for R, a circle for Gunblade, Smite and Flash (Flash's shows the landing ring while aiming). Drawn in pale blue under Lucian.
 - **Key labels** (skills and item slots) follow the bindings in Settings.
+- **Built in Phase 9:** the Evolution Tree shows these same skill and summoner icons (`main_screen.md`). Learning a rank plays `rank_up`, and Q, W and E each have a cast sound (§8).
 
 ### Buff icons (above the skill bar)
 - **Very small icons** (36 px) in a row just above the HUD panel, starting over the portrait, like LoL.
@@ -54,6 +55,7 @@
 - **Built in Phase 7:** the **Blue** and **Red** jungle buffs (a blue rune shield, a red flame shield) with their 60 s sweep; **Slowed** (the strongest slow on Lucian) and **Burning** while a burn ticks on him. Over an enemy's bar, slow and burn icons.
 - A shield (Ichorshield and Barrier together) shows as a white segment after the HP on Lucian's HP bar, and as "(+N)" in its text.
 - With **Rapid Firecannon** equipped and the Energized charge full, a light-blue ring shows its longer attack range until the Energized shot lands.
+- **Built in Phase 9: the Endless modifier row.** In an Endless run with a modifier, its icon comes first in the row and never moves: `stats/move_speed` (#1), `ui/essence_orange` (#2), `stats/max_hp` (#3), `stats/ad` (#4) or `ui/skull` (#5). It has no sweep and no number. Its hover card reads "Endless modifier", then the downside in red and the reward in green ("−10% max HP", "+15% blue"). There is no row before the first pick or after Nothing.
 
 ### Stats panel (left of the portrait)
 - Like LoL's: each stat is its **icon + value**, two per row. Main panel: AD | AP, Armor | MR, Attack speed | Ability haste, Crit | Move speed.
@@ -102,6 +104,12 @@ Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
   - **The break bar:** while a boss channels something that damage breaks (the Ocean Drake's Soothing Mist, Karthus's Requiem), a thin yellow bar (`#ffd166`, 8 px, 4 px under the HP bar) fills with the damage done against the damage needed. It goes when the channel ends. The bar's height grows by 12 px for every boss.
   - **The phase text:** `Boss.phase_label()` after the name, in the same line: "Thresh   Phase 1", then "Thresh   Phase 2" from the rise on. Other bosses show none.
   - **Elise's Rappel:** while she is up her art and bar fade out, but her name and bar stay on the boss bar.
+- **Phase 9 (Endless):** Endless has no last wave, so the counter has no "/ N".
+  - During a wave: "Endless · Jungle  Wave 23  Enemies: 12", or "Mini boss wave" / "Boss wave" in place of "Wave 23".
+  - Before a wave: "Wave 24 in 0:12" (or "Mini boss wave in 0:18", "Boss wave in 0:20") in gold, with Skip.
+  - A dim **"Best 22"** line (16 px) under the row, centered: the save's best, read live. Only Endless has it.
+  - While the modifier pick is open, the countdown and Skip hide: the panel shows only the name and the Best line.
+  - The boss bar sits under the Best line, so an Endless boss's or mini boss's bar never covers it.
 
 ### Top right – Loot
 - Stage gold: a coin and the amount, in the HUD panel style (Phase 3).
@@ -182,6 +190,13 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 - **The abyss** is near-black with slow green swirls; the Chain Warden ledges are rock islands with chains.
 - **Hecarim's charge** has a glowing teal trail, and his ride shows four ghost riders beside him.
 
+**Built in Phase 9:**
+- **The level-up burst** (`LevelUpBurst`), on every level gained (never at a stage's start, never for a level lost on the debug table), with the `level_up` chime:
+  - A gold ring (`#ffcf5a`), seen at a slant (96 × 32), with 8 sparks. It starts at Lucian's feet, rises 96 px to over his head while it shrinks to 70% and turns, and fades out.
+  - "Level 7" in gold floats up from just over his HP bar.
+  - It lasts 1.2 s (the floating text's time) and moves with him.
+  - On Low quality only the text shows.
+
 ### The End screen (`TheEndScreen`)
 Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the stage-end screen's button, then it goes where that button said.
 
@@ -237,6 +252,50 @@ Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the 
 
 - **Retry** starts the stage again. **Next stage** starts the next one. **Main screen** opens the main screen on that act. **Back to title** goes to the title screen. If the save fails, Retry and Next go to the main screen with a red "Could not save" toast.
 - **Built:** the panel is 1040 px wide in the HUD panel style. Title 56, stage name 26, section heads 20 (dim), rows 22 (label left, value right), reward lines 20. Buttons 260 × 60, text 24.
+- **Sounds (Phase 9):** `victory` with STAGE CLEARED, `defeat` with DEFEATED, GAME OVER and RUN OVER (§8).
+
+**RUN OVER (Endless, built in Phase 9).** When Lucian dies in an Endless run, the same screen shows the run:
+
+```
+                 RUN OVER                      (red, like DEFEATED)
+          Endless · Dark mid lane
+ STATS                      REWARDS
+ Waves cleared      22      ◆ +208 blue essence
+ Time            22:11      ◆ +1 orange essence
+ Kills              34      New best: 22 waves!
+ Damage dealt      123
+ Damage taken      313
+ Gold earned     4,850
+ Level reached      16
+ Modifier  −10% max HP
+        [ Retry ]      [ Main screen ]
+```
+
+- The title is the optional `title_text` of `StageResult.show_result`; its red color and glow are the defeat's.
+- **Stats:** Waves cleared first, in place of "Waves N / M", then the usual rows, then **Modifier**: the current modifier's downside, or "None" (none picked yet, or Nothing).
+- **Rewards:** the essences, then a green **"New best: 22 waves!"** ("New best: 1 wave!" for one) when the run cleared more waves than the best it started with.
+- **Buttons:** **Retry** (a new run on the same map choice; Random rolls again) and **Main screen** (the Journey on Endless, with the run's map still chosen). There is no Next.
+- With the longest Modifier text ("Bosses and mini bosses +25% max HP") the panel grows to about 1074 px wide.
+
+### Endless: the modifier pick (`ModifierPick`)
+Built in Phase 9. After each Endless boss wave (10, 20, …) the break waits for a pick.
+
+```
+┌────────────────────────────────────────────────────────┐
+│                  Choose a modifier                     │
+│  ┌────────────┐   ┌──────────────────┐   ┌──────────┐  │
+│  │     ♥      │   │       boot       │   │          │  │
+│  │ −10% max HP│   │ Enemies move 20% │   │ Nothing  │  │
+│  │ +15% blue  │   │ faster  +30% gold│   │ Nothing  │  │
+│  └────────────┘   └──────────────────┘   └──────────┘  │
+└────────────────────────────────────────────────────────┘
+```
+
+- A centered panel over a 0.55 black backdrop, on layer 36: over the HUD (10) and the backpack (30), under the menus, the result and the prompts. The backdrop eats clicks, so the HUD's Skip under it can't be pressed.
+- The title "Choose a modifier" (32, gold). **3 cards** (280 × 230 buttons): 2 modifiers drawn from #1–5 (never the current one), then **Nothing** last.
+- A card shows the modifier's icon (64 px; none for Nothing), its downside in red and its reward in green (20 px). A long downside wraps to 2 lines.
+- The game is paused, and the backpack and the menu are closed. ESC and P do nothing. A click picks (only the first click counts), plays `buff`, closes the panel and lets the full 20 s break count down.
+- The modifiers and what they do are in the game design doc §14.
 
 ### Cutscenes
 - Black bars (120 px) at the top and bottom; the HUD hides.
@@ -377,6 +436,11 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
   - **Settings** (cast mode, camera, volume, etc.)
   - **Leave this stage** (keeps all essences collected; the game auto-saves). Works since Phase 5: the stage counts as left, the game saves to the current slot and goes back to the main screen. Since Phase 6, Journey opens on the act just played (after Training: the first act with a stage left to clear, else Training). When `stage.tscn` runs on its own, it stays disabled ("Not available yet").
   - **Exit the game** (asks **"Save before leaving?"** Yes / No; see the game design doc §15)
+- **Built in Phase 9: both exits ask, and both can be cancelled.**
+  - **Leave this stage** asks **"Leave this stage? Essences collected so far are kept."** with **Leave / Cancel**. In Endless it asks **"Leave this run? Your best wave is kept."** Leave ends the stage as before. Cancel, or ESC, goes back to this menu, still paused. The menu only emits its request; `Game` asks.
+  - **Exit the game** asks **"Save before leaving?"** with **Yes / No / Cancel**. Cancel, or ESC, goes back to this menu, still paused.
+  - The question sits over the menu (`Game`'s prompt, layer 90) and reads ESC first, so the menu doesn't close under it.
+  - After a Leave, the Journey opens on the act just played, or on Endless after an Endless run (`main_screen.md`).
 
 ## 5. Settings (from the ESC menu)
 
@@ -407,7 +471,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - [x] Evolution Tree screen (built in Phase 5, see `main_screen.md`)
 - [x] Skin shop (built in Phase 5, see `main_screen.md`)
 - [x] Main menu and save slot selection (the title screen, built in Phase 6, below)
-- [x] Stage select (Journey: act, Training and Endless tabs, built in Phase 5, see `main_screen.md`)
+- [x] Stage select (Journey: act, Training and Endless tabs, built in Phase 5; a world map since Phase 9; see `main_screen.md`)
 - [x] Stage end screen (stats, rewards, Retry / Next stage / Main screen; built in Phase 7, above)
 
 ## 7. Title screen
@@ -418,7 +482,8 @@ The game opens here (built in Phase 6).
 - Four buttons (420 × 64): **Start new game**, **Load game**, **Settings**, **Exit game**.
   - **Load game** is disabled with no saved slot (hover: "No saved games yet").
   - **Settings** opens the shared Settings screen; Back or ESC closes it.
-  - **Exit game** quits at once. So does the window's close button on this screen: nothing is unsaved here.
+  - **Exit game** quits at once. So does the window's close button on this screen: nothing is unsaved here. *(Phase 9: both ask first; see below.)*
+  - **Built in Phase 9:** **Exit game** and the window's close button ask **"Exit the game?"** with **Exit / Cancel**. Exit quits. Cancel, or ESC, stays on the title. There is no save question: nothing here is unsaved.
 - **Start new game** and **Load game** turn the buttons into a slot list, titled "START NEW GAME" or "LOAD GAME", with **Back** (ESC works too):
 
 | Slot | Reads |
@@ -429,3 +494,41 @@ The game opens here (built in Phase 6).
 - A new game on a used slot asks "Overwrite slot 2? Its progress will be lost." (Yes / No). Yes writes the new game at once and starts Act 1. An empty slot starts at once.
 - Loading a slot opens the main screen on Journey.
 - The slot buttons are 520 px wide, so the longest text keeps room around it. The gear menu's Save as copy uses the same list.
+
+## 8. Sounds
+
+All 24 sounds are placeholders, generated in code by `Sfx` (`src/audio/sfx.gd`): there are no audio files. Phases 3–8 made 13 of them; Phase 9 added 11.
+- They play on the **SFX** bus, so the Sound effects slider (Settings → Audio) sets them all. Each plays with a small random pitch (±4%), and the same sound never starts twice within 0.035 s.
+- `Game` and a stage run on its own each add one `Sfx` node, so the title screen and the main screen have sounds too.
+- **Volume** is the play's own level: 0 dB is full.
+- Phase 9's sounds were tuned from their numbers only. Nobody has listened to them yet.
+
+| Sound | When it plays | Volume | What it is |
+|---|---|---|---|
+| `shot` | Lucian's gunshots: each basic attack, the passive's second shot, each R bullet. Also Senna's shots, Akshan's Comeuppance bullets, Dark Lucian's Culling bullets, Galeforce's missiles and the ending's shot through the lantern | Lucian −6 dB; Senna −10; Akshan −4; Dark Lucian −8; Galeforce 0 (pitch ×1.4); the ending 0 | A short noisy "pew", 900 → 300 Hz |
+| `hit` | An enemy takes a hit (not a burn tick) | −12 dB | A short low thud |
+| `coin` | A buy, sale or refresh in the shop; loot picked up; a tree level or a skin bought; Save or Save as copy done; a volume slider let go (a test sound) | 0 dB | Two high notes |
+| `potion` | A potion drunk; Ghost, Barrier, Heal or Clarity cast; a Honeyfruit eaten | 0 dB | Four rising blips |
+| `refresh` | The Evolution Tree reset; Hextech Rocketbelt | 0 dB; Rocketbelt −2 | A noisy rising sweep |
+| `error` | A refused buy, sale or refresh in the shop; a save that failed on the main screen | 0 dB | A low buzz |
+| `craft` | Two items crafted into a legendary | 0 dB | Three rising notes |
+| `zap` | Flash, Smite, Hextech Gunblade, an Energized hit; Dark Lucian's Piercing Light | 0 dB; Dark Lucian −4 (pitch ×0.6) | An electric zap with a flutter |
+| `hurt` | Lucian takes a hit (not a burn tick, not in stasis) | −8 dB | A short low grunt |
+| `hook` | Thresh's Death Sentence (Act 1 and the final fight); the hook in Act 1's cutscene | 0 dB | A falling whir |
+| `shell` | A siege minion's shell lands; a Blast Cone pops | 0 dB; Blast Cone −6 | A low noisy boom |
+| `buff` | Banshee's Veil blocks a skill; Guardian Angel saves Lucian; an Endless modifier is picked | 0 dB | A rising sweep |
+| `freed` | A Lantern Soul goes free; Senna is freed in the ending | Soul −6 dB; the ending 0 | A soft rising chime |
+| **New in Phase 9** | | | |
+| `level_up` | Lucian gains a level: only when the level goes up, never at a stage's start or for a level lost on the debug table. With the level-up burst (§1) | 0 dB | A bright rising chime: C, E, G, the top note ringing |
+| `rank_up` | A skill rank is learned (the HUD's "+" or Ctrl + the key). A refused rank-up and Senna teaching E are silent | 0 dB | A short two-note blip |
+| `cast_q` | Piercing Light's laser fires (after its 0.3 s cast) | 0 dB | A bright laser zap |
+| `cast_w` | Ardent Blaze's missile leaves (after its 0.2 s cast) | 0 dB | A fiery whoosh, then a pop |
+| `cast_e` | Relentless Pursuit's dash starts | 0 dB | An airy dash whoosh |
+| `wave` | Each wave starts, except a boss wave | 0 dB | A short low horn |
+| `boss` | A boss or a mini boss enters (any, in story or Endless). On a boss wave it takes the horn's place; a mini boss wave has the horn, then the gong when the mini boss comes | 0 dB | A deep gong and roar |
+| `victory` | The end screen: STAGE CLEARED | 0 dB | A short fanfare: C, E, G and a held high C |
+| `defeat` | The end screen: DEFEATED, GAME OVER or RUN OVER | 0 dB | A falling three-note sting |
+| `click` | Any button styled by `UiStyle.style_button` is pressed: menus, the main screen, the title, prompts, the modifier cards. Connected once per button, so a restyled button still clicks once | **−10 dB** | A soft tick |
+| `essence` | Orange or purple essence gained in a stage (`Stage.add_essences`). Blue alone is quiet; it comes with every kill | 0 dB | A quick high sparkle |
+
+- On a boss stage's clear, `essence` (the purple) and `victory` play together. A mini boss kill pays orange and purple in the same frame; the 0.035 s gap keeps that to one `essence`.

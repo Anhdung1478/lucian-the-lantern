@@ -186,7 +186,7 @@ Acts 3 and 4 play this way too (`act3_the_jungle.md`, `act4_the_darkness.md`): p
 **Mini bosses** come last in their stage's last wave (`kind = mini_boss`). They don't scale. Their purple is paid on the kill.
 
 ### Built in Phase 8
-Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). **All 22 stages can be played.** Only Endless waits.
+Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). **All 22 stages can be played.** Only Endless waits. *(Phase 9: Endless plays too; see §14.)*
 
 **Crowd control on Lucian.** Root, stun and fear come from Maokai, Elise, Hecarim and nothing else. One entry point, `Lucian.add_cc`; the timers live in `CrowdControl`.
 
@@ -462,7 +462,7 @@ Every kill pays out at once, Senna's kills too:
 | Elite | 3% a legendary; else 25% a fragment |
 | Boss | A fragment for sure, plus 15% a legendary |
 
-- The kill that ends a stage (the boss, or the last enemy of the last wave) drops nothing: the result comes up at once, and items don't carry over. The boss row waits for Endless.
+- The kill that ends a stage (the boss, or the last enemy of the last wave) drops nothing: the result comes up at once, and items don't carry over. The boss row waits for Endless. *(Phase 9: Endless uses it, since every Endless kill drops loot; see §14.)*
 - Loot stays until the stage ends. It shows as the item's icon over a bobbing glow (gold for a legendary).
 - Lucian picks it up by walking within 60 of it, into the backpack.
 - With no room it stays, and "Backpack full" shows at most once every 3 s.
@@ -606,7 +606,7 @@ Stage gold, bonus XP and essence drops work since Phase 6: +10% gold, XP or blue
 | 5 | Shadow Isles | 5 | Maokai's saplings, Elise's spiderlings | Maiden of the Mist, Broodmother | Maokai (stage 2), Elise (stage 4) | Karthus |
 | 6 | The Lantern | 5 | Mist Walkers, Lantern Souls | Spectral Riders, Chain Wardens | Karthus – revived (stage 2), Hecarim (stage 4) | Thresh (2 phases) |
 
-**Built so far:** Acts 1–2 (Phase 6), Acts 3–4 (Phase 7) and Acts 5–6 (Phase 8) can be played: **all 22 stages**. Endless comes in a later phase.
+**Built so far:** Acts 1–2 (Phase 6), Acts 3–4 (Phase 7) and Acts 5–6 (Phase 8) can be played: **all 22 stages**. Endless plays since Phase 9 (§14).
 
 ### Story summary
 - **Act 1 – The Loss:** Lucian and Senna fight together until Thresh kills Senna and traps her soul in his lantern.
@@ -707,6 +707,105 @@ A new pick **replaces** the previous modifier (they do not stack).
 | 5 | Bosses and mini bosses +25% max HP | ×1.5 purple essence |
 | 6 | Nothing | Nothing |
 
+### Built in Phase 9
+Endless plays. Every number is a placeholder: the constants sit at the top of `src/core/endless_plan.gd` and `endless_modifiers.gd`.
+
+**A run:**
+- **Start** from the Journey's Endless portal (`main_screen.md`). It opens once Act 3 is cleared. The side panel picks the map: **Random** or one of six. Random rolls a map at Start, and again on Retry.
+- The map changes only the ground. Every map has the same enemies and the same ramp.
+
+| Map choice | Built from | Why |
+|---|---|---|
+| Mid lane | Act 1, stage 1 | |
+| Training ground | Act 2, stage 3 | The ring of 10 pillars |
+| Jungle | Act 3, stage 4 | Water and Honeyfruit: sustain for long runs |
+| Dark mid lane | Act 4, stage 1 | |
+| Dead forest | Act 5, stage 3 | 3 mist banks and the spider nest |
+| Thresh's domain | Act 6, stage 1 | 4 wide bridges, 2 ledges |
+
+- The stage is named "Endless · Jungle". It starts like a story stage: empty backpack, level 1, 0 gold, and the tree, skin and spells from the save. Wave 1 comes after 5 s.
+- **Waves never end.** Every wave is followed by the 20 s break with the merchant. The level cap stays at 18.
+- **A run ends** when Lucian dies (RUN OVER) or the player leaves (Leave this run, or Yes / No when quitting). There is nothing to clear.
+
+**Waves** (w = the wave number):
+
+| Wave | What comes |
+|---|---|
+| w % 10 = 0 | **One boss, alone**, at the map's boss point. Never the boss of the last boss wave. |
+| w % 5 = 0 (not 10) | A normal wave with **a mini boss** as its last enemy. Never the last mini boss. |
+| Any other | A normal wave |
+
+- **A normal wave:** min(8 + w, 30) normal enemies of **2 kinds** from the normal pool, then min(w / 4, 4) elites, each drawn from the elite pool (repeats allowed). Modifier #2 doubles the elites, up to 8.
+  - A pack counts as its size (raptors 5, Murkwolves 3, Krugs 3) and comes whole. When both kinds are packs, the wave can be up to 2 short of the count; it never goes over it.
+- The enemies come as in the story: groups of 3 every 1.2 s from the spawn points. Camp enemies, perched Chain Wardens and the nest fall back to the spawn points on maps that lack them.
+
+| Pool | Enemies |
+|---|---|
+| Normal (12) | Melee, ranged, shadow melee and shadow ranged minions; Raptors, Murkwolves and Krugs (packs); Gromp; sapling; spiderling; Mist Walker; Lantern Soul |
+| Elite (11) | Siege, super, shadow siege and shadow super minions; Blue Sentinel; Red Brambleback; Rift Scuttler; Maiden of the Mist; Broodmother; Spectral Rider; Chain Warden |
+| Mini boss (6) | Infernal Drake, Ocean Drake, Maokai, Elise, Karthus (revived), Hecarim |
+| Boss (5) | Akshan, Elder Dragon, Dark Lucian, Karthus, Thresh (final). Act 1's Thresh never comes: his fight needs Senna. |
+
+**Strength.** It replaces the act and wave scaling. n = w − 1; k is the boss's tier.
+
+| Who | Formula | Wave 1 | Wave 10 | Wave 20 | Wave 35 | Wave 50 |
+|---|---|---|---|---|---|---|
+| Normal and elite HP | base × (1 + 0.06n) × (1 + 0.05n) | ×1 | ×2.23 | ×4.17 | ×8.21 | ×13.59 |
+| Normal and elite damage | base × (1 + 0.025n) × (1 + 0.05n) | ×1 | ×1.78 | ×2.88 | ×5.0 | ×7.68 |
+
+| Who | Formula | Values |
+|---|---|---|
+| Boss HP (each phase, for Thresh) | 15000 × (1 + 0.3(k − 1)), k = w / 10 | Wave 10: 15000 · 20: 19500 · 30: 24000 · 50: 33000 |
+| Mini boss HP | 9000 × (1 + 0.3(k − 1)), k = (w + 5) / 10 | Wave 5: 9000 · 15: 11700 · 25: 14400 · 45: 19800 |
+| Boss and mini boss damage | basic damage and every skill hit × (1 + 0.15(k − 1)) | ×1, ×1.15, ×1.3, … |
+
+- Wave 1 is as easy as Act 1. The HP passes Act 6's last story wave (×7.6) at wave 34.
+- A boss's HP is fixed by its wave, whoever comes, so the random pick doesn't swing the run.
+- The ground hazards bosses leave (the Infernal Drake's burning ground, Karthus's Defile) are not scaled.
+- Bosses come at the boss point, mini bosses from their camp or the spawn points. An Endless boss is never the stage's boss, so its kill ends nothing. Final Thresh still rises into Phase 2 at full HP. His fall in Phase 2 has no cutscene: he leaves, and the run goes on.
+
+**Rewards:**
+- **Gold, XP and blue** use the story's rules with the act a = 1 + (w − 1) / 10 (whole numbers): waves 1–10 pay like Act 1, waves 11–20 like Act 2, and so on, with no cap. A normal kill gives a blue, an elite 5a. The orange chances are the story's (1% and 10%).
+- **Bosses and mini bosses** pay the story's essences (a boss 100 blue and 5 orange, a mini boss 50 and 3). They always pay their **repeat purple, on the kill**: 2 for Akshan, the Elder Dragon, Dark Lucian and Karthus, 4 for Thresh, 1 for a mini boss. The save's `"bosses"` list is never touched, and the end screen gets no purple line.
+- **Final Thresh's fall counts as a kill:** 300 gold, XP, a loot roll and his 4 purple.
+- **Loot drops on every kill,** a boss's too (§9: a fragment for sure, plus 15% a legendary). There is no last kill in Endless.
+- The tree's economy nodes work as in the story. A modifier's reward multiplies on top of them.
+
+**Modifiers** (the table above):
+- After each boss wave (10, 20, …) the break **waits**. A **"Choose a modifier"** panel shows **3 cards**: 2 of #1–5 at random (never the current one), then Nothing. The game pauses, the backpack and the menu close, and ESC and P do nothing. A click picks, with the `buff` sound. Then the full 20 s break counts down.
+- The pick **replaces** the old modifier; Nothing clears it.
+
+| # | Card (downside / reward) | How it works |
+|---|---|---|
+| 1 | Enemies move 20% faster / +30% gold | Every enemy's move speed × 1.2 at spawn, summons and splits too. Gold × 1.3. |
+| 2 | Elites twice as often / ×1.5 orange drop rate | Elites per wave × 2 (up to 8). The orange chance × 1.5; a boss's sure orange is not. |
+| 3 | −10% max HP / +15% blue | Lucian's max HP × 0.9, applied like a skin's scale (his HP share is kept). Blue × 1.15, a boss's too. |
+| 4 | −5% AD / +10% gold | Lucian's AD × 0.95. Gold × 1.1. |
+| 5 | Bosses and mini bosses +25% max HP / ×1.5 purple | Their max HP × 1.25 at spawn. Purple = round(repeat × 1.5): 3 for a boss, 6 for Thresh, 2 for a mini boss. |
+| 6 | Nothing / Nothing | No modifier |
+
+- The enemy speed and boss HP apply from the next spawn; the rest at once. XP has no multiplier.
+- The modifier is the first icon in the buff row, with no timer: `stats/move_speed`, `ui/essence_orange`, `stats/max_hp`, `stats/ad` or `ui/skull`. Its hover card is "Endless modifier" with both lines (`ui_design.md`).
+
+**The HUD's stage info:**
+- During a wave: "Endless · Jungle  Wave 23  Enemies: 12", or "Mini boss wave" / "Boss wave". There is no "/ N".
+- In a break: "Wave 24 in 0:12" (or "Mini boss wave in …", "Boss wave in …") and Skip. While the pick is open, the countdown and Skip hide.
+- A dim "Best 22" line under it, read live. The boss bar sits under that line.
+
+**Best wave:**
+- It is the most waves cleared in one run: dying in wave 23 records 22. Waves skipped by a debug jump don't count.
+- It is kept in memory each time a wave is won (`SaveGame.record_endless`). The run's end-of-stage save (death or Leave) or a Yes when quitting writes it.
+- `"cleared"` never gets `"endless"`, and `"bosses"` is unchanged by Endless.
+
+**The end of a run** (the end screen, on death):
+- **RUN OVER** in red, then "Endless · Jungle". The `defeat` sound plays.
+- **Stats:** Waves cleared, Time, Kills, Damage dealt, Damage taken, Gold earned, Level reached, Modifier (its downside, or "None").
+- **Rewards:** the essences, plus a green **"New best: 22 waves!"** ("1 wave" for one) when the run beat the best it started with.
+- **Retry** starts a new run on the same map choice (Random rolls again). **Main screen** opens the Journey on Endless, with the run's map still chosen. There is no Next.
+- Leaving a run shows no end screen: it saves and opens the Journey on Endless the same way.
+
+**Debug:** "Jump to boss wave" jumps to the next tenth wave (from wave 3 to 10, from 10 to 20) and closes an open pick first. "Jump to the last wave" is hidden. The wave line reads "Wave 7 (Endless)".
+
 ---
 
 ## 15. Save System
@@ -717,7 +816,7 @@ A new pick **replaces** the previous modifier (they do not stack).
   - **Load game** lists the same slots, with the empty ones disabled. The button itself is disabled ("No saved games yet") when no slot exists. It opens the main screen.
   - Each used slot shows its play time and when it was saved: "Slot 2 · 1h 02m · saved 2026-10-29 03:10".
 - **Save as copy:** the current progress can be copied into another slot (asks for confirmation before overwriting).
-- **Leave to main menu** (gear menu) asks "Save before leaving?", then goes back to the title screen.
+- **Leave to main menu** (gear menu) asks "Save before leaving?" (Yes / No / Cancel), then goes back to the title screen.
 - Files: `user://save_slot_1.json`, `save_slot_2.json`, `save_slot_3.json`, each with its own `_backup.json`.
 - Settings are saved separately in `user://settings.json` and shared by all slots.
 
@@ -727,19 +826,32 @@ A new pick **replaces** the previous modifier (they do not stack).
 - The spells picked for D and F
 - Owned skins, equipped skin
 - Cleared stages, and which bosses / mini bosses already gave first-time purple
-- Endless best wave
+- Endless best wave (the most waves cleared in one run)
 - Play time: every second outside the title screen, pauses not counted
 
 Nothing inside a stage is saved (items, gold, level, enemies), since stages always reset.
 
 ### When to save
 - **Auto-save only when a stage is done:** cleared, left (ESC → Leave this stage) or failed (Lucian dies). Nothing is saved between waves.
+  - An Endless run is done when Lucian dies or the run is left. Its best wave is kept in memory each time a wave is won, so that save writes it (§14).
 - **Nothing on the main screen auto-saves.** Evolution Tree purchases and resets, skin purchases and skin changes are kept only by the next auto-save, the **Save** button in the gear menu, or a **Yes** when leaving.
-- **Leaving the game** (Exit the game in the ESC menu or the gear menu, Leave to main menu, or closing the window) asks **"Save before leaving?"** (Yes / No).
-  - **Yes:** saves to the current slot right away, then leaves. Inside a stage, this keeps the essences collected so far, as leaving the stage would.
+- **Every exit can be cancelled** (since Phase 9). Cancel, or ESC, closes the question and nothing else happens.
+
+| Exit | Question | Cancel / ESC |
+|---|---|---|
+| Gear menu → Leave to main menu | **"Save before leaving?"** Yes / No / **Cancel** | The gear menu is still open |
+| Exit the game (ESC menu or gear menu); the window's close button anywhere but the title | **"Save before leaving?"** Yes / No / **Cancel** | The game goes on, paused only if it was paused before; an open ESC menu or gear menu stays open |
+| ESC menu → Leave this stage | **"Leave this stage? Essences collected so far are kept."** Leave / **Cancel**. In Endless: **"Leave this run? Your best wave is kept."** | Back in the ESC menu, still paused |
+| Title screen → Exit game; the window's close button on the title | **"Exit the game?"** Exit / **Cancel** | Stays on the title |
+
+- **"Save before leaving?"**
+  - **Yes:** saves to the current slot right away, then leaves. Inside a stage, this keeps the essences collected so far, as leaving the stage would. In Endless it keeps the best wave too.
   - **No:** leaves without saving. Everything since the last save is lost.
-  - If the save fails, it asks **"Could not save. Quit anyway?"** (Leave to main menu: "Could not save. Leave anyway?"): Yes leaves, No goes back to the game. A failed auto-save after a stage shows a red "Could not save" on the main screen.
-- The title screen has nothing unsaved: its **Exit game** and the window's close button quit at once, with no question.
+  - If the save fails, it asks **"Could not save. Quit anyway?"** (Leave to main menu: "Could not save. Leave anyway?"): Yes leaves, No goes back to the game. These two keep Yes / No, and ESC does nothing on them. A failed auto-save after a stage shows a red "Could not save" on the main screen.
+- **Leave this stage:** Leave ends the stage as left: the auto-save, then the main screen. A stage run on its own keeps Leave disabled.
+- The title screen has nothing unsaved, so its **Exit game** and the window's close button only ask **"Exit the game?"**. Exit quits. *(Before Phase 9 they quit at once.)*
+- The other Yes / No questions stay as they were: Overwrite slot, Reset tree. ESC answers No on them.
+- *Phase 5 built "Save before leaving?" with Yes / No and no Cancel, as the user asked then. In Phase 9 the user asked for a Cancel on every exit, which replaces that decision.*
 - Settings are not part of the save: they are written to `user://settings.json` on every change.
 
 ### Implementation notes (Godot 4)
@@ -756,7 +868,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 | `loadout` | The spells on D and F: `["flash", "heal"]` (`""` for none) |
 | `cleared` | Cleared stage ids: `["1-1", "2-1"]` |
 | `bosses` | Bosses that already gave their first-time purple: `["thresh_1", "akshan"]` |
-| `endless_best` | Best Endless wave |
+| `endless_best` | Best Endless wave: the most waves cleared in one run (dying in wave 23 records 22) |
 | `play_time` | Whole seconds played in this slot: `3720` |
 
 - Numbers are converted back with `int()` when loading (JSON numbers load as floats). Unknown keys, node ids, skins, spell ids and stage ids are dropped, so an old or edited file still loads.
@@ -775,8 +887,8 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - [x] Full Endless modifier list
 - [x] Unspent skill points: wasted
 - [x] Wave count per stage across the 22 stages
-- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`, Phase 4: `implementation/phase4.md`, Phase 5: `implementation/phase5.md`, Phase 6: `implementation/phase6.md`, Phase 7: `implementation/phase7.md`, Phase 8: `implementation/phase8.md`)
+- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`, Phase 4: `implementation/phase4.md`, Phase 5: `implementation/phase5.md`, Phase 6: `implementation/phase6.md`, Phase 7: `implementation/phase7.md`, Phase 8: `implementation/phase8.md`, Phase 9: `implementation/phase9.md`)
 - [x] Item stats and effects (`items.md`)
 - [x] UI (see `ui_design.md` and `main_screen.md`): HUD (with the stage info, boss bar and radar), backpack, crafting, recipe table, ESC menu, merchant's shop, Settings, the main screen (Journey, Evolution Tree, Skin Shop), and the title screen with save slot selection
 - [x] Save system
-- [ ] Art style, sound (Phase 3 has generated placeholder sound effects and audio buses; no music yet)
+- [ ] Art style, sound (Phase 3 has generated placeholder sound effects and audio buses; Phase 9 adds 11 more, 24 in all, listed in `ui_design.md` §8; no music yet)

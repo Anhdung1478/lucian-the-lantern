@@ -60,6 +60,8 @@ Phase 1 builds the first playable slice: one stage screen on a test map. Lucian 
 | Range | 500 | — |
 | Crit | 0% (crit damage 175%) | — |
 
+*Since Phase 9 (`data/lucian_stats.tres`): move speed **345** (was 335), and mana regen **14.0 per 5 s, +1.225 per level** (×1.75 of the base and the growth; was 8.0 and +0.7). That is 2.8/s at level 1 and about 6.97/s at level 18. Item and Blue-buff regen are not scaled.*
+
 **Formulas:**
 - **Growth:** LoL's curve, `base + growth × g(L)` where `g(L) = (L−1) × (0.7025 + 0.0175 × (L−1))` (g(1)=0, g(18)=17).
 - **XP to next level:** `180 + 100 × L`, so 18,360 total to reach level 18, which is the cap.

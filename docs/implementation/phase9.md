@@ -529,3 +529,123 @@ Each task follows the house checklist: write the failing tests → run them, the
 - **Rewriting Journey's tests:** port each assertion one for one. Don't drop coverage.
 - **The click sound:** `style_button` is called again on re-style, so connect once (meta flag). Keep it quiet so menus don't feel noisy.
 - **The map thumbnail:** `StageMaps.create` must not bake or leak. Free the instance right after reading its polygons.
+
+
+---
+
+## Implementation notes (Phase 9 done)
+
+Everything in the plan is in place, one commit per task (Tasks 0–9). Task 10 is three commits: a code fix found in the screenshots, the screenshots, then these docs and the report (`docs/report/phase9.md`). Every task review came back clean, so there are no review-fix commits; what the reviews found went into later tasks (*Fixes from reviews*) or was left as is (*Left as is*). The numbers in *Design* were placeholders; the game design doc §14 ("Built in Phase 9"), `main_screen.md` and `ui_design.md` give the built ones. Changes and details settled while building:
+
+| Task | Commits |
+|---|---|
+| 0 Plan | `1b04898` |
+| 1 Move speed 345, mana regen ×1.75 | `ad878ce` |
+| 2 Cancel on every exit | `57d5f8a` |
+| 3 The stage's icons in the tree | `f480555` |
+| 4 Level-up chime and burst, the missing sounds | `0468999` |
+| 5 Endless logic (pure) | `cb4e50d` |
+| 6 Endless in the stage | `f262490` |
+| 7 Modifiers | `4f82adc` |
+| 8 The end of a run, and Start | `823b95b` |
+| 9 Journey as a world map | `32a2e80` |
+| 10a Screenshots | fix `a9802c3`, screenshots `492ebae` |
+| 10b Docs and report | "Phase 9 docs and report" |
+
+Tasks 0–6 were first built on `b2ad250` and rebased onto Phase 8's final `main` (`9f1ab78`) after Task 6, so their SHAs above are the rebased ones (Task 0 was `29f8521`, Task 6 `a84a831`).
+
+### Deviations and rulings
+The plan's *Decisions made with the user* and *Defaults chosen here* stand as written. The controller's rulings while building, each with its reason:
+
+- **Worktree and rebase.** Phase 9 ran in the `phase9` worktree beside Phase 8's last task, as planned. Phase 8 landed while Task 6 was being built, so the rebase came **right after Task 6's review, not before Task 10**: Phase 8's final fixes touched `stage.gd`, `enemy_unit.gd` and `thresh_final.gd`, which Tasks 6–8 also change, and an early rebase kept Tasks 7–9 on the real code. There was one conflict, a doc comment in `stage.gd` (main's text kept, plus "Endless has no last wave."). The suite was green after it (1458 tests).
+- **Task 0 was done by the controller** (a file copy), with no review.
+- **Each brief** carried the task's text plus the design sections it needs, since the tasks point at design sections a bare task brief would drop.
+- **Task N+1's implementer ran while Task N was in review** (an unattended overnight run, about 10 minutes per suite). Tasks that ran side by side touched different files.
+- **Pre-flight rulings:**
+  - Task 2 built only the story's Leave text; Task 8 added "Leave this run? Your best wave is kept." (Task 2 had no Endless yet).
+  - Task 4 plays `boss` from the spawned enemy's kind (boss or mini boss), not from `run.boss`, because Endless bosses are never `run.boss`.
+- **Task 4, sounds:**
+  - `rank_up` plays in `Lucian.try_rank_up`, the one place the HUD's "+" and Ctrl + key both go through, not in `ChampionProgress` or `skill_slot.gd` as the plan's file list said. `src/core` stays free of sound. So Senna teaching E in Act 1 (`teach_skill`) is silent: a scripted grant, not a choice.
+  - Q's and W's sounds play when the laser and the missile leave (after the cast time), like R's per bullet; E's at the dash start.
+  - Every new sound is at 0 dB except `click` (−10 dB). None was heard: they were tuned from their numbers, headless.
+  - A boss stage's clear plays `essence` and `victory` together. A mini boss wave plays the horn, then the gong when the mini boss comes.
+  - The debug table's "Level +1" also plays the chime and the burst.
+- **Task 5, Endless logic:**
+  - **Damage at wave 35 is ×5.0, not the plan's "×5.2".** The plan's check column was an arithmetic slip: 1.85 × 2.7 = 4.995. The formula is the binding part. If ×5.2 was meant, `DAMAGE_GROWTH` 0.0275 gives it.
+  - **A normal wave may be up to 2 short** when both kinds are packs: packs come whole, and the cap must hold. This happens with about 4.5% of kind pairs.
+  - The damage multipliers are two functions, `boss_power(w)` and `mini_boss_power(w)`, mirroring the HP ones. A tier is at least 1, so a boss spawned early by debug is never weaker than its first tier.
+  - A wave lists its normal groups first, then the elites one by one, then the mini boss.
+  - The runner owns a seeded RNG of its own (random per run).
+- **Task 6, Endless in the stage:**
+  - **The Endless flow lives in a new `EndlessDirector`** (`src/stage/endless_director.gd`, 140 lines at the end), a child of the Stage only in Endless. The Stage keeps small hooks. The plan's *Risks* said to move it out past ~850 lines; Tasks 2 and 4 had already taken `stage.gd` from 719 to 742 lines, and Tasks 7–8 would add more flow. `stage.gd` ended at 810 lines.
+  - **The break text keeps the story's clock:** "Wave 24 in 0:12", not the plan's "in 12". One format for both modes.
+  - Until Task 7 the hold after a boss wave was released at once (a placeholder); Task 7 replaced it.
+  - The boss bar moves down under the Best line in Endless (`Hud.BOSS_BAR_TOP` plus the line's height).
+- **Task 7, modifiers:**
+  - New texts: the pick's title "Choose a modifier", and the buff row's name "Endless modifier". The Nothing card reads "Nothing" / "Nothing" from the data.
+  - Picking Nothing stores `NONE`: no modifier.
+  - The offer draws from the stage's RNG, not the runner's.
+  - The pick opens deferred after `boss_cleared` (the boss's death can come inside a shot's physics callback), and not at all if Lucian is dead, the result is up or a debug jump let the break go.
+- **Task 8, the end of a run:**
+  - **The Modifier row reads "None"** both before any pick and after Nothing: the same for the player.
+  - **"New best: 1 wave!"** is singular; every other N reads "N waves".
+  - **"New best"** compares with the best the run started with (`EndlessDirector.start_best`), since the save's own best rises in memory with every wave won.
+  - **An Endless final Thresh's fall counts as a kill** and pays gold, XP and a loot roll like the other bosses (from the Task 6 review): "loot drops on every kill", and the Kills row needs it. Two helpers came out of `_on_enemy_died` for it, with no change in behavior: `_pay_kill` and `_drop_loot_of`.
+  - `Game` and `MainScreen` each own a small RNG for Random's roll (Start and Retry).
+- **Task 9, the world map:**
+  - **Accepted beyond the plan:** the ENEMIES roster in the stage panel (the panel was half empty), "No boss on replays" for 1-1 once cleared, the captions "PRACTICE" and "WAVES NEVER END", the wording of the four Endless rule rows, and "Clear 3-3 first" in a locked stage's hover. They serve the overview the user asked for.
+  - The layout uses fixed positions, as the plan's x values do. On a screen wider than 16:9 the extra width stays empty on the right.
+  - `journey_map.gd` is about 700 lines, almost all drawing, one function per region.
+  - Two pure helpers: `WavePlan.mini_boss(stage_id)` and `Journey.stage_name(act, stage)`. `stage_name` is shared by `StageSetup` and the map's hover text.
+- **Task 10 is two dispatches** (screenshots, then docs and report): `screenshot.gd` is large, and the docs need the final PNGs.
+- **Commit lines:** each commit ends with the `Claude-Session:` line, which replaces the old `Co-Authored-By:` line for this session.
+
+### Visual pass (Task 10a)
+Every Phase 9 scenario, and every scenario Phase 9 touched, was run in a window and every PNG looked at.
+- **One game fix** (`a9802c3`): after an Endless run, Main screen opened the Journey on Endless but reset the map chip to Random, so Start would roll a random map instead of the one just played. `Game.show_main_screen` now takes the run's map choice, and the Journey opens with it chosen (`JourneyPanel.choose_map`). Test: `test_game.gd` `test_main_screen_after_a_run_keeps_its_map_chosen` (it failed first).
+- **Checked and judged readable, no change:** the level-up burst (and its text-only Low form), the modifier cards (the longest downside wraps to 2 lines inside the card), RUN OVER, every prompt with its Cancel, the map's three progress states, the thumbnails, and the `*_upgrade` chevrons, which are outlined and read on all six, gold Barrier included.
+- **Noticed, not changed:** "ACT 1" sits on the edge of a tree clump; the break line before wave 5 reads "Mini boss wave in 0:18", not "Wave 5 in …" (as designed); 4-1's Start reads "Start stage 1" (as planned).
+
+### Screenshot harness (Task 10a)
+- **Carried from earlier tasks:** the Journey helpers ported to the map (`start_training` picks `map.training` and presses the panel's Start; `locked_place_names`; `main_journey`, `main_acts`, `main_endless`); the skins' expected move speed (345, and 396.75 for Project, whose ×1.15 now applies to 345); `leave_stage()` answers the new Leave prompt; the art sheet reads each tree icon's path from its `.tres`.
+- **New scenarios:** `journey_map`, `journey_endless`, `endless_wave`, `endless_boss`, `endless_pick`, `endless_run_over`, `exit_cancel`, `tree_icons` (Game scenarios) and `level_up` (an `ACT_SCENARIOS` entry on 2-1). 70 PNGs in all, 1600 × 900 like Phase 8's, in `docs/report/phase9/`.
+- **Helpers:** `enter_stage`, `start_endless(choice)`, `endless_save(best)` (Act 3 cleared, the tree maxed, Flash and Heal, best 14), `endless_runner`, `wait_for_kind` (Endless bosses aren't `boss_unit`), `seed_boss(id)`, `win_boss_wave`, `face_boss` and `frame` (the camera between Lucian and the boss), `enemy_ids`, `prompt_text`.
+- **Harness fixes, not game bugs:** a HUD tooltip left over from the OS cursor covered some shots, so `start_endless` and `exit_cancel` move the mouse off the HUD; the Elder Dragon was out of frame until `face_boss`.
+- **What the shots don't show:** only `endless_boss` is seeded (`seed_boss`); the other Endless shots' enemies, mini boss and offer are random each run. `endless_pick_2_other_cards` is a built `ModifierPick` of the three modifiers not offered, not a real offer. `endless_run_over` reaches wave 22 through the runner's debug skip and sets the clock (22:11) and the level (16), so its kills and damage come from 1–2 real waves.
+
+### Fixes from reviews
+Every task review was clean. Their findings were carried into later tasks, and each carry is done:
+- **Task 5 → 6:** a debug "Jump to boss wave" during a held break would leave the runner held. `EndlessDirector.skip_to_boss` releases first (and, since Task 7, closes an open pick). Tests: `test_jump_to_boss_wave_lets_a_held_break_go`, and Task 7's jump-closes-the-pick test.
+- **Task 6 → 7:** the held break showed Skip and a frozen countdown. They hide while the pick is open.
+- **Task 6 → 8:** the result read "Waves N / -1" in Endless. Endless has its own rows.
+- **Task 6 review → 8:** an Endless Thresh's fall paid no gold, XP, kill or loot (the ruling above).
+- **Task 2 → 10a:** `screenshot.gd`'s `leave_stage()` answers the Leave prompt; the gear's save-prompt shot shows Cancel.
+- **Task 3 → 10a:** the six redrawn upgrade icons were looked at (readable), and the art sheet's tree paths fixed.
+- **Task 9 → 10a:** `screenshot.gd` parses again, on the map's API.
+- **Found by the implementers in self-review:** the debug table read `stage.endless` before the director existed (it reads `run.endless`; Task 6); a second card clicked in the same frame applied a second modifier and released twice (only the first click counts, tested; Task 7).
+
+### Left as is (small, from the reviews)
+- **Task 1:** one blank line instead of two before `test_lucian_base_move_speed_is_345` in `test_data_files.gd`.
+- **Task 2:** no direct `Stage.leave()` unit test (the run-alone Leave is covered by `test_game.gd`); the test helpers `_choices` (3 files) and `_press_esc` (2 files) are copied; `Game._leave_stage_question()` is a one-line method (it holds the Endless text).
+- **Task 3:** the upgrade icons' chevrons sit over part of the spell art. They read.
+- **Task 4:** `essence` (a 3.5 kHz sparkle) and `cast_q` at 0 dB may be loud; about −4 dB may suit them. `add_essences` plays `essence` before zero amounts are filtered out (harmless). Senna teaching E is silent.
+- **Task 5:** the normal-wave fill can be up to 2 short even when an exact pack mix exists (about 3% of waves); the runner's RNG isn't shared with the map roll or the offer; `kill_rewards.gd`'s header still says boss purple comes only from `SaveGame.award_boss`; `waves_cleared` repeats `waves_done()`.
+- **Task 6:** ground hazards (Karthus's Defile, the Infernal Drake's burning ground) aren't scaled by boss power. A debug-spawned boss in Endless uses wave 1, so it has tier-1 HP.
+- **Task 7:** `_close_pick` clears the lock and the pause even if something else set them (only a debug jump reaches it with a pick open); `test_the_current_modifier_is_never_offered` catches a regression only about 40% of the time (the stage RNG is unseeded); `Hud.modifier_buff` rebuilds its dictionary every frame; small style nits in `modifier_pick.gd`.
+- **Task 8:** `test_the_modifier_row_reads_its_downside_and_none_after_nothing` runs two Stages at once; `test_retry_after_random_keeps_random_so_it_rolls_again` checks less than its name says; `EndlessDirector.RUN_OVER`'s comment says a run only ends when Lucian falls (Leave ends one too, with no end screen).
+- **Task 9:** `JourneyNode._draw_plate` makes a `StyleBoxFlat` per draw, and the animated places redraw every frame; the map and the panel sit 8 px inside the content area (y 80–984, not 72–992); some decorative coordinates in `journey_map.gd`'s draw helpers are inline; `MAP_RECT` and `PANEL_RECT` repeat `JourneyMap.SIZE` and `JourneyPanel.SIZE`; small inefficiencies (`_near_node` calls `places()` per candidate, a double pick in `_ready`, `_process` while hidden).
+- **Task 10a:** `main_tree`'s printed expectations have been stale since Phase 6 (Q and W hidden on a new save); the PNGs are fine. A HUD tooltip stays over a just-opened menu if the mouse rests on a slot (Godot doesn't recompute hover without motion; not a Phase 9 change).
+- **Not from Phase 9:** an Endless final Thresh's fall is ignored while Lucian is dead (the story's rule); `test_monsters.gd` `test_swarm_raptors_spread_around_lucian` waits on wall-clock time and can fail under load; `test_stage_hud.gd`'s boss-bar test fails when that file runs alone and passes in the suite.
+- **Endless's reward act has no cap:** wave 61 pays like an "Act 7" (7 blue a normal kill, gold and XP × 2.5).
+- **Plan checklists:** the task checklists in this file are left unticked; the commits above are the record.
+- **Tests:** the suite is **1512 tests, all passing** (23489 asserts, about 606 s), up from 1342 at the end of Phase 8: 170 new. GUT's 2 warnings are the known unfreed children in `test_act4` and `test_lucian_skills`.
+
+### Running the checks
+
+```
+godot_console --headless --path . --import
+godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
+godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+```
+
+Phase 9's scenarios: `journey_map`, `journey_endless`, `endless_wave`, `endless_boss`, `endless_pick`, `endless_run_over`, `exit_cancel`, `tree_icons` and `level_up`. Phase 9 also changed `main_journey`, `main_acts`, `main_endless`, `main_gear`, `art_sheet`, `training_setup`, `skins_stage`, `main_tree` and `main_tree_max`. Run them in a window and keep the mouse off it. Run `--import` first: Task 3 deleted 11 SVGs and redrew 6.
