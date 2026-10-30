@@ -659,9 +659,6 @@ Every scenario Phase 10 added or changed was run in a window, and every PNG was 
   - The locked-cell hover has no full stop, and no test pins it or the debug spinner.
 - **Task 8:**
   - No test pins the grid-to-page centring (`test_nodes_sit_on_their_grid_cells` was dropped).
-  - `test_tree_data_files` asserts that Skills and Summoners both use (0, 0), which is incidental.
-  - `TABS_RECT` is a literal, not built from `PAGE_RECT`. `TreePage.MINI_COLUMNS` repeats `BackpackScreen.COLUMNS`.
-  - A picked hidden node shows its description, "None → Rank 1" and the ladder.
   - `NodeInfoPanel` grows with its content and has no clip.
 - **Task 9:** the badge anchoring is repeated in `section_bar.gd` and `branch_tabs.gd`.
 - **Task 10:**
@@ -670,15 +667,25 @@ Every scenario Phase 10 added or changed was run in a window, and every PNG was 
   - The motes move under Settings.
   - The gallery's stone shading shifts slightly with the window width.
 - **Task 11:**
-  - The dropped Controls hint line.
+  - The Controls hint's dropped line is not lost: `GameSettings.ACTION_NAMES[&"toggle_stats"]` is "Stats panel (Ctrl: toggle, hold: more)", the label of its own row.
   - `_style_tab` casts a stylebox without a null check, and restyles four boxes per tab on every `show_tab`.
   - No test pins the "too big" resolution marks.
   - `settings_screen.gd` is 518 lines; `_draw_emblem` could live with the Journey panel's glow helpers.
-- **Task 12:** `test_skins`'s muzzle test comment says it checks the SVG tips; it checks the markers in `lucian.tscn`. Classic's and High Noon's Senna-gun bodies are lighter than the plan's hexes.
+- **Task 12:** Classic's and High Noon's Senna-gun bodies are lighter than the plan's hexes.
 - **Task 13:** the title's effects keep redrawing under Settings; `title_backdrop.gd` is 509 lines; Lucian's rect is 21 px from the slot list (test-guarded).
-- **Not from Phase 10's game code:** `test_backpack_drag.gd` (Task 6) leaves 3 orphans and leak lines at exit. `test_monsters`'s raptor-spread test can fail under load.
+- **Not from Phase 10's game code:** `test_monsters`'s raptor-spread test can fail under load.
 - **Plan checklists:** the task checklists in this file are left unticked; the commits above are the record.
-- **Tests:** the suite is **1601 tests, all passing** (24494 asserts, about 627 s), up from 1516 before the phase: 85 new. GUT's 2 warnings are the known unfreed children in `test_act4` and `test_lucian_skills`. The 3 orphans are `test_backpack_drag.gd`'s.
+- **Tests:** the suite is **1604 tests, all passing** (24651 asserts, about 633 s), up from 1516 before the phase: 88 new. GUT's 2 warnings are the known unfreed children in `test_act4` and `test_lucian_skills`. There are no orphans and no leak lines at exit.
+
+### Fixes from the final review
+The whole-branch review found no critical or important issue. These were fixed:
+- **`test_backpack_drag.gd`** leaked a tooltip card (3 nodes), the source of the 3 orphans and the exit leak lines. The test frees the card now and checks its text.
+- **A hidden node** picked in the tree now shows "???" with no value, description, sum line or ladder. It keeps the requirement line.
+- **`test_the_info_column_fits_its_panel_for_every_branch_and_node`** guards the info column's height, on a new save and on a max tree.
+- **`test_level_sums_acts_and_values_match_max_level`** checks that `level_sums`, `level_acts` and `level_values` line up with `max_level`.
+- **`TABS_RECT`** is built from `PAGE_RECT`, and `MINI_COLUMNS` is `BackpackScreen.COLUMNS`.
+- **Test cleanups:** the `test_skins` muzzle comment says it checks the markers in `lucian.tscn`, and the incidental (0, 0) assertion is gone from `test_tree_data_files`.
+- **Commits:** "Final review fixes: no tooltip leak in the backpack test, a hidden node shows nothing in the info column, fit and data guards", then this docs commit.
 
 ### Running the checks
 

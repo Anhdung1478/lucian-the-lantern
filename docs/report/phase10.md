@@ -21,7 +21,7 @@ Your Phase 10 request had seven points, and the tree rules among them had six pa
 - **The title screen** shows Lucian and Senna on the left, facing Thresh on the right under the Shadow Isles moon, with cliffs, ruins, graves, mist, souls and a spectral chain.
 - **Lucian's second gun is Senna's** on all five skins.
 
-The test suite grew from **1516 to 1601 tests**, and all of them pass. Every new screen was checked in screenshots from a real game window. This last pass found no wrong state; the bugs found earlier in the phase are fixed (see *Verification*).
+The test suite grew from **1516 to 1604 tests**, and all of them pass. Every new screen was checked in screenshots from a real game window. This last pass found no wrong state; the bugs found earlier in the phase are fixed (see *Verification*).
 
 Your choices during planning:
 
@@ -88,7 +88,7 @@ Settled while building (rulings that change what you see):
 - **Settings:**
   - The panel is opaque, because the title's logo showed through.
   - Volumes read as whole numbers.
-  - The Controls hint lost one line (see *Known limits*).
+  - The Controls hint lost one line. Nothing is lost: the stats key's own row in the Controls list reads "Stats panel (Ctrl: toggle, hold: more)".
 - **A card's controls pass the mouse to the card,** so hovering a slider lights its card. As a side effect, the wheel scrolls the Controls list even over its buttons.
 - **A gold diamond marks the chosen entry in dropdown lists** (`option_check.svg`, one SVG more than planned). Without it the lists kept Godot's grey radio circles.
 - **Senna's gun colours:**
@@ -102,7 +102,7 @@ Settled while building (rulings that change what you see):
 
 ## Verification
 
-- **Unit and scene tests (GUT):** **1601 of 1601 pass** (24494 asserts, 627 s), up from 1516 before the phase: 85 new.
+- **Unit and scene tests (GUT):** **1604 of 1604 pass** (24651 asserts, 633 s), up from 1516 before the phase: 88 new. The run shows no orphans and no leak lines at exit.
   - New test files: `test_settings_screen` (19 tests) and `test_main_backdrop` (6).
   - Extended: `test_evolution_tree`, `test_tree_data_files`, `test_inventory`, `test_shop`, `test_loot`, `test_backpack_drag`, `test_stage_setup`, `test_lucian_casting`, `test_game`, `test_save_game`, `test_act1`, `test_main_screen`, `test_main_debug`, `test_skins` and `test_title_screen`.
   - `test_tree_section` was largely rewritten for the pages. Every behaviour that still exists kept its test: states, badges, the info column, the cost bar, hover, reset, ESC and no file writes. The pan and zoom tests are gone.
@@ -248,18 +248,15 @@ All PNGs are 1600 × 900 (the window). The motes, mist, souls and badge pulse mo
 
 ## Known limits
 
-- **A hidden node says too much when picked.** R before it opens reads "???", but still shows its description, "None → Rank 1" and the LEVELS ladder with its costs. The leak is older; the ladder adds to it.
 - **The info column can grow too tall.** It has no scroll or clip. The Summoners list (13 rows) nearly fills it.
 - **Some scenes keep moving under Settings:** the main screen's motes, and the title's mist and souls. The cost is small.
-- **The Controls hint lost a line:** "Ctrl + the stats key toggles the stats panel (hold it for more)". The binding's own name still says "Stats panel (Ctrl: toggle, hold: more)".
 - **An item stuck in a locked backpack cell** can't be dragged out, only sold. This only happens when the debug spinner lowers the open cells with no room left.
 - **The "Buy Backpack Slots" hover** shows only on locked backpack cells, not on locked equip slots.
 - **Max tree (debug) leaves the "Act 2" and "Act 4" tags dim,** because it skips the act rules.
 - **The sounds were never heard,** including Phase 9's 11. Phase 10 adds none.
 - **Wider screens:** the title keeps its figures at the edges, and the hall adds arches. The tree and the Journey keep fixed positions, so extra width stays empty on the right (as in Phase 9).
-- **Tests:** every test passes, with notes:
+- **Tests:** every test passes, with no orphans and no leak lines at exit. Notes:
   - GUT's 2 warnings are test scripts that leave a node or two unfreed (`test_act4`, `test_lucian_skills`).
-  - `test_backpack_drag.gd`'s locked-cell tests leave 3 orphans, and Godot prints leak lines at exit.
   - `test_monsters`'s raptor-spread test waits on wall-clock time and can fail under load; it passes on a re-run.
   - The full suite takes about 10 minutes.
 
