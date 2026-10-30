@@ -3990,6 +3990,20 @@ func scenario_skin_fx() -> void:
 	GameSettings.instance().set_value(&"quality", "high")
 
 
+## Waits until W's missile has landed (no live LinearProjectile is left), at most 2 s.
+func skin_fx_missile_lands() -> void:
+	var waited := 0.0
+	while waited < 2.0:
+		var flying := false
+		for node in lucian.projectile_parent.get_children():
+			if node is LinearProjectile and not node.is_queued_for_deletion():
+				flying = true
+		if not flying:
+			return
+		await wait(0.02)
+		waited += 0.02
+
+
 ## Q, W's cross, E mid-dash and R's stream, one screenshot each.
 func skin_fx_shots(prefix: String, dummy: TrainingDummy, start: Vector2) -> void:
 	var Slot := ChampionProgress.Slot
@@ -4001,7 +4015,9 @@ func skin_fx_shots(prefix: String, dummy: TrainingDummy, start: Vector2) -> void
 	await shot(prefix + "_q")
 	await wait(0.4)
 	lucian.try_cast(Slot.W, dummy.global_position)
-	await wait(0.59)
+	await wait(0.25)
+	await skin_fx_missile_lands()
+	await wait(0.05)
 	await shot(prefix + "_w")
 	await wait(0.4)
 	lucian.try_cast(Slot.E, lucian.global_position + Vector2(0, -280))
