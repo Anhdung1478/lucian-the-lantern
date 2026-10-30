@@ -170,6 +170,21 @@ static func _recipe(sound: StringName) -> PackedFloat32Array:
 		&"shot_high_noon":
 			# A low revolver crack.
 			samples = _as_loud_as(&"shot", _tone(0.11, 520.0, 140.0, 0.55, 0.6, 26.0))
+		# --- V1.1 skin sounds: PROJECT, square-wave synth ---
+		&"cast_q_project":
+			# A square-wave synth laser with a fast flutter.
+			samples = _as_loud_as(&"cast_q", _tone(0.2, 2200.0, 900.0, 0.0, 0.9, 12.0, 60.0))
+		&"cast_w_project":
+			# A quick rising bleep, then a pop.
+			var bleep := _notes([880.0, 1320.0, 1760.0], 0.04, 20.0, 0.9)
+			bleep.append_array(_tone(0.07, 600.0, 200.0, 0.2, 0.9, 35.0))
+			samples = _as_loud_as(&"cast_w", bleep)
+		&"cast_e_project":
+			# A stuttering glitch chirp.
+			samples = _as_loud_as(&"cast_e", _tone(0.18, 1600.0, 2400.0, 0.3, 0.9, 10.0, 90.0))
+		&"shot_project":
+			# A short square blip.
+			samples = _as_loud_as(&"shot", _tone(0.07, 1400.0, 900.0, 0.0, 0.9, 30.0))
 	return samples
 
 

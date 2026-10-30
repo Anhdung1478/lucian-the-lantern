@@ -33,6 +33,7 @@ func _blast(fx: SkinFx) -> Node2D:
 func _themed() -> Dictionary:
 	return {
 		&"high_noon": [HighNoonFx, HighNoonBeam, HighNoonBlast, HighNoonTrail, HighNoonShot, HighNoonFlash],
+		&"project": [ProjectFx, ProjectBeam, ProjectBlast, ProjectTrail, ProjectShot, ProjectFlash],
 	}
 
 
