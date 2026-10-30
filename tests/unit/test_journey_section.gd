@@ -659,3 +659,14 @@ func test_escape_closes_the_menu_first() -> void:
 	section.loadout.open_menu(0)
 	assert_true(section.close_popup())
 	assert_false(section.loadout.menu.visible)
+
+
+func test_picking_a_place_clicks_but_a_locked_one_stays_silent() -> void:
+	var sfx := Sfx.new()
+	add_child_autofree(sfx)
+	sfx._last_played.clear()
+	_node("1-1")._gui_input(_click())
+	assert_true(sfx._last_played.has(&"click"), "an open place clicks")
+	sfx._last_played.clear()
+	_node("2-1")._gui_input(_click())
+	assert_false(sfx._last_played.has(&"click"), "a locked place refuses silently")

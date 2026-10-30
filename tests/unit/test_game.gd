@@ -93,7 +93,10 @@ func test_training_swaps_in_the_stage_with_its_setup() -> void:
 
 
 func test_leaving_the_stage_asks_then_saves_and_returns() -> void:
-	var stage: Stage = await _stage_with_the_menu_open()
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 1, 1))
+	await wait_physics_frames(2)
+	var stage := game.screen as Stage
+	stage.screens.set_menu_open(true)
 	_leave_button(stage).pressed.emit()
 	assert_true(game.prompt.is_open())
 	assert_eq(game.prompt._message.text, "Leave this stage? Essences collected so far are kept.")
@@ -470,6 +473,12 @@ func test_main_screen_after_a_run_keeps_its_map_chosen() -> void:
 	assert_eq(panel.thumbnail.choice, JUNGLE)
 	assert_true(panel.map_buttons[JUNGLE].button_pressed)
 	assert_false(panel.map_buttons[EndlessPlan.RANDOM].button_pressed)
+
+
+func test_leaving_training_asks_without_mentioning_essences() -> void:
+	var stage: Stage = await _stage_with_the_menu_open()
+	_leave_button(stage).pressed.emit()
+	assert_eq(game.prompt._message.text, "Leave Training?")
 
 
 func test_leaving_an_endless_run_asks_its_own_question_and_saves_the_best() -> void:

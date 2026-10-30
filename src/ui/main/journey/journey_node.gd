@@ -199,6 +199,7 @@ func set_best(waves: int) -> void:
 func _gui_input(event: InputEvent) -> void:
 	var click := event as InputEventMouseButton
 	if click and click.pressed and click.button_index == MOUSE_BUTTON_LEFT and not locked:
+		Sfx.play(&"click", UiStyle.CLICK_DB)
 		chosen.emit()
 		accept_event()
 

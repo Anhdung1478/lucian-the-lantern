@@ -1356,10 +1356,10 @@ func _refresh_stats(keep_share: bool) -> void:
 
 
 ## Stats follow the level. A level gained (not one lost on the debug table)
-## also gets a chime and a gold burst over his art.
+## also gets a chime and a gold burst over his art (not while he is dead).
 func _on_level_changed(level: int) -> void:
 	_refresh_stats(false)
-	if level > _level_shown:
+	if level > _level_shown and not dead:
 		Sfx.play(&"level_up")
 		var burst := LevelUpBurst.new(level)
 		add_child(burst)

@@ -344,3 +344,15 @@ func test_the_buff_bar_shows_the_modifier_row_with_no_timer() -> void:
 	stage.endless.choose(EndlessModifiers.NOTHING)
 	await wait_process_frames(1)
 	assert_null(_modifier_row(stage), "no row for Nothing")
+
+
+func test_the_hud_builds_the_modifier_row_once_per_modifier() -> void:
+	var stage: Stage = await _endless()
+	var first := Hud.modifier_buff(1)
+	stage.endless.modifier = 1
+	var hud := stage.hud
+	var row: Dictionary = hud._buffs()[0]
+	assert_same(hud._buffs()[0], row, "the same row on the next frame")
+	assert_eq(row, first, "its content is unchanged")
+	stage.endless.modifier = 2
+	assert_ne(hud._buffs()[0]["text"], row["text"], "a new modifier, a new row")

@@ -54,6 +54,9 @@ var _fps_label: Label
 var _buff_bar := BuffBar.new()
 var _shield_overlay := Control.new()
 var _skill_slots: Array[SkillSlot] = []
+## The modifier row of the modifier shown, built once per modifier (it loads an icon).
+var _modifier_shown := EndlessModifiers.NONE
+var _modifier_row := {}
 
 @onready var bottom_panel: PanelContainer = %BottomPanel
 @onready var portrait: TextureRect = %Portrait
@@ -193,7 +196,10 @@ func _buffs() -> Array[Dictionary]:
 	var shown := lucian.buffs()
 	var modifier := stage.endless.modifier if stage and stage.endless else EndlessModifiers.NONE
 	if modifier != EndlessModifiers.NONE:
-		shown.push_front(modifier_buff(modifier))
+		if modifier != _modifier_shown:
+			_modifier_shown = modifier
+			_modifier_row = modifier_buff(modifier)
+		shown.push_front(_modifier_row)
 	return shown
 
 

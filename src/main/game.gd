@@ -115,10 +115,12 @@ func ask_to_leave_stage(stage: Stage) -> void:
 	prompt.confirm(_leave_stage_question(), "Leave", stage.leave)
 
 
-## What Leave this stage asks (Endless: leave the run).
+## What Leave this stage asks (Endless: leave the run; Training earns no essences).
 func _leave_stage_question() -> String:
 	if _run.endless:
 		return "Leave this run? Your best wave is kept."
+	if _run.act == 0:
+		return "Leave Training?"
 	return "Leave this stage? Essences collected so far are kept."
 
 

@@ -75,6 +75,17 @@ func test_a_level_gained_plays_the_chime_and_adds_a_burst_with_the_level() -> vo
 	assert_eq((texts[0] as FloatingText).text, "Level 2")
 
 
+func test_a_level_gained_while_dead_plays_no_chime_and_no_burst() -> void:
+	var sfx := _sfx()
+	var lucian := _lucian()
+	lucian.dead = true
+	sfx._last_played.clear()
+	lucian.progress.add_xp(ChampionProgress.xp_to_next(1))
+	assert_eq(lucian.progress.level, 2, "the level still counts")
+	assert_false(sfx._last_played.has(&"level_up"))
+	assert_eq(_bursts(lucian).size(), 0)
+
+
 func test_the_burst_goes_away_on_its_own() -> void:
 	_sfx()
 	var lucian := _lucian()
