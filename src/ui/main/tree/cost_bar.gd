@@ -81,7 +81,7 @@ func refresh() -> void:
 	if tree.is_maxed(id):
 		text = "MAXED"
 		color = TreeNodeView.MAXED_COLOR
-	elif not tree.is_open(id):
+	elif not tree.next_level_open(id):
 		text = "LOCKED"
 		color = LOCKED_COLOR
 	elif price == Vector2i.ZERO:
@@ -132,7 +132,7 @@ func _draw() -> void:
 	var color := FILL_COLOR
 	if tree.is_maxed(id):
 		color = MAXED_FILL
-	elif not tree.is_open(id):
+	elif not tree.next_level_open(id):
 		color = Color(LOCKED_COLOR, 0.12)
 	var inner := Rect2(Vector2.ONE * INSET, size - Vector2.ONE * INSET * 2.0)
 	inner.size.x *= fill()

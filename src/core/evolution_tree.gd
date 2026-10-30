@@ -1,14 +1,18 @@
 class_name EvolutionTree
 extends RefCounted
-## Levels bought in the Evolution Tree and the rules for buying them. A node
-## opens once enough of its requirements have level 1 (and, for E, once
-## Act 1 is cleared). Reset costs 5 purple and gives back every blue and
-## orange spent.
+## Levels bought in the Evolution Tree and the rules for buying them. Each
+## level has its own rules: enough acts cleared, enough of the node's
+## requirements at level 1, and enough levels in the nodes of its level sum
+## (R needs Q + W + E ranks). Reset costs 5 purple and gives back every blue
+## and orange spent. `changed` fires on the acts setter, buy, reset, max_all,
+## clear and from_dict.
 
 signal changed
 
 const CATALOG: TreeCatalog = preload("res://data/tree/catalog.tres")
 const RESET_COST := 5
+## The groves, in tab order.
+const BRANCHES: Array[StringName] = [&"skills", &"stats", &"backpack", &"economy", &"summoners"]
 
 ## Acts cleared, kept in step by SaveGame.
 var acts_cleared := 0:
@@ -31,6 +35,15 @@ func node(id: StringName) -> TreeNodeData:
 	return null
 
 
+## The nodes of one grove.
+func branch_nodes(branch: StringName) -> Array[TreeNodeData]:
+	var out: Array[TreeNodeData] = []
+	for data in CATALOG.nodes:
+		if data.branch == branch:
+			out.append(data)
+	return out
+
+
 func level(id: StringName) -> int:
 	return _levels.get(id, 0)
 
@@ -40,12 +53,86 @@ func value(id: StringName) -> float:
 	return node(id).value(level(id))
 
 
-func is_open(id: StringName) -> bool:
+## The total of the levels in the node's `level_sum_ids`.
+func level_sum(id: StringName) -> int:
+	var total := 0
+	for summed in node(id).level_sum_ids:
+		total += level(summed)
+	return total
+
+
+## Whether the rules for buying the level after `at_level` are met: acts
+## cleared, requirements and level sum. Cost and max level are not looked at.
+func is_level_open(id: StringName, at_level: int) -> bool:
 	var data := node(id)
-	if acts_cleared < data.requires_act:
+	if acts_cleared < _act_needed(data, at_level):
 		return false
-	var met := data.requires.filter(func(required: StringName) -> bool: return level(required) > 0).size()
-	return met >= (data.requires.size() if data.requires_count == 0 else data.requires_count)
+	return _requires_met(data) and level_sum(id) >= data.sum_needed(at_level)
+
+
+## The first level's rules are met.
+func is_open(id: StringName) -> bool:
+	return is_level_open(id, 0)
+
+
+## Not maxed, and the rules for the next level are met.
+func next_level_open(id: StringName) -> bool:
+	return not is_maxed(id) and is_level_open(id, level(id))
+
+
+## "Requires: ..." for what is still missing to buy the level after
+## `at_level`: nodes ("A, B or C", "any 2 of ...", "A, B and C"), "Clear Act 2"
+## and "9 levels in Q + W + E (now 7)", joined with "and". "" when all is met.
+func requirement_text(id: StringName, at_level: int) -> String:
+	var data := node(id)
+	var parts: PackedStringArray = []
+	if not _requires_met(data):
+		var names: PackedStringArray = []
+		for required in data.requires:
+			names.append(node(required).display_name)
+		if data.requires_count == 0 or data.requires_count >= names.size():
+			parts.append(_join(names, "and"))
+		elif data.requires_count == 1:
+			parts.append(_join(names, "or"))
+		else:
+			parts.append("any %d of %s" % [data.requires_count, _join(names, "or")])
+	var act := _act_needed(data, at_level)
+	if acts_cleared < act:
+		parts.append("Clear Act %d" % act)
+	var needed := data.sum_needed(at_level)
+	if level_sum(id) < needed:
+		var names: PackedStringArray = []
+		for summed in data.level_sum_ids:
+			names.append(node(summed).short_name())
+		parts.append("%d level%s in %s (now %d)" % [needed, "" if needed == 1 else "s", " + ".join(names), level_sum(id)])
+	if parts.is_empty():
+		return ""
+	return "Requires: " + " and ".join(parts)
+
+
+## What the next level still needs; "" when maxed or when it is open.
+func next_requirement_text(id: StringName) -> String:
+	if is_maxed(id) or next_level_open(id):
+		return ""
+	return requirement_text(id, level(id))
+
+
+## The next level is open and costs nothing: a free upgrade to claim.
+func is_free(id: StringName) -> bool:
+	return next_level_open(id) and cost(id) == Vector2i.ZERO
+
+
+## The ids of the free upgrades, in catalog order; of one grove, or of all.
+func free_ids(branch := &"") -> Array[StringName]:
+	var out: Array[StringName] = []
+	for data in CATALOG.nodes:
+		if (branch == &"" or data.branch == branch) and is_free(data.id):
+			out.append(data.id)
+	return out
+
+
+func has_free(branch := &"") -> bool:
+	return not free_ids(branch).is_empty()
 
 
 func is_maxed(id: StringName) -> bool:
@@ -62,7 +149,7 @@ func cost(id: StringName) -> Vector2i:
 
 func can_buy(id: StringName, essences: Essences) -> bool:
 	var price := cost(id)
-	return is_open(id) and not is_maxed(id) and essences.can_afford(price.x, price.y)
+	return next_level_open(id) and essences.can_afford(price.x, price.y)
 
 
 ## Pays for the next level of `id`; false when it is closed, maxed or too dear.
@@ -140,3 +227,19 @@ func from_dict(data: Dictionary) -> void:
 		if clamped > 0:
 			_levels[node_data.id] = clamped
 	changed.emit()
+
+
+func _act_needed(data: TreeNodeData, at_level: int) -> int:
+	return maxi(data.requires_act, data.act_needed(at_level))
+
+
+func _requires_met(data: TreeNodeData) -> bool:
+	var met := data.requires.filter(func(required: StringName) -> bool: return level(required) > 0).size()
+	return met >= (data.requires.size() if data.requires_count == 0 else data.requires_count)
+
+
+## "A, B or C" with `word` before the last name.
+static func _join(names: PackedStringArray, word: String) -> String:
+	if names.size() == 1:
+		return names[0]
+	return "%s %s %s" % [", ".join(names.slice(0, -1)), word, names[-1]]

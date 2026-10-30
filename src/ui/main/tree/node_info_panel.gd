@@ -2,7 +2,7 @@ class_name NodeInfoPanel
 extends PanelContainer
 ## The chosen node, bottom-right of the Evolution Tree: its name, "LVL 2 / 5",
 ## its value now and at the next level, what it does and the CostBar that
-## buys it. A hidden node reads "???" and says what it needs.
+## buys it. A hidden node reads "???"; a closed next level says what it needs.
 
 const WIDTH := 440.0
 
@@ -14,7 +14,7 @@ var level_label: Label
 ## "+8 AD → +12 AD"; only the value, in green, once maxed.
 var value_label: Label
 var description: RichTextLabel
-## "Requires: …", shown while the node is hidden.
+## "Requires: …", shown while the next level is closed.
 var requires_label: Label
 var cost_bar: CostBar
 
@@ -73,32 +73,7 @@ func refresh() -> void:
 		value_label.text = "%s → %s" % [data.value_text(level), data.value_text(level + 1)]
 		value_label.add_theme_color_override(&"font_color", UiStyle.TEXT_COLOR)
 	description.text = TooltipText.colorize(data.description)
-	requires_label.visible = hidden
-	requires_label.text = requirement_text(tree, data)
+	var needs := tree.next_requirement_text(id)
+	requires_label.visible = needs != ""
+	requires_label.text = needs
 	cost_bar.refresh()
-
-
-## "Requires: A, B or C" (any one), "any 2 of …", "A, B and C" (all of them),
-## and "Clear Act 1" for an act.
-static func requirement_text(evolution_tree: EvolutionTree, data: TreeNodeData) -> String:
-	var parts: PackedStringArray = []
-	if not data.requires.is_empty():
-		var names: PackedStringArray = []
-		for required in data.requires:
-			names.append(evolution_tree.node(required).display_name)
-		if data.requires_count == 0 or data.requires_count >= names.size():
-			parts.append(_join(names, "and"))
-		elif data.requires_count == 1:
-			parts.append(_join(names, "or"))
-		else:
-			parts.append("any %d of %s" % [data.requires_count, _join(names, "or")])
-	if data.requires_act > 0:
-		parts.append("Clear Act %d" % data.requires_act)
-	return "Requires: " + " and ".join(parts)
-
-
-## "A, B or C" with `word` before the last name.
-static func _join(names: PackedStringArray, word: String) -> String:
-	if names.size() == 1:
-		return names[0]
-	return "%s %s %s" % [", ".join(names.slice(0, -1)), word, names[-1]]

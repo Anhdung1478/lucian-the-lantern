@@ -128,3 +128,80 @@ func test_changed_emits_on_buy() -> void:
 	watch_signals(tree)
 	tree.buy(&"flash", essences)
 	assert_signal_emit_count(tree, "changed", 1)
+
+
+func _data() -> TreeNodeData:
+	var data := TreeNodeData.new()
+	data.display_name = "Q – Piercing Light"
+	data.max_level = 3
+	data.level_values = [0.0, 5.0, 12.0, 20.0]
+	data.level_acts = [0, 2]
+	data.level_sums = [5, 9]
+	return data
+
+
+func test_level_values_replace_base_and_per_level() -> void:
+	var data := _data()
+	data.base = 99.0
+	assert_eq(data.value(2), 12.0)
+	assert_eq(data.value(0), 0.0)
+	assert_eq(data.value_text(0), "None", "None is decided by the value at level 0")
+	data.format = "{v} cells"
+	assert_eq(data.value_text(3), "20 cells")
+
+
+func test_value_text_is_none_only_when_level_0_is_zero() -> void:
+	var data := TreeNodeData.new()
+	data.per_level = 1.0
+	data.format = "Rank {v}"
+	assert_eq(data.value_text(0), "None")
+	data.base = 1.0
+	data.format = "{v} slots"
+	assert_eq(data.value_text(0), "1 slots")
+
+
+func test_act_needed_and_sum_needed_are_0_past_the_end() -> void:
+	var data := _data()
+	assert_eq(data.act_needed(1), 2)
+	assert_eq(data.act_needed(2), 0)
+	assert_eq(data.sum_needed(1), 9)
+	assert_eq(data.sum_needed(5), 0)
+	assert_eq(TreeNodeData.new().act_needed(0), 0)
+
+
+func test_short_name_is_the_part_before_the_dash() -> void:
+	assert_eq(_data().short_name(), "Q")
+	var plain := TreeNodeData.new()
+	plain.display_name = "Flash"
+	assert_eq(plain.short_name(), "Flash")
+
+
+func test_level_rules_are_checked_per_level() -> void:
+	tree.acts_cleared = 1
+	assert_true(tree.is_level_open(&"skill_q", 0))
+	assert_true(tree.next_level_open(&"skill_q"))
+	tree.max_all()
+	assert_false(tree.next_level_open(&"skill_q"), "maxed")
+	assert_eq(tree.next_requirement_text(&"skill_q"), "")
+
+
+func test_requirement_text_names_only_what_is_missing() -> void:
+	assert_eq(tree.requirement_text(&"skill_e", 0), "Requires: Clear Act 1")
+	assert_eq(tree.next_requirement_text(&"skill_e"), "Requires: Clear Act 1")
+	tree.acts_cleared = 1
+	assert_eq(tree.next_requirement_text(&"skill_e"), "")
+	assert_eq(tree.requirement_text(&"skill_e", 0), "")
+
+
+func test_free_upgrades_are_open_and_cost_nothing() -> void:
+	assert_false(tree.is_free(&"skill_e"), "closed before Act 1")
+	assert_eq(tree.free_ids(), [])
+	assert_false(tree.has_free())
+	tree.acts_cleared = 1
+	assert_true(tree.is_free(&"skill_e"))
+	assert_eq(tree.free_ids(), [&"skill_e"] as Array[StringName])
+	assert_true(tree.has_free(&"skills"))
+	assert_false(tree.has_free(&"stats"))
+	assert_false(tree.is_free(&"skill_q"), "open but not free")
+	tree.buy(&"skill_e", essences)
+	assert_false(tree.is_free(&"skill_e"), "the next rank costs")
