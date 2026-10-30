@@ -523,3 +523,169 @@ Each task follows the same checklist: write failing tests, run them, implement, 
 - **Animated backdrops** redraw every frame. Keep the static layers cached (draw once into a child that never redraws, and redraw only the motes), and check the FPS display stays at the cap.
 - **`test_tree_section.gd` is largely rewritten** in Task 8. Keep every behaviour it covered that still exists: states, badges, the info panel, cost bar, hover, reset, ESC, no file writes.
 - **Old dev saves** may sit above the new rules (bought, with a LOCKED next level). The pages must show that state cleanly.
+
+
+---
+
+## Implementation notes (Phase 10 done)
+
+Everything in the plan is in place, one commit per task (Tasks 0–13), plus a review-fix commit for Tasks 8 and 9. Task 14 is two commits: the screenshots, then these docs and the report (`docs/report/phase10.md`). The numbers in *Design* were placeholders; the game design doc §10–§11 ("Built in Phase 10"), `main_screen.md` and `ui_design.md` give the built ones. Changes and details settled while building:
+
+| Task | Commits |
+|---|---|
+| 0 Plan | `60a905a` |
+| 1 Per-level rules | `77b505a` |
+| 2 R needs 5 / 9 / 13 | `d68a56f` |
+| 3 Equip slot acts, the Backpack grove | `fe6c8db` |
+| 4 Ghost free after 1-1 | `62c2326` |
+| 5 Health Regen and Mana Regen | `7b4aa32` |
+| 6 A 54-cell backpack | `5fe05c7` |
+| 7 Backpack Slots | `36f4f96` |
+| 8 Tree pages with tabs | `7c5f71d`, review fix `220d7bb` |
+| 9 FREE badges | `076fd72`, review fix `b6d4a92` |
+| 10 Grove and gallery backgrounds | `bd96a40` |
+| 11 Settings | `c40888e` |
+| 12 Senna's gun | `f6df41c` |
+| 13 Title art | `cece518` |
+| 14a Screenshots | `d0b34bb` |
+| 14b Docs and report | "Phase 10 docs and report" |
+
+### Deviations and rulings
+The plan's *Decisions made with the user* and *Defaults chosen here* stand as written. The controller's rulings, each with its reason:
+- **R1, `screenshot.gd` keeps compiling.** A task that removed or renamed something the screenshot tool uses (Task 8 deleting `TreeMap`) updated the tool in the same task, just enough for it to compile and run. Task 14 added the new scenarios. A tool that doesn't compile would have blocked every later task's screenshot check.
+- **R2, the gallery reads the shop's sizes.** `MainBackdrop` lines its arches up with `SkinCard.SIZE`, `SkinShop.GAP` and `MainScreen.TOP_BAR` / `BOTTOM_BAR`, which already existed. No number is copied.
+- **R3, batches.** Tasks 1–4 ran as one dispatch and Tasks 5–7 as another, one commit per task. Each commit ran its focused tests, and the full suite ran before each batch's last commit.
+- **R4, Task 0 by the controller:** the plan copy, the §16 line and the baseline suite (1516 tests).
+- **R5, commit trailers.** Every commit ends with both `Co-Authored-By: Claude <noreply@anthropic.com>` (the user's rule) and the session's `Claude-Session:` line.
+- **R6, the tree's palette.** Task 8 kept the night-grove colours as constants in `TreePage`, since the grove backdrop didn't exist yet. Task 10 moved the shared sky colours to `MainBackdrop`.
+- **R7, no second moon.** The grove backdrop draws only what shows around the framed tree page and Journey map: the sky, stars, mist bands, a vignette and motes. There is no moon or hill, since `TreePage` draws its own inside its frame. The sky, the stars and the motes became shared static helpers (`MainBackdrop.draw_sky`, `draw_stars`, `draw_mote`), used by `TreePage`, `MainBackdrop` and `TitleBackdrop`.
+- **Tasks 1–4:**
+  - `requirement_text` lists only what is still missing, so R at rank 1 reads "Requires: 9 levels in Q + W + E (now 7)", without the passive. It returns "" when everything is met.
+  - `level_acts[i]` and `level_sums[i]` are the rules for buying level i + 1, indexed like `blue`.
+  - `from_dict` still clamps to the max level only, so old saves keep levels above the new rules.
+- **Tasks 5–7:**
+  - The regen nodes sat at grid (7, 1) and (11, 1), and Backpack Slots at (14, 0), until Task 8 re-authored every grid for the pages.
+  - `drop_outcome` returns RETURN when either end is locked. So an item stranded in a locked cell can't be dragged out, only sold. Only lowering the debug spinner with no room left can strand one.
+  - The "Buy Backpack Slots in the Evolution Tree" hover shows on locked backpack cells only.
+  - `Shop.Result.CELL_LOCKED` is new, checked before `can_put`.
+- **Task 8, the pages:**
+  - **Accepted beyond the plan:**
+    - each node's name on a plate under it, so vines never cross it;
+    - the info column's node list, grouped like the page, whose rows pick a node;
+    - the per-level LEVELS ladder;
+    - the moon and the side trees;
+    - the `node_chosen` signal.
+
+    They fill what were empty areas, as the request asked.
+  - The page centres the branch's columns, and its rows from the ground (row 0) to the top row, not from the lowest node. That keeps room under the Backpack page's nodes for their previews.
+  - Skills spreads to columns 0, 2.5 and 5. Each bough leaves the trunk on its own side, so they never cross.
+  - R's ring leaves its bottom 144° open for the badge and the name.
+  - The equip strip outlines the next slot only when its level is open. Otherwise that slot shows a lock.
+  - `JourneyPanel._divider()` became the public static `JourneyPanel.divider()`.
+  - `tree_page.gd` is 733 lines, almost all drawing.
+- **Task 9:** after 1-1 the badge shows on the Ghost node, the Summoners tab and the tree button. `FreeBadge` syncs its pulse in `_ready`, because entering the tree turns processing on without a visibility change.
+- **Task 10:**
+  - More unlit arches continue past the five cards, as far as the screen goes. That also covers wider screens.
+  - `draw_mote` is shared too, so the tree's, the main screen's and the title's motes look alike.
+  - `main_backdrop.gd` is 611 lines, about 330 of them the gallery.
+- **Task 11:**
+  - **Accepted beyond the plan:** `SettingsRow` (the card, in its own class) and `option_check.svg` (the gold diamond in dropdown lists). Without the SVG, the lists kept Godot's grey radio circles.
+  - The theme reaches the dropdowns' pop-up lists without being set on them. A test pins it.
+  - The panel is opaque, because at 0.96 the title's logo showed through. Volumes show as whole numbers.
+  - A card's controls let the mouse through to the card (PASS), so the card lights when its slider is hovered. The wheel now scrolls the Controls list over its buttons too.
+  - The old 4-line Controls hint was split: its first sentence is the page subtitle, and the rest is a 2-line hint. "Ctrl + the stats key toggles the stats panel (hold it for more)" was dropped, since the action's own name says it.
+  - `settings_screen.gd` is 518 lines.
+- **Task 12:**
+  - The art sheet gained a second page, `art_sheet_1_bodies`: the five bodies at 2× and at game size.
+  - High Noon's rings are ember `#ff6a2a`. The first orange matched the revolver.
+  - The dark gun bodies of High Noon, PROJECT and Vampire are lighter than the plan's hexes, so they show on the floor. PROJECT also got a dim neon rim.
+  - On PROJECT and Vampire, Senna's muzzle light is the same colour family as Lucian's, as the ring colours asked.
+- **Task 13:**
+  - Godot's SVG importer (ThorVG) draws nothing for `<mask>`, so Senna fades with alpha gradients instead.
+  - The figures at 1920 × 1080: Senna x 0–398, Lucian x 190–679, Thresh x 1258–1880. Lucian's rect ends 21 px before the slot list's column (x 700); a test pins it.
+  - Anything in the right half moves with the right edge, so on a wider screen only the middle widens.
+  - `title_backdrop.gd` is 509 lines, about 135 of them constants.
+
+### Visual pass (Task 14)
+Every scenario Phase 10 added or changed was run in a window, and every PNG was looked at: 64 in all.
+- **No game bug found.** All printed checks matched.
+- **Checked against the request:**
+  - the pages fill their frames, and the nodes read;
+  - the FREE badges show after 1-1 and go once Ghost is claimed;
+  - R's ring;
+  - the backpack at 5 / 54 open;
+  - the grove and the gallery;
+  - no grey default widget in Settings, dropdown lists included;
+  - the two guns differ on every skin at game zoom;
+  - the title figures stay clear of the buttons in the 1600 × 900 window.
+- **Noticed, not changed:**
+  - the Economy and Backpack pages have open sky in their middle;
+  - Max tree leaves the "Act 2" and "Act 4" tags dim, because it skips the act rules;
+  - a picked hidden node shows its description and ladder (the known leak);
+  - the Summoners list nearly fills the info column.
+
+### Screenshot harness
+- **Carried from earlier tasks:**
+  - Task 8 moved `main_tree`, `main_tree_max` and `tree_icons` to `section.views`, the tabs and `show_branch`, and dropped the pan, zoom and drag shots. `main_tree` clears Act 1 before its buys; its printed expectations had been stale since Q needed Act 1. It shoots every tab and prints each tab's draw mode.
+  - Task 9 added `tree_free`.
+  - Task 11 added `title_settings`, the dropdown step in `settings`, and the `hover()` helper.
+  - Task 12 added the art sheet's bodies page.
+- **Task 14:**
+  - New Game scenarios:
+    - `tree_rules`: R needs 9, Equip Slots needs Act 2, then Act 2 cleared;
+    - `backpack_slots`: 5 of 54 cells in Training, a locked cell's hover, "Backpack full", then 16 cells after two levels.
+  - `main_journey` no longer buys Ghost on a new save, since Ghost needs Act 1 now. Its menu expectation is [flash, heal, smite].
+  - `main_tree` prints R's expected requirement text.
+  - `art_sheet` adds the 15 new icons: the regen and Backpack Slots nodes and the 12 Settings SVGs (51 in all).
+  - `title_settings` scrolls E's row into view before its listening shot.
+- 64 PNGs in `docs/report/phase10/`, all 1600 × 900, each with its `.import`, as in Phase 9.
+
+### Fixes from reviews
+- **Task 8 (Important):** `TreePage` and `NodeInfoPanel` had copied the Journey's frame, text, glow and rule drawing, and `TreePage` changed a shared `FontVariation` while drawing. Fixed in `220d7bb`:
+  - `JourneyMap.draw_frame`, `draw_text` and `text_font` (a cache of spaced fonts that are never changed) are shared statics;
+  - so are `JourneyPanel.frame_style`, `draw_top_glow` and `draw_rule`;
+  - the Journey looks the same: a pixel diff found changes only in animated spots.
+- **Task 8, the lit tab:** one early run showed the Skills tab lit on other pages. It was a synthetic mouse release lost in the harness, and it didn't come back in 6 runs. `main_tree` now prints every tab's draw mode at shot time.
+- **Task 9 (Important):** a badge visible as the tree opened didn't pulse. Fixed in `b6d4a92`, with a test for 4 cases.
+- **Found by the implementers in self-review:**
+  - The info column's rows were freed with `queue_free`, so every rebuild left GUT orphans until the frame ended. They are freed at once now.
+  - Hovering a Settings slider darkened its card. The cards' controls are PASS now, with a test.
+
+### Left as is (small, from the reviews)
+- **Tasks 1–4:** `requirement_text` declares `var names` in two blocks (legal). The `free_ids` tests assert catalog order (skill_e before ghost), on purpose.
+- **Tasks 5–7:**
+  - An item stranded in a locked cell can be sold but not dragged out (debug only).
+  - `Shop.Result.CELL_LOCKED` sits mid-enum and shifts the later ints; nothing stores them.
+  - The locked-cell hover has no full stop, and no test pins it or the debug spinner.
+- **Task 8:**
+  - No test pins the grid-to-page centring (`test_nodes_sit_on_their_grid_cells` was dropped).
+  - `test_tree_data_files` asserts that Skills and Summoners both use (0, 0), which is incidental.
+  - `TABS_RECT` is a literal, not built from `PAGE_RECT`. `TreePage.MINI_COLUMNS` repeats `BackpackScreen.COLUMNS`.
+  - A picked hidden node shows its description, "None → Rank 1" and the ladder.
+  - `NodeInfoPanel` grows with its content and has no clip.
+- **Task 9:** the badge anchoring is repeated in `section_bar.gd` and `branch_tabs.gd`.
+- **Task 10:**
+  - `main_backdrop.gd` is about 600 lines; the gallery could be its own class.
+  - The shared draw helpers live on a `Control`, and some tuning literals in the gallery's drawing are inline.
+  - The motes move under Settings.
+  - The gallery's stone shading shifts slightly with the window width.
+- **Task 11:**
+  - The dropped Controls hint line.
+  - `_style_tab` casts a stylebox without a null check, and restyles four boxes per tab on every `show_tab`.
+  - No test pins the "too big" resolution marks.
+  - `settings_screen.gd` is 518 lines; `_draw_emblem` could live with the Journey panel's glow helpers.
+- **Task 12:** `test_skins`'s muzzle test comment says it checks the SVG tips; it checks the markers in `lucian.tscn`. Classic's and High Noon's Senna-gun bodies are lighter than the plan's hexes.
+- **Task 13:** the title's effects keep redrawing under Settings; `title_backdrop.gd` is 509 lines; Lucian's rect is 21 px from the slot list (test-guarded).
+- **Not from Phase 10's game code:** `test_backpack_drag.gd` (Task 6) leaves 3 orphans and leak lines at exit. `test_monsters`'s raptor-spread test can fail under load.
+- **Plan checklists:** the task checklists in this file are left unticked; the commits above are the record.
+- **Tests:** the suite is **1601 tests, all passing** (24494 asserts, about 627 s), up from 1516 before the phase: 85 new. GUT's 2 warnings are the known unfreed children in `test_act4` and `test_lucian_skills`. The 3 orphans are `test_backpack_drag.gd`'s.
+
+### Running the checks
+
+```
+godot_console --headless --path . --import
+godot_console --headless --path . -s res://addons/gut/gut_cmdln.gd
+godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+```
+
+Phase 10's scenarios: `tree_rules`, `backpack_slots`, `tree_free` and `title_settings`. Phase 10 also changed `main_tree`, `main_tree_max`, `tree_icons`, `main_journey`, `settings` and `art_sheet`. Run them in a window and keep the mouse off it. Run `--import` first: Phase 10 added 18 SVGs.

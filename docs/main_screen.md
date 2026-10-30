@@ -81,6 +81,18 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
   4. Otherwise ESC opens the gear menu.
 - **Sounds:** every styled button clicks softly (−10 dB), on the main screen and the title too (`ui_design.md` §8).
 
+### Built in Phase 10
+- **A new background.** The plain gradient is gone. `MainBackdrop` draws a scene behind the sections, set by the open section:
+
+| Scene | Behind | Look |
+|---|---|---|
+| Grove at night | Evolution Tree and Journey | A deep teal to indigo night sky with 220 stars, ten brighter stars with soft glints along the top bar, three mist bands, a vignette, and 40 warm light motes rising slowly. It shows around the framed tree page and Journey map. There is no moon or hill here: the tree's pages draw their own. |
+| Hall of Relics | Skin Shop | A stone gallery with one lit arch per skin card (Section 2) |
+
+- Only the motes move; the rest is drawn once per scene. The backdrop never takes the mouse.
+- **FREE badge.** A small green-gold "FREE" pill, pulsing slowly, sits at the top right of the bottom bar's **Evolution Tree** button whenever the tree has a free upgrade to claim, such as Ghost after 1-1 (game design doc §11). It goes once the upgrade is claimed. The tree's tabs and nodes wear the same badge (Section 1).
+- **ESC** in the Evolution Tree clears the picked node; the info column goes back to the branch's summary.
+
 ---
 
 ## Section 1 – Evolution Tree
@@ -88,9 +100,9 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 Reference: a node-graph tree with icons in square frames connected by lines (see the screenshot the design was based on).
 
 ### Layout
-- **One big map shown as a forest:** no separate pages for skills, stats, equipment, summoners and economy. Every branch lives on the same canvas, each growing from its own roots.
+- **One big map shown as a forest:** no separate pages for skills, stats, equipment, summoners and economy. Every branch lives on the same canvas, each growing from its own roots. *(Phase 10: one page per branch, with tabs. See "Built in Phase 10".)*
 - Each upgrade is a **square node with an icon**. Lines connect a node to its requirements.
-- The player can **drag to move** around the map and **zoom** with the mouse wheel.
+- The player can **drag to move** around the map and **zoom** with the mouse wheel. *(Phase 10: no panning or zoom; each page fits the screen.)*
 - Essences in the top-left.
 - **Reset tree** button (costs 5 purple, refunds all blue and orange).
 
@@ -104,7 +116,7 @@ Reference: a node-graph tree with icons in square frames connected by lines (see
 | Maxed | **Green** frame |
 
 ### Node info panel
-Clicking a node opens a panel (bottom-right, like the reference):
+Clicking a node opens a panel (bottom-right, like the reference): *(Phase 10: a column on the right that is always shown.)*
 - **Name** of the upgrade
 - **Current value → next value** (e.g. `+40% → +60%`)
 - **Short description**
@@ -114,6 +126,8 @@ Clicking a node opens a panel (bottom-right, like the reference):
 ### Built in Phase 5
 
 **31 nodes** in five groves, left to right: Skills, Stats, Equipment, Economy, Summoners. Costs and what each level gives are in the game design doc §11; this table is where each node sits. Grid = (column, row up from the ground); one cell is 150 px.
+
+*(Phase 10: 34 nodes on five pages, Equipment renamed Backpack, and new grids; see "Built in Phase 10". R's and Ghost's requirements changed too (game design doc §11).)*
 
 | Grove | Node (id) | Grid | Levels | Requires |
 |---|---|---|---|---|
@@ -155,12 +169,50 @@ A node with a level is never hidden (this only matters after the debug table's M
 - The name, "LVL 2 / 5", and "+8 AD → +12 AD". A maxed node shows only its value, in green.
 - The description.
 - A hidden node reads "???" and adds a red line built from its requirements, e.g. "Requires: Q – Piercing Light, W – Ardent Blaze or E – Relentless Pursuit", "Requires: any 2 of …", "Requires: Clear Act 1".
-- **Cost bar** (400 × 56, the buy button): for each essence the next level needs, its icon and "owned / cost" (red when short). A gold fill shows how close the player is (the smallest share over the kinds needed). It can only be clicked when the level can be bought; a click buys it with a coin sound. It reads **MAXED** (green), **LOCKED** (grey) or **Free** (E's first level after Act 1).
+- **Cost bar** (400 × 56, the buy button): for each essence the next level needs, its icon and "owned / cost" (red when short). A gold fill shows how close the player is (the smallest share over the kinds needed). It can only be clicked when the level can be bought; a click buys it with a coin sound. It reads **MAXED** (green), **LOCKED** (grey) or **Free** (E's first level after Act 1). *(Since Phase 10 also Ghost after 1-1, and LOCKED for a bought node whose next level is closed.)*
 
 **Reset tree** (top-right): "Reset tree 5" with the purple icon. Disabled until something is bought and 5 purple are owned. It asks "Reset the Evolution Tree for 5 purple essence? Every blue and orange essence spent comes back." Buying and resetting never save by themselves.
 
 ### Built in Phase 9
 **The tree shows the stage's icons.** The skill nodes (Q, W, E, R, the passive) use the HUD's skill icons (`assets/art/ui/icon_*.svg`). The six spell nodes use the summoner art (`assets/art/summoners/*.svg`), as the HUD and the Journey's spells do. The 11 old `tree/` copies are gone. The six spell upgrades (`tree/*_upgrade.svg`) are redrawn from their spell's art with three outlined gold chevrons, so each still matches its spell. Every other node keeps its `tree/<id>.svg`.
+
+### Built in Phase 10
+**Branch pages with tabs** (the user's choice in planning). The forest strip, its panning and its zoom are gone. The section is laid out like the Journey: a framed page on the left and a column on the right.
+
+| Part | On screen (1920 × 1080) |
+|---|---|
+| The page (`TreePage`): one per branch, one shown | x 32–1448, y 80–920 (1416 × 840) |
+| The tabs (`BranchTabs`) | Under the page, y 920–984, 24 px in from its sides |
+| The info column (`NodeInfoPanel`), always shown | x 1448–1888, y 80–984 (440 × 904): the Journey panel's size, frame and glow |
+| Reset tree | The page's top right, as before |
+
+**Tabs:** Skills, Stats, Backpack, Economy, Summoners. Each shows an icon, the name and "levels bought / all" ("Stats 3 / 45"). The open tab is lit gold. A tab with a free upgrade wears a FREE badge on its top edge. The tree opens on the first branch with a free upgrade, otherwise on Skills. This is chosen each time the main screen opens.
+
+**Each page** draws one branch large, as a tree in a night grove:
+- a starry sky, a moon, hills, dark side trees and a green canopy haze;
+- a glowing trunk rising from roots, and curved boughs out to every node;
+- a vine for each requirement link, wound along the boughs: dim until the node that needs it is bought, then gold;
+- faint leaves and 28 drifting light motes;
+- at the top left, "EVOLUTION TREE", the branch's name and a one-line blurb.
+
+| Page | Layout |
+|---|---|
+| Skills | Q, W and E along the bottom, the passive above W, and R crowning the trunk. R wears a ring of 13 segments, lit up to the Q + W + E total, with marks at 5, 9 and 13. |
+| Stats | Three boughs of three, with captions: OFFENSE (AD, AP, Attack Speed), DEFENSE on the trunk (Health, Armor, Magic Resist) and SUSTAIN (Mana, Health Regen, Mana Regen). |
+| Backpack | Equip Slots and Backpack Slots, each over a plaque. Equip Slots shows the 6 slots: open ones lit, the rest locked, with "Act 2" under slots 3–4 and "Act 4" under slots 5–6 (green once that level is open). Backpack Slots shows the 9 × 6 backpack with the open cells lit ("5 / 54"). The next level's slots or cells are outlined once it can be bought. |
+| Economy | REWARDS (Stage Gold, Bonus XP, Essence Drops) and MERCHANT (Merchant Stock, Cheaper Refresh). |
+| Summoners | The six spells along the bottom, each spell's upgrade above it, and the Second Summoner Slot at the top of the trunk. |
+
+**Nodes** are 96 px (72 before), with a larger level badge and the node's name on a dark plate under it ("???" while hidden). Two new marks:
+- a small **lock** at the bottom-right corner when the node is bought but its next level is closed (R at rank 1 below 9 Q + W + E; Equip Slots at level 1 before Act 2);
+- a **FREE** badge at the top-right corner when its next level is free (Ghost after 1-1).
+
+**The info column:**
+- **Nothing picked:** "EVOLUTION TREE", the branch's name and blurb, "Levels bought 3 / 45" with a gold bar, "Pick a node", then one row per node of the branch (icon, name, level), grouped under the page's captions. A click on a row picks that node.
+- **A node picked:** the branch, the name, a 96 px portrait in the node's state colours, "LVL 1 / 3", "Rank 1 → Rank 2", and the description. For R, "Q + W + E ranks: 7 / 9". In red, what the next level still needs ("Requires: 9 levels in Q + W + E (now 7)"). Then LEVELS: one row per level with its value and cost ("Free" when it costs nothing), the bought ones lit and the next one framed. The cost bar sits at the bottom, like the Journey's Start.
+- ESC or a tab click clears the pick.
+
+**FREE badges** (`FreeBadge`): a 48 × 20 pill reading "FREE" in 13 px, green with a gold border, pulsing every 1.8 s. It shows on the bottom bar's Evolution Tree button, the tabs and the nodes, for any next level whose rules are met and which costs nothing. It updates whenever the tree changes.
 
 ---
 
@@ -198,6 +250,25 @@ A **full-screen** section showing every skin, including **Classic Lucian**.
 - **Purchase 25** shows the purple icon. Without enough purple it is disabled and its price turns red.
 - **Buying doesn't equip**; there is no confirm step. Neither buying nor equipping saves by itself.
 - In a stage, Lucian's body sprite and the HUD portrait follow the equipped skin. How the stat changes work is in the game design doc §10.
+
+### Built in Phase 10
+**The Hall of Relics**, a background of its own (`MainBackdrop`'s gallery scene), drawn once:
+- A stone wall of block courses under a cornice.
+- One tall arch behind each card, centred on it, with 11 voussoirs and a keystone gem in that skin's colour. More arches, unlit, run on past the five to the screen's edges.
+- In each lit arch: an iron lantern hanging from the keystone on a chain, its glass and flame in the skin's colour, a soft light cone down to the floor, a glow behind the card, and a plinth lit in that colour.
+- Fluted piers between the arches, each with a navy banner trimmed in gold.
+- A polished floor of tiles in perspective, with a pool of light at each plinth, and the light cones, the cards and the piers mirrored in it, dark.
+- 60 dust motes drift in the beams and over the pools of light. Only they move.
+
+| Skin | Its colour |
+|---|---|
+| Classic | Gold `#f2c75c` |
+| High Noon | Amber `#ff8f3a` |
+| PROJECT | Cyan `#3fe6ff` |
+| Pulsefire | Blue `#4a8dff` |
+| Vampire | Crimson `#e8283f` |
+
+**Lucian's second gun is Senna's** on every skin's body in a stage (game design doc §10). The cards' portraits are unchanged.
 
 ---
 

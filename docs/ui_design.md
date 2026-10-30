@@ -328,8 +328,10 @@ Built in Phase 9. After each Endless boss wave (10, 20, …) the break waits for
   [1][2][3][4][5][6][S]   <- equip row, outside the backpack
 ```
 
+*(Phase 10: 6 rows of 9, 54 cells, and only the open ones take items; see "Built in Phase 10".)*
+
 ### Layout
-- **Rows 1–7:** 49 backpack slots (7 per row), in a light tan style like the reference image.
+- **Rows 1–7:** 49 backpack slots (7 per row), in a light tan style like the reference image. *(Rows 1–6, 9 per row, since Phase 10.)*
 - **Row 8 – equip row:**
   - Placed **further away** from the other rows, so it looks like it sits **outside the backpack** (like the darker bottom row in the reference image), with its own darker style.
   - Slots **1–6:** equipped items. Locked slots show a chain.
@@ -389,6 +391,14 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - Works in the **backpack**, the **merchant's shop**, the **recipe table** and the **HUD item slots**.
 - Layout like LoL: icon, name and cost; stat lines; each passive / active with its name; for a legendary, its recipe.
 - Each stat line is the **stat icon, the amount in the stat's color, then the name**, e.g. `[axe] +65 Attack Damage`.
+
+### Built in Phase 10
+- **54 cells: 6 rows of 9.** The equip row below is unchanged.
+- **Only the open cells take items.** A new game opens 5: the first 5 cells. The others show a chain, like a locked equip slot, and hovering one says "Buy Backpack Slots in the Evolution Tree". The tree's Backpack Slots opens more, up to all 54 (game design doc §11).
+- Which cells are open is read from the tree when a stage starts, before the equip slots, so items leaving a locked equip slot land in an open cell. A stage run on its own opens all 54.
+- **Drag and drop:** a drop on a locked cell returns the item to its cell.
+- **When the open cells are full:** loot stays on the ground ("Backpack full" over Lucian), a right-click buy says "No room in the backpack", and a buy dragged onto a locked cell says "That cell is locked".
+- **Debug:** the stage debug table has a "Backpack slots" spinner (1–54).
 
 ---
 
@@ -457,6 +467,30 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 
 - **Not yet:** cast modes (normal / quick / quick with indicator) and camera options.
 
+### Built in Phase 10
+**A new look; the same settings and the same behaviour.** It is one screen, opened from the title, the main screen's gear menu and a stage's ESC menu.
+
+| Part | Look |
+|---|---|
+| Panel | 1120 × 720, opaque navy with a gold border. A lantern medallion sits on its top edge with a green glow, over "SETTINGS" in spaced gold capitals and a gold rule with a diamond, as on the Journey panel. |
+| Tab rail | 240 px on the left: Audio, Controls, Graphics and Gameplay, each with its own icon (a speaker, a mouse, a monitor, a gamepad). The open tab has a gold-tint fill and a gold bar at its left edge. Under the tabs: "Every change applies at once and is saved." |
+| Pages | A title in spaced capitals, a dim one-line subtitle, a gold line, then one card per setting: its name, a short dim description where there is one, and its control on the right. A card's border brightens on hover. |
+| Footer | Back, in gold, at the bottom right. Controls keeps **Reset to defaults**, beside its title. |
+
+| Page | Subtitle and content |
+|---|---|
+| Audio | "Volumes change at once. Letting go of a slider plays a test sound." The three volumes, shown as whole numbers ("80"). "No music yet" is now the Music row's description. |
+| Controls | "Click a binding, then press a key or click it again with a mouse button." The list is grouped: MOVE AND ATTACK, SKILLS, SUMMONER SPELLS, ITEMS, INTERFACE. A 2-line hint sits under it. A binding waiting for a key is lit gold and reads "Press a key...". |
+| Graphics | "The window, the frame rate and how much the effects cost." The old notes are the Resolution and Quality rows' descriptions. |
+| Gameplay | "How Lucian takes your orders." Skill queue, with its note as the description. |
+
+**No grey default widget is left.** A theme made in code (`UiStyle.theme()`) styles every control:
+- **sliders:** a dark rounded track, a gold fill, and a gold diamond handle that brightens on hover;
+- **dropdowns:** navy with a gold border and a gold chevron. Their lists are navy too: the hovered entry is gold-tinted, the chosen one has a gold diamond, and "too big" sizes stay greyed;
+- **switches:** a gold track with a check when on, a dark track with a steel knob when off;
+- **scroll bars:** thin, with a gold handle;
+- **separators:** a thin gold line.
+
 ---
 
 ## 6. Screens to design
@@ -478,7 +512,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 
 The game opens here (built in Phase 6).
 
-- A dark green radial background, Thresh's lantern (200 px) with its green glow, **LUCIAN** in gold and **THE LANTERN** in pale green.
+- A dark green radial background, Thresh's lantern (200 px) with its green glow, **LUCIAN** in gold and **THE LANTERN** in pale green. *(Phase 10: a Shadow Isles night with Lucian, Senna and Thresh replaces the background; see below.)*
 - Four buttons (420 × 64): **Start new game**, **Load game**, **Settings**, **Exit game**.
   - **Load game** is disabled with no saved slot (hover: "No saved games yet").
   - **Settings** opens the shared Settings screen; Back or ESC closes it.
@@ -494,6 +528,24 @@ The game opens here (built in Phase 6).
 - A new game on a used slot asks "Overwrite slot 2? Its progress will be lost." (Yes / No). Yes writes the new game at once and starts Act 1. An empty slot starts at once.
 - Loading a slot opens the main screen on Journey.
 - The slot buttons are 520 px wide, so the longest text keeps room around it. The gear menu's Save as copy uses the same list.
+
+### Built in Phase 10
+**The story on the title screen:** Lucian and Senna on the left face Thresh on the right, under the Shadow Isles moon. The figures are backlit silhouettes (the user's choice in planning): dark bodies with a moonlight rim on one edge, and colour accents. The centred column (lantern, title, buttons, slot list) is unchanged.
+
+| Figure | Where (1920 × 1080) | Look |
+|---|---|---|
+| Senna | x 0–398, 790 tall, behind Lucian | A hooded spirit in ghostly teal that fades toward the ground (her soul is taken), her relic cannon on her shoulder with teal rings and a glowing core |
+| Lucian | x 190–679, 870 tall | In his long coat, facing right. His own slim pistol is aimed, with a gold glint at its muzzle. Senna's heavy relic gun is raised beside his head, with teal rings. |
+| Thresh | x 1258–1880, 1010 tall | Looming and facing left: a tall hood with green eyes, spiked shoulders, chains across his body and down to the ground, the sickle on a chain, and the green lantern held out |
+
+- **The scene** (`TitleBackdrop`), drawn once:
+  - a teal-black sky with stars, and a large pale moon at the upper left with halos;
+  - far isles under a haze, and a Shadow Isles cliff at the right, with Helia's ruined arches and spires on it (some broken, with faint green windows);
+  - four dead trees and nine gravestones;
+  - a faint spectral chain along the ground, from Thresh toward Senna;
+  - a soft dark shade behind the column, so the buttons read.
+- **What moves:** three bands of ground mist, green mist on Thresh's side, the lantern's glow pulse, nine souls rising from the lantern with fading trails, 22 teal motes around Senna, three lights running along the chain, and a gold twinkle on Lucian's muzzle.
+- On a wider screen, Lucian and Senna keep to the left edge and Thresh to the right; only the middle widens. Nothing here takes the mouse, so every button works as before.
 
 ## 8. Sounds
 

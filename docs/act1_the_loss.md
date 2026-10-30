@@ -16,7 +16,7 @@
 
 Lucian and Senna fight minion waves together. At the first break, Senna teaches him **E (Relentless Pursuit)**. Thresh appears and attacks. When Thresh reaches 50% HP, a cutscene plays: he kills Senna and traps her soul in his lantern. Lucian takes up Senna's gun.
 
-**Rewards:** Senna's gun (second gun), **E level 1** in the Evolution Tree, **Q and W** open in the Evolution Tree, first-time purple essence.
+**Rewards:** Senna's gun (second gun), **E level 1** in the Evolution Tree, **Q and W** open in the Evolution Tree, first-time purple essence. *(Since Phase 10 also: **Ghost** free to claim in the Evolution Tree.)*
 
 ## Waves (placeholder)
 
@@ -155,6 +155,7 @@ His skill hits count as skills, so Banshee's Veil blocks one (the hook's pull to
 - A caption stays 3.5 s. Space or a left-click moves on. **Skip** (top right) ends the scene at once; he still gets her gun.
 - Then **STAGE CLEARED**, with "Lucian takes Senna's gun: two guns from now on", "E – Relentless Pursuit: level 1 in the Evolution Tree", "Q – Piercing Light and W – Ardent Blaze can now be bought in the Evolution Tree", "+10 purple essence (first clear)" and "Act 2 is open". Thresh's blue and orange rise where he sank.
 - The save then has E at level 1 in the Evolution Tree (free, nothing to buy), and Q and W open there.
+- *Since Phase 10:* a line follows the Q and W one: "Ghost is free to claim in the Evolution Tree". Ghost then costs nothing, but it isn't given: the player clicks it in the tree. A FREE badge on the main screen's Evolution Tree button, the Summoners tab and the Ghost node points to it (`main_screen.md`).
 - If Lucian dies first, it is GAME OVER: no cutscene and no purple.
 
 ### Replay

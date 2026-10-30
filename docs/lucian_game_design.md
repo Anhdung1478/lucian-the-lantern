@@ -270,8 +270,8 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 ## 6. Items
 
 ### Backpack & equipment
-- **Backpack:** 49 slots (7 × 7).
-- **Equip slots:** start with 1, unlock up to 6 in the Evolution Tree.
+- **Backpack:** 49 slots (7 × 7). *(Since Phase 10: 54 cells (9 × 6), and only 5 are open at the start. The Evolution Tree's Backpack Slots opens the rest (§11).)*
+- **Equip slots:** start with 1, unlock up to 6 in the Evolution Tree. *(Since Phase 10, slots 3–4 need Act 2 cleared and slots 5–6 need Act 4 (§11).)*
 - Items can be **sold** to the merchant for **70%** of their buy price (**Guardian Angel: 40%**). Legendary items **cannot be broken** back into fragments.
 - **Crafting:** drag one fragment onto another that forms a recipe and hold for a short time (see `ui_design.md`).
 - **Shared item cooldowns:** every copy of the same item shares **one cooldown** (e.g. all Galeforces, all Guardian Angels). Selling an item on cooldown and getting another copy does **not** reset it.
@@ -517,6 +517,16 @@ Skins can only be changed **outside stages**.
 - Attack speed, move speed, ability haste and lifesteal are added like item stats. The AD, AP and max HP percentages multiply the final stats, after item passives.
 - Vampire's kill heal works on real kills; training dummies never die, so only the tests show it for now.
 
+**Built in Phase 10: Lucian's second gun is Senna's.** On all five bodies, the left-hand gun stays his own slim pistol. The right-hand gun is that skin's take on Senna's relic gun: a chunkier, darker body with a heavy stock, two glowing ring bands, a muzzle cap and a muzzle light in the ring colour. The muzzles didn't move, so the shots leave from the same points. The one-gun body of Act 1's first play is unchanged.
+
+| Skin | Lucian's gun | Senna's gun |
+|---|---|---|
+| Classic | Slim silver-gold | Gunmetal, teal rings |
+| High Noon | Bronze revolver | Dark iron, ember-orange rings |
+| PROJECT | Chrome | Boxy gunmetal with a dim neon rim, cyan rings |
+| Pulsefire | White | Blue and white, pale blue rings, a glowing core between them |
+| Vampire | Silver with a red gem | Black iron with a crimson rim, crimson rings |
+
 ---
 
 ## 11. Evolution Tree
@@ -525,9 +535,9 @@ A node opens once **all of its requirements** are bought (or any 1 / any 2 of th
 
 **Reset:** costs **5 purple** and refunds all blue and orange essence.
 
-**Nodes have levels** (built in Phase 5; 31 nodes, laid out in `main_screen.md`):
+**Nodes have levels** (built in Phase 5; 31 nodes, laid out in `main_screen.md`). *(34 since Phase 10: Health Regen, Mana Regen and Backpack Slots are new.)*
 - Q, W and E are one node each with 5 levels, R one node with 3. Equip slots are one node with 5 levels (slots 2–6), Merchant stock one node with 2 (3 and 4 items). Each level costs what the tables below say for that rank, slot or step.
-- A node opens once its requirements have level 1; its later levels need nothing more.
+- A node opens once its requirements have level 1; its later levels need nothing more. *(Since Phase 10 a level can have rules of its own: R's ranks need 5, 9 and 13 levels in Q + W + E, and equip slots 3–4 and 5–6 need Act 2 and Act 4 cleared. A level opens only when all of its rules are met.)*
 - **Q, W and E** stay hidden until Act 1 is cleared. Clearing it puts **E at level 1** for free (Senna taught it). A reset takes it back like any level, and it is free to buy again.
 - In a stage, skill points only go into bought ranks, and the passive only works once bought.
 
@@ -537,25 +547,44 @@ A node opens once **all of its requirements** are bought (or any 1 / any 2 of th
 | Q / W rank 1 | 100B each | Clear Act 1 |
 | E rank 1 | Free, given when Act 1 is cleared | Clear Act 1 |
 | Passive | 150B | Any 1 of Q, W, E rank 1 |
-| R rank 1 | 600B + 10O | Q, W, E rank 1 and Passive |
+| R rank 1 | 600B + 10O | Passive, and 5 levels in Q + W + E |
 | Q / W / E rank 2 | 200B | Previous rank |
 | Q / W / E rank 3 | 350B | Previous rank |
 | Q / W / E rank 4 | 500B + 5O | Previous rank |
 | Q / W / E rank 5 | 800B + 10O | Previous rank |
-| R rank 2 | 1200B + 20O | R rank 1 |
-| R rank 3 | 2000B + 30O | R rank 2 |
+| R rank 2 | 1200B + 20O | R rank 1, and 9 levels in Q + W + E |
+| R rank 3 | 2000B + 30O | R rank 2, and 13 levels in Q + W + E |
 
-### Equipment
-| Node | Cost |
-|---|---|
-| Equip slot 2 | 150B |
-| Equip slot 3 | 300B |
-| Equip slot 4 | 600B + 5O |
-| Equip slot 5 | 1000B + 15O |
-| Equip slot 6 | 1500B + 30O |
+*(Since Phase 10. Before, R rank 1 needed Q, W and E each at rank 1 plus the passive, and ranks 2–3 only the rank before. Q + W + E is the sum of the three ranks bought, 15 at most: Q 4 + E 1 opens R once the passive is bought.)*
+
+### Backpack
+*(Called Equipment before Phase 10.)*
+
+| Node | Cost | Requires |
+|---|---|---|
+| Equip slot 2 | 150B | — |
+| Equip slot 3 | 300B | Clear Act 2 |
+| Equip slot 4 | 600B + 5O | Clear Act 2 |
+| Equip slot 5 | 1000B + 15O | Clear Act 4 |
+| Equip slot 6 | 1500B + 30O | Clear Act 4 |
+
+*(The act rules since Phase 10.)*
+
+**Backpack Slots** (since Phase 10): the backpack has 54 cells, and a new game opens 5. Each level opens more. The equip slots don't count. No act rule.
+
+| Level | Open cells | Added | Cost |
+|---|---|---|---|
+| 0 (start) | 5 | — | — |
+| 1 | 10 | +5 | 50B |
+| 2 | 16 | +6 | 100B |
+| 3 | 22 | +6 | 200B |
+| 4 | 29 | +7 | 350B + 3O |
+| 5 | 37 | +8 | 500B + 8O |
+| 6 | 45 | +8 | 800B + 15O |
+| 7 | 54 | +9 | 1200B + 25O |
 
 ### Stats
-AD, AP, HP, Armor, MR, Attack Speed, Mana — 5 levels each.
+AD, AP, HP, Armor, MR, Attack Speed, Mana, Health Regen, Mana Regen — 5 levels each. *(The two regen nodes since Phase 10.)*
 Costs: 50B → 100B → 200B → 350B + 3O → 500B + 8O.
 
 | Stat | Per level | At level 5 |
@@ -567,15 +596,20 @@ Costs: 50B → 100B → 200B → 350B + 3O → 500B + 8O.
 | MR | +4 | +20 |
 | Attack Speed | +3% | +15% |
 | Mana | +40 | +200 |
+| Health Regen | +0.5/s | +2.5/s |
+| Mana Regen | +0.6/s | +3/s |
 
-They count as **bonus** stats (yellow in the stats panel) from the start of every stage.
+They count as **bonus** stats (yellow in the stats panel) from the start of every stage. The regen bonuses show in the "+x/s" on the HUD's health and mana bars.
 
 ### Summoners
 | Node | Cost | Requires |
 |---|---|---|
-| Unlock each spell | 150B | — |
+| Unlock Flash, Barrier, Heal, Clarity or Smite | 150B | — |
+| Unlock Ghost | Free, claimed in the tree | Clear Act 1 (stage 1-1) |
 | 2nd summoner slot | 400B + 5O | 2 spells unlocked |
 | Spell upgrades (3 levels each) | 150B → 300B → 400B + 5O | That spell unlocked |
+
+*(Ghost since Phase 10. Before, it cost 150B with no requirement. It is not given automatically, unlike E: the player clicks it in the tree, where a FREE badge points to it.)*
 
 ### Economy
 | Node | Cost |
@@ -590,6 +624,33 @@ They count as **bonus** stats (yellow in the stats panel) from the start of ever
 Stage gold, bonus XP and essence drops work since Phase 6: +10% gold, XP or blue per kill for each level, and the essence node also raises the chance of orange (§9).
 
 **Balance goal:** in 5–7 hours a skilled player can afford all skills, R, 4–5 equip slots and some stats, but not the full tree. The rest is a goal for Endless mode.
+
+### Built in Phase 10
+- **Rules per level.** A level opens when enough acts are cleared, the node's requirements have level 1, and the node's level sum is high enough. The act needed is the larger of the node's act and the level's own act. R's level sum is Q + W + E (5, 9, 13).
+- **What a level still needs** shows in red in the tree's info column. Only what is missing is listed:
+
+| Case | Text |
+|---|---|
+| R on a new save | "Requires: Passive – Lightslinger and 5 levels in Q + W + E (now 0)" |
+| R at rank 1 | "Requires: 9 levels in Q + W + E (now 7)" |
+| Equip Slots at level 1 | "Requires: Clear Act 2" |
+| Ghost before 1-1 | "Requires: Clear Act 1" |
+
+- **Free upgrades** are levels whose rules are met and that cost nothing. After 1-1 that is Ghost (E's first level is still put in the tree for free, as before). After a reset it is E and Ghost. A FREE badge marks them on the main screen (`main_screen.md`).
+- **Old saves keep their levels**, even above the new rules: an R at rank 2 with fewer than 13 Q + W + E levels, or equip slots past the acts cleared. Such a node shows as bought, with a small lock, and its next level reads LOCKED. A reset refunds from today's tables, so a Ghost bought for 150B gives back nothing.
+- **Backpack Slots** sets how many backpack cells are open in a stage: 5 on a new save, 16 after two levels. Items only go into open cells. With them full, loot stays on the ground ("Backpack full"). A locked cell shows a chain; hovering it says "Buy Backpack Slots in the Evolution Tree". A stage run on its own opens all 54, and the stage debug table has a "Backpack slots" spinner (`ui_design.md` §2).
+- **Health Regen and Mana Regen** add to Lucian's regen per second from the start of every stage.
+- **34 nodes, 114 levels:**
+
+| Branch | Nodes | Levels |
+|---|---|---|
+| Skills | 5 | 19 |
+| Stats | 9 | 45 |
+| Backpack | 2 | 12 |
+| Economy | 5 | 13 |
+| Summoners | 13 | 25 |
+
+- **The numbers are placeholders.** The R sums, the act rules, the Backpack Slots table and the regen per level are from the Phase 10 plan, not from play.
 
 ---
 
