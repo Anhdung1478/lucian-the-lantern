@@ -140,8 +140,6 @@ var cheat_infinite_mana := false
 var queue_casts := true
 ## The equipped skin: its body art, stat changes and kill heal.
 var skin: SkinData = Skins.ALL[0]
-## Classic's effects, for a skin without a set.
-static var _classic_fx := SkinFx.new()
 ## Flat stats from the Evolution Tree's stat nodes, keyed like ItemStats.
 var tree_bonus := {}
 ## Endless's modifier (#3, #4): stat multipliers keyed like a skin's scale,
@@ -441,8 +439,9 @@ func apply_setup(setup: StageSetup) -> void:
 
 
 ## The equipped skin's effect set: how Q, W, E, R and shots look and sound.
+## A skin without one uses Classic's (no static state: a static resource leaks at exit).
 func fx() -> SkinFx:
-	return skin.fx if skin.fx else _classic_fx
+	return skin.fx if skin.fx else Skins.ALL[0].fx
 
 
 ## Wears `new_skin`: its body art and stats. Keeps the HP and mana share.

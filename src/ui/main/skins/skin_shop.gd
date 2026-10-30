@@ -28,6 +28,7 @@ func _ready() -> void:
 		card.preview_pressed.connect(open_preview)
 		row.add_child(card)
 		cards.append(card)
+	visibility_changed.connect(_on_visibility_changed)
 	SaveGame.instance().changed.connect(refresh)
 	# Essences change on their own (rewards, debug): the Purchase buttons follow.
 	SaveGame.instance().essences.changed.connect(refresh)
@@ -54,6 +55,12 @@ func open_preview(id: StringName) -> void:
 	preview = SkinPreview.new(Skins.find(id))
 	preview.closed.connect(func() -> void: preview = null)
 	add_child(preview)
+
+
+## A hidden shop closes its preview, so it never plays on another page.
+func _on_visibility_changed() -> void:
+	if not visible:
+		close_popup()
 
 
 func _buy(id: StringName) -> void:

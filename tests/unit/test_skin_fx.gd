@@ -175,8 +175,7 @@ func test_skin_sounds_are_as_loud_as_classic() -> void:
 
 func test_as_loud_as_scales_a_sound_to_the_classic_peak() -> void:
 	var scaled := Sfx._as_loud_as(&"shot", PackedFloat32Array([0.0, 0.1, -0.2, 0.05]))
-	var target := Sfx._peak(Sfx._recipe(&"shot"))
-	assert_almost_eq(Sfx._peak(scaled), target, target * 0.1)
+	assert_almost_eq(Sfx._peak(scaled), _peak(&"shot"), 0.01)
 
 
 func test_every_skin_but_classic_has_a_set_of_its_own() -> void:

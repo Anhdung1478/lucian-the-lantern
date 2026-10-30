@@ -223,15 +223,24 @@ static func _recipe(sound: StringName) -> PackedFloat32Array:
 	return samples
 
 
-## `samples` scaled to the loudest point of `like`'s recipe, so a skin's
-## sound is as loud as the Classic one it replaces.
+## `samples` scaled to the loudest point of the cached stream of `like`, so a
+## skin's sound is as loud as the Classic one the player hears.
 static func _as_loud_as(like: StringName, samples: PackedFloat32Array) -> PackedFloat32Array:
-	var target := _peak(_recipe(like))
+	var target := _stream_peak(like)
 	var peak := _peak(samples)
 	if peak > 0.0:
 		for i in samples.size():
 			samples[i] *= target / peak
 	return samples
+
+
+## The loudest point of the cached stream of `sound`, 0–1 (16-bit, as _generate writes it).
+static func _stream_peak(sound: StringName) -> float:
+	var data := stream(sound).data
+	var peak := 0
+	for i in range(0, data.size(), 2):
+		peak = maxi(peak, absi(data.decode_s16(i)))
+	return peak / 32000.0
 
 
 ## The loudest sample, 0–1.

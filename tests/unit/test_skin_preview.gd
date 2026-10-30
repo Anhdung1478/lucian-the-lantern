@@ -151,3 +151,11 @@ func test_preview_numbers_are_the_skills_rank_1_numbers() -> void:
 	assert_eq([SkinPreview.R_SHOTS, SkinPreview.R_DURATION, SkinPreview.R_SPEED], [r.shots, r.duration, r.bullet_speed])
 	assert_eq(SkinPreview.MUZZLES[0], (lucian.get_node("Visuals/MuzzleLeft") as Marker2D).position)
 	assert_eq(SkinPreview.MUZZLES[1], (lucian.get_node("Visuals/MuzzleRight") as Marker2D).position)
+
+
+func test_hiding_the_shop_closes_the_preview() -> void:
+	var preview := _open(&"project")
+	shop.visible = false
+	assert_null(shop.preview)
+	await wait_process_frames(2)
+	assert_false(is_instance_valid(preview))
