@@ -28,6 +28,8 @@ var focus_act := 0
 var focus_endless := false
 ## The Endless map chosen in the Journey (the last run's choice).
 var endless_map := EndlessPlan.RANDOM
+## Drawn behind every section: the night grove, or the Skin Shop's gallery.
+var backdrop := MainBackdrop.new()
 var essence_bar := EssenceBar.new()
 var section_bar := SectionBar.new()
 var gear := GearMenu.new()
@@ -47,11 +49,13 @@ func _ready() -> void:
 	show_section(SECTION_JOURNEY)
 
 
-## Shows one section and lights its button.
+## Shows one section and lights its button; the Skin Shop stands in the
+## backdrop's gallery, the others in its night grove.
 func show_section(index: int) -> void:
 	for i in sections.size():
 		sections[i].visible = i == index
 	section_bar.select(index)
+	backdrop.scene = MainBackdrop.Scene.GALLERY if index == SECTION_SKINS else MainBackdrop.Scene.GROVE
 
 
 ## A short message at the top center that fades away.
@@ -96,20 +100,7 @@ func _close_section_popup() -> bool:
 
 
 func _build() -> void:
-	var background := TextureRect.new()
-	var gradient := Gradient.new()
-	gradient.colors = PackedColorArray([Color(0.12, 0.14, 0.2), Color(0.03, 0.035, 0.05)])
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.5)
-	texture.fill_to = Vector2(1.0, 0.5)
-	background.texture = texture
-	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	background.stretch_mode = TextureRect.STRETCH_SCALE
-	background.set_anchors_preset(Control.PRESET_FULL_RECT)
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(background)
+	add_child(backdrop)
 
 	var area := Control.new()
 	area.set_anchors_preset(Control.PRESET_FULL_RECT)

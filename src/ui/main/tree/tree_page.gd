@@ -66,18 +66,16 @@ const BACKPACK_ID := &"backpack_slots"
 ## Light motes drifting up: how many, how fast.
 const MOTES := 28
 const MOTE_SPEED := 9.0
+## The sky's stars (the sky and its palette are MainBackdrop's).
+const STARS := 120
 
-## The night grove (the main screen's backdrop matches these).
-const SKY_TOP := Color("08101f")
-const SKY_BOTTOM := Color("0d2a2b")
-const STAR_COLOR := Color(0.82, 0.88, 1.0)
+## The night grove.
 const MOON_COLOR := Color("f3ead2")
 const MOON_AT := Vector2(1010, 132)
 const MOON_RADIUS := 26.0
 const HILL_FAR := Color("0f252c")
 const HILL_NEAR := Color("0a191c")
 const SILHOUETTE := Color("081316")
-const MIST_COLOR := Color(0.6, 0.82, 0.86, 0.05)
 const GROUND_COLOR := Color("0a1411")
 const GRASS_COLOR := Color("1d3a2a")
 const CANOPY_COLOR := Color(0.1, 0.24, 0.18, 0.55)
@@ -85,7 +83,7 @@ const LEAF_COLOR := Color("447556")
 const LEAF_DARK := Color("2a4c3c")
 const BARK_COLOR := Color("54443a")
 const BARK_EDGE := Color("140f0c")
-const LIGHT := Color("ffd98a")
+const LIGHT := MainBackdrop.GROVE_LIGHT
 const VINE_DIM := Color("4d6458")
 const VINE_LIT := UiStyle.GOLD_COLOR
 const RING_DIM := Color(0.22, 0.27, 0.3)
@@ -354,13 +352,8 @@ func _draw() -> void:
 
 
 func _draw_sky() -> void:
-	draw_polygon(PackedVector2Array([Vector2.ZERO, Vector2(SIZE.x, 0), SIZE, Vector2(0, SIZE.y)]),
-		PackedColorArray([SKY_TOP, SKY_TOP, SKY_BOTTOM, SKY_BOTTOM]))
-	var rng := _rng(1)
-	for i in 120:
-		var at := Vector2(rng.randf_range(0.0, SIZE.x), rng.randf_range(0.0, SIZE.y * 0.62))
-		var alpha := rng.randf_range(0.05, 0.32) * (1.0 - at.y / SIZE.y)
-		draw_rect(Rect2(at, Vector2.ONE * rng.randf_range(1.0, 2.2)), Color(STAR_COLOR, alpha))
+	MainBackdrop.draw_sky(self, Rect2(Vector2.ZERO, SIZE))
+	MainBackdrop.draw_stars(self, Rect2(Vector2.ZERO, SIZE), _rng(1), STARS)
 	var glow := JourneyMap.glow()
 	# The moon and its halo, and the tree's own light around its crown.
 	draw_texture_rect(glow, Rect2(MOON_AT - Vector2(330, 260), Vector2(660, 520)), false, Color(0.55, 0.7, 0.85, 0.08))
@@ -368,7 +361,7 @@ func _draw_sky() -> void:
 	draw_circle(MOON_AT, MOON_RADIUS, MOON_COLOR)
 	for spot: Vector3 in [Vector3(-8, -6, 7), Vector3(9, 6, 5), Vector3(-2, 12, 4), Vector3(10, -10, 3)]:
 		draw_circle(MOON_AT + Vector2(spot.x, spot.y), spot.z, Color(0.75, 0.72, 0.62, 0.45))
-	draw_circle(MOON_AT + Vector2(9, -5), MOON_RADIUS * 0.92, Color(SKY_TOP, 0.12))
+	draw_circle(MOON_AT + Vector2(9, -5), MOON_RADIUS * 0.92, Color(MainBackdrop.SKY_TOP, 0.12))
 	var crown := Vector2(SIZE.x * 0.5, (_trunk_top + MIDDLE_Y) * 0.5)
 	draw_texture_rect(glow, Rect2(crown - Vector2(640, 420), Vector2(1280, 840)), false, Color(LIGHT, 0.09))
 	draw_texture_rect(glow, Rect2(crown - Vector2(300, 240), Vector2(600, 480)), false, Color(LIGHT, 0.06))
@@ -392,7 +385,7 @@ func _draw_hills() -> void:
 		var rng := _rng(20 + layer)
 		for i in 5:
 			var at := Vector2(rng.randf_range(0.0, SIZE.x), base - 10.0 + rng.randf_range(-20.0, 30.0))
-			draw_texture_rect(JourneyMap.glow(), Rect2(at - Vector2(340, 50), Vector2(680, 100)), false, MIST_COLOR)
+			draw_texture_rect(JourneyMap.glow(), Rect2(at - Vector2(340, 50), Vector2(680, 100)), false, MainBackdrop.MIST_COLOR)
 
 
 ## Tall dark trees in the grove's corners, framing the page.
@@ -727,14 +720,11 @@ func _draw_header() -> void:
 
 
 func _draw_motes() -> void:
-	var glow := JourneyMap.glow()
 	var height := GROUND_Y + 20.0
 	for mote in _mote_seeds:
 		var speed := MOTE_SPEED * (0.6 + mote.z)
 		var at := Vector2(mote.x + sin(_time * 0.5 + mote.z * 9.0) * 14.0, fposmod(mote.y - _time * speed, height))
-		var alpha := 0.35 + 0.3 * sin(_time * 1.3 + mote.z * 20.0)
-		_motes.draw_texture_rect(glow, Rect2(at - Vector2.ONE * 9.0, Vector2.ONE * 18.0), false, Color(LIGHT, alpha * 0.45))
-		_motes.draw_circle(at, 1.6, Color(LIGHT, alpha))
+		MainBackdrop.draw_mote(_motes, at, LIGHT, 0.35 + 0.3 * sin(_time * 1.3 + mote.z * 20.0))
 
 
 func _rng(salt: int) -> RandomNumberGenerator:
