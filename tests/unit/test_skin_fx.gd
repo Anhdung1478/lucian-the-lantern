@@ -34,6 +34,7 @@ func _themed() -> Dictionary:
 	return {
 		&"high_noon": [HighNoonFx, HighNoonBeam, HighNoonBlast, HighNoonTrail, HighNoonShot, HighNoonFlash],
 		&"project": [ProjectFx, ProjectBeam, ProjectBlast, ProjectTrail, ProjectShot, ProjectFlash],
+		&"pulsefire": [PulsefireFx, PulsefireBeam, PulsefireBlast, PulsefireTrail, PulsefireShot, PulsefireFlash],
 	}
 
 

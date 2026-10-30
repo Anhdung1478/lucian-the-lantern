@@ -185,6 +185,23 @@ static func _recipe(sound: StringName) -> PackedFloat32Array:
 		&"shot_project":
 			# A short square blip.
 			samples = _as_loud_as(&"shot", _tone(0.07, 1400.0, 900.0, 0.0, 0.9, 30.0))
+		# --- V1.1 skin sounds: Pulsefire, a shimmering time rift ---
+		&"cast_q_pulsefire":
+			# A shimmering sweep that rises, then falls.
+			var sweep := _tone(0.1, 1200.0, 2600.0, 0.05, 0.2, 6.0, 40.0)
+			sweep.append_array(_tone(0.14, 2600.0, 900.0, 0.05, 0.2, 14.0, 40.0))
+			samples = _as_loud_as(&"cast_q", sweep)
+		&"cast_w_pulsefire":
+			# A deep whomp, then a bell ring.
+			var whomp := _tone(0.12, 160.0, 90.0, 0.2, 0.3, 14.0)
+			whomp.append_array(_tone(0.25, 1568.0, 1568.0, 0.0, 0.0, 9.0))
+			samples = _as_loud_as(&"cast_w", whomp)
+		&"cast_e_pulsefire":
+			# A rising "rewind" whoosh.
+			samples = _as_loud_as(&"cast_e", _tone(0.22, 250.0, 1400.0, 0.85, 0.0, 6.0, 30.0))
+		&"shot_pulsefire":
+			# A soft high pulse with a flutter.
+			samples = _as_loud_as(&"shot", _tone(0.08, 1800.0, 1200.0, 0.05, 0.1, 25.0, 70.0))
 	return samples
 
 
