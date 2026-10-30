@@ -238,3 +238,30 @@ func test_free_upgrades_are_open_and_cost_nothing() -> void:
 	assert_false(tree.is_free(&"skill_q"), "open but not free")
 	tree.buy(&"skill_e", essences)
 	assert_false(tree.is_free(&"skill_e"), "the next rank costs")
+
+
+func test_equip_slot_2_has_no_act_slot_3_needs_act_2_and_slot_5_act_4() -> void:
+	tree.acts_cleared = 1
+	assert_true(tree.buy(&"equip_slots", essences), "slot 2")
+	assert_false(tree.buy(&"equip_slots", essences), "slot 3 needs Act 2")
+	assert_eq(tree.next_requirement_text(&"equip_slots"), "Requires: Clear Act 2")
+	tree.acts_cleared = 2
+	assert_true(tree.buy(&"equip_slots", essences), "slot 3")
+	assert_true(tree.buy(&"equip_slots", essences), "slot 4")
+	assert_false(tree.buy(&"equip_slots", essences), "slot 5 needs Act 4")
+	assert_eq(tree.next_requirement_text(&"equip_slots"), "Requires: Clear Act 4")
+	tree.acts_cleared = 3
+	assert_false(tree.next_level_open(&"equip_slots"))
+	tree.acts_cleared = 4
+	assert_true(tree.buy(&"equip_slots", essences), "slot 5")
+	assert_true(tree.buy(&"equip_slots", essences), "slot 6")
+	assert_true(tree.is_maxed(&"equip_slots"))
+
+
+func test_every_node_is_in_a_listed_branch() -> void:
+	var total := 0
+	for branch in EvolutionTree.BRANCHES:
+		assert_false(tree.branch_nodes(branch).is_empty(), str(branch))
+		total += tree.branch_nodes(branch).size()
+	assert_eq(total, tree.nodes().size())
+	assert_has(tree.branch_nodes(&"backpack").map(func(d: TreeNodeData) -> StringName: return d.id), &"equip_slots")

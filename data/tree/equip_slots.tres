@@ -7,13 +7,14 @@
 script = ExtResource("1_data")
 id = &"equip_slots"
 display_name = "Equip Slots"
-description = "Lucian can carry more items into a stage."
+description = "Opens more equip slots; only equipped items give stats."
 icon = ExtResource("2_icon")
-branch = &"equipment"
+branch = &"backpack"
 grid = Vector2(13, 0)
 max_level = 5
 blue = Array[int]([150, 300, 600, 1000, 1500])
 orange = Array[int]([0, 0, 5, 15, 30])
+level_acts = Array[int]([0, 2, 2, 4, 4])
 base = 1.0
 per_level = 1.0
 format = "{v} equip slots"
