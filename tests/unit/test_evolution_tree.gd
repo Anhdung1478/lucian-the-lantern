@@ -35,13 +35,46 @@ func test_passive_needs_any_one_basic_skill() -> void:
 	assert_true(tree.is_open(&"passive"))
 
 
-func test_r_needs_q_w_e_and_the_passive() -> void:
+func test_r_needs_the_passive_and_5_levels_in_q_w_e() -> void:
 	tree.acts_cleared = 1
-	for id in [&"skill_q", &"skill_w", &"skill_e"]:
-		tree.buy(id, essences)
-	assert_false(tree.is_open(&"skill_r"))
-	tree.buy(&"passive", essences)
-	assert_true(tree.is_open(&"skill_r"))
+	tree.from_dict({"skill_q": 4, "skill_e": 1})
+	assert_false(tree.is_open(&"skill_r"), "no passive yet")
+	tree.from_dict({"skill_q": 4, "skill_e": 1, "passive": 1})
+	assert_true(tree.is_open(&"skill_r"), "Q4 W0 E1 is 5")
+	tree.from_dict({"skill_q": 3, "skill_e": 1, "passive": 1})
+	assert_false(tree.is_open(&"skill_r"), "4 is too few")
+	tree.from_dict({"skill_q": 5, "passive": 1})
+	assert_true(tree.is_open(&"skill_r"), "W and E need not be bought")
+
+
+func test_r_rank_2_needs_9_and_rank_3_needs_13() -> void:
+	tree.acts_cleared = 1
+	tree.from_dict({"skill_q": 4, "skill_e": 1, "passive": 1, "skill_r": 1})
+	assert_false(tree.next_level_open(&"skill_r"))
+	tree.from_dict({"skill_q": 4, "skill_w": 3, "skill_e": 2, "passive": 1, "skill_r": 1})
+	assert_true(tree.next_level_open(&"skill_r"), "9")
+	tree.from_dict({"skill_q": 4, "skill_w": 3, "skill_e": 2, "passive": 1, "skill_r": 2})
+	assert_false(tree.next_level_open(&"skill_r"), "9 is not 13")
+	tree.from_dict({"skill_q": 5, "skill_w": 4, "skill_e": 4, "passive": 1, "skill_r": 2})
+	assert_true(tree.next_level_open(&"skill_r"), "13")
+
+
+func test_old_save_keeps_r_at_3_with_the_next_level_closed() -> void:
+	tree.from_dict({"skill_r": 3, "skill_q": 1})
+	assert_eq(tree.level(&"skill_r"), 3)
+	assert_true(tree.is_maxed(&"skill_r"))
+	tree.from_dict({"skill_r": 2, "skill_q": 1})
+	assert_eq(tree.level(&"skill_r"), 2)
+	assert_false(tree.next_level_open(&"skill_r"))
+	assert_false(tree.can_buy(&"skill_r", essences))
+
+
+func test_r_panel_texts() -> void:
+	assert_eq(tree.next_requirement_text(&"skill_r"),
+		"Requires: Passive – Lightslinger and 5 levels in Q + W + E (now 0)")
+	tree.acts_cleared = 1
+	tree.from_dict({"skill_q": 4, "skill_w": 2, "skill_e": 1, "passive": 1, "skill_r": 1})
+	assert_eq(tree.next_requirement_text(&"skill_r"), "Requires: 9 levels in Q + W + E (now 7)")
 
 
 func test_e_rank_1_is_free_after_act_1() -> void:

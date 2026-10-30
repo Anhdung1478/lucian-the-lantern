@@ -224,7 +224,7 @@ func test_a_hidden_node_reads_unknown_locked_and_its_requirements() -> void:
 func test_requirement_lines_for_all_any_two_and_an_act() -> void:
 	var tree := _save().tree
 	assert_eq(tree.requirement_text(&"skill_r", 0),
-		"Requires: Q – Piercing Light, W – Ardent Blaze, E – Relentless Pursuit and Passive – Lightslinger")
+		"Requires: Passive – Lightslinger and 5 levels in Q + W + E (now 0)")
 	assert_eq(tree.requirement_text(&"summoner_slot_2", 0),
 		"Requires: any 2 of Flash, Ghost, Barrier, Heal, Clarity or Smite")
 	assert_eq(tree.requirement_text(&"skill_e", 0), "Requires: Clear Act 1")
