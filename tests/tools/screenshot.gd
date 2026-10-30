@@ -9,7 +9,8 @@ const SAVE_PREFIX := "user://screenshot_save_slot_"
 ## Scenarios that start from the game's root scene (the main screen).
 const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "title_settings", "the_end",
 	"journey_map", "journey_endless", "endless_wave", "endless_boss", "endless_pick", "endless_run_over",
-	"exit_cancel", "tree_icons", "tree_free", "tree_rules", "backpack_slots"]
+	"exit_cancel", "tree_icons", "tree_free", "tree_rules", "backpack_slots",
+	"skin_preview"]
 ## Endless map choices (Journey.ENDLESS_MAPS indices) for the Endless scenarios.
 const RANDOM_MAP := 0
 const TRAINING_GROUND := 2
@@ -171,6 +172,8 @@ func _run(scenario: String) -> void:
 			await scenario_tree_rules()
 		"backpack_slots":
 			await scenario_backpack_slots()
+		"skin_preview":
+			await scenario_skin_preview()
 		"main_skins":
 			await scenario_main_skins()
 		"main_gear":
@@ -1618,6 +1621,28 @@ func scenario_main_skins() -> void:
 	print("equipped (expect vampire): ", save.skin, "  buttons: ", buttons.call())
 	print("no file written (expect false): ", FileAccess.file_exists(save.path(1)))
 	await shot("main_skins_1_vampire")
+
+
+## The Skin Shop's preview of Pulsefire: Q, W's cross, E and R, then ESC.
+func scenario_skin_preview() -> void:
+	main_screen().show_section(MainScreen.SECTION_SKINS)
+	var shop := main_screen().sections[MainScreen.SECTION_SKINS] as SkinShop
+	await wait(0.3)
+	shop.cards[3].preview_button.pressed.emit()
+	await wait(0.36)
+	await shot("skin_preview_0_q")
+	shop.preview.play(&"w")
+	await wait(0.65)
+	await shot("skin_preview_1_w")
+	shop.preview.play(&"e")
+	await wait(0.12)
+	await shot("skin_preview_2_e")
+	shop.preview.play(&"r")
+	await wait(0.8)
+	await shot("skin_preview_3_r")
+	print("ESC closes it (expect true): ", shop.close_popup())
+	await wait(0.2)
+	await shot("skin_preview_4_closed")
 
 
 ## The gear menu (Leave to main menu), Save and its

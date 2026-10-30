@@ -1,12 +1,14 @@
 class_name SkinShop
 extends Control
 ## The Skin Shop page of the main screen: one card per skin in a centered row.
-## Buying does not equip. Nothing here saves.
+## Buying does not equip. Each card's Preview opens a SkinPreview. Nothing here saves.
 
 const GAP := 24
 
 ## One card per skin, Classic first.
 var cards: Array[SkinCard] = []
+## The open preview, or null.
+var preview: SkinPreview
 
 
 func _ready() -> void:
@@ -23,6 +25,7 @@ func _ready() -> void:
 		var card := SkinCard.new(skin)
 		card.buy_pressed.connect(_buy)
 		card.equip_pressed.connect(_equip)
+		card.preview_pressed.connect(open_preview)
 		row.add_child(card)
 		cards.append(card)
 	SaveGame.instance().changed.connect(refresh)
@@ -37,9 +40,20 @@ func refresh() -> void:
 		card.refresh(SaveGame.instance())
 
 
-## No pop-ups here (the main screen's ESC calls this).
+## Closes the preview, if one is open (the main screen's ESC calls this).
 func close_popup() -> bool:
-	return false
+	if preview == null:
+		return false
+	preview.close()
+	return true
+
+
+## Opens the preview of skin `id` over the shop, closing any other.
+func open_preview(id: StringName) -> void:
+	close_popup()
+	preview = SkinPreview.new(Skins.find(id))
+	preview.closed.connect(func() -> void: preview = null)
+	add_child(preview)
 
 
 func _buy(id: StringName) -> void:

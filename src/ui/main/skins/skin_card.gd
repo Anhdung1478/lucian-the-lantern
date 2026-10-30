@@ -1,10 +1,11 @@
 class_name SkinCard
 extends PanelContainer
 ## One Skin Shop card: portrait, name, bonuses (green), weaknesses (red),
-## playstyle and the Purchase / Equip / Equipped button at the bottom.
+## playstyle, a Preview button and the Purchase / Equip / Equipped button at the bottom.
 
 signal buy_pressed(id: StringName)
 signal equip_pressed(id: StringName)
+signal preview_pressed(id: StringName)
 
 const SIZE := Vector2(320, 640)
 const PORTRAIT := 288.0
@@ -14,6 +15,7 @@ const PURPLE_ICON := preload("res://assets/art/ui/essence_purple.svg")
 
 var skin: SkinData
 var button := Button.new()
+var preview_button := Button.new()
 
 
 func _init(skin_data: SkinData = null) -> void:
@@ -64,6 +66,11 @@ func _build() -> void:
 	play.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	play.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(play)
+	preview_button.text = "Preview"
+	UiStyle.style_button(preview_button, 18)
+	preview_button.custom_minimum_size = Vector2(0, 40)
+	preview_button.pressed.connect(func() -> void: preview_pressed.emit(skin.id))
+	column.add_child(preview_button)
 	UiStyle.style_button(button, 22)
 	button.custom_minimum_size = Vector2(0, 48)
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT

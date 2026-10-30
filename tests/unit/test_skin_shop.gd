@@ -75,5 +75,5 @@ func test_purchase_then_equip() -> void:
 	assert_false(SaveGame.instance().slot_exists(1), "no file written")
 
 
-func test_close_popup_has_nothing_to_close() -> void:
+func test_close_popup_has_nothing_to_close_without_a_preview() -> void:
 	assert_false(shop.close_popup())
