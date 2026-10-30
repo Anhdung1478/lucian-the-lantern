@@ -140,6 +140,8 @@ var cheat_infinite_mana := false
 var queue_casts := true
 ## The equipped skin: its body art, stat changes and kill heal.
 var skin: SkinData = Skins.ALL[0]
+## Classic's effects, for a skin without a set.
+static var _classic_fx := SkinFx.new()
 ## Flat stats from the Evolution Tree's stat nodes, keyed like ItemStats.
 var tree_bonus := {}
 ## Endless's modifier (#3, #4): stat multipliers keyed like a skin's scale,
@@ -436,6 +438,11 @@ func apply_setup(setup: StageSetup) -> void:
 	apply_skin(setup.skin)
 	hp = stats.max_hp
 	mana = stats.max_mana
+
+
+## The equipped skin's effect set: how Q, W, E, R and shots look and sound.
+func fx() -> SkinFx:
+	return skin.fx if skin.fx else _classic_fx
 
 
 ## Wears `new_skin`: its body art and stats. Keeps the HP and mana share.
@@ -1078,18 +1085,20 @@ func is_cast_locked() -> bool:
 	return _cast_lock_left > 0.0
 
 
-## Dashes through enemies (walls and the abyss still stop him), leaving a
-## trail in `trail_color`. A move ordered before the dash ends here (see
-## _drop_move), and the attack timer resets.
-func start_dash(direction: Vector2, distance: float, speed: float, trail_color := DashTrail.LIGHT) -> void:
+## Dashes through enemies (walls and the abyss still stop him), leaving `trail`
+## (E's skin trail) or else a plain trail in `trail_color`. A move ordered
+## before the dash ends here (see _drop_move), and the attack timer resets.
+func start_dash(direction: Vector2, distance: float, speed: float, trail_color := DashTrail.LIGHT, trail: DashTrail = null) -> void:
 	_cancel_windup()
 	_dash_velocity = direction * speed
 	_dash_left = distance / speed
 	_attack_cooldown = 0.0
 	# A dash aimed right on Lucian goes nowhere, but still counts as one.
 	if _dash_left > 0.0:
-		_start_dash_trail(trail_color)
+		_start_dash_trail(trail_color, trail)
 		collision_mask = _body_mask()
+	elif trail:
+		trail.free()
 	_drop_move()
 	visuals.face(direction)
 
@@ -1157,17 +1166,20 @@ func next_gun() -> LucianVisuals.Gun:
 func fire_attack_projectile(gun: LucianVisuals.Gun, target: Enemy, info: DamageInfo) -> void:
 	var shot := AttackProjectile.new()
 	shot.launch(visuals.muzzle_position(gun), target, info)
+	shot.set_look(fx().attack_shot_look())
 	spawn(shot)
 	flash_muzzle(gun)
 
 
-## The gunshot sound and, unless the quality is Low, a muzzle flash.
+## The skin's gunshot sound and, unless the quality is Low, its muzzle flash,
+## turned the way Lucian faces.
 func flash_muzzle(gun: LucianVisuals.Gun) -> void:
-	Sfx.play(&"shot", -6.0)
+	Sfx.play(fx().shot_sound, -6.0)
 	if GameSettings.instance().low_effects():
 		return
-	var flash := MuzzleFlash.new()
+	var flash := fx().muzzle_flash()
 	flash.position = visuals.muzzle_position(gun)
+	flash.rotation = visuals.global_rotation
 	spawn(flash)
 
 
@@ -1392,14 +1404,17 @@ func _dash_step(delta: float) -> void:
 		_dash_trail = null
 
 
-## The trail starts with the dash and grows behind Lucian. None on low effects.
-func _start_dash_trail(color: Color) -> void:
+## The trail starts with the dash and grows behind Lucian. None on low
+## effects; a given trail is then freed.
+func _start_dash_trail(color: Color, trail: DashTrail) -> void:
 	if is_instance_valid(_dash_trail):
 		_dash_trail.finish()
 	_dash_trail = null
 	if GameSettings.instance().low_effects():
+		if trail:
+			trail.free()
 		return
-	_dash_trail = DashTrail.new()
+	_dash_trail = trail if trail else DashTrail.new()
 	_dash_trail.setup(global_position, color)
 	spawn(_dash_trail)
 

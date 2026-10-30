@@ -4,6 +4,11 @@
 [ext_resource type="Texture2D" path="res://assets/art/lucian/skins/vampire_portrait.svg" id="2_portrait"]
 [ext_resource type="Texture2D" path="res://assets/art/lucian/skins/vampire_body.svg" id="3_body"]
 
+[ext_resource type="Script" path="res://src/lucian/skin_fx/skin_fx.gd" id="5_fx"]
+
+[sub_resource type="Resource" id="Resource_fx"]
+script = ExtResource("5_fx")
+
 [resource]
 script = ExtResource("1_data")
 id = &"vampire"
@@ -21,3 +26,4 @@ scale = Dictionary[StringName, float]({
 &"max_hp": 0.8
 })
 kill_heal = 0.02
+fx = SubResource("Resource_fx")

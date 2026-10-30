@@ -213,6 +213,8 @@ func _run(scenario: String) -> void:
 			await scenario_defeat()
 		"loot":
 			await scenario_loot()
+		"skin_fx":
+			await scenario_skin_fx()
 		"guardian_angel":
 			await scenario_guardian_angel()
 		"attack_pick":
@@ -3963,3 +3965,51 @@ func scenario_level_up() -> void:
 	await wait(0.3)
 	print("low effects (expect true), level (expect 4): ", GameSettings.instance().low_effects(), " ", progress.level)
 	await shot("level_up_3_low_effects")
+
+
+# --- V1.1: skin effects -----------------------------------------------------
+
+
+## Each skin's Q, W's cross, E mid-dash and R's stream in Training, on the
+## same ranks; then Vampire's on Low effects (main shapes only).
+func scenario_skin_fx() -> void:
+	var Slot := ChampionProgress.Slot
+	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
+	var start := lucian.global_position
+	lucian.cheat_infinite_mana = true
+	lucian.progress.set_level(6)
+	for slot in [Slot.Q, Slot.W, Slot.E, Slot.R]:
+		lucian.try_rank_up(slot)
+	for i in Skins.ALL.size():
+		var skin := Skins.ALL[i]
+		lucian.apply_skin(skin)
+		await skin_fx_shots("skin_fx_%d_%s" % [i, skin.id], dummy, start)
+	GameSettings.instance().set_value(&"quality", "low")
+	lucian.apply_skin(Skins.find(&"vampire"))
+	await skin_fx_shots("skin_fx_low_vampire", dummy, start)
+	GameSettings.instance().set_value(&"quality", "high")
+
+
+## Q, W's cross, E mid-dash and R's stream, one screenshot each.
+func skin_fx_shots(prefix: String, dummy: TrainingDummy, start: Vector2) -> void:
+	var Slot := ChampionProgress.Slot
+	for slot in [Slot.Q, Slot.W, Slot.E, Slot.R]:
+		lucian.skills[slot].cooldown.clear()
+	lucian.global_position = start
+	lucian.try_cast(Slot.Q, dummy.global_position)
+	await wait(0.36)
+	await shot(prefix + "_q")
+	await wait(0.4)
+	lucian.try_cast(Slot.W, dummy.global_position)
+	await wait(0.59)
+	await shot(prefix + "_w")
+	await wait(0.4)
+	lucian.try_cast(Slot.E, lucian.global_position + Vector2(0, -280))
+	await wait(0.15)
+	await shot(prefix + "_e")
+	await wait(0.4)
+	lucian.global_position = start
+	lucian.try_cast(Slot.R, dummy.global_position)
+	await wait(0.7)
+	await shot(prefix + "_r")
+	await wait(2.6)

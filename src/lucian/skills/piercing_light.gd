@@ -59,7 +59,6 @@ func _fire() -> void:
 	var damage := data.damage_at(rank(), lucian.stats)
 	for enemy in lucian.query_enemies(box, xform):
 		enemy.take_damage(lucian.make_damage(damage, data.damage_type, data.id))
-	var beam := LaserBeam.new()
-	beam.setup(origin + _direction * Lucian.GUN_REACH, _direction, beam_length - Lucian.GUN_REACH, beam_width)
-	lucian.spawn(beam)
-	Sfx.play(&"cast_q")
+	var fx := lucian.fx()
+	lucian.spawn(fx.q_beam(origin + _direction * Lucian.GUN_REACH, _direction, beam_length - Lucian.GUN_REACH, beam_width))
+	Sfx.play(fx.q_sound)

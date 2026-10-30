@@ -64,7 +64,29 @@ func _play(sound: StringName, volume_db: float, pitch: float) -> void:
 	player.play()
 
 
+## True when `sound` has a recipe of its own, not the fallback beep.
+static func has_recipe(sound: StringName) -> bool:
+	return not _recipe(sound).is_empty()
+
+
 static func _generate(sound: StringName) -> AudioStreamWAV:
+	var samples := _recipe(sound)
+	if samples.is_empty():
+		samples = _tone(0.05, 440.0, 440.0, 0.0, 0.0, 30.0)
+	var bytes := PackedByteArray()
+	bytes.resize(samples.size() * 2)
+	for i in samples.size():
+		bytes.encode_s16(i * 2, int(clampf(samples[i], -1.0, 1.0) * 32000.0))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = MIX_RATE
+	wav.stereo = false
+	wav.data = bytes
+	return wav
+
+
+## The samples of `sound`'s recipe, or none when it has no recipe.
+static func _recipe(sound: StringName) -> PackedFloat32Array:
 	var samples := PackedFloat32Array()
 	match sound:
 		&"shot":
@@ -130,18 +152,26 @@ static func _generate(sound: StringName) -> AudioStreamWAV:
 		&"essence":
 			# A quick high sparkle.
 			samples = _notes([1760.0, 2637.0, 2217.5, 3520.0], 0.045, 35.0, 0.0, 3.0)
-		_:
-			samples = _tone(0.05, 440.0, 440.0, 0.0, 0.0, 30.0)
-	var bytes := PackedByteArray()
-	bytes.resize(samples.size() * 2)
-	for i in samples.size():
-		bytes.encode_s16(i * 2, int(clampf(samples[i], -1.0, 1.0) * 32000.0))
-	var wav := AudioStreamWAV.new()
-	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.mix_rate = MIX_RATE
-	wav.stereo = false
-	wav.data = bytes
-	return wav
+	return samples
+
+
+## `samples` scaled to the loudest point of `like`'s recipe, so a skin's
+## sound is as loud as the Classic one it replaces.
+static func _as_loud_as(like: StringName, samples: PackedFloat32Array) -> PackedFloat32Array:
+	var target := _peak(_recipe(like))
+	var peak := _peak(samples)
+	if peak > 0.0:
+		for i in samples.size():
+			samples[i] *= target / peak
+	return samples
+
+
+## The loudest sample, 0–1.
+static func _peak(samples: PackedFloat32Array) -> float:
+	var peak := 0.0
+	for value in samples:
+		peak = maxf(peak, absf(value))
+	return peak
 
 
 ## A tone sweeping from `start_hz` to `end_hz` over `seconds`. `noise` mixes

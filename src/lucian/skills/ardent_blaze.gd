@@ -61,15 +61,11 @@ func _physics_process(delta: float) -> void:
 func _launch() -> void:
 	var missile := LinearProjectile.new()
 	missile.launch(lucian.global_position + _direction * Lucian.GUN_REACH, _direction, missile_speed, missile_range, 16.0)
-	missile.color = Color("ffd27a")
-	missile.glow_color = Color(1.0, 0.45, 0.1, 0.6)
-	missile.streak_length = 40.0
-	missile.streak_width = 8.0
-	missile.head_radius = 11.0
+	missile.set_look(lucian.fx().w_missile_look())
 	# Deferred: physics queries are locked while area overlaps are reported.
 	missile.finished.connect(_explode, CONNECT_DEFERRED)
 	lucian.spawn(missile)
-	Sfx.play(&"cast_w")
+	Sfx.play(lucian.fx().w_sound)
 
 
 func _explode(at: Vector2) -> void:
@@ -84,6 +80,4 @@ func _explode(at: Vector2) -> void:
 	for enemy in enemies:
 		enemy.take_damage(lucian.make_damage(damage, data.damage_type, data.id))
 		enemy.add_mark(MARK, mark_duration)
-	var blast := CrossBlast.new()
-	blast.setup(at, _direction, bar.size)
-	lucian.spawn(blast)
+	lucian.spawn(lucian.fx().w_blast(at, _direction, bar.size))

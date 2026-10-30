@@ -15,8 +15,9 @@ const KILL_CUT := 1.0
 
 func execute(aim: Vector2) -> void:
 	var distance := clampf(lucian.global_position.distance_to(aim), min_distance, max_distance)
-	lucian.start_dash(lucian.aim_direction(aim), distance, dash_speed)
-	Sfx.play(&"cast_e")
+	var fx := lucian.fx()
+	lucian.start_dash(lucian.aim_direction(aim), distance, dash_speed, DashTrail.LIGHT, fx.e_trail(lucian.visuals.body_texture()))
+	Sfx.play(fx.e_sound)
 
 
 func cast_range() -> CastRange:

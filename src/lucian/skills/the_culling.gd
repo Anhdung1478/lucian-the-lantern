@@ -73,8 +73,7 @@ func _fire() -> void:
 	var gun := lucian.next_gun()
 	var bullet := LinearProjectile.new()
 	bullet.launch(lucian.visuals.muzzle_position(gun), _direction, bullet_speed, bullet_range, 10.0, is_max_rank())
-	bullet.streak_length = 36.0
-	bullet.streak_width = 5.0
+	bullet.set_look(lucian.fx().r_bullet_look())
 	bullet.hit_enemy.connect(_on_bullet_hit)
 	lucian.spawn(bullet)
 	lucian.flash_muzzle(gun)
