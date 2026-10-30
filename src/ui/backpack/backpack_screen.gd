@@ -1,6 +1,6 @@
 class_name BackpackScreen
 extends CanvasLayer
-## The backpack (P): 7x7 tan cells, and below them, outside the backpack, the
+## The backpack (P): 9x6 tan cells, and below them, outside the backpack, the
 ## dark equip row (slots 1-6 and the sell slot). The recipe table sits
 ## top-left while it is open.
 ##
@@ -21,7 +21,7 @@ signal potion_used(index: int)
 ## A purchase, sale or refresh went through (true) or was refused (false).
 signal traded(ok: bool)
 
-const COLUMNS := 7
+const COLUMNS := 9
 const CELL_GAP := 6
 ## The backpack is centered in the screen area above the HUD panel.
 const AREA_BOTTOM := 880.0

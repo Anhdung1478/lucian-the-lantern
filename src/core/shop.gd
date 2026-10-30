@@ -4,7 +4,7 @@ extends RefCounted
 ## MerchantStock slot) or the Potions tab, selling, and refreshing, all for
 ## stage gold. Nothing is paid when a purchase does not fit.
 
-enum Result { OK, NO_GOLD, NO_ROOM, CELL_TAKEN, SOLD_OUT }
+enum Result { OK, NO_GOLD, NO_ROOM, CELL_LOCKED, CELL_TAKEN, SOLD_OUT }
 
 var stock: MerchantStock
 var inventory: Inventory
@@ -63,6 +63,8 @@ func _buy(item: ItemData, cell: int) -> Result:
 		return Result.NO_GOLD
 	if cell < 0 and inventory.space_for(item) <= 0:
 		return Result.NO_ROOM
+	if cell >= 0 and inventory.is_locked(cell):
+		return Result.CELL_LOCKED
 	if cell >= 0 and not inventory.can_put(cell, item):
 		return Result.CELL_TAKEN
 	wallet.spend(item.cost)

@@ -110,3 +110,20 @@ func test_a_refresh_costs_what_the_shop_says() -> void:
 	wallet.add(120)
 	assert_eq(shop.refresh(), Result.OK)
 	assert_eq(wallet.gold, 70)
+
+
+func test_a_locked_cell_is_refused_without_paying() -> void:
+	wallet.add(5000)
+	inventory.unlocked_backpack = 5
+	assert_eq(shop.buy_slot(0, 5), Result.CELL_LOCKED)
+	assert_eq(wallet.gold, 5000)
+	assert_null(inventory.item_at(5))
+
+
+func test_no_room_counts_only_the_open_cells() -> void:
+	wallet.add(5000)
+	inventory.unlocked_backpack = 2
+	inventory.add(catalog.find(&"sword"), 1)
+	inventory.add(catalog.find(&"belt"), 1)
+	assert_eq(shop.buy_slot(0), Result.NO_ROOM)
+	assert_eq(wallet.gold, 5000)

@@ -9,6 +9,7 @@ const MESSAGE_TIME := 1.6
 const MESSAGES := {
 	Shop.Result.NO_GOLD: "Not enough gold",
 	Shop.Result.NO_ROOM: "No room in the backpack",
+	Shop.Result.CELL_LOCKED: "That cell is locked",
 	Shop.Result.CELL_TAKEN: "That cell is taken",
 	Shop.Result.SOLD_OUT: "Already sold",
 }

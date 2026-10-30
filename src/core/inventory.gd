@@ -1,7 +1,8 @@
 class_name Inventory
 extends RefCounted
-## Lucian's items in a stage: 49 backpack cells and 6 equip slots in one index
-## space (0-48 backpack, 49-54 equip). Only unlocked equip slots give stats.
+## Lucian's items in a stage: 54 backpack cells (a 9x6 grid) and 6 equip slots in one
+## index space (0-53 backpack, 54-59 equip). Only the unlocked backpack cells
+## take items and only the unlocked equip slots give stats.
 ## Potions stack up to their max_stack in one cell; everything else is 1.
 
 signal changed
@@ -9,7 +10,7 @@ signal changed
 ## What dropping a dragged item on a cell does.
 enum Drop { RETURN, MOVE, SWAP, CRAFT, STACK }
 
-const BACKPACK_SIZE := 49
+const BACKPACK_SIZE := 54
 const EQUIP_SIZE := 6
 const EQUIP_START := BACKPACK_SIZE
 const SIZE := BACKPACK_SIZE + EQUIP_SIZE
@@ -19,6 +20,18 @@ var catalog: ItemCatalog
 var items: Array[ItemData] = []
 ## How many of the item each cell holds; 0 for an empty cell.
 var counts: Array[int] = []
+## Backpack cells 0..n-1 are usable. Lowering it moves items out of the cells
+## that become locked into the first empty unlocked cell; when there is none
+## they stay where they are.
+var unlocked_backpack := BACKPACK_SIZE:
+	set(value):
+		unlocked_backpack = clampi(value, 1, BACKPACK_SIZE)
+		for i in range(unlocked_backpack, BACKPACK_SIZE):
+			var empty := _first_empty_backpack_cell()
+			if items[i] and empty >= 0:
+				_set_cell(empty, items[i], counts[i])
+				_set_cell(i, null, 0)
+		changed.emit()
 ## Equip slots 1..n are usable. Lowering it moves items out of the slots that
 ## become locked and back into the backpack.
 var unlocked_equip := EQUIP_SIZE:
@@ -43,6 +56,8 @@ static func is_equip(index: int) -> bool:
 
 
 func is_locked(index: int) -> bool:
+	if index < EQUIP_START:
+		return index >= unlocked_backpack
 	return index >= EQUIP_START + unlocked_equip
 
 
@@ -55,10 +70,10 @@ func count_at(index: int) -> int:
 
 
 ## How many more of `item` the backpack takes: room left in its stacks plus
-## empty cells.
+## empty cells, in the unlocked cells only.
 func space_for(item: ItemData) -> int:
 	var room := 0
-	for i in BACKPACK_SIZE:
+	for i in unlocked_backpack:
 		if items[i] == null:
 			room += item.max_stack
 		elif items[i] == item:
@@ -72,7 +87,7 @@ func add(item: ItemData, amount := 1) -> bool:
 	if space_for(item) < amount:
 		return false
 	for pass_empty in [false, true]:
-		for i in BACKPACK_SIZE:
+		for i in unlocked_backpack:
 			if amount == 0:
 				break
 			var fits := items[i] == item if not pass_empty else items[i] == null
@@ -139,7 +154,7 @@ func craft_result(from: int, to: int) -> ItemData:
 ## What dropping the item from `from` onto `to` does. `to` is -1 outside any
 ## cell. `craft_ready` is true once the craft pop-up's line has gone around.
 func drop_outcome(from: int, to: int, craft_ready: bool) -> Drop:
-	if to < 0 or to >= SIZE or to == from or items[from] == null or is_locked(to):
+	if to < 0 or to >= SIZE or to == from or items[from] == null or is_locked(to) or is_locked(from):
 		return Drop.RETURN
 	if items[to] == null:
 		return Drop.MOVE
@@ -197,7 +212,7 @@ func _set_cell(index: int, item: ItemData, count: int) -> void:
 
 
 func _first_empty_backpack_cell() -> int:
-	for i in BACKPACK_SIZE:
+	for i in unlocked_backpack:
 		if items[i] == null:
 			return i
 	return -1

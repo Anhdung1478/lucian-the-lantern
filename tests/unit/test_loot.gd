@@ -131,3 +131,16 @@ func test_a_mini_boss_always_drops_a_fragment_and_sometimes_a_legendary() -> voi
 	assert_eq(without_fragment, 0)
 	# 8% of 5000 is 400.
 	assert_between(legendaries, 320, 480)
+
+
+func test_a_drop_stays_when_the_open_cells_are_full() -> void:
+	_stage()
+	var sword := stage.lucian.item_catalog.find(&"bf_sword")
+	stage.lucian.inventory.unlocked_backpack = 3
+	for i in 3:
+		stage.lucian.inventory.add(sword)
+	assert_eq(stage.lucian.inventory.space_for(sword), 0)
+	var drop := _drop_on_lucian(sword)
+	await wait_physics_frames(2)
+	assert_true(is_instance_valid(drop))
+	assert_null(stage.lucian.inventory.item_at(3))

@@ -18,7 +18,10 @@ func item(id: StringName) -> ItemData:
 
 
 func test_starts_empty_with_all_equip_slots_unlocked() -> void:
-	assert_eq(inventory.items.size(), 55)
+	assert_eq(inventory.items.size(), 60)
+	assert_eq(Inventory.BACKPACK_SIZE, 54)
+	assert_eq(Inventory.EQUIP_START, 54)
+	assert_eq(inventory.unlocked_backpack, 54)
 	for i in Inventory.SIZE:
 		assert_null(inventory.item_at(i))
 	assert_eq(inventory.unlocked_equip, 6)
@@ -162,9 +165,9 @@ func test_unlocked_slots_stay_between_1_and_6() -> void:
 
 
 func test_is_equip() -> void:
-	assert_false(Inventory.is_equip(48))
-	assert_true(Inventory.is_equip(49))
+	assert_false(Inventory.is_equip(53))
 	assert_true(Inventory.is_equip(54))
+	assert_true(Inventory.is_equip(59))
 
 
 func test_items_count_one_and_empty_cells_zero() -> void:
@@ -281,3 +284,79 @@ func test_sell_price_uses_the_ratio() -> void:
 	assert_eq(sword.sell_price(), 910)
 	sword.sell_ratio = 0.4
 	assert_eq(sword.sell_price(), 520)
+
+
+func test_everything_is_open_by_default() -> void:
+	for i in Inventory.SIZE:
+		assert_false(inventory.is_locked(i), str(i))
+
+
+func test_the_lock_edges_with_5_open() -> void:
+	inventory.unlocked_backpack = 5
+	assert_false(inventory.is_locked(4))
+	assert_true(inventory.is_locked(5))
+	assert_true(inventory.is_locked(Inventory.BACKPACK_SIZE - 1))
+	assert_false(inventory.is_locked(EQUIP), "equip slots follow their own count")
+
+
+func test_unlocked_backpack_stays_between_1_and_54() -> void:
+	inventory.unlocked_backpack = 0
+	assert_eq(inventory.unlocked_backpack, 1)
+	inventory.unlocked_backpack = 99
+	assert_eq(inventory.unlocked_backpack, 54)
+
+
+func test_add_and_space_for_use_only_open_cells() -> void:
+	inventory.unlocked_backpack = 5
+	assert_eq(inventory.space_for(item(&"sword")), 5)
+	for i in 5:
+		assert_true(inventory.add(item(&"sword")))
+	assert_false(inventory.add(item(&"sword")))
+	assert_eq(inventory.space_for(item(&"sword")), 0)
+	assert_null(inventory.item_at(5))
+	inventory.remove(2)
+	inventory.add(item(&"red"), 3)
+	assert_eq(inventory.space_for(item(&"red")), 6, "the open stack's room")
+
+
+func test_put_is_refused_on_a_locked_cell() -> void:
+	inventory.unlocked_backpack = 5
+	assert_true(inventory.put(4, item(&"sword")))
+	assert_false(inventory.put(5, item(&"sword")))
+	assert_null(inventory.item_at(5))
+
+
+func test_a_drop_to_or_from_a_locked_cell_returns() -> void:
+	inventory.add(item(&"sword"))
+	inventory.unlocked_backpack = 5
+	assert_eq(inventory.apply_drop(0, 5, false), Drop.RETURN)
+	assert_eq(inventory.item_at(0), item(&"sword"))
+
+
+func test_lowering_the_backpack_moves_items_to_open_cells() -> void:
+	inventory.put(10, item(&"sword"))
+	inventory.put(11, item(&"red"))
+	inventory.put(11, item(&"red"))
+	inventory.unlocked_backpack = 5
+	assert_null(inventory.item_at(10))
+	assert_null(inventory.item_at(11))
+	assert_eq(inventory.item_at(0), item(&"sword"))
+	assert_eq(inventory.item_at(1), item(&"red"))
+	assert_eq(inventory.count_at(1), 2)
+
+
+func test_lowering_the_backpack_with_no_room_leaves_items_in_place() -> void:
+	for i in 6:
+		inventory.put(i, item(&"sword"))
+	inventory.unlocked_backpack = 5
+	assert_eq(inventory.item_at(5), item(&"sword"))
+	assert_true(inventory.is_locked(5))
+
+
+func test_lowering_the_equip_slots_skips_locked_backpack_cells() -> void:
+	inventory.put(EQUIP + 5, item(&"sword"))
+	inventory.unlocked_backpack = 5
+	inventory.put(0, item(&"rod"))
+	inventory.unlocked_equip = 5
+	assert_eq(inventory.item_at(1), item(&"sword"), "the first empty open cell")
+	assert_null(inventory.item_at(EQUIP + 5))

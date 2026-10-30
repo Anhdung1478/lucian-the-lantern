@@ -42,6 +42,8 @@ func is_locked() -> bool:
 func tooltip_content() -> Control:
 	if style == Style.SELL and screen.is_shopping() and not screen.is_dragging():
 		return TooltipCard.note("Drop an item here to sell it for 70% of its cost (Guardian Angel: 40%).")
+	if is_locked() and style == Style.BACKPACK:
+		return TooltipCard.note("Buy Backpack Slots in the Evolution Tree")
 	var shown := item()
 	return TooltipCard.item(shown, screen.inventory.catalog) if shown and not screen.is_dragging() else null
 

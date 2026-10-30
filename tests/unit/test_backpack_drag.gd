@@ -190,3 +190,23 @@ func test_left_click_hides_the_use_button() -> void:
 	right_click(6)
 	press(0)
 	assert_eq(screen.use_index(), -1)
+
+
+func test_a_drop_on_a_locked_backpack_cell_returns() -> void:
+	inventory.unlocked_backpack = 10
+	drag(0, 20, 0.1)
+	assert_eq(id_at(0), &"sword")
+	assert_eq(id_at(20), &"")
+
+
+func test_the_grid_has_9_columns_and_54_cells() -> void:
+	assert_eq(BackpackScreen.COLUMNS, 9)
+	var grid := screen._cells[0].get_parent() as GridContainer
+	assert_eq(grid.columns, 9)
+	assert_eq(grid.get_child_count(), 54)
+
+
+func test_a_locked_backpack_cell_points_to_the_evolution_tree() -> void:
+	inventory.unlocked_backpack = 10
+	assert_not_null(screen._cells[20].tooltip_content())
+	assert_null(screen._cells[5].tooltip_content())
