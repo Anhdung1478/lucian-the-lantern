@@ -527,6 +527,37 @@ Skins can only be changed **outside stages**.
 | Pulsefire | White | Blue and white, pale blue rings, a glowing core between them |
 | Vampire | Silver with a red gem | Black iron with a crimson rim, crimson rings |
 
+**Built in V1.1: skin effects.** Each skin has its own look and sounds for Q, W, E, R, basic attacks and the muzzle flash. Classic keeps 1.0's. Hitboxes, damage and timing don't change.
+
+| | **High Noon**: hellfire gunslinger | **PROJECT**: hologram | **Pulsefire**: time rift | **Vampire**: blood |
+|---|---|---|---|---|
+| **Palette** | Ember orange `#ff6a2a`, deep red `#c8300a`, hot white `#fff6e0`, smoke grey | Cyan `#38e8ff`, pale cyan `#7ff4ff`, gunmetal `#1c2029`, magenta for glitches | White core `#f4f8ff`, pale blue `#7fd8ff`, deep blue `#4a5cff` | Crimson `#d01830`, bright red `#ff3a50`, black red `#4a0812` |
+| **Q beam** | Red edges, an orange core and a white-hot centre. Embers drift off and a smoke puff hangs at the muzzle. | Bright cyan edge lines over a see-through fill, with scan lines sweeping along. It breaks into pixels instead of fading. | A white core with blue edges. Rings ripple down the beam and a clock-face ring shows at the muzzle. | Black-red edges and a crimson core. Drops spray off and fall, and it drains away from Lucian's end outward. |
+| **W missile** | A molten slug with a smoke tail | A spinning diamond "data packet" | An orb with two orbiting rings | A blood orb with a dripping tail |
+| **W cross** | Burning arms, a charred ring under it, embers flying out along the 4 arms | Built from grid squares that light up from the centre outward, then flicker off | Comes with a shockwave ring and a ticking clock flash at the centre | A blood splash, with four small bats flying out along the arms |
+| **E dash** | A fire streak along the ground and dust kicked up where he started | A glitch: 3 offset copies of Lucian split cyan/magenta, with broken scan-line pieces | 3-4 fading blue afterimages of Lucian's body, with a ring at both ends | A red mist trail with 5-6 bats flapping along it |
+| **R bullets** | Heavy orange tracers | Thin cyan laser bolts | Pale blue pulse bolts with a small ring at the tip | Crimson bullets with a dark drip streak |
+| **Basic attack** | Orange tracer | Cyan bolt | Pale blue pulse with a tiny ring | Crimson bullet |
+| **Muzzle flash** | Star-shaped, with sparks | Square, with hex sparks | A small blue ring | Red |
+
+Rules for every skin:
+- **The main shapes match the hitboxes.** Q's beam is drawn `length x width` and W's cross arms are drawn `bar` size. Small details may reach a little past the edge.
+- **The main shapes last as long as Classic's:** Q's beam 0.25 s, W's cross 0.35 s, the muzzle flash 0.08 s, and the dash trail fades in 0.3 s.
+- **Details stay at most 0.6 s** (embers, drops, bats, afterimages, rings), at low alpha.
+- **Low effects:** only the main shapes, in the skin's colours: the beam, the missile, the cross and the bullets. No particles, rings, bats, afterimages, scan lines or pixel break-up. The muzzle flash and the dash trail are off, as in 1.0.
+- **Others keep their looks:** Senna's shots, item effects (Galeforce, Rocketbelt, Runaan's), Dark Lucian's Q and trail, and the Act 1 E-lesson trail.
+
+Sounds are synthesized, four per themed skin (`cast_q_<skin>`, `cast_w_<skin>`, `cast_e_<skin>`, `shot_<skin>`). The shot sound plays for basic attacks, Lightslinger's second shot and every R bullet. Each is as loud as the Classic sound it replaces.
+
+| | Q | W | E | Shot |
+|---|---|---|---|---|
+| **High Noon** | A roaring fire crackle, noisy and falling | A whoosh and a heavy thump | A dusty whoosh and a two-note spur jingle | A low revolver crack |
+| **PROJECT** | A square-wave synth laser with a fast flutter | A quick rising bleep and a pop | A stuttering glitch chirp | A short square blip |
+| **Pulsefire** | A shimmering sweep that rises then falls | A deep "whomp" with a bell ring | A rising "rewind" whoosh | A soft high pulse with a flutter |
+| **Vampire** | A low, wet, falling zap | A low splash thump | Three quick wing flaps | A muffled low crack |
+
+The Skin Shop's Preview button plays these before you buy (`main_screen.md`, Section 2).
+
 ---
 
 ## 11. Evolution Tree
@@ -948,7 +979,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - [x] Full Endless modifier list
 - [x] Unspent skill points: wasted
 - [x] Wave count per stage across the 22 stages
-- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`, Phase 4: `implementation/phase4.md`, Phase 5: `implementation/phase5.md`, Phase 6: `implementation/phase6.md`, Phase 7: `implementation/phase7.md`, Phase 8: `implementation/phase8.md`, Phase 9: `implementation/phase9.md`, Phase 10: `implementation/phase10.md`)
+- [x] Implementation / MVP plan (Phase 1: `implementation/phase1.md`, Phase 2: `implementation/phase2.md`, Phase 3: `implementation/phase3.md`, Phase 4: `implementation/phase4.md`, Phase 5: `implementation/phase5.md`, Phase 6: `implementation/phase6.md`, Phase 7: `implementation/phase7.md`, Phase 8: `implementation/phase8.md`, Phase 9: `implementation/phase9.md`, Phase 10: `implementation/phase10.md`, V1.1: `implementation/v1.1.md`)
 - [x] Item stats and effects (`items.md`)
 - [x] UI (see `ui_design.md` and `main_screen.md`): HUD (with the stage info, boss bar and radar), backpack, crafting, recipe table, ESC menu, merchant's shop, Settings, the main screen (Journey, Evolution Tree, Skin Shop), and the title screen with save slot selection
 - [x] Save system

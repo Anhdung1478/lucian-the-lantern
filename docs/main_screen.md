@@ -225,6 +225,7 @@ A **full-screen** section showing every skin, including **Classic Lucian**.
 - Below the art:
   - **Bonuses** (green) and **weaknesses** (red)
   - A **short description** of its playstyle
+  - A small **Preview** button (V1.1), for owned and unowned skins alike
   - **Button:**
 
 | Situation | Button |
@@ -269,6 +270,18 @@ A **full-screen** section showing every skin, including **Classic Lucian**.
 | Vampire | Crimson `#e8283f` |
 
 **Lucian's second gun is Senna's** on every skin's body in a stage (game design doc §10). The cards' portraits are unchanged.
+
+### Built in V1.1
+**The Preview pop-up** plays a skin's skill effects before you buy it.
+- **Size and title:** about 1200 x 680 px, a dark panel with the title "<Skin> · Preview". Clicks outside the panel are blocked.
+- **The stage:** a clipped floor. Lucian (that skin's body) stands on the left facing right, and the training dummy stands on the right, about 700 px away. Effects play at game size.
+- **Buttons:** Q, W, E, R, Attack and ▶ All.
+  - Each of the first five plays that one effect: Q's beam, W's missile and cross, E's dash and trail, R's 22 bullets over 3 s with the muzzle flash, and three basic shots.
+  - ▶ All plays the five in order, with a 0.6 s gap, and loops. **The loop starts by itself when the pop-up opens.** Pressing Q, W, E, R or Attack stops the loop and plays that one. ▶ All starts it again.
+- **Closing:** the ✕ button or ESC. The pop-up also closes if you leave the Skin Shop. Closing frees everything it spawned.
+- **No damage, nothing saved.** The shots hit only enemies, and the main screen has none.
+- **Sound** plays on the SFX bus.
+- **Low effects** applies: only the main shapes, and no muzzle flash or dash trail.
 
 ---
 
