@@ -365,6 +365,14 @@ func test_e_is_given_only_when_act_1_becomes_cleared() -> void:
 	assert_eq(save_game.tree.level(&"skill_e"), 0, "after a tree reset it is free to buy again, not given")
 
 
+func test_clearing_1_1_leaves_ghost_free_to_claim_not_bought() -> void:
+	save_game.finish_stage(&"cleared", "1-1")
+	assert_eq(save_game.tree.level(&"ghost"), 0)
+	assert_eq(save_game.tree.free_ids(), [&"ghost"] as Array[StringName])
+	save_game.tree.clear()
+	assert_eq(save_game.tree.free_ids(), [&"skill_e", &"ghost"] as Array[StringName])
+
+
 func test_losing_act_1_gives_nothing() -> void:
 	save_game.finish_stage(&"failed", "1-1")
 	assert_eq(save_game.tree.level(&"skill_e"), 0)

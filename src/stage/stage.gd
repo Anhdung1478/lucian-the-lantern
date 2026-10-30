@@ -52,6 +52,7 @@ const ACT_1_REWARDS: Array[String] = [
 	"Lucian takes Senna's gun: two guns from now on",
 	"E – Relentless Pursuit: level 1 in the Evolution Tree",
 	"Q – Piercing Light and W – Ardent Blaze can now be bought in the Evolution Tree",
+	"Ghost is free to claim in the Evolution Tree",
 ]
 
 var wallet := Wallet.new()

@@ -21,7 +21,7 @@ const COSTS := {
 	&"equip_slots": [[150, 300, 600, 1000, 1500], [0, 0, 5, 15, 30]],
 	&"stage_gold": [ECO_B, ECO_O], &"bonus_xp": [ECO_B, ECO_O], &"essence_drop": [ECO_B, ECO_O],
 	&"merchant_stock": [[300, 800], [0, 10]], &"refresh_cost": [[200, 500], [0, 5]],
-	&"flash": [[150], [0]], &"ghost": [[150], [0]], &"barrier": [[150], [0]],
+	&"flash": [[150], [0]], &"ghost": [[0], [0]], &"barrier": [[150], [0]],
 	&"heal": [[150], [0]], &"clarity": [[150], [0]], &"smite": [[150], [0]],
 	&"flash_upgrade": [UP_B, UP_O], &"ghost_upgrade": [UP_B, UP_O], &"barrier_upgrade": [UP_B, UP_O],
 	&"heal_upgrade": [UP_B, UP_O], &"clarity_upgrade": [UP_B, UP_O], &"smite_upgrade": [UP_B, UP_O],

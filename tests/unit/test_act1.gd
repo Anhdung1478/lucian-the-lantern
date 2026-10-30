@@ -208,6 +208,7 @@ func test_skip_takes_senna_and_thresh_away_with_the_rewards() -> void:
 	assert_has(stage.reward_lines, "Lucian takes Senna's gun: two guns from now on")
 	assert_has(stage.reward_lines, "E – Relentless Pursuit: level 1 in the Evolution Tree")
 	assert_has(stage.reward_lines, "Q – Piercing Light and W – Ardent Blaze can now be bought in the Evolution Tree")
+	assert_has(stage.reward_lines, "Ghost is free to claim in the Evolution Tree")
 	assert_false(stage.lucian.one_gun, "Senna's gun is his after a skip too")
 	assert_eq(stage.lucian.visuals.body_texture(), Skins.find(&"classic").body)
 

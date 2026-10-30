@@ -232,7 +232,7 @@ func test_free_upgrades_are_open_and_cost_nothing() -> void:
 	assert_false(tree.has_free())
 	tree.acts_cleared = 1
 	assert_true(tree.is_free(&"skill_e"))
-	assert_eq(tree.free_ids(), [&"skill_e"] as Array[StringName])
+	assert_eq(tree.free_ids(), [&"skill_e", &"ghost"] as Array[StringName])
 	assert_true(tree.has_free(&"skills"))
 	assert_false(tree.has_free(&"stats"))
 	assert_false(tree.is_free(&"skill_q"), "open but not free")
@@ -265,3 +265,13 @@ func test_every_node_is_in_a_listed_branch() -> void:
 		total += tree.branch_nodes(branch).size()
 	assert_eq(total, tree.nodes().size())
 	assert_has(tree.branch_nodes(&"backpack").map(func(d: TreeNodeData) -> StringName: return d.id), &"equip_slots")
+
+
+func test_ghost_is_hidden_before_act_1_and_free_after() -> void:
+	assert_false(tree.is_open(&"ghost"))
+	assert_eq(tree.next_requirement_text(&"ghost"), "Requires: Clear Act 1")
+	assert_false(tree.buy(&"ghost", essences))
+	tree.acts_cleared = 1
+	assert_true(tree.is_free(&"ghost"))
+	assert_true(tree.buy(&"ghost", Essences.new()), "costs nothing")
+	assert_true(tree.is_open(&"ghost_upgrade"))
