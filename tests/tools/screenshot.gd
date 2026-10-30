@@ -9,7 +9,7 @@ const SAVE_PREFIX := "user://screenshot_save_slot_"
 ## Scenarios that start from the game's root scene (the main screen).
 const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "title_settings", "the_end",
 	"journey_map", "journey_endless", "endless_wave", "endless_boss", "endless_pick", "endless_run_over",
-	"exit_cancel", "tree_icons", "tree_free"]
+	"exit_cancel", "tree_icons", "tree_free", "tree_rules", "backpack_slots"]
 ## Endless map choices (Journey.ENDLESS_MAPS indices) for the Endless scenarios.
 const RANDOM_MAP := 0
 const TRAINING_GROUND := 2
@@ -167,6 +167,10 @@ func _run(scenario: String) -> void:
 			await scenario_main_tree_max()
 		"tree_free":
 			await scenario_tree_free()
+		"tree_rules":
+			await scenario_tree_rules()
+		"backpack_slots":
+			await scenario_backpack_slots()
 		"main_skins":
 			await scenario_main_skins()
 		"main_gear":
@@ -1163,7 +1167,8 @@ func scenario_cast_modes() -> void:
 
 ## The Phase 5 art: essence, gear and skull icons, then every Evolution Tree
 ## node's icon as its .tres names it (since Phase 9 the skills and the spells
-## use the stage's art), each at 64 px and 32 px with its file under it.
+## use the stage's art), then Phase 10's Settings icons and control art, each
+## at 64 px and 32 px with its file under it.
 func scenario_art_sheet() -> void:
 	var paths: Array[String] = []
 	for file in ["essence_blue", "essence_orange", "essence_purple", "gear", "skull"]:
@@ -1171,13 +1176,18 @@ func scenario_art_sheet() -> void:
 	for id in [
 		"skill_q", "skill_w", "skill_e", "passive", "skill_r",
 		"stat_ad", "stat_ap", "stat_hp", "stat_armor", "stat_mr", "stat_attack_speed", "stat_mana",
-		"equip_slots", "stage_gold", "bonus_xp", "essence_drop", "merchant_stock", "refresh_cost",
+		"stat_hp_regen", "stat_mana_regen",
+		"equip_slots", "backpack_slots", "stage_gold", "bonus_xp", "essence_drop", "merchant_stock", "refresh_cost",
 		"flash", "ghost", "barrier", "heal", "clarity", "smite",
 		"flash_upgrade", "ghost_upgrade", "barrier_upgrade", "heal_upgrade", "clarity_upgrade", "smite_upgrade",
 		"summoner_slot_2",
 	]:
 		var node: TreeNodeData = load("res://data/tree/%s.tres" % id)
 		paths.append(node.icon.resource_path if node.icon else "res://data/tree/%s.tres" % id)
+	for file in ["settings_audio", "settings_controls", "settings_graphics", "settings_gameplay",
+			"slider_grabber", "slider_grabber_hl", "option_arrow", "option_check",
+			"toggle_on", "toggle_off", "toggle_on_disabled", "toggle_off_disabled"]:
+		paths.append("res://assets/art/ui/%s.svg" % file)
 	var background := ColorRect.new()
 	background.color = Color("0b0d12")
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1335,7 +1345,8 @@ func scenario_main_journey() -> void:
 	var save := SaveGame.instance()
 	save.essences.add(Essences.BLUE, 2000)
 	save.essences.add(Essences.ORANGE, 10)
-	for id: StringName in [&"flash", &"ghost", &"heal", &"smite", &"summoner_slot_2"]:
+	# Ghost needs Act 1 since Phase 10, so a new save can't claim it.
+	for id: StringName in [&"flash", &"heal", &"smite", &"summoner_slot_2"]:
 		save.tree.buy(id, save.essences)
 	save.set_loadout(0, &"flash")
 	save.set_loadout(1, &"heal")
@@ -1343,7 +1354,7 @@ func scenario_main_journey() -> void:
 	print("2nd slot bought: F chained (expect false): ", loadout.picks[1].disabled)
 	loadout.open_menu(1)
 	await wait(0.1)
-	print("menu lists (expect [flash, ghost, heal, smite]): ", loadout.menu.spell_ids())
+	print("menu lists (expect [flash, heal, smite]): ", loadout.menu.spell_ids())
 	await shot("main_journey_1_spell_menu")
 	loadout.menu.pick(&"flash")
 	await wait(0.1)
@@ -1425,7 +1436,7 @@ func scenario_main_tree() -> void:
 	section.select(&"skill_r")
 	await wait(0.2)
 	print("R hidden (expect ???, LOCKED): ", section.info.name_label.text, ", ", section.info.cost_bar.status.text)
-	print("R requires: ", section.info.requires_label.text)
+	print("R requires (expect Requires: 5 levels in Q + W + E (now 4)): ", section.info.requires_label.text)
 	await shot("main_tree_2_hidden_info")
 	section.close_popup()
 	section.show_branch(&"stats")
@@ -1468,6 +1479,95 @@ func scenario_tree_free() -> void:
 	await wait(0.3)
 	print("badges after claiming Ghost (expect false): ", save.tree.has_free())
 	await shot("tree_free_3_claimed")
+
+
+## Phase 10's per-level rules on the pages. Act 1 cleared, Q 3, W 3 (E 1 from
+## Act 1), the passive and R rank 1: R's ring is lit to 7 and rank 2 asks for
+## 9. Then Equip Slots at level 1: slot 3 is LOCKED until Act 2; with Act 2
+## cleared it opens.
+func scenario_tree_rules() -> void:
+	var save := SaveGame.instance()
+	var tree := save.tree
+	save.set_cleared(Journey.all_stage_ids(1))
+	save.essences.add(Essences.BLUE, 10000)
+	save.essences.add(Essences.ORANGE, 100)
+	for id: StringName in [&"skill_q", &"skill_q", &"skill_q", &"skill_w", &"skill_w", &"skill_w", &"passive",
+			&"skill_r", &"equip_slots"]:
+		tree.buy(id, save.essences)
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	var info := section.info
+	await mouse_move(Vector2(960, 1060))
+	section.select(&"skill_r")
+	await wait(0.3)
+	print("Q + W + E (expect 7), R level (expect 1): ", tree.level_sum(&"skill_r"), " ", tree.level(&"skill_r"))
+	print("R (expect LVL 1 / 3 | Q + W + E ranks: 7 / 9 | Requires: 9 levels in Q + W + E (now 7) | LOCKED): ",
+		" | ".join([info.level_label.text, info.sum_label.text, info.requires_label.text, info.cost_bar.status.text]))
+	print("R's lock corner (expect true): ", (section.views[&"skill_r"] as TreeNodeView).locked())
+	await shot("tree_rules_0_r_needs_9")
+	section.select(&"equip_slots")
+	await wait(0.3)
+	print("page (expect backpack), Equip Slots (expect LVL 1 / 5 | Requires: Clear Act 2 | LOCKED): ", section.branch, " ",
+		" | ".join([info.level_label.text, info.requires_label.text, info.cost_bar.status.text]))
+	print("Equip Slots' lock corner (expect true): ", (section.views[&"equip_slots"] as TreeNodeView).locked())
+	await shot("tree_rules_1_equip_needs_act_2")
+	save.set_cleared(Journey.all_stage_ids(2))
+	await wait(0.3)
+	print("Act 2 cleared: slot 3 open (expect true, no requirement shown: false): ", tree.next_level_open(&"equip_slots"), " ",
+		info.requires_label.visible, "  Equip Slots after Act 4 (expect Requires: Clear Act 4): ", tree.requirement_text(&"equip_slots", 3))
+	await shot("tree_rules_2_act_2_cleared")
+
+
+## A new save in Training: the 9 x 6 backpack with 5 cells open and the rest
+## chained, and a chained cell's hover. Five items fill it; walking onto a
+## sixth on the ground says "Backpack full". Then two levels of Backpack
+## Slots on the main screen: 16 cells open in the next stage.
+func scenario_backpack_slots() -> void:
+	await start_training()
+	var inventory := lucian.inventory
+	print("new save: open cells (expect 5 of 54): ", inventory.unlocked_backpack, " of ", Inventory.BACKPACK_SIZE)
+	give([&"bf_sword", &"recurve_bow", &"needlessly_large_rod", &"chain_vest", &"giants_belt"])
+	print("a sixth item fits (expect false): ", inventory.add(lucian.item_catalog.find(&"negatron_cloak")))
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	await wait(0.3)
+	var backpack := (stage as Stage).screens.backpack
+	var chained := backpack._cells.filter(func(cell: ItemCell) -> bool: return cell.style == ItemCell.Style.BACKPACK and cell.is_locked())
+	print("chained backpack cells (expect 49), grid columns (expect 9): ", chained.size(), " ", BackpackScreen.COLUMNS)
+	await mouse_move(Vector2(1750, 500))
+	await wait(0.2)
+	await shot("backpack_slots_0_five_open")
+	await mouse_move(control_center(backpack._cells[5]))
+	await wait_for_tooltip(backpack._cells[5])
+	await shot("backpack_slots_1_locked_hover")
+	await mouse_move(Vector2(1750, 500))
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	await wait(0.2)
+	(stage as Stage).drop_loot(lucian.item_catalog.find(&"negatron_cloak"), lucian.global_position + Vector2(260, 0))
+	await wait(0.2)
+	var drop: Node2D = stage.get_node("World").get_children().filter(func(node: Node) -> bool: return node is LootDrop)[0]
+	lucian.command_move(drop.global_position)
+	await wait(1.0)
+	var notes := stage.get_node("World").get_children().filter(func(node: Node) -> bool: return node is FloatingText)
+	print("notes (expect Backpack full): ", notes.map(func(note: FloatingText) -> String: return note.text))
+	await shot("backpack_slots_2_full")
+	await leave_stage()
+	var save := SaveGame.instance()
+	save.essences.add(Essences.BLUE, 150)
+	for i in 2:
+		save.tree.buy(&"backpack_slots", save.essences)
+	print("Backpack Slots level (expect 2), value (expect 16): ", save.tree.level(&"backpack_slots"), " ",
+		save.tree.value(&"backpack_slots"))
+	await start_training()
+	inventory = lucian.inventory
+	print("next stage: open cells (expect 16): ", inventory.unlocked_backpack)
+	give([&"bf_sword", &"recurve_bow", &"needlessly_large_rod", &"chain_vest", &"giants_belt", &"negatron_cloak"])
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	await mouse_move(Vector2(1750, 500))
+	await wait(0.3)
+	await shot("backpack_slots_3_sixteen_open")
 
 
 func hover_node(view: TreeNodeView) -> void:
@@ -1720,7 +1820,11 @@ func scenario_title_settings() -> void:
 	await click(screen._tab_buttons[1])
 	await mouse_move(Vector2(8, 8))
 	screen.listen(&"skill_e")
+	# E's row sits below the fold; scroll it into view.
+	var list: ScrollContainer = screen._pages[1].find_children("*", "ScrollContainer", true, false)[0]
+	list.ensure_control_visible(screen._bind_buttons[&"skill_e"])
 	await wait(0.2)
+	print("E listening (expect Press a key...): ", (screen._bind_buttons[&"skill_e"] as Button).text)
 	await shot("title_settings_6_listening")
 	screen.close()
 	title._open_settings()
