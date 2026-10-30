@@ -527,3 +527,54 @@ func test_the_main_screen_shows_the_tree_and_escape_clears_its_pick() -> void:
 	assert_eq(tree_section.info.id, &"")
 	assert_false(tree_section.views[&"skill_q"].selected)
 	assert_false(main.gear.visible)
+
+
+# --- FREE badges -------------------------------------------------------------------
+
+
+func _free_tabs() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for i in EvolutionTree.BRANCHES.size():
+		if section.tabs.free_badges[i].visible:
+			out.append(EvolutionTree.BRANCHES[i])
+	return out
+
+
+func _free_nodes() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for id: StringName in section.views:
+		if section.views[id].free_badge.visible:
+			out.append(id)
+	return out
+
+
+func test_a_new_save_shows_no_free_badge() -> void:
+	assert_eq(_free_tabs().size(), 0)
+	assert_eq(_free_nodes().size(), 0)
+
+
+func test_after_1_1_the_summoners_tab_and_ghost_show_free() -> void:
+	_save().set_cleared(Journey.all_stage_ids(1))
+	assert_eq(_free_tabs(), [&"summoners"] as Array[StringName])
+	assert_eq(_free_nodes(), [&"ghost"] as Array[StringName])
+
+
+func test_claiming_ghost_clears_the_badges() -> void:
+	_save().set_cleared(Journey.all_stage_ids(1))
+	assert_true(_save().tree.buy(&"ghost", _save().essences))
+	assert_eq(_free_tabs().size(), 0)
+	assert_eq(_free_nodes().size(), 0)
+
+
+func test_a_reset_shows_free_on_skills_and_summoners() -> void:
+	_save().set_cleared(Journey.all_stage_ids(1))
+	assert_true(_save().tree.buy(&"ghost", _save().essences))
+	_save().essences.add(Essences.PURPLE, EvolutionTree.RESET_COST)
+	assert_true(_save().tree.reset(_save().essences))
+	assert_eq(_free_tabs(), [&"skills", &"summoners"] as Array[StringName])
+	assert_true(section.views[&"skill_e"].free_badge.visible)
+	assert_true(section.views[&"ghost"].free_badge.visible)
+
+
+func test_the_badge_ignores_the_mouse() -> void:
+	assert_eq(section.views[&"ghost"].free_badge.mouse_filter, Control.MOUSE_FILTER_IGNORE)

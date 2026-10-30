@@ -9,7 +9,7 @@ const SAVE_PREFIX := "user://screenshot_save_slot_"
 ## Scenarios that start from the game's root scene (the main screen).
 const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "the_end",
 	"journey_map", "journey_endless", "endless_wave", "endless_boss", "endless_pick", "endless_run_over",
-	"exit_cancel", "tree_icons"]
+	"exit_cancel", "tree_icons", "tree_free"]
 ## Endless map choices (Journey.ENDLESS_MAPS indices) for the Endless scenarios.
 const RANDOM_MAP := 0
 const TRAINING_GROUND := 2
@@ -165,6 +165,8 @@ func _run(scenario: String) -> void:
 			await scenario_main_tree()
 		"main_tree_max":
 			await scenario_main_tree_max()
+		"tree_free":
+			await scenario_tree_free()
 		"main_skins":
 			await scenario_main_skins()
 		"main_gear":
@@ -1407,6 +1409,29 @@ func scenario_main_tree() -> void:
 		print("tab ", branch, " shows its page, tab draw modes (expect true [0, 0, 0, 0, 0]): ", section.pages[branch].visible, " ",
 			section.tabs.buttons.map(func(tab: Button) -> int: return tab.get_draw_mode()))
 		await shot("main_tree_4_%s" % branch)
+
+
+## After 1-1: FREE badges on the Evolution Tree button, the Summoners tab and
+## Ghost; then Ghost is claimed and they go.
+func scenario_tree_free() -> void:
+	var save := SaveGame.instance()
+	save.set_cleared(Journey.all_stage_ids(1))
+	main_screen().show_section(MainScreen.SECTION_SKINS)
+	await wait(0.3)
+	await shot("tree_free_0_button")
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	section.show_branch(&"summoners")
+	await wait(0.4)
+	await shot("tree_free_1_summoners")
+	section.show_branch(&"skills")
+	await wait(0.2)
+	await shot("tree_free_2_skills")
+	save.tree.buy(&"ghost", save.essences)
+	section.show_branch(&"summoners")
+	await wait(0.3)
+	print("badges after claiming Ghost (expect false): ", save.tree.has_free())
+	await shot("tree_free_3_claimed")
 
 
 func hover_node(view: TreeNodeView) -> void:

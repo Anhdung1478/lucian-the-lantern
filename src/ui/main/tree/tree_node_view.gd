@@ -25,6 +25,8 @@ const NAME_PLATE := Color(0.015, 0.025, 0.03, 0.78)
 ## The lock at the bottom-right corner.
 const LOCK_RADIUS := 13.0
 const LOCK_AT := Vector2(SIZE - 4.0, SIZE - 12.0)
+## The FREE badge at the top-right corner: how far it pokes past the frame.
+const FREE_POKE := Vector2(10.0, 10.0)
 const LOCK := preload("res://assets/art/ui/lock.svg")
 const HIDDEN_COLOR := Color("2a2f3a")
 const POOR_COLOR := Color("ff6a5a")
@@ -52,6 +54,8 @@ var _badge_style: StyleBoxFlat
 ## Over the icon, so it is a child of its own.
 var _lock := Control.new()
 var _hovered := false
+## At the top-right corner while the next level is free.
+var free_badge := FreeBadge.new()
 
 
 func _init(node_data: TreeNodeData, evolution_tree: EvolutionTree, owned: Essences) -> void:
@@ -91,6 +95,8 @@ func _init(node_data: TreeNodeData, evolution_tree: EvolutionTree, owned: Essenc
 	_lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_lock.draw.connect(_draw_lock)
 	add_child(_lock)
+	free_badge.position = Vector2(SIZE + FREE_POKE.x - FreeBadge.SIZE.x, -FREE_POKE.y)
+	add_child(free_badge)
 	refresh()
 
 
@@ -168,6 +174,7 @@ func refresh() -> void:
 	_badge_style.border_color = state_color(current) if lit else Color(0.36, 0.4, 0.48)
 	badge.add_theme_color_override(&"font_color", state_color(current) if lit else UiStyle.TEXT_COLOR)
 	_lock.visible = locked()
+	free_badge.visible = tree.is_free(data.id)
 	queue_redraw()
 
 

@@ -13,6 +13,8 @@ const ICON_SIZE := 34.0
 const NAME_FONT := 21
 const COUNT_FONT := 17
 const GAP := 12
+## The FREE badge's distance from a tab's top-right corner; it straddles the tab's top edge.
+const BADGE_MARGIN := Vector2(8, -10)
 
 ## One tab per EvolutionTree.BRANCHES entry, in that order.
 var buttons: Array[Button] = []
@@ -20,6 +22,9 @@ var buttons: Array[Button] = []
 var counts: Array[Label] = []
 ## The lit tab's branch.
 var selected: StringName
+
+## Each tab's FREE badge, shown while its branch has a free upgrade.
+var free_badges: Array[FreeBadge] = []
 
 var _names: Array[Label] = []
 
@@ -56,6 +61,15 @@ func _init() -> void:
 		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(count)
 		counts.append(count)
+		var free := FreeBadge.new()
+		free.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+		free.offset_left = -FreeBadge.SIZE.x - BADGE_MARGIN.x
+		free.offset_right = -BADGE_MARGIN.x
+		free.offset_top = BADGE_MARGIN.y
+		free.offset_bottom = BADGE_MARGIN.y + FreeBadge.SIZE.y
+		free.visible = false
+		button.add_child(free)
+		free_badges.append(free)
 	select(EvolutionTree.BRANCHES[0])
 
 
@@ -81,3 +95,4 @@ func refresh(tree: EvolutionTree) -> void:
 	for i in buttons.size():
 		var bought := TreePage.levels(tree, EvolutionTree.BRANCHES[i])
 		counts[i].text = "%d / %d" % [bought.x, bought.y]
+		free_badges[i].visible = tree.has_free(EvolutionTree.BRANCHES[i])

@@ -309,3 +309,25 @@ func test_buying_a_tree_node_writes_no_file() -> void:
 	save.tree.buy(save.tree.nodes()[0].id, save.essences)
 	assert_false(FileAccess.file_exists(save.path(1)))
 	assert_false(save.slot_exists(2))
+
+
+# --- FREE badge on the Evolution Tree button ----------------------------------------
+
+
+func test_the_tree_button_shows_free_only_while_something_is_free() -> void:
+	assert_false(main.section_bar.badges[MainScreen.SECTION_TREE].visible)
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	assert_true(main.section_bar.badges[MainScreen.SECTION_TREE].visible)
+	assert_false(main.section_bar.badges[MainScreen.SECTION_SKINS].visible)
+	assert_true(SaveGame.instance().tree.buy(&"ghost", SaveGame.instance().essences))
+	assert_false(main.section_bar.badges[MainScreen.SECTION_TREE].visible)
+
+
+func test_a_freed_main_screen_leaves_no_connection_on_the_save_tree() -> void:
+	var tree := SaveGame.instance().tree
+	var before := tree.changed.get_connections().size()
+	var screen := MainScreen.new()
+	add_child(screen)
+	assert_gt(tree.changed.get_connections().size(), before)
+	screen.free()
+	assert_eq(tree.changed.get_connections().size(), before)

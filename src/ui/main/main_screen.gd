@@ -152,6 +152,8 @@ func _build() -> void:
 	section_bar.set_anchors_preset(Control.PRESET_FULL_RECT)
 	section_bar.section_chosen.connect(show_section)
 	bottom.add_child(section_bar)
+	SaveGame.instance().tree.changed.connect(_refresh_free_badge)
+	_refresh_free_badge()
 
 	_toast = UiStyle.label("", 28, UiStyle.TITLE_COLOR)
 	_toast.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -178,6 +180,11 @@ func _build() -> void:
 	var debug := MainDebugTable.new()
 	debug.name = &"MainDebugTable"
 	add_child(debug)
+
+
+## The Evolution Tree button's FREE badge: on while any upgrade is free.
+func _refresh_free_badge() -> void:
+	section_bar.set_badge(SECTION_TREE, SaveGame.instance().tree.has_free())
 
 
 func _start_training() -> void:
