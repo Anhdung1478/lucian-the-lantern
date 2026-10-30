@@ -85,7 +85,7 @@ func _texts(node: Node) -> PackedStringArray:
 
 
 func test_a_new_save_hides_q_w_e_and_the_passive() -> void:
-	assert_eq(section.map.views.size(), 33)
+	assert_eq(section.map.views.size(), 34)
 	for id in [&"skill_q", &"skill_w", &"skill_e", &"passive"]:
 		assert_eq(_state(id), &"hidden", str(id))
 	assert_eq(_state(&"stat_ad"), &"poor")

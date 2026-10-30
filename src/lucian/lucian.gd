@@ -424,6 +424,8 @@ func restore_mana(amount: float) -> void:
 func apply_setup(setup: StageSetup) -> void:
 	progress.bought = setup.bought.duplicate()
 	passive.learned = setup.passive
+	# The backpack first, so items leaving locked equip slots land in open cells.
+	inventory.unlocked_backpack = setup.backpack_slots
 	inventory.unlocked_equip = setup.equip_slots
 	summoners.slots = setup.summoners.duplicate()
 	summoners.open_slots = setup.summoner_slots

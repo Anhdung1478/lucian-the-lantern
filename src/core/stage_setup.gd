@@ -3,7 +3,7 @@ extends RefCounted
 ## What Lucian starts a stage with: Evolution Tree purchases, the equipped
 ## skin and the Journey loadout. A plain StageSetup.new() is the sandbox
 ## that stage.tscn uses on its own (tests, screenshots, F6): every rank
-## bought, 6 equip slots, Flash and Heal.
+## bought, a fully open backpack, 6 equip slots, Flash and Heal.
 
 const SPELL_IDS: Array[StringName] = [&"flash", &"ghost", &"barrier", &"heal", &"clarity", &"smite"]
 
@@ -17,6 +17,7 @@ var stage := 0
 var stage_id := ""
 var bought: Array[int] = [5, 5, 5, 3]
 var passive := true
+var backpack_slots := Inventory.BACKPACK_SIZE
 var equip_slots := Inventory.EQUIP_SIZE
 var shop_slots := 2
 var refresh_cost := MerchantStock.REFRESH_COST
@@ -57,6 +58,7 @@ static func from_save(save: SaveGame) -> StageSetup:
 	var setup := StageSetup.new()
 	setup.bought = [tree.level(&"skill_q"), tree.level(&"skill_w"), tree.level(&"skill_e"), tree.level(&"skill_r")]
 	setup.passive = tree.level(&"passive") > 0
+	setup.backpack_slots = int(tree.value(&"backpack_slots"))
 	setup.equip_slots = int(tree.value(&"equip_slots"))
 	setup.shop_slots = int(tree.value(&"merchant_stock"))
 	setup.refresh_cost = int(tree.value(&"refresh_cost"))

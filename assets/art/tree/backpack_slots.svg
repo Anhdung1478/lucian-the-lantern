@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Backpack Slots: a grid of cells, the first rows open and the last ones still empty, with a gold glow -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ffe9a8" stop-opacity="0.9"/><stop offset="0.45" stop-color="#ffcf5a" stop-opacity="0.45"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="open"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#ffe9a8"/><stop offset="1" stop-color="#c9a45c"/></radialGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="45" cy="45" r="22" fill="url(#glow)"/>
+  <g fill="#d9c59b" stroke="#8c6e45" stroke-width="2">
+    <rect x="6" y="8" width="13" height="13" rx="2.5"/>
+    <rect x="25.5" y="8" width="13" height="13" rx="2.5"/>
+    <rect x="45" y="8" width="13" height="13" rx="2.5"/>
+    <rect x="6" y="27" width="13" height="13" rx="2.5"/>
+    <rect x="25.5" y="27" width="13" height="13" rx="2.5"/>
+  </g>
+  <g fill="#10171a" stroke="#7d8f86" stroke-width="2">
+    <rect x="6" y="46" width="13" height="13" rx="2.5"/>
+    <rect x="25.5" y="46" width="13" height="13" rx="2.5"/>
+  </g>
+  <rect x="45" y="27" width="13" height="13" rx="2.5" fill="url(#open)" stroke="#c9a45c" stroke-width="2.5"/>
+  <rect x="45" y="46" width="13" height="13" rx="2.5" fill="url(#open)" stroke="#c9a45c" stroke-width="2.5"/>
+  <path d="M 51.5 49 L 51.5 56 M 48 52.5 L 55 52.5" stroke="#8c6e45" stroke-width="2" stroke-linecap="round"/>
+</svg>

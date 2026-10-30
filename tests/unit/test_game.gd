@@ -86,10 +86,12 @@ func test_starts_on_the_title_screen() -> void:
 func test_training_swaps_in_the_stage_with_its_setup() -> void:
 	var run := StageSetup.new()
 	run.equip_slots = 2
+	run.backpack_slots = 7
 	game.start_stage(run)
 	await wait_process_frames(2)
 	assert_is(game.screen, Stage)
 	assert_eq((game.screen as Stage).lucian.inventory.unlocked_equip, 2)
+	assert_eq((game.screen as Stage).lucian.inventory.unlocked_backpack, 7)
 
 
 func test_leaving_the_stage_asks_then_saves_and_returns() -> void:

@@ -26,6 +26,7 @@ var _item_picker: OptionButton
 var _enemy_picker: OptionButton
 ## The picker's items, A to Z.
 var _picker_items: Array[ItemData] = []
+var _backpack_slots: SpinBox
 var _equip_slots: SpinBox
 var _shop_slots: SpinBox
 ## D and F.
@@ -63,6 +64,7 @@ func setup(owner_stage: Stage) -> void:
 	_picker_items = lucian.item_catalog.by_name()
 	for item in _picker_items:
 		_item_picker.add_item(item.display_name)
+	_backpack_slots.set_value_no_signal(lucian.inventory.unlocked_backpack)
 	_equip_slots.set_value_no_signal(lucian.inventory.unlocked_equip)
 	_shop_slots.set_value_no_signal(stage.shop_slots)
 	_last_wave_button.visible = not stage.run.endless
@@ -263,6 +265,9 @@ func _build() -> void:
 	_button(row, "+MP potion", func() -> void: lucian.inventory.add(lucian.item_catalog.find(&"mp_potion")))
 	_button(row, "Energize now", func() -> void: lucian.passives.energize.value = EnergizeCharge.MAX)
 	row = _row(box)
+	_label(row, "Backpack slots")
+	_backpack_slots = _spin(row, 1, Inventory.BACKPACK_SIZE, Inventory.BACKPACK_SIZE)
+	_backpack_slots.value_changed.connect(func(value: float) -> void: lucian.inventory.unlocked_backpack = int(value))
 	_label(row, "Equip slots")
 	_equip_slots = _spin(row, 1, Inventory.EQUIP_SIZE, Inventory.EQUIP_SIZE)
 	_equip_slots.value_changed.connect(func(value: float) -> void: lucian.inventory.unlocked_equip = int(value))

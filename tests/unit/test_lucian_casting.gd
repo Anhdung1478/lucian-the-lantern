@@ -144,3 +144,24 @@ func test_setup_regen_bonus_raises_the_regen_per_second() -> void:
 	lucian.apply_setup(setup)
 	assert_almost_eq(lucian.stats.hp_regen, hp_before + 1.5, 0.001)
 	assert_almost_eq(lucian.stats.mana_regen, mana_before + 1.8, 0.001)
+
+
+func test_setup_backpack_slots_lock_the_rest() -> void:
+	var setup := StageSetup.new()
+	setup.backpack_slots = 5
+	lucian.apply_setup(setup)
+	assert_eq(lucian.inventory.unlocked_backpack, 5)
+	assert_true(lucian.inventory.is_locked(5))
+
+
+func test_setup_locks_the_backpack_before_the_equip_slots() -> void:
+	var sword := lucian.item_catalog.find(&"bf_sword")
+	for i in 5:
+		lucian.inventory.put(i, sword)
+	lucian.inventory.put(Inventory.EQUIP_START + 5, sword)
+	var setup := StageSetup.new()
+	setup.backpack_slots = 5
+	setup.equip_slots = 1
+	lucian.apply_setup(setup)
+	assert_null(lucian.inventory.item_at(5), "never moved into a cell that is about to lock")
+	assert_eq(lucian.inventory.item_at(Inventory.EQUIP_START + 5), sword, "stays: no open cell")

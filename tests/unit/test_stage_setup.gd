@@ -162,3 +162,20 @@ func test_regen_nodes_reach_the_stat_bonus() -> void:
 	var setup := StageSetup.from_save(save)
 	assert_almost_eq(setup.stat_bonus[&"hp_regen"], 1.0, 0.001)
 	assert_almost_eq(setup.stat_bonus[&"mana_regen"], 0.6, 0.001)
+
+
+func test_a_new_save_gets_5_backpack_cells() -> void:
+	var setup := StageSetup.from_save(SaveGame.new("user://test_setup_"))
+	assert_eq(setup.backpack_slots, 5)
+
+
+func test_backpack_levels_reach_the_setup() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	save.essences.from_dict({"blue": 99999, "orange": 999, "purple": 0})
+	for i in 2:
+		assert_true(save.tree.buy(&"backpack_slots", save.essences))
+	assert_eq(StageSetup.from_save(save).backpack_slots, 16)
+
+
+func test_the_sandbox_has_the_whole_backpack() -> void:
+	assert_eq(StageSetup.new().backpack_slots, Inventory.BACKPACK_SIZE)
