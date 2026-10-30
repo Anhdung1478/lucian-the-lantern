@@ -22,4 +22,4 @@ static func draw(canvas: CanvasItem, at: Vector2, heading: float, span: float, f
 		points.append(at + point.rotated(heading))
 	canvas.draw_colored_polygon(points, Color(BODY, BODY.a * alpha))
 	points.append(points[0])
-	canvas.draw_polyline(points, Color(RIM, alpha), 1.5)
+	canvas.draw_polyline(points, Color(RIM, alpha), 2.5)

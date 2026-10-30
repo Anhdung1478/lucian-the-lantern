@@ -85,6 +85,8 @@ func play_all() -> void:
 
 ## Closes the preview and frees everything it spawned.
 func close() -> void:
+	if is_queued_for_deletion():
+		return
 	_stop()
 	closed.emit()
 	queue_free()

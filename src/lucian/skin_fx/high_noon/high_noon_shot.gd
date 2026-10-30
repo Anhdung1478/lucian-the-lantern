@@ -12,10 +12,15 @@ const SMOKE := Color(0.35, 0.3, 0.28)
 const TAIL := [[-50.0, 7.0, 0.35], [-65.0, 8.5, 0.25], [-80.0, 10.0, 0.16], [-95.0, 11.0, 0.08]]
 
 
+func _ready() -> void:
+	super()
+	# Only W's missile animates; the rest never need a frame.
+	set_process(kind == Kind.MISSILE and not low)
+
+
 func _process(delta: float) -> void:
-	if kind == Kind.MISSILE and not low:
-		age += delta
-		queue_redraw()
+	age += delta
+	queue_redraw()
 
 
 func _draw() -> void:

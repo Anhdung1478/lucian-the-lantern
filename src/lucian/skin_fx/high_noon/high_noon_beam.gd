@@ -15,6 +15,7 @@ const PUFFS := 3
 
 
 func _start() -> void:
+	sparks.drag = 3.0
 	for i in EMBERS:
 		var side := 1.0 if randf() < 0.5 else -1.0
 		var at := Vector2(randf_range(0.0, length), side * width * randf_range(0.25, 0.45))

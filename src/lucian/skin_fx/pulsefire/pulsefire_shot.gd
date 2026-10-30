@@ -9,10 +9,15 @@ const WHITE := Color("f4f8ff")
 const RING := Color("7fd8ff")
 
 
+func _ready() -> void:
+	super()
+	# Only W's missile animates; the rest never need a frame.
+	set_process(kind == Kind.MISSILE and not low)
+
+
 func _process(delta: float) -> void:
-	if kind == Kind.MISSILE and not low:
-		age += delta
-		queue_redraw()
+	age += delta
+	queue_redraw()
 
 
 func _draw() -> void:

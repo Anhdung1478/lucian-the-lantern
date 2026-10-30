@@ -8,8 +8,9 @@ const INNER := Color(0.82, 0.09, 0.19, 0.85)
 const CENTER := Color("ff3a50")
 const DROP := Color("d01830")
 const DROPS := 14
+const BATS := 4
 const BAT_SPEED := 520.0
-const BAT_SPAN := 28.0
+const BAT_SPAN := 36.0
 ## Seconds the bats fly.
 const BAT_TIME := 0.5
 
@@ -29,7 +30,7 @@ func _lingers() -> bool:
 
 
 func details() -> int:
-	return sparks.size() + (4 if _lingers() else 0)
+	return sparks.size() + (BATS if _lingers() else 0)
 
 
 func _draw() -> void:
@@ -43,6 +44,6 @@ func _draw() -> void:
 	if _lingers():
 		# The bats stop at the arm ends.
 		var reach := minf(age * BAT_SPEED, bar.x * 0.5)
-		for i in 4:
-			var heading := i * PI / 2.0
+		for i in BATS:
+			var heading := i * TAU / BATS
 			VampireBat.draw(self, Vector2.RIGHT.rotated(heading) * reach, heading, BAT_SPAN, sin(age * 40.0 + i), 1.0 - age / BAT_TIME)

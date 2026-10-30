@@ -185,3 +185,30 @@ func test_every_skin_but_classic_has_a_set_of_its_own() -> void:
 			continue
 		assert_true(themed.has(skin.id), str(skin.id))
 		assert_ne(skin.fx.get_script(), SkinFx, str(skin.id))
+
+
+func test_pulsefire_shockwave_stays_inside_the_cross() -> void:
+	var blast := _blast(Skins.find(&"pulsefire").fx) as PulsefireBlast
+	for step in 11:
+		var radius := blast.wave_radius(step / 10.0)
+		assert_lte(radius, BAR.y * 1.5 + 0.001, "t %d/10" % step)
+		assert_gte(radius, BAR.y * 0.5 - 0.001, "t %d/10" % step)
+	assert_almost_eq(blast.wave_radius(1.0), BAR.y * 1.5, 0.001)
+	blast.free()
+
+
+func test_only_a_missile_look_on_high_keeps_processing() -> void:
+	for id: StringName in [&"high_noon", &"project", &"pulsefire"]:
+		var fx := Skins.find(id).fx
+		var bullet := fx.r_bullet_look()
+		var bolt := fx.attack_shot_look()
+		var missile := fx.w_missile_look()
+		for look: ShotLook in [bullet, bolt, missile]:
+			add_child_autofree(look)
+		assert_false(bullet.is_processing(), "%s bullet" % id)
+		assert_false(bolt.is_processing(), "%s bolt" % id)
+		assert_true(missile.is_processing(), "%s missile on high" % id)
+	GameSettings.instance().set_value(&"quality", "low")
+	var low_missile := Skins.find(&"pulsefire").fx.w_missile_look()
+	add_child_autofree(low_missile)
+	assert_false(low_missile.is_processing(), "missile on low")

@@ -439,9 +439,12 @@ func apply_setup(setup: StageSetup) -> void:
 
 
 ## The equipped skin's effect set: how Q, W, E, R and shots look and sound.
-## A skin without one uses Classic's (no static state: a static resource leaks at exit).
+## A skin without one uses Classic's; with neither, a plain SkinFx (no static
+## state: a static resource leaks at exit).
 func fx() -> SkinFx:
-	return skin.fx if skin.fx else Skins.ALL[0].fx
+	if skin.fx:
+		return skin.fx
+	return Skins.ALL[0].fx if Skins.ALL[0].fx else SkinFx.new()
 
 
 ## Wears `new_skin`: its body art and stats. Keeps the HP and mana share.

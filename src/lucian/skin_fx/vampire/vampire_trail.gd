@@ -7,7 +7,7 @@ const MIST := Color(0.82, 0.09, 0.19, 0.18)
 const CLOUD := Color(0.29, 0.03, 0.07, 0.3)
 ## One bat and one mist cloud every this many px of trail.
 const STEP := 50.0
-const BAT_SPAN := 22.0
+const BAT_SPAN := 28.0
 ## Seconds each bat flies.
 const BAT_LIFE := 0.5
 

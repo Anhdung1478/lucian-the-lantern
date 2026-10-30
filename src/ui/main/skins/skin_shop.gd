@@ -52,9 +52,12 @@ func close_popup() -> bool:
 ## Opens the preview of skin `id` over the shop, closing any other.
 func open_preview(id: StringName) -> void:
 	close_popup()
-	preview = SkinPreview.new(Skins.find(id))
-	preview.closed.connect(func() -> void: preview = null)
-	add_child(preview)
+	var opened := SkinPreview.new(Skins.find(id))
+	preview = opened
+	opened.closed.connect(func() -> void:
+		if preview == opened:
+			preview = null)
+	add_child(opened)
 
 
 ## A hidden shop closes its preview, so it never plays on another page.

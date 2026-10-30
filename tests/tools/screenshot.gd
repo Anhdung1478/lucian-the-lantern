@@ -4029,7 +4029,20 @@ func skin_fx_missile_lands() -> void:
 		waited += 0.02
 
 
-## Q, W's cross, E mid-dash and R's stream, one screenshot each.
+## Waits until a basic attack's bolt is in flight (a little after it fires), at most 3 s.
+func skin_fx_bolt_flies() -> void:
+	var waited := 0.0
+	while waited < 3.0:
+		for node in lucian.projectile_parent.get_children():
+			if node is AttackProjectile and not node.is_queued_for_deletion():
+				await wait(0.1)
+				return
+		await wait(0.02)
+		waited += 0.02
+
+
+## Q, W's cross, E mid-dash, W's missile in flight, R's stream and a basic
+## attack's bolt, one screenshot each (W's after it lands too).
 func skin_fx_shots(prefix: String, dummy: TrainingDummy, start: Vector2) -> void:
 	var Slot := ChampionProgress.Slot
 	for slot in [Slot.Q, Slot.W, Slot.E, Slot.R]:
@@ -4040,7 +4053,8 @@ func skin_fx_shots(prefix: String, dummy: TrainingDummy, start: Vector2) -> void
 	await shot(prefix + "_q")
 	await wait(0.4)
 	lucian.try_cast(Slot.W, dummy.global_position)
-	await wait(0.25)
+	await wait(0.33)
+	await shot(prefix + "_w_flight")
 	await skin_fx_missile_lands()
 	await wait(0.05)
 	await shot(prefix + "_w")
@@ -4054,3 +4068,8 @@ func skin_fx_shots(prefix: String, dummy: TrainingDummy, start: Vector2) -> void
 	await wait(0.7)
 	await shot(prefix + "_r")
 	await wait(2.6)
+	lucian.command_attack(dummy)
+	await skin_fx_bolt_flies()
+	await shot(prefix + "_attack")
+	lucian.command_move(lucian.global_position)
+	await wait(0.8)

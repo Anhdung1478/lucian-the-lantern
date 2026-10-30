@@ -13,10 +13,15 @@ const TRAIL := [[-22.0, 6.0, 0.6], [-34.0, 5.0, 0.4], [-46.0, 4.0, 0.25]]
 const SPIN := 14.0
 
 
+func _ready() -> void:
+	super()
+	# Only W's missile animates; the rest never need a frame.
+	set_process(kind == Kind.MISSILE and not low)
+
+
 func _process(delta: float) -> void:
-	if kind == Kind.MISSILE and not low:
-		age += delta
-		queue_redraw()
+	age += delta
+	queue_redraw()
 
 
 func _draw() -> void:

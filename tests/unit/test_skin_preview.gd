@@ -159,3 +159,14 @@ func test_hiding_the_shop_closes_the_preview() -> void:
 	assert_null(shop.preview)
 	await wait_process_frames(2)
 	assert_false(is_instance_valid(preview))
+
+
+func test_closing_twice_emits_closed_once_and_keeps_the_next_preview() -> void:
+	var first := _open(&"vampire")
+	var closes: Array[int] = [0]
+	first.closed.connect(func() -> void: closes[0] += 1)
+	first.close()
+	var second := _open(&"project")
+	first.close()
+	assert_eq(closes[0], 1, "closed emitted once")
+	assert_eq(shop.preview, second, "the new preview is still the shop's")
