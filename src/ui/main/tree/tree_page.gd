@@ -66,7 +66,6 @@ const BACKPACK_ID := &"backpack_slots"
 ## Light motes drifting up: how many, how fast.
 const MOTES := 28
 const MOTE_SPEED := 9.0
-const FRAME_INSET := 7.0
 
 ## The night grove (the main screen's backdrop matches these).
 const SKY_TOP := Color("08101f")
@@ -91,9 +90,6 @@ const VINE_DIM := Color("4d6458")
 const VINE_LIT := UiStyle.GOLD_COLOR
 const RING_DIM := Color(0.22, 0.27, 0.3)
 const PLAQUE_COLOR := Color(0.035, 0.05, 0.06, 0.94)
-const FRAME_COLOR := Color(0.79, 0.64, 0.36, 0.85)
-const FRAME_INNER := Color(0.79, 0.64, 0.36, 0.28)
-const TEXT_OUTLINE := Color(0.01, 0.02, 0.03, 0.9)
 
 ## The branches' names, blurbs and tab icons.
 const NAMES := {
@@ -159,7 +155,6 @@ var _motes := Control.new()
 ## Per mote: its x, y and a phase in 0..1.
 var _mote_seeds: Array[Vector3] = []
 var _time := 0.0
-var _spaced_font: FontVariation
 
 
 func _init(branch_id: StringName, evolution_tree: EvolutionTree, essences: Essences) -> void:
@@ -354,7 +349,8 @@ func _draw() -> void:
 		_draw_backpack_preview(centers[BACKPACK_ID])
 	_draw_group_captions()
 	_draw_header()
-	_draw_frame()
+	# The Journey map's frame, open on the right where the info column stands.
+	JourneyMap.draw_frame(self, SIZE)
 
 
 func _draw_sky() -> void:
@@ -620,10 +616,8 @@ func _draw_ring(id: StringName) -> void:
 		var across := direction.orthogonal() * 5.0
 		draw_colored_polygon(PackedVector2Array([tip, tip + direction * 7.0 + across, tip + direction * 14.0, tip + direction * 7.0 - across]),
 			UiStyle.GOLD_COLOR if reached else RING_DIM.lightened(0.3))
-		var text := str(mark)
 		var label_at := center + direction * (RING_RADIUS + 30.0)
-		var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, RING_FONT).x
-		_draw_text(text, label_at + Vector2(-width * 0.5, font.get_ascent(RING_FONT) * 0.4), RING_FONT, color)
+		JourneyMap.draw_text(self, str(mark), label_at + Vector2(0, font.get_ascent(RING_FONT) * 0.4), RING_FONT, color, true)
 
 
 ## Under Equip Slots: the six equip slots, open ones lit, the next level's
@@ -644,7 +638,6 @@ func _draw_equip_preview(center: Vector2) -> void:
 		if i >= next:
 			draw_texture_rect(LOCK, Rect2(rect.get_center() - Vector2.ONE * 10.0, Vector2.ONE * 20.0), false, Color(1, 1, 1, 0.75))
 	# The act each slot's level needs, under a bracket per act.
-	var font := get_theme_default_font()
 	var i := 1
 	while i < all:
 		var act := data.act_needed(i - 1)
@@ -658,11 +651,9 @@ func _draw_equip_preview(center: Vector2) -> void:
 			var cleared := tree.is_level_open(EQUIP_ID, i - 1)
 			var color := TreeNodeView.MAXED_COLOR if cleared else JourneyPanel.CAPTION_COLOR
 			draw_polyline(PackedVector2Array([Vector2(from_x + 2, y - 4), Vector2(from_x + 2, y), Vector2(to_x - 2, y), Vector2(to_x - 2, y - 4)]), Color(color, 0.7), 1.5, true)
-			var text := "Act %d" % act
-			var text_width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-			_draw_text(text, Vector2((from_x + to_x - text_width) * 0.5, y + 22.0), 16, color)
+			JourneyMap.draw_text(self, "Act %d" % act, Vector2((from_x + to_x) * 0.5, y + 22.0), 16, color, true)
 		i = last + 1
-	_draw_text("Only equipped items give stats.", Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), 15, UiStyle.DIM_COLOR)
+	JourneyMap.draw_text(self, "Only equipped items give stats.", Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), 15, UiStyle.DIM_COLOR)
 
 
 ## Under Backpack Slots: the 9x6 backpack, its open cells lit and the next
@@ -687,10 +678,9 @@ func _draw_plaque(center: Vector2, caption: String, count: String) -> Rect2:
 	style.shadow_color = Color(0, 0, 0, 0.5)
 	style.shadow_size = 10
 	draw_style_box(style, rect)
-	_draw_text(caption, rect.position + Vector2(20.0, 30.0), 15, JourneyPanel.CAPTION_COLOR, 3)
-	var font := get_theme_default_font()
-	var width := font.get_string_size(count, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
-	_draw_text(count, rect.position + Vector2(PLAQUE_SIZE.x - 20.0 - width, 31.0), 18, UiStyle.TITLE_COLOR)
+	JourneyMap.draw_text(self, caption, rect.position + Vector2(20.0, 30.0), 15, JourneyPanel.CAPTION_COLOR, false, 3)
+	var width := JourneyMap.text_font(self).get_string_size(count, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
+	JourneyMap.draw_text(self, count, rect.position + Vector2(PLAQUE_SIZE.x - 20.0 - width, 31.0), 18, UiStyle.TITLE_COLOR)
 	return rect
 
 
@@ -713,7 +703,7 @@ func _draw_slot(rect: Rect2, open: bool, next: bool, radius := 6) -> void:
 
 ## Each captioned limb's name over its top node, between two small diamonds.
 func _draw_group_captions() -> void:
-	var font := _font(3)
+	var font := JourneyMap.text_font(self, 3)
 	for limb: Dictionary in LIMBS.get(branch, []):
 		if not limb.has("label"):
 			continue
@@ -724,31 +714,16 @@ func _draw_group_captions() -> void:
 		var text: String = limb["label"]
 		var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, GROUP_FONT).x
 		var baseline := Vector2(top.x - width * 0.5, top.y - TreeNodeView.SIZE * 0.5 - GROUP_LIFT)
-		_draw_text(text, baseline, GROUP_FONT, JourneyPanel.CAPTION_COLOR, 3)
+		JourneyMap.draw_text(self, text, baseline, GROUP_FONT, JourneyPanel.CAPTION_COLOR, false, 3)
 		for side: float in [-1.0, 1.0]:
 			var at := Vector2(top.x + side * (width * 0.5 + 16.0), baseline.y - GROUP_FONT * 0.35)
 			draw_colored_polygon(PackedVector2Array([at + Vector2(0, -4), at + Vector2(4, 0), at + Vector2(0, 4), at + Vector2(-4, 0)]), JourneyPanel.CAPTION_COLOR)
 
 
 func _draw_header() -> void:
-	_draw_text("EVOLUTION TREE", HEADER_AT, CAPTION_FONT, JourneyPanel.CAPTION_COLOR, 3)
-	_draw_text(String(NAMES[branch]).to_upper(), HEADER_AT + Vector2(0, 40), TITLE_FONT, UiStyle.TITLE_COLOR, 4)
-	_draw_text(BLURBS[branch], HEADER_AT + Vector2(0, 70), BLURB_FONT, UiStyle.DIM_COLOR)
-
-
-## The gold frame, open on the right where the info column stands.
-func _draw_frame() -> void:
-	var outer := StyleBoxFlat.new()
-	outer.draw_center = false
-	outer.border_color = FRAME_COLOR
-	outer.set_border_width_all(2)
-	outer.border_width_right = 0
-	outer.corner_radius_top_left = 10
-	outer.corner_radius_bottom_left = 10
-	draw_style_box(outer, Rect2(Vector2.ZERO, SIZE))
-	draw_rect(Rect2(Vector2.ONE * FRAME_INSET, SIZE - Vector2(FRAME_INSET, FRAME_INSET * 2.0)), FRAME_INNER, false, 1.0)
-	for corner: Vector2 in [Vector2(FRAME_INSET, FRAME_INSET), Vector2(FRAME_INSET, SIZE.y - FRAME_INSET)]:
-		draw_colored_polygon(PackedVector2Array([corner + Vector2(0, -6), corner + Vector2(6, 0), corner + Vector2(0, 6), corner + Vector2(-6, 0)]), FRAME_COLOR)
+	JourneyMap.draw_text(self, "EVOLUTION TREE", HEADER_AT, CAPTION_FONT, JourneyPanel.CAPTION_COLOR, false, 3)
+	JourneyMap.draw_text(self, String(NAMES[branch]).to_upper(), HEADER_AT + Vector2(0, 40), TITLE_FONT, UiStyle.TITLE_COLOR, false, 4)
+	JourneyMap.draw_text(self, BLURBS[branch], HEADER_AT + Vector2(0, 70), BLURB_FONT, UiStyle.DIM_COLOR)
 
 
 func _draw_motes() -> void:
@@ -760,24 +735,6 @@ func _draw_motes() -> void:
 		var alpha := 0.35 + 0.3 * sin(_time * 1.3 + mote.z * 20.0)
 		_motes.draw_texture_rect(glow, Rect2(at - Vector2.ONE * 9.0, Vector2.ONE * 18.0), false, Color(LIGHT, alpha * 0.45))
 		_motes.draw_circle(at, 1.6, Color(LIGHT, alpha))
-
-
-## `text` with its baseline at `at`, outlined; `spacing` spreads capitals.
-func _draw_text(text: String, at: Vector2, font_size: int, color: Color, spacing := 0) -> void:
-	var font := _font(spacing)
-	draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 5, TEXT_OUTLINE)
-	draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
-
-
-## The default font, its capitals spread by `spacing` px.
-func _font(spacing := 0) -> Font:
-	if spacing == 0:
-		return get_theme_default_font()
-	if _spaced_font == null:
-		_spaced_font = FontVariation.new()
-		_spaced_font.base_font = get_theme_default_font()
-	_spaced_font.spacing_glyph = spacing
-	return _spaced_font
 
 
 func _rng(salt: int) -> RandomNumberGenerator:

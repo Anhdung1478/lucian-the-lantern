@@ -1403,7 +1403,9 @@ func scenario_main_tree() -> void:
 		await click(section.tabs.buttons[EvolutionTree.BRANCHES.find(branch)])
 		await mouse_move(Vector2(960, 1060))
 		await wait(0.2)
-		print("tab ", branch, " shows its page (expect true): ", section.pages[branch].visible)
+		# Draw modes at shot time: a tab left in DRAW_PRESSED (1) means a synthetic release was lost.
+		print("tab ", branch, " shows its page, tab draw modes (expect true [0, 0, 0, 0, 0]): ", section.pages[branch].visible, " ",
+			section.tabs.buttons.map(func(tab: Button) -> int: return tab.get_draw_mode()))
 		await shot("main_tree_4_%s" % branch)
 
 

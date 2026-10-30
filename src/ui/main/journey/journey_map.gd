@@ -102,6 +102,9 @@ const ROUND_SIDES := 40
 
 static var _glow: GradientTexture2D
 static var _blob: GradientTexture2D
+## The default font with its capitals spread: spacing -> FontVariation, made
+## once each and never changed after.
+static var _spaced_fonts := {}
 
 ## The 22 stages, in play order.
 var nodes: Array[JourneyNode] = []
@@ -127,8 +130,6 @@ var _fogged: Array[bool] = [false, false, false, false, false, false]
 var _overlay := Control.new()
 var _token_base := Vector2.ZERO
 var _time := 0.0
-## The default font with its capitals spread, for the region names.
-var _spaced_font: FontVariation
 
 
 func _init() -> void:
@@ -240,6 +241,50 @@ static func blob() -> Texture2D:
 	if _blob == null:
 		_blob = _radial(PackedFloat32Array([0.0, 0.5, 1.0]), PackedColorArray([Color.WHITE, Color(1, 1, 1, 0.92), Color(1, 1, 1, 0)]))
 	return _blob
+
+
+## The gold frame of a map or page that has a panel on its right: the outer
+## line (none on the right side), an inner line and a diamond at each left
+## corner, drawn on `canvas` over `frame_size`. The Evolution Tree's pages
+## use it too.
+static func draw_frame(canvas: CanvasItem, frame_size: Vector2) -> void:
+	var outer := StyleBoxFlat.new()
+	outer.draw_center = false
+	outer.border_color = FRAME_COLOR
+	outer.set_border_width_all(2)
+	outer.border_width_right = 0
+	outer.corner_radius_top_left = 10
+	outer.corner_radius_bottom_left = 10
+	canvas.draw_style_box(outer, Rect2(Vector2.ZERO, frame_size))
+	canvas.draw_rect(Rect2(Vector2.ONE * FRAME_INSET, frame_size - Vector2(FRAME_INSET, FRAME_INSET * 2.0)), FRAME_INNER, false, 1.0)
+	for corner: Vector2 in [Vector2(FRAME_INSET, FRAME_INSET), Vector2(FRAME_INSET, frame_size.y - FRAME_INSET)]:
+		canvas.draw_colored_polygon(PackedVector2Array([corner + Vector2(0, -6), corner + Vector2(6, 0), corner + Vector2(0, 6), corner + Vector2(-6, 0)]), FRAME_COLOR)
+
+
+## Draws `text` on `canvas` with its baseline at `at` (centered on it when
+## `centered`), outlined; `spacing` spreads capitals. The Evolution Tree's
+## pages use it too.
+static func draw_text(canvas: Control, text: String, at: Vector2, font_size: int, color: Color, centered := false, spacing := 0) -> void:
+	var font := text_font(canvas, spacing)
+	var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+	var start := at - Vector2(width * 0.5, 0) if centered else at
+	canvas.draw_string_outline(font, start, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 5, NAME_OUTLINE)
+	canvas.draw_string(font, start, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+
+
+## The font draw_text() uses on `canvas`: the default one, its capitals
+## spread by `spacing` px when that is above 0.
+static func text_font(canvas: Control, spacing := 0) -> Font:
+	var font: Font = canvas.get_theme_default_font()
+	if spacing <= 0:
+		return font
+	var key := "%d %d" % [font.get_instance_id(), spacing]
+	if not _spaced_fonts.has(key):
+		var spaced := FontVariation.new()
+		spaced.base_font = font
+		spaced.spacing_glyph = spacing
+		_spaced_fonts[key] = spaced
+	return _spaced_fonts[key]
 
 
 ## Draws `texture` cropped to a circle of `radius` at `center` on `canvas`;
@@ -378,7 +423,7 @@ func _draw_compass(at: Vector2) -> void:
 		draw_colored_polygon(PackedVector2Array([at, at + side, tip]), Color(0.79, 0.64, 0.36, 0.55))
 		draw_colored_polygon(PackedVector2Array([at, tip, at - side]), Color(0.25, 0.2, 0.12, 0.7))
 	draw_circle(at, 4.0, Color(0.79, 0.64, 0.36, 0.8))
-	_draw_text("N", at + Vector2(0, -58), 15, Color(0.79, 0.64, 0.36, 0.75), true)
+	draw_text(self, "N", at + Vector2(0, -58), 15, Color(0.79, 0.64, 0.36, 0.75), true)
 
 
 ## Act 1: the lane from bottom-left to top-right, the river across it.
@@ -594,24 +639,10 @@ func _draw_overlay() -> void:
 	for act in REGIONS.size():
 		var at: Vector2 = REGIONS[act]["name_at"]
 		var fogged := _fogged[act]
-		_draw_text("ACT %d" % (act + 1), at + Vector2(0, ACT_FONT), ACT_FONT, FOGGED_NAME if fogged else ACT_COLOR, false, _overlay, 3)
-		_draw_text(String(Journey.ACTS[act]["name"]).to_upper(), at + Vector2(0, ACT_FONT + 6.0 + NAME_FONT), NAME_FONT,
-			FOGGED_NAME if fogged else NAME_COLOR, false, _overlay, 3)
-	_draw_frame()
-
-
-func _draw_frame() -> void:
-	var outer := StyleBoxFlat.new()
-	outer.draw_center = false
-	outer.border_color = FRAME_COLOR
-	outer.set_border_width_all(2)
-	outer.border_width_right = 0
-	outer.corner_radius_top_left = 10
-	outer.corner_radius_bottom_left = 10
-	_overlay.draw_style_box(outer, Rect2(Vector2.ZERO, SIZE))
-	_overlay.draw_rect(Rect2(Vector2.ONE * FRAME_INSET, SIZE - Vector2(FRAME_INSET, FRAME_INSET * 2.0)), FRAME_INNER, false, 1.0)
-	for corner: Vector2 in [Vector2(FRAME_INSET, FRAME_INSET), Vector2(FRAME_INSET, SIZE.y - FRAME_INSET)]:
-		_overlay.draw_colored_polygon(PackedVector2Array([corner + Vector2(0, -6), corner + Vector2(6, 0), corner + Vector2(0, 6), corner + Vector2(-6, 0)]), FRAME_COLOR)
+		draw_text(_overlay, "ACT %d" % (act + 1), at + Vector2(0, ACT_FONT), ACT_FONT, FOGGED_NAME if fogged else ACT_COLOR, false, 3)
+		draw_text(_overlay, String(Journey.ACTS[act]["name"]).to_upper(), at + Vector2(0, ACT_FONT + 6.0 + NAME_FONT), NAME_FONT,
+			FOGGED_NAME if fogged else NAME_COLOR, false, 3)
+	draw_frame(_overlay, SIZE)
 
 
 func _draw_token() -> void:
@@ -628,23 +659,6 @@ func _draw_token() -> void:
 	if token_texture:
 		draw_round_art(token, token_texture, middle, radius - 1.0, 1.0)
 	token.draw_arc(middle, radius + 3.0, PI * 1.1, PI * 1.9, 24, Color(1, 0.95, 0.75, 0.9), 1.5, true)
-
-
-## Draws `text` with its baseline at `at` (centered on it when `centered`),
-## outlined, on `canvas` (the map by default); `spacing` spreads capitals.
-func _draw_text(text: String, at: Vector2, font_size: int, color: Color, centered := false, canvas: CanvasItem = null, spacing := 0) -> void:
-	var target := canvas if canvas else self
-	var font: Font = get_theme_default_font()
-	if spacing > 0:
-		if _spaced_font == null or _spaced_font.spacing_glyph != spacing:
-			_spaced_font = FontVariation.new()
-			_spaced_font.base_font = font
-			_spaced_font.spacing_glyph = spacing
-		font = _spaced_font
-	var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
-	var start := at - Vector2(width * 0.5, 0) if centered else at
-	target.draw_string_outline(font, start, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 5, NAME_OUTLINE)
-	target.draw_string(font, start, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
 
 
 ## A wide soft band from `from` to `to`, fading in and out at its ends.

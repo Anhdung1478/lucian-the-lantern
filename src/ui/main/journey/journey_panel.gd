@@ -73,19 +73,14 @@ var _status_mark := Control.new()
 var _cleared_mark := false
 ## The stage the roster shows, so a refresh doesn't rebuild it.
 var _roster_stage := ""
-var _top_glow: GradientTexture2D
+
+## The white top glow that draw_top_glow() tints.
+static var _top_glow: GradientTexture2D
 
 
 func _init() -> void:
 	size = SIZE
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	var gradient := Gradient.new()
-	gradient.colors = PackedColorArray([Color.WHITE, Color(1, 1, 1, 0)])
-	_top_glow = GradientTexture2D.new()
-	_top_glow.gradient = gradient
-	_top_glow.fill = GradientTexture2D.FILL_RADIAL
-	_top_glow.fill_from = Vector2(0.5, 0.0)
-	_top_glow.fill_to = Vector2(0.5, 1.0)
 	for box: VBoxContainer in [stage_box, training_box, endless_box]:
 		box.position = Vector2(PAD, PAD + 4.0)
 		box.size = Vector2(CONTENT_WIDTH, 0)
@@ -196,17 +191,44 @@ func _show_roster(stage_id: String) -> void:
 		roster.add_child(icon)
 
 
-func _draw() -> void:
+## The side panel's frame: opaque, a gold border, rounded on the right only
+## (the map or page left of it has no right border). A new box each call, so
+## a caller may set its content margins. The Evolution Tree's info column
+## uses it too.
+static func frame_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = BACKGROUND
 	style.border_color = UiStyle.BORDER_COLOR
 	style.set_border_width_all(2)
 	style.corner_radius_top_right = 10
 	style.corner_radius_bottom_right = 10
-	draw_style_box(style, Rect2(Vector2.ZERO, size))
-	draw_texture_rect(_top_glow, Rect2(2, 2, size.x - 4.0, GLOW_HEIGHT), false, Color(_accent, GLOW_ALPHA))
-	var line_y := start_button.position.y - GAP * 0.5
-	draw_line(Vector2(PAD, line_y), Vector2(size.x - PAD, line_y), Color(UiStyle.BORDER_COLOR, 0.25), 1.0)
+	return style
+
+
+## The soft glow of `accent` down from the top of a panel `width` wide, drawn
+## on `canvas` (over the frame).
+static func draw_top_glow(canvas: CanvasItem, width: float, accent: Color, alpha := GLOW_ALPHA) -> void:
+	if _top_glow == null:
+		var gradient := Gradient.new()
+		gradient.colors = PackedColorArray([Color.WHITE, Color(1, 1, 1, 0)])
+		_top_glow = GradientTexture2D.new()
+		_top_glow.gradient = gradient
+		_top_glow.fill = GradientTexture2D.FILL_RADIAL
+		_top_glow.fill_from = Vector2(0.5, 0.0)
+		_top_glow.fill_to = Vector2(0.5, 1.0)
+	canvas.draw_texture_rect(_top_glow, Rect2(2, 2, width - 4.0, GLOW_HEIGHT), false, Color(accent, alpha))
+
+
+## The faint gold rule across a panel `width` wide at `y`, over its bottom
+## button.
+static func draw_rule(canvas: CanvasItem, y: float, width: float) -> void:
+	canvas.draw_line(Vector2(PAD, y), Vector2(width - PAD, y), Color(UiStyle.BORDER_COLOR, 0.25), 1.0)
+
+
+func _draw() -> void:
+	draw_style_box(frame_style(), Rect2(Vector2.ZERO, size))
+	draw_top_glow(self, size.x, _accent)
+	draw_rule(self, start_button.position.y - GAP * 0.5, size.x)
 
 
 func _build_stage() -> void:

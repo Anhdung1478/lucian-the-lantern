@@ -65,7 +65,6 @@ var _ladder_id: StringName
 var _node_box := VBoxContainer.new()
 var _portrait := Control.new()
 var _progress := Control.new()
-var _top_glow: GradientTexture2D
 
 
 func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
@@ -75,18 +74,10 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	size = JourneyPanel.SIZE
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	# Opaque, with the Journey panel's frame: rounded on the right only.
-	var style := UiStyle.panel(JourneyPanel.BACKGROUND, UiStyle.BORDER_COLOR, 2, JourneyPanel.PAD, 0)
-	style.corner_radius_top_right = 10
-	style.corner_radius_bottom_right = 10
+	var style := JourneyPanel.frame_style()
+	style.set_content_margin_all(JourneyPanel.PAD)
 	style.content_margin_top = JourneyPanel.PAD + 4.0
 	add_theme_stylebox_override(&"panel", style)
-	var gradient := Gradient.new()
-	gradient.colors = PackedColorArray([Color.WHITE, Color(1, 1, 1, 0)])
-	_top_glow = GradientTexture2D.new()
-	_top_glow.gradient = gradient
-	_top_glow.fill = GradientTexture2D.FILL_RADIAL
-	_top_glow.fill_from = Vector2(0.5, 0.0)
-	_top_glow.fill_to = Vector2(0.5, 1.0)
 
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override(&"separation", ROW_GAP)
@@ -370,11 +361,10 @@ func _wrapped(label: Label) -> Label:
 
 
 func _draw() -> void:
-	draw_texture_rect(_top_glow, Rect2(2, 2, size.x - 4.0, JourneyPanel.GLOW_HEIGHT), false, Color(UiStyle.GOLD_COLOR, JourneyPanel.GLOW_ALPHA * 0.7))
+	JourneyPanel.draw_top_glow(self, size.x, UiStyle.GOLD_COLOR, JourneyPanel.GLOW_ALPHA * 0.7)
 	if cost_bar.visible:
-		# The cost bar is last, at the bottom: a faint rule over it, as over Start.
-		var line_y := size.y - JourneyPanel.PAD - CostBar.SIZE.y - JourneyPanel.GAP * 0.5
-		draw_line(Vector2(JourneyPanel.PAD, line_y), Vector2(size.x - JourneyPanel.PAD, line_y), Color(UiStyle.BORDER_COLOR, 0.25), 1.0)
+		# The cost bar is last, at the bottom: the Journey's rule over it, as over Start.
+		JourneyPanel.draw_rule(self, size.y - JourneyPanel.PAD - CostBar.SIZE.y - JourneyPanel.GAP * 0.5, size.x)
 
 
 ## The levels bought as a gold bar.
