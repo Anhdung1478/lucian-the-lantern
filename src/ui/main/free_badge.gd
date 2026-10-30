@@ -37,3 +37,9 @@ func _sync_pulse() -> void:
 	set_process(is_visible_in_tree())
 	if not is_visible_in_tree():
 		modulate.a = 1.0
+
+
+## Entering the tree turns processing on and sends no visibility change, so
+## a badge that comes in already shown (or hidden) syncs here.
+func _ready() -> void:
+	_sync_pulse()

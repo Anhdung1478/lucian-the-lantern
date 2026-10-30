@@ -578,3 +578,17 @@ func test_a_reset_shows_free_on_skills_and_summoners() -> void:
 
 func test_the_badge_ignores_the_mouse() -> void:
 	assert_eq(section.views[&"ghost"].free_badge.mouse_filter, Control.MOUSE_FILTER_IGNORE)
+
+
+func test_the_free_badge_pulses_only_while_it_shows() -> void:
+	var shown := FreeBadge.new()
+	add_child_autofree(shown)
+	assert_true(shown.is_processing(), "visible when it enters the tree")
+	shown.hide()
+	assert_false(shown.is_processing(), "hidden")
+	shown.show()
+	assert_true(shown.is_processing(), "shown again")
+	var hidden := FreeBadge.new()
+	hidden.visible = false
+	add_child_autofree(hidden)
+	assert_false(hidden.is_processing(), "hidden when it enters the tree")
