@@ -29,6 +29,25 @@ func _blast(fx: SkinFx) -> Node2D:
 	return fx.w_blast(Vector2(300, 0), Vector2.DOWN, BAR)
 
 
+## Themed skin -> its classes: [SkinFx, beam, blast, trail, shot look, flash].
+func _themed() -> Dictionary:
+	return {
+		&"high_noon": [HighNoonFx, HighNoonBeam, HighNoonBlast, HighNoonTrail, HighNoonShot, HighNoonFlash],
+	}
+
+
+func test_themed_skins_use_their_own_pieces() -> void:
+	var themed := _themed()
+	for id: StringName in themed:
+		var row: Array = themed[id]
+		var skin := Skins.find(id)
+		var pieces: Array = [skin.fx, _beam(skin.fx), _blast(skin.fx), skin.fx.e_trail(skin.body), skin.fx.r_bullet_look(), skin.fx.muzzle_flash()]
+		for i in row.size():
+			assert_true(is_instance_of(pieces[i], row[i]), "%s piece %d" % [id, i])
+		for i in range(1, pieces.size()):
+			(pieces[i] as Node).free()
+
+
 ## The loudest sample of a generated sound, 0–1.
 func _peak(sound: StringName) -> float:
 	var data := Sfx.stream(sound).data

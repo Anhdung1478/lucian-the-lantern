@@ -152,6 +152,24 @@ static func _recipe(sound: StringName) -> PackedFloat32Array:
 		&"essence":
 			# A quick high sparkle.
 			samples = _notes([1760.0, 2637.0, 2217.5, 3520.0], 0.045, 35.0, 0.0, 3.0)
+
+		# --- V1.1 skin sounds: High Noon, hellfire and a revolver ---
+		&"cast_q_high_noon":
+			# A roaring fire crackle, noisy and falling.
+			samples = _as_loud_as(&"cast_q", _tone(0.24, 1400.0, 380.0, 0.75, 0.2, 9.0, 45.0))
+		&"cast_w_high_noon":
+			# A whoosh, then a heavy thump.
+			var whoosh := _tone(0.12, 220.0, 600.0, 0.85, 0.0, 9.0)
+			whoosh.append_array(_tone(0.14, 140.0, 60.0, 0.35, 0.5, 18.0))
+			samples = _as_loud_as(&"cast_w", whoosh)
+		&"cast_e_high_noon":
+			# A dusty whoosh and a two-note spur jingle.
+			var dash := _tone(0.16, 700.0, 250.0, 0.95, 0.0, 12.0)
+			dash.append_array(_notes([2637.0, 3136.0], 0.05, 30.0))
+			samples = _as_loud_as(&"cast_e", dash)
+		&"shot_high_noon":
+			# A low revolver crack.
+			samples = _as_loud_as(&"shot", _tone(0.11, 520.0, 140.0, 0.55, 0.6, 26.0))
 	return samples
 
 
