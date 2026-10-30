@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="704" height="1144" viewBox="-12 -8 176 286">
+  <!-- Title screen: Thresh, looming, facing left (towards Lucian and Senna). A tall hood with green eyes, spiked
+       pauldrons, a tattered robe, chains, his sickle hanging from his right hand and the green lantern held out in
+       his left. Dark with a moonlight rim on the upper-left edges (as in title_lucian.svg); near the lantern, the
+       parts also catch its green light on their lower-left edges: the part again in that light, then the dark
+       part shifted up-right, clipped to the part and to its moonlit copy. -->
+  <defs>
+    <linearGradient id="rim" gradientUnits="userSpaceOnUse" x1="0" y1="-8" x2="0" y2="276">
+      <stop offset="0" stop-color="#e2edff"/>
+      <stop offset="0.45" stop-color="#b4c8e6" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#8aa2c4" stop-opacity="0.08"/>
+    </linearGradient>
+    <radialGradient id="lit" gradientUnits="userSpaceOnUse" cx="21" cy="135" r="95">
+      <stop offset="0" stop-color="#b8ffd4"/>
+      <stop offset="0.45" stop-color="#8fe3b0" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#2f8a5a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="green_glow">
+      <stop offset="0" stop-color="#eafff2"/>
+      <stop offset="0.3" stop-color="#8fe3b0" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#2fbf74" stop-opacity="0"/>
+    </radialGradient>
+    <!-- the lantern's light cast on his robe and chest -->
+    <radialGradient id="cast" gradientUnits="userSpaceOnUse" cx="21" cy="138" r="120">
+      <stop offset="0" stop-color="#8fe3b0" stop-opacity="0.3"/>
+      <stop offset="0.5" stop-color="#5fc890" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#2f8a5a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo">
+      <stop offset="0" stop-color="#6ee6a0" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#6ee6a0" stop-opacity="0"/>
+    </radialGradient>
+    <path id="robe" d="M 82 120 L 118 118 C 126 150 136 190 146 228 C 150 244 154 260 157 276 L 149 266 L 146 277 L 137 263 L 131 276 L 122 262 L 113 277 L 106 265 L 99 276 L 92 260 L 85 275 L 77 262 L 67 273 L 61 256 L 50 268 L 47 254 L 34 262 L 38 250 L 24 254 C 40 236 54 212 62 190 C 70 166 77 144 82 120 Z"/>
+    <path id="far_arm" d="M 124 72 L 136 72 C 140 96 144 120 147 146 L 139 148 C 135 124 130 98 124 72 Z"/>
+    <path id="far_hand" d="M 138 144 L 148 143 L 150 150 L 146 155 L 140 154 Z"/>
+    <path id="sickle" d="M 145 206 C 160 208 168 224 162 246 C 159 232 152 222 139 218 L 141 212 Z M 141 204 L 147 204 L 146 214 L 140 214 Z"/>
+    <path id="torso" d="M 64 70 C 90 66 112 62 134 64 C 132 88 124 108 116 128 L 84 131 C 78 110 70 90 64 70 Z"/>
+    <path id="far_pauldron" d="M 110 60 C 118 55 130 57 136 64 C 139 70 137 77 133 80 L 112 76 Z M 124 59 L 134 41 L 132 62 Z M 131 63 L 147 52 L 136 70 Z"/>
+    <path id="hood" d="M 70 60 C 64 52 62 40 65 30 C 68 20 76 13 86 11 C 92 6 98 0 107 -5 C 102 4 100 10 101 16 C 106 24 107 36 104 46 C 102 54 98 60 92 64 Z"/>
+    <path id="face" d="M 67 32 C 70 25 77 21 84 23 C 88 30 88 42 84 52 C 80 58 74 60 70 56 C 66 50 65 40 67 32 Z"/>
+    <path id="pauldron" d="M 52 74 C 54 63 63 56 74 56 L 84 60 L 82 75 C 72 79 61 79 52 74 Z M 55 67 L 43 52 L 61 61 Z M 62 60 L 55 42 L 69 57 Z M 71 57 L 72 40 L 78 57 Z"/>
+    <path id="arm" d="M 61 70 C 57 80 51 89 45 95 C 40 98.5 34 99.5 28 100 L 28 106 C 35 106.5 42 106 49 103 C 56 98 62 90 68 82 Z"/>
+    <path id="sleeve" d="M 66 74 C 60 86 52 95 44 99 L 45 113 L 50 104 L 53 118 L 57 104 L 62 113 L 63 98 C 66 92 68 86 70 80 Z"/>
+    <path id="hand" d="M 29 99.5 L 22.5 99.5 L 18 102.5 L 21.5 103.5 L 18.5 106.5 L 23 106 L 22 110 L 26 107 L 30 106.5 Z"/>
+    <clipPath id="c_body"><use href="#robe"/><use href="#torso"/></clipPath>
+    <clipPath id="c_robe"><use href="#robe"/></clipPath>
+    <clipPath id="c_robe9"><use href="#robe" transform="translate(0.9 0.9)"/></clipPath>
+    <clipPath id="c_far_arm"><use href="#far_arm"/></clipPath>
+    <clipPath id="c_far_hand"><use href="#far_hand"/></clipPath>
+    <clipPath id="c_sickle"><use href="#sickle"/></clipPath>
+    <clipPath id="c_torso"><use href="#torso"/></clipPath>
+    <clipPath id="c_torso9"><use href="#torso" transform="translate(0.9 0.9)"/></clipPath>
+    <clipPath id="c_far_pauldron"><use href="#far_pauldron"/></clipPath>
+    <clipPath id="c_hood"><use href="#hood"/></clipPath>
+    <clipPath id="c_hood9"><use href="#hood" transform="translate(0.9 0.9)"/></clipPath>
+    <clipPath id="c_pauldron"><use href="#pauldron"/></clipPath>
+    <clipPath id="c_pauldron9"><use href="#pauldron" transform="translate(0.9 0.9)"/></clipPath>
+    <clipPath id="c_arm"><use href="#arm"/></clipPath>
+    <clipPath id="c_arm9"><use href="#arm" transform="translate(0.9 0.9)"/></clipPath>
+    <clipPath id="c_sleeve"><use href="#sleeve"/></clipPath>
+    <clipPath id="c_sleeve9"><use href="#sleeve" transform="translate(0.9 0.9)"/></clipPath>
+    <clipPath id="c_hand"><use href="#hand"/></clipPath>
+  </defs>
+
+  <!-- the halo of the lantern's light on the air around it -->
+  <circle cx="21" cy="135" r="32" fill="url(#halo)"/>
+
+  <!-- far arm, sickle chain and sickle, behind the robe -->
+  <use href="#far_arm" fill="url(#rim)"/>
+  <g clip-path="url(#c_far_arm)"><use href="#far_arm" fill="#0a120f" transform="translate(0.9 0.9)"/></g>
+  <path d="M 144 152 C 145 170 145 188 144 206" fill="none" stroke="#050807" stroke-width="3.2"/>
+  <path d="M 144 152 C 145 170 145 188 144 206" fill="none" stroke="#56705f" stroke-width="1.8" stroke-dasharray="2.6 1.6"/>
+  <use href="#sickle" fill="url(#rim)"/>
+  <g clip-path="url(#c_sickle)"><use href="#sickle" fill="#1a2621" transform="translate(0.8 0.8)"/></g>
+  <path d="M 147 211 C 158 214 163 226 161 240" fill="none" stroke="#8fe3b0" stroke-width="0.8" opacity="0.6"/>
+  <use href="#far_hand" fill="url(#rim)"/>
+  <g clip-path="url(#c_far_hand)"><use href="#far_hand" fill="#0c1411" transform="translate(0.7 0.7)"/></g>
+
+  <!-- robe, lit green on its front -->
+  <use href="#robe" fill="url(#rim)"/>
+  <g clip-path="url(#c_robe)"><use href="#robe" fill="url(#lit)" transform="translate(0.9 0.9)"/></g>
+  <g clip-path="url(#c_robe)"><g clip-path="url(#c_robe9)"><use href="#robe" fill="#0a110e" transform="translate(1.8 -0.8)"/></g></g>
+  <g clip-path="url(#c_robe)">
+    <path d="M 94 132 C 92 172 86 212 78 256" fill="none" stroke="#040706" stroke-width="1.2" opacity="0.8"/>
+    <path d="M 108 130 C 112 172 118 214 122 258" fill="none" stroke="#040706" stroke-width="1" opacity="0.7"/>
+  </g>
+
+  <!-- torso and the far pauldron -->
+  <use href="#torso" fill="url(#rim)"/>
+  <g clip-path="url(#c_torso)"><use href="#torso" fill="url(#lit)" transform="translate(0.9 0.9)"/></g>
+  <g clip-path="url(#c_torso)"><g clip-path="url(#c_torso9)"><use href="#torso" fill="#0b1310" transform="translate(1.8 -0.8)"/></g></g>
+  <g clip-path="url(#c_body)"><circle cx="21" cy="138" r="120" fill="url(#cast)"/></g>
+  <use href="#far_pauldron" fill="url(#rim)"/>
+  <g clip-path="url(#c_far_pauldron)"><use href="#far_pauldron" fill="#0f1915" transform="translate(0.9 0.9)"/></g>
+
+  <!-- chains: across his chest, around his waist and down to the ground (the backdrop takes it on towards Senna),
+       and a loop from his lantern arm -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M 70 78 C 88 92 104 104 122 116" stroke="#050807" stroke-width="3.2"/>
+    <path d="M 70 78 C 88 92 104 104 122 116" stroke="#56705f" stroke-width="1.8" stroke-dasharray="2.6 1.6"/>
+    <path d="M 82 126 C 96 132 110 130 120 124" stroke="#050807" stroke-width="3.2"/>
+    <path d="M 82 126 C 96 132 110 130 120 124" stroke="#56705f" stroke-width="1.8" stroke-dasharray="2.6 1.6"/>
+    <path d="M 82 127 C 70 160 58 214 44 262 C 40 270 30 273 -12 274" stroke="#050807" stroke-width="3.2"/>
+    <path d="M 82 127 C 70 160 58 214 44 262 C 40 270 30 273 -12 274" stroke="#6f9a82" stroke-width="1.8" stroke-dasharray="2.6 1.6"/>
+    <path d="M 48 101 C 52 122 66 132 82 126" stroke="#050807" stroke-width="3.2"/>
+    <path d="M 48 101 C 52 122 66 132 82 126" stroke="#6f9a82" stroke-width="1.8" stroke-dasharray="2.6 1.6"/>
+  </g>
+
+  <!-- hood: the dark of his face, green eyes -->
+  <use href="#hood" fill="url(#rim)"/>
+  <g clip-path="url(#c_hood)"><use href="#hood" fill="url(#lit)" transform="translate(0.9 0.9)"/></g>
+  <g clip-path="url(#c_hood)"><g clip-path="url(#c_hood9)"><use href="#hood" fill="#0d1512" transform="translate(1.8 -0.8)"/></g></g>
+  <use href="#face" fill="#010403"/>
+  <ellipse cx="76" cy="44" rx="9" ry="11" fill="url(#green_glow)" opacity="0.25"/>
+  <circle cx="73.5" cy="38" r="5" fill="url(#green_glow)"/>
+  <circle cx="80.5" cy="37.5" r="5" fill="url(#green_glow)"/>
+  <ellipse cx="73.5" cy="38" rx="2.2" ry="1.1" fill="#eafff2" transform="rotate(12 73.5 38)"/>
+  <ellipse cx="80.5" cy="37.5" rx="2" ry="1" fill="#eafff2" transform="rotate(-8 80.5 37.5)"/>
+
+  <!-- his near pauldron, sleeve, arm and clawed hand -->
+  <use href="#sleeve" fill="url(#rim)"/>
+  <g clip-path="url(#c_sleeve)"><use href="#sleeve" fill="url(#lit)" transform="translate(0.9 0.9)"/></g>
+  <g clip-path="url(#c_sleeve)"><g clip-path="url(#c_sleeve9)"><use href="#sleeve" fill="#0a110e" transform="translate(1.8 -0.8)"/></g></g>
+  <use href="#arm" fill="url(#rim)"/>
+  <g clip-path="url(#c_arm)"><use href="#arm" fill="url(#lit)" transform="translate(0.9 0.9)"/></g>
+  <g clip-path="url(#c_arm)"><g clip-path="url(#c_arm9)"><use href="#arm" fill="#101a16" transform="translate(1.8 -0.8)"/></g></g>
+  <use href="#pauldron" fill="url(#rim)"/>
+  <g clip-path="url(#c_pauldron)"><use href="#pauldron" fill="url(#lit)" transform="translate(0.9 0.9)"/></g>
+  <g clip-path="url(#c_pauldron)"><g clip-path="url(#c_pauldron9)"><use href="#pauldron" fill="#111c17" transform="translate(1.8 -0.8)"/></g></g>
+  <use href="#hand" fill="url(#rim)"/>
+  <g clip-path="url(#c_hand)"><use href="#hand" fill="#1c2b24" transform="translate(0.6 0.6)"/></g>
+
+  <!-- the lantern on a short chain from his hand -->
+  <path d="M 21 106 L 21 114" stroke="#050807" stroke-width="3"/>
+  <path d="M 21 106 L 21 114" stroke="#6f9a82" stroke-width="1.6" stroke-dasharray="1.8 1.2"/>
+  <g transform="translate(21 114) scale(1.15) translate(-21 -114)">
+    <circle cx="21" cy="135" r="20" fill="url(#halo)"/>
+    <path d="M 13 120 L 21 113.5 L 29 120 Z" fill="#1b221f" stroke="#050807" stroke-width="1"/>
+    <rect x="12" y="119.5" width="18" height="3.5" rx="1" fill="#2a332f" stroke="#050807" stroke-width="1"/>
+    <path d="M 14 123 L 28 123 L 31 135 L 28 147 L 14 147 L 11 135 Z" fill="#0f1a16" stroke="#050807" stroke-width="1"/>
+    <ellipse cx="21" cy="135" rx="9" ry="11" fill="url(#green_glow)"/>
+    <path d="M 21 128 Q 24.5 135 21 142 Q 17.5 135 21 128 Z" fill="#eafff2"/>
+    <g stroke="#1b221f" stroke-width="1.3" stroke-linecap="round" fill="none">
+      <path d="M 17 123.5 L 16 146.5"/>
+      <path d="M 25 123.5 L 26 146.5"/>
+      <path d="M 21 123.5 L 21 146.5" stroke-width="0.9"/>
+    </g>
+    <rect x="13" y="146.5" width="16" height="3.5" rx="1" fill="#2a332f" stroke="#050807" stroke-width="1"/>
+    <path d="M 15 150 L 27 150 L 25 154 L 17 154 Z" fill="#1b221f" stroke="#050807" stroke-width="1"/>
+  </g>
+</svg>

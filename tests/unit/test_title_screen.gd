@@ -52,8 +52,123 @@ func _press_esc() -> void:
 	Input.flush_buffered_events()
 
 
+## A real left click on `control`'s middle, through the viewport: whatever
+## is on top there gets it.
+func _click(control: Control) -> void:
+	var at := control.get_global_rect().get_center()
+	for pressed in [true, false]:
+		var click := InputEventMouseButton.new()
+		click.button_index = MOUSE_BUTTON_LEFT
+		click.pressed = pressed
+		click.position = at
+		click.global_position = at
+		get_viewport().push_input(click, true)
+	await wait_process_frames(1)
+
+
 func test_the_game_opens_on_the_title_screen() -> void:
 	assert_is(game.screen, TitleScreen)
+
+
+# --- The backdrop: the night scene and the three figures -------------------------
+
+
+func test_the_backdrop_and_the_figures_ignore_the_mouse_and_load_their_art() -> void:
+	var title := _title()
+	var backdrop := title.backdrop
+	assert_is(backdrop, TitleBackdrop)
+	assert_eq(title.get_child(0), backdrop, "behind everything")
+	await wait_process_frames(1)
+	assert_eq(backdrop.size, title.size, "fills the screen")
+	assert_eq(backdrop.mouse_filter, Control.MOUSE_FILTER_IGNORE)
+	var layers := backdrop.find_children("*", "Control", true, false)
+	assert_gte(layers.size(), 4, "the three figures and the moving layer")
+	for layer: Control in layers:
+		assert_eq(layer.mouse_filter, Control.MOUSE_FILTER_IGNORE, layer.name)
+	for figure: TextureRect in [backdrop.lucian, backdrop.senna, backdrop.thresh]:
+		assert_not_null(figure.texture, figure.name)
+		if figure.texture:
+			assert_gt(figure.texture.get_height(), 1000, "%s's art is imported large, so it stays sharp" % figure.name)
+	assert_lt(backdrop.senna.get_index(), backdrop.lucian.get_index(), "Senna stands behind Lucian")
+
+
+func test_lucian_and_senna_stand_left_of_the_column_and_thresh_right_of_it() -> void:
+	var title := _title()
+	var backdrop := title.backdrop
+	await wait_process_frames(2)
+	var middle := title.size.x * 0.5
+	for page: String in ["menu", "slots"]:
+		if page == "slots":
+			title.show_slots(false)
+			await wait_process_frames(2)
+		var column := title.column.get_global_rect()
+		assert_gt(column.size.x, 400.0, "the %s column is laid out" % page)
+		for figure: TextureRect in [backdrop.lucian, backdrop.senna]:
+			var rect := figure.get_global_rect()
+			assert_lt(rect.get_center().x, middle, "%s left of centre" % figure.name)
+			assert_lt(rect.end.x, column.position.x, "%s clear of the %s column" % [figure.name, page])
+		var thresh := backdrop.thresh.get_global_rect()
+		assert_gt(thresh.get_center().x, middle, "Thresh right of centre")
+		assert_gt(thresh.position.x, column.end.x, "Thresh clear of the %s column" % page)
+	for figure: TextureRect in [backdrop.lucian, backdrop.senna, backdrop.thresh]:
+		var rect := figure.get_global_rect()
+		assert_gt(rect.end.y, title.size.y - 60.0, "%s stands at the bottom" % figure.name)
+		assert_lte(rect.end.y, title.size.y, "%s's feet show" % figure.name)
+
+
+func test_on_a_wider_screen_the_figures_keep_to_the_edges() -> void:
+	# The backdrop fills its parent, as it fills the title screen.
+	var screen := Control.new()
+	screen.size = Vector2(1920, 1080)
+	var backdrop := TitleBackdrop.new()
+	screen.add_child(backdrop)
+	add_child_autofree(screen)
+	var lucian := backdrop.lucian.get_rect()
+	var senna := backdrop.senna.get_rect()
+	var thresh := backdrop.thresh.get_rect()
+	screen.size = Vector2(2560, 1080)
+	assert_eq(backdrop.size, screen.size)
+	assert_eq(backdrop.lucian.get_rect(), lucian, "Lucian keeps to the left edge")
+	assert_eq(backdrop.senna.get_rect(), senna, "Senna too")
+	assert_eq(backdrop.thresh.get_rect(), Rect2(thresh.position + Vector2(640, 0), thresh.size), "Thresh keeps to the right edge")
+
+
+func test_the_scene_is_drawn_once_and_only_its_effects_move_while_it_shows() -> void:
+	var title := _title()
+	var backdrop := title.backdrop
+	await wait_process_frames(2)
+	watch_signals(backdrop)
+	watch_signals(backdrop.effects)
+	await wait_process_frames(4)
+	assert_signal_emit_count(backdrop, "draw", 0, "the scene is drawn once")
+	assert_gt(get_signal_emit_count(backdrop.effects, "draw"), 2, "mist, wisps and motes move")
+	assert_true(backdrop.is_processing())
+	title.visible = false
+	assert_false(backdrop.is_processing(), "hidden")
+	title.visible = true
+	assert_true(backdrop.is_processing(), "shown again")
+
+
+func test_every_button_is_still_found_and_clicks_through_the_backdrop() -> void:
+	var title := _title()
+	await wait_process_frames(2)
+	for text: String in ["Start new game", "Load game", "Settings", "Exit game"]:
+		assert_not_null(title.find_button(text), text)
+	await _click(title.find_button("Start new game"))
+	assert_true(title.is_showing_slots(), "Start new game opens the slots")
+	await _click(title.find_button("Back"))
+	assert_false(title.is_showing_slots(), "Back")
+	await _click(title.find_button("Settings"))
+	assert_true(title.settings.visible, "Settings opens")
+	title.settings.close()
+	await _click(title.find_button("Exit game"))
+	assert_true(game.prompt.is_open(), "Exit game asks")
+	game.prompt.cancel()
+	SaveGame.instance().copy_to(2)
+	title.show_menu()
+	await _click(title.find_button("Load game"))
+	assert_true(title.is_showing_slots(), "Load game opens the slots")
+	assert_eq(title._slots_title.text, "LOAD GAME")
 
 
 func test_load_game_is_disabled_with_no_saves() -> void:

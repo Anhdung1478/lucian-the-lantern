@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="584" height="1040" viewBox="0 -12 146 260">
+  <!-- Title screen: Lucian, a backlit silhouette facing right (towards Thresh) in his long coat. His left arm aims
+       his own slim pistol (gold glint); his right holds Senna's heavy relic gun up by his head (teal rings).
+       Each part is dark with a moonlight rim on its upper-left edges: the part in rim light, then the part again,
+       shifted down-right and clipped to itself, in the dark. -->
+  <defs>
+    <linearGradient id="rim" gradientUnits="userSpaceOnUse" x1="0" y1="-12" x2="0" y2="246">
+      <stop offset="0" stop-color="#e2edff"/>
+      <stop offset="0.5" stop-color="#b4c8e6" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#8aa2c4" stop-opacity="0.35"/>
+    </linearGradient>
+    <radialGradient id="teal_glow">
+      <stop offset="0" stop-color="#f0fffc"/>
+      <stop offset="0.25" stop-color="#b8fff0" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#5fe8cf" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gold_glow">
+      <stop offset="0" stop-color="#fff6d8"/>
+      <stop offset="0.25" stop-color="#ffcf5a" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#ffb030" stop-opacity="0"/>
+    </radialGradient>
+    <!-- far arm, aiming right -->
+    <path id="far_arm" d="M 73 42 C 85 44 100 47 114 51 L 117 51 L 117 61 L 113 61 C 100 59 87 58 76 57 Z"/>
+    <!-- his own slim pistol: barrel, frame, grip -->
+    <path id="pistol" d="M 117 51.3 L 138 51.3 L 139.5 52.4 L 139.5 55.4 L 126 55.8 L 125 58 L 122 58 L 121 66 L 116.8 65.5 L 117.8 57 L 116.5 55.5 Z"/>
+    <path id="far_fist" d="M 114 51 Q 121 49.5 122.5 52.5 L 122.5 58.5 Q 119 61.5 114.5 61 Z"/>
+    <!-- legs and boots: back (left) and front (right) -->
+    <path id="legs" d="M 52 125 L 67 128 C 63 150 59 170 57 186 C 55 204 53 220 52 230 L 53 238 L 60 242 L 60 246 L 39 246 L 39 238 L 41 230 C 42 214 42 198 43 184 C 44 164 47 144 52 125 Z
+      M 67 125 L 83 123 C 90 142 96 160 98 178 C 100 196 102 214 102 228 L 103 237 L 114 242 L 114 246 L 88 246 L 88 238 L 90 229 C 89 214 87 198 84 184 C 79 166 72 148 67 125 Z"/>
+    <!-- the long coat: high collar, broad shoulders, narrow waist, tails swept back by the wind, open in front -->
+    <path id="coat" d="M 55.5 23 Q 56.5 21 58 23.5 L 62.5 36 L 48 42 C 46 52 48 64 50 76 C 52 88 53 96 51 106 C 47 132 38 160 26 184 C 19 197 11 207 3 213 L 15 210 L 12 223 L 25 212 L 29 226 L 37 211 L 48 207 C 50 186 54 160 58 140 L 66 131 L 73 140 C 80 160 87 184 92 204 L 103 207 C 99 186 94 160 89 138 C 85 122 80 110 78 98 C 77 84 80 64 81 48 L 77 40 L 77 28 L 70 37 Z"/>
+    <path id="head" d="M 63 30 C 61 26 60.5 20 61.5 15 C 62.5 9.5 66.5 6.3 71.5 6.3 C 76.5 6.5 79.5 10.2 79.3 15 L 79.8 17.8 L 78.8 19.5 L 81.6 24.2 L 79.2 25.2 L 79.6 27.4 L 78.8 28.6 L 79.2 31.5 C 78 33.5 76 34.6 73.6 34.8 L 69 34.8 C 66.5 33.8 64.5 32.4 63 30 Z"/>
+    <!-- near arm, raised: upper arm, forearm, fist -->
+    <path id="near_arm" d="M 49 41 C 44 44 40 50 36 60 L 31 72 L 35 78 L 42 75 L 49 64 C 52 60 55 56 57 52 L 57 44 Z
+      M 30 71 C 31 62 33 54 34 47 L 43 47 C 43 56 42 66 40 75 L 35 78 Z"/>
+    <path id="near_fist" d="M 33 40 L 44 40 L 45 47 L 43 50 L 34 50 L 32.5 46 Z"/>
+    <!-- Senna's relic gun, pointing up: heavy receiver, barrel, muzzle cap -->
+    <path id="relic_gun" d="M 31.5 25 L 46 25 L 47.2 29 L 47.2 40 L 44.5 43 L 33.2 43 L 30.8 40 L 30.8 29 Z
+      M 34.6 5 L 42.8 5 L 42.8 26 L 34.6 26 Z M 34 1 L 43.4 1 L 42.8 5.5 L 34.6 5.5 Z"/>
+    <clipPath id="c_far_arm"><use href="#far_arm"/></clipPath>
+    <clipPath id="c_pistol"><use href="#pistol"/></clipPath>
+    <clipPath id="c_far_fist"><use href="#far_fist"/></clipPath>
+    <clipPath id="c_legs"><use href="#legs"/></clipPath>
+    <clipPath id="c_coat"><use href="#coat"/></clipPath>
+    <clipPath id="c_head"><use href="#head"/></clipPath>
+    <clipPath id="c_near_arm"><use href="#near_arm"/></clipPath>
+    <clipPath id="c_near_fist"><use href="#near_fist"/></clipPath>
+    <clipPath id="c_relic_gun"><use href="#relic_gun"/></clipPath>
+  </defs>
+
+  <!-- far arm and pistol, behind the body -->
+  <use href="#far_arm" fill="url(#rim)"/>
+  <g clip-path="url(#c_far_arm)"><use href="#far_arm" fill="#0e141b" transform="translate(0.9 0.9)"/></g>
+  <use href="#pistol" fill="url(#rim)"/>
+  <g clip-path="url(#c_pistol)"><use href="#pistol" fill="#161c24" transform="translate(0.6 0.6)"/></g>
+  <path d="M 122 56.5 Q 124 60.5 127 55.8" fill="none" stroke="#161c24" stroke-width="1"/>
+  <path d="M 119 52 L 138 52" stroke="#c9d1dc" stroke-width="0.5" opacity="0.6"/>
+  <use href="#far_fist" fill="url(#rim)"/>
+  <g clip-path="url(#c_far_fist)"><use href="#far_fist" fill="#10161d" transform="translate(0.7 0.7)"/></g>
+
+  <!-- legs -->
+  <use href="#legs" fill="url(#rim)"/>
+  <g clip-path="url(#c_legs)"><use href="#legs" fill="#0b1015" transform="translate(0.9 0.9)"/></g>
+
+  <!-- coat, with a fold in each panel catching a little light -->
+  <use href="#coat" fill="url(#rim)"/>
+  <g clip-path="url(#c_coat)">
+    <use href="#coat" fill="#0d1218" transform="translate(1 0.9)"/>
+    <path d="M 54 116 C 50 146 42 172 30 200" fill="none" stroke="#9fb4d4" stroke-width="0.6" opacity="0.3"/>
+    <path d="M 55 116 C 51 146 43 172 31 200" fill="none" stroke="#06090c" stroke-width="1.4"/>
+    <path d="M 83 128 C 86 150 90 176 95 202" fill="none" stroke="#06090c" stroke-width="1.2"/>
+    <path d="M 70 37 C 70 60 70 80 68 96" fill="none" stroke="#8a95a5" stroke-width="0.6" opacity="0.35"/>
+  </g>
+  <!-- belt and its gold buckle -->
+  <path d="M 51.5 97 L 78 95.5 L 78.3 100.5 L 51.5 102 Z" fill="#161d26"/>
+  <rect x="64" y="95.8" width="4" height="4.6" rx="0.8" fill="#c9a45c" opacity="0.8"/>
+
+  <!-- head -->
+  <use href="#head" fill="url(#rim)"/>
+  <g clip-path="url(#c_head)"><use href="#head" fill="#10161d" transform="translate(0.9 0.9)"/></g>
+
+  <!-- near arm and Senna's gun, tilted a little outwards -->
+  <use href="#near_arm" fill="url(#rim)"/>
+  <g clip-path="url(#c_near_arm)"><use href="#near_arm" fill="#121921" transform="translate(0.9 0.9)"/></g>
+  <g transform="rotate(-8 38.5 45)">
+    <use href="#relic_gun" fill="url(#rim)"/>
+    <g clip-path="url(#c_relic_gun)"><use href="#relic_gun" fill="#1d252e" transform="translate(0.8 0.8)"/></g>
+    <!-- teal ring bands and core -->
+    <rect x="33" y="19" width="11.4" height="3.5" rx="1" fill="#b8fff0"/>
+    <rect x="33" y="11" width="11.4" height="3.5" rx="1" fill="#b8fff0"/>
+    <circle cx="39" cy="34" r="2.8" fill="#b8fff0"/>
+    <ellipse cx="38.7" cy="16.5" rx="10" ry="8" fill="url(#teal_glow)" opacity="0.35"/>
+    <circle cx="38.7" cy="0" r="8" fill="url(#teal_glow)" opacity="0.9"/>
+  </g>
+  <use href="#near_fist" fill="url(#rim)"/>
+  <g clip-path="url(#c_near_fist)"><use href="#near_fist" fill="#121921" transform="translate(0.8 0.8)"/></g>
+
+  <!-- the gold glint on his pistol's muzzle -->
+  <circle cx="140.5" cy="53.4" r="6.5" fill="url(#gold_glow)"/>
+  <path d="M 140.5 48 L 141.3 52.6 L 146 53.4 L 141.3 54.2 L 140.5 58.8 L 139.7 54.2 L 135 53.4 L 139.7 52.6 Z" fill="#fff2c0"/>
+</svg>

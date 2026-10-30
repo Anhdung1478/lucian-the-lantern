@@ -5,6 +5,8 @@ extends Control
 ## the panel into the slot list. A new game in a used slot asks first and
 ## writes the slot at once. Nothing is unsaved here, so Exit (and the
 ## window's X) only ask "Exit the game?": Exit / Cancel, from the game root.
+## Behind it all, the TitleBackdrop tells the story: Lucian and Senna facing
+## Thresh under the Shadow Isles moon.
 
 signal new_game_started
 signal game_loaded
@@ -13,9 +15,13 @@ signal exit_requested
 const LANTERN := preload("res://assets/art/ui/title_lantern.svg")
 const BUTTON_SIZE := Vector2(420, 64)
 
+## The night scene behind everything: Lucian and Senna facing Thresh.
+var backdrop := TitleBackdrop.new()
 var settings := SettingsScreen.new()
 var confirm := ConfirmPopup.new()
 var slot_list := SlotList.new()
+## The centred column: the lantern, the title and the menu or the slot page.
+var column: VBoxContainer
 var load_button: Button
 var error_label := UiStyle.label("", 20, UiStyle.ERROR_COLOR)
 ## Under the title, in red: "Could not save" after a game over whose save failed.
@@ -90,24 +96,11 @@ func _start_new(slot: int) -> void:
 
 
 func _build() -> void:
-	var background := TextureRect.new()
-	var gradient := Gradient.new()
-	gradient.colors = PackedColorArray([Color(0.1, 0.18, 0.16), Color(0.02, 0.03, 0.04)])
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.35)
-	texture.fill_to = Vector2(1.0, 0.9)
-	background.texture = texture
-	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	background.stretch_mode = TextureRect.STRETCH_SCALE
-	background.set_anchors_preset(Control.PRESET_FULL_RECT)
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(background)
+	add_child(backdrop)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(center)
-	var column := VBoxContainer.new()
+	column = VBoxContainer.new()
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
 	column.add_theme_constant_override(&"separation", 18)
 	center.add_child(column)

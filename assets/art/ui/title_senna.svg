@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="528" height="1048" viewBox="0 -14 132 262">
+  <!-- Title screen: Senna's spirit behind Lucian, facing right (towards Thresh). Hooded, her relic cannon on her
+       shoulder, its barrel up and back. Ghostly teal: a dark teal body with a teal rim, a teal aura, light in her
+       hood and in the cannon's rings, fading out towards the ground. Each part is lit as in title_lucian.svg. -->
+  <defs>
+    <linearGradient id="rim" gradientUnits="userSpaceOnUse" x1="0" y1="-14" x2="0" y2="246">
+      <stop offset="0" stop-color="#d8fff6"/>
+      <stop offset="0.6" stop-color="#8ff0dc" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#5fd8c0" stop-opacity="0.3"/>
+    </linearGradient>
+    <!-- her lower half fades into the mist: the rim, her dark and her aura thin out towards the ground -->
+    <linearGradient id="rim_low" gradientUnits="userSpaceOnUse" x1="0" y1="90" x2="0" y2="246">
+      <stop offset="0" stop-color="#9ff5e6" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#5fd8c0" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="dark_low" gradientUnits="userSpaceOnUse" x1="0" y1="90" x2="0" y2="246">
+      <stop offset="0" stop-color="#0e2528" stop-opacity="0.97"/>
+      <stop offset="0.6" stop-color="#123033" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#1a3d3e" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="aura_fill" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="246">
+      <stop offset="0" stop-color="#5fe8cf"/>
+      <stop offset="0.6" stop-color="#5fe8cf" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#5fe8cf" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="teal_glow">
+      <stop offset="0" stop-color="#f0fffc"/>
+      <stop offset="0.25" stop-color="#b8fff0" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#5fe8cf" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="aura" x="-0.3" y="-0.2" width="1.6" height="1.4"><feGaussianBlur stdDeviation="4"/></filter>
+    <path id="cloak" d="M 62 36 C 56 42 52 48 50 56 C 46 80 44 110 40 140 C 36 170 28 200 14 226 L 27 222 L 28 237 L 41 228 L 50 241 L 60 234 L 72 243 L 84 236 L 97 241 C 98 214 96 180 94 150 C 92 120 92 90 92 66 C 91 54 87 46 80 40 Z"/>
+    <path id="boot" d="M 86 234 L 96 234 L 98 240 L 106 243 L 106 246 L 85 246 Z"/>
+    <path id="hood" d="M 60 40 C 56 31 56 20 60 13 C 63.5 7 70 3.5 76 4.5 C 82.5 5.5 86.5 11 87 18 L 86.5 26 C 86 32 83.5 37.5 79 41 L 70 44 Z"/>
+    <path id="arm" d="M 52 50 C 56 46 62 47 64 52 C 66 60 67 68 70 74 L 82 79 L 84 86 L 70 86 C 63 84 59 78 57 70 C 55 62 53 56 52 50 Z"/>
+    <path id="hand" d="M 80 77.5 L 86.5 78.5 L 87.5 85 L 81 86.5 Z"/>
+    <!-- the relic cannon, lying along +x from its breech: stock with the relic core, a handle, barrel, flared muzzle -->
+    <path id="cannon" d="M 0 -7 Q -4 -7 -4 -3 L -4 5 Q -4 9.5 1 9.5 L 22 9.5 L 22 6 L 26 6 L 28 12 L 33 12 L 32 5 L 118 4.5 L 118 6.5 L 128 7.5 L 128 -6.5 L 118 -5.5 L 118 -4.5 L 22 -5 L 22 -9 L 2 -9 Z"/>
+    <clipPath id="upper"><rect x="-10" y="-20" width="160" height="110"/></clipPath>
+    <clipPath id="c_cloak"><use href="#cloak"/></clipPath>
+    <clipPath id="c_boot"><use href="#boot"/></clipPath>
+    <clipPath id="c_hood"><use href="#hood"/></clipPath>
+    <clipPath id="c_arm"><use href="#arm"/></clipPath>
+    <clipPath id="c_hand"><use href="#hand"/></clipPath>
+    <clipPath id="c_cannon"><use href="#cannon" transform="translate(90 106) rotate(-125)"/></clipPath>
+  </defs>
+
+  <!-- her aura -->
+  <g filter="url(#aura)" opacity="0.3">
+    <use href="#cloak" fill="url(#aura_fill)"/>
+    <use href="#hood" fill="url(#aura_fill)"/>
+  </g>
+
+  <g>
+    <use href="#boot" fill="url(#rim_low)"/>
+    <g clip-path="url(#c_boot)"><use href="#boot" fill="url(#dark_low)" transform="translate(0.9 0.9)"/></g>
+    <use href="#cloak" fill="url(#rim_low)"/>
+    <use href="#cloak" fill="url(#rim)" clip-path="url(#upper)"/>
+    <g clip-path="url(#c_cloak)">
+      <use href="#cloak" fill="url(#dark_low)" transform="translate(1 0.9)"/>
+      <path d="M 60 70 C 58 120 50 170 34 220" fill="none" stroke="#071315" stroke-width="1.2" opacity="0.45"/>
+      <path d="M 80 90 C 82 140 82 190 84 236" fill="none" stroke="#071315" stroke-width="1" opacity="0.4"/>
+      <path d="M 70 46 C 72 60 74 70 76 80" fill="none" stroke="#071315" stroke-width="1" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- the relic cannon over her shoulder -->
+  <use href="#cannon" fill="url(#rim)" transform="translate(90 106) rotate(-125)"/>
+  <g clip-path="url(#c_cannon)"><use href="#cannon" fill="#15292d" transform="translate(90.8 106.8) rotate(-125)"/></g>
+  <g transform="translate(90 106) rotate(-125)">
+    <rect x="44" y="-6.5" width="4" height="13" rx="1.2" fill="#b8fff0"/>
+    <rect x="68" y="-6.5" width="4" height="13" rx="1.2" fill="#b8fff0"/>
+    <rect x="92" y="-6.5" width="4" height="13" rx="1.2" fill="#b8fff0"/>
+    <circle cx="10" cy="0" r="6" fill="#0a1a1c"/>
+    <circle cx="10" cy="0" r="4.6" fill="#b8fff0"/>
+    <circle cx="10" cy="0" r="12" fill="url(#teal_glow)" opacity="0.5"/>
+    <circle cx="130" cy="0.5" r="11" fill="url(#teal_glow)"/>
+  </g>
+
+  <!-- hood, her light inside -->
+  <use href="#hood" fill="url(#rim)"/>
+  <g clip-path="url(#c_hood)">
+    <use href="#hood" fill="#0f2629" transform="translate(0.9 0.9)"/>
+    <path d="M 78 11 C 83.5 13 86 19 85.5 26 C 85 32 82 36.5 77.5 39 C 75 33 74 26 74.6 20 C 75 16 76.2 13 78 11 Z" fill="#02080a"/>
+  </g>
+  <ellipse cx="80" cy="25" rx="6" ry="9" fill="url(#teal_glow)" opacity="0.55"/>
+
+  <!-- arm and hand on the cannon's handle -->
+  <use href="#arm" fill="url(#rim)"/>
+  <g clip-path="url(#c_arm)"><use href="#arm" fill="#11292c" transform="translate(0.9 0.9)"/></g>
+  <use href="#hand" fill="url(#rim)"/>
+  <g clip-path="url(#c_hand)"><use href="#hand" fill="#11292c" transform="translate(0.7 0.7)"/></g>
+</svg>
