@@ -134,3 +134,13 @@ func test_setup_stat_bonus_adds_to_stats_and_fills_hp_and_mana() -> void:
 	assert_almost_eq(lucian.stats.ad, base + 8.0, 0.001)
 	assert_eq(lucian.hp, lucian.stats.max_hp)
 	assert_eq(lucian.mana, lucian.stats.max_mana)
+
+
+func test_setup_regen_bonus_raises_the_regen_per_second() -> void:
+	var hp_before := lucian.stats.hp_regen
+	var mana_before := lucian.stats.mana_regen
+	var setup := StageSetup.new()
+	setup.stat_bonus = {&"hp_regen": 1.5, &"mana_regen": 1.8}
+	lucian.apply_setup(setup)
+	assert_almost_eq(lucian.stats.hp_regen, hp_before + 1.5, 0.001)
+	assert_almost_eq(lucian.stats.mana_regen, mana_before + 1.8, 0.001)

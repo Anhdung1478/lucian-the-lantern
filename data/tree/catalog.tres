@@ -33,7 +33,9 @@
 [ext_resource type="Resource" path="res://data/tree/clarity_upgrade.tres" id="30_n"]
 [ext_resource type="Resource" path="res://data/tree/smite_upgrade.tres" id="31_n"]
 [ext_resource type="Resource" path="res://data/tree/summoner_slot_2.tres" id="32_n"]
+[ext_resource type="Resource" path="res://data/tree/stat_hp_regen.tres" id="33_n"]
+[ext_resource type="Resource" path="res://data/tree/stat_mana_regen.tres" id="34_n"]
 
 [resource]
 script = ExtResource("1_cat")
-nodes = Array[ExtResource("1_data")]([ExtResource("2_n"), ExtResource("3_n"), ExtResource("4_n"), ExtResource("5_n"), ExtResource("6_n"), ExtResource("7_n"), ExtResource("8_n"), ExtResource("9_n"), ExtResource("10_n"), ExtResource("11_n"), ExtResource("12_n"), ExtResource("13_n"), ExtResource("14_n"), ExtResource("15_n"), ExtResource("16_n"), ExtResource("17_n"), ExtResource("18_n"), ExtResource("19_n"), ExtResource("20_n"), ExtResource("21_n"), ExtResource("22_n"), ExtResource("23_n"), ExtResource("24_n"), ExtResource("25_n"), ExtResource("26_n"), ExtResource("27_n"), ExtResource("28_n"), ExtResource("29_n"), ExtResource("30_n"), ExtResource("31_n"), ExtResource("32_n")])
+nodes = Array[ExtResource("1_data")]([ExtResource("2_n"), ExtResource("3_n"), ExtResource("4_n"), ExtResource("5_n"), ExtResource("6_n"), ExtResource("7_n"), ExtResource("8_n"), ExtResource("9_n"), ExtResource("10_n"), ExtResource("11_n"), ExtResource("12_n"), ExtResource("13_n"), ExtResource("33_n"), ExtResource("34_n"), ExtResource("14_n"), ExtResource("15_n"), ExtResource("16_n"), ExtResource("17_n"), ExtResource("18_n"), ExtResource("19_n"), ExtResource("20_n"), ExtResource("21_n"), ExtResource("22_n"), ExtResource("23_n"), ExtResource("24_n"), ExtResource("25_n"), ExtResource("26_n"), ExtResource("27_n"), ExtResource("28_n"), ExtResource("29_n"), ExtResource("30_n"), ExtResource("31_n"), ExtResource("32_n")])

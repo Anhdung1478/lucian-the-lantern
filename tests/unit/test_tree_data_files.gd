@@ -18,6 +18,7 @@ const COSTS := {
 	&"stat_ad": [STAT_B, STAT_O], &"stat_ap": [STAT_B, STAT_O], &"stat_hp": [STAT_B, STAT_O],
 	&"stat_armor": [STAT_B, STAT_O], &"stat_mr": [STAT_B, STAT_O],
 	&"stat_attack_speed": [STAT_B, STAT_O], &"stat_mana": [STAT_B, STAT_O],
+	&"stat_hp_regen": [STAT_B, STAT_O], &"stat_mana_regen": [STAT_B, STAT_O],
 	&"equip_slots": [[150, 300, 600, 1000, 1500], [0, 0, 5, 15, 30]],
 	&"stage_gold": [ECO_B, ECO_O], &"bonus_xp": [ECO_B, ECO_O], &"essence_drop": [ECO_B, ECO_O],
 	&"merchant_stock": [[300, 800], [0, 10]], &"refresh_cost": [[200, 500], [0, 5]],
@@ -35,8 +36,8 @@ func before_all() -> void:
 	nodes = EvolutionTree.new().nodes()
 
 
-func test_31_nodes_with_unique_ids() -> void:
-	assert_eq(nodes.size(), 31)
+func test_33_nodes_with_unique_ids() -> void:
+	assert_eq(nodes.size(), 33)
 	var seen := {}
 	for data in nodes:
 		assert_false(seen.has(data.id), "duplicate %s" % data.id)
@@ -81,7 +82,7 @@ func test_requirements_exist() -> void:
 
 
 func test_costs_match_the_table() -> void:
-	assert_eq(COSTS.size(), 31)
+	assert_eq(COSTS.size(), 33)
 	for data in nodes:
 		assert_true(COSTS.has(data.id), str(data.id))
 		var expected: Array = COSTS[data.id]
@@ -95,3 +96,22 @@ func test_upgrades_are_named_after_their_spell() -> void:
 		var upgrade := tree.node(StringName("%s_upgrade" % spell))
 		assert_not_null(upgrade, str(spell))
 		assert_eq(Array(upgrade.requires), [spell])
+
+
+func test_regen_nodes_give_half_and_six_tenths_a_second_per_level() -> void:
+	var hp := EvolutionTree.new().node(&"stat_hp_regen")
+	var mana := EvolutionTree.new().node(&"stat_mana_regen")
+	assert_eq(hp.branch, &"stats")
+	assert_eq(mana.branch, &"stats")
+	assert_eq(hp.value_text(0), "None")
+	assert_eq(hp.value_text(1), "+0.5/s Health Regen")
+	assert_eq(hp.value_text(5), "+2.5/s Health Regen")
+	assert_eq(mana.value_text(1), "+0.6/s Mana Regen")
+	assert_eq(mana.value_text(5), "+3/s Mana Regen")
+
+
+func test_grid_cells_are_unique() -> void:
+	var seen := {}
+	for data in nodes:
+		assert_false(seen.has(data.grid), "%s shares a cell" % data.id)
+		seen[data.grid] = true

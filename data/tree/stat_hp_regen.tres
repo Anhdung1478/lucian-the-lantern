@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TreeNodeData" format=3]
+
+[ext_resource type="Script" path="res://src/core/tree_node_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/tree/stat_hp_regen.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"stat_hp_regen"
+display_name = "Health Regen"
+description = "Lucian recovers [hp]Health[/hp] faster."
+icon = ExtResource("2_icon")
+branch = &"stats"
+grid = Vector2(7, 1)
+max_level = 5
+blue = Array[int]([50, 100, 200, 350, 500])
+orange = Array[int]([0, 0, 0, 3, 8])
+stat_key = &"hp_regen"
+per_level = 0.5
+format = "+{v}/s Health Regen"

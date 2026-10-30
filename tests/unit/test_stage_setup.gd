@@ -152,3 +152,13 @@ func test_endless_random_rolls_a_real_map_and_keeps_the_choice() -> void:
 		assert_eq(setup.display_name, "Endless · %s" % Journey.ENDLESS_MAPS[setup.act])
 		seen[setup.act] = true
 	assert_eq(seen.size(), 6)
+
+
+func test_regen_nodes_reach_the_stat_bonus() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	save.essences.from_dict({"blue": 99999, "orange": 999, "purple": 0})
+	for id in [&"stat_hp_regen", &"stat_hp_regen", &"stat_mana_regen"]:
+		assert_true(save.tree.buy(id, save.essences), String(id))
+	var setup := StageSetup.from_save(save)
+	assert_almost_eq(setup.stat_bonus[&"hp_regen"], 1.0, 0.001)
+	assert_almost_eq(setup.stat_bonus[&"mana_regen"], 0.6, 0.001)

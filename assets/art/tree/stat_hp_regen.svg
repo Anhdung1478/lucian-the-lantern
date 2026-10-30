@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Health Regen: a green heart with an up arrow -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
+    <linearGradient id="heart" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8f0a8"/><stop offset="0.45" stop-color="#6fd36f"/><stop offset="1" stop-color="#2f8a3a"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <path d="M 32 59 C 15 47 7 38 7 28 C 7 19 13 14 20 14 C 25 14 29 17 32 21 C 35 17 39 14 44 14 C 51 14 57 19 57 28 C 57 38 49 47 32 59 Z" fill="url(#heart)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 27 44 L 27 30 L 20 30 L 32 17 L 44 30 L 37 30 L 37 44 Z" fill="#ffffff" stroke="#256a2c" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 11 27 C 11 22 14 19 19 19" fill="none" stroke="#e8ffe8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 50 6 L 50 2 M 46 4 L 54 4" stroke="#e8ffe8" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+</svg>
