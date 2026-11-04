@@ -181,6 +181,68 @@ func test_every_view_stays_inside_its_page_at_1920x1080() -> void:
 # --- Nodes ----------------------------------------------------------------------------
 
 
+func test_a_node_is_grey_in_silver_then_gold_then_green_with_a_crest() -> void:
+	var view: TreeNodeView = section.views[&"stat_ad"]
+	assert_eq(view.state(), &"poor")
+	assert_true(view.is_grey(), "not bought: greyscale")
+	assert_eq(TreeNodeView.state_color(&"poor"), TreeNodeView.SILVER_COLOR)
+	assert_eq(TreeNodeView.state_color(&"open"), TreeNodeView.SILVER_COLOR)
+	assert_eq(TreeNodeView.border_width(&"open"), TreeNodeView.THIN_BORDER)
+	_buy(&"stat_ad", 2)
+	assert_false(view.is_grey(), "in progress: full colour")
+	assert_eq(TreeNodeView.state_color(view.state()), UiStyle.GOLD_COLOR)
+	assert_eq(TreeNodeView.border_width(view.state()), TreeNodeView.BORDER)
+	assert_false(view.crest.visible)
+	assert_eq(view.badge.text, "2/5")
+	_buy(&"stat_ad", 3)
+	assert_eq(view.state(), &"maxed")
+	assert_eq(TreeNodeView.state_color(view.state()), TreeNodeView.MAXED_COLOR)
+	assert_true(view.crest.visible)
+	assert_eq(view.badge.text, "MAX")
+
+
+func test_the_ready_arrow_shows_while_the_next_level_can_be_bought() -> void:
+	var view: TreeNodeView = section.views[&"stat_ad"]
+	assert_false(view.ready_chip.visible, "too dear")
+	_save().essences.add(Essences.BLUE, 50)
+	assert_true(view.ready_chip.visible, "50 blue buys level 1")
+	assert_true(_save().tree.buy(&"stat_ad", _save().essences))
+	assert_false(view.ready_chip.visible, "level 2 costs 100")
+	_save().tree.max_all()
+	assert_false(view.ready_chip.visible, "maxed")
+	assert_false(section.views[&"skill_r"].ready_chip.visible, "hidden")
+
+
+func test_a_free_upgrade_shows_free_and_not_the_arrow() -> void:
+	_save().set_cleared(Journey.all_stage_ids(1))
+	var ghost: TreeNodeView = section.views[&"ghost"]
+	assert_true(ghost.free_badge.visible)
+	assert_false(ghost.ready_chip.visible)
+
+
+func test_the_level_bar_has_a_segment_per_level_inside_the_badge() -> void:
+	for count in range(1, 8):
+		var segments := TreeNodeView.segment_rects(count)
+		assert_eq(segments.size(), count)
+		for i in count:
+			assert_true(Rect2(Vector2.ZERO, TreeNodeView.BADGE_SIZE).encloses(segments[i]), "%d of %d" % [i, count])
+			if i > 0:
+				assert_gt(segments[i].position.x, segments[i - 1].end.x, "a gap between segments")
+
+
+func test_the_info_column_greys_what_is_not_bought() -> void:
+	section.show_branch(&"stats")
+	var info := section.info
+	var icon: TextureRect = info.rows[&"stat_ad"].get_node(^"Line/Icon")
+	assert_not_null(icon.material, "not bought")
+	_buy(&"stat_ad")
+	assert_null(icon.material, "bought")
+	section.select(&"stat_ap")
+	assert_not_null(info._portrait.material, "Ability Power is not bought")
+	section.select(&"stat_ad")
+	assert_null(info._portrait.material)
+
+
 func test_a_new_save_hides_q_w_e_and_the_passive() -> void:
 	for id in [&"skill_q", &"skill_w", &"skill_e", &"passive", &"skill_r"]:
 		assert_eq(_state(id), &"hidden", str(id))

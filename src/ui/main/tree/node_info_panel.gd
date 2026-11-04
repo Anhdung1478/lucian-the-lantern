@@ -9,6 +9,7 @@ extends PanelContainer
 ##   next level still needs, a row per level (value and cost; bought ones lit,
 ##   the next one framed) and the CostBar that buys it, at the bottom. A
 ##   hidden node reads "???".
+##   Icons not bought yet show in greyscale, as on the page.
 
 ## A row of the branch's node list was clicked.
 signal node_chosen(id: StringName)
@@ -217,6 +218,7 @@ func _show_node() -> void:
 	_fill_ladder(hidden)
 	cost_bar.refresh()
 	_portrait.queue_redraw()
+	_portrait.material = TreeNodeView.grey_material() if TreeNodeView.state_of(tree, essences, id) in [&"open", &"poor"] else null
 
 
 ## The picked node's levels: built when the node changes, recoloured every
@@ -309,6 +311,7 @@ func _fill_list() -> void:
 		var hidden := current == &"hidden"
 		var icon: TextureRect = row.get_node(^"Line/Icon")
 		icon.texture = null if hidden else tree.node(node_id).icon
+		icon.material = TreeNodeView.grey_material() if current in [&"open", &"poor"] else null
 		var title: Label = row.get_node(^"Line/Name")
 		title.text = "???" if hidden else tree.node(node_id).display_name
 		title.add_theme_color_override(&"font_color", UiStyle.DIM_COLOR if hidden else UiStyle.TEXT_COLOR)
@@ -398,7 +401,7 @@ func _draw_portrait() -> void:
 	var frame := StyleBoxFlat.new()
 	frame.bg_color = TreeNodeView.HIDDEN_FILL if current == &"hidden" else TreeNodeView.FILL_COLOR
 	frame.border_color = TreeNodeView.state_color(current)
-	frame.set_border_width_all(TreeNodeView.BORDER)
+	frame.set_border_width_all(TreeNodeView.border_width(current))
 	frame.set_corner_radius_all(TreeNodeView.CORNER)
 	var rect := Rect2(Vector2.ZERO, Vector2.ONE * PORTRAIT_SIZE)
 	if current in [&"bought", &"maxed"]:
