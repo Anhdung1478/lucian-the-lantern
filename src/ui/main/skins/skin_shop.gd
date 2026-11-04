@@ -1,7 +1,9 @@
 class_name SkinShop
 extends Control
 ## The Skin Shop page of the main screen: one card per skin in a centered row.
-## Buying does not equip. Each card's Preview opens a SkinPreview. Nothing here saves.
+## A card's Purchase opens a SkinPurchasePopup that asks first; buying does
+## not equip. Each card's Preview opens a SkinPreview. One pop-up shows at a
+## time. Nothing here saves.
 
 const GAP := 24
 
@@ -9,6 +11,8 @@ const GAP := 24
 var cards: Array[SkinCard] = []
 ## The open preview, or null.
 var preview: SkinPreview
+## The open purchase question, or null.
+var purchase: SkinPurchasePopup
 
 
 func _ready() -> void:
@@ -23,7 +27,7 @@ func _ready() -> void:
 	center.add_child(row)
 	for skin in Skins.ALL:
 		var card := SkinCard.new(skin)
-		card.buy_pressed.connect(_buy)
+		card.buy_pressed.connect(ask_purchase)
 		card.equip_pressed.connect(_equip)
 		card.preview_pressed.connect(open_preview)
 		row.add_child(card)
@@ -41,15 +45,18 @@ func refresh() -> void:
 		card.refresh(SaveGame.instance())
 
 
-## Closes the preview, if one is open (the main screen's ESC calls this).
+## Closes the open pop-up, if any (the main screen's ESC calls this).
 func close_popup() -> bool:
-	if preview == null:
-		return false
-	preview.close()
-	return true
+	if preview:
+		preview.close()
+		return true
+	if purchase:
+		purchase.close()
+		return true
+	return false
 
 
-## Opens the preview of skin `id` over the shop, closing any other.
+## Opens the preview of skin `id` over the shop, closing any other pop-up.
 func open_preview(id: StringName) -> void:
 	close_popup()
 	var opened := SkinPreview.new(Skins.find(id))
@@ -60,7 +67,19 @@ func open_preview(id: StringName) -> void:
 	add_child(opened)
 
 
-## A hidden shop closes its preview, so it never plays on another page.
+## Asks before buying skin `id`, closing any other pop-up.
+func ask_purchase(id: StringName) -> void:
+	close_popup()
+	var opened := SkinPurchasePopup.new(Skins.find(id), SaveGame.instance().essences)
+	purchase = opened
+	opened.confirmed.connect(_buy)
+	opened.closed.connect(func() -> void:
+		if purchase == opened:
+			purchase = null)
+	add_child(opened)
+
+
+## A hidden shop closes its pop-up, so it never shows on another page.
 func _on_visibility_changed() -> void:
 	if not visible:
 		close_popup()

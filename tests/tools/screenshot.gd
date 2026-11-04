@@ -1615,6 +1615,8 @@ func scenario_main_skins() -> void:
 	save.essences.add(Essences.PURPLE, 100)
 	var vampire := shop.cards[4]
 	vampire.button.pressed.emit()
+	print("Purchase asks first (expect true): ", shop.purchase != null)
+	shop.purchase.purchase_button.pressed.emit()
 	print("bought Vampire: purple (expect 75), skin (expect classic): ", save.essences.amount(Essences.PURPLE), " ", save.skin)
 	vampire.button.pressed.emit()
 	await wait(0.2)

@@ -1,7 +1,8 @@
 class_name SkinCard
 extends PanelContainer
 ## One Skin Shop card: portrait, name, bonuses (green), weaknesses (red),
-## playstyle, a Preview button and the Purchase / Equip / Equipped button at the bottom.
+## playstyle, a Preview button and the Purchase / Equip / Equipped button at
+## the bottom. Purchase only emits buy_pressed: the shop asks before buying.
 
 signal buy_pressed(id: StringName)
 signal equip_pressed(id: StringName)
