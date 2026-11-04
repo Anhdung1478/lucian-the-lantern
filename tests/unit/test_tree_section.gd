@@ -213,6 +213,29 @@ func test_the_ready_arrow_shows_while_the_next_level_can_be_bought() -> void:
 	assert_false(section.views[&"skill_r"].ready_chip.visible, "hidden")
 
 
+func test_the_chips_stay_off_every_other_nodes_drawing() -> void:
+	# First with essences to spare (the arrows), then maxed (the crests and every name).
+	_save().essences.add(Essences.BLUE, 100000)
+	_save().essences.add(Essences.ORANGE, 1000)
+	for pass_number in 2:
+		if pass_number == 1:
+			_save().tree.max_all()
+		var chips_seen := 0
+		for branch: StringName in EvolutionTree.BRANCHES:
+			var ids: Array = section.pages[branch].views.keys()
+			for id in ids:
+				var view: TreeNodeView = section.views[id]
+				for chip: Control in [view.ready_chip, view.crest]:
+					if not chip.visible:
+						continue
+					chips_seen += 1
+					var rect := Rect2(view.position + chip.position, chip.size)
+					for other in ids:
+						if other != id:
+							assert_false(rect.intersects(_drawn(section.views[other])), "%s chip on %s" % [id, other])
+		assert_gt(chips_seen, 0, "pass %d showed chips" % pass_number)
+
+
 func test_a_free_upgrade_shows_free_and_not_the_arrow() -> void:
 	_save().set_cleared(Journey.all_stage_ids(1))
 	var ghost: TreeNodeView = section.views[&"ghost"]

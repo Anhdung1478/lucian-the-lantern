@@ -303,6 +303,17 @@ func test_esc_is_ignored_while_settings_or_the_popup_are_open() -> void:
 	main.confirm.answer(false)
 
 
+func test_esc_closes_the_skin_purchase_pop_up_and_not_the_menu() -> void:
+	main.show_section(MainScreen.SECTION_SKINS)
+	var shop: SkinShop = main.sections[MainScreen.SECTION_SKINS]
+	SaveGame.instance().essences.add(Essences.PURPLE, 100)
+	shop.cards[1].button.pressed.emit()
+	assert_not_null(shop.purchase, "Purchase asks first")
+	_esc()
+	assert_null(shop.purchase, "the first ESC closes the pop-up")
+	assert_false(main.gear.visible, "and does not open the menu")
+
+
 func test_buying_a_tree_node_writes_no_file() -> void:
 	var save := SaveGame.instance()
 	save.essences.add(Essences.BLUE, 1000)

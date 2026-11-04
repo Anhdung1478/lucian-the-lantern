@@ -454,7 +454,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Built in V1.2: an ornate card.**
   - The menu is a card (`MenuCard`) over the game, which is blurred, darkened and vignetted behind it (`MenuBackdrop`).
   - The card has a navy-to-teal gradient, a double gold frame with a diamond at each corner, and a round lantern medallion over its top edge.
-  - Under the spaced **MENU** title is the stage's name ("Stage 2-3", "Training", "Endless · Jungle") between two gold rules.
+  - Under the spaced **MENU** title is the stage's name ("Stage 2-3 · The Sentinels", "Training", "Endless · Jungle") between two gold rules.
   - Each row (`MenuEntry`) has an icon. **Resume** is gold. **Settings** has the hint "Audio, controls, graphics".
   - **Leave this stage** and **Exit the game** turn red on hover. The other rows turn gold, with a bar at the left.
   - The Yes / No pop-ups use the same card.

@@ -225,7 +225,7 @@ A node with a level is never hidden (this only matters after the debug table's M
 - **Roots:** they grip a grassy mound with glowing mushrooms.
 - **Boughs:** they taper out to the nodes, with leafy twigs.
 - **Canopy:** layered leaf clumps (dark, mid, light) around every limb group. None covers the header or Reset tree, and the leaves darken under each node.
-- **Lanterns:** a small lantern hangs from each bough and **lights once its node is bought**.
+- **Lanterns:** a small lantern hangs from each bough that has room for one and **lights once its node is bought**.
 - **Light flow:** gold motes climb from the roots to every bought node. None on Low effects.
 
 **Node states, at a glance:**

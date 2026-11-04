@@ -47,8 +47,8 @@ const LOCK_AT := Vector2(SIZE - 4.0, SIZE - 12.0)
 ## The ready ▲ (top-left) and the crest (top-right): their radius and where
 ## their middles sit, poking past the corners like FREE.
 const CHIP_RADIUS := 12.0
-const READY_AT := Vector2(2.0, 2.0)
-const CREST_AT := Vector2(SIZE - 2.0, 2.0)
+const READY_AT := Vector2(2.0, 9.0)
+const CREST_AT := Vector2(SIZE - 2.0, 9.0)
 ## The FREE badge at the top-right corner: how far it pokes past the frame.
 const FREE_POKE := Vector2(10.0, 10.0)
 const LOCK := preload("res://assets/art/ui/lock.svg")
