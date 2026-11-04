@@ -166,6 +166,10 @@ func _run(scenario: String) -> void:
 			await scenario_main_tree()
 		"main_tree_max":
 			await scenario_main_tree_max()
+		"main_tree_states":
+			await scenario_main_tree_states()
+		"main_skin_purchase":
+			await scenario_main_skin_purchase()
 		"tree_free":
 			await scenario_tree_free()
 		"tree_rules":
@@ -517,6 +521,11 @@ func scenario_menu() -> void:
 	await wait(0.5)
 	print("paused after ESC (expect true): ", paused, "  Lucian frozen (expect true): ", is_equal_approx(x, lucian.global_position.x))
 	await shot("menu_0")
+	var exit_entry := find_buttons((stage as Stage).screens.menu, "Exit the game")[0]
+	await mouse_move(control_center(exit_entry))
+	await wait(0.2)
+	await shot("menu_1_hover_exit")
+	await mouse_move(Vector2(960, 1060))
 	await press_key(KEY_ESCAPE, true)
 	await press_key(KEY_ESCAPE, false)
 	await wait(0.3)
@@ -1600,6 +1609,59 @@ func scenario_main_tree_max() -> void:
 	await shot("main_tree_max_5_summoners_picked")
 
 
+## V1.2's node states. Stats: done (Health 5/5 with its crest), in progress
+## (Attack Damage 2/5, Armor 1/5) and not bought with a ready ▲ (60 blue buys
+## any level 1). Economy: everything too dear (Stage Gold's level 1 is 100).
+## Skills: R's lock. Summoners: Ghost free. Backpack: Equip Slots' lock.
+func scenario_main_tree_states() -> void:
+	var save := SaveGame.instance()
+	var tree := save.tree
+	save.set_cleared(Journey.all_stage_ids(1))
+	save.essences.add(Essences.BLUE, 10000)
+	save.essences.add(Essences.ORANGE, 100)
+	for id: StringName in [&"stat_ad", &"stat_ad", &"stat_hp", &"stat_hp", &"stat_hp", &"stat_hp", &"stat_hp", &"stat_armor",
+			&"skill_q", &"skill_q", &"skill_q", &"skill_w", &"skill_w", &"skill_w", &"passive", &"skill_r", &"equip_slots"]:
+		tree.buy(id, save.essences)
+	save.essences.set_amount(Essences.BLUE, 60)
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	var views := section.views
+	await mouse_move(Vector2(960, 1060))
+	print("Health (expect maxed true MAX): ", views[&"stat_hp"].state(), " ", views[&"stat_hp"].crest.visible, " ", views[&"stat_hp"].badge.text)
+	print("Attack Damage (expect bought false 2/5): ", views[&"stat_ad"].state(), " ", views[&"stat_ad"].is_grey(), " ", views[&"stat_ad"].badge.text)
+	print("Ability Power ready, grey (expect true true): ", views[&"stat_ap"].ready_chip.visible, " ", views[&"stat_ap"].is_grey())
+	print("Stage Gold ready (expect false, 60 < 100): ", views[&"stage_gold"].ready_chip.visible)
+	print("R locked, Ghost free (expect true true): ", views[&"skill_r"].locked(), " ", views[&"ghost"].free_badge.visible)
+	for branch: StringName in [&"stats", &"economy", &"skills", &"summoners", &"backpack"]:
+		section.show_branch(branch)
+		await wait(0.4)
+		await shot("tree_states_%s" % branch)
+
+
+## The Skin Shop's purchase question: High Noon with 40 purple, Cancel; then
+## PROJECT, Purchase: 10 left and its card reads Equip.
+func scenario_main_skin_purchase() -> void:
+	main_screen().show_section(MainScreen.SECTION_SKINS)
+	var shop := main_screen().sections[MainScreen.SECTION_SKINS] as SkinShop
+	var save := SaveGame.instance()
+	save.essences.add(Essences.PURPLE, 40)
+	await wait(0.3)
+	shop.cards[1].button.pressed.emit()
+	await wait(0.3)
+	print("asks first (expect true 40): ", shop.purchase != null, " ", save.essences.amount(Essences.PURPLE))
+	await shot("skin_purchase_0_high_noon")
+	shop.purchase.cancel_button.pressed.emit()
+	shop.cards[2].button.pressed.emit()
+	await mouse_move(control_center(shop.purchase.purchase_button))
+	await wait(0.3)
+	await shot("skin_purchase_1_project_hover")
+	shop.purchase.purchase_button.pressed.emit()
+	await mouse_move(Vector2(960, 1060))
+	await wait(0.3)
+	print("bought PROJECT (expect 10 Equip): ", save.essences.amount(Essences.PURPLE), " ", shop.cards[2].button.text)
+	await shot("skin_purchase_2_bought")
+
+
 ## The Skin Shop with 0 purple, then with 100 purple: Vampire bought and
 ## equipped.
 func scenario_main_skins() -> void:
@@ -1657,6 +1719,13 @@ func scenario_main_gear() -> void:
 	var leave := main.gear.find_button("Leave to main menu")
 	print("Leave to main menu enabled (expect true): ", not leave.disabled)
 	await shot("main_gear_0_menu")
+	await mouse_move(control_center(main.gear.find_button("Save")))
+	await wait(0.2)
+	await shot("main_gear_0_hover_save")
+	await mouse_move(control_center(main.gear.find_button("Exit the game")))
+	await wait(0.2)
+	await shot("main_gear_0_hover_exit")
+	await mouse_move(Vector2(960, 1060))
 	main.gear.find_button("Save").pressed.emit()
 	await wait(0.1)
 	print("Save: slot 1 written (expect true), toast (expect Saved to slot 1): ",

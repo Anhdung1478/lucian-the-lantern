@@ -9,7 +9,7 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 ## Download and play
 
 1. Open the [latest release](https://github.com/Anhdung1478/lucian-the-lantern/releases/latest).
-2. Download `LucianTheLantern-v1.1.0-windows-x64.zip`.
+2. Download `LucianTheLantern-v1.2.0-windows-x64.zip`.
 3. Unzip it anywhere and run `LucianTheLantern.exe`.
 
 - Needs Windows 10 or 11, 64-bit.

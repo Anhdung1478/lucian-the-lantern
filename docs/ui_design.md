@@ -451,6 +451,13 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
   - **Exit the game** asks **"Save before leaving?"** with **Yes / No / Cancel**. Cancel, or ESC, goes back to this menu, still paused.
   - The question sits over the menu (`Game`'s prompt, layer 90) and reads ESC first, so the menu doesn't close under it.
   - After a Leave, the Journey opens on the act just played, or on Endless after an Endless run (`main_screen.md`).
+- **Built in V1.2: an ornate card.**
+  - The menu is a card (`MenuCard`) over the game, which is blurred, darkened and vignetted behind it (`MenuBackdrop`).
+  - The card has a navy-to-teal gradient, a double gold frame with a diamond at each corner, and a round lantern medallion over its top edge.
+  - Under the spaced **MENU** title is the stage's name ("Stage 2-3", "Training", "Endless · Jungle") between two gold rules.
+  - Each row (`MenuEntry`) has an icon. **Resume** is gold. **Settings** has the hint "Audio, controls, graphics".
+  - **Leave this stage** and **Exit the game** turn red on hover. The other rows turn gold, with a bar at the left.
+  - The Yes / No pop-ups use the same card.
 
 ## 5. Settings (from the ESC menu)
 

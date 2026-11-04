@@ -28,6 +28,11 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 | **Exit the game** | Asks **"Save before leaving?"** (Yes / No / Cancel), then closes the game. Cancel stays, with the menu open |
 
 - **Nothing on the main screen saves by itself.** Evolution Tree and Skin Shop purchases are kept by **Save**, a **Yes** when leaving, or the auto-save when the next stage is done (see the game design doc §15).
+- **Built in V1.2:** the pop-up is the same ornate card as the stage's ESC menu (`ui_design.md` §4).
+  - Under **MENU** it shows "Slot N · <play time>".
+  - Close is gold. Save shows "Slot N". Save as copy shows "To another slot". Leave to main menu shows "Title screen".
+  - Leave and Exit turn red on hover.
+  - Save as copy's page is titled **SAVE AS COPY**, "Pick a slot", with a Back row.
 
 ### Navigation
 - **Sections** (Evolution Tree, Skin Shop, Journey): switched with a bar at the **bottom** of the screen.
@@ -214,6 +219,28 @@ A node with a level is never hidden (this only matters after the debug table's M
 
 **FREE badges** (`FreeBadge`): a 48 × 20 pill reading "FREE" in 13 px, green with a gold border, pulsing every 1.8 s. It shows on the bottom bar's Evolution Tree button, the tabs and the nodes, for any next level whose rules are met and which costs nothing. It updates whenever the tree changes.
 
+### Built in V1.2
+**A living lantern tree** (`TreeArt`) replaces the bare trunk.
+- **Trunk:** warm bark with a root flare, grooves, a knot and a moonlit rim on its right.
+- **Roots:** they grip a grassy mound with glowing mushrooms.
+- **Boughs:** they taper out to the nodes, with leafy twigs.
+- **Canopy:** layered leaf clumps (dark, mid, light) around every limb group. None covers the header or Reset tree, and the leaves darken under each node.
+- **Lanterns:** a small lantern hangs from each bough and **lights once its node is bought**.
+- **Light flow:** gold motes climb from the roots to every bought node. None on Low effects.
+
+**Node states, at a glance:**
+
+| State | Icon | Frame | Level bar | Extra |
+|---|---|---|---|---|
+| Hidden | "?" | dark | none | |
+| Not bought (open or too dear) | greyscale | thin silver | empty | ▲ (gold, top-left) while you can buy it now |
+| In progress | colour | gold, gold glow | lit gold up to the level | ▲ while the next level can be bought; lock when it is closed |
+| Done | colour | green, green glow | all green, "MAX" | ✔ crest (top-right) |
+
+- **The badge** under a node is a level bar: the number over one segment per level.
+- **FREE** still shows on a free upgrade, in place of ▲.
+- **The info column's list and portrait** show not-bought icons in greyscale too.
+
 ---
 
 ## Section 2 – Skin Shop
@@ -282,6 +309,26 @@ A **full-screen** section showing every skin, including **Classic Lucian**.
 - **No damage, nothing saved.** The shots hit only enemies, and the main screen has none.
 - **Sound** plays on the SFX bus.
 - **Low effects** applies: only the main shapes, and no muzzle flash or dash trail.
+
+### Built in V1.2
+**Purchase asks first.** A card's **Purchase** opens a pop-up (`SkinPurchasePopup`) over the blurred shop, on the menus' ornate card.
+- **Title:** **PURCHASE SKIN**, with the skin's name under it.
+- **The portrait:** in a frame lit with the skin's colour.
+- **A table:**
+
+| Row | Shows |
+|---|---|
+| Bonuses | green |
+| Weaknesses | red |
+| Price | the cost in purple |
+| You have | purple owned |
+| After purchase | what is left (red if short) |
+
+- **A note:** "Buying does not equip it."
+- **Purchase N** (gold) buys and closes. It is off while the price can't be paid.
+- **Cancel**, or ESC, closes and spends nothing.
+- **Leaving the Skin Shop** closes it.
+- **The Preview and the purchase pop-up** replace each other.
 
 ---
 
