@@ -1,18 +1,26 @@
 class_name GameMenu
 extends CanvasLayer
-## The ESC menu: Resume, Settings, Leave this stage, Exit the game. The last
-## two only emit; under the game root they ask first (Leave / Cancel, Yes /
-## No / Cancel), and Cancel comes back to this menu, still paused.
+## The ESC menu of a stage: an ornate card (MenuCard) over the blurred game,
+## the stage's name under MENU, then Resume, Settings, Leave this stage and
+## Exit the game. The last two only emit; under the game root they ask first
+## (Leave / Cancel, Yes / No / Cancel), and Cancel comes back to this menu,
+## still paused.
 
 signal resume_requested
 signal settings_requested
 signal leave_requested
 signal exit_requested
 
-const BUTTON_SIZE := Vector2(340, 56)
 const NOT_AVAILABLE := "Not available yet"
+const SETTINGS_HINT := "Audio, controls, graphics"
+const RESUME_ICON := preload("res://assets/art/ui/menu_resume.svg")
+const SETTINGS_ICON := preload("res://assets/art/ui/menu_settings.svg")
+const LEAVE_ICON := preload("res://assets/art/ui/menu_leave.svg")
+const EXIT_ICON := preload("res://assets/art/ui/menu_exit.svg")
 
-var _leave: Button
+var card := MenuCard.new("MENU")
+
+var _leave: MenuEntry
 
 
 func _ready() -> void:
@@ -21,55 +29,35 @@ func _ready() -> void:
 	_build()
 
 
-func _build() -> void:
-	var backdrop := ColorRect.new()
-	backdrop.color = Color(0, 0, 0, 0.55)
-	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(backdrop)
-
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	backdrop.add_child(center)
-	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override(&"panel", UiStyle.panel())
-	center.add_child(panel)
-
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override(&"separation", 14)
-	panel.add_child(box)
-	var title := Label.new()
-	title.text = "MENU"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_color_override(&"font_color", UiStyle.TITLE_COLOR)
-	title.add_theme_font_size_override(&"font_size", 30)
-	box.add_child(title)
-	box.add_child(HSeparator.new())
-	_button(box, "Resume", func() -> void: resume_requested.emit())
-	_button(box, "Settings", func() -> void: settings_requested.emit())
-	_leave = _button(box, "Leave this stage", func() -> void: leave_requested.emit())
-	_button(box, "Exit the game", func() -> void: exit_requested.emit())
+## The line under MENU: the stage's name (Stage sets it).
+func set_subtitle(text: String) -> void:
+	card.set_subtitle(text)
 
 
 ## Leave this stage is shown disabled, with a hover note, when nothing would
 ## take the player anywhere (the stage running alone).
 func set_leave_enabled(enabled: bool) -> void:
-	_leave.disabled = not enabled
 	if enabled:
-		_leave.remove_meta(&"hover_text")
+		_leave.enable()
 	else:
-		_leave.set_meta(&"hover_text", NOT_AVAILABLE)
+		_leave.disable(NOT_AVAILABLE)
 
 
-## A button without an action is shown disabled, with a hover note.
-func _button(parent: Control, text: String, action: Callable) -> Button:
-	var button := Button.new()
-	button.text = text
-	button.custom_minimum_size = BUTTON_SIZE
-	UiStyle.style_button(button)
-	if action.is_valid():
-		button.pressed.connect(action)
-	else:
-		button.disabled = true
-		button.set_meta(&"hover_text", NOT_AVAILABLE)
-	parent.add_child(button)
-	return button
+func _build() -> void:
+	var backdrop := MenuBackdrop.new()
+	add_child(backdrop)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	backdrop.add_child(center)
+	center.add_child(card)
+	_entry("Resume", RESUME_ICON, MenuEntry.Kind.PRIMARY, "", resume_requested.emit)
+	_entry("Settings", SETTINGS_ICON, MenuEntry.Kind.NORMAL, SETTINGS_HINT, settings_requested.emit)
+	_leave = _entry("Leave this stage", LEAVE_ICON, MenuEntry.Kind.DANGER, "", leave_requested.emit)
+	_entry("Exit the game", EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
+
+
+func _entry(label: String, icon: Texture2D, kind: MenuEntry.Kind, hint: String, action: Callable) -> MenuEntry:
+	var entry := MenuEntry.new(label, icon, kind, hint)
+	entry.pressed.connect(action)
+	card.content.add_child(entry)
+	return entry

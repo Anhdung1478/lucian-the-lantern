@@ -130,6 +130,7 @@ func _ready() -> void:
 	# Game connects `leave_requested` before adding the stage; alone, nobody would act on Leave.
 	screens.menu.set_leave_enabled(not leave_requested.get_connections().is_empty())
 	screens.menu.exit_requested.connect(_exit)
+	screens.menu.set_subtitle(run.display_name)
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	camera.setup(lucian, arena.get_bounds().grow(StageMap.WALL_THICKNESS))
 	lucian.projectile_parent = $Projectiles

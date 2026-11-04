@@ -331,3 +331,26 @@ func test_a_freed_main_screen_leaves_no_connection_on_the_save_tree() -> void:
 	assert_gt(tree.changed.get_connections().size(), before)
 	screen.free()
 	assert_eq(tree.changed.get_connections().size(), before)
+
+
+func test_the_gear_menu_shows_the_slot_and_its_rows() -> void:
+	main.gear.open()
+	var save := SaveGame.instance()
+	assert_eq(main.gear.card.title_label.text, "MENU")
+	assert_eq(main.gear.card.subtitle_label.text, "Slot 1 · %s" % SaveGame.play_time_text(int(save.play_time)))
+	assert_eq((main.gear.find_button("Close") as MenuEntry).kind, MenuEntry.Kind.PRIMARY)
+	assert_eq((main.gear.find_button("Save") as MenuEntry).hint_label.text, "Slot 1")
+	assert_eq((main.gear.find_button("Leave to main menu") as MenuEntry).kind, MenuEntry.Kind.DANGER)
+	assert_eq((main.gear.find_button("Exit the game") as MenuEntry).kind, MenuEntry.Kind.DANGER)
+	main.gear.show_slots()
+	assert_eq(main.gear.card.title_label.text, "SAVE AS COPY")
+	assert_eq(main.gear.card.subtitle_label.text, "Pick a slot")
+	assert_true(main.gear.find_button("Back") is MenuEntry)
+	main.gear.find_button("Back").pressed.emit()
+	assert_eq(main.gear.card.title_label.text, "MENU")
+
+
+func test_the_yes_no_popup_sits_on_a_card_over_the_blur() -> void:
+	var cards := main.confirm.find_children("*", "PanelContainer", true, false).filter(func(node: Node) -> bool: return node is MenuCard)
+	assert_eq(cards.size(), 1)
+	assert_true(main.confirm.get_child(0) is MenuBackdrop)

@@ -79,3 +79,31 @@ func test_the_click_sound_is_connected_once() -> void:
 	assert_eq(entry.pressed.get_connections().size(), 1)
 	UiStyle.add_click(entry)
 	assert_eq(entry.pressed.get_connections().size(), 1, "a second add_click adds nothing")
+
+
+func _entries(node: Node) -> Dictionary:
+	var out := {}
+	for button: Button in node.find_children("*", "Button", true, false):
+		if button is MenuEntry and button.is_visible_in_tree():
+			out[button.text] = button
+	return out
+
+
+func test_the_stage_menu_is_a_card_with_resume_first() -> void:
+	var menu := GameMenu.new()
+	add_child_autofree(menu)
+	menu.visible = true
+	var entries := _entries(menu)
+	assert_eq(entries.keys(), ["Resume", "Settings", "Leave this stage", "Exit the game"])
+	assert_eq(entries["Resume"].kind, MenuEntry.Kind.PRIMARY)
+	assert_eq(entries["Settings"].hint_label.text, GameMenu.SETTINGS_HINT)
+	assert_eq(entries["Leave this stage"].kind, MenuEntry.Kind.DANGER)
+	assert_eq(entries["Exit the game"].kind, MenuEntry.Kind.DANGER)
+	for entry: MenuEntry in entries.values():
+		assert_not_null(entry.icon, entry.text)
+	assert_eq(menu.card.title_label.text, "MENU")
+	menu.set_subtitle("Stage 2-3")
+	assert_eq(menu.card.subtitle_label.text, "Stage 2-3")
+	watch_signals(menu)
+	entries["Resume"].pressed.emit()
+	assert_signal_emitted(menu, "resume_requested")

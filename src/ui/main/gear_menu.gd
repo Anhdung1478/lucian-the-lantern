@@ -1,8 +1,9 @@
 class_name GearMenu
 extends CanvasLayer
-## The gear button's menu: Close, Save, Save as copy, Settings, Leave to main
-## menu and Exit the game. Save as copy swaps the panel for a
-## slot list. Only Save and Save as copy write files.
+## The gear button's menu: an ornate card (MenuCard) over the blurred main
+## screen, the slot and its play time under MENU, then Close, Save, Save as
+## copy, Settings, Leave to main menu and Exit the game. Save as copy swaps
+## the rows for a slot list. Only Save and Save as copy write files.
 
 signal settings_requested
 signal exit_requested
@@ -10,15 +11,19 @@ signal leave_requested
 signal saved(ok: bool)
 signal copied(slot: int, ok: bool)
 
-const BUTTON_SIZE := Vector2(340, 56)
+const CLOSE_ICON := preload("res://assets/art/ui/menu_close.svg")
+const SAVE_ICON := preload("res://assets/art/ui/menu_save.svg")
+const COPY_ICON := preload("res://assets/art/ui/menu_copy.svg")
+const BACK_ICON := preload("res://assets/art/ui/menu_back.svg")
 
 ## Asked "Overwrite slot N?"; the main screen sets it. Without one the copy just happens.
 var confirm: ConfirmPopup
+var card := MenuCard.new()
 
 var _menu_page: VBoxContainer
 var _slot_page: VBoxContainer
 var _slot_list := SlotList.new()
-var _title: Label
+var _save_entry: MenuEntry
 var _showing_slots := false
 
 
@@ -46,7 +51,8 @@ func is_showing_slots() -> bool:
 ## The slot list, with "Slot 1 (current)" disabled.
 func show_slots() -> void:
 	_showing_slots = true
-	_title.text = "SAVE AS COPY"
+	card.set_title("SAVE AS COPY")
+	card.set_subtitle("Pick a slot")
 	_menu_page.visible = false
 	_slot_page.visible = true
 	_slot_list.refresh(SaveGame.instance().slot)
@@ -62,65 +68,49 @@ func find_button(text: String) -> Button:
 
 
 func _build() -> void:
-	var backdrop := ColorRect.new()
-	backdrop.color = Color(0, 0, 0, 0.55)
-	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var backdrop := MenuBackdrop.new()
 	add_child(backdrop)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	backdrop.add_child(center)
-	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override(&"panel", UiStyle.panel())
-	center.add_child(panel)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override(&"separation", 14)
-	panel.add_child(column)
-	_title = Label.new()
-	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title.add_theme_color_override(&"font_color", UiStyle.TITLE_COLOR)
-	_title.add_theme_font_size_override(&"font_size", 30)
-	column.add_child(_title)
-	column.add_child(HSeparator.new())
-	_menu_page = _page(column)
-	_button(_menu_page, "Close", close)
-	_button(_menu_page, "Save", _save)
-	_button(_menu_page, "Save as copy", show_slots)
-	_button(_menu_page, "Settings", settings_requested.emit)
-	_button(_menu_page, "Leave to main menu", leave_requested.emit)
-	_button(_menu_page, "Exit the game", exit_requested.emit)
-	_slot_page = _page(column)
+	center.add_child(card)
+	_menu_page = _page()
+	_entry(_menu_page, "Close", CLOSE_ICON, MenuEntry.Kind.PRIMARY, "", close)
+	_save_entry = _entry(_menu_page, "Save", SAVE_ICON, MenuEntry.Kind.NORMAL, "", _save)
+	_entry(_menu_page, "Save as copy", COPY_ICON, MenuEntry.Kind.NORMAL, "To another slot", show_slots)
+	_entry(_menu_page, "Settings", GameMenu.SETTINGS_ICON, MenuEntry.Kind.NORMAL, GameMenu.SETTINGS_HINT, settings_requested.emit)
+	_entry(_menu_page, "Leave to main menu", GameMenu.LEAVE_ICON, MenuEntry.Kind.DANGER, "Title screen", leave_requested.emit)
+	_entry(_menu_page, "Exit the game", GameMenu.EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
+	_slot_page = _page()
 	_slot_list.picked.connect(_copy)
 	_slot_page.add_child(_slot_list)
-	_button(_slot_page, "Back", _show_menu)
+	_entry(_slot_page, "Back", BACK_ICON, MenuEntry.Kind.NORMAL, "", _show_menu)
 	_show_menu()
 
 
-func _page(parent: Control) -> VBoxContainer:
+func _page() -> VBoxContainer:
 	var page := VBoxContainer.new()
-	page.add_theme_constant_override(&"separation", 14)
-	parent.add_child(page)
+	page.add_theme_constant_override(&"separation", 12)
+	card.content.add_child(page)
 	return page
 
 
+## MENU, with the slot and its play time under it.
 func _show_menu() -> void:
 	_showing_slots = false
-	_title.text = "MENU"
+	var save := SaveGame.instance()
+	card.set_title("MENU")
+	card.set_subtitle("Slot %d · %s" % [save.slot, SaveGame.play_time_text(int(save.play_time))])
+	_save_entry.set_hint("Slot %d" % save.slot)
 	_menu_page.visible = true
 	_slot_page.visible = false
 
 
-## A button without an action is shown disabled.
-func _button(parent: Control, text: String, action: Callable) -> Button:
-	var button := Button.new()
-	button.text = text
-	button.custom_minimum_size = BUTTON_SIZE
-	UiStyle.style_button(button)
-	if action.is_valid():
-		button.pressed.connect(action)
-	else:
-		button.disabled = true
-	parent.add_child(button)
-	return button
+func _entry(parent: Control, label: String, icon: Texture2D, kind: MenuEntry.Kind, hint: String, action: Callable) -> MenuEntry:
+	var entry := MenuEntry.new(label, icon, kind, hint)
+	entry.pressed.connect(action)
+	parent.add_child(entry)
+	return entry
 
 
 func _save() -> void:

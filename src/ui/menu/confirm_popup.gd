@@ -1,6 +1,6 @@
 class_name ConfirmPopup
 extends CanvasLayer
-## A question over everything else: Yes / No (ask), Yes / No / Cancel
+## A question over everything else, on a MenuCard over the blurred screen: Yes / No (ask), Yes / No / Cancel
 ## (ask_or_cancel) or an action / Cancel (confirm). Swallows all keys while
 ## open. ESC is Cancel when the question has one; on a Yes / No question it
 ## answers No when the question allows it.
@@ -33,21 +33,15 @@ func _ready() -> void:
 
 
 func _build() -> void:
-	var backdrop := ColorRect.new()
-	backdrop.color = Color(0, 0, 0, 0.55)
-	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var backdrop := MenuBackdrop.new()
 	add_child(backdrop)
-
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	backdrop.add_child(center)
-	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override(&"panel", UiStyle.panel())
-	center.add_child(panel)
-
-	var box := VBoxContainer.new()
+	var card := MenuCard.new()
+	center.add_child(card)
+	var box := card.content
 	box.add_theme_constant_override(&"separation", 18)
-	panel.add_child(box)
 	_message = Label.new()
 	_message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_message.add_theme_color_override(&"font_color", UiStyle.TITLE_COLOR)

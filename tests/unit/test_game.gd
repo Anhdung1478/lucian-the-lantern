@@ -545,3 +545,15 @@ func test_closing_the_window_on_stage_cleared_keeps_the_clear() -> void:
 	var saved := SaveGame.new(SaveGame.instance().prefix)
 	saved.load_slot(1)
 	assert_true("2-1" in saved.cleared, str(saved.cleared))
+
+
+func test_the_esc_menu_names_the_stage() -> void:
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 1, 1))
+	await wait_physics_frames(2)
+	assert_eq((game.screen as Stage).screens.menu.card.subtitle_label.text, Journey.stage_name(1, 1))
+
+
+func test_a_stage_alone_is_training_in_its_esc_menu() -> void:
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	add_child_autofree(stage)
+	assert_eq(stage.screens.menu.card.subtitle_label.text, "Training")
