@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 32 32">
+  <!-- Menu: Save as copy, two sheets -->
+  <rect x="11" y="5" width="15" height="18" rx="2" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+  <path d="M 7 10 V 25 Q 7 27 9 27 H 20" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

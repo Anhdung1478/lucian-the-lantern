@@ -69,12 +69,18 @@ static func button_style(state: StringName, selected := false) -> StyleBoxFlat:
 	return style
 
 
+## Connects a button's soft click, once (CLICK_META marks it).
+static func add_click(button: BaseButton) -> void:
+	if button.has_meta(CLICK_META):
+		return
+	button.set_meta(CLICK_META, true)
+	button.pressed.connect(func() -> void: Sfx.play(&"click", CLICK_DB))
+
+
 ## Applies the button look and its click. `selected` keeps it lit, e.g. the
 ## open tab.
 static func style_button(button: Button, font_size := 22, selected := false) -> void:
-	if not button.has_meta(CLICK_META):
-		button.set_meta(CLICK_META, true)
-		button.pressed.connect(func() -> void: Sfx.play(&"click", CLICK_DB))
+	add_click(button)
 	button.focus_mode = Control.FOCUS_NONE
 	button.add_theme_font_size_override(&"font_size", font_size)
 	for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
