@@ -42,14 +42,15 @@ func test_lucian_base_move_speed_is_345() -> void:
 	assert_almost_eq(stats.at_level(1).move_speed, 345.0, 0.001)
 
 
-func test_lucian_mana_regen_is_1_75_times_the_old_base() -> void:
+func test_lucian_mana_regen_is_20_per_5_seconds_at_level_1() -> void:
 	var stats := load("res://data/lucian_stats.tres") as UnitStats
-	assert_almost_eq(stats.at_level(1).mana_regen, 2.8, 0.001)
-	# (14 + 1.225 * 17) / 5
-	assert_almost_eq(stats.at_level(18).mana_regen, 6.965, 0.001)
+	# 20 per 5 s since V1.3 (was 14).
+	assert_almost_eq(stats.at_level(1).mana_regen, 4.0, 0.001)
+	# (20 + 1.225 * 17) / 5
+	assert_almost_eq(stats.at_level(18).mana_regen, 8.165, 0.001)
 
 
 func test_blue_buff_mana_regen_is_added_unscaled() -> void:
 	var stats := load("res://data/lucian_stats.tres") as UnitStats
 	var blue := stats.at_level(1, JungleBuffs.BLUE_BONUS)
-	assert_almost_eq(blue.mana_regen, 2.8 + 10.0, 0.001)
+	assert_almost_eq(blue.mana_regen, 4.0 + 10.0, 0.001)

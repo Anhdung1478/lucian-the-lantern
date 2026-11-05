@@ -23,10 +23,13 @@ const WAVE_FIRST := 3.0
 const SLOW_ID := &"tidal_wave"
 const MIST_TIME := 4.0
 ## The share of max HP the whole channel heals.
-const MIST_HEAL := 0.3
+const MIST_HEAL := 0.2
 ## The share of max HP in damage during the channel that interrupts it.
-const MIST_BREAK := 0.08
+const MIST_BREAK := 0.05
 const MIST_COOLDOWN := 18.0
+## At most this many channels a fight, so it heals at most 60% in all and
+## any fight ends, however little damage Lucian does.
+const MIST_USES := 3
 ## Soothing Mist waits until HP is at or below this share.
 const MIST_HP := 0.7
 ## Seconds it stands dazed after an interrupt.
@@ -45,6 +48,8 @@ const INTERRUPTED_AT := Vector2(0, 10)
 const DAZE_STAR := Color("ffe14a")
 
 var _mist_left := 0.0
+## Channels begun this fight (MIST_USES at most).
+var _mists := 0
 ## Damage taken since the channel began.
 var _mist_damage := 0.0
 var _daze_left := 0.0
@@ -77,6 +82,7 @@ func tidal_wave() -> float:
 
 ## Stands and heals MIST_HEAL of max HP over MIST_TIME (see _physics_process).
 func soothing_mist() -> float:
+	_mists += 1
 	_mist_left = MIST_TIME
 	_mist_damage = 0.0
 	queue_redraw()
@@ -84,7 +90,7 @@ func soothing_mist() -> float:
 
 
 func _can_use(id: StringName) -> bool:
-	return id != &"soothing_mist" or hp <= max_hp * MIST_HP
+	return id != &"soothing_mist" or (hp <= max_hp * MIST_HP and _mists < MIST_USES)
 
 
 ## The water shot: the data's bolt, in water colors.

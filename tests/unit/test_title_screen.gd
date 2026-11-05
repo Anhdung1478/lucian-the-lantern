@@ -175,15 +175,57 @@ func test_load_game_is_disabled_with_no_saves() -> void:
 	assert_true(_title().load_button.disabled)
 
 
-func test_a_new_game_in_an_empty_slot_starts_act_1() -> void:
+func test_a_new_game_in_an_empty_slot_starts_act_1_on_the_difficulty_picked() -> void:
 	_title().show_slots(false)
 	_title().slot_list.buttons[1].pressed.emit()
+	assert_true(_title().is_showing_difficulty(), "the difficulty comes first")
+	assert_false(SaveGame.instance().slot_exists(2), "nothing written yet")
+	_title().difficulty_buttons[Difficulty.HARD].pressed.emit()
 	await wait_process_frames(2)
 	assert_is(game.screen, Stage)
 	assert_eq((game.screen as Stage).run.stage_id, "1-1")
 	assert_true((game.screen as Stage).run.tutorial)
+	assert_eq((game.screen as Stage).run.difficulty, Difficulty.HARD)
 	assert_eq(SaveGame.instance().slot, 2)
 	assert_true(SaveGame.instance().slot_exists(2))
+	var loaded := SaveGame.new(SaveGame.instance().prefix)
+	loaded.load_slot(2)
+	assert_eq(loaded.difficulty, Difficulty.HARD, "written with the new game")
+
+
+func test_the_difficulty_page_lists_the_four_levels() -> void:
+	_title().show_difficulty(1)
+	var texts := _title().difficulty_buttons.map(func(button: Button) -> String: return button.text)
+	assert_eq(texts, ["Easy   ×0.8", "Normal   ×1.0", "Hard   ×1.1", "Extreme   ×1.3"])
+	for level in Difficulty.LEVELS:
+		assert_eq(_title().difficulty_buttons[level].get_meta(&"hover_text"), Difficulty.describe(level))
+	assert_not_null(_title().find_button("Back"))
+
+
+func test_back_and_esc_on_the_difficulty_page_return_to_the_slots() -> void:
+	_title().show_slots(false)
+	_title().slot_list.buttons[0].pressed.emit()
+	_title().find_button("Back").pressed.emit()
+	assert_true(_title().is_showing_slots())
+	assert_false(_title().is_showing_difficulty())
+	_title().slot_list.buttons[0].pressed.emit()
+	var esc := InputEventAction.new()
+	esc.action = &"open_menu"
+	esc.pressed = true
+	_title()._input(esc)
+	assert_true(_title().is_showing_slots())
+	assert_false(SaveGame.instance().slot_exists(1), "no game started")
+
+
+func test_the_difficulty_page_fits_and_clears_the_figures() -> void:
+	var title := _title()
+	title.show_difficulty(1)
+	await wait_process_frames(2)
+	var column := title.column.get_global_rect()
+	assert_true(title.get_global_rect().encloses(column), "%s on screen" % column)
+	for figure: TextureRect in [title.backdrop.lucian, title.backdrop.senna]:
+		assert_lt(figure.get_global_rect().end.x, column.position.x, figure.name)
+	assert_gt(title.backdrop.thresh.get_global_rect().position.x, column.end.x)
 
 
 func test_a_new_game_on_a_used_slot_asks_first() -> void:
@@ -194,6 +236,10 @@ func test_a_new_game_on_a_used_slot_asks_first() -> void:
 	assert_eq(_choices(_title().confirm), "Yes / No", "Overwrite stays Yes / No")
 	_title().confirm.answer(false)
 	assert_is(game.screen, TitleScreen)
+	assert_false(_title().is_showing_difficulty())
+	_title().slot_list.buttons[2].pressed.emit()
+	_title().confirm.answer(true)
+	assert_true(_title().is_showing_difficulty(), "Yes goes on to the difficulty")
 
 
 func test_load_game_opens_the_main_screen_on_that_slot() -> void:

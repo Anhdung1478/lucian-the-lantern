@@ -115,8 +115,9 @@ func test_a_slow_cuts_move_speed() -> void:
 
 func test_numbers_scale_with_act_and_wave() -> void:
 	var minion := _minion("melee_minion", Vector2(2000, 0), 2, 3)
-	assert_almost_eq(minion.max_hp, 240.0 * 1.6 * 1.3, 0.01)
-	assert_almost_eq(minion.damage, 12.0 * 1.25 * 1.3, 0.01)
+	# Act 2: HP × 1.25, damage × 1.15; wave 3: × 1.2.
+	assert_almost_eq(minion.max_hp, 240.0 * 1.25 * 1.2, 0.01)
+	assert_almost_eq(minion.damage, 12.0 * 1.15 * 1.2, 0.01)
 
 
 func test_minions_stand_still_while_lucian_is_untouchable() -> void:

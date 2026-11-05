@@ -30,15 +30,15 @@ func test_a_countdown_then_wave_1_in_groups_of_3() -> void:
 	runner.tick(0.01)
 	assert_eq(spawned.size(), WaveRunner.GROUP_SIZE)
 	_spawn_all(runner)
-	assert_eq(spawned.size(), 10)
-	assert_eq(spawned.count(WavePlan.MELEE), 6)
+	assert_eq(spawned.size(), 6, "the tutorial's first wave is small")
+	assert_eq(spawned.count(WavePlan.MELEE), 4)
 
 
 func test_the_break_waits_for_the_last_enemy() -> void:
 	var runner := _runner(WavePlan.waves("1-1"))
 	runner.skip()
 	_spawn_all(runner)
-	for i in 9:
+	for i in 5:
 		runner.enemy_died()
 	assert_eq(runner.state, WaveRunner.State.FIGHT)
 	runner.enemy_died()
@@ -154,7 +154,7 @@ func test_a_packs_members_spawn_in_groups_of_3_in_order() -> void:
 
 func test_waves_without_packs_are_unchanged() -> void:
 	assert_eq(WavePlan.waves("1-1"), WavePlan.expand(WavePlan.STAGES["1-1"]))
-	assert_eq(WavePlan.waves("1-1")[0].size(), 10)
+	assert_eq(WavePlan.waves("1-1")[0].size(), 6)
 
 
 ## Act 3's waves as the design's table writes them: R raptors, W wolves,
@@ -164,10 +164,10 @@ func test_act_3_waves_follow_the_table() -> void:
 	var letters := {&"raptors": "R", &"wolves": "W", &"krugs": "K", &"gromp": "G",
 		WavePlan.BLUE_SENTINEL: "B", WavePlan.RED_BRAMBLEBACK: "D", WavePlan.SCUTTLER: "S"}
 	var table := {
-		"3-1": "R W · R R G B · W K G D S",
-		"3-2": "R W G · R K W B · W K G D S · R W K G",
+		"3-1": "R W · R G B · W K G D S",
+		"3-2": "R W G · R K W B · W K G D S · R W",
 		"3-3": "R R W G · K W G B · R W K D S · R R W K G B",
-		"3-4": "R W G K · R W K B · W K G D S · R R K G B · R W K G D",
+		"3-4": "R W G K · R W K B · W K G D S · R R K G B · R W D",
 		"3-5": "R W K G · R R W B · W K G D S · R W K G B · R R W K D S",
 	}
 	var mini_bosses := {"3-2": WavePlan.INFERNAL_DRAKE, "3-4": WavePlan.OCEAN_DRAKE}

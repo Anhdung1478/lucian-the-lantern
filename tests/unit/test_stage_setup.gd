@@ -107,6 +107,23 @@ func test_act_2_stage_3_has_akshan() -> void:
 	assert_eq(setup.display_name, "Stage 2-3 · The Sentinels")
 
 
+func test_each_act_starts_lucian_at_its_level() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	var levels: Array[int] = []
+	for act in range(1, Journey.ACTS.size() + 1):
+		levels.append(StageSetup.for_stage(save, act, 1).start_level)
+	assert_eq(levels, [1, 2, 5, 5, 7, 9] as Array[int])
+	assert_eq(StageSetup.for_stage(save, 3, 4).start_level, 5, "every stage of an act")
+
+
+func test_training_and_endless_start_at_level_1() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	assert_eq(StageSetup.new().start_level, 1)
+	assert_eq(StageSetup.from_save(save).start_level, 1)
+	var rng := RandomNumberGenerator.new()
+	assert_eq(StageSetup.for_endless(save, 5, rng).start_level, 1)
+
+
 func test_a_new_setup_is_not_endless() -> void:
 	var setup := StageSetup.new()
 	assert_eq(setup.act, 0)

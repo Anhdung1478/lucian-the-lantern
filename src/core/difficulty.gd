@@ -1,0 +1,56 @@
+class_name Difficulty
+extends RefCounted
+## A save's difficulty: one number that scales every enemy's HP (bosses and
+## mini bosses too) and all the damage Lucian takes, and on Hard and Extreme
+## more blue essence, so replays pay for the tree. Picked with a new game,
+## changed from the main screen's gear menu. Gold, XP, orange, purple, speeds
+## and timings stay the same.
+
+const EASY := 0
+const NORMAL := 1
+const HARD := 2
+const EXTREME := 3
+const LEVELS: Array[int] = [EASY, NORMAL, HARD, EXTREME]
+## The save file's word for each level.
+const KEYS: Array[String] = ["easy", "normal", "hard", "extreme"]
+const NAMES: Array[String] = ["Easy", "Normal", "Hard", "Extreme"]
+const SCALES: Array[float] = [0.8, 1.0, 1.1, 1.3]
+## Every kill's blue essence is multiplied by this (KillRewards).
+const BLUE_SCALES: Array[float] = [1.0, 1.0, 1.2, 1.5]
+
+
+static func is_level(level: int) -> bool:
+	return level >= EASY and level <= EXTREME
+
+
+## Enemy HP and the damage Lucian takes are multiplied by this.
+static func scale(level: int) -> float:
+	return SCALES[level] if is_level(level) else 1.0
+
+
+## Blue essence from kills is multiplied by this.
+static func blue_scale(level: int) -> float:
+	return BLUE_SCALES[level] if is_level(level) else 1.0
+
+
+static func name_of(level: int) -> String:
+	return NAMES[level] if is_level(level) else NAMES[NORMAL]
+
+
+## "×1.2".
+static func scale_text(level: int) -> String:
+	return "×%s" % String.num(scale(level), 1)
+
+
+## "Enemies have 110% HP and deal 110% damage. Blue essence ×1.2."
+static func describe(level: int) -> String:
+	var percent := roundi(scale(level) * 100.0)
+	var text := "Enemies have %d%% HP and deal %d%% damage." % [percent, percent]
+	if blue_scale(level) != 1.0:
+		text += " Blue essence ×%s." % String.num(blue_scale(level), 1)
+	return text
+
+
+## The level a save file's word names; Normal for anything else.
+static func from_key(key: Variant) -> int:
+	return KEYS.find(key) if key is String and key in KEYS else NORMAL

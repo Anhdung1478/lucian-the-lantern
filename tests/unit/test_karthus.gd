@@ -439,7 +439,7 @@ func test_the_boss_bar_shows_the_break_bar_for_the_ocean_drakes_mist_too() -> vo
 	drake.take_damage(_true_hit(300.0))
 	bar._process(0.0)
 	assert_eq(bar.channel.done, 300.0)
-	assert_eq(bar.channel.need, drake.max_hp * 0.08)
+	assert_eq(bar.channel.need, drake.max_hp * OceanDrake.MIST_BREAK)
 
 
 # --- in a stage -------------------------------------------------------------------

@@ -22,8 +22,8 @@ Lucian and Senna fight minion waves together. At the first break, Senna teaches 
 
 | Wave | Enemies |
 |---|---|
-| 1 | 6 melee minions, 4 ranged minions |
-| 2 | 6 melee minions, 6 ranged minions, 1 siege minion |
+| 1 | 4 melee minions, 2 ranged minions *(V1.3; was 6 and 4)* |
+| 2 | 6 melee minions, 4 ranged minions, 1 siege minion *(V1.3; was 6 ranged)* |
 | Boss | Thresh |
 
 ---
@@ -86,7 +86,7 @@ Only 2 skills in this act. The full fight happens in Act 6, where these skills a
 ## Built in Phase 6
 
 ### Enemies
-Numbers at wave 1 (`data/enemies/*.tres`). Each later wave adds **+15% HP and damage**. Enemies attack only Lucian.
+Numbers at wave 1 (`data/enemies/*.tres`). Each later wave adds **+10% HP and damage** (+15% before V1.3). Enemies attack only Lucian.
 
 | Enemy | Kind | HP | Armor / MR | Attack | Range | Every | Speed | Gold | XP |
 |---|---|---|---|---|---|---|---|---|---|
@@ -95,6 +95,7 @@ Numbers at wave 1 (`data/enemies/*.tres`). Each later wave adds **+15% HP and da
 | Siege minion | elite | 700 | 20 / 10 | Cannon Shell: a red circle (r 110) on Lucian, 40 physical 1 s later | 700 | 3.0 s | 220 | 120 | 60 |
 
 - In this stage (1-1), melee and ranged minions have **20% less HP**: 192 and 128 at wave 1. Other stages use the table (scaled by act and wave).
+- *(V1.3)* In this stage the melee, ranged and siege minions also hit **25% softer** (`WavePlan.DAMAGE_SHARES`): 9, 13.5 and 30.
 - Walls stop the ranged bolts. Stepping out of the circle in time dodges the shell.
 - Elites have a small gold diamond at the left end of their HP bar.
 - A kill gives 1 blue (5 for the siege minion) and a small chance of orange and an item (game design doc §9).

@@ -337,6 +337,10 @@ func spawn_unit(data: EnemyData, at: Vector2, wave := 1) -> EnemyUnit:
 	if endless:
 		endless.scale(unit)
 	unit.max_hp *= WavePlan.hp_share(run.stage_id, data.id)
+	unit.damage *= WavePlan.damage_share(run.stage_id, data.id)
+	# The difficulty's damage is on Lucian's side (damage_taken_scale), so
+	# boss skills and hazards get it too.
+	unit.max_hp *= Difficulty.scale(run.difficulty)
 	unit.projectile_parent = $Projectiles
 	unit.warning_parent = $Warnings
 	if unit is Boss:

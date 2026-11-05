@@ -180,7 +180,7 @@ func test_normal_and_elite_strength_follow_the_table() -> void:
 	assert_almost_eq(EndlessPlan.hp_scale(10), 2.233, 0.001)
 	assert_almost_eq(EndlessPlan.hp_scale(35), 8.208, 0.001)
 	var melee: EnemyData = load(Stage.ENEMY_PATH % &"melee_minion")
-	assert_almost_eq(melee.hp_scale(6, 7), 7.6, 0.001, "Act 6's last wave")
+	assert_almost_eq(melee.hp_scale(6, 7), 3.6, 0.001, "Act 6's last wave")
 	assert_gt(EndlessPlan.hp_scale(35), melee.hp_scale(6, 7))
 	assert_almost_eq(EndlessPlan.damage_scale(10), 1.225 * 1.45, 0.001)
 	assert_almost_eq(EndlessPlan.damage_scale(35), 1.85 * 2.7, 0.001)

@@ -94,7 +94,7 @@ It is one target: after that kill Lucian stops and idles. A dead or untargetable
 
 ## 3. Stage Rules
 
-- Every stage starts with an **empty backpack**, **level 1**, and **0 stage gold**.
+- Every stage starts with an **empty backpack** and **0 stage gold**. Lucian starts at **level 1** in Act 1, Training and Endless; from V1.3 a story stage starts him at its act's level (Act 2: 2, Act 3: 5, Act 4: 5, Act 5: 7, Act 6: 9), with that many skill points to spend (§17).
 - A stage is made of **waves**. The stage ends when **all enemies are cleared**.
 - The last stage of each act has **1 extra wave**, in which the boss appears.
 - Waves per stage increase across the game (boss wave not included):
@@ -143,7 +143,7 @@ Acts 1 and 2 play this way. Training keeps its dummies and has no waves.
 - **Enemies** attack only Lucian. They walk straight at him, sliding along walls; one that gets stuck sidesteps for a moment. They bump into each other and into Lucian. There is no navigation mesh. *(Phase 7: they path around walls; see below.)*
 - **Enemy bolts** are stopped by walls and pillars. Lucian's homing shots still fly over walls.
 - **Enemy hits** reach Lucian within his radius (30) of his center. Red ground warnings (circle, line, cone, lock line) fill up before an attack lands.
-- **Scaling** (bosses don't scale): per act after the first, HP × (1 + 0.6 · (act − 1)), damage and rewards × (1 + 0.25 · (act − 1)). Each wave after the first adds +15% HP and damage. A stage can also lower some enemies' HP on its own: in Act 1 (1-1), melee and ranged minions have 20% less HP.
+- **Scaling** (bosses don't scale): per act after the first, HP × (1 + 0.6 · (act − 1)), damage and rewards × (1 + 0.25 · (act − 1)). Each wave after the first adds +15% HP and damage. A stage can also lower some enemies' HP on its own: in Act 1 (1-1), melee and ranged minions have 20% less HP. *(V1.3: HP × (1 + 0.25 · (act − 1)), damage × (1 + 0.15 · (act − 1)), +10% a wave; the first stage of every act is gentler, and the tutorial's minions hit 25% softer. See §17.)*
 - **Death:** Lucian turns grey and fades for 1.5 s, then DEFEATED shows. Enemies stand still while he is dead or in stasis. Guardian Angel's stasis comes first.
 - **Game over:** losing Act 1 before its first clear (the tutorial) shows **GAME OVER** instead, and **Back to title** returns to the title screen. It still auto-saves, so the essences collected are kept.
 - **Result panel** (pauses the game; ESC and P do nothing): **STAGE CLEARED**, **DEFEATED** or **GAME OVER**, the stage name, "Waves cleared: 2 / 3 · Time 4:32", the essences collected and any first-clear lines. **Continue** auto-saves and opens the main screen on that act (Back to title after a game over). *(Phase 7: the end screen replaces it; see below.)*
@@ -226,7 +226,7 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 
 - **Base stats:** based on Lucian in LoL as a starting point, then adjusted (about 70–80% similar).
 - **Damage formulas:** based on LoL's Armor / MR formulas *(proposed)*.
-- **Levels:** 1 → 18 within each stage. Gain XP by killing enemies.
+- **Levels:** 1 → 18 within each stage. Gain XP by killing enemies. *(V1.3: a story stage starts at its act's level, §3; the next level needs 100 + 60 × level XP, was 180 + 100 × level.)*
 - Each level gives **bonus stats** and **1 skill point**.
 
 ---
@@ -904,7 +904,7 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 
 ### Slots
 - **3 save slots.** The player picks a slot on the **title screen**. That is the **current slot**: every save writes to it.
-  - **Start new game** lists the 3 slots. A used slot asks "Overwrite slot N? Its progress will be lost." The new game is **written at once** (`SaveGame.start_new`), so the overwrite is real. Then Act 1 starts.
+  - **Start new game** lists the 3 slots. A used slot asks "Overwrite slot N? Its progress will be lost." Then the player picks the **difficulty** (Easy, Normal, Hard or Extreme; see §17). The new game is **written at once** (`SaveGame.start_new`), so the overwrite is real. Then Act 1 starts.
   - **Load game** lists the same slots, with the empty ones disabled. The button itself is disabled ("No saved games yet") when no slot exists. It opens the main screen.
   - Each used slot shows its play time and when it was saved: "Slot 2 · 1h 02m · saved 2026-10-29 03:10".
 - **Save as copy:** the current progress can be copied into another slot (asks for confirmation before overwriting).
@@ -920,13 +920,14 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 - Cleared stages, and which bosses / mini bosses already gave first-time purple
 - Endless best wave (the most waves cleared in one run)
 - Play time: every second outside the title screen, pauses not counted
+- The difficulty (V1.3)
 
 Nothing inside a stage is saved (items, gold, level, enemies), since stages always reset.
 
 ### When to save
 - **Auto-save only when a stage is done:** cleared, left (ESC → Leave this stage) or failed (Lucian dies). Nothing is saved between waves.
   - An Endless run is done when Lucian dies or the run is left. Its best wave is kept in memory each time a wave is won, so that save writes it (§14).
-- **Nothing on the main screen auto-saves.** Evolution Tree purchases and resets, skin purchases and skin changes are kept only by the next auto-save, the **Save** button in the gear menu, or a **Yes** when leaving.
+- **Nothing on the main screen auto-saves.** Evolution Tree purchases and resets, skin purchases and skin changes, and a difficulty change are kept only by the next auto-save, the **Save** button in the gear menu, or a **Yes** when leaving.
 - **Every exit can be cancelled** (since Phase 9). Cancel, or ESC, closes the question and nothing else happens.
 
 | Exit | Question | Cancel / ESC |
@@ -962,12 +963,13 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 | `bosses` | Bosses that already gave their first-time purple: `["thresh_1", "akshan"]` |
 | `endless_best` | Best Endless wave: the most waves cleared in one run (dying in wave 23 records 22) |
 | `play_time` | Whole seconds played in this slot: `3720` |
+| `difficulty` | `"easy"`, `"normal"`, `"hard"` or `"extreme"` (V1.3) |
 
 - Numbers are converted back with `int()` when loading (JSON numbers load as floats). Unknown keys, node ids, skins, spell ids and stage ids are dropped, so an old or edited file still loads.
 - IDs are saved, not display names.
 - A save is written to a temp file first. Then the old save becomes the backup (only if it still reads, so a broken file never replaces a good backup) and the temp file replaces it. If anything fails, the old file and backup stay as they were. The backup loads if the main file is broken. With both broken, it's a new game.
-- `"version"` stays 1: Phase 6 only added keys. A file without `"bosses"` or `"play_time"` loads with none.
-- `SaveGame.start_new(slot)` makes that slot current, resets the progress and writes it at once. `award_boss(id, first, repeat)` returns the purple due and records the boss; the stage adds the essence.
+- `"version"` stays 1: Phase 6 and V1.3 only added keys. A file without `"bosses"` or `"play_time"` loads with none; one without `"difficulty"` (or with an unknown word) plays on Normal.
+- `SaveGame.start_new(slot, difficulty)` makes that slot current, resets the progress, sets the difficulty and writes it at once. `set_difficulty(level)` changes it in memory. `award_boss(id, first, repeat)` returns the purple due and records the boss; the stage adds the essence.
 - The main screen's debug table (F3 + Q) gives essences, sets the acts cleared, maxes or clears the tree, resets the progress, and forgets the bosses' first-time purple.
 
 ---
@@ -984,3 +986,44 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - [x] UI (see `ui_design.md` and `main_screen.md`): HUD (with the stage info, boss bar and radar), backpack, crafting, recipe table, ESC menu, merchant's shop, Settings, the main screen (Journey, Evolution Tree, Skin Shop), and the title screen with save slot selection
 - [x] Save system
 - [ ] Art style, sound (Phase 3 has generated placeholder sound effects and audio buses; Phase 9 adds 11 more, 24 in all, listed in `ui_design.md` §8; no music yet)
+
+---
+
+## 17. Balance pass (V1.3)
+
+A playtest bot (`tests/tools/autoplay.gd`) played the story headless at three skill tiers. On 1.2's numbers the novice could not finish the tutorial, the average player was stuck at 2-1, and the skilled player needed 7 tries for 2-1 and was stuck at 3-1 (`docs/report/v1.3.md`). The causes, and what changed:
+
+| Cause | Change |
+|---|---|
+| Lucian restarted every stage at level 1 while enemies grew per act, so each act's first wave was the hardest moment of the game. Skill ranks bought in the tree could not be used: rank 3 needs level 5, R needs level 6, and Act 2 ended at level 3–5. | A story stage starts Lucian at its act's level: 1, 2, 5, 5, 7, 9 (`StageSetup.ACT_START_LEVELS`: the user's numbers, with Act 3 raised from 4 to 5 after Hard's playtest), with that many skill points. The XP to the next level is 100 + 60 × level (was 180 + 100 × level). Act 1, Training and Endless start at level 1. |
+| Enemy HP grew ×1.6 to ×4.0 by act while Lucian's damage grew far less. | `EnemyData`: HP per act 0.6 → **0.25**, damage per act 0.25 → **0.15**, growth per wave 15% → **10%**. Rewards per act are unchanged. |
+| 1-1 → 2-1 was a cliff: 2.7× the tutorial's HP and no Senna. | The first stage of every act (2-1, 3-1, 4-1, 5-1, 6-1) gives its normal enemies 20% less HP (in 2-1 the elites too); 3-1's wave 2 brings one raptor pack (was two). |
+| The tutorial killed a player who doesn't kite in 26 s. | 1-1's wave 1 is 4 melee and 2 ranged (was 6 and 4), wave 2 has 4 ranged (was 6), and its minions hit 25% softer (`WavePlan.DAMAGE_SHARES`). |
+| Swarm enemies outran Lucian (345), so kiting, his whole kit, did nothing. | Raptors 300 / 295, wolves 310 / 300, spiderlings 330, saplings 320, Mist Walkers 320. |
+| Act 3's packs of 12+ melee monsters at once. | The small monsters have about 22% less HP and 25% less damage; the Blue Sentinel and Red Brambleback 1400 HP (was 1700) and 30 / 34 damage (was 42 / 40; the Sentinel's 36 became 30 after Hard's playtest, where it was the wall). A drake's wave brings 2 packs, not 4. |
+| Sticky elites: the Blue Sentinel's 30% slow made Lucian as slow as it; super minions were the top killer in Act 2. | Blue's slow is 20% for 1.0 s (was 30% for 1.5 s); super minions 1150 HP and 36 damage (was 1400 and 45). |
+| A soft-lock: below ~200 damage a second the Ocean Drake healed more than it took (bots fought it for 35 and 40 minutes). | Soothing Mist heals 20% (was 30%); 5% of its max HP interrupts it (was 8%); at most 3 channels a fight (`OceanDrake.MIST_USES`). |
+| Mana ran dry every fight at low levels. | Lucian's base mana regen 14 → 20 per 5 s. |
+
+Bosses and mini bosses don't scale and keep their numbers (except the Ocean Drake's mist). Endless keeps its own scaling (`EndlessPlan`).
+
+**Tools:** `tests/tools/autoplay.gd` plays the story at a tier (skilled, average, novice), retries a lost stage, farms the last cleared one after 3 losses, and prints each try (kills, damage taken by enemy, what killed him). `AUTOPLAY_DIFFICULTY=hard` plays it on a difficulty. `tests/tools/stage_budget.gd` prints every stage's HP per wave, XP, gold, blue and the level Lucian ends at. Both run headless only.
+
+### Difficulty (V1.3)
+
+The pass above makes Normal fit a new player. The difficulty lets the player make the game easier or harder, with one number (`Difficulty.SCALES`), and pays more blue essence on the harder levels (`Difficulty.BLUE_SCALES`):
+
+| Difficulty | Enemy HP | Damage Lucian takes | Blue essence |
+|---|---|---|---|
+| Easy | ×0.8 | ×0.8 | ×1.0 |
+| **Normal** | ×1.0 | ×1.0 | ×1.0 |
+| Hard | ×1.1 | ×1.1 | ×1.2 |
+| Extreme | ×1.3 | ×1.3 | ×1.5 |
+
+*The user first picked Hard ×1.2 and Extreme ×1.5 with no extra blue. On those numbers both bots were stuck at the start of Act 3 on Hard and Extreme, so the user chose four changes at once: the smaller steps above, more blue on Hard and Extreme, Act 3 starting at level 5, and the Blue Sentinel's slam 36 → 30.*
+
+- **Where it is picked:** after the slot in **Start new game** (a page titled CHOOSE DIFFICULTY; Normal is gold; hovering a level shows "Enemies have 110% HP and deal 110% damage. Blue essence ×1.2."). Back or ESC returns to the slots.
+- **Changed** from the main screen's gear menu: **Difficulty** (its hint names the current one) opens the four levels, the current one greyed. A pick shows the toast "Difficulty: Hard" and is kept by the next save, like a tree purchase. It can't be changed inside a stage.
+- **What it scales:** the HP of every enemy, bosses and mini bosses included (`Stage.spawn_unit`), and every hit Lucian takes before armor and magic resist (`Lucian.damage_taken_scale`), so boss skills, ground hazards and burns count too. The damage is on Lucian's side because boss skills have their own numbers.
+- **Blue essence:** every kill's blue × 1.2 on Hard and × 1.5 on Extreme (`KillRewards`), on top of the tree's Essence Drops and an Endless modifier, so replays pay for the tree.
+- **What it doesn't:** gold, XP, orange and purple essence, enemy speed, timings, and the boss break bars (they are shares of the boss's HP, so they grow with it). It applies in the story and Endless; Training's dummies keep their HP.

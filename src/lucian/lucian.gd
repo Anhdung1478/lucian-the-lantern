@@ -145,6 +145,9 @@ var tree_bonus := {}
 ## Endless's modifier (#3, #4): stat multipliers keyed like a skin's scale,
 ## applied with it (set_run_scale).
 var run_scale := {}
+## The save's difficulty (Difficulty.scale): every hit he takes is
+## multiplied by it before armor and magic resist.
+var damage_taken_scale := 1.0
 
 var _order := Order.NONE
 var _move_point := Vector2.ZERO
@@ -423,6 +426,10 @@ func restore_mana(amount: float) -> void:
 ## before the HUD and debug table read him.
 func apply_setup(setup: StageSetup) -> void:
 	progress.bought = setup.bought.duplicate()
+	if setup.start_level != progress.level:
+		# No chime or burst: he starts there.
+		_level_shown = setup.start_level
+		progress.set_level(setup.start_level)
 	passive.learned = setup.passive
 	# The backpack first, so items leaving locked equip slots land in open cells.
 	inventory.unlocked_backpack = setup.backpack_slots
@@ -433,6 +440,7 @@ func apply_setup(setup: StageSetup) -> void:
 	tree_bonus = setup.stat_bonus.duplicate()
 	tutorial = setup.tutorial
 	one_gun = setup.tutorial
+	damage_taken_scale = Difficulty.scale(setup.difficulty)
 	apply_skin(setup.skin)
 	hp = stats.max_hp
 	mana = stats.max_mana
@@ -617,14 +625,14 @@ func add_shield(id: StringName, amount: float, seconds: float, magic_only := fal
 
 
 ## A hit from an enemy. False when it is refused: Lucian is dead, in stasis
-## or untouchable. Armor or magic resist lower it, then the shields and HP
-## take it. A burn tick (`over_time`) makes no hurt sound and no flash.
+## or untouchable. The difficulty scales it (damage_taken_scale), armor or
+## magic resist lower it, then the shields and HP take it. A burn tick (`over_time`) makes no hurt sound and no flash.
 func take_damage(info: DamageInfo) -> bool:
 	if dead or invulnerable or in_stasis():
 		return false
 	if not passives.before_damage_taken(info):
 		return false
-	var amount := DamageCalc.mitigate(info.amount, info.type, stats.armor, stats.mr, info.armor_pen, info.magic_pen)
+	var amount := DamageCalc.mitigate(info.amount * damage_taken_scale, info.type, stats.armor, stats.mr, info.armor_pen, info.magic_pen)
 	damage_received.emit(info, amount)
 	lose_hp(passives.delay_damage(amount), info.type)
 	passives.on_damage_taken(info, amount)

@@ -9,6 +9,10 @@ const SPELL_IDS: Array[StringName] = [&"flash", &"ghost", &"barrier", &"heal", &
 
 ## Act 1's only stage: the tutorial, the first time it is played.
 const TUTORIAL_STAGE := "1-1"
+## The level Lucian starts a story stage at, per act: he grows over the
+## story, so each act's first wave meets a stronger Lucian, and the skill
+## ranks bought in the Evolution Tree can be used from the start.
+const ACT_START_LEVELS: Array[int] = [1, 2, 5, 5, 7, 9]
 
 ## The stage played (0 for Training): its act, stage and "act-stage" id. The
 ## sandbox pays like act 1.
@@ -17,6 +21,10 @@ var stage := 0
 var stage_id := ""
 var bought: Array[int] = [5, 5, 5, 3]
 var passive := true
+## Lucian's level at the start (Training, Endless and the sandbox: 1).
+var start_level := 1
+## The save's Difficulty level: enemy HP and the damage Lucian takes.
+var difficulty := Difficulty.NORMAL
 var backpack_slots := Inventory.BACKPACK_SIZE
 var equip_slots := Inventory.EQUIP_SIZE
 var shop_slots := 2
@@ -78,6 +86,7 @@ static func from_save(save: SaveGame) -> StageSetup:
 	setup.xp_bonus = tree.value(&"bonus_xp")
 	setup.essence_bonus = tree.value(&"essence_drop")
 	setup.skin = Skins.find(save.skin)
+	setup.difficulty = save.difficulty
 	return setup
 
 
@@ -90,6 +99,7 @@ static func for_stage(save: SaveGame, act_number: int, stage_number: int) -> Sta
 	setup.stage_id = Journey.stage_id(act_number, stage_number)
 	setup.display_name = Journey.stage_name(act_number, stage_number)
 	setup.boss = WavePlan.boss(setup.stage_id)
+	setup.start_level = ACT_START_LEVELS[act_number - 1]
 	if setup.stage_id == TUTORIAL_STAGE:
 		if TUTORIAL_STAGE in save.cleared:
 			setup.boss = &""

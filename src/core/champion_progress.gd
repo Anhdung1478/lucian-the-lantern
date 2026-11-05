@@ -23,7 +23,7 @@ var bought: Array[int] = [5, 5, 5, 3]
 
 
 static func xp_to_next(from_level: int) -> int:
-	return 180 + 100 * from_level
+	return 100 + 60 * from_level
 
 
 static func required_level(slot: Slot, rank: int) -> int:

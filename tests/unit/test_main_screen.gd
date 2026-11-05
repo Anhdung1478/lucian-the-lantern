@@ -361,6 +361,76 @@ func test_the_gear_menu_shows_the_slot_and_its_rows() -> void:
 	assert_eq(main.gear.card.title_label.text, "MENU")
 
 
+func test_the_difficulty_row_shows_the_saves_level() -> void:
+	main.gear.open()
+	var row := main.gear.find_button("Difficulty") as MenuEntry
+	assert_not_null(row)
+	assert_eq(row.hint_label.text, "Normal")
+	SaveGame.instance().difficulty = Difficulty.EXTREME
+	main.gear.open()
+	assert_eq(row.hint_label.text, "Extreme")
+
+
+func test_the_difficulty_page_greys_the_current_level() -> void:
+	SaveGame.instance().difficulty = Difficulty.HARD
+	main.gear.open()
+	_press("Difficulty")
+	assert_true(main.gear.is_showing_difficulty())
+	assert_eq(main.gear.card.title_label.text, "DIFFICULTY")
+	assert_eq(main.gear.card.subtitle_label.text, "Enemy HP and damage")
+	var hints := []
+	for name in ["Easy", "Normal", "Hard", "Extreme"]:
+		var entry := main.gear.find_button(name) as MenuEntry
+		assert_not_null(entry, name)
+		hints.append(entry.hint_label.text)
+		assert_eq(entry.disabled, name == "Hard", name)
+		assert_eq(entry.get_meta(&"hover_text", ""), Difficulty.describe(Difficulty.NAMES.find(name)), name)
+	assert_eq(hints, ["×0.8", "×1.0", "Current · ×1.1", "×1.3"])
+	assert_true(main.gear.find_button("Back") is MenuEntry)
+
+
+func test_picking_a_level_changes_it_in_memory_and_says_so() -> void:
+	main.gear.open()
+	_press("Difficulty")
+	_press("Easy")
+	assert_eq(SaveGame.instance().difficulty, Difficulty.EASY)
+	assert_eq(main.toast_text(), "Difficulty: Easy")
+	assert_true(main.gear.visible, "back on the menu page")
+	assert_false(main.gear.is_showing_difficulty())
+	assert_eq((main.gear.find_button("Difficulty") as MenuEntry).hint_label.text, "Easy")
+	assert_false(SaveGame.instance().slot_exists(1), "no file is written")
+	_press("Save")
+	var loaded := SaveGame.new(SaveGame.instance().prefix)
+	loaded.load_slot(1)
+	assert_eq(loaded.difficulty, Difficulty.EASY, "Save writes it")
+
+
+func test_back_or_esc_leaves_the_difficulty_unchanged() -> void:
+	main.gear.open()
+	_press("Difficulty")
+	_press("Back")
+	assert_eq(main.gear.card.title_label.text, "MENU")
+	_press("Difficulty")
+	_esc()
+	assert_true(main.gear.visible, "ESC goes back to the menu")
+	assert_false(main.gear.is_showing_difficulty())
+	assert_eq(SaveGame.instance().difficulty, Difficulty.NORMAL)
+	_esc()
+	assert_false(main.gear.visible)
+
+
+func test_the_gear_menu_card_fits_on_screen() -> void:
+	main.gear.open()
+	await wait_process_frames(2)
+	var screen := main.get_viewport_rect()
+	for page in ["menu", "difficulty"]:
+		if page == "difficulty":
+			main.gear.show_difficulty()
+			await wait_process_frames(2)
+		var card := main.gear.card.get_global_rect()
+		assert_true(screen.encloses(card), "the %s page: %s in %s" % [page, card, screen])
+
+
 func test_the_yes_no_popup_sits_on_a_card_over_the_blur() -> void:
 	var cards := main.confirm.find_children("*", "PanelContainer", true, false).filter(func(node: Node) -> bool: return node is MenuCard)
 	assert_eq(cards.size(), 1)

@@ -2,8 +2,9 @@ class_name TitleScreen
 extends Control
 ## The screen the game opens on: Thresh's lantern, the title, and Start new
 ## game, Load game, Settings and Exit the game. The two game buttons turn
-## the panel into the slot list. A new game in a used slot asks first and
-## writes the slot at once. Nothing is unsaved here, so Exit (and the
+## the panel into the slot list. A new game in a used slot asks first, then
+## the difficulty page picks Easy, Normal, Hard or Extreme and the slot is
+## written at once. Nothing is unsaved here, so Exit (and the
 ## window's X) only ask "Exit the game?": Exit / Cancel, from the game root.
 ## Behind it all, the TitleBackdrop tells the story: Lucian and Senna facing
 ## Thresh under the Shadow Isles moon.
@@ -27,10 +28,16 @@ var error_label := UiStyle.label("", 20, UiStyle.ERROR_COLOR)
 ## Under the title, in red: "Could not save" after a game over whose save failed.
 var notice_label := UiStyle.label("", 22, UiStyle.ERROR_COLOR)
 
+## The difficulty page's buttons, by Difficulty level.
+var difficulty_buttons: Array[Button] = []
+
 var _menu: VBoxContainer
 var _slots_page: VBoxContainer
 var _slots_title: Label
+var _difficulty_page: VBoxContainer
 var _loading := false
+## The slot the difficulty page starts a new game in.
+var _new_slot := 0
 
 
 func _ready() -> void:
@@ -41,6 +48,7 @@ func _ready() -> void:
 
 func show_menu() -> void:
 	_slots_page.visible = false
+	_difficulty_page.visible = false
 	_menu.visible = true
 	error_label.text = ""
 	load_button.disabled = not SaveGame.instance().any_slot_exists()
@@ -56,11 +64,25 @@ func show_slots(loading: bool) -> void:
 	_slots_title.text = "LOAD GAME" if loading else "START NEW GAME"
 	slot_list.refresh(0, not loading)
 	_menu.visible = false
+	_difficulty_page.visible = false
 	_slots_page.visible = true
 
 
 func is_showing_slots() -> bool:
 	return _slots_page.visible
+
+
+## The new game's last step: its difficulty, for slot `slot`.
+func show_difficulty(slot: int) -> void:
+	_new_slot = slot
+	error_label.text = ""
+	_menu.visible = false
+	_slots_page.visible = false
+	_difficulty_page.visible = true
+
+
+func is_showing_difficulty() -> bool:
+	return _difficulty_page.visible
 
 
 func find_button(text: String) -> Button:
@@ -73,7 +95,10 @@ func find_button(text: String) -> Button:
 func _input(event: InputEvent) -> void:
 	if not event.is_action_pressed(&"open_menu") or settings.visible or confirm.is_open():
 		return
-	if is_showing_slots():
+	if is_showing_difficulty():
+		show_slots(false)
+		get_viewport().set_input_as_handled()
+	elif is_showing_slots():
 		show_menu()
 		get_viewport().set_input_as_handled()
 
@@ -83,16 +108,16 @@ func _on_picked(slot: int, used: bool) -> void:
 		SaveGame.instance().load_slot(slot)
 		game_loaded.emit()
 	elif used:
-		confirm.ask("Overwrite slot %d? Its progress will be lost." % slot, _start_new.bind(slot))
+		confirm.ask("Overwrite slot %d? Its progress will be lost." % slot, show_difficulty.bind(slot))
 	else:
-		_start_new(slot)
+		show_difficulty(slot)
 
 
-func _start_new(slot: int) -> void:
-	if SaveGame.instance().start_new(slot):
+func _start_new(level: int) -> void:
+	if SaveGame.instance().start_new(_new_slot, level):
 		new_game_started.emit()
 	else:
-		error_label.text = "Could not write slot %d" % slot
+		error_label.text = "Could not write slot %d" % _new_slot
 
 
 func _build() -> void:
@@ -135,11 +160,36 @@ func _build() -> void:
 	_slots_page.add_child(slot_list)
 	_slots_page.add_child(error_label)
 	_button(_slots_page, "Back", show_menu)
+	_build_difficulty_page()
 	settings.setup(GameSettings.instance())
 	settings.back_requested.connect(func() -> void: settings.close())
 	add_child(settings)
 	add_child(confirm)
 	add_child(HoverTip.new())
+
+
+## CHOOSE DIFFICULTY: a button per level ("Hard  ×1.2", the full
+## effect on hover), Normal in gold, then Back to the slots.
+func _build_difficulty_page() -> void:
+	_difficulty_page = VBoxContainer.new()
+	_difficulty_page.add_theme_constant_override(&"separation", 14)
+	column.add_child(_difficulty_page)
+	var heading := UiStyle.label("CHOOSE DIFFICULTY", 28, UiStyle.TITLE_COLOR)
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_difficulty_page.add_child(heading)
+	var note := UiStyle.label("Enemy HP and damage. You can change it later from the gear menu.", 18, UiStyle.DIM_COLOR)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size.x = BUTTON_SIZE.x
+	_difficulty_page.add_child(note)
+	for level in Difficulty.LEVELS:
+		var button := _button(_difficulty_page, "%s   %s" % [Difficulty.name_of(level), Difficulty.scale_text(level)], _start_new.bind(level))
+		button.set_meta(&"hover_text", Difficulty.describe(level))
+		if level == Difficulty.NORMAL:
+			button.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
+		difficulty_buttons.append(button)
+	_button(_difficulty_page, "Back", show_slots.bind(false))
+	_difficulty_page.visible = false
 
 
 func _open_settings() -> void:

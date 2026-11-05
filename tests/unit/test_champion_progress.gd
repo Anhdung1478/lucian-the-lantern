@@ -13,37 +13,37 @@ func test_starts_at_level_1_with_one_point() -> void:
 	assert_eq(progress.level, 1)
 	assert_eq(progress.xp, 0)
 	assert_eq(progress.skill_points(), 1)
-	assert_eq(progress.xp_for_next(), 280)
+	assert_eq(progress.xp_for_next(), 160)
 
 
 func test_xp_to_next_follows_formula() -> void:
-	assert_eq(ChampionProgress.xp_to_next(1), 280)
-	assert_eq(ChampionProgress.xp_to_next(17), 1880)
+	assert_eq(ChampionProgress.xp_to_next(1), 160)
+	assert_eq(ChampionProgress.xp_to_next(17), 1120)
 
 
 func test_total_xp_to_level_18() -> void:
 	var total := 0
 	for level in range(1, 18):
 		total += ChampionProgress.xp_to_next(level)
-	assert_eq(total, 18360)
+	assert_eq(total, 10880)
 	progress.add_xp(total)
 	assert_eq(progress.level, 18)
 
 
 func test_add_xp_below_threshold_keeps_level() -> void:
-	progress.add_xp(279)
+	progress.add_xp(159)
 	assert_eq(progress.level, 1)
-	assert_eq(progress.xp, 279)
+	assert_eq(progress.xp, 159)
 
 
 func test_add_xp_crosses_several_levels() -> void:
 	watch_signals(progress)
-	progress.add_xp(280 + 380 + 10)
+	progress.add_xp(160 + 220 + 10)
 	assert_eq(progress.level, 3)
 	assert_eq(progress.xp, 10)
 	assert_eq(progress.skill_points(), 3)
 	assert_signal_emitted_with_parameters(progress, "level_changed", [3])
-	assert_signal_emitted_with_parameters(progress, "xp_changed", [10, 480])
+	assert_signal_emitted_with_parameters(progress, "xp_changed", [10, 280])
 
 
 func test_level_caps_at_18_and_xp_stops() -> void:

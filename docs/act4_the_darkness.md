@@ -58,12 +58,12 @@ A mirror of the player. He has **no Passive and no W**, and always uses his skil
 ### Scaling
 | | Per act after the first | Act 4 |
 |---|---|---|
-| HP | × (1 + 0.6 · (act − 1)) | × 2.8 |
-| Damage | × (1 + 0.25 · (act − 1)) | × 1.75 |
+| HP | × (1 + 0.25 · (act − 1)) | × 1.75 |
+| Damage | × (1 + 0.15 · (act − 1)) | × 1.45 |
 | Gold and XP | × (1 + 0.25 · (act − 1)) | × 1.75 |
 | Blue per kill | = act number (elites 5×) | 4 (elites 20) |
 
-Each wave after the first also adds **+15% HP and damage**. Dark Lucian doesn't scale.
+Each wave after the first also adds **+10% HP and damage**. Dark Lucian doesn't scale. *(V1.3 balance pass: the numbers here are the new ones; see `lucian_game_design.md` §17.)* Lucian starts every Act 4 stage at **level 5**; in 4-1 the shadow melee and ranged minions have 20% less HP. The shadow super minion has the light one's new 1150 HP and 36 damage.
 
 ### Shadow minions
 Their own data files (`shadow_*_minion.tres`) with the Act 1–2 minions' numbers, behaviors and kinds; only the id, the name and the art change. Empower works on them as on the light ones.

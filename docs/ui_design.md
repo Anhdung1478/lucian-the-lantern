@@ -533,6 +533,7 @@ The game opens here (built in Phase 6).
 | Used | "Slot 2 · 1h 02m · saved 2026-10-29 03:10": its play time and when it was saved |
 
 - A new game on a used slot asks "Overwrite slot 2? Its progress will be lost." (Yes / No). Yes writes the new game at once and starts Act 1. An empty slot starts at once.
+- **Built in V1.3:** after the slot (and its Overwrite question), **CHOOSE DIFFICULTY**: "Enemy HP and damage. You can change it later from the gear menu.", then four buttons, **Easy ×0.8**, **Normal ×1.0** (in gold), **Hard ×1.1** and **Extreme ×1.3**, and Back. Hovering one says what it does ("Enemies have 110% HP and deal 110% damage. Blue essence ×1.2."). A pick writes the new game and starts Act 1. Back or ESC returns to the slot list.
 - Loading a slot opens the main screen on Journey.
 - The slot buttons are 520 px wide, so the longest text keeps room around it. The gear menu's Save as copy uses the same list.
 

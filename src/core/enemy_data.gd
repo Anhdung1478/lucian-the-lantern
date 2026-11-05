@@ -5,10 +5,10 @@ extends Resource
 
 ## HP, damage and reward growth per act after the first; HP and damage
 ## growth per wave after the first.
-const ACT_HP := 0.6
-const ACT_DAMAGE := 0.25
+const ACT_HP := 0.25
+const ACT_DAMAGE := 0.15
 const ACT_REWARD := 0.25
-const WAVE_GROWTH := 0.15
+const WAVE_GROWTH := 0.1
 ## The kinds with a boss-size health bar, a skull on the radar, the boss
 ## bar, no scaling and a first-time purple reward.
 const BOSS_KINDS: Array[StringName] = [&"mini_boss", &"boss"]

@@ -377,7 +377,7 @@ func test_the_drake_channels_soothing_mist_on_its_own_at_70_percent() -> void:
 	assert_almost_eq(drake._cooldowns[&"soothing_mist"], 18.0, 0.1)
 
 
-func test_soothing_mist_heals_30_percent_over_4_seconds_standing_still() -> void:
+func test_soothing_mist_heals_20_percent_over_4_seconds_standing_still() -> void:
 	var drake := _ocean(Vector2(800, 0))
 	drake.move_speed = 260.0
 	drake.hp = drake.max_hp * 0.5
@@ -388,24 +388,24 @@ func test_soothing_mist_heals_30_percent_over_4_seconds_standing_still() -> void
 	assert_true(drake.is_channeling())
 	var at := drake.global_position
 	await wait_seconds(2.0)
-	assert_almost_eq(drake.hp / drake.max_hp, 0.65, 0.02, "half the heal at 2 s")
+	assert_almost_eq(drake.hp / drake.max_hp, 0.6, 0.02, "half the heal at 2 s")
 	assert_almost_eq(drake.health_bar._ratio, drake.hp / drake.max_hp, 0.001, "the bar follows")
 	assert_true(drake.is_channeling())
 	assert_eq(drake.global_position, at, "it stands still")
 	await wait_seconds(2.3)
 	assert_false(drake.is_channeling())
-	assert_almost_eq(drake.hp / drake.max_hp, 0.8, 0.001, "30% in all")
+	assert_almost_eq(drake.hp / drake.max_hp, 0.7, 0.001, "20% in all")
 
 
-func test_8_percent_damage_in_the_channel_interrupts_it_and_dazes_it_for_1_5_seconds() -> void:
+func test_5_percent_damage_in_the_channel_interrupts_it_and_dazes_it_for_1_5_seconds() -> void:
 	var drake := _ocean(Vector2(3000, 0))
 	drake.hp = drake.max_hp * 0.5
 	await wait_physics_frames(1)
 	drake.soothing_mist()
-	drake.take_damage(DamageInfo.create(drake.max_hp * 0.05, DamageInfo.Type.TRUE, &"test"))
+	drake.take_damage(DamageInfo.create(drake.max_hp * 0.03, DamageInfo.Type.TRUE, &"test"))
 	await wait_physics_frames(2)
-	assert_true(drake.is_channeling(), "5% is not enough")
-	drake.take_damage(DamageInfo.create(drake.max_hp * 0.031, DamageInfo.Type.TRUE, &"test"))
+	assert_true(drake.is_channeling(), "3% is not enough")
+	drake.take_damage(DamageInfo.create(drake.max_hp * 0.021, DamageInfo.Type.TRUE, &"test"))
 	assert_true(drake.is_channeling(), "recorded in _lose_hp: nothing happens inside the damage path")
 	await wait_physics_frames(1)
 	assert_false(drake.is_channeling(), "interrupted")
@@ -418,6 +418,18 @@ func test_8_percent_damage_in_the_channel_interrupts_it_and_dazes_it_for_1_5_sec
 	await wait_seconds(1.1)
 	assert_false(drake.is_dazed())
 	assert_eq(drake.busy_left, 0.0)
+
+
+func test_the_mist_comes_at_most_3_times_a_fight() -> void:
+	var drake := _ocean(Vector2(3000, 0))
+	drake.hp = drake.max_hp * 0.5
+	await wait_physics_frames(1)
+	for i in OceanDrake.MIST_USES:
+		assert_true(drake._can_use(&"soothing_mist"), "use %d" % (i + 1))
+		drake.soothing_mist()
+	assert_eq(OceanDrake.MIST_USES, 3)
+	assert_false(drake._can_use(&"soothing_mist"), "no fourth")
+	assert_true(drake._can_use(&"tidal_wave"), "its wave goes on")
 
 
 func test_damage_before_the_channel_does_not_count() -> void:

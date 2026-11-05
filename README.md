@@ -9,7 +9,7 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 ## Download and play
 
 1. Open the [latest release](https://github.com/Anhdung1478/lucian-the-lantern/releases/latest).
-2. Download `LucianTheLantern-v1.2.0-windows-x64.zip`.
+2. Download `LucianTheLantern-v1.3.0-windows-x64.zip`.
 3. Unzip it anywhere and run `LucianTheLantern.exe`.
 
 - Needs Windows 10 or 11, 64-bit.
@@ -34,6 +34,7 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 - **Evolution Tree:** spend the essences you earn on skill ranks, stats, backpack and equip slots, a better economy, and summoner spells. The spells are Flash, Ghost, Barrier, Heal, Clarity and Smite.
 - **Skin Shop:** five skins, Classic, High Noon, PROJECT, Pulsefire and Vampire, each with its own strengths and weaknesses, and its own look and sounds for Q, W, E, R and basic attacks. Preview plays them in the shop.
 - **Endless mode:** opens after Act 3. Waves keep getting stronger, with a mini boss every 5 waves, a boss every 10, and a modifier pick after each boss.
+- **Difficulty:** Easy, Normal, Hard or Extreme, picked with a new game and changed any time from the main screen's gear menu. It scales enemy HP and the damage Lucian takes (×0.8 to ×1.3), and Hard and Extreme pay more blue essence.
 - **Other:** three save slots, rebindable keys, and three cast modes for each key.
 
 | | |

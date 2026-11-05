@@ -8,35 +8,35 @@ const IDS := [
 	"sapling", "spiderling", "ghoul", "maiden_of_the_mist", "broodmother",
 	"mist_walker", "lantern_soul", "spectral_rider", "chain_warden",
 ]
-## Act 3's monsters (docs/implementation/phase7.md): id -> [kind, behavior,
-## camp, HP, armor, MR, damage, attack range, attack interval, speed, radius,
-## gold, XP].
+## Act 3's monsters (docs/implementation/phase7.md, the small ones softened
+## and slowed in V1.3): id -> [kind, behavior, camp, HP, armor, MR, damage,
+## attack range, attack interval, speed, radius, gold, XP].
 const ACT_3 := {
-	"raptor": [&"normal", &"swarm", &"raptors", 110.0, 10.0, 0.0, 8.0, 90.0, 0.9, 330.0, 22.0, 20, 10],
-	"raptor_big": [&"normal", &"swarm", &"raptors", 360.0, 20.0, 10.0, 18.0, 100.0, 1.0, 320.0, 32.0, 55, 28],
-	"murkwolf": [&"normal", &"flank", &"wolves", 190.0, 10.0, 10.0, 12.0, 100.0, 1.1, 340.0, 26.0, 30, 16],
-	"murkwolf_big": [&"normal", &"flank", &"wolves", 480.0, 20.0, 15.0, 24.0, 110.0, 1.2, 320.0, 36.0, 70, 36],
-	"krug": [&"normal", &"brute", &"krugs", 200.0, 30.0, 10.0, 16.0, 100.0, 1.5, 200.0, 28.0, 30, 16],
-	"krug_big": [&"normal", &"brute", &"krugs", 720.0, 40.0, 15.0, 34.0, 120.0, 1.8, 170.0, 46.0, 80, 42],
-	"gromp": [&"normal", &"spit", &"gromp", 650.0, 15.0, 25.0, 22.0, 500.0, 1.7, 160.0, 44.0, 80, 40],
-	"blue_sentinel": [&"elite", &"brute", &"blue", 1700.0, 35.0, 35.0, 42.0, 150.0, 1.6, 240.0, 50.0, 160, 90],
-	"red_brambleback": [&"elite", &"brute", &"red", 1700.0, 35.0, 35.0, 40.0, 150.0, 1.5, 240.0, 50.0, 160, 90],
+	"raptor": [&"normal", &"swarm", &"raptors", 85.0, 10.0, 0.0, 6.0, 90.0, 0.9, 300.0, 22.0, 20, 10],
+	"raptor_big": [&"normal", &"swarm", &"raptors", 280.0, 20.0, 10.0, 14.0, 100.0, 1.0, 295.0, 32.0, 55, 28],
+	"murkwolf": [&"normal", &"flank", &"wolves", 150.0, 10.0, 10.0, 9.0, 100.0, 1.1, 310.0, 26.0, 30, 16],
+	"murkwolf_big": [&"normal", &"flank", &"wolves", 375.0, 20.0, 15.0, 18.0, 110.0, 1.2, 300.0, 36.0, 70, 36],
+	"krug": [&"normal", &"brute", &"krugs", 155.0, 30.0, 10.0, 12.0, 100.0, 1.5, 200.0, 28.0, 30, 16],
+	"krug_big": [&"normal", &"brute", &"krugs", 560.0, 40.0, 15.0, 26.0, 120.0, 1.8, 170.0, 46.0, 80, 42],
+	"gromp": [&"normal", &"spit", &"gromp", 500.0, 15.0, 25.0, 17.0, 500.0, 1.7, 160.0, 44.0, 80, 40],
+	"blue_sentinel": [&"elite", &"brute", &"blue", 1400.0, 35.0, 35.0, 30.0, 150.0, 1.6, 240.0, 50.0, 160, 90],
+	"red_brambleback": [&"elite", &"brute", &"red", 1400.0, 35.0, 35.0, 34.0, 150.0, 1.5, 240.0, 50.0, 160, 90],
 	"rift_scuttler": [&"elite", &"flee", &"scuttle", 600.0, 20.0, 20.0, 0.0, 0.0, 1.25, 250.0, 34.0, 120, 60],
 }
 ## Act 5's enemies (the Phase 8 plan), the same columns. Act 5 scales them
 ## itself, so these are the base numbers.
 const ACT_5 := {
-	"sapling": [&"normal", &"bomber", &"", 110.0, 0.0, 10.0, 30.0, 80.0, 0.0, 340.0, 22.0, 30, 15],
-	"spiderling": [&"normal", &"brute", &"nest", 130.0, 5.0, 5.0, 8.0, 90.0, 0.9, 380.0, 20.0, 25, 12],
+	"sapling": [&"normal", &"bomber", &"", 110.0, 0.0, 10.0, 30.0, 80.0, 0.0, 320.0, 22.0, 30, 15],
+	"spiderling": [&"normal", &"brute", &"nest", 130.0, 5.0, 5.0, 8.0, 90.0, 0.9, 330.0, 20.0, 25, 12],
 	"ghoul": [&"normal", &"brute", &"", 90.0, 0.0, 0.0, 8.0, 90.0, 1.0, 320.0, 20.0, 20, 10],
 	"maiden_of_the_mist": [&"elite", &"brute", &"", 1500.0, 35.0, 35.0, 40.0, 130.0, 1.5, 220.0, 42.0, 140, 80],
 	"broodmother": [&"elite", &"spit", &"", 1100.0, 20.0, 40.0, 30.0, 600.0, 2.0, 200.0, 48.0, 150, 90],
 }
 ## Act 6's enemies (the Phase 8 plan), the same columns. Act 6 scales them
-## itself (HP x4, damage x2.25, rewards x2.25, +15% a wave), so these are the
-## base numbers.
+## itself (HP x2.25, damage x1.75, rewards x2.25, +10% a wave since V1.3), so
+## these are the base numbers.
 const ACT_6 := {
-	"mist_walker": [&"normal", &"brute", &"", 220.0, 10.0, 10.0, 14.0, 100.0, 0.9, 360.0, 26.0, 55, 28],
+	"mist_walker": [&"normal", &"brute", &"", 220.0, 10.0, 10.0, 14.0, 100.0, 0.9, 320.0, 26.0, 55, 28],
 	"lantern_soul": [&"normal", &"spit", &"", 150.0, 0.0, 20.0, 22.0, 550.0, 1.6, 280.0, 24.0, 45, 25],
 	"spectral_rider": [&"elite", &"charger", &"", 1300.0, 40.0, 20.0, 60.0, 800.0, 4.0, 280.0, 42.0, 140, 80],
 	"chain_warden": [&"elite", &"warden", &"", 1200.0, 35.0, 35.0, 45.0, 700.0, 3.5, 220.0, 40.0, 150, 90],
@@ -175,7 +175,7 @@ func test_the_act_3_on_hits_and_specials() -> void:
 	assert_eq([gromp.keep_min, gromp.keep_max], [380.0, 480.0])
 	assert_eq([gromp.hit_burn, gromp.hit_burn_time, gromp.burn_type()], [6.0, 3.0, DamageInfo.Type.MAGIC])
 	var blue := _data("blue_sentinel")
-	assert_eq([blue.hit_slow, blue.hit_slow_time, blue.buff_on_kill], [0.3, 1.5, JungleBuffs.BLUE])
+	assert_eq([blue.hit_slow, blue.hit_slow_time, blue.buff_on_kill], [0.2, 1.0, JungleBuffs.BLUE])
 	var red := _data("red_brambleback")
 	assert_eq([red.hit_burn, red.hit_burn_time, red.burn_type(), red.buff_on_kill], [8.0, 3.0, DamageInfo.Type.MAGIC, JungleBuffs.RED])
 	var krug_big := _data("krug_big")

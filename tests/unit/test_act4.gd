@@ -70,8 +70,9 @@ func test_a_shadow_super_minion_empowers_shadow_melee_and_ranged_not_siege() -> 
 
 func test_act_4_scaling() -> void:
 	var minion := _minion("shadow_melee_minion", Vector2(2000, 0), 4, 1)
-	assert_almost_eq(minion.max_hp, 240.0 * 2.8, 0.01)
-	assert_almost_eq(minion.damage, 12.0 * 1.75, 0.01)
+	# Act 4: HP × (1 + 0.25 · 3), damage × (1 + 0.15 · 3).
+	assert_almost_eq(minion.max_hp, 240.0 * 1.75, 0.01)
+	assert_almost_eq(minion.damage, 12.0 * 1.45, 0.01)
 	var data: EnemyData = load("res://data/enemies/shadow_melee_minion.tres")
 	assert_almost_eq(data.reward_scale(4), 1.75, 0.001)
 	var reward := KillRewards.roll(data, 4, StageSetup.new(), RandomNumberGenerator.new())

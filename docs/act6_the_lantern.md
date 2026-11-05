@@ -111,26 +111,26 @@ All numbers are placeholders. A mini boss's or boss's skill hit counts as a skil
 ### Scaling
 | | Act 6 |
 |---|---|
-| HP | × 4.0 |
-| Damage | × 2.25 |
+| HP | × 2.25 *(× 4.0 before V1.3)* |
+| Damage | × 1.75 *(× 2.25 before V1.3)* |
 | Gold and XP | × 2.25 |
 | Blue per kill | 6 (elites 30) |
 
-Each wave after the first also adds **+15% HP and damage**. Mini bosses and the boss don't scale.
+Each wave after the first also adds **+10% HP and damage**. Mini bosses and the boss don't scale. *(V1.3 balance pass: the numbers here are the new ones; see `lucian_game_design.md` §17.)* Lucian starts every Act 6 stage at **level 9**; in 6-1 the Mist Walkers and Lantern Souls have 20% less HP.
 
 ### Enemies
 Base numbers (the data files). The last column shows wave 1 of Act 6, scaled.
 
 | Enemy | Kind | HP | Armor / MR | Attack | Range | Every | Speed | Radius | Gold / XP | Act 6, wave 1 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Mist Walker | normal | 220 | 10 / 10 | Fast ghoul melee, 14 physical | 100 | 0.9 s | 360 | 26 | 55 / 28 | 880 HP, hits for 31 |
-| Lantern Soul | normal | 150 | 0 / 20 | A bolt at 500 px/s, 22 magic. Keeps 420–550 away. **Freed** on death | 550 | 1.6 s | 280 | 24 | 45 / 25 | 600 HP, bolt 49 |
-| Spectral Rider | elite | 1300 | 40 / 20 | **Charge** (below), 60 physical | 800 | 4.0 s | 280 | 42 | 140 / 80 | 5200 HP, charge 135 |
-| Chain Warden | elite | 1200 | 35 / 35 | **Chain** (below), 45 physical. Keeps 500–700 away | 700 | 3.5 s | 220 | 40 | 150 / 90 | 4800 HP, chain 101 |
+| Mist Walker | normal | 220 | 10 / 10 | Fast ghoul melee, 14 physical | 100 | 0.9 s | 320 *(360 before V1.3)* | 26 | 55 / 28 | 495 HP, hits for 24.5 |
+| Lantern Soul | normal | 150 | 0 / 20 | A bolt at 500 px/s, 22 magic. Keeps 420–550 away. **Freed** on death | 550 | 1.6 s | 280 | 24 | 45 / 25 | 338 HP, bolt 38.5 |
+| Spectral Rider | elite | 1300 | 40 / 20 | **Charge** (below), 60 physical | 800 | 4.0 s | 280 | 42 | 140 / 80 | 2925 HP, charge 105 |
+| Chain Warden | elite | 1200 | 35 / 35 | **Chain** (below), 45 physical. Keeps 500–700 away | 700 | 3.5 s | 220 | 40 | 150 / 90 | 2700 HP, chain 79 |
 
 - **Lantern Soul:** killed, it is **freed** and pays like any kill. It rises and brightens into teal-white light, then fades upward with a soft chime (0.9 s), in place of the grey fade. Its health bar goes at once.
-- **Spectral Rider:** it walks in until Lucian is within 800 (and keeps 250 away while the charge cools down). When the charge is ready it locks a red line (800 × 90) toward him and stands 0.8 s. Then it charges along the line at 1400 px/s. A hit is 60 physical (× 2.25) and a **push of 150** along the charge, at 1600 px/s. It hits at most once per charge. A wall or the abyss stops it. Step sideways to dodge. A perched rider never charges (it only faces him).
-- **Chain Warden:** when the chain is ready and Lucian is within 700, it marks a red line (700 × 60) for 0.8 s, then throws a chain at 1200 px/s. A hit is 45 physical (× 2.25) and a **pull of 300** toward the warden at 1600 px/s. The pull stops in front of the warden (it never pulls him past it) and at the abyss edge: it can't drag him into the abyss. Practice for Thresh's hook.
+- **Spectral Rider:** it walks in until Lucian is within 800 (and keeps 250 away while the charge cools down). When the charge is ready it locks a red line (800 × 90) toward him and stands 0.8 s. Then it charges along the line at 1400 px/s. A hit is 60 physical (× 1.75) and a **push of 150** along the charge, at 1600 px/s. It hits at most once per charge. A wall or the abyss stops it. Step sideways to dodge. A perched rider never charges (it only faces him).
+- **Chain Warden:** when the chain is ready and Lucian is within 700, it marks a red line (700 × 60) for 0.8 s, then throws a chain at 1200 px/s. A hit is 45 physical (× 1.75) and a **pull of 300** toward the warden at 1600 px/s. The pull stops in front of the warden (it never pulls him past it) and at the abyss edge: it can't drag him into the abyss. Practice for Thresh's hook.
 - **Perched wardens:** a warden spawns on a free **ledge**, the one **nearest Lucian**, and never moves. It turns to face him. With no free ledge (6-5 has none) it spawns at the spawn points and walks, keeping 500–700 away.
 - **Summons** work as in Act 5 (`act5_shadow_isles.md`): Thresh's souls count for the wave at once, pay 25% gold and XP, and give no essences or loot.
 

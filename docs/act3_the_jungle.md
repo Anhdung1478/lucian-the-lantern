@@ -106,26 +106,28 @@ High damage, big fire damage over time.
 ## Built in Phase 7
 
 ### Scaling
-Monsters scale like Act 1–2 minions (`EnemyData`); mini bosses and the boss don't.
+Monsters scale like Act 1–2 minions (`EnemyData`); mini bosses and the boss don't. *(V1.3 balance pass: the numbers here are the new ones; see `lucian_game_design.md` §17.)*
 
 | | Per act after the first | Act 3 |
 |---|---|---|
-| HP | × (1 + 0.6 · (act − 1)) | × 2.2 |
-| Damage | × (1 + 0.25 · (act − 1)) | × 1.5 |
+| HP | × (1 + 0.25 · (act − 1)) | × 1.5 |
+| Damage | × (1 + 0.15 · (act − 1)) | × 1.3 |
 | Gold and XP | × (1 + 0.25 · (act − 1)) | × 1.5 |
 | Blue per kill | = act number (elites 5×) | 3 (elites 15) |
 
-Each wave after the first also adds **+15% HP and damage**. A raptor at wave 1 has 242 HP and bites for 12.
+Each wave after the first also adds **+10% HP and damage**. A raptor at wave 1 has 128 HP and bites for 7.8. Lucian starts every Act 3 stage at **level 5**. In 3-1 the monsters have 20% less HP.
 
 ### Monsters (`data/enemies/*.tres`, base numbers)
 | Enemy | Behavior | HP | Armor / MR | Attack | Every | Speed | Gold / XP |
 |---|---|---|---|---|---|---|---|
-| Raptor | swarm | 110 | 10 / 0 | 8 physical, range 90 | 0.9 s | 330 | 20 / 10 |
-| Crimson Raptor (big) | swarm | 360 | 20 / 10 | 18 physical, range 100 | 1.0 s | 320 | 55 / 28 |
-| Murk Wolf | flank | 190 | 10 / 10 | 12 physical, range 100 | 1.1 s | 340 | 30 / 16 |
-| Greater Murk Wolf (big) | flank | 480 | 20 / 15 | 24 physical, range 110 | 1.2 s | 320 | 70 / 36 |
-| Krug | brute | 200 | 30 / 10 | 16 physical, range 100 | 1.5 s | 200 | 30 / 16 |
-| Ancient Krug (big) | brute | 720 | 40 / 15 | 34 physical, range 120. Splits into 2 Krugs. | 1.8 s | 170 | 80 / 42 |
+| Raptor | swarm | 85 | 10 / 0 | 6 physical, range 90 | 0.9 s | 300 | 20 / 10 |
+| Crimson Raptor (big) | swarm | 280 | 20 / 10 | 14 physical, range 100 | 1.0 s | 295 | 55 / 28 |
+| Murk Wolf | flank | 150 | 10 / 10 | 9 physical, range 100 | 1.1 s | 310 | 30 / 16 |
+| Greater Murk Wolf (big) | flank | 375 | 20 / 15 | 18 physical, range 110 | 1.2 s | 300 | 70 / 36 |
+| Krug | brute | 155 | 30 / 10 | 12 physical, range 100 | 1.5 s | 200 | 30 / 16 |
+| Ancient Krug (big) | brute | 560 | 40 / 15 | 26 physical, range 120. Splits into 2 Krugs. | 1.8 s | 170 | 80 / 42 |
+
+*(V1.3: HP about 22% and damage about 25% lower than Phase 7's 110 / 360 / 190 / 480 / 200 / 720 HP and 8 / 18 / 12 / 24 / 16 / 34 damage. The raptors and wolves now run slower than Lucian's 345, so he can kite them. Gromp: 500 HP and 17 magic, was 650 and 22.)*
 | Gromp | spit | 650 | 15 / 25 | A 22 magic bolt (500 px/s), range 500. Poisons Lucian: 6 magic a second for 3 s. | 1.7 s | 160 | 80 / 40 |
 
 **How they move (`Monster`):**
@@ -152,8 +154,10 @@ Blue's camp is low on the left, Red's low on the right, the Scuttler's on the ri
 ### Elites
 | Elite | HP | Armor / MR | Attack | Every | Speed | Gold / XP | On death |
 |---|---|---|---|---|---|---|---|
-| Blue Sentinel (brute) | 1700 | 35 / 35 | A 42 physical slam, range 150. Slows Lucian 30% for 1.5 s. | 1.6 s | 240 | 160 / 90 | Blue buff |
-| Red Brambleback (brute) | 1700 | 35 / 35 | 40 physical, range 150. Burns Lucian: 8 magic a second for 3 s. | 1.5 s | 240 | 160 / 90 | Red buff |
+| Blue Sentinel (brute) | 1400 *(1700)* | 35 / 35 | A 30 *(42; 36 in the first V1.3 pass)* physical slam, range 150. Slows Lucian 20% for 1.0 s *(30% for 1.5 s: one hit made him as slow as it)*. | 1.6 s | 240 | 160 / 90 | Blue buff |
+| Red Brambleback (brute) | 1400 *(1700)* | 35 / 35 | 34 *(40)* physical, range 150. Burns Lucian: 8 magic a second for 3 s. | 1.5 s | 240 | 160 / 90 | Red buff |
+
+*(V1.3: the brackets hold the numbers before the balance pass.)*
 | Rift Scuttler (flee) | 600 | 20 / 20 | None | — | 250 | 120 / 60 | +45 blue and +4 orange on top of an elite's |
 
 **Jungle buffs** (`JungleBuffs`), given when the elite dies, for **60 s**. Each shows in the HUD's buff row with its timer. Death clears them.
@@ -175,7 +179,7 @@ Each comes last in its stage's last wave, out of the pit. All skill hits count a
 | Basic attack | A fireball, 50 magic (700 px/s), that burns 10 magic a second for 2 s. Range 600, every 1.6 s. | A water shot, 55 magic (800 px/s). Range 600, every 1.5 s. |
 | Speed / radius | 260 / 70 | 260 / 70 |
 | Skill 1 | **Fire Breath:** when Lucian is within 580, a cone warning (60°, 550 long) for 0.8 s, then 100 magic. The cone then burns for 3 s (30 magic a second). Cooldown 9 s, first after 3 s. | **Tidal Wave:** a line warning (1100 × 180) for 0.8 s, then a wave front, 180 wide, rolls along it at 900 px/s. A hit: 90 magic, a push of 300 along the line (walls stop it), and a 30% slow for 2 s. Cooldown 10 s, first after 3 s. |
-| Skill 2 | **Meteor Fall:** within 900, 4 circle warnings (r 120): one on Lucian, 3 within 280 of him, all on walkable ground. 1.2 s later each lands for 80 magic and burns for 3 s (25 magic a second). Cooldown 13 s, first after 6 s. | **Soothing Mist:** at or below 70% HP, it stands still and heals 30% of its max HP over 4 s, a mist ring round it. 8% of its max HP in damage during that time **interrupts** it: "Interrupted!", and it stands dazed for 1.5 s (stars over its head). Cooldown 18 s. |
+| Skill 2 | **Meteor Fall:** within 900, 4 circle warnings (r 120): one on Lucian, 3 within 280 of him, all on walkable ground. 1.2 s later each lands for 80 magic and burns for 3 s (25 magic a second). Cooldown 13 s, first after 6 s. | **Soothing Mist:** at or below 70% HP, it stands still and heals 20% of its max HP over 4 s, a mist ring round it. 5% of its max HP in damage during that time **interrupts** it: "Interrupted!", and it stands dazed for 1.5 s (stars over its head). Cooldown 18 s, and at most 3 channels a fight (V1.3), so the fight always ends. |
 
 **Rewards, paid on the kill:** 300 gold, 50 blue, 3 orange, and **5 purple the first time, 1 after**, with a line on the end screen ("+5 purple essence (Infernal Drake, first kill)"). Its loot: a fragment for sure, and 8% a legendary. The kill that ends the stage drops nothing.
 
@@ -203,13 +207,13 @@ Packs: **R** raptors, **W** wolves, **K** Krugs, **G** Gromp. Elites: **B** Blue
 
 | Stage | Waves | Enemies | HP per wave | Mini boss / boss |
 |---|---|---|---|---|
-| 3-1 | R W · R R G B · W K G D S | 8 · 12 · 9 | 3.7k · 10.0k · 15.2k | — |
-| 3-2 | R W G · R K W B · W K G D S · R W K G + drake | 9 · 12 · 9 · 13 | 5.1k · 12.3k · 15.2k · 12.2k + 9k | Infernal Drake, last in wave 4 |
-| 3-3 | R R W G · K W G B · R W K D S · R R W K G B | 14 · 8 · 13 · 18 | 6.8k · 12.0k · 15.7k · 20.2k | — |
-| 3-4 | R W G K · R W K B · W K G D S · R R K G B · R W K G D + drake | 12 · 12 · 9 · 15 · 14 | 8.4k · 12.3k · 15.2k · 17.4k · 19.5k + 10k | Ocean Drake, last in wave 5 |
-| 3-5 | R W K G · R R W B · W K G D S · R W K G B · R R W K D S | 12 · 14 · 9 · 13 · 18 | 8.4k · 10.5k · 15.2k · 17.6k · 22.1k | Elder Dragon (boss wave) |
+| 3-1 | R W · R G B · W K G D S | 8 · 7 · 9 | 1.6k · 3.8k · 7.0k | — |
+| 3-2 | R W G · R K W B · W K G D S · R W + drake | 9 · 12 · 9 · 9 | 2.7k · 6.4k · 7.8k · 2.5k + 9k | Infernal Drake, last in wave 4 |
+| 3-3 | R R W G · K W G B · R W K D S · R R W K G B | 14 · 8 · 13 · 18 | 3.6k · 6.2k · 8.1k · 9.7k | — |
+| 3-4 | R W G K · R W K B · W K G D S · R R K G B · R W D + drake | 12 · 12 · 9 · 15 · 10 | 4.5k · 6.4k · 7.8k · 8.4k · 5.7k + 10k | Ocean Drake, last in wave 5 |
+| 3-5 | R W K G · R R W B · W K G D S · R W K G B · R R W K D S | 12 · 14 · 9 · 13 · 18 | 4.5k · 5.5k · 7.8k · 8.5k · 10.7k | Elder Dragon (boss wave) |
 
-The waves hold about **275k HP**, plus 35k for the two drakes and the dragon. 3-1's first wave is the act's smallest, so the act starts gently.
+The waves hold about **129k HP** (275k before V1.3), plus 35k for the two drakes and the dragon. 3-1 is the act's gentle stage: one raptor pack in wave 2 (it had two) and 20% less HP for its monsters. A drake's wave brings fewer packs (V1.3: 3-2's last wave lost the Krugs and Gromp, 3-4's too), so its fight is about the drake. `tests/tools/stage_budget.gd` prints these numbers.
 
 ### The jungle (`JungleMap`, stages 3-1 to 3-4)
 | | |

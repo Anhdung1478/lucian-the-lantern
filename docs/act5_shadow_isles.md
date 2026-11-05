@@ -101,25 +101,27 @@ All numbers are placeholders. A mini boss's or boss's skill hit counts as a skil
 ### Scaling
 | | Act 5 |
 |---|---|
-| HP | × 3.4 |
-| Damage | × 2.0 |
+| HP | × 2.0 *(× 3.4 before V1.3)* |
+| Damage | × 1.6 *(× 2.0 before V1.3)* |
 | Gold and XP | × 2.0 |
 | Blue per kill | 5 (elites 25) |
 
-Each wave after the first also adds **+15% HP and damage**. Mini bosses and the boss don't scale.
+Each wave after the first also adds **+10% HP and damage**. Mini bosses and the boss don't scale. *(V1.3 balance pass: the numbers here are the new ones; see `lucian_game_design.md` §17.)* Lucian starts every Act 5 stage at **level 7**; in 5-1 the spiderlings and saplings have 20% less HP.
 
 ### Enemies
 Base numbers (the data files). The last column shows wave 1 of Act 5, scaled.
 
 | Enemy | Kind | HP | Armor / MR | Attack | Range | Every | Speed | Radius | Gold / XP | Act 5, wave 1 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Sapling | normal | 110 | 0 / 10 | **Bomber** (below), 30 magic | 80 | — | 340 | 22 | 30 / 15 | 374 HP, blast 60 |
-| Spiderling | normal | 130 | 5 / 5 | Fast melee, 8 physical | 90 | 0.9 s | 380 | 20 | 25 / 12 | 442 HP, hits for 16 |
-| Ghoul (a summon) | normal | 90 | 0 / 0 | Melee, 8 physical | 90 | 1.0 s | 320 | 20 | 20 / 10, paid at 25% | 306 HP, hits for 16 |
-| Maiden of the Mist | elite | 1500 | 35 / 35 | Tanky melee, 40 physical. **Summons 2 ghouls every 7 s, at most 6 alive** | 130 | 1.5 s | 220 | 42 | 140 / 80 | 5100 HP, hits for 80 |
-| Broodmother | elite | 1100 | 20 / 40 | **Web spit:** a bolt at 600 px/s, 30 magic, slows Lucian 30% for 1.5 s. Keeps 450–600 away. **Summons 1 spiderling every 3.5 s, at most 5 alive** | 600 | 2.0 s | 200 | 48 | 150 / 90 | 3740 HP, bolt 60 |
+| Sapling | normal | 110 | 0 / 10 | **Bomber** (below), 30 magic | 80 | — | 320 *(340)* | 22 | 30 / 15 | 220 HP, blast 48 |
+| Spiderling | normal | 130 | 5 / 5 | Fast melee, 8 physical | 90 | 0.9 s | 330 *(380)* | 20 | 25 / 12 | 260 HP, hits for 12.8 |
+| Ghoul (a summon) | normal | 90 | 0 / 0 | Melee, 8 physical | 90 | 1.0 s | 320 | 20 | 20 / 10, paid at 25% | 180 HP, hits for 12.8 |
+| Maiden of the Mist | elite | 1500 | 35 / 35 | Tanky melee, 40 physical. **Summons 2 ghouls every 7 s, at most 6 alive** | 130 | 1.5 s | 220 | 42 | 140 / 80 | 3000 HP, hits for 64 |
+| Broodmother | elite | 1100 | 20 / 40 | **Web spit:** a bolt at 600 px/s, 30 magic, slows Lucian 30% for 1.5 s. Keeps 450–600 away. **Summons 1 spiderling every 3.5 s, at most 5 alive** | 600 | 2.0 s | 200 | 48 | 150 / 90 | 2200 HP, bolt 48 |
 
-- **Sapling (Bomber):** it runs at Lucian. Within 80 (plus Lucian's 30 radius) it stops and marks a red circle (r 120) on its own spot for 0.6 s, then blasts everyone inside for 30 magic (× 2.0) and **vanishes**: no gold, no XP, no essence, no loot and no "Escaped!" note. Killed first, it pays like any normal enemy and its mark goes with it.
+*(V1.3: the sapling and the spiderling run slower than Lucian's 345; the brackets hold the old speeds.)*
+
+- **Sapling (Bomber):** it runs at Lucian. Within 80 (plus Lucian's 30 radius) it stops and marks a red circle (r 120) on its own spot for 0.6 s, then blasts everyone inside for 30 magic (× 1.6) and **vanishes**: no gold, no XP, no essence, no loot and no "Escaped!" note. Killed first, it pays like any normal enemy and its mark goes with it.
 - **Spiderlings** come out of the **nest** from 5-3 (the `nest` camp). In 5-1 and 5-2 they come from the spawn points.
 - **Summons** (the ghouls and the Broodmother's spiderlings):
   - The wave counts a summon the moment it is asked for and waits for it. When a summoner dies, its summons stay.

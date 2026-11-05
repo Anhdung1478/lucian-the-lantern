@@ -23,6 +23,7 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 | **Close** | Closes the pop-up |
 | **Save** | Saves to the current save slot |
 | **Save as copy** | Copies the current progress into another slot (asks before overwriting) |
+| **Difficulty** | Easy, Normal, Hard or Extreme for this save (V1.3) |
 | **Settings** | Opens the game settings |
 | **Leave to main menu** | Asks **"Save before leaving?"** (Yes / No / Cancel), then returns to the title screen / save slot selection. Cancel stays, with the menu open |
 | **Exit the game** | Asks **"Save before leaving?"** (Yes / No / Cancel), then closes the game. Cancel stays, with the menu open |
@@ -33,6 +34,9 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
   - Close is gold. Save shows "Slot N". Save as copy shows "To another slot". Leave to main menu shows "Title screen".
   - Leave and Exit turn red on hover.
   - Save as copy's page is titled **SAVE AS COPY**, "Pick a slot", with a Back row.
+- **Built in V1.3:** a **Difficulty** row (skull icon) after Save as copy; its hint names the current level.
+  - It opens a page titled **DIFFICULTY**, "Enemy HP and damage": Easy ×0.8, Normal ×1.0, Hard ×1.1, Extreme ×1.3, then Back. The current one is greyed ("Current · ×1.0"), and hovering a level says what it does.
+  - A pick goes back to the menu with the toast "Difficulty: Hard". Like a tree purchase, it is kept by the next save. ESC on the page goes back to the menu.
 
 ### Navigation
 - **Sections** (Evolution Tree, Skin Shop, Journey): switched with a bar at the **bottom** of the screen.

@@ -4,8 +4,9 @@ extends RefCounted
 ## and orange essence for good, plus the data's extra essence. Boss and mini
 ## boss purple comes from SaveGame.award_boss. The tree's Stage Gold, Bonus
 ## XP and Essence Drops raise them, then an Endless modifier's multipliers
-## (StageSetup.gold_mult, blue_mult, orange_mult; XP has none). Pure: the
-## randomness comes from `rng`.
+## (StageSetup.gold_mult, blue_mult, orange_mult; XP has none), and the
+## difficulty's blue (Difficulty.blue_scale). Pure: the randomness comes
+## from `rng`.
 
 const ORANGE_CHANCE := {&"normal": 0.01, &"elite": 0.1}
 const ELITE_BLUE := 5
@@ -41,7 +42,7 @@ static func roll(data: EnemyData, act: int, run: StageSetup, rng: RandomNumberGe
 			blue = act * ELITE_BLUE
 		if rng.randf() < ORANGE_CHANCE[data.kind] * (1.0 + run.essence_bonus) * run.orange_mult:
 			reward.orange = 1
-	reward.blue = roundi((blue + data.extra_blue) * (1.0 + run.essence_bonus) * run.blue_mult)
+	reward.blue = roundi((blue + data.extra_blue) * (1.0 + run.essence_bonus) * run.blue_mult * Difficulty.blue_scale(run.difficulty))
 	reward.orange += data.extra_orange
 	return reward
 

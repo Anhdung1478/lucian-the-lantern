@@ -38,6 +38,9 @@ const BOSS_IDS: Array[String] = ["thresh_1", "akshan", "infernal_drake", "ocean_
 var bosses: Array[String] = []
 ## Seconds played in this slot (title screen and pauses not counted).
 var play_time := 0.0
+## Difficulty.EASY ... EXTREME: picked with the new game, changed from the
+## gear menu.
+var difficulty := Difficulty.NORMAL
 
 
 ## The running game's progress: slot 1 until the title screen loads another.
@@ -114,16 +117,28 @@ func reset() -> void:
 	endless_best = 0
 	bosses = []
 	play_time = 0.0
+	difficulty = Difficulty.NORMAL
 	tree.acts_cleared = 0
 	changed.emit()
 
 
-## A new game in slot `of_slot`, which becomes current and is written at
-## once (it replaces what was there).
-func start_new(of_slot: int) -> bool:
+## A new game on `level` (a Difficulty level) in slot `of_slot`, which
+## becomes current and is written at once (it replaces what was there).
+func start_new(of_slot: int, level := Difficulty.NORMAL) -> bool:
 	slot = of_slot
 	reset()
+	difficulty = level if Difficulty.is_level(level) else Difficulty.NORMAL
 	return save()
+
+
+## Changes the difficulty, in memory (the next save writes it). False for an
+## unknown level or the current one.
+func set_difficulty(level: int) -> bool:
+	if not Difficulty.is_level(level) or level == difficulty:
+		return false
+	difficulty = level
+	changed.emit()
+	return true
 
 
 func any_slot_exists() -> bool:
@@ -243,6 +258,7 @@ func to_dict() -> Dictionary:
 		"endless_best": endless_best,
 		"bosses": bosses.duplicate(),
 		"play_time": int(play_time),
+		"difficulty": Difficulty.KEYS[difficulty],
 	}
 
 
@@ -328,5 +344,7 @@ func _apply(data: Dictionary) -> void:
 				bosses.append(id)
 	var seconds: Variant = data.get("play_time", 0)
 	play_time = maxf(float(seconds), 0.0) if (seconds is int or seconds is float) else 0.0
+	# A save from before difficulties plays on Normal.
+	difficulty = Difficulty.from_key(data.get("difficulty", ""))
 	tree.acts_cleared = Journey.acts_cleared(cleared)
 	changed.emit()

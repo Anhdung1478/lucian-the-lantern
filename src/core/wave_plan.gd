@@ -50,20 +50,20 @@ const PACKS := {
 }
 ## Stage id -> waves; each wave lists [enemy or pack id, count] in spawn order.
 const STAGES := {
-	"1-1": [[[MELEE, 6], [RANGED, 4]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1]]],
+	"1-1": [[[MELEE, 4], [RANGED, 2]], [[MELEE, 6], [RANGED, 4], [SIEGE, 1]]],
 	"2-1": [[[MELEE, 6], [RANGED, 4], [SIEGE, 1]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]]],
 	"2-2": [[[MELEE, 6], [RANGED, 6], [SIEGE, 1]], [[MELEE, 6], [RANGED, 6], [SIEGE, 2]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]]],
 	"2-3": [[[MELEE, 6], [RANGED, 6], [SIEGE, 2]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]], [[MELEE, 8], [RANGED, 6], [SIEGE, 2], [SUPER, 1]]],
 	"3-1": [
 		[[&"raptors", 1], [&"wolves", 1]],
-		[[&"raptors", 2], [&"gromp", 1], [BLUE_SENTINEL, 1]],
+		[[&"raptors", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
 		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
 	],
 	"3-2": [
 		[[&"raptors", 1], [&"wolves", 1], [&"gromp", 1]],
 		[[&"raptors", 1], [&"krugs", 1], [&"wolves", 1], [BLUE_SENTINEL, 1]],
 		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
-		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [INFERNAL_DRAKE, 1]],
+		[[&"raptors", 1], [&"wolves", 1], [INFERNAL_DRAKE, 1]],
 	],
 	"3-3": [
 		[[&"raptors", 2], [&"wolves", 1], [&"gromp", 1]],
@@ -76,7 +76,7 @@ const STAGES := {
 		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [BLUE_SENTINEL, 1]],
 		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
 		[[&"raptors", 2], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
-		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [OCEAN_DRAKE, 1]],
+		[[&"raptors", 1], [&"wolves", 1], [RED_BRAMBLEBACK, 1], [OCEAN_DRAKE, 1]],
 	],
 	"3-5": [
 		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1]],
@@ -189,9 +189,20 @@ const STAGES := {
 }
 ## Stage id -> the boss wave's enemy id.
 const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan", "3-5": &"elder_dragon", "4-3": &"dark_lucian", "5-5": &"karthus", "6-5": THRESH_FINAL}
-## Stage id -> enemy id -> its share of HP in that stage only. Act 1's stage
-## is gentler: its melee and ranged minions have 20% less HP.
-const HP_SHARES := {"1-1": {MELEE: 0.8, RANGED: 0.8}}
+## Stage id -> enemy id -> its share of HP in that stage only. The first
+## stage of every act is gentler: its normal enemies (and Act 2's elites)
+## have 20% less HP.
+const HP_SHARES := {
+	"1-1": {MELEE: 0.8, RANGED: 0.8},
+	"2-1": {MELEE: 0.8, RANGED: 0.8, SIEGE: 0.8, SUPER: 0.8},
+	"3-1": {&"raptor": 0.8, &"raptor_big": 0.8, &"murkwolf": 0.8, &"murkwolf_big": 0.8, &"krug": 0.8, &"krug_big": 0.8, &"gromp": 0.8},
+	"4-1": {SHADOW_MELEE: 0.8, SHADOW_RANGED: 0.8},
+	"5-1": {SPIDERLING: 0.8, SAPLING: 0.8},
+	"6-1": {MIST_WALKER: 0.8, LANTERN_SOUL: 0.8},
+}
+## Stage id -> enemy id -> its share of damage in that stage only. The
+## tutorial's minions hit 25% softer.
+const DAMAGE_SHARES := {"1-1": {MELEE: 0.75, RANGED: 0.75, SIEGE: 0.75}}
 
 
 static func has_stage(stage_id: String) -> bool:
@@ -201,6 +212,11 @@ static func has_stage(stage_id: String) -> bool:
 ## Enemy `id`'s share of HP in stage `stage_id` (1.0 unless listed).
 static func hp_share(stage_id: String, id: StringName) -> float:
 	return HP_SHARES.get(stage_id, {}).get(id, 1.0)
+
+
+## Enemy `id`'s share of damage in stage `stage_id` (1.0 unless listed).
+static func damage_share(stage_id: String, id: StringName) -> float:
+	return DAMAGE_SHARES.get(stage_id, {}).get(id, 1.0)
 
 
 ## Each wave as the enemy ids to spawn, in order.

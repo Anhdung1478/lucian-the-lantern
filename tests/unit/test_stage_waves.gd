@@ -185,9 +185,31 @@ func test_act_1_melee_and_ranged_minions_have_20_percent_less_hp() -> void:
 	assert_almost_eq(stage.spawn_enemy(WavePlan.SIEGE, at).max_hp, 700.0, 0.01)
 
 
-func test_act_2_minions_keep_their_hp() -> void:
+func test_act_1_minions_hit_25_percent_softer() -> void:
+	var stage: Stage = await _stage(1, 1)
+	var at := stage.arena.spawn_points[0]
+	assert_almost_eq(stage.spawn_enemy(WavePlan.MELEE, at).damage, 12.0 * 0.75, 0.01)
+	assert_almost_eq(stage.spawn_enemy(WavePlan.RANGED, at).damage, 18.0 * 0.75, 0.01)
+	assert_almost_eq(stage.spawn_enemy(WavePlan.SIEGE, at).damage, 40.0 * 0.75, 0.01)
+
+
+func test_the_first_stage_of_act_2_is_gentler_and_the_next_is_not() -> void:
 	var stage: Stage = await _stage(2, 1)
-	assert_almost_eq(stage.spawn_enemy(WavePlan.MELEE, stage.arena.spawn_points[0]).max_hp, 240.0 * 1.6, 0.01)
+	var at := stage.arena.spawn_points[0]
+	var act_2 := 1.0 + EnemyData.ACT_HP
+	assert_almost_eq(stage.spawn_enemy(WavePlan.MELEE, at).max_hp, 240.0 * act_2 * 0.8, 0.01)
+	assert_almost_eq(stage.spawn_enemy(WavePlan.SUPER, at).max_hp, 1150.0 * act_2 * 0.8, 0.01)
+	assert_almost_eq(stage.spawn_enemy(WavePlan.MELEE, at).damage, 12.0 * (1.0 + EnemyData.ACT_DAMAGE), 0.01, "damage stays")
+	var next: Stage = await _stage(2, 2)
+	assert_almost_eq(next.spawn_enemy(WavePlan.MELEE, next.arena.spawn_points[0]).max_hp, 240.0 * act_2, 0.01)
+
+
+func test_lucian_starts_at_the_acts_level_with_its_skill_points() -> void:
+	var stage: Stage = await _stage(4, 1)
+	assert_eq(stage.lucian.progress.level, 5)
+	assert_eq(stage.lucian.progress.skill_points(), 5)
+	assert_almost_eq(stage.lucian.hp, stage.lucian.stats.max_hp, 0.01, "full HP at his level")
+	assert_gt(stage.lucian.stats.max_hp, stage.lucian.base_stats.at_level(1).max_hp)
 
 
 func test_esc_does_nothing_on_the_result() -> void:

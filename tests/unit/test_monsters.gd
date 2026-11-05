@@ -106,8 +106,8 @@ func test_blues_slam_slows() -> void:
 	var blue := _monster("blue_sentinel", Vector2(400, 0))
 	var hit: bool = await wait_until(func() -> bool: return not received.is_empty(), 3.0)
 	assert_true(hit)
-	assert_almost_eq(lucian.slow_amount(), 0.3, 0.001)
-	assert_almost_eq(lucian._slows[&"blue_sentinel"].left, 1.5, 0.05)
+	assert_almost_eq(lucian.slow_amount(), 0.2, 0.001)
+	assert_almost_eq(lucian._slows[&"blue_sentinel"].left, 1.0, 0.05)
 	assert_eq(received[0][0].type, DamageInfo.Type.PHYSICAL)
 	assert_eq(blue.data.buff_on_kill, JungleBuffs.BLUE)
 
