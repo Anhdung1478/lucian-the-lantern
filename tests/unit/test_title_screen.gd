@@ -4,12 +4,15 @@ const BROKEN_PREFIX := "user://no_such_dir/test_title_save_slot_"
 
 var game: Game
 var quit_called := false
+## The save prefix the test runs with, put back after a test breaks it.
+var good_prefix := ""
 
 
 func before_each() -> void:
 	quit_called = false
 	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
 		SaveGame._instance = SaveGame.new("user://test_title_save_slot_")
+	good_prefix = SaveGame.instance().prefix
 	_delete_slots()
 	SaveGame.instance().load_slot(1)
 	game = load("res://src/main/game.tscn").instantiate()
@@ -19,6 +22,7 @@ func before_each() -> void:
 
 func after_each() -> void:
 	get_tree().paused = false
+	SaveGame.instance().prefix = good_prefix
 	_delete_slots()
 
 
@@ -458,7 +462,6 @@ func test_a_failed_new_game_save_shows_in_red_and_starts_nothing() -> void:
 	SaveGame.instance().load_slot(1)
 	SaveGame.instance().essences.add(Essences.BLUE, 7)
 	var kept := SaveGame.instance().to_dict()
-	var good_prefix := SaveGame.instance().prefix
 	SaveGame.instance().prefix = BROKEN_PREFIX
 	var title := _title()
 	watch_signals(title)
@@ -475,12 +478,10 @@ func test_a_failed_new_game_save_shows_in_red_and_starts_nothing() -> void:
 	kept.erase("saved_at")
 	now.erase("saved_at")
 	assert_eq(now, kept, "and its data")
-	SaveGame.instance().prefix = good_prefix
 	assert_push_warning_count(1)
 
 
 func test_back_from_the_difficulty_page_clears_the_failed_save_notice() -> void:
-	var good_prefix := SaveGame.instance().prefix
 	SaveGame.instance().prefix = BROKEN_PREFIX
 	var title := _title()
 	title.show_slots(false)
@@ -491,5 +492,4 @@ func test_back_from_the_difficulty_page_clears_the_failed_save_notice() -> void:
 	assert_true(title.is_showing_slots())
 	assert_eq(title.notice_label.text, "", "Back clears it")
 	assert_eq(title.error_label.text, "")
-	SaveGame.instance().prefix = good_prefix
 	assert_push_warning_count(1)
