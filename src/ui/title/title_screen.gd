@@ -4,7 +4,8 @@ extends Control
 ## game, Load game, Settings and Exit the game. The two game buttons turn
 ## the panel into the slot list. A new game in a used slot asks first, then
 ## the difficulty page picks Easy, Normal, Hard or Extreme and the slot is
-## written at once. Nothing is unsaved here, so Exit (and the
+## written at once (if it can't be, a red notice says so and the player stays
+## on that page). Nothing is unsaved here, so Exit (and the
 ## window's X) only ask "Exit the game?": Exit / Cancel, from the game root.
 ## The arrow keys and Enter work each page as the mouse does (MenuKeys).
 ## Behind it all, the TitleBackdrop tells the story: Lucian and Senna facing
@@ -16,6 +17,7 @@ signal exit_requested
 
 const LANTERN := preload("res://assets/art/ui/title_lantern.svg")
 const BUTTON_SIZE := Vector2(420, 64)
+const COULD_NOT_START := "Could not write slot %d. The game can't start until it can save."
 const BROKEN_LOAD := "Slot %d's save can't be read, so it can't be loaded.
 You can only overwrite it with a new game."
 const BROKEN_OVERWRITE := "Slot %d's save can't be read. Overwrite it with a new game?"
@@ -66,8 +68,11 @@ func show_menu() -> void:
 
 
 ## The slot list: for a new game (every slot), or to load (used slots only).
+## It clears an old error, such as a new game that could not be written.
 func show_slots(loading: bool) -> void:
 	_loading = loading
+	error_label.text = ""
+	notice_label.text = ""
 	_slots_title.text = "LOAD GAME" if loading else "START NEW GAME"
 	slot_list.refresh(0, not loading)
 	_menu.visible = false
@@ -140,11 +145,15 @@ func _on_picked(slot: int, used: bool) -> void:
 		show_difficulty(slot)
 
 
+## Writes the new game. If the slot can't be written the game doesn't start:
+## the player stays on the difficulty page with a red notice and the error
+## sound, as the main screen does for a stage.
 func _start_new(level: int) -> void:
 	if SaveGame.instance().start_new(_new_slot, level):
 		new_game_started.emit()
 	else:
-		error_label.text = "Could not write slot %d" % _new_slot
+		notice_label.text = COULD_NOT_START % _new_slot
+		Sfx.play(&"error")
 
 
 func _build() -> void:

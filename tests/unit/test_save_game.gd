@@ -471,3 +471,19 @@ func test_the_endless_best_survives_save_and_load() -> void:
 	assert_eq(loaded.endless_best, 12)
 	assert_false(loaded.record_endless(11))
 	assert_eq(loaded.endless_best, 12)
+
+
+func test_a_failed_start_new_puts_the_slot_and_progress_back() -> void:
+	save_game.slot = 3
+	save_game.essences.add(Essences.BLUE, 9)
+	save_game.difficulty = Difficulty.HARD
+	var before := save_game.to_dict()
+	save_game.prefix = "user://no_such_dir/test_save_slot_"
+	assert_false(save_game.start_new(2, Difficulty.EXTREME))
+	assert_eq(save_game.slot, 3)
+	assert_eq(save_game.difficulty, Difficulty.HARD)
+	var after := save_game.to_dict()
+	before.erase("saved_at")
+	after.erase("saved_at")
+	assert_eq(after, before)
+	assert_push_warning_count(1)

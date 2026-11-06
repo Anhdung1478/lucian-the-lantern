@@ -1,5 +1,7 @@
 extends GutTest
 
+const BROKEN_PREFIX := "user://no_such_dir/test_title_save_slot_"
+
 var game: Game
 var quit_called := false
 
@@ -450,3 +452,44 @@ func test_a_new_game_on_a_broken_slot_asks_to_overwrite_it() -> void:
 	_title().confirm.answer(true)
 	assert_true(_title().is_showing_difficulty())
 	assert_eq(_title()._new_slot, 3)
+
+
+func test_a_failed_new_game_save_shows_in_red_and_starts_nothing() -> void:
+	SaveGame.instance().load_slot(1)
+	SaveGame.instance().essences.add(Essences.BLUE, 7)
+	var kept := SaveGame.instance().to_dict()
+	var good_prefix := SaveGame.instance().prefix
+	SaveGame.instance().prefix = BROKEN_PREFIX
+	var title := _title()
+	watch_signals(title)
+	title.show_slots(false)
+	title.slot_list.buttons[1].pressed.emit()
+	title.difficulty_buttons[Difficulty.HARD].pressed.emit()
+	assert_true(title.is_showing_difficulty(), "the player stays on the difficulty page")
+	assert_eq(title.notice_label.text, "Could not write slot 2. The game can't start until it can save.")
+	assert_true(title.notice_label.is_visible_in_tree(), "the notice shows on this page")
+	assert_signal_not_emitted(title, "new_game_started")
+	assert_is(game.screen, TitleScreen, "nothing started")
+	assert_eq(SaveGame.instance().slot, 1, "the old slot is back")
+	var now := SaveGame.instance().to_dict()
+	kept.erase("saved_at")
+	now.erase("saved_at")
+	assert_eq(now, kept, "and its data")
+	SaveGame.instance().prefix = good_prefix
+	assert_push_warning_count(1)
+
+
+func test_back_from_the_difficulty_page_clears_the_failed_save_notice() -> void:
+	var good_prefix := SaveGame.instance().prefix
+	SaveGame.instance().prefix = BROKEN_PREFIX
+	var title := _title()
+	title.show_slots(false)
+	title.slot_list.buttons[1].pressed.emit()
+	title.difficulty_buttons[Difficulty.NORMAL].pressed.emit()
+	assert_ne(title.notice_label.text, "")
+	title.find_button("Back").pressed.emit()
+	assert_true(title.is_showing_slots())
+	assert_eq(title.notice_label.text, "", "Back clears it")
+	assert_eq(title.error_label.text, "")
+	SaveGame.instance().prefix = good_prefix
+	assert_push_warning_count(1)

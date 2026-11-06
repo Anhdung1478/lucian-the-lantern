@@ -144,12 +144,21 @@ func reset() -> void:
 
 
 ## A new game on `level` (a Difficulty level) in slot `of_slot`, which
-## becomes current and is written at once (it replaces what was there).
+## becomes current and is written at once (it replaces what was there). If
+## the write fails the slot and the progress held before come back, so
+## memory is never left as a half-made new game.
 func start_new(of_slot: int, level := Difficulty.NORMAL) -> bool:
+	var before := to_dict()
+	var before_slot := slot
 	slot = of_slot
 	reset()
 	difficulty = level if Difficulty.is_level(level) else Difficulty.NORMAL
-	return save()
+	if save():
+		return true
+	_apply(before)
+	slot = before_slot
+	changed.emit()
+	return false
 
 
 func any_slot_exists() -> bool:
