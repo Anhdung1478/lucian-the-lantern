@@ -310,10 +310,6 @@ func _die() -> void:
 	super()
 
 
-func _exit_tree() -> void:
-	_hide_culling_band()
-
-
 ## The dark laser along Q's line, and its hit on Lucian if he is in it. A
 ## dead Dark Lucian fires nothing.
 func _fire_laser(from: Vector2, toward: Vector2) -> void:
