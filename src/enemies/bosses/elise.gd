@@ -87,8 +87,13 @@ func rappel() -> float:
 	return RAPPEL_TIME + RECOVER
 
 
+## Rappel waits for 85% HP, and never starts while Lucian is stunned (he
+## couldn't step out of its circle); she tries something else, and Rappel
+## keeps its cooldown.
 func _can_use(id: StringName) -> bool:
-	return id != &"rappel" or hp <= max_hp * RAPPEL_HP
+	if id != &"rappel":
+		return true
+	return hp <= max_hp * RAPPEL_HP and not (is_instance_valid(target) and target.has_cc(CrowdControl.Kind.STUN))
 
 
 ## Nothing while she is up: no walking, no shots, no skills.

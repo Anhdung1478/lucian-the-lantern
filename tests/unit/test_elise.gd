@@ -145,6 +145,24 @@ func test_rappel_hits_160_magic_inside_the_locked_circle() -> void:
 		assert_eq([hits[0][0].amount, hits[0][0].type, hits[0][0].from_skill], [160.0, DamageInfo.Type.MAGIC, true])
 
 
+func test_no_rappel_while_lucian_is_stunned_and_it_comes_after() -> void:
+	var boss := _elise(Vector2.ZERO)
+	boss._cooldowns[&"rappel"] = 0.0
+	boss._cooldowns[&"cocoon"] = 1000.0
+	boss.hp = boss.max_hp * 0.5
+	lucian.global_position = Vector2(400, 0)
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.5)
+	await wait_physics_frames(1)
+	boss._think(0.1)
+	assert_false(boss.untargetable, "no Rappel during the stun")
+	assert_eq(boss._cooldowns[&"rappel"], 0.0, "its cooldown isn't spent")
+	await wait_seconds(0.7)
+	assert_false(lucian.has_cc(CrowdControl.Kind.STUN))
+	boss._think(0.1)
+	assert_true(boss.untargetable, "Rappel after the stun")
+	assert_gt(boss._cooldowns[&"rappel"], 15.8)
+
+
 func test_rappel_waits_for_85_percent_and_the_skills_have_cooldowns() -> void:
 	var boss := _elise(Vector2.ZERO)
 	boss._cooldowns[&"rappel"] = 0.0
