@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/items/mercurys_treads.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[resource]
+script = ExtResource("3_data")
+id = &"mercurys_treads"
+display_name = "Mercury's Treads"
+kind = 3
+code = "MT"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"move_speed": 45.0,
+&"mr": 20.0,
+&"tenacity": 0.3
+})
+boots_tier = 2
+upgrade_fragment = &"negatron_cloak"
+upgrade_cost = 550

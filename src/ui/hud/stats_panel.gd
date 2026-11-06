@@ -11,7 +11,8 @@ const MAIN: Array[StringName] = [
 ]
 const EXTRA: Array[StringName] = [
 	&"regen", &"heal_shield_power", &"armor_pen", &"magic_pen",
-	&"lifesteal", &"omnivamp", &"attack_range", &"tenacity",
+	&"magic_pen_flat", &"lifesteal", &"omnivamp", &"attack_range",
+	&"tenacity", &"slow_resist", &"summoner_haste",
 ]
 
 var lucian: Lucian

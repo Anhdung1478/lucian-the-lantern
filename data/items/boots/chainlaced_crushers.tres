@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_effect"]
+[ext_resource type="Texture2D" path="res://assets/art/items/chainlaced_crushers.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_noxian_persistence"]
+script = ExtResource("1_effect")
+effect_name = "Noxian Persistence"
+description = "Taking [magic]magic damage[/magic] grants a shield against magic damage of 100-200 (by level) [hp]+8% bonus health[/hp] for 5 s. 15 s cooldown."
+
+[resource]
+script = ExtResource("3_data")
+id = &"chainlaced_crushers"
+display_name = "Chainlaced Crushers"
+kind = 3
+code = "CC"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"move_speed": 45.0,
+&"mr": 25.0,
+&"tenacity": 0.3
+})
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_noxian_persistence")])
+boots_tier = 3
+upgrade_from = &"mercurys_treads"
+upgrade_fragment = &"negatron_cloak"
+upgrade_cost = 500

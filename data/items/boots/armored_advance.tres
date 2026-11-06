@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_effect"]
+[ext_resource type="Texture2D" path="res://assets/art/items/armored_advance.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_plating"]
+script = ExtResource("1_effect")
+effect_name = "Plating"
+description = "Enemy basic attacks deal 10% less damage. Burns don't count."
+
+[sub_resource type="Resource" id="Resource_noxian_endurance"]
+script = ExtResource("1_effect")
+effect_name = "Noxian Endurance"
+description = "Taking [phys]physical damage[/phys] grants a shield against physical damage of 100-200 (by level) [hp]+8% bonus health[/hp] for 5 s. 15 s cooldown."
+
+[resource]
+script = ExtResource("3_data")
+id = &"armored_advance"
+display_name = "Armored Advance"
+kind = 3
+code = "AA"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"armor": 35.0,
+&"move_speed": 45.0
+})
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_plating"), SubResource("Resource_noxian_endurance")])
+boots_tier = 3
+upgrade_from = &"plated_steelcaps"
+upgrade_fragment = &"chain_vest"
+upgrade_cost = 500

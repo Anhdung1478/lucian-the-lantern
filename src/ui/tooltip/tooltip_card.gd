@@ -13,13 +13,18 @@ const SUB_COLOR := Color("9aa3b2")
 const UPGRADE_COLOR := "7fd67f"
 ## A locked skill's note ("Locked: clear Act 1 to unlock it…").
 const LOCKED_COLOR := "ff6a5a"
-const KIND_NAMES := {ItemData.Kind.FRAGMENT: "Fragment", ItemData.Kind.LEGENDARY: "Legendary", ItemData.Kind.POTION: "Potion"}
+const KIND_NAMES := {
+	ItemData.Kind.FRAGMENT: "Fragment", ItemData.Kind.LEGENDARY: "Legendary", ItemData.Kind.POTION: "Potion",
+	ItemData.Kind.BOOTS: "Boots",
+}
 
 
 static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 	var icon := ItemIcon.new(shown)
 	icon.tooltips = false
 	var cost := TooltipText.color("%d gold" % shown.cost, TooltipText.GOLD)
+	if shown.is_boots():
+		cost = TooltipText.color("Can't be sold", TooltipText.DIM)
 	var card := _card(icon, shown.display_name, KIND_NAMES[shown.kind], cost)
 	var stats: PackedStringArray = []
 	for key: StringName in shown.stats:
@@ -39,7 +44,10 @@ static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 	if shown.is_fragment():
 		footer = "Drag onto another fragment to craft a legendary."
 	elif shown.is_potion():
-		footer = "Right-click it in the backpack to drink, or put it in slot 1-6 and press its key. Stacks up to %d." % shown.max_stack
+		var key := GameSettings.instance().key_label(Inventory.key_action(Inventory.potion_cell(shown)))
+		footer = "Right-click it in the backpack to drink, or put it in its potion cell and press %s. Stacks up to %d." % [key, shown.max_stack]
+	elif shown.is_boots():
+		footer = boots_footer(shown, catalog)
 	elif catalog and shown.components.size() == 2:
 		footer = "Recipe: %s + %s" % [
 			catalog.find(shown.components[0]).display_name, catalog.find(shown.components[1]).display_name]
@@ -47,6 +55,25 @@ static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 		_separator(card)
 		_body(card, TooltipText.color(footer, TooltipText.DIM))
 	return card
+
+
+## How `shown` boots upgrade at the merchant's Boots tab, or "Fully upgraded."
+static func boots_footer(shown: ItemData, catalog: ItemCatalog) -> String:
+	if catalog == null or shown.boots_tier >= 3:
+		return "Fully upgraded."
+	if shown.boots_tier == 1:
+		var lines := catalog.boots().map(func(boots: ItemData) -> StringName: return boots.upgrade_fragment)
+		var others := catalog.fragments().filter(func(fragment: ItemData) -> bool: return not lines.has(fragment.id))
+		var text := "Upgrade at the merchant's Boots tab with a fragment: each one makes its own boots"
+		if others.is_empty():
+			return text + "."
+		return text + " (all but %s)." % ", ".join(others.map(func(fragment: ItemData) -> String: return fragment.display_name))
+	for boots in catalog.boots():
+		if boots.upgrade_from == shown.id:
+			var fragment := catalog.find(boots.upgrade_fragment)
+			return "Upgrade at the merchant with a %s (%d gold) into %s." % [
+				fragment.display_name if fragment else String(boots.upgrade_fragment), boots.upgrade_cost, boots.display_name]
+	return "Fully upgraded."
 
 
 ## "Restores 200 HP over 5 s." with the HP / mana colored.

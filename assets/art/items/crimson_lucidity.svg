@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Crimson Lucidity: the Ionian boot dyed crimson, with blue bands and a longer blue ribbon, a gold cuff and toe tip, and a glowing sapphire -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e3266"/><stop offset="1" stop-color="#0a0818"/></linearGradient><radialGradient id="aura"><stop offset="0" stop-color="#7cc4ff" stop-opacity="0.45"/><stop offset="1" stop-color="#3a7fe0" stop-opacity="0"/></radialGradient><linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2404c"/><stop offset="1" stop-color="#6a0c1c"/></linearGradient><radialGradient id="gem" cx="0.4" cy="0.35" r="0.65"><stop offset="0" stop-color="#eafaff"/><stop offset="0.45" stop-color="#4fa8ff"/><stop offset="1" stop-color="#1450b0"/></radialGradient><clipPath id="upper"><path d="M 19 10 L 38 10 L 38.5 29 C 45 33 53 35 61 33 C 60.5 40 58.5 45 55 46 L 16.5 46 C 16 36 17.5 22 19 10 Z"/></clipPath></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="32" cy="30" r="28" fill="url(#aura)"/>
+  <path d="M 2 40 L 12 40 M 4 48 L 12 48" stroke="#cfe6ff" stroke-width="2.2" stroke-linecap="round" opacity="0.6"/>
+  <path d="M 18 8 C 13 4 9 8.5 2.5 6 C 5 11 9 13 13 12 C 9.5 15 6.5 20 2 22 C 8 23.5 14 19 18.5 13 Z" fill="#3a7fea" stroke="#0a1830" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M 16 9.6 C 12 7.6 9 9.6 5 8.4 M 16.5 13 C 13 16.5 9.5 19.8 5.5 21.2" fill="none" stroke="#e0b04a" stroke-width="1" stroke-linecap="round"/>
+  <path d="M 15 45 L 54 45 C 58 44.5 60.5 41 61.5 36.5 C 62.5 44 60 51.5 55 52 L 30 52 L 29 56 L 16 56 Z" fill="#2a0a14" stroke="#0a0818" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 17.5 48.6 L 56 48.6" stroke="#e0b04a" stroke-width="1.2"/>
+  <path d="M 19 10 L 38 10 L 38.5 29 C 45 33 53 35 61 33 C 60.5 40 58.5 45 55 46 L 16.5 46 C 16 36 17.5 22 19 10 Z" fill="url(#leather)"/>
+  <g clip-path="url(#upper)">
+    <path d="M 10 25 L 44 15 L 44 20 L 10 30 Z M 10 36 L 44 26 L 44 31 L 10 41 Z" fill="#3a7fea"/>
+    <path d="M 10 25 L 44 15 M 10 36 L 44 26" stroke="#9cc8ff" stroke-width="1.1"/>
+    <path d="M 10 30 L 44 20 M 10 41 L 44 31" stroke="#e0b04a" stroke-width="1"/>
+    <path d="M 52 34 C 54.5 38 54.5 42 52.5 46 L 64 46 L 64 30 Z" fill="#e0b04a"/>
+    <path d="M 52 34 C 54.5 38 54.5 42 52.5 46" fill="none" stroke="#0a0818" stroke-width="1.4"/>
+  </g>
+  <path d="M 19 10 L 38 10 L 38.5 29 C 45 33 53 35 61 33 C 60.5 40 58.5 45 55 46 L 16.5 46 C 16 36 17.5 22 19 10 Z" fill="none" stroke="#0a0818" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 40.5 31.8 C 44 33.6 47.5 34.6 50.5 35" fill="none" stroke="#ff9a9a" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M 54.5 35.6 C 56.5 35.6 58 35.2 59.5 34.6" fill="none" stroke="#fff0b0" stroke-width="1.1" stroke-linecap="round"/>
+  <path d="M 17 5 L 40 5 L 40.5 13.5 L 16.5 13.5 Z" fill="#e0b04a" stroke="#0a0818" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 18.5 7.4 L 38.8 7.4" stroke="#fff0b0" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M 19 11.2 L 38.5 11.2" stroke="#3a7fea" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="35" cy="9.5" r="6" fill="url(#aura)"/>
+  <path d="M 35 5 L 38.6 9.3 L 35 13.6 L 31.4 9.3 Z" fill="url(#gem)" stroke="#0a1830" stroke-width="1.1" stroke-linejoin="round"/>
+  <circle cx="34.2" cy="8.2" r="0.8" fill="#ffffff"/>
+  <path d="M 50 13 L 51 16 L 54 17 L 51 18 L 50 21 L 49 18 L 46 17 L 49 16 Z" fill="#e8f4ff"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

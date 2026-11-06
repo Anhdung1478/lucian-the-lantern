@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Slow Resist: a boot breaking out of a block of ice -->
+  <path d="M 22 8 L 37 8 L 37 31 L 52 37 C 57 39 57 49 52 49 L 22 49 Z" fill="#6fe6f2" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 23 43 L 55 43" stroke="#1a1d24" stroke-width="2"/>
+  <path d="M 4 27 L 13 21 L 18 29 L 13 38 L 5 36 Z" fill="#d8fbff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 43 16 L 53 10 L 60 18 L 53 26 L 44 24 Z" fill="#d8fbff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 13 21 L 12 29 L 18 29 M 12 29 L 13 38 M 53 10 L 51 18 L 60 18 M 51 18 L 53 26" fill="none" stroke="#6fe6f2" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M 20 17 L 16 14 M 40 23 L 44 27 M 21 41 L 17 44" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 20 17 L 16 14 M 40 23 L 44 27 M 21 41 L 17 44" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+</svg>

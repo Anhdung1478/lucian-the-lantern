@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_effect"]
+[ext_resource type="Texture2D" path="res://assets/art/items/crimson_lucidity.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_noxian_haste"]
+script = ExtResource("1_effect")
+effect_name = "Noxian Haste"
+description = "Hitting an enemy with a skill or casting a summoner spell grants [ms]8% move speed[/ms] for 4 s. Once every 4 s."
+
+[resource]
+script = ExtResource("3_data")
+id = &"crimson_lucidity"
+display_name = "Crimson Lucidity"
+kind = 3
+code = "CL"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"ability_haste": 20.0,
+&"move_speed": 45.0,
+&"summoner_haste": 20.0
+})
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_noxian_haste")])
+boots_tier = 3
+upgrade_from = &"ionian_boots_of_lucidity"
+upgrade_fragment = &"tear_of_the_goddess"
+upgrade_cost = 500

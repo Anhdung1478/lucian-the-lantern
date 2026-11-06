@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/items/ionian_boots_of_lucidity.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[resource]
+script = ExtResource("3_data")
+id = &"ionian_boots_of_lucidity"
+display_name = "Ionian Boots of Lucidity"
+kind = 3
+code = "IB"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"ability_haste": 10.0,
+&"move_speed": 45.0,
+&"summoner_haste": 10.0
+})
+boots_tier = 2
+upgrade_fragment = &"tear_of_the_goddess"
+upgrade_cost = 350

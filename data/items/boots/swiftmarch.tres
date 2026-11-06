@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_effect"]
+[ext_resource type="Texture2D" path="res://assets/art/items/swiftmarch.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_noxian_fervor"]
+script = ExtResource("1_effect")
+effect_name = "Noxian Fervor"
+description = "Gain adaptive force equal to 5% of [ms]move speed[/ms]: [ad]0.6 AD[/ad] per point, or [ap]1 AP[/ap] when bonus AP is higher than bonus AD."
+
+[resource]
+script = ExtResource("3_data")
+id = &"swiftmarch"
+display_name = "Swiftmarch"
+kind = 3
+code = "SW"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"move_speed": 65.0,
+&"slow_resist": 0.25
+})
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_noxian_fervor")])
+boots_tier = 3
+upgrade_from = &"boots_of_swiftness"
+upgrade_fragment = &"cloak_of_agility"
+upgrade_cost = 500

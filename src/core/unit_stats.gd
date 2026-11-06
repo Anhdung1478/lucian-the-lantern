@@ -55,6 +55,7 @@ func at_level(level: int, bonus: Dictionary = {}) -> StatBlock:
 	block.ability_haste = bonus.get(&"ability_haste", 0.0)
 	block.attack_range = attack_range
 	block.crit_damage = crit_damage
-	for key in [&"lifesteal", &"omnivamp", &"armor_pen", &"magic_pen", &"heal_shield_power", &"tenacity"]:
+	for key in [&"lifesteal", &"omnivamp", &"armor_pen", &"magic_pen", &"heal_shield_power", &"tenacity",
+			&"slow_resist", &"summoner_haste", &"magic_pen_flat"]:
 		block.set(key, bonus.get(key, 0.0))
 	return block

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/items/boots_of_swiftness.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[resource]
+script = ExtResource("3_data")
+id = &"boots_of_swiftness"
+display_name = "Boots of Swiftness"
+kind = 3
+code = "BW"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"move_speed": 55.0,
+&"slow_resist": 0.25
+})
+boots_tier = 2
+upgrade_fragment = &"cloak_of_agility"
+upgrade_cost = 700

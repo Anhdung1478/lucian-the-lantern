@@ -1,9 +1,13 @@
 class_name Inventory
 extends RefCounted
-## Lucian's items in a stage: 54 backpack cells (a 9x6 grid) and 6 equip slots in one
-## index space (0-53 backpack, 54-59 equip). Only the unlocked backpack cells
-## take items and only the unlocked equip slots give stats.
+## Lucian's items in a stage: 54 backpack cells (a 9x6 grid), 6 equip slots,
+## the two potion cells and the boots cell in one index space (0-53 backpack,
+## 54-59 equip, 60 Health potion, 61 Mana potion, 62 boots). Only the unlocked
+## backpack cells take items and only the unlocked equip slots give stats; the
+## potion cells and the boots cell are never locked.
 ## Potions stack up to their max_stack in one cell; everything else is 1.
+## Potions go only in the backpack and their potion cell, never in an equip
+## slot. Boots live only in the boots cell: they never move by drag.
 
 signal changed
 
@@ -13,7 +17,13 @@ enum Drop { RETURN, MOVE, SWAP, CRAFT, STACK }
 const BACKPACK_SIZE := 54
 const EQUIP_SIZE := 6
 const EQUIP_START := BACKPACK_SIZE
-const SIZE := BACKPACK_SIZE + EQUIP_SIZE
+const EQUIP_END := EQUIP_START + EQUIP_SIZE
+## Keys 7 and 8 drink from these (key_action).
+const HP_POTION_CELL := EQUIP_END
+const MP_POTION_CELL := EQUIP_END + 1
+## The boots bought in the Evolution Tree; they count as equipped.
+const BOOTS_CELL := EQUIP_END + 2
+const SIZE := EQUIP_END + 3
 
 var catalog: ItemCatalog
 ## Null for an empty cell.
@@ -37,7 +47,7 @@ var unlocked_backpack := BACKPACK_SIZE:
 var unlocked_equip := EQUIP_SIZE:
 	set(value):
 		unlocked_equip = clampi(value, 1, EQUIP_SIZE)
-		for i in range(EQUIP_START + unlocked_equip, SIZE):
+		for i in range(EQUIP_START + unlocked_equip, EQUIP_END):
 			var empty := _first_empty_backpack_cell()
 			if items[i] and empty >= 0:
 				_set_cell(empty, items[i], counts[i])
@@ -52,13 +62,59 @@ func _init(item_catalog: ItemCatalog = null) -> void:
 
 
 static func is_equip(index: int) -> bool:
-	return index >= EQUIP_START and index < SIZE
+	return index >= EQUIP_START and index < EQUIP_END
 
 
+## The potion cells and the boots cell are never locked.
 func is_locked(index: int) -> bool:
 	if index < EQUIP_START:
 		return index >= unlocked_backpack
-	return index >= EQUIP_START + unlocked_equip
+	if index < EQUIP_END:
+		return index >= EQUIP_START + unlocked_equip
+	return false
+
+
+## The input action whose key uses cell `index`: &"item_1".."item_6" for the
+## equip slots, &"potion_hp" and &"potion_mp" for the potion cells, &"" for
+## the rest.
+static func key_action(index: int) -> StringName:
+	if is_equip(index):
+		return StringName("item_%d" % (index - EQUIP_START + 1))
+	match index:
+		HP_POTION_CELL:
+			return &"potion_hp"
+		MP_POTION_CELL:
+			return &"potion_mp"
+	return &""
+
+
+## Whether cell `index` may hold `item` (null fits anywhere): the backpack
+## takes anything but boots, the equip slots anything but potions and boots,
+## each potion cell only its kind of potion, and the boots cell nothing (boots
+## are put there with set_boots).
+static func accepts(index: int, item: ItemData) -> bool:
+	if item == null:
+		return true
+	if index < EQUIP_START:
+		return not item.is_boots()
+	if index < EQUIP_END:
+		return not item.is_potion() and not item.is_boots()
+	match index:
+		HP_POTION_CELL:
+			return item.is_potion() and item.restore_hp > 0.0
+		MP_POTION_CELL:
+			return item.is_potion() and item.restore_mana > 0.0
+	return false
+
+
+## The potion cell `item` goes in (Health for a potion restoring both), or -1
+## when it is not a potion.
+static func potion_cell(item: ItemData) -> int:
+	if item == null or not item.is_potion():
+		return -1
+	if item.restore_hp > 0.0:
+		return HP_POTION_CELL
+	return MP_POTION_CELL if item.restore_mana > 0.0 else -1
 
 
 func item_at(index: int) -> ItemData:
@@ -69,40 +125,44 @@ func count_at(index: int) -> int:
 	return counts[index]
 
 
-## How many more of `item` the backpack takes: room left in its stacks plus
-## empty cells, in the unlocked cells only.
+## How many more of `item` fit: room in a potion's own potion cell, then in
+## the backpack's stacks and empty cells (unlocked cells only). Boots never
+## fit.
 func space_for(item: ItemData) -> int:
+	if item.is_boots():
+		return 0
 	var room := 0
+	var cell := potion_cell(item)
+	if cell >= 0:
+		room += _room_in(cell, item)
 	for i in unlocked_backpack:
-		if items[i] == null:
-			room += item.max_stack
-		elif items[i] == item:
-			room += item.max_stack - counts[i]
+		room += _room_in(i, item)
 	return room
 
 
-## Puts `amount` of `item` in the backpack: first into its stacks with room,
-## then into the first empty cells. All or nothing: false when it doesn't fit.
+## Puts `amount` of `item` away: a potion fills its potion cell first; then
+## the backpack's stacks with room, then its first empty cells. All or
+## nothing: false when it doesn't fit.
 func add(item: ItemData, amount := 1) -> bool:
 	if space_for(item) < amount:
 		return false
+	var cell := potion_cell(item)
+	if cell >= 0:
+		amount = _fill(cell, item, amount)
 	for pass_empty in [false, true]:
 		for i in unlocked_backpack:
 			if amount == 0:
 				break
-			var fits := items[i] == item if not pass_empty else items[i] == null
-			if fits:
-				var moved := mini(amount, item.max_stack - counts[i])
-				_set_cell(i, item, counts[i] + moved)
-				amount -= moved
+			if (items[i] == null) == pass_empty:
+				amount = _fill(i, item, amount)
 	changed.emit()
 	return true
 
 
-## True when one `item` fits in cell `index`: an empty unlocked cell, or a
-## stack of the same item with room.
+## True when one `item` fits in cell `index`: an empty unlocked cell that
+## accepts it, or a stack of the same item with room.
 func can_put(index: int, item: ItemData) -> bool:
-	if index < 0 or index >= SIZE or is_locked(index):
+	if index < 0 or index >= SIZE or is_locked(index) or not accepts(index, item):
 		return false
 	return items[index] == null or (items[index] == item and counts[index] < item.max_stack)
 
@@ -137,9 +197,24 @@ func take_one(index: int) -> ItemData:
 	return item
 
 
+## Empties every cell but the boots cell: the boots stay for the stage.
 func clear() -> void:
+	var kept := boots()
 	items.fill(null)
 	counts.fill(0)
+	_set_cell(BOOTS_CELL, kept, 1)
+	changed.emit()
+
+
+## The boots in the boots cell, or null.
+func boots() -> ItemData:
+	return items[BOOTS_CELL]
+
+
+## Puts `item` in the boots cell, replacing what was there (null empties it).
+## Only the stage setup, the merchant's upgrade and the debug table call it.
+func set_boots(item: ItemData) -> void:
+	_set_cell(BOOTS_CELL, item, 1)
 	changed.emit()
 
 
@@ -153,8 +228,12 @@ func craft_result(from: int, to: int) -> ItemData:
 
 ## What dropping the item from `from` onto `to` does. `to` is -1 outside any
 ## cell. `craft_ready` is true once the craft pop-up's line has gone around.
+## Boots never move, and a cell that doesn't accept the item moving in (or,
+## on a swap, the item coming back) sends it back.
 func drop_outcome(from: int, to: int, craft_ready: bool) -> Drop:
 	if to < 0 or to >= SIZE or to == from or items[from] == null or is_locked(to) or is_locked(from):
+		return Drop.RETURN
+	if from == BOOTS_CELL or to == BOOTS_CELL or not accepts(to, items[from]):
 		return Drop.RETURN
 	if items[to] == null:
 		return Drop.MOVE
@@ -162,6 +241,8 @@ func drop_outcome(from: int, to: int, craft_ready: bool) -> Drop:
 		return Drop.STACK
 	if craft_ready and craft_result(from, to) != null:
 		return Drop.CRAFT
+	if not accepts(from, items[to]):
+		return Drop.RETURN
 	return Drop.SWAP
 
 
@@ -188,7 +269,7 @@ func apply_drop(from: int, to: int, craft_ready: bool) -> Drop:
 	return outcome
 
 
-## Stats from the unlocked equip slots, summed by ItemStats key.
+## Stats from the unlocked equip slots and the boots, summed by ItemStats key.
 func equipped_bonus() -> Dictionary:
 	var bonus := {}
 	for item in equipped():
@@ -197,18 +278,37 @@ func equipped_bonus() -> Dictionary:
 	return bonus
 
 
-## The items in the unlocked equip slots, duplicates included.
+## The items in the unlocked equip slots, duplicates included, then the boots.
 func equipped() -> Array[ItemData]:
 	var found: Array[ItemData] = []
 	for i in range(EQUIP_START, EQUIP_START + unlocked_equip):
 		if items[i]:
 			found.append(items[i])
+	if boots():
+		found.append(boots())
 	return found
 
 
 func _set_cell(index: int, item: ItemData, count: int) -> void:
 	items[index] = item
 	counts[index] = count if item else 0
+
+
+## How many more of `item` cell `index` takes: a full stack when empty, the
+## rest of its stack, or 0 when it holds another item.
+func _room_in(index: int, item: ItemData) -> int:
+	if items[index] == null:
+		return item.max_stack
+	return item.max_stack - counts[index] if items[index] == item else 0
+
+
+## Puts up to `amount` of `item` in cell `index` (empty or the same item);
+## returns how many are left over.
+func _fill(index: int, item: ItemData, amount: int) -> int:
+	var moved := mini(amount, _room_in(index, item))
+	if moved > 0:
+		_set_cell(index, item, counts[index] + moved)
+	return amount - moved
 
 
 func _first_empty_backpack_cell() -> int:

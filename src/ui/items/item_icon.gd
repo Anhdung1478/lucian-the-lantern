@@ -9,6 +9,7 @@ const CODE_COLORS := {
 	"CR": Color("d9d2b0"), "HP": Color("a83248"), "MP": Color("2f6fc4"), "MR": Color("6a3f8f"),
 }
 const LEGENDARY_COLOR := Color("8a6a2a")
+const BOOTS_COLOR := Color("5c4a36")
 const BORDER_COLOR := Color(0.07, 0.08, 0.1)
 
 var item: ItemData:
@@ -34,16 +35,21 @@ func _draw() -> void:
 	draw_item(self, item, Rect2(Vector2.ZERO, size))
 
 
-## Shared with cells that draw an item inside their own frame.
-static func draw_item(canvas: CanvasItem, shown: ItemData, rect: Rect2) -> void:
+## Shared with cells that draw an item inside their own frame. `tint` fades
+## an empty cell's placeholder.
+static func draw_item(canvas: CanvasItem, shown: ItemData, rect: Rect2, tint := Color.WHITE) -> void:
 	if shown == null:
 		return
 	if shown.icon:
-		canvas.draw_texture_rect(shown.icon, rect, false)
+		canvas.draw_texture_rect(shown.icon, rect, false, tint)
 		return
-	var fill: Color = CODE_COLORS.get(shown.code, LEGENDARY_COLOR) if shown.is_fragment() else LEGENDARY_COLOR
-	canvas.draw_rect(rect, fill)
-	canvas.draw_rect(rect.grow(-1.0), BORDER_COLOR, false, 2.0)
+	var fill := LEGENDARY_COLOR
+	if shown.is_fragment():
+		fill = CODE_COLORS.get(shown.code, LEGENDARY_COLOR)
+	elif shown.is_boots():
+		fill = BOOTS_COLOR
+	canvas.draw_rect(rect, fill * tint)
+	canvas.draw_rect(rect.grow(-1.0), BORDER_COLOR * tint, false, 2.0)
 	var font := ThemeDB.fallback_font
 	var font_size := int(rect.size.y * 0.3)
 	var text_color := Color.BLACK if fill.get_luminance() > 0.6 else Color.WHITE

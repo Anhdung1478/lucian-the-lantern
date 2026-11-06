@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/items/gunmetal_greaves.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[resource]
+script = ExtResource("3_data")
+id = &"gunmetal_greaves"
+display_name = "Gunmetal Greaves"
+kind = 3
+code = "GG"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"attack_speed": 0.45,
+&"lifesteal": 0.05,
+&"move_speed": 45.0
+})
+boots_tier = 3
+upgrade_from = &"berserkers_greaves"
+upgrade_fragment = &"recurve_bow"
+upgrade_cost = 500

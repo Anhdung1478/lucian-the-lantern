@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_effect"]
+[ext_resource type="Texture2D" path="res://assets/art/items/plated_steelcaps.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_plating"]
+script = ExtResource("1_effect")
+effect_name = "Plating"
+description = "Enemy basic attacks deal 10% less damage. Burns don't count."
+
+[resource]
+script = ExtResource("3_data")
+id = &"plated_steelcaps"
+display_name = "Plated Steelcaps"
+kind = 3
+code = "PS"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"armor": 25.0,
+&"move_speed": 45.0
+})
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_plating")])
+boots_tier = 2
+upgrade_fragment = &"chain_vest"
+upgrade_cost = 600

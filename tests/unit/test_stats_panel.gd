@@ -25,7 +25,7 @@ func test_panels_have_one_cell_per_stat() -> void:
 	extra.keys = StatsPanel.EXTRA
 	add_child_autofree(extra)
 	var grid := extra.get_child(0)
-	assert_eq(grid.get_child_count(), 8)
+	assert_eq(grid.get_child_count(), 11)
 	assert_true(grid.get_child(0) is StatCell)
 
 

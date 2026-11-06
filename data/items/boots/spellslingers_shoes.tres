@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/items/spellslingers_shoes.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[resource]
+script = ExtResource("3_data")
+id = &"spellslingers_shoes"
+display_name = "Spellslinger's Shoes"
+kind = 3
+code = "SL"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"magic_pen": 0.08,
+&"magic_pen_flat": 20.0,
+&"move_speed": 45.0
+})
+boots_tier = 3
+upgrade_from = &"sorcerers_shoes"
+upgrade_fragment = &"needlessly_large_rod"
+upgrade_cost = 500

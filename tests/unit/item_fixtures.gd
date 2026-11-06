@@ -34,6 +34,21 @@ static func potion(id: StringName, hp: float, mana: float) -> ItemData:
 	return item
 
 
+## Boots of `tier`; tier 2 and 3 are upgraded with `fragment` for `fee`, and
+## a tier 3 from `from`.
+static func boots(id: StringName, tier: int, fragment := &"", from := &"", fee := 0) -> ItemData:
+	var item := ItemData.new()
+	item.id = id
+	item.display_name = String(id)
+	item.kind = ItemData.Kind.BOOTS
+	item.stats.assign({&"move_speed": 25.0 + 20.0 * (tier - 1)})
+	item.boots_tier = tier
+	item.upgrade_fragment = fragment
+	item.upgrade_from = from
+	item.upgrade_cost = fee
+	return item
+
+
 static func catalog() -> ItemCatalog:
 	var result := ItemCatalog.new()
 	result.items.assign([

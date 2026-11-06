@@ -23,6 +23,12 @@ var armor_pen := 0.0
 var magic_pen := 0.0
 var heal_shield_power := 0.0
 var tenacity := 0.0
+## Shortens how strong slows on Lucian are (0.25 = a 40% slow becomes 30%).
+var slow_resist := 0.0
+## Shortens summoner spell cooldowns like ability haste does skills.
+var summoner_haste := 0.0
+## Flat magic resist ignored, after the percent penetration.
+var magic_pen_flat := 0.0
 
 
 func attack_period() -> float:

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Spellslinger's Shoes: the curled wizard shoe made grand, gold trim along the cuff and toe, gold-tipped cuff points, a glowing violet orb on the toe tip, gold stars and an arcane glow -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#341a78"/><stop offset="1" stop-color="#0a0620"/></linearGradient><radialGradient id="aura"><stop offset="0" stop-color="#c8b0ff" stop-opacity="0.5"/><stop offset="1" stop-color="#6a3ae0" stop-opacity="0"/></radialGradient><linearGradient id="cloth" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9a74ff"/><stop offset="1" stop-color="#321a84"/></linearGradient><radialGradient id="orb" cx="0.38" cy="0.35" r="0.7"><stop offset="0" stop-color="#f6efff"/><stop offset="0.35" stop-color="#a68aff"/><stop offset="1" stop-color="#3a1a8a"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
+  <circle cx="34" cy="32" r="29" fill="url(#aura)"/>
+  <path d="M 3 33 L 12 33 M 2 42 L 12 42" stroke="#e8dcff" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
+  <path d="M 15 45 L 48 45 C 53 45 57.5 42 59.5 38 C 60.5 45 56.5 52 49 52 L 30 52 L 29 56 L 16 56 Z" fill="#24183a" stroke="#0c0818" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 17.5 48.6 L 52 48.6" stroke="#e0b04a" stroke-width="1.2"/>
+  <path d="M 19 18 L 37 18 L 37.5 33 C 45 37 52 36 55 31 C 56.5 28 56.3 24.5 54.5 22.5 C 57 21.5 60 23 60.5 27 C 61.5 35 56 45 48 46 L 16.5 46 C 16 37 17.5 27 19 18 Z" fill="url(#cloth)" stroke="#0c0818" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 40 34.6 C 46 37.4 51.5 36 54 32 C 55 30 55.3 27.5 54.8 25.5" fill="none" stroke="#e0b04a" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 21.5 30 C 20.8 35 20.3 39 20.3 42" fill="none" stroke="#c8b8ff" stroke-width="1.3" stroke-linecap="round"/>
+  <path d="M 28 30 L 29.8 34 L 34 34.5 L 30.8 37.4 L 31.8 41.6 L 28 39.4 L 24.2 41.6 L 25.2 37.4 L 22 34.5 L 26.2 34 Z" fill="#ffd76a" stroke="#0c0818" stroke-width="0.9" stroke-linejoin="round"/>
+  <circle cx="54" cy="20.5" r="8" fill="url(#aura)"/>
+  <circle cx="54" cy="20.5" r="3.6" fill="url(#orb)" stroke="#e0b04a" stroke-width="1.4"/>
+  <circle cx="53" cy="19.4" r="0.9" fill="#ffffff"/>
+  <path d="M 17 12.5 L 40 12.5 L 41 20 L 37 26 L 33 20.5 L 28.5 26.5 L 24.5 20.5 L 20.5 26 L 16.5 20 Z" fill="#3a1e8a" stroke="#0c0818" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 18.4 18.8 L 20.5 22.6 L 24.5 17.6 L 28.5 23 L 33 17.6 L 37 22.6 L 39.2 18.8" fill="none" stroke="#e0b04a" stroke-width="1.3" stroke-linejoin="round"/>
+  <path d="M 18.5 15 L 38.8 15" stroke="#e0b04a" stroke-width="1.6" stroke-linecap="round"/>
+  <g fill="#e0b04a" stroke="#3a2410" stroke-width="0.6"><circle cx="20.5" cy="26.3" r="1.6"/><circle cx="28.5" cy="26.8" r="1.6"/><circle cx="37" cy="26.3" r="1.6"/></g>
+  <path d="M 47 4 L 48.2 7.8 L 52 9 L 48.2 10.2 L 47 14 L 45.8 10.2 L 42 9 L 45.8 7.8 Z" fill="#ffd76a" stroke="#0c0818" stroke-width="0.6" stroke-linejoin="round"/>
+  <path d="M 10 12.6 L 10.7 14.3 L 12.4 15 L 10.7 15.7 L 10 17.4 L 9.3 15.7 L 7.6 15 L 9.3 14.3 Z" fill="#ffd76a" stroke="#0c0818" stroke-width="0.6" stroke-linejoin="round"/>
+  <circle cx="59" cy="10" r="1" fill="#e8dcff"/>
+  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+</svg>

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_effect"]
+[ext_resource type="Texture2D" path="res://assets/art/items/gluttonous_greaves.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_slay"]
+script = ExtResource("1_effect")
+effect_name = "Slay"
+description = "Each elite, mini boss or boss kill grants [hp]0.6% omnivamp[/hp], up to 10 stacks. The stacks last for the stage and carry over to Immortal Path."
+
+[resource]
+script = ExtResource("3_data")
+id = &"gluttonous_greaves"
+display_name = "Gluttonous Greaves"
+kind = 3
+code = "GL"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"move_speed": 45.0,
+&"omnivamp": 0.04
+})
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_slay")])
+boots_tier = 2
+upgrade_fragment = &"bf_sword"
+upgrade_cost = 800

@@ -2,12 +2,14 @@ class_name StatStyle
 extends RefCounted
 ## How each stat looks: icon, color, name and hover text. Covers every item
 ## stat key (ItemStats) plus the panel-only regen (health and mana together)
-## and attack_range. move_speed_pct looks like move_speed.
+## and attack_range. move_speed_pct looks like move_speed, and magic_pen_flat
+## like magic_pen.
 
 const KEYS: Array[StringName] = [
 	&"ad", &"ap", &"armor", &"mr", &"attack_speed", &"ability_haste", &"crit_chance", &"move_speed",
 	&"move_speed_pct", &"max_hp", &"max_mana", &"regen", &"heal_shield_power",
-	&"armor_pen", &"magic_pen", &"lifesteal", &"omnivamp", &"attack_range", &"tenacity",
+	&"armor_pen", &"magic_pen", &"magic_pen_flat", &"lifesteal", &"omnivamp", &"attack_range", &"tenacity",
+	&"slow_resist", &"summoner_haste",
 ]
 const ICONS := {
 	&"ad": preload("res://assets/art/stats/ad.svg"),
@@ -28,6 +30,8 @@ const ICONS := {
 	&"omnivamp": preload("res://assets/art/stats/omnivamp.svg"),
 	&"attack_range": preload("res://assets/art/stats/attack_range.svg"),
 	&"tenacity": preload("res://assets/art/stats/tenacity.svg"),
+	&"slow_resist": preload("res://assets/art/stats/slow_resist.svg"),
+	&"summoner_haste": preload("res://assets/art/stats/summoner_haste.svg"),
 }
 const COLORS := {
 	&"ad": Color("ff9a3c"),
@@ -48,6 +52,8 @@ const COLORS := {
 	&"omnivamp": Color("c0508f"),
 	&"attack_range": Color("cfd6e0"),
 	&"tenacity": Color("c9b28a"),
+	&"slow_resist": Color("6fe6f2"),
+	&"summoner_haste": Color("c4ef5a"),
 }
 ## Stats no item gives.
 const EXTRA_NAMES := {&"regen": "Health / Mana Regen", &"attack_range": "Attack Range"}
@@ -67,10 +73,13 @@ const DESCRIPTIONS := {
 	&"heal_shield_power": "Makes heals and shields on Lucian stronger.",
 	&"armor_pen": "Ignores this share of the target's armor.",
 	&"magic_pen": "Ignores this share of the target's magic resist.",
+	&"magic_pen_flat": "Ignores this much of the target's magic resist, after the percent penetration.",
 	&"lifesteal": "Basic attacks heal Lucian for this share of their damage.",
 	&"omnivamp": "All damage heals Lucian for this share of it.",
 	&"attack_range": "How far basic attacks reach.",
 	&"tenacity": "Shortens crowd control on Lucian.",
+	&"slow_resist": "Weakens slows on Lucian by this share.",
+	&"summoner_haste": "Shortens summoner spell cooldowns: 100 haste halves them.",
 }
 
 
@@ -98,4 +107,9 @@ static func item_line(key: StringName, value: float) -> String:
 
 ## The key whose icon, color and text `key` uses.
 static func _look(key: StringName) -> StringName:
-	return &"move_speed" if key == &"move_speed_pct" else key
+	match key:
+		&"move_speed_pct":
+			return &"move_speed"
+		&"magic_pen_flat":
+			return &"magic_pen"
+	return key

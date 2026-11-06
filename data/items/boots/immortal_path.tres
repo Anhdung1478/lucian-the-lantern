@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/core/item_effect.gd" id="1_effect"]
+[ext_resource type="Texture2D" path="res://assets/art/items/immortal_path.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_slay"]
+script = ExtResource("1_effect")
+effect_name = "Slay"
+description = "Each elite, mini boss or boss kill grants [hp]0.6% omnivamp[/hp], up to 10 stacks. The stacks last for the stage and carry over to Immortal Path."
+
+[sub_resource type="Resource" id="Resource_now_and_forever"]
+script = ExtResource("1_effect")
+effect_name = "Now and Forever"
+description = "At 50% health or more, deal 4% more damage. Below 50%, healing, shields and health regen are 12% stronger."
+
+[resource]
+script = ExtResource("3_data")
+id = &"immortal_path"
+display_name = "Immortal Path"
+kind = 3
+code = "IP"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"move_speed": 45.0,
+&"omnivamp": 0.04
+})
+effects = Array[ExtResource("1_effect")]([SubResource("Resource_slay"), SubResource("Resource_now_and_forever")])
+boots_tier = 3
+upgrade_from = &"gluttonous_greaves"
+upgrade_fragment = &"bf_sword"
+upgrade_cost = 500

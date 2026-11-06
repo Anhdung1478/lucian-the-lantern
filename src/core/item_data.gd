@@ -1,8 +1,9 @@
 class_name ItemData
 extends Resource
-## One fragment, legendary item or potion. Stats use ItemStats keys.
+## One fragment, legendary item, potion or pair of boots. Stats use ItemStats
+## keys.
 
-enum Kind { FRAGMENT, LEGENDARY, POTION }
+enum Kind { FRAGMENT, LEGENDARY, POTION, BOOTS }
 
 @export var id: StringName
 @export var display_name := ""
@@ -24,6 +25,15 @@ enum Kind { FRAGMENT, LEGENDARY, POTION }
 @export var restore_hp := 0.0
 @export var restore_mana := 0.0
 @export var restore_time := 0.0
+## Boots: 1 (bought in the Evolution Tree), 2 or 3 (upgraded at the merchant).
+@export var boots_tier := 0
+## Boots of tier 3: the tier-2 boots id they are upgraded from. Tier 2 is
+## upgraded from either tier-1 boots, so it leaves this empty.
+@export var upgrade_from: StringName
+## Boots of tier 2 and 3: the fragment id the merchant's upgrade takes.
+@export var upgrade_fragment: StringName
+## Boots of tier 2 and 3: the gold fee the upgrade costs.
+@export var upgrade_cost := 0
 
 
 func is_fragment() -> bool:
@@ -34,6 +44,13 @@ func is_potion() -> bool:
 	return kind == Kind.POTION
 
 
+func is_boots() -> bool:
+	return kind == Kind.BOOTS
+
+
 ## Rounded down; the epsilon keeps 1300 x 0.7 at 910 despite float error.
+## Boots can't be sold: 0.
 func sell_price() -> int:
+	if is_boots():
+		return 0
 	return floori(cost * sell_ratio + 0.0001)

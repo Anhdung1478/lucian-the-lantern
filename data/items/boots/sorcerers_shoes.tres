@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/items/sorcerers_shoes.svg" id="2_icon"]
+[ext_resource type="Script" path="res://src/core/item_data.gd" id="3_data"]
+
+[resource]
+script = ExtResource("3_data")
+id = &"sorcerers_shoes"
+display_name = "Sorcerer's Shoes"
+kind = 3
+code = "SS"
+icon = ExtResource("2_icon")
+stats = Dictionary[StringName, float]({
+&"magic_pen_flat": 12.0,
+&"move_speed": 45.0
+})
+boots_tier = 2
+upgrade_fragment = &"needlessly_large_rod"
+upgrade_cost = 800

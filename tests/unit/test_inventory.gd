@@ -3,6 +3,9 @@ extends GutTest
 const Fixtures := preload("res://tests/unit/item_fixtures.gd")
 const Drop := Inventory.Drop
 const EQUIP := Inventory.EQUIP_START
+const HP_CELL := Inventory.HP_POTION_CELL
+const MP_CELL := Inventory.MP_POTION_CELL
+const BOOTS := Inventory.BOOTS_CELL
 
 var catalog: ItemCatalog
 var inventory: Inventory
@@ -18,9 +21,11 @@ func item(id: StringName) -> ItemData:
 
 
 func test_starts_empty_with_all_equip_slots_unlocked() -> void:
-	assert_eq(inventory.items.size(), 60)
+	assert_eq(inventory.items.size(), 63)
 	assert_eq(Inventory.BACKPACK_SIZE, 54)
 	assert_eq(Inventory.EQUIP_START, 54)
+	assert_eq(Inventory.EQUIP_END, 60)
+	assert_eq([HP_CELL, MP_CELL, BOOTS], [60, 61, 62])
 	assert_eq(inventory.unlocked_backpack, 54)
 	for i in Inventory.SIZE:
 		assert_null(inventory.item_at(i))
@@ -176,18 +181,33 @@ func test_items_count_one_and_empty_cells_zero() -> void:
 	assert_eq(inventory.count_at(1), 0)
 
 
-func test_potions_stack_into_the_first_cell_with_room() -> void:
+func test_potions_fill_their_potion_cell_first() -> void:
 	inventory.add(item(&"sword"))
 	inventory.add(item(&"red"))
 	inventory.add(item(&"red"), 3)
+	assert_eq(inventory.item_at(HP_CELL), item(&"red"))
+	assert_eq(inventory.count_at(HP_CELL), 4)
+	assert_null(inventory.item_at(1), "the backpack waits until the cell is full")
+	inventory.add(item(&"blue"), 2)
+	assert_eq(inventory.count_at(MP_CELL), 2, "mana potions have their own cell")
+
+
+func test_a_full_potion_cell_spills_into_the_backpack_stacks() -> void:
+	inventory.add(item(&"sword"))
+	inventory.add(item(&"red"), 7)
+	inventory.add(item(&"red"), 3)
+	assert_eq(inventory.count_at(HP_CELL), 9, "a potion cell holds 9")
 	assert_eq(inventory.item_at(1), item(&"red"))
+	assert_eq(inventory.count_at(1), 1)
+	inventory.add(item(&"red"), 3)
 	assert_eq(inventory.count_at(1), 4)
 	assert_null(inventory.item_at(2))
 
 
 func test_a_full_stack_spills_into_a_new_cell() -> void:
-	inventory.add(item(&"red"), 8)
+	inventory.add(item(&"red"), 9 + 8)
 	inventory.add(item(&"red"), 3)
+	assert_eq(inventory.count_at(HP_CELL), 9)
 	assert_eq(inventory.count_at(0), 9)
 	assert_eq(inventory.count_at(1), 2)
 
@@ -195,27 +215,28 @@ func test_a_full_stack_spills_into_a_new_cell() -> void:
 func test_space_for_counts_room_in_stacks_and_empty_cells() -> void:
 	for i in Inventory.BACKPACK_SIZE - 1:
 		inventory.add(item(&"sword"))
-	inventory.add(item(&"red"), 5)
+	inventory.add(item(&"red"), 9 + 5)
 	assert_eq(inventory.space_for(item(&"red")), 4)
-	assert_eq(inventory.space_for(item(&"blue")), 0)
+	assert_eq(inventory.space_for(item(&"blue")), 9, "only its own potion cell is left")
 	assert_eq(inventory.space_for(item(&"sword")), 0)
 
 
 func test_add_is_all_or_nothing() -> void:
 	for i in Inventory.BACKPACK_SIZE - 1:
 		inventory.add(item(&"sword"))
-	inventory.add(item(&"red"), 7)
+	inventory.add(item(&"red"), 9 + 7)
 	assert_false(inventory.add(item(&"red"), 3))
 	assert_eq(inventory.count_at(Inventory.BACKPACK_SIZE - 1), 7)
+	assert_eq(inventory.count_at(HP_CELL), 9)
 
 
 func test_take_one_lowers_the_stack_and_empties_the_last() -> void:
 	inventory.add(item(&"red"), 2)
-	assert_eq(inventory.take_one(0), item(&"red"))
-	assert_eq(inventory.count_at(0), 1)
-	inventory.take_one(0)
-	assert_null(inventory.item_at(0))
-	assert_eq(inventory.count_at(0), 0)
+	assert_eq(inventory.take_one(HP_CELL), item(&"red"))
+	assert_eq(inventory.count_at(HP_CELL), 1)
+	inventory.take_one(HP_CELL)
+	assert_null(inventory.item_at(HP_CELL))
+	assert_eq(inventory.count_at(HP_CELL), 0)
 
 
 func test_drop_on_same_potion_stacks() -> void:
@@ -233,12 +254,17 @@ func test_drop_on_same_potion_stacks() -> void:
 func test_drop_on_a_full_stack_swaps() -> void:
 	inventory.add(item(&"red"), 9)
 	inventory.add(item(&"red"), 2)
-	assert_eq(inventory.drop_outcome(1, 0, false), Drop.SWAP)
+	assert_eq(inventory.drop_outcome(0, HP_CELL, false), Drop.SWAP)
+	for i in 9:
+		inventory.put(5, item(&"red"))
+	assert_eq(inventory.drop_outcome(0, 5, false), Drop.SWAP)
 
 
 func test_drop_on_other_potion_swaps_counts_too() -> void:
-	inventory.add(item(&"red"), 3)
-	inventory.add(item(&"blue"), 7)
+	for i in 3:
+		inventory.put(0, item(&"red"))
+	for i in 7:
+		inventory.put(1, item(&"blue"))
 	inventory.apply_drop(0, 1, false)
 	assert_eq(inventory.item_at(0), item(&"blue"))
 	assert_eq(inventory.count_at(0), 7)
@@ -246,9 +272,10 @@ func test_drop_on_other_potion_swaps_counts_too() -> void:
 
 
 func test_moving_a_stack_keeps_its_count() -> void:
-	inventory.add(item(&"red"), 4)
-	inventory.apply_drop(0, EQUIP, false)
-	assert_eq(inventory.count_at(EQUIP), 4)
+	for i in 4:
+		inventory.put(0, item(&"red"))
+	inventory.apply_drop(0, HP_CELL, false)
+	assert_eq(inventory.count_at(HP_CELL), 4)
 	assert_eq(inventory.count_at(0), 0)
 
 
@@ -257,11 +284,12 @@ func test_put_into_a_chosen_cell() -> void:
 	assert_false(inventory.put(0, item(&"rod")), "occupied by another item")
 	assert_true(inventory.put(3, item(&"rod")))
 	assert_eq(inventory.item_at(3), item(&"rod"))
-	assert_true(inventory.put(EQUIP, item(&"red")))
-	assert_true(inventory.put(EQUIP, item(&"red")))
-	assert_eq(inventory.count_at(EQUIP), 2)
+	assert_true(inventory.put(HP_CELL, item(&"red")))
+	assert_true(inventory.put(HP_CELL, item(&"red")))
+	assert_eq(inventory.count_at(HP_CELL), 2)
+	assert_true(inventory.put(EQUIP, item(&"rod")))
 	inventory.unlocked_equip = 1
-	assert_false(inventory.put(EQUIP + 1, item(&"red")), "locked slot")
+	assert_false(inventory.put(EQUIP + 1, item(&"sword")), "locked slot")
 
 
 func test_clear_resets_counts() -> void:
@@ -270,12 +298,12 @@ func test_clear_resets_counts() -> void:
 	assert_eq(inventory.count_at(0), 0)
 
 
-func test_locking_a_slot_moves_its_stack() -> void:
-	inventory.add(item(&"red"), 4)
+func test_locking_a_slot_moves_its_item() -> void:
+	inventory.add(item(&"sword"))
 	inventory.apply_drop(0, EQUIP + 5, false)
 	inventory.unlocked_equip = 5
-	assert_eq(inventory.item_at(0), item(&"red"))
-	assert_eq(inventory.count_at(0), 4)
+	assert_eq(inventory.item_at(0), item(&"sword"))
+	assert_eq(inventory.count_at(0), 1)
 
 
 func test_sell_price_uses_the_ratio() -> void:
@@ -315,7 +343,8 @@ func test_add_and_space_for_use_only_open_cells() -> void:
 	assert_eq(inventory.space_for(item(&"sword")), 0)
 	assert_null(inventory.item_at(5))
 	inventory.remove(2)
-	inventory.add(item(&"red"), 3)
+	inventory.add(item(&"red"), 9 + 3)
+	assert_eq(inventory.count_at(2), 3)
 	assert_eq(inventory.space_for(item(&"red")), 6, "the open stack's room")
 
 

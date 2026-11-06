@@ -44,8 +44,24 @@
 [ext_resource type="Resource" path="res://data/items/legendary/kaenic_rookern.tres" id="42_5psfp"]
 [ext_resource type="Resource" path="res://data/items/potions/hp_potion.tres" id="44_hppot"]
 [ext_resource type="Resource" path="res://data/items/potions/mp_potion.tres" id="45_mppot"]
+[ext_resource type="Resource" path="res://data/items/boots/boots_of_speed.tres" id="46_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/slightly_magical_boots.tres" id="47_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/berserkers_greaves.tres" id="48_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/gunmetal_greaves.tres" id="49_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/boots_of_swiftness.tres" id="50_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/swiftmarch.tres" id="51_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/gluttonous_greaves.tres" id="52_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/immortal_path.tres" id="53_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/ionian_boots_of_lucidity.tres" id="54_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/crimson_lucidity.tres" id="55_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/mercurys_treads.tres" id="56_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/chainlaced_crushers.tres" id="57_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/plated_steelcaps.tres" id="58_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/armored_advance.tres" id="59_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/sorcerers_shoes.tres" id="60_boots"]
+[ext_resource type="Resource" path="res://data/items/boots/spellslingers_shoes.tres" id="61_boots"]
 [ext_resource type="Script" path="res://src/core/item_catalog.gd" id="43_fintp"]
 
 [resource]
 script = ExtResource("43_fintp")
-items = Array[ExtResource("1_vxsbo")]([ExtResource("2_oadv6"), ExtResource("3_qw8tr"), ExtResource("4_mc1lg"), ExtResource("5_s1bfh"), ExtResource("6_6mv0h"), ExtResource("7_s4gsf"), ExtResource("8_vcihw"), ExtResource("9_0fila"), ExtResource("10_dy3jo"), ExtResource("11_0ypii"), ExtResource("12_s1x7y"), ExtResource("13_xhywj"), ExtResource("14_p1d20"), ExtResource("15_ggadw"), ExtResource("16_mehsb"), ExtResource("17_dkvat"), ExtResource("18_tamn3"), ExtResource("19_61nqd"), ExtResource("20_e7oka"), ExtResource("21_dcdu6"), ExtResource("22_c0pyy"), ExtResource("23_4wq7i"), ExtResource("24_rch1o"), ExtResource("25_paiys"), ExtResource("26_j4d61"), ExtResource("27_xfae8"), ExtResource("28_od478"), ExtResource("29_lumpq"), ExtResource("30_gs6br"), ExtResource("31_7124j"), ExtResource("32_wglf8"), ExtResource("33_xrxjh"), ExtResource("34_yweog"), ExtResource("35_2270g"), ExtResource("36_7kikg"), ExtResource("37_2pgx5"), ExtResource("38_crlqx"), ExtResource("39_j2s3u"), ExtResource("40_f0nrl"), ExtResource("41_jkkhy"), ExtResource("42_5psfp"), ExtResource("44_hppot"), ExtResource("45_mppot")])
+items = Array[ExtResource("1_vxsbo")]([ExtResource("2_oadv6"), ExtResource("3_qw8tr"), ExtResource("4_mc1lg"), ExtResource("5_s1bfh"), ExtResource("6_6mv0h"), ExtResource("7_s4gsf"), ExtResource("8_vcihw"), ExtResource("9_0fila"), ExtResource("10_dy3jo"), ExtResource("11_0ypii"), ExtResource("12_s1x7y"), ExtResource("13_xhywj"), ExtResource("14_p1d20"), ExtResource("15_ggadw"), ExtResource("16_mehsb"), ExtResource("17_dkvat"), ExtResource("18_tamn3"), ExtResource("19_61nqd"), ExtResource("20_e7oka"), ExtResource("21_dcdu6"), ExtResource("22_c0pyy"), ExtResource("23_4wq7i"), ExtResource("24_rch1o"), ExtResource("25_paiys"), ExtResource("26_j4d61"), ExtResource("27_xfae8"), ExtResource("28_od478"), ExtResource("29_lumpq"), ExtResource("30_gs6br"), ExtResource("31_7124j"), ExtResource("32_wglf8"), ExtResource("33_xrxjh"), ExtResource("34_yweog"), ExtResource("35_2270g"), ExtResource("36_7kikg"), ExtResource("37_2pgx5"), ExtResource("38_crlqx"), ExtResource("39_j2s3u"), ExtResource("40_f0nrl"), ExtResource("41_jkkhy"), ExtResource("42_5psfp"), ExtResource("44_hppot"), ExtResource("45_mppot"), ExtResource("46_boots"), ExtResource("47_boots"), ExtResource("48_boots"), ExtResource("49_boots"), ExtResource("50_boots"), ExtResource("51_boots"), ExtResource("52_boots"), ExtResource("53_boots"), ExtResource("54_boots"), ExtResource("55_boots"), ExtResource("56_boots"), ExtResource("57_boots"), ExtResource("58_boots"), ExtResource("59_boots"), ExtResource("60_boots"), ExtResource("61_boots")])

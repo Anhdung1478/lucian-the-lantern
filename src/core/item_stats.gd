@@ -21,10 +21,13 @@ const NAMES := {
 	&"magic_pen": "Magic Penetration",
 	&"heal_shield_power": "Heal and Shield Power",
 	&"tenacity": "Tenacity",
+	&"slow_resist": "Slow Resist",
+	&"summoner_haste": "Summoner Spell Haste",
+	&"magic_pen_flat": "Magic Penetration",
 }
 const PERCENT := [
 	&"attack_speed", &"crit_chance", &"move_speed_pct", &"lifesteal", &"omnivamp",
-	&"armor_pen", &"magic_pen", &"heal_shield_power", &"tenacity",
+	&"armor_pen", &"magic_pen", &"heal_shield_power", &"tenacity", &"slow_resist",
 ]
 
 
