@@ -110,11 +110,14 @@ static func landmark(landmark_kind: StringName) -> JourneyNode:
 
 
 ## A stage's waves: "2 waves", "3 waves + boss wave", "4 waves + mini boss".
-static func waves_line(act_number: int, stage_number: int) -> String:
+## With `with_boss` off (Act 1's stage replayed: Thresh comes only on its
+## first play), a boss stage says its waves alone.
+static func waves_line(act_number: int, stage_number: int, with_boss := true) -> String:
 	var text := "%d waves" % Journey.waves(act_number, stage_number)
 	match Journey.boss_kind(act_number, stage_number):
 		&"boss":
-			text += " + boss wave"
+			if with_boss:
+				text += " + boss wave"
 		&"mini_boss":
 			# The mini boss comes last in the last wave, not in a wave of its own.
 			text += " + mini boss"
@@ -171,6 +174,9 @@ func set_state(is_locked: bool, is_fogged: bool, is_cleared: bool) -> void:
 	locked = is_locked
 	fogged = is_fogged
 	cleared = is_cleared
+	if is_stage():
+		# Act 1's stage brings Thresh only on its first play (StageSetup).
+		waves_text = waves_line(act, stage, not (stage_id == StageSetup.TUTORIAL_STAGE and cleared))
 	if fogged:
 		modulate = FOGGED_TINT
 	elif locked:

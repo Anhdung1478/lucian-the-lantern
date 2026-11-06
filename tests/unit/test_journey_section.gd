@@ -128,7 +128,7 @@ func test_hover_says_the_stage_and_its_waves() -> void:
 	assert_eq(_node("3-1").get_meta(&"hover_text"), "Stage 3-1 · The Jungle\n3 waves")
 	assert_eq(_node("3-2").get_meta(&"hover_text"), "Stage 3-2 · The Jungle\n4 waves + mini boss\nClear 3-1 first",
 		"a locked stage in an open act")
-	assert_eq(_node("1-1").get_meta(&"hover_text"), "Act 1 · The Loss\n2 waves + boss wave")
+	assert_eq(_node("1-1").get_meta(&"hover_text"), "Act 1 · The Loss\n2 waves", "a cleared 1-1 has no boss wave")
 
 
 func test_clearing_three_acts_opens_act_four_and_endless() -> void:
@@ -277,7 +277,15 @@ func test_act_one_replays_have_no_boss() -> void:
 	section.pick(_node("1-1"))
 	assert_false(section.panel.boss_row.visible)
 	assert_eq(section.panel.purple_label.text, "No boss on replays")
+	assert_eq(section.panel.waves_label.text, "2 waves", "no boss wave promised either")
 	assert_eq(section.panel.status_label.text, "Cleared")
+
+
+func test_act_one_says_its_boss_wave_until_it_is_cleared() -> void:
+	section.pick(_node("1-1"))
+	assert_eq(section.panel.waves_label.text, "2 waves + boss wave")
+	assert_eq(_node("1-1").get_meta(&"hover_text"), "Act 1 · The Loss\n2 waves + boss wave")
+	assert_eq(_node("2-3").waves_text, "3 waves + boss wave", "other boss stages keep it on replays too")
 
 
 func test_picking_a_mini_boss_stage_fills_the_panel() -> void:
