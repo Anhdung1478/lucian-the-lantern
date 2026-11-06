@@ -76,6 +76,53 @@ func test_senna_shoots_the_nearest_enemy() -> void:
 	assert_false(senna.is_in_group(&"enemies"))
 
 
+## An enemy with `hp` that Senna's shot hits for her damage.
+func _senna_kills(senna: Senna, hp: float) -> Enemy:
+	var enemy := Enemy.new()
+	enemy.max_hp = hp
+	enemy.position = Vector2(300, 0)
+	add_child_autofree(enemy)
+	enemy.take_damage(DamageInfo.create(Senna.DAMAGE, DamageInfo.Type.PHYSICAL, &"senna", senna))
+	return enemy
+
+
+func test_sennas_last_hit_is_lucians_kill() -> void:
+	var senna: Senna = autofree(Senna.new())
+	senna.lucian = lucian
+	lucian.progress.set_level(9)
+	for i in 5:
+		assert_true(lucian.try_rank_up(ChampionProgress.Slot.E))
+	var e := lucian.skills[ChampionProgress.Slot.E]
+	e.cooldown.start(10.0)
+	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"deaths_dance"))
+	watch_signals(lucian)
+	_senna_kills(senna, 10.0)
+	assert_signal_emitted(lucian, "enemy_killed")
+	assert_almost_eq(e.cooldown.remaining, 10.0 - RelentlessPursuit.KILL_CUT, 0.001, "max-rank E's kill cut")
+	assert_eq(lucian.restores.count(&"deaths_dance"), 1, "Death's Dance heals on her kill")
+
+
+func test_a_kill_after_lucian_died_is_nobodys() -> void:
+	var senna: Senna = autofree(Senna.new())
+	senna.lucian = lucian
+	watch_signals(lucian)
+	lucian.dead = true
+	_senna_kills(senna, 10.0)
+	assert_signal_not_emitted(lucian, "enemy_killed")
+
+
+func test_senna_stops_while_lucian_is_dead() -> void:
+	var senna := Senna.new()
+	senna.lucian = lucian
+	add_child_autofree(senna)
+	var dummy: TrainingDummy = load("res://src/enemies/training_dummy.tscn").instantiate()
+	dummy.position = Vector2(600, 0)
+	add_child_autofree(dummy)
+	lucian.dead = true
+	await wait_seconds(Senna.INTERVAL + 0.6)
+	assert_eq(dummy.hp, dummy.max_hp, "no shot while he is dead")
+
+
 func test_a_tip_shows_once_and_later_tips_wait_their_turn() -> void:
 	var tips := TipBanner.new()
 	add_child_autofree(tips)
