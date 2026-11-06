@@ -208,6 +208,18 @@ func test_a_stun_ends_a_dash_where_he_is() -> void:
 	assert_eq(lucian.global_position, stopped)
 
 
+func test_a_root_ends_a_dash_where_he_is() -> void:
+	assert_true(lucian.try_cast(Slot.E, Vector2(1000, 0)))
+	await wait_physics_frames(2)
+	assert_true(lucian.is_dashing())
+	lucian.add_cc(Kind.ROOT, 0.3)
+	assert_false(lucian.is_dashing())
+	assert_eq(lucian.collision_mask, Layers.WORLD | Layers.ENEMY_BODY | Layers.CHASM, "his walking mask is back")
+	var stopped := lucian.global_position
+	await wait_physics_frames(10)
+	assert_eq(lucian.global_position, stopped)
+
+
 func test_a_stun_drops_the_windup_and_keeps_the_attack_order() -> void:
 	var near := _enemy(Vector2(lucian.attack_range() * 0.5, 0), 5000.0)
 	lucian.command_attack(near)

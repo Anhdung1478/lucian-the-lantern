@@ -740,12 +740,16 @@ func add_burn(id: StringName, dps: float, seconds: float, type: DamageInfo.Type,
 ## invulnerable or thrown. A stun or fear ends what he was in the middle of
 ## (_interrupt), as a displacement does, and keeps his move, attack or visit
 ## order for when it ends; one landing mid-pull lets the pull finish (it has
-## done that already).
+## done that already). A root ends a dash he is in, where he is, and nothing
+## else: orders and attacks go on.
 func add_cc(kind: CrowdControl.Kind, seconds: float, from := Vector2.ZERO) -> void:
 	if dead or invulnerable or in_stasis() or is_launched():
 		return
 	_cc.add(kind, seconds, stats.tenacity, from)
-	if kind != CrowdControl.Kind.ROOT and _cc.has(kind) and not is_displaced():
+	if kind == CrowdControl.Kind.ROOT:
+		if _cc.has(kind) and is_dashing():
+			_end_dash()
+	elif _cc.has(kind) and not is_displaced():
 		_interrupt()
 
 
@@ -907,10 +911,7 @@ func _drop_in_flight() -> void:
 		skill.cancel()
 	passive.cancel()
 	actives.cancel()
-	_dash_left = 0.0
-	if is_instance_valid(_dash_trail):
-		_dash_trail.finish()
-	_dash_trail = null
+	_end_dash()
 	_displace_left = 0.0
 	if is_launched():
 		global_position = _launch_to
@@ -1514,11 +1515,16 @@ func _dash_step(delta: float) -> void:
 	if is_instance_valid(_dash_trail):
 		_dash_trail.reach(global_position)
 	if _dash_left <= 0.0 or get_slide_collision_count() > 0:
-		_dash_left = 0.0
-		collision_mask = _body_mask()
-		if is_instance_valid(_dash_trail):
-			_dash_trail.finish()
-		_dash_trail = null
+		_end_dash()
+
+
+## The dash stops where he is: his walking mask is back and its trail ends.
+func _end_dash() -> void:
+	_dash_left = 0.0
+	collision_mask = _body_mask()
+	if is_instance_valid(_dash_trail):
+		_dash_trail.finish()
+	_dash_trail = null
 
 
 ## The trail starts with the dash and grows behind Lucian. None on low

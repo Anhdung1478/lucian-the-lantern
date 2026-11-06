@@ -183,6 +183,17 @@ func test_a_stun_mid_galeforce_dash_fires_no_missiles() -> void:
 	assert_eq(sources.count(&"galeforce"), 0)
 
 
+func test_a_root_mid_galeforce_dash_still_fires_the_missiles() -> void:
+	equip(&"galeforce")
+	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
+	await wait_physics_frames(2)
+	assert_true(lucian.is_dashing())
+	lucian.add_cc(CrowdControl.Kind.ROOT, 0.3)
+	assert_false(lucian.is_dashing())
+	await wait_seconds(1.5)
+	assert_eq(sources.count(&"galeforce"), ItemActives.GALEFORCE_MISSILES)
+
+
 func test_death_mid_galeforce_dash_fires_no_missiles() -> void:
 	equip(&"galeforce")
 	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
