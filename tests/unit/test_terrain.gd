@@ -162,6 +162,32 @@ func test_honeyfruit_heals_once_then_regrows_at_30_s() -> void:
 	assert_false(fruit.is_ripe(), "eaten again")
 
 
+func test_honeyfruit_stays_ripe_while_hp_and_mana_are_full() -> void:
+	lucian.hp = lucian.stats.max_hp
+	lucian.mana = lucian.stats.max_mana
+	var fruit := Honeyfruit.new()
+	fruit.lucian = lucian
+	fruit.position = Vector2(1000, 0)
+	add_child_autofree(fruit)
+	lucian.global_position = fruit.position
+	await wait_physics_frames(3)
+	assert_true(fruit.is_ripe(), "nothing to restore, so it waits")
+
+
+func test_honeyfruit_restores_mana_when_only_mana_is_missing() -> void:
+	lucian.hp = lucian.stats.max_hp
+	lucian.mana = 10.0
+	var fruit := Honeyfruit.new()
+	fruit.lucian = lucian
+	fruit.position = Vector2(1000, 0)
+	add_child_autofree(fruit)
+	lucian.global_position = fruit.position
+	await wait_physics_frames(2)
+	assert_false(fruit.is_ripe(), "eaten for the mana")
+	var restored := Honeyfruit.MANA + Honeyfruit.MANA_SHARE * lucian.stats.max_mana
+	assert_almost_eq(lucian.mana, minf(10.0 + restored, lucian.stats.max_mana), 2.0)
+
+
 # --- Blast Cone -------------------------------------------------------------
 
 

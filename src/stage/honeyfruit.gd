@@ -2,13 +2,17 @@ class_name Honeyfruit
 extends Node2D
 ## A Honeyfruit plant on the jungle floor (3-4). Lucian walking over it
 ## (within PICKUP_RANGE of his body's edge) eats it: it heals HEAL plus
-## HEAL_SHARE of his max HP, through Lucian.heal. Then it is an empty stalk
-## for REGROW_TIME and grows back. Set `lucian` before adding it.
+## HEAL_SHARE of his max HP, through Lucian.heal, and restores MANA plus
+## MANA_SHARE of his max mana. It waits, ripe, while he is full on both. Then
+## it is an empty stalk for REGROW_TIME and grows back. Set `lucian` before
+## adding it.
 
 const ART := preload("res://assets/art/stage/honeyfruit.svg")
 const PICKUP_RANGE := 50.0
 const HEAL := 100.0
 const HEAL_SHARE := 0.06
+const MANA := 60.0
+const MANA_SHARE := 0.06
 const REGROW_TIME := 30.0
 ## Drawn flat on the ground, under the units.
 const Z := -1
@@ -39,12 +43,15 @@ func _physics_process(delta: float) -> void:
 		return
 	if not is_instance_valid(lucian) or not lucian.can_act():
 		return
+	if lucian.hp >= lucian.stats.max_hp and lucian.mana >= lucian.stats.max_mana:
+		return
 	if global_position.distance_to(lucian.global_position) <= PICKUP_RANGE + Lucian.HIT_RADIUS:
 		_eat()
 
 
 func _eat() -> void:
 	lucian.heal(HEAL + HEAL_SHARE * lucian.stats.max_hp)
+	lucian.restore_mana(MANA + MANA_SHARE * lucian.stats.max_mana)
 	Sfx.play(&"potion")
 	if not GameSettings.instance().low_effects():
 		# Heal's green ring and crosses, over his art.
