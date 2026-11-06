@@ -4,7 +4,7 @@ extends Control
 ## training dummy on a stage floor. Q, W, E, R and basic attacks play with
 ## the skin's SkinFx at game size and with its sounds. ▶ All loops them and
 ## starts on opening; a skill's button plays only that one. It deals no
-## damage and saves nothing. ✕ or ESC (SkinShop.close_popup) closes it and
+## damage and saves nothing. It stands still while covered (set_covered). ✕ or ESC (SkinShop.close_popup) closes it and
 ## frees everything it spawned.
 
 signal closed
@@ -81,6 +81,13 @@ func play_all() -> void:
 	for piece in PIECES:
 		_queue(piece)
 		_tween.tween_interval(GAP)
+
+
+## True while the gear menu, Settings or a pop-up covers the preview: it
+## freezes (the loop, the shots and their effects stand still) and plays on
+## from the same spot when uncovered.
+func set_covered(on: bool) -> void:
+	process_mode = Node.PROCESS_MODE_DISABLED if on else Node.PROCESS_MODE_INHERIT
 
 
 ## Closes the preview and frees everything it spawned.

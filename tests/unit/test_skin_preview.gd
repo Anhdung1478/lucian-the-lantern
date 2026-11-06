@@ -8,6 +8,7 @@ const Slot := ChampionProgress.Slot
 const PREFIX := "user://test_skin_preview_save_slot_"
 
 var shop: SkinShop
+var _main: MainScreen
 
 
 func before_each() -> void:
@@ -170,3 +171,49 @@ func test_closing_twice_emits_closed_once_and_keeps_the_next_preview() -> void:
 	first.close()
 	assert_eq(closes[0], 1, "closed emitted once")
 	assert_eq(shop.preview, second, "the new preview is still the shop's")
+
+
+## A main screen on the Skin Shop with `id`'s preview open.
+func _open_in_main(id: StringName) -> SkinPreview:
+	var main := MainScreen.new()
+	add_child_autofree(main)
+	main.show_section(MainScreen.SECTION_SKINS)
+	var skin_shop: SkinShop = main.sections[MainScreen.SECTION_SKINS]
+	skin_shop.open_preview(id)
+	_main = main
+	return skin_shop.preview
+
+
+func test_the_gear_menu_over_the_preview_freezes_it_and_closing_resumes_it() -> void:
+	var preview := _open_in_main(&"pulsefire")
+	var spawned: Array[int] = [0]
+	preview.effects.child_entered_tree.connect(func(_node: Node) -> void: spawned[0] += 1)
+	await wait_seconds(0.2)
+	_main.gear.open()
+	assert_eq(preview.process_mode, Node.PROCESS_MODE_DISABLED)
+	var before := spawned[0]
+	await wait_seconds(1.5)
+	assert_eq(spawned[0], before, "no new effects while covered")
+	_main.gear.close()
+	assert_eq(preview.process_mode, Node.PROCESS_MODE_INHERIT)
+	await wait_seconds(1.5)
+	assert_gt(spawned[0], before, "it plays on again")
+
+
+func test_settings_and_a_pop_up_freeze_the_preview_too() -> void:
+	var preview := _open_in_main(&"project")
+	_main.settings.open()
+	assert_eq(preview.process_mode, Node.PROCESS_MODE_DISABLED, "Settings")
+	_main.settings.close()
+	assert_eq(preview.process_mode, Node.PROCESS_MODE_INHERIT)
+	_main.confirm.ask("Sure?", func() -> void: pass)
+	assert_eq(preview.process_mode, Node.PROCESS_MODE_DISABLED, "a pop-up")
+	_main.confirm.answer(false)
+	assert_eq(preview.process_mode, Node.PROCESS_MODE_INHERIT)
+
+
+func test_a_preview_opened_under_the_gear_menu_starts_frozen() -> void:
+	var preview := _open_in_main(&"vampire")
+	_main.gear.open()
+	_main.sections[MainScreen.SECTION_SKINS].open_preview(&"project")
+	assert_eq(_main.sections[MainScreen.SECTION_SKINS].preview.process_mode, Node.PROCESS_MODE_DISABLED)

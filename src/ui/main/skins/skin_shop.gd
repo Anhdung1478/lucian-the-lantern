@@ -3,7 +3,8 @@ extends Control
 ## The Skin Shop page of the main screen: one card per skin in a centered row.
 ## A card's Purchase opens a SkinPurchasePopup that asks first; buying does
 ## not equip. Each card's Preview opens a SkinPreview. One pop-up shows at a
-## time. Nothing here saves.
+## time. An open preview stands still while something covers the shop. Nothing
+## here saves.
 
 const GAP := 24
 
@@ -13,6 +14,8 @@ var cards: Array[SkinCard] = []
 var preview: SkinPreview
 ## The open purchase question, or null.
 var purchase: SkinPurchasePopup
+
+var _covered := false
 
 
 func _ready() -> void:
@@ -56,11 +59,20 @@ func close_popup() -> bool:
 	return false
 
 
+## True while the gear menu, Settings or a pop-up covers the shop: an open
+## preview stands still (and a preview opened meanwhile starts still).
+func set_covered(on: bool) -> void:
+	_covered = on
+	if preview:
+		preview.set_covered(on)
+
+
 ## Opens the preview of skin `id` over the shop, closing any other pop-up.
 func open_preview(id: StringName) -> void:
 	close_popup()
 	var opened := SkinPreview.new(Skins.find(id))
 	preview = opened
+	opened.set_covered(_covered)
 	opened.closed.connect(func() -> void:
 		if preview == opened:
 			preview = null)

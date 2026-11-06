@@ -171,6 +171,8 @@ func _build() -> void:
 	add_child(settings)
 	# The pop-up and the tooltip come last, so they read input first.
 	add_child(confirm)
+	for cover: CanvasLayer in [gear, settings, confirm]:
+		cover.visibility_changed.connect(_update_covered)
 	add_child(HoverTip.new())
 	var debug := MainDebugTable.new()
 	debug.name = &"MainDebugTable"
@@ -204,6 +206,13 @@ func _request_start(run: StageSetup) -> void:
 		Sfx.play(&"error")
 		return
 	start_requested.emit(run)
+
+
+## The Skin Shop's preview stands still while the gear menu, Settings or a
+## Yes / No pop-up covers it.
+func _update_covered() -> void:
+	var shop := sections[SECTION_SKINS] as SkinShop
+	shop.set_covered(gear.visible or settings.visible or confirm.is_open())
 
 
 func _open_settings() -> void:
