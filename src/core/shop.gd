@@ -1,10 +1,14 @@
 class_name Shop
 extends RefCounted
 ## The merchant's rules for one open shop: buying from the Items tab (a
-## MerchantStock slot) or the Potions tab, selling, and refreshing, all for
-## stage gold. Nothing is paid when a purchase does not fit.
+## MerchantStock slot) or the Potions tab, upgrading boots on the Boots tab,
+## selling, and refreshing, all for stage gold. Nothing is paid when a
+## purchase does not fit. Boots are never sold.
 
-enum Result { OK, NO_GOLD, NO_ROOM, CELL_LOCKED, CELL_TAKEN, SOLD_OUT, NOTHING_TO_REFRESH }
+enum Result {
+	OK, NO_GOLD, NO_ROOM, CELL_LOCKED, CELL_TAKEN, SOLD_OUT, NOTHING_TO_REFRESH,
+	NOT_UPGRADABLE, NO_BOOTS, WRONG_CELL,
+}
 
 var stock: MerchantStock
 var inventory: Inventory
@@ -35,20 +39,52 @@ func buy_potion(potion: ItemData, cell := -1) -> Result:
 	return _buy(potion, cell)
 
 
-## Gold the merchant pays for everything in `index`.
-func sell_value(index: int) -> int:
+## There is an item in `index` and it isn't boots, which can't be sold.
+func can_sell(index: int) -> bool:
 	var item := inventory.item_at(index)
-	return item.sell_price() * inventory.count_at(index) if item else 0
+	return item != null and not item.is_boots()
 
 
-## Sells everything in `index`. Returns the gold gained.
+## Gold the merchant pays for everything in `index` (0 for boots).
+func sell_value(index: int) -> int:
+	return inventory.item_at(index).sell_price() * inventory.count_at(index) if can_sell(index) else 0
+
+
+## Sells everything in `index`. Returns the gold gained; boots are refused.
 func sell(index: int) -> int:
-	var value := sell_value(index)
-	if inventory.item_at(index) == null:
+	if not can_sell(index):
 		return 0
+	var value := sell_value(index)
 	inventory.remove(index)
 	wallet.add(value)
 	return value
+
+
+## The boots the Boots tab makes from the boots in `boots_index` and the
+## fragment in `fragment_index`, or null when they don't upgrade (see
+## ItemCatalog.boots_upgrade).
+func upgrade_result(boots_index: int, fragment_index: int) -> ItemData:
+	if inventory.catalog == null or boots_index < 0 or fragment_index < 0 or boots_index == fragment_index:
+		return null
+	if inventory.is_locked(fragment_index):
+		return null
+	return inventory.catalog.boots_upgrade(inventory.item_at(boots_index), inventory.item_at(fragment_index))
+
+
+## The Boots tab's Upgrade: pays the new boots' fee, uses up the fragment and
+## puts the new boots in the boots cell.
+func upgrade_boots(boots_index: int, fragment_index: int) -> Result:
+	var boots := inventory.item_at(boots_index) if boots_index >= 0 else null
+	if boots == null or not boots.is_boots():
+		return Result.NO_BOOTS
+	var result := upgrade_result(boots_index, fragment_index)
+	if result == null:
+		return Result.NOT_UPGRADABLE
+	if not wallet.spend(result.upgrade_cost):
+		return Result.NO_GOLD
+	inventory.remove(fragment_index)
+	inventory.set_boots(result)
+	return Result.OK
 
 
 ## A refresh would change something: an open slot is still unsold.
@@ -74,6 +110,8 @@ func _buy(item: ItemData, cell: int) -> Result:
 		return Result.NO_ROOM
 	if cell >= 0 and inventory.is_locked(cell):
 		return Result.CELL_LOCKED
+	if cell >= 0 and not Inventory.accepts(cell, item):
+		return Result.WRONG_CELL
 	if cell >= 0 and not inventory.can_put(cell, item):
 		return Result.CELL_TAKEN
 	wallet.spend(item.cost)

@@ -67,8 +67,8 @@ func test_potions_stack_and_never_sell_out() -> void:
 	var red := catalog.find(&"red")
 	for i in 10:
 		assert_eq(shop.buy_potion(red), Result.OK)
-	assert_eq(inventory.count_at(0), 9)
-	assert_eq(inventory.count_at(1), 1)
+	assert_eq(inventory.count_at(Inventory.HP_POTION_CELL), 9, "its potion cell first")
+	assert_eq(inventory.count_at(0), 1, "then the backpack")
 	assert_eq(wallet.gold, 500)
 
 
@@ -90,7 +90,7 @@ func test_selling_pays_the_sell_price() -> void:
 
 func test_selling_a_stack_pays_for_each() -> void:
 	inventory.add(catalog.find(&"red"), 4)
-	assert_eq(shop.sell(0), 4 * 35)
+	assert_eq(shop.sell(Inventory.HP_POTION_CELL), 4 * 35, "from a potion cell too")
 
 
 func test_selling_an_empty_cell_does_nothing() -> void:
