@@ -452,8 +452,8 @@ func _build_resolution(page: Control) -> OptionButton:
 
 func _build_gameplay() -> Control:
 	var page := _page(3)
-	_toggle(page, "Skill queue", &"queue_casts",
-		"A skill pressed during another skill's cast time or the E dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept.")
+	_toggle(page, "Cast queue", &"queue_casts",
+		"A skill, item active or summoner spell pressed during a cast time or a dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept.")
 	return page
 
 

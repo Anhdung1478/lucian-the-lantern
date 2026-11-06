@@ -222,10 +222,23 @@ func test_no_cooldowns_refreshes_summoners() -> void:
 	assert_true(lucian.summoners.cooldown(&"flash").is_ready())
 
 
-func test_no_summoner_while_dashing() -> void:
+func test_no_summoner_during_a_dash_or_a_cast_time() -> void:
 	lucian.start_dash(Vector2.RIGHT, 200.0, 1000.0)
-	assert_false(lucian.use_summoner(0, Vector2(1000, 0)))
+	assert_false(lucian.summoners.use(0, Vector2(1000, 0)), "dashing")
+	await wait_seconds(0.3)
+	assert_false(lucian.is_dashing())
+	lucian.lock_cast(0.2)
+	assert_false(lucian.summoners.use(0, Vector2(1000, 0)), "in a cast time")
 	assert_true(lucian.summoners.cooldown(&"flash").is_ready())
+
+
+func test_a_summoner_pressed_during_a_dash_is_cast_once_it_lands() -> void:
+	lucian.start_dash(Vector2.RIGHT, 200.0, 1000.0)
+	assert_false(lucian.use_summoner(0, Vector2(1000, 0)), "queued")
+	assert_true(lucian.summoners.cooldown(&"flash").is_ready())
+	await wait_seconds(0.4)
+	assert_false(lucian.summoners.cooldown(&"flash").is_ready())
+	assert_almost_eq(lucian.global_position, Vector2(200.0 + SummonerSpells.FLASH_RANGE, 0), Vector2(1, 1))
 
 
 func test_barrier_shows_a_buff_and_grows_with_heal_and_shield_power() -> void:

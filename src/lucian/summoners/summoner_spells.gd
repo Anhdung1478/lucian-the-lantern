@@ -121,10 +121,11 @@ func clear_cooldowns() -> void:
 
 
 ## Casts the spell on `slot` (0 = D, 1 = F) toward `aim`. False on cooldown,
-## while dashing, or for Smite with no enemy in reach.
+## during a cast time or a dash (Lucian.use_summoner queues it then), or for
+## Smite with no enemy in reach.
 func use(slot: int, aim: Vector2) -> bool:
 	var spell := spell_in(slot)
-	if spell == null or lucian.is_dashing() or not cooldown(spell.id).is_ready():
+	if spell == null or lucian.is_cast_locked() or lucian.is_dashing() or not cooldown(spell.id).is_ready():
 		return false
 	match spell.id:
 		&"flash":

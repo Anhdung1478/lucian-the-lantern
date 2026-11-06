@@ -3,8 +3,9 @@ extends Node
 ## Item actives on keys 1-6: Hextech Gunblade, Galeforce and Hextech
 ## Rocketbelt, aimed at the cursor. Every copy of an item shares one cooldown
 ## (Lucian.item_cooldown), which keeps running after the item is sold.
-## Not usable during a cast time or a dash. Lucian can't steer Galeforce's or
-## Rocketbelt's dash, and can move again as soon as it lands.
+## Not usable during a cast time or a dash (Lucian.use_equip_slot queues it
+## then). Lucian can't steer Galeforce's or Rocketbelt's dash, and can move
+## again as soon as it lands.
 
 const GUNBLADE_RANGE := 700.0
 const GUNBLADE_BASE := 175.0

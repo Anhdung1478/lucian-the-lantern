@@ -145,7 +145,7 @@ func test_a_switch_writes_its_value() -> void:
 	assert_true(toggle.button_pressed)
 	toggle.button_pressed = false
 	assert_eq(settings.get_value(&"vsync"), false)
-	var queue := _control("Skill queue", "CheckButton") as CheckButton
+	var queue := _control("Cast queue", "CheckButton") as CheckButton
 	queue.button_pressed = false
 	assert_eq(settings.get_value(&"queue_casts"), false)
 

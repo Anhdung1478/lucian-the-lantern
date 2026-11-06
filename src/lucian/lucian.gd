@@ -24,6 +24,8 @@ signal died
 signal damage_received(info: DamageInfo, amount: float)
 
 enum Order { NONE, MOVE, ATTACK, VISIT, CAST }
+## What a queued cast is: a skill, an item active or a summoner spell.
+enum CastKind { SKILL, ITEM, SUMMONER }
 
 ## Share of the attack period spent winding up before the shot leaves the gun.
 const WINDUP_RATIO := 0.15
@@ -143,9 +145,9 @@ var cheat_no_cooldowns := false:
 				cooldown.clear()
 			summoners.clear_cooldowns()
 var cheat_infinite_mana := false
-## Setting: a skill pressed during a cast time or a dash is cast as soon as it
-## ends, aimed where the key was pressed, like LoL's spell buffering. Only the
-## latest press is kept.
+## Setting: a skill, item active or summoner spell pressed during a cast time
+## or a dash is cast as soon as it ends, aimed where the key was pressed, like
+## LoL's spell buffering. They share one slot: only the latest press is kept.
 var queue_casts := true
 ## The equipped skin: its body art, stat changes and kill heal.
 var skin: SkinData = Skins.ALL[0]
@@ -175,7 +177,9 @@ var _dash_trail: DashTrail
 ## to 0 over its duration.
 var _speed_buffs := {}
 var _last_position := Vector2.ZERO
-var _queued_slot := -1
+## The cast waiting for the cast time or dash to end: {kind: CastKind, index:
+## the skill slot, equip slot or summoner slot, aim}, or {} when none.
+var _queued := {}
 ## Order.CAST: the enemy a targeted cast waits to be in reach of, the reach,
 ## and the cast, called with the enemy's position.
 var _cast_target: Enemy
@@ -183,7 +187,6 @@ var _cast_reach := 0.0
 var _cast_call: Callable
 ## The gun the next shot comes from: they take turns, left first.
 var _next_gun := LucianVisuals.Gun.LEFT
-var _queued_aim := Vector2.ZERO
 ## Ghost: seconds left passing through enemies.
 var _ghost_left := 0.0
 var _displace_velocity := Vector2.ZERO
@@ -319,9 +322,7 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 		return false
 	var skill := skills[slot]
 	if is_cast_locked() or is_dashing():
-		if queue_casts:
-			_queued_slot = slot
-			_queued_aim = aim
+		_queue(CastKind.SKILL, slot, aim)
 		return false
 	mana -= skill.mana_cost()
 	skill.cooldown.start(0.0 if cheat_no_cooldowns else skill.cooldown_seconds(), skill_haste(slot))
@@ -355,9 +356,33 @@ func is_skill_blocked(slot: ChampionProgress.Slot) -> bool:
 	return false
 
 
-## The slot waiting for the current cast time or dash to end, or -1.
+## The skill slot waiting for the current cast time or dash to end, or -1
+## (also while an item active or a summoner spell waits instead).
 func queued_cast() -> int:
-	return _queued_slot
+	if _queued.is_empty() or _queued.kind != CastKind.SKILL:
+		return -1
+	return _queued.index
+
+
+## With queue_casts on, keeps a cast pressed during a cast time or a dash to
+## cast once it ends, in place of any cast already waiting.
+func _queue(kind: CastKind, index: int, aim: Vector2) -> void:
+	if queue_casts:
+		_queued = {"kind": kind, "index": index, "aim": aim}
+
+
+## Casts what waited for the cast time or dash, through the same gate as its
+## key, so an out-of-reach Gunblade or Smite still walks over first.
+func _cast_queued() -> void:
+	var queued := _queued
+	_queued = {}
+	match queued.kind:
+		CastKind.SKILL:
+			try_cast(queued.index, queued.aim)
+		CastKind.ITEM:
+			use_equip_slot(queued.index, queued.aim)
+		CastKind.SUMMONER:
+			use_summoner(queued.index, queued.aim)
 
 
 ## Called by an enemy just before Lucian's hit is mitigated: item damage
@@ -538,7 +563,9 @@ func use_item(index: int) -> bool:
 
 
 ## Keys 1-6: uses the item active in equip slot `slot` (0-5). No item dash
-## while rooted. Potions never sit in equip slots: they have keys 7 and 8.
+## while rooted. One off cooldown, pressed during a cast time or a dash, is
+## queued like a skill (queue_casts). Potions never sit in equip slots: they
+## have keys 7 and 8.
 func use_equip_slot(slot: int, aim: Vector2) -> bool:
 	if not can_act():
 		return false
@@ -547,6 +574,9 @@ func use_equip_slot(slot: int, aim: Vector2) -> bool:
 		return false
 	var item := inventory.item_at(index)
 	if ItemActives.has_active(item):
+		if queue_casts and (is_cast_locked() or is_dashing()) and item_cooldown(item.id).is_ready():
+			_queue(CastKind.ITEM, slot, aim)
+			return false
 		if actives.use(item, aim):
 			return true
 		if item_cooldown(item.id).is_ready():
@@ -556,14 +586,19 @@ func use_equip_slot(slot: int, aim: Vector2) -> bool:
 
 
 ## D and F: casts the summoner spell on `slot` (0-1) toward `aim`. No Flash
-## while rooted.
+## while rooted. One off cooldown, pressed during a cast time or a dash, is
+## queued like a skill (queue_casts).
 func use_summoner(slot: int, aim: Vector2) -> bool:
 	if not can_act() or _move_refused(summoner_range(slot)):
 		return false
+	var spell := summoners.spell_in(slot)
+	var off_cooldown := spell != null and summoners.cooldown(spell.id).is_ready()
+	if queue_casts and (is_cast_locked() or is_dashing()) and off_cooldown:
+		_queue(CastKind.SUMMONER, slot, aim)
+		return false
 	if summoners.use(slot, aim):
 		return true
-	var spell := summoners.spell_in(slot)
-	if spell and summoners.cooldown(spell.id).is_ready():
+	if off_cooldown:
 		_walk_into_reach(aim, summoner_range(slot), func(at: Vector2) -> void: use_summoner(slot, at))
 	return false
 
@@ -865,7 +900,7 @@ func _interrupt() -> void:
 ## destination at once, never mid-air over a wall.
 func _drop_in_flight() -> void:
 	_cancel_windup()
-	_queued_slot = -1
+	_queued = {}
 	_cast_lock_left = 0.0
 	for skill in skills:
 		skill.cancel()
@@ -1316,10 +1351,8 @@ func _physics_process(delta: float) -> void:
 	if _cc.has(CrowdControl.Kind.FEAR):
 		_fear_step()
 		return
-	if _queued_slot >= 0 and not is_cast_locked() and not is_dashing():
-		var queued := _queued_slot as ChampionProgress.Slot
-		_queued_slot = -1
-		try_cast(queued, _queued_aim)
+	if not _queued.is_empty() and not is_cast_locked() and not is_dashing():
+		_cast_queued()
 	if _dash_left > 0.0:
 		_dash_step(delta)
 		_track_movement(was_dashing)

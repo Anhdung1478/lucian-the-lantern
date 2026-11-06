@@ -132,6 +132,27 @@ func test_an_active_on_cooldown_is_refused() -> void:
 	assert_false(lucian.use_equip_slot(0, dummy.position))
 
 
+func test_the_active_itself_refuses_a_cast_time_and_a_dash() -> void:
+	var gunblade := lucian.item_catalog.find(&"hextech_gunblade")
+	lucian.lock_cast(0.2)
+	assert_false(lucian.actives.use(gunblade, dummy.position), "in a cast time")
+	await wait_seconds(0.3)
+	lucian.start_dash(Vector2.UP, 200.0, 1000.0)
+	assert_false(lucian.actives.use(gunblade, dummy.position), "dashing")
+	assert_true(lucian.item_cooldown(&"hextech_gunblade").is_ready())
+	assert_eq(sources, [])
+
+
+func test_an_active_pressed_during_a_dash_is_used_once_it_lands() -> void:
+	equip(&"galeforce")
+	equip(&"hextech_gunblade", 1)
+	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
+	assert_false(lucian.use_equip_slot(1, dummy.position), "queued: Lucian is dashing")
+	assert_does_not_have(sources, &"hextech_gunblade")
+	await wait_seconds(0.3)
+	assert_has(sources, &"hextech_gunblade", "bolted once the dash landed")
+
+
 func test_copies_share_one_cooldown_kept_after_selling() -> void:
 	equip(&"hextech_gunblade", 0)
 	equip(&"hextech_gunblade", 1)
