@@ -84,7 +84,7 @@ func _input(event: InputEvent) -> void:
 	if settings.visible or confirm.is_open():
 		return
 	if not _close_section_popup():
-		if gear.is_showing_slots() or gear.is_showing_difficulty():
+		if gear.is_showing_slots():
 			gear.open()
 		elif gear.visible:
 			gear.close()
@@ -162,7 +162,6 @@ func _build() -> void:
 	gear.leave_requested.connect(leave_requested.emit)
 	gear.saved.connect(_on_saved)
 	gear.copied.connect(_on_copied)
-	gear.difficulty_changed.connect(_on_difficulty_changed)
 	add_child(gear)
 	settings.setup(GameSettings.instance())
 	settings.back_requested.connect(_close_settings)
@@ -209,11 +208,6 @@ func _on_saved(ok: bool) -> void:
 
 func _on_copied(slot: int, ok: bool) -> void:
 	_report(ok, "Copied to slot %d" % slot)
-
-
-## Kept in memory: the next save (a stage's end, Save) writes it.
-func _on_difficulty_changed(level: int) -> void:
-	show_toast("Difficulty: %s" % Difficulty.name_of(level))
 
 
 func _report(ok: bool, text: String) -> void:

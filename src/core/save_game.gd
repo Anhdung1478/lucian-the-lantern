@@ -38,8 +38,7 @@ const BOSS_IDS: Array[String] = ["thresh_1", "akshan", "infernal_drake", "ocean_
 var bosses: Array[String] = []
 ## Seconds played in this slot (title screen and pauses not counted).
 var play_time := 0.0
-## Difficulty.EASY ... EXTREME: picked with the new game, changed from the
-## gear menu.
+## Difficulty.EASY ... EXTREME: picked with the new game and fixed after that.
 var difficulty := Difficulty.NORMAL
 ## The End screen was shown in this slot. Until it is, every clear of the
 ## last stage shows it (a clear saved from its result panel, by closing the
@@ -147,16 +146,6 @@ func start_new(of_slot: int, level := Difficulty.NORMAL) -> bool:
 	reset()
 	difficulty = level if Difficulty.is_level(level) else Difficulty.NORMAL
 	return save()
-
-
-## Changes the difficulty, in memory (the next save writes it). False for an
-## unknown level or the current one.
-func set_difficulty(level: int) -> bool:
-	if not Difficulty.is_level(level) or level == difficulty:
-		return false
-	difficulty = level
-	changed.emit()
-	return true
 
 
 func any_slot_exists() -> bool:

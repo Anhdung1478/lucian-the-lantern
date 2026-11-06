@@ -193,6 +193,14 @@ func test_a_new_game_in_an_empty_slot_starts_act_1_on_the_difficulty_picked() ->
 	assert_eq(loaded.difficulty, Difficulty.HARD, "written with the new game")
 
 
+func test_the_difficulty_page_says_it_cannot_be_changed_later() -> void:
+	_title().show_difficulty(1)
+	var texts: Array[String] = []
+	for label: Label in _title()._difficulty_page.find_children("*", "Label", true, false):
+		texts.append(label.text)
+	assert_has(texts, "Enemy HP and damage. It can't be changed later.")
+
+
 func test_the_difficulty_page_lists_the_four_levels() -> void:
 	_title().show_difficulty(1)
 	var texts := _title().difficulty_buttons.map(func(button: Button) -> String: return button.text)

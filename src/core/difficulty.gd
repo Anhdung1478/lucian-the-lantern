@@ -2,8 +2,8 @@ class_name Difficulty
 extends RefCounted
 ## A save's difficulty: one number that scales every enemy's HP (bosses and
 ## mini bosses too) and all the damage Lucian takes, and on Hard and Extreme
-## more blue essence, so replays pay for the tree. Picked with a new game,
-## changed from the main screen's gear menu. Gold, XP, orange, purple, speeds
+## more blue essence, so replays pay for the tree. Picked when a new game
+## starts and fixed after that. Gold, XP, orange, purple, speeds
 ## and timings stay the same.
 
 const EASY := 0

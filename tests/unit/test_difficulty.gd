@@ -102,21 +102,6 @@ func test_a_save_from_before_difficulties_or_a_broken_one_plays_on_normal() -> v
 		assert_eq(loaded.difficulty, Difficulty.NORMAL, str(value))
 
 
-func test_set_difficulty_changes_it_in_memory_only() -> void:
-	var save := SaveGame.new(PREFIX)
-	save.start_new(1)
-	watch_signals(save)
-	assert_true(save.set_difficulty(Difficulty.EASY))
-	assert_eq(save.difficulty, Difficulty.EASY)
-	assert_signal_emitted(save, "changed")
-	assert_false(save.set_difficulty(Difficulty.EASY), "already Easy")
-	assert_false(save.set_difficulty(9), "unknown")
-	assert_eq(save.difficulty, Difficulty.EASY)
-	var on_disk := SaveGame.new(PREFIX)
-	on_disk.load_slot(1)
-	assert_eq(on_disk.difficulty, Difficulty.NORMAL, "not written until the next save")
-
-
 func test_every_kind_of_run_takes_the_saves_difficulty() -> void:
 	var save := SaveGame.new(PREFIX)
 	save.difficulty = Difficulty.HARD

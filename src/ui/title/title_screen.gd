@@ -189,7 +189,7 @@ func _build_difficulty_page() -> void:
 	var heading := UiStyle.label("CHOOSE DIFFICULTY", 28, UiStyle.TITLE_COLOR)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_difficulty_page.add_child(heading)
-	var note := UiStyle.label("Enemy HP and damage. You can change it later from the gear menu.", 18, UiStyle.DIM_COLOR)
+	var note := UiStyle.label("Enemy HP and damage. It can't be changed later.", 18, UiStyle.DIM_COLOR)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size.x = BUTTON_SIZE.x
