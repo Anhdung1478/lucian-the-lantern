@@ -1,7 +1,7 @@
 extends GutTest
 ## The ending: Thresh falls in 6-5, SennaFreed plays (skippable), the stage
 ## pays and clears, "The story is complete" on the first clear, and Game shows
-## TheEndScreen on that first clear only.
+## TheEndScreen on a clear until the slot has seen it (SaveGame.ending_seen).
 
 const PREFIX := "user://test_ending_save_slot_"
 
@@ -227,6 +227,7 @@ func test_continue_after_retry_plays_6_5_again() -> void:
 
 func test_a_replay_goes_straight_where_the_button_said() -> void:
 	SaveGame.instance().set_cleared(["6-5"] as Array[String])
+	SaveGame.instance().ending_seen = true
 	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 6, 5))
 	await wait_process_frames(2)
 	var stage := game.screen as Stage
@@ -234,6 +235,41 @@ func test_a_replay_goes_straight_where_the_button_said() -> void:
 	stage.result.chosen.emit(&"main")
 	await wait_process_frames(3)
 	assert_is(game.screen, MainScreen, "no end screen on a replay")
+
+
+func test_the_first_clear_saves_that_the_end_was_seen() -> void:
+	var stage := await _fight()
+	await _win(stage)
+	stage.result.chosen.emit(&"main")
+	await wait_process_frames(3)
+	assert_is(game.screen, TheEndScreen)
+	assert_true(SaveGame.instance().ending_seen)
+	var saved := SaveGame.new(SaveGame.instance().prefix)
+	saved.load_slot(1)
+	assert_true(saved.ending_seen, "written with the clear")
+	assert_true("6-5" in saved.cleared)
+
+
+## Closing the window on the first clear's result and saving records the
+## clear, but The End was never shown: the next clear shows it.
+func test_a_clear_saved_from_the_result_panel_still_shows_the_end_next_time() -> void:
+	var stage := await _fight()
+	await _win(stage)
+	game.notification(NOTIFICATION_WM_CLOSE_REQUEST)
+	game.prompt.answer(true)
+	await wait_process_frames(2)
+	var saved := SaveGame.new(SaveGame.instance().prefix)
+	saved.load_slot(1)
+	assert_true("6-5" in saved.cleared, "the clear is kept")
+	assert_false(saved.ending_seen, "but The End was not seen")
+	get_tree().paused = false
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 6, 5))
+	await wait_process_frames(2)
+	(game.screen as Stage).show_result(true)
+	(game.screen as Stage).result.chosen.emit(&"main")
+	await wait_process_frames(3)
+	assert_is(game.screen, TheEndScreen, "a replay shows The End until it is seen")
+	assert_true(SaveGame.instance().ending_seen)
 
 
 func test_a_failed_save_still_shows_the_end_screen() -> void:

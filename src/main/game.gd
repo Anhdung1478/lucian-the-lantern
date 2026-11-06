@@ -173,8 +173,12 @@ func _on_stage_finished(result: StringName, then: StringName) -> void:
 	var act := _run.act
 	var stage := _run.stage
 	var next := Journey.next_stage(act, stage)
-	# Before finish_stage records it.
-	var story_ends := result == &"cleared" and next == Vector2i.ZERO and not _run.stage_id in SaveGame.instance().cleared
+	# The End shows on a clear of the last stage until the slot has seen it,
+	# so a clear saved by closing the window on the result still gets it.
+	# The flag is set first, so finish_stage writes it with the clear.
+	var story_ends := result == &"cleared" and next == Vector2i.ZERO and not SaveGame.instance().ending_seen
+	if story_ends:
+		SaveGame.instance().ending_seen = true
 	var saved := SaveGame.instance().finish_stage(result, _run.stage_id)
 	if result == &"failed" and _run.tutorial:
 		then = &"title"

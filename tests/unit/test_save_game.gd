@@ -322,6 +322,27 @@ func test_a_file_without_bosses_loads() -> void:
 	assert_true(loaded.bosses.is_empty())
 
 
+func test_ending_seen_is_saved_and_an_old_file_has_not_seen_it() -> void:
+	assert_false(save_game.ending_seen, "a new game")
+	save_game.ending_seen = true
+	save_game.save()
+	var loaded := SaveGame.new(PREFIX)
+	loaded.load_slot(1)
+	assert_true(loaded.ending_seen)
+	var data := save_game.to_dict()
+	data.erase("ending_seen")
+	_write_text(save_game.path(1), JSON.stringify(data))
+	loaded.load_slot(1)
+	assert_false(loaded.ending_seen, "a save from before the flag")
+	data["ending_seen"] = "yes"
+	_write_text(save_game.path(1), JSON.stringify(data))
+	loaded.load_slot(1)
+	assert_false(loaded.ending_seen, "a wrong type is a new game's value")
+	loaded.ending_seen = true
+	loaded.reset()
+	assert_false(loaded.ending_seen)
+
+
 func test_start_new_writes_that_slot_and_makes_it_current() -> void:
 	save_game.essences.add(Essences.BLUE, 500)
 	assert_true(save_game.start_new(2))

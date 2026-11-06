@@ -41,6 +41,10 @@ var play_time := 0.0
 ## Difficulty.EASY ... EXTREME: picked with the new game, changed from the
 ## gear menu.
 var difficulty := Difficulty.NORMAL
+## The End screen was shown in this slot. Until it is, every clear of the
+## last stage shows it (a clear saved from its result panel, by closing the
+## window, has not seen it yet). A save from before the flag has not.
+var ending_seen := false
 
 
 ## The running game's progress: slot 1 until the title screen loads another.
@@ -118,6 +122,7 @@ func reset() -> void:
 	bosses = []
 	play_time = 0.0
 	difficulty = Difficulty.NORMAL
+	ending_seen = false
 	tree.acts_cleared = 0
 	changed.emit()
 
@@ -259,6 +264,7 @@ func to_dict() -> Dictionary:
 		"bosses": bosses.duplicate(),
 		"play_time": int(play_time),
 		"difficulty": Difficulty.KEYS[difficulty],
+		"ending_seen": ending_seen,
 	}
 
 
@@ -346,5 +352,7 @@ func _apply(data: Dictionary) -> void:
 	play_time = maxf(float(seconds), 0.0) if (seconds is int or seconds is float) else 0.0
 	# A save from before difficulties plays on Normal.
 	difficulty = Difficulty.from_key(data.get("difficulty", ""))
+	var seen: Variant = data.get("ending_seen", false)
+	ending_seen = seen if seen is bool else false
 	tree.acts_cleared = Journey.acts_cleared(cleared)
 	changed.emit()
