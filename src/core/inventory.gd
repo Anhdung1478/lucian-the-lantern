@@ -126,8 +126,8 @@ func count_at(index: int) -> int:
 
 
 ## How many more of `item` fit: room in a potion's own potion cell, then in
-## the backpack's stacks and empty cells (unlocked cells only). Boots never
-## fit.
+## the backpack's stacks and empty cells, then in empty equip slots that take
+## it (unlocked cells only; potions never go to equip slots). Boots never fit.
 func space_for(item: ItemData) -> int:
 	if item.is_boots():
 		return 0
@@ -137,12 +137,15 @@ func space_for(item: ItemData) -> int:
 		room += _room_in(cell, item)
 	for i in unlocked_backpack:
 		room += _room_in(i, item)
+	for i in _equip_cells_for(item):
+		room += _room_in(i, item)
 	return room
 
 
 ## Puts `amount` of `item` away: a potion fills its potion cell first; then
-## the backpack's stacks with room, then its first empty cells. All or
-## nothing: false when it doesn't fit.
+## the backpack's stacks with room, then its first empty cells; then, when the
+## backpack is full, empty equip slots that take it (it applies at once). All
+## or nothing: false when it doesn't fit.
 func add(item: ItemData, amount := 1) -> bool:
 	if space_for(item) < amount:
 		return false
@@ -155,6 +158,8 @@ func add(item: ItemData, amount := 1) -> bool:
 				break
 			if (items[i] == null) == pass_empty:
 				amount = _fill(i, item, amount)
+	for i in _equip_cells_for(item):
+		amount = _fill(i, item, amount)
 	changed.emit()
 	return true
 
@@ -304,6 +309,15 @@ func _fill(index: int, item: ItemData, amount: int) -> int:
 	if moved > 0:
 		_set_cell(index, item, counts[index] + moved)
 	return amount - moved
+
+
+## The unlocked equip slots `item` may go in (none for potions and boots).
+func _equip_cells_for(item: ItemData) -> Array[int]:
+	var cells: Array[int] = []
+	for i in range(EQUIP_START, EQUIP_START + unlocked_equip):
+		if accepts(i, item):
+			cells.append(i)
+	return cells
 
 
 func _first_empty_backpack_cell() -> int:

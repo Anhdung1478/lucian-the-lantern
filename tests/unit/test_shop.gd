@@ -46,9 +46,18 @@ func test_a_sold_or_locked_slot_cannot_be_bought() -> void:
 	assert_eq(wallet.gold, 4000)
 
 
-func test_full_backpack_is_refused_without_paying() -> void:
+func test_a_full_backpack_buys_into_an_empty_equip_slot() -> void:
 	wallet.add(5000)
 	for i in Inventory.BACKPACK_SIZE:
+		inventory.add(catalog.find(&"sword"))
+	assert_eq(shop.buy_slot(0), Result.OK)
+	assert_eq(inventory.item_at(EQUIP), stock.items[0])
+	assert_eq(wallet.gold, 4000)
+
+
+func test_full_backpack_and_equip_row_is_refused_without_paying() -> void:
+	wallet.add(5000)
+	for i in Inventory.BACKPACK_SIZE + Inventory.EQUIP_SIZE:
 		inventory.add(catalog.find(&"sword"))
 	assert_eq(shop.buy_slot(0), Result.NO_ROOM)
 	assert_eq(wallet.gold, 5000)
@@ -136,8 +145,9 @@ func test_a_locked_cell_is_refused_without_paying() -> void:
 func test_no_room_counts_only_the_open_cells() -> void:
 	wallet.add(5000)
 	inventory.unlocked_backpack = 2
-	inventory.add(catalog.find(&"sword"), 1)
-	inventory.add(catalog.find(&"belt"), 1)
+	inventory.unlocked_equip = 1
+	for i in 3:
+		inventory.add(catalog.find(&"sword"), 1)
 	assert_eq(shop.buy_slot(0), Result.NO_ROOM)
 	assert_eq(wallet.gold, 5000)
 

@@ -42,11 +42,51 @@ func test_add_fills_first_empty_backpack_cell() -> void:
 	assert_eq(inventory.item_at(0), item(&"belt"))
 
 
-func test_add_never_fills_equip_slots() -> void:
+func test_a_full_backpack_fills_an_empty_equip_slot() -> void:
 	for i in Inventory.BACKPACK_SIZE:
 		inventory.add(item(&"sword"))
-	assert_false(inventory.add(item(&"rod")), "backpack is full")
+	assert_true(inventory.add(item(&"rod")), "the backpack is full, an equip slot is free")
+	assert_eq(inventory.item_at(EQUIP), item(&"rod"))
+	assert_true(inventory.add(item(&"belt")))
+	assert_eq(inventory.item_at(EQUIP + 1), item(&"belt"), "the first empty slot each time")
+
+
+func test_the_backpack_is_used_before_the_equip_slots() -> void:
+	inventory.add(item(&"rod"))
+	assert_eq(inventory.item_at(0), item(&"rod"))
 	assert_null(inventory.item_at(EQUIP))
+
+
+func test_add_skips_locked_and_taken_equip_slots() -> void:
+	for i in Inventory.BACKPACK_SIZE:
+		inventory.add(item(&"sword"))
+	inventory.unlocked_equip = 2
+	inventory.put(EQUIP, item(&"belt"))
+	assert_eq(inventory.space_for(item(&"rod")), 1)
+	assert_true(inventory.add(item(&"rod")))
+	assert_eq(inventory.item_at(EQUIP + 1), item(&"rod"))
+	assert_false(inventory.add(item(&"rod")), "every open cell is taken")
+	assert_null(inventory.item_at(EQUIP + 2), "the locked slot stays empty")
+
+
+func test_potions_never_go_to_equip_slots() -> void:
+	for i in Inventory.BACKPACK_SIZE:
+		inventory.add(item(&"sword"))
+	assert_eq(inventory.space_for(item(&"red")), 9, "only its own potion cell")
+	assert_false(inventory.add(item(&"red"), 10))
+	assert_true(inventory.add(item(&"red"), 9))
+	assert_eq(inventory.space_for(item(&"red")), 0)
+	assert_false(inventory.add(item(&"red")))
+	for i in range(EQUIP, Inventory.EQUIP_END):
+		assert_null(inventory.item_at(i))
+
+
+func test_changed_fires_when_add_fills_an_equip_slot() -> void:
+	for i in Inventory.BACKPACK_SIZE:
+		inventory.add(item(&"sword"))
+	watch_signals(inventory)
+	inventory.add(item(&"rod"))
+	assert_signal_emitted(inventory, "changed")
 
 
 func test_drop_on_empty_cell_moves() -> void:
@@ -203,7 +243,7 @@ func test_space_for_counts_room_in_stacks_and_empty_cells() -> void:
 	inventory.add(item(&"red"), 9 + 5)
 	assert_eq(inventory.space_for(item(&"red")), 4)
 	assert_eq(inventory.space_for(item(&"blue")), 9, "only its own potion cell is left")
-	assert_eq(inventory.space_for(item(&"sword")), 0)
+	assert_eq(inventory.space_for(item(&"sword")), Inventory.EQUIP_SIZE, "then the empty equip slots")
 
 
 func test_add_is_all_or_nothing() -> void:
@@ -321,6 +361,8 @@ func test_unlocked_backpack_stays_between_1_and_54() -> void:
 
 func test_add_and_space_for_use_only_open_cells() -> void:
 	inventory.unlocked_backpack = 5
+	inventory.unlocked_equip = 1
+	inventory.put(EQUIP, item(&"belt"))
 	assert_eq(inventory.space_for(item(&"sword")), 5)
 	for i in 5:
 		assert_true(inventory.add(item(&"sword")))
