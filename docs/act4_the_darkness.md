@@ -96,7 +96,7 @@ He rises from the river in the boss wave. He uses one skill at a time; while bus
 | Basic attack | Two dark shots 0.15 s apart, one from each gun, 40 physical each (1400 px/s). Range 550, every 1.3 s. Walks at 330; radius 40. |
 | **Piercing Light (Q)** | A line warning (1100 × 70) at Lucian for 0.7 s, then a dark violet laser along it: 170 physical. Cooldown 7 s, first after 3 s. |
 | **Relentless Pursuit (E)** | A 400 px dash in 0.2 s, untargetable on the way: shots in flight miss, and he is half seen, with a violet trail. **Dodge:** sideways, once he has taken 6% of his max HP (1080) within 1.5 s. **Chase:** at Lucian, when Lucian is more than 750 away. Cooldown 6 s. |
-| **The Culling (R)** | At or below 80% HP. A line warning (1200 × 120) at Lucian for 0.8 s. Then for 3 s he fires 24 bullets along that fixed line (±4° spread, 30 physical each, 1400 px/s, reach 1200) while he strafes sideways at 150 px/s. A step out of the line dodges them all. Cooldown 20 s. |
+| **The Culling (R)** | At or below 80% HP. A line warning (1200 × 120) at Lucian for 0.8 s. Then for 3 s he fires 24 bullets along that fixed line (±4° spread, 30 physical each, 1400 px/s, reach 1200) while he strafes sideways at 150 px/s. A step out of the line dodges them all. Cooldown 20 s. *(V1.4.2: while the stream fires, a faint band (alpha about 0.12, 1200 × 120) lies along the line, under the units, and moves with him. It is gone when the stream ends or he dies.)* |
 | Rewards | 300 gold, 100 blue, 5 orange, and 10 purple the first time, 2 on a replay |
 
 Lucian keeps his attack order on him through the dash and shoots again once he is back.

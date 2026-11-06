@@ -23,6 +23,18 @@ it would. The legendary takes the first fragment's cell. Selling a crafted legen
 less than selling its two fragments, so crafting and then selling never makes gold. The same tab
 upgrades the boots (see *Boots*).
 
+**Buyback** *(since V1.4.2)*: the merchant's **Undo sale** button buys back what you sold, last
+sale first, for the gold you got, until you leave the merchant. The item goes back to its old
+cell if that is empty, or to a free cell. Stacks and cooldowns of an equipped item that was sold
+and bought back are not restored.
+
+**Recipe hints** *(since V1.4.2)*: in the shop, a fragment's card lists what it builds into with
+the items you hold ("Builds into Muramana with Tear (you have it)"; at most 3 lines, then "+N
+more"), and "Upgrades your Boots into X" when it fits your boots.
+
+**Full backpack** *(since V1.4.2)*: a fragment or legendary with no backpack cell free goes to an
+empty, unlocked equip slot instead. Potions never do.
+
 ## Fragments
 
 | Code | Fragment | Stat | Cost |
@@ -292,7 +304,7 @@ spell haste** (shortens summoner cooldowns like ability haste does skills: 100 h
 - +40 Attack Damage
 - +40 Armor
 - +250 Health
-- *Passive — Ignore Pain:* 30% of damage taken is delayed and taken over 3 s instead.
+- *Passive — Ignore Pain:* 30% of damage taken is delayed and taken over 3 s instead. *(Since V1.4.2 an **Ignore Pain** icon shows in the buff row while damage is still to come: the number is the damage left, and it goes when the bleed ends or Defy clears it.)*
 - *Passive — Defy:* Killing an enemy clears the delayed damage and restores 15% max health over 2 s.
 
 ### Fimbulwinter

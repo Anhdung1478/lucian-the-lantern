@@ -45,6 +45,7 @@
 ### Buff icons (above the skill bar)
 - **Very small icons** (36 px) in a row just above the HUD panel, starting over the portrait, like LoL.
 - Shows: Blue / Red buff (with timer), current Endless modifier, status effects (slow, stun, burn, etc.).
+- **Death's Dance (V1.4.2):** an **Ignore Pain** icon shows while its delayed damage is still to come. The number is the damage left, it counts down as the bleed ticks, and a sweep shows the time left. It leaves when the bleed ends, or when Defy's cleanse removes it.
 - **Phase 3 shows:** potions being drunk, move speed buffs (W, Fervor, Stormrazor, and since Phase 4 Ghost and Heal), the Bloodthirster shield, Barrier, and item passive states:
   - **Energized** (only while an Energized item is equipped): the charge 0–100; glows gold at 100.
   - **Kraken Slayer**: the hit count; glows before the 3rd hit.
@@ -52,7 +53,7 @@
 - A dark sweep shows the time that has run out; a number shows stacks, charge or shield.
 - **Hover** the cursor over an icon to see its effect.
 - **Built in Phase 8:** three crowd-control debuffs, in the style of `debuff_slow.svg` (64 × 64, a tinted dark backdrop, `#1a1d24` outlines): **Rooted** (a boot bound by green vines), **Stunned** (yellow stars circling a head) and **Feared** (a frightened purple ghost). Each has a sweep for its time and a one-line text on hover. They sit after "Slowed", the strongest first (stun, fear, root).
-- **Enemy statuses** (Carve stacks, Grievous Wounds, slow, Hatefog) show as tiny icons above the enemy's HP bar.
+- **Enemy statuses** (Carve stacks, Grievous Wounds, slow, Hatefog) show as tiny icons above the enemy's HP bar. *(V1.4.2: an enemy's bar redraws only when its health or a status changes, and about 10 times a second while a timed status is shown, so the time-spent shading still moves.)*
 - **Built in Phase 7:** the **Blue** and **Red** jungle buffs (a blue rune shield, a red flame shield) with their 60 s sweep; **Slowed** (the strongest slow on Lucian) and **Burning** while a burn ticks on him. Over an enemy's bar, slow and burn icons.
 - A shield (Ichorshield and Barrier together) shows as a white segment after the HP on Lucian's HP bar, and as "(+N)" in its text.
 - With **Rapid Firecannon** equipped and the Energized charge full, a light-blue ring shows its longer attack range until the Energized shot lands.
@@ -86,6 +87,22 @@
 | Tenacity | broken chain | tan |
 
 Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
+
+### Short key names (V1.4.2)
+The labels on the HUD's item and potion slots, skill slots, summoner slots and the backpack's cells are small, so a long key name is shortened there (`GameSettings.short_label`). Settings, tooltips, stage tips, the cutscene and the Journey's D / F labels keep the full name.
+
+| Key | Short label |
+|---|---|
+| Mouse 4, Mouse 5, other buttons | M4, M5, M6 … |
+| Wheel up, wheel down | WhU, WhD |
+| Backspace, Space, Escape, Enter | Bcksp, Spc, Esc, Ent |
+| Delete, Insert, Page Up, Page Down, Caps Lock | Del, Ins, PgUp, PgDn, Caps |
+| Keypad N | Num N |
+| Arrows | Up, Dn, Lt, Rt |
+| Backtick | ` |
+| Anything else longer than 5 characters | Cut to 5 |
+
+Godot names the key "Backspace" (not "BackSpace"), so that is the full name Settings shows. The fix wave added short labels for the brackets, the backslash, the slash and the keypad operators, so they don't all collide after the 5-character cut.
 
 ### Top center – Stage info
 - Stage name, **wave counter** (e.g. Wave 2/4) and **enemies remaining**.
@@ -405,6 +422,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Hover** the cursor over a cell with an item for about **1 second** → a pop-up shows that item's stats and effect.
 - Works in the **backpack**, the **merchant's shop**, the **recipe table** and the **HUD item slots**.
 - Layout like LoL: icon, name and cost; stat lines; each passive / active with its name; for a legendary, its recipe.
+- **Recipe hints (V1.4.2):** a fragment's card in the shop lists what it builds into with the items you hold: "Builds into **Muramana** with Tear (you have it)", one line for each partner you own in a backpack or equip cell. At most 3 lines, then "+N more". An extra line, "Upgrades your Boots into X", shows when the fragment fits the boots you wear. With no partner owned, the usual footer stays. Cards elsewhere (backpack, HUD) don't show hints.
 - Each stat line is the **stat icon, the amount in the stat's color, then the name**, e.g. `[axe] +65 Attack Damage`.
 
 ### Built in Phase 10
@@ -412,7 +430,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Only the open cells take items.** A new game opens 5: the first 5 cells. The others show a chain, like a locked equip slot, and hovering one says "Buy Backpack Slots in the Evolution Tree". The tree's Backpack Slots opens more, up to all 54 (game design doc §11).
 - Which cells are open is read from the tree when a stage starts, before the equip slots, so items leaving a locked equip slot land in an open cell. A stage run on its own opens all 54.
 - **Drag and drop:** a drop on a locked cell returns the item to its cell.
-- **When the open cells are full:** loot stays on the ground ("Backpack full" over Lucian), a right-click buy says "No room in the backpack", and a buy dragged onto a locked cell says "That cell is locked".
+- **When the open cells are full:** loot stays on the ground ("Backpack full" over Lucian), a right-click buy says "No room in the backpack", and a buy dragged onto a locked cell says "That cell is locked". *(V1.4.2: **empty, unlocked equip slots are used before this.** A fragment or legendary goes to an open equip slot once the backpack is full, and applies its stats at once. Loot and shop buys both do it. Potions never go to equip slots, and the backpack comes first. The messages above show only when the equip slots are full too.)*
 - **Debug:** the stage debug table has a "Backpack slots" spinner (1–54).
 
 ---
@@ -445,7 +463,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Opening:** right-click the merchant. Lucian walks over; the shop opens once he is within 250 units (right away if he already is). Hovering the merchant shows a gold ring.
 - **Header:** "MERCHANT" and the stage gold. The recipe table is hidden; the backpack and the shop are centered side by side.
 - **Slots:** 64 px, the price with a coin under each (red when it can't be afforded). A bought slot shows **SOLD** for the rest of the visit, even after a refresh.
-- **Buying:** right-click a shop item to buy it into the first cell it fits, or **hold-drag** it onto a backpack or equip cell. Dropping it on an occupied cell (other than a stack of the same potion with room) buys nothing.
+- **Buying:** right-click a shop item to buy it into the first cell it fits, or **hold-drag** it onto a backpack or equip cell. Dropping it on an occupied cell (other than a stack of the same potion with room) buys nothing. *(V1.4.2: a drop on a taken cell buys into a free cell instead, and says "No room in the backpack" only when none is free. A locked or wrong cell keeps its message.)*
 - **Refused purchase** (not enough gold, no room): a red message in the bottom row and the price flashes red, with an error sound.
 - **Selling:** the 7th equip-row cell turns red and reads **SELL**. Dragging an item over it shows "+N" and "Sells for N gold"; releasing sells it (a whole potion stack at once).
 - **Closing:** ESC or P. The game stays paused while the shop is open.
@@ -469,6 +487,12 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Cards:** a fragment's says "Craft it with another fragment at the merchant's Craft tab."; a legendary's "Recipe: X + Y + N gold at the merchant."
 - **No Use button** in the backpack (see §2, Potions).
 
+### Built in V1.4.2
+- **Undo sale:** a button in the bottom row, on every tab (you can sell from any tab). It is greyed while nothing is sold. Its hover card names the last sale: "Buy back Muramana for 2030 gold".
+  - Each press buys back the **last** thing you sold, and again for the one before it, until you leave the merchant. A new visit starts with nothing to undo.
+  - It costs the gold you got for it. Without enough gold it says "Not enough gold" and keeps the sale. The item returns to its old cell if that is still empty and fits; otherwise to any free cell, or "No room in the backpack".
+  - **Limits:** the stacks and cooldowns of an equipped item that is sold and bought back are not restored.
+
 ---
 
 ## 4. Menu (ESC)
@@ -485,6 +509,12 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
   - **Exit the game** asks **"Save before leaving?"** with **Yes / No / Cancel**. Cancel, or ESC, goes back to this menu, still paused.
   - The question sits over the menu (`Game`'s prompt, layer 90) and reads ESC first, so the menu doesn't close under it.
   - After a Leave, the Journey opens on the act just played, or on Endless after an Endless run (`main_screen.md`).
+- **Menu keys (V1.4.2): arrow keys and Enter work the menus.** (`MenuKeys`, `src/ui/menu/menu_keys.gd`.)
+  - **Where:** the title menu and its slot and difficulty pages, this ESC menu, the main screen's gear menu and its slot page, and every confirm pop-up.
+  - **Keys:** Up and Down (and Left and Right) move a lit row. Greyed and hidden rows are skipped, and the list wraps around. Enter or Keypad Enter presses the lit row. A held Enter is ignored (it doesn't repeat), so it can't answer the next pop-up.
+  - **The lit look** is the row's own hover look (the gold row and bar, or the button's hover colours). Nothing is lit until the first arrow key, so mouse play looks as before. Once something is lit, the mouse moving onto a row lights that one, so the mouse and the keys agree.
+  - **Pop-ups** open with their first button lit (Yes, or the action), so Enter answers at once. Left and Right move across the side-by-side buttons. ESC still answers as before.
+  - **Space** is untouched: it is still Center camera. Not covered: the skin and tree purchase pop-ups, the stage result panel, The End and Settings.
 - **Built in V1.2: an ornate card.**
   - The menu is a card (`MenuCard`) over the game, which is blurred, darkened and vignetted behind it (`MenuBackdrop`).
   - The card has a navy-to-teal gradient, a double gold frame with a diamond at each corner, and a round lantern medallion over its top edge.
@@ -502,9 +532,9 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 | Tab | Contents |
 |---|---|
 | Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. No music yet. |
-| Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. Each skill, summoner and item key also has a **cast mode** picker: Quick cast, Quick + indicator, Normal cast (Reset to defaults sets them back to Quick cast). |
+| Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A double-click doesn't bind the left button (the second press is ignored); a separate later click still does. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. Each skill, summoner and item key also has a **cast mode** picker: Quick cast, Quick + indicator, Normal cast (Reset to defaults sets them back to Quick cast). |
 | Graphics | Window mode (windowed, borderless fullscreen, fullscreen), Resolution (1280×720, 1366×768, 1600×900, 1920×1080, 2560×1440, 3840×2160; sizes too big for a window on this screen, title bar included, are greyed out and marked "too big"; sets and centers the window, greyed out in borderless/fullscreen; *V1.3.1:* only at launch and when changed here, so starting a stage leaves a maximized or resized window alone), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails, muzzle flashes or summoner spell effects (Flash sparks, Ghost afterimages, Barrier bubble, Heal and Clarity bursts); Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
-| Gameplay | Skill queue (on by default; see the game design doc §2). |
+| Gameplay | Cast queue (on by default; see the game design doc §2). It was called Skill queue before V1.4.2. |
 
 - **Not yet:** cast modes (normal / quick / quick with indicator) and camera options.
 
@@ -523,7 +553,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 | Audio | "Volumes change at once. Letting go of a slider plays a test sound." The three volumes, shown as whole numbers ("80"). "No music yet" is now the Music row's description. |
 | Controls | "Click a binding, then press a key or click it again with a mouse button." The list is grouped: MOVE AND ATTACK, SKILLS, SUMMONER SPELLS, ITEMS, INTERFACE. A 2-line hint sits under it. A binding waiting for a key is lit gold and reads "Press a key...". |
 | Graphics | "The window, the frame rate and how much the effects cost." The old notes are the Resolution and Quality rows' descriptions. |
-| Gameplay | "How Lucian takes your orders." Skill queue, with its note as the description. |
+| Gameplay | "How Lucian takes your orders." Cast queue, with its note as the description: a skill, item active or summoner spell pressed during a cast time or a dash is cast when it ends. |
 
 **No grey default widget is left.** A theme made in code (`UiStyle.theme()`) styles every control:
 - **sliders:** a dark rounded track, a gold fill, and a gold diamond handle that brightens on hover;
@@ -566,8 +596,9 @@ The game opens here (built in Phase 6).
 | Empty | "Slot 3 · empty" (disabled in Load game) |
 | Used | "Slot 2 · 1h 02m · saved 2026-10-29 03:10": its play time and when it was saved |
 
+- **Built in V1.4.2:** if the new game can't be written to its slot, the game doesn't start. You stay on the difficulty page, and a red line on every page reads "Could not write slot N. The game can't start until it can save." with the error sound. The slot and the data in memory go back to what they were. Back, or going to the slot list, clears the line.
 - A new game on a used slot asks "Overwrite slot 2? Its progress will be lost." (Yes / No). Yes writes the new game at once and starts Act 1. An empty slot starts at once.
-- **Built in V1.3:** after the slot (and its Overwrite question), **CHOOSE DIFFICULTY**: "Enemy HP and damage. You can change it later from the gear menu.", then four buttons, **Easy ×0.8**, **Normal ×1.0** (in gold), **Hard ×1.1** and **Extreme ×1.3**, and Back. Hovering one says what it does ("Enemies have 110% HP and deal 110% damage. Blue essence ×1.2."). A pick writes the new game and starts Act 1. Back or ESC returns to the slot list.
+- **Built in V1.3:** after the slot (and its Overwrite question), **CHOOSE DIFFICULTY**: "Enemy HP and damage. It can't be changed later.", then four buttons, **Easy ×0.8**, **Normal ×1.0** (in gold), **Hard ×1.1** and **Extreme ×1.3**, and Back. Hovering one says what it does ("Enemies have 110% HP and deal 110% damage. Blue essence ×1.2."). A pick writes the new game and starts Act 1. Back or ESC returns to the slot list.
 - Loading a slot opens the main screen on Journey.
 - The slot buttons are 520 px wide, so the longest text keeps room around it. The gear menu's Save as copy uses the same list.
 
@@ -592,7 +623,7 @@ The game opens here (built in Phase 6).
 ## 8. Sounds
 
 All 24 sounds are placeholders, generated in code by `Sfx` (`src/audio/sfx.gd`): there are no audio files. Phases 3–8 made 13 of them; Phase 9 added 11.
-- They play on the **SFX** bus, so the Sound effects slider (Settings → Audio) sets them all. Each plays with a small random pitch (±4%), and the same sound never starts twice within 0.035 s.
+- They play on the **SFX** bus, so the Sound effects slider (Settings → Audio) sets them all. Each plays with a small random pitch (±4%), and the same sound never starts twice within 0.035 s. *(V1.4.2: a new sound takes a free player first. With none free, it takes the oldest that isn't playing a stinger (`boss`, `victory`, `defeat`, `wave`, `level_up`, `rank_up`, `freed`), so busy fights don't cut off a stinger. A stinger is cut only when all 12 players hold stingers.)*
 - `Game` and a stage run on its own each add one `Sfx` node, so the title screen and the main screen have sounds too.
 - **Volume** is the play's own level: 0 dB is full.
 - Phase 9's sounds were tuned from their numbers only. Nobody has listened to them yet.

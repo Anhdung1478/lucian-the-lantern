@@ -23,20 +23,21 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 | **Close** | Closes the pop-up |
 | **Save** | Saves to the current save slot |
 | **Save as copy** | Copies the current progress into another slot (asks before overwriting) |
-| **Difficulty** | Easy, Normal, Hard or Extreme for this save (V1.3) |
+| **Difficulty** | A greyed info row: it shows the save's level and can't be pressed. Difficulty is set when a new game starts (V1.4.2) |
 | **Settings** | Opens the game settings |
 | **Leave to main menu** | Asks **"Save before leaving?"** (Yes / No / Cancel), then returns to the title screen / save slot selection. Cancel stays, with the menu open |
 | **Exit the game** | Asks **"Save before leaving?"** (Yes / No / Cancel), then closes the game. Cancel stays, with the menu open |
 
-- **Nothing on the main screen saves by itself.** Evolution Tree and Skin Shop purchases are kept by **Save**, a **Yes** when leaving, or the auto-save when the next stage is done (see the game design doc §15).
+- **Little on the main screen saves by itself.** Evolution Tree and Skin Shop purchases are kept by **Save**, a **Yes** when leaving, **pressing Start** (any Start: a stage, Endless or Training; V1.4.2), or the auto-save when the next stage is done (see the game design doc §15).
+- **Start saves first.** If the save fails, the stage doesn't start. A red toast reads "Could not save, so the stage didn't start", the error sound plays, and you stay on the main screen. *(V1.4.2.)*
 - **Built in V1.2:** the pop-up is the same ornate card as the stage's ESC menu (`ui_design.md` §4).
   - Under **MENU** it shows "Slot N · <play time>".
   - Close is gold. Save shows "Slot N". Save as copy shows "To another slot". Leave to main menu shows "Title screen".
   - Leave and Exit turn red on hover.
   - Save as copy's page is titled **SAVE AS COPY**, "Pick a slot", with a Back row.
-- **Built in V1.3:** a **Difficulty** row (skull icon) after Save as copy; its hint names the current level.
-  - It opens a page titled **DIFFICULTY**, "Enemy HP and damage": Easy ×0.8, Normal ×1.0, Hard ×1.1, Extreme ×1.3, then Back. The current one is greyed ("Current · ×1.0"), and hovering a level says what it does.
-  - A pick goes back to the menu with the toast "Difficulty: Hard". Like a tree purchase, it is kept by the next save. ESC on the page goes back to the menu.
+- **Built in V1.3, locked in V1.4.2:** a **Difficulty** row (skull icon) after Save as copy; its hint names the current level (Easy ×0.8, Normal ×1.0, Hard ×1.1, Extreme ×1.3).
+  - V1.3 let you change it here, on a page titled **DIFFICULTY**. Since V1.4.2 the row is greyed and can't be pressed. Its hover text says "Set when this game started". The level is picked once, on the title screen's new-game page, and an old save keeps the level it has.
+  - The DIFFICULTY page, its toast and its ESC step are gone.
 
 ### Navigation
 - **Sections** (Evolution Tree, Skin Shop, Journey): switched with a bar at the **bottom** of the screen.
@@ -63,6 +64,9 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
   2. An open pop-up in the section closes: the spell menu in Journey, the node info panel in the Evolution Tree.
   3. The slot list goes back to the menu; an open gear menu closes.
   4. Otherwise ESC opens the gear menu.
+  - *(V1.4.2: while the gear menu is open, ESC goes to it first, before a pop-up that is hidden under it. So a tree purchase pop-up stays open when the menu closes.)*
+- **Arrow keys and Enter (V1.4.2):** with the gear menu open, Up and Down light a row (greyed and hidden rows are skipped, and the list wraps) and Enter presses it. The slot page works the same. Nothing is lit until the first arrow key. Space is untouched: it is still Center camera. Confirm pop-ups open with their first button lit, so Enter answers it; Left and Right move across the buttons (`ui_design.md`, "Menu keys").
+- **The skin preview stops while covered (V1.4.2):** an open Skin Shop preview is frozen while the gear menu, Settings or a confirm pop-up covers it, and resumes when it is closed.
 - **Debug table (F3 + Q, hidden by default):** an **Essences** tab (blue +100 / +1000 / +10000, orange and purple +1 / +10 / +100, Reset for each) and a **Progress** tab (Acts cleared 0–6, Max tree (free), Clear tree (no refund), Reset progress: a new game in memory). Nothing there saves.
 
 ### Built in Phase 6
@@ -86,7 +90,7 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 - **ESC**, in this order:
   1. An open question reads ESC first. On "Save before leaving?" (and the title's "Exit the game?") ESC is **Cancel**. On a Yes / No question it answers **No** (Overwrite, Reset tree). On "Could not save…" it does nothing. Settings reads its own ESC, as in a stage.
   2. An open pop-up in the section closes: the spell menu in Journey, the node info panel in the Evolution Tree.
-  3. The slot list goes back to the menu; an open gear menu closes.
+  3. The slot list goes back to the menu; an open gear menu closes. *(V1.4.2: the gear menu comes before step 2, so a pop-up under it stays open.)*
   4. Otherwise ESC opens the gear menu.
 - **Sounds:** every styled button clicks softly (−10 dB), on the main screen and the title too (`ui_design.md` §8).
 
@@ -393,7 +397,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
   - A locked card shows a chain; a cleared card gets a green check and a green frame.
   - **Start** is disabled ("Acts come in a later phase"). *(Acts 1–2 start since Phase 6, Acts 3–4 since Phase 7, Acts 5–6 since Phase 8.)*
 - **Training page:** what Training is ("Practice on training dummies with what you have bought in the Evolution Tree and your equipped skin. No essences are earned. Leave from the ESC menu to come back here.") and a gold **Start Training** button.
-- **Endless page:** the rules (waves never end, a mini boss every 5 waves, an act boss every 10, a modifier pick every 10), a map choice (Random or one of the six act maps; kept on the page, not saved yet), "Best wave: N" and **Start** disabled ("Endless comes in a later phase"). *(Start works since Phase 9.)*
+- **Endless page:** the rules (waves never end, a mini boss every 5 waves, an act boss every 10, a modifier pick every 10), a map choice (Random or one of the six act maps; since V1.4.2 it is kept in the save, with its other data, and is written by the next save, such as the one Start makes), "Best wave: N" and **Start** disabled ("Endless comes in a later phase"). *(Start works since Phase 9.)*
 - **Loadout panel** (right side, on every tab): "SUMMONER SPELLS" with two 72 px buttons under their keys (**D** and **F**, following the bindings).
   - A click opens a small menu beside the panel: one icon per **bought** spell (the one already there is lit) and **None**. It closes on a pick, ESC, a click outside, or a second click on the same key.
   - Picking the spell that is on the other key swaps the two.

@@ -80,7 +80,7 @@ Casts with no aim (potions, Ghost, Barrier, Heal, Clarity) and casts that aren't
 
 **Key bindings** can be changed in Settings → Controls (all but ESC and the debug F3 + Q).
 
-**Skill queueing (setting, on by default):** a skill pressed during another skill's cast time or the E dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept. Q / W pressed during R are still refused.
+**Cast queue (setting, on by default; called Skill queue before V1.4.2):** a skill, an item active (Gunblade, Galeforce, Rocketbelt…) or a summoner spell pressed during a cast time or the E dash is cast as soon as it ends, aimed where the key was pressed. All three share **one slot** and only the latest press is kept. The only cast times are Q's 0.3 s and W's 0.2 s: R is a channel, not a lock, so nothing waits through it, and Q / W pressed during R are still refused. Potions stay instant. A rooted Flash or item dash is refused, not queued. A stun, a displacement or death drops the queued press. With the setting **off**, a summoner spell pressed during Q's or W's cast time is refused, as a skill is. *(V1.4.2.)*
 
 **A + Left-click (built in Phase 7).** A arms it: Lucian's attack range shows as a ring and the cursor turns to a cross. The left-click then picks one target, in this order:
 1. The enemy (or Blast Cone) under the cursor, even out of range.
@@ -174,6 +174,7 @@ Acts 3 and 4 play this way too (`act3_the_jungle.md`, `act4_the_darkness.md`): p
 
 **Status effects:**
 - **Slows** work on Lucian and on enemies. The strongest one wins; tenacity doesn't shorten them. Gunblade's 40% uses the same rule. *(Since V1.4, Lucian's slow resist from boots weakens the slow: × (1 − slow resist).)*
+- **Overlapping burns** with the same id: **the strongest wins** (V1.4.2). A weaker one can't lower a stronger one that still has time left, and it takes over once the stronger one runs out. A zone re-applies its burn every frame, so a weaker zone takes over 0.5 s after Lucian leaves the stronger one. An equal or stronger burn replaces the current one, as before.
 - **Burns** deal damage every 0.5 s for their time, physical, magic or true (armor and MR lower them as usual). A tick makes no hit sound and no flash. It isn't a basic attack or a skill, so it triggers no on-hit effect, no Thornmail, and Banshee's Veil doesn't spend itself on one.
 - On Lucian they show in the buff row ("Slowed", "Burning", the strongest slow); on an enemy, as icons over its HP bar.
 - **Timed stat buffs** (the jungle buffs) raise HP regen, mana regen and ability haste for their time.
@@ -193,11 +194,12 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 | Kind | Effect |
 |---|---|
 | Root | He can't walk, use E, Flash or an item dash (Galeforce, Rocketbelt). A move order waits and runs when the root ends. Attacks in range, Q, W, R and items that don't move him still work. |
-| Stun | He can't act. It drops the windup, the queued cast, a dash and R, as a displacement does. *(V1.3.1: it also drops a shot still waiting to fire: Q's beam or W's missile in their cast time, the passive's second shot, Galeforce's missiles. Death and Guardian Angel's stasis drop them too. Mana and cooldowns stay spent; a shot already flying still lands.)* |
+| Stun | He can't act. It drops the windup, the queued cast, a dash and R, as a displacement does. **His last move, attack or merchant order is kept** (V1.4.2, see below). *(V1.3.1: it also drops a shot still waiting to fire: Q's beam or W's missile in their cast time, the passive's second shot, Galeforce's missiles. Death and Guardian Angel's stasis drop them too. Mana and cooldowns stay spent; a shot already flying still lands.)* |
 | Fear | He can't act. It drops the same, and he runs straight away from the source at 60% of his speed, sliding along walls. Walls and the abyss stop him; enemy bodies don't, so nothing can push him along. It builds no Energize. With a root at the same time, the fear still walks him (the fear wins). |
 
 - **Tenacity** shortens root, stun and fear (a time × (1 − tenacity)); the same kind keeps the longer time. **Slows are not shortened**, as before.
-- A stun or fear during a pull lets the pull finish and holds him after it. A root doesn't end a dash already under way.
+- A stun or fear during a pull lets the pull finish and holds him after it. A **root ends a dash already under way** (V1.4.2): he stops where he is. Galeforce's missiles still fire, since a root doesn't stop attacks.
+- **Orders through crowd control (V1.4.2, like LoL):** a stun, fear, displacement, throw or Guardian Angel's stasis drops what is in flight (the windup, a queued cast, a walk to a cast) but **keeps a MOVE, ATTACK or merchant-visit order**. The order doesn't run during the CC and runs again when it ends. Right-clicks and left-clicks (and A + Left-click) are accepted while he is stunned, so a click given during the CC replaces the old order and runs after it; the attack target is resolved at the click. A held right-click keeps steering afterwards. A merchant clicked during CC opens once it ends. Skill, item, summoner and potion keys stay ignored during CC. Death clears everything.
 - Dead, in stasis, `invulnerable` or thrown over a wall: he refuses CC. Death clears it.
 - **A skill's CC lands only when its hit lands:** Banshee's Veil blocks the damage and the CC with it.
 - **Fairness:** every root, stun or fear comes from a warning of 0.7 s or more, or from a bolt or wave he can see, and lasts 1.5 s at most (1.0, 1.25 and 1.25 s are the built values). It shows in the buff row ("Rooted", "Stunned", "Feared", with icons) and as a short red word under his health bar (the strongest: stun, then fear, then root).
@@ -214,7 +216,7 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 
 **The ending:** the cutscene (skippable), STAGE CLEARED with "Senna is free" and "The story is complete", then, on the first clear only, `TheEndScreen` with the slot's story time. Replays skip it.
 
-**Debug:** the stage debug table gains "Boss HP 5%" and "Jump to the last wave" (every enemy goes, no rewards, and the last wave comes next).
+**Debug:** the stage debug table gains "Boss HP 5%" and "Jump to the last wave" (every enemy goes, no rewards, and the last wave comes next). Since V1.4.2 the jump also removes untargetable bosses (one mid-dash, mid-Rappel or mid-Sky Dive).
 
 ---
 
@@ -272,9 +274,10 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 ### Backpack & equipment
 - **Backpack:** 49 slots (7 × 7). *(Since Phase 10: 54 cells (9 × 6), and only 5 are open at the start. The Evolution Tree's Backpack Slots opens the rest (§11).)*
 - **Equip slots:** start with 1, unlock up to 6 in the Evolution Tree. *(Since Phase 10, slots 3–4 need Act 2 cleared and slots 5–6 need Act 4 (§11).)*
+- **Full backpack (V1.4.2):** a fragment or legendary that finds the backpack full goes to an **empty, unlocked equip slot** that takes it, and applies its stats at once. Shop buys and loot pickup both do this. The backpack comes first, and potions never go to equip slots.
 - **Potion cells** *(since V1.4)*: one for Health potions on key 7 and one for Mana potions on key 8, never locked, 9 each. Bought potions fill them first; the player refills them by hand. Potions can't go in equip slots.
 - **Boots cell** *(since V1.4)*: the boots bought in the Evolution Tree, worn on every map. They give stats and passives, have no key and never leave the cell. The merchant's Boots tab (the Craft tab since V1.4.1) upgrades them with a fragment and a gold fee (`items.md`, Boots).
-- Items can be **sold** to the merchant for **70%** of their buy price (**Guardian Angel: 40%**). Legendary items **cannot be broken** back into fragments.
+- Items can be **sold** to the merchant for **70%** of their buy price (**Guardian Angel: 40%**). Legendary items **cannot be broken** back into fragments. **Undo sale** (V1.4.2): the merchant buys back your sales, last first, for the gold you got, until you leave him.
 - **Crafting:** ~~drag one fragment onto another that forms a recipe and hold for a short time~~. Since V1.4.1, only at the merchant's **Craft** tab: two fragments and a fee of the legendary's cost minus the fragments' costs, so crafting then selling never makes gold (see `ui_design.md` §3 and `items.md`).
 - **Shared item cooldowns:** every copy of the same item shares **one cooldown** (e.g. all Galeforces, all Guardian Angels). Selling an item on cooldown and getting another copy does **not** reset it.
 - **Duplicates allowed.** Stats stack, but each **unique effect only counts once**.
@@ -360,7 +363,7 @@ Only these pairs combine. **Stats and unique passives/actives are based on LoL**
 ### Potions
 - **HP potion** restores HP, **MP potion** restores mana, **gradually** over a few seconds (not instantly).
   - Placeholders: Health Potion 200 HP over 5 s, Mana Potion 150 mana over 5 s, 50 gold each.
-- Use: right-click it in the backpack and press **Use**, or put it in an equip slot (1–6) and press its key.
+- Use: keys 7 and 8 (V1.4.1; the backpack's Use button is gone). A potion in an equip slot also works with that slot's key.
 - Works during waves and during the break.
 - Does **not** heal while the game is paused (backpack, shop or menu open).
 - Like all items, potions are lost when the stage ends.
@@ -863,12 +866,12 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 
 - Wave 1 is as easy as Act 1. The HP passes Act 6's last story wave (×7.6) at wave 34.
 - A boss's HP is fixed by its wave, whoever comes, so the random pick doesn't swing the run.
-- The ground hazards bosses leave (the Infernal Drake's burning ground, Karthus's Defile) are not scaled.
+- *(V1.4.2)* An Endless boss's power also reaches the burns it makes: Karthus's Defile, the Infernal Drake's breath and meteor burns, and the on-hit burn of its basic shots are multiplied by the boss's `skill_scale` (×1.3 at tier 3). It is 1.0 for everything else, so the story doesn't change. Other ground hazards are not scaled.
 - Bosses come at the boss point, mini bosses from their camp or the spawn points. An Endless boss is never the stage's boss, so its kill ends nothing. Final Thresh still rises into Phase 2 at full HP. His fall in Phase 2 has no cutscene: he leaves, and the run goes on.
 
 **Rewards:**
 - **Gold, XP and blue** use the story's rules with the act a = 1 + (w − 1) / 10 (whole numbers): waves 1–10 pay like Act 1, waves 11–20 like Act 2, and so on, with no cap. A normal kill gives a blue, an elite 5a. The orange chances are the story's (1% and 10%).
-- **Bosses and mini bosses** pay the story's essences (a boss 100 blue and 5 orange, a mini boss 50 and 3). They always pay their **repeat purple, on the kill**: 2 for Akshan, the Elder Dragon, Dark Lucian and Karthus, 4 for Thresh, 1 for a mini boss. The save's `"bosses"` list is never touched, and the end screen gets no purple line.
+- **Bosses and mini bosses** pay the story's essences (a boss 100 blue and 5 orange, a mini boss 50 and 3), **scaled with the tier** since V1.4.2: the same factor as their HP, 1 + 0.3(k − 1), applied to the base blue and the sure orange and rounded. A boss pays 100 blue and 5 orange at tier 1, **130 and 7** at tier 2, **160 and 8** at tier 3. Gold, XP, loot and the repeat purple stay as they are. They always pay their **repeat purple, on the kill**: 2 for Akshan, the Elder Dragon, Dark Lucian and Karthus, 4 for Thresh, 1 for a mini boss. The save's `"bosses"` list is never touched, and the end screen gets no purple line.
 - **Final Thresh's fall counts as a kill:** 300 gold, XP, a loot roll and his 4 purple.
 - **Loot drops on every kill,** a boss's too (§9: a fragment for sure, plus 15% a legendary). There is no last kill in Endless.
 - The tree's economy nodes work as in the story. A modifier's reward multiplies on top of them.
@@ -937,7 +940,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 ### When to save
 - **Auto-save only when a stage is done:** cleared, left (ESC → Leave this stage) or failed (Lucian dies). Nothing is saved between waves.
   - An Endless run is done when Lucian dies or the run is left. Its best wave is kept in memory each time a wave is won, so that save writes it (§14).
-- **Nothing on the main screen auto-saves.** Evolution Tree purchases and resets, skin purchases and skin changes, and a difficulty change are kept only by the next auto-save, the **Save** button in the gear menu, or a **Yes** when leaving.
+- **Little on the main screen auto-saves.** Evolution Tree purchases and resets, skin purchases and skin changes, and the Endless map choice are kept only by the next auto-save, the **Save** button in the gear menu, a **Yes** when leaving, or **pressing Start** (V1.4.2). A Start saves first; if the save fails, the stage doesn't start and a red toast says so. The difficulty can't change after a new game.
 - **Every exit can be cancelled** (since Phase 9). Cancel, or ESC, closes the question and nothing else happens.
 
 | Exit | Question | Cancel / ESC |
@@ -973,13 +976,14 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 | `bosses` | Bosses that already gave their first-time purple: `["thresh_1", "akshan"]` |
 | `endless_best` | Best Endless wave: the most waves cleared in one run (dying in wave 23 records 22) |
 | `play_time` | Whole seconds played in this slot: `3720` |
+| `endless_map` | The Endless map choice: 0–6, 6 meaning Random (V1.4.2). Anything else loads as Random |
 | `difficulty` | `"easy"`, `"normal"`, `"hard"` or `"extreme"` (V1.3) |
 
 - Numbers are converted back with `int()` when loading (JSON numbers load as floats). Unknown keys, node ids, skins, spell ids and stage ids are dropped, so an old or edited file still loads.
 - IDs are saved, not display names.
 - A save is written to a temp file first. Then the old save becomes the backup (only if it still reads, so a broken file never replaces a good backup) and the temp file replaces it. If anything fails, the old file and backup stay as they were. The backup loads if the main file is broken. With both broken, it's a new game.
 - `"version"` stays 1: Phase 6 and V1.3 only added keys. A file without `"bosses"` or `"play_time"` loads with none; one without `"difficulty"` (or with an unknown word) plays on Normal.
-- `SaveGame.start_new(slot, difficulty)` makes that slot current, resets the progress, sets the difficulty and writes it at once. `set_difficulty(level)` changes it in memory. `award_boss(id, first, repeat)` returns the purple due and records the boss; the stage adds the essence.
+- `SaveGame.start_new(slot, difficulty)` makes that slot current, resets the progress, sets the difficulty and writes it at once. If the write fails, the old data and slot are put back and the title screen shows a red notice (V1.4.2). The difficulty is chosen only here: `set_difficulty` was removed in V1.4.2. `award_boss(id, first, repeat)` returns the purple due and records the boss; the stage adds the essence.
 - The main screen's debug table (F3 + Q) gives essences, sets the acts cleared, maxes or clears the tree, resets the progress, and forgets the bosses' first-time purple.
 
 ---
@@ -1032,8 +1036,8 @@ The pass above makes Normal fit a new player. The difficulty lets the player mak
 
 *The user first picked Hard ×1.2 and Extreme ×1.5 with no extra blue. On those numbers both bots were stuck at the start of Act 3 on Hard and Extreme, so the user chose four changes at once: the smaller steps above, more blue on Hard and Extreme, Act 3 starting at level 5, and the Blue Sentinel's slam 36 → 30.*
 
-- **Where it is picked:** after the slot in **Start new game** (a page titled CHOOSE DIFFICULTY; Normal is gold; hovering a level shows "Enemies have 110% HP and deal 110% damage. Blue essence ×1.2."). Back or ESC returns to the slots.
-- **Changed** from the main screen's gear menu: **Difficulty** (its hint names the current one) opens the four levels, the current one greyed. A pick shows the toast "Difficulty: Hard" and is kept by the next save, like a tree purchase. It can't be changed inside a stage.
+- **Where it is picked:** after the slot in **Start new game** (a page titled CHOOSE DIFFICULTY, noted "Enemy HP and damage. It can't be changed later."; Normal is gold; hovering a level shows "Enemies have 110% HP and deal 110% damage. Blue essence ×1.2."). Back or ESC returns to the slots.
+- **Fixed for the save (V1.4.2):** the level is chosen only here, at a new game. The main screen's gear menu shows it as a greyed row ("Difficulty · Normal", hover "Set when this game started"), and nothing changes it afterwards. *(V1.3 let you change it from the gear menu; saves keep the level they have.)*
 - **What it scales:** the HP of every enemy, bosses and mini bosses included (`Stage.spawn_unit`), and every hit Lucian takes before armor and magic resist (`Lucian.damage_taken_scale`), so boss skills, ground hazards and burns count too. The damage is on Lucian's side because boss skills have their own numbers.
 - **Blue essence:** every kill's blue × 1.2 on Hard and × 1.5 on Extreme (`KillRewards`), on top of the tree's Essence Drops and an Endless modifier, so replays pay for the tree.
 - **What it doesn't:** gold, XP, orange and purple essence, enemy speed, timings, and the boss break bars (they are shares of the boss's HP, so they grow with it). It applies in the story and Endless; Training's dummies keep their HP.
