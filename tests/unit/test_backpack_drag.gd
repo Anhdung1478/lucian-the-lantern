@@ -132,26 +132,12 @@ func right_click(index: int) -> void:
 	send(index, event, center(index))
 
 
-func test_right_click_on_a_potion_offers_use() -> void:
-	inventory.put(6, inventory.catalog.find(&"red"))
-	watch_signals(screen)
-	right_click(6)
-	assert_eq(screen.use_index(), 6)
-	screen._press_use()
-	assert_signal_emitted_with_parameters(screen, "potion_used", [6])
-	assert_eq(screen.use_index(), -1)
-
-
-func test_right_click_on_other_items_offers_nothing() -> void:
-	right_click(0)
-	assert_eq(screen.use_index(), -1)
-
-
-func test_left_click_hides_the_use_button() -> void:
+func test_a_right_click_on_a_potion_does_nothing() -> void:
 	inventory.put(6, inventory.catalog.find(&"red"))
 	right_click(6)
-	press(0)
-	assert_eq(screen.use_index(), -1)
+	assert_eq(inventory.count_at(6), 1, "no Use button: potions are drunk with keys 7 and 8")
+	assert_false(screen.has_signal(&"potion_used"))
+	assert_false(screen.is_dragging())
 
 
 func test_a_drop_on_a_locked_backpack_cell_returns() -> void:

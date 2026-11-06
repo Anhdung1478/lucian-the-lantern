@@ -151,7 +151,6 @@ func _ready() -> void:
 	lucian.damage_received.connect(damage_numbers.spawn.bind(lucian, LUCIAN_NUMBER_SCALE))
 	lucian.damage_received.connect(func(_info: DamageInfo, amount: float) -> void: stats.damage_taken += amount)
 	screens.backpack.setup(lucian.inventory)
-	screens.backpack.potion_used.connect(lucian.use_item)
 	screens.backpack_toggled.connect(debug_table.set_docked_right)
 	lucian.merchant_reached.connect(_open_shop)
 	screens.backpack.traded.connect(func(ok: bool) -> void: Sfx.play(&"coin" if ok else &"error"))

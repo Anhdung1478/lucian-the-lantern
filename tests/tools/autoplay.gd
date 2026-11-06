@@ -329,8 +329,8 @@ class Bot extends Node:
 	func _survive(enemies: Array[EnemyUnit]) -> void:
 		var share := lucian.hp / lucian.stats.max_hp
 		if share < POTION_AT and lucian.restores.count(&"hp_potion") == 0:
-			var index := _find(&"hp_potion")
-			if index >= 0 and lucian.use_item(index):
+			# Key 7, as a player would: the backpack has no Use button.
+			if lucian.use_potion_cell(Inventory.HP_POTION_CELL):
 				potions += 1
 		if share < 0.35 and not enemies.is_empty():
 			for slot in 2:
@@ -519,10 +519,14 @@ class Bot extends Node:
 				if again:
 					break
 
-	## The priciest items go into the open equip slots; potions stay in their
-	## cells and the backpack, and the boots in theirs.
+	## The priciest items go into the open equip slots; Health potions in the
+	## backpack top up their cell (key 7), and the boots stay in theirs.
 	func _equip() -> void:
 		var inv := lucian.inventory
+		for i in Inventory.BACKPACK_SIZE:
+			var held := inv.item_at(i)
+			if held and held.id == &"hp_potion" and not inv.is_locked(i):
+				inv.apply_drop(i, Inventory.HP_POTION_CELL)
 		var gear: Array[int] = []
 		for i in Inventory.SIZE:
 			var item := inv.item_at(i)

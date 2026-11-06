@@ -511,13 +511,14 @@ func _show_body() -> void:
 ## Keys 7 and 8: drinks from the Health (Inventory.HP_POTION_CELL) or Mana
 ## potion cell. False when it is empty or Lucian can't act.
 func use_potion_cell(index: int) -> bool:
-	if not can_act():
-		return false
 	return use_item(index)
 
 
-## Drinks the potion in inventory cell `index`. False when there is none.
+## Drinks the potion in inventory cell `index`. False when there is none or
+## Lucian can't act (dead, in stasis, stunned, feared or moved by force).
 func use_item(index: int) -> bool:
+	if not can_act():
+		return false
 	var item := inventory.item_at(index)
 	if item == null or not item.is_potion():
 		return false

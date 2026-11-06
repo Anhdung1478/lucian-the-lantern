@@ -45,7 +45,7 @@ static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 		footer = "Craft it with another fragment at the merchant's Craft tab."
 	elif shown.is_potion():
 		var key := GameSettings.instance().key_label(Inventory.key_action(Inventory.potion_cell(shown)))
-		footer = "Right-click it in the backpack to drink, or put it in its potion cell and press %s. Stacks up to %d." % [key, shown.max_stack]
+		footer = "Put it in its potion cell and press %s to drink. Stacks up to %d." % [key, shown.max_stack]
 	elif shown.is_boots():
 		footer = boots_footer(shown, catalog)
 	elif catalog and shown.components.size() == 2:

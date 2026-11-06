@@ -20,10 +20,7 @@ func test_drinking_takes_one_from_the_stack() -> void:
 	lucian.inventory.add(potion(&"hp_potion"), 3)
 	assert_true(lucian.use_item(HP_CELL))
 	assert_eq(lucian.inventory.count_at(HP_CELL), 2)
-	for i in 3:
-		lucian.inventory.put(4, potion(&"hp_potion"))
-	assert_true(lucian.use_item(4), "the backpack's Use button drinks from any cell")
-	assert_eq(lucian.inventory.count_at(4), 2)
+
 
 
 func test_non_potions_and_empty_cells_cannot_be_drunk() -> void:
@@ -83,3 +80,23 @@ func test_an_empty_potion_cell_is_not_refilled() -> void:
 func test_potions_never_sit_in_equip_slots() -> void:
 	assert_false(lucian.inventory.put(EQUIP + 2, potion(&"hp_potion")))
 	assert_false(lucian.use_equip_slot(2, Vector2.ZERO), "an empty slot")
+
+
+func test_no_potion_while_lucian_cannot_act() -> void:
+	lucian.inventory.add(potion(&"hp_potion"), 5)
+	lucian.add_cc(CrowdControl.Kind.STUN, 1.0)
+	assert_false(lucian.use_item(HP_CELL), "stunned")
+	assert_false(lucian.use_potion_cell(HP_CELL), "stunned, key 7")
+	lucian._cc.clear()
+	lucian.add_cc(CrowdControl.Kind.FEAR, 1.0)
+	assert_false(lucian.use_item(HP_CELL), "feared")
+	lucian._cc.clear()
+	lucian.enter_stasis(2.0, 100.0, 0.0)
+	assert_false(lucian.use_item(HP_CELL), "in Guardian Angel's stasis")
+	lucian._stasis_left = 0.0
+	lucian.dead = true
+	assert_false(lucian.use_item(HP_CELL), "dead")
+	assert_eq(lucian.inventory.count_at(HP_CELL), 5, "nothing was drunk")
+	lucian.dead = false
+	assert_true(lucian.use_item(HP_CELL), "free again")
+	assert_eq(lucian.inventory.count_at(HP_CELL), 4)

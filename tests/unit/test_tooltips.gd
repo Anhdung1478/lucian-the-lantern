@@ -121,7 +121,8 @@ func test_boots_cards_say_they_cant_be_sold_and_how_they_upgrade() -> void:
 
 func test_potion_cards_point_to_their_key() -> void:
 	var card := TooltipCard.item(lucian.item_catalog.find(&"mp_potion"), lucian.item_catalog)
-	assert_string_contains(card_text(card), "put it in its potion cell and press 8")
+	assert_string_contains(card_text(card), "Put it in its potion cell and press 8 to drink.")
+	assert_false(card_text(card).contains("Right-click"), "no Use button any more")
 	card.free()
 
 
