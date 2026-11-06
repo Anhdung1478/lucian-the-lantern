@@ -5,7 +5,8 @@ extends CanvasLayer
 ## copy, Difficulty, Settings, Leave to main menu and Exit the game. Save as
 ## copy swaps the rows for a slot list. Difficulty is only shown (greyed, with
 ## the level): it is picked when a game starts and can't change later. Only
-## Save and Save as copy write files.
+## Save and Save as copy write files. The main screen passes it the arrow
+## keys and Enter (`keys`), which skip the greyed Difficulty row.
 
 signal settings_requested
 signal exit_requested
@@ -22,6 +23,8 @@ const DIFFICULTY_ICON := preload("res://assets/art/ui/skull.svg")
 ## Asked "Overwrite slot N?"; the main screen sets it. Without one the copy just happens.
 var confirm: ConfirmPopup
 var card := MenuCard.new()
+## Arrow keys and Enter on the page shown.
+var keys := MenuKeys.new()
 
 var _menu_page: VBoxContainer
 var _slot_page: VBoxContainer
@@ -60,6 +63,7 @@ func show_slots() -> void:
 	_menu_page.visible = false
 	_slot_page.visible = true
 	_slot_list.refresh(SaveGame.instance().slot)
+	keys.set_buttons(MenuKeys.buttons_in(_slot_page))
 	visible = true
 
 
@@ -114,6 +118,7 @@ func _show_menu() -> void:
 	_difficulty_entry.set_hint(Difficulty.name_of(save.difficulty))
 	_menu_page.visible = true
 	_slot_page.visible = false
+	keys.set_buttons(MenuKeys.buttons_in(_menu_page))
 
 
 func _entry(parent: Control, label: String, icon: Texture2D, kind: MenuEntry.Kind, hint: String, action: Callable) -> MenuEntry:

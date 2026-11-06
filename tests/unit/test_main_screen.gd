@@ -167,6 +167,35 @@ func _ask_to_exit() -> void:
 	main.confirm.confirm("Exit the game?", "Exit", _record.bind("exit"), _record.bind("cancel"))
 
 
+## A key press, as the pop-up or the main screen reads it.
+func _key(code: Key) -> InputEventKey:
+	var key := InputEventKey.new()
+	key.keycode = code
+	key.physical_keycode = code
+	key.pressed = true
+	return key
+
+
+## Item 33: the confirm button starts lit, so Enter confirms at once; the
+## arrow keys move across the buttons shown.
+func test_enter_confirms_a_popup_and_the_arrows_move_across_it() -> void:
+	_ask_to_save()
+	main.confirm._input(_key(KEY_SPACE))
+	assert_true(main.confirm.is_open(), "Space is not Enter")
+	main.confirm._input(_key(KEY_ENTER))
+	assert_false(main.confirm.is_open())
+	_ask_to_save()
+	main.confirm._input(_key(KEY_RIGHT))
+	main.confirm._input(_key(KEY_RIGHT))
+	main.confirm._input(_key(KEY_ENTER))
+	_ask_to_exit()
+	main.confirm._input(_key(KEY_LEFT))
+	assert_eq(main.confirm._keys.lit_button().text, "Cancel", "the hidden No is skipped")
+	main.confirm._input(_key(KEY_RIGHT))
+	main.confirm._input(_key(KEY_KP_ENTER))
+	assert_eq(_calls, ["yes", "cancel", "exit"] as Array[String])
+
+
 func test_ask_or_cancel_offers_yes_no_and_cancel() -> void:
 	_ask_to_save()
 	assert_eq(_choices(main.confirm), "Yes / No / Cancel")
@@ -246,6 +275,27 @@ func test_the_toast_stays_in_the_top_bar() -> void:
 	main.show_toast("Saved to slot 1")
 	await wait_process_frames(1)
 	assert_lte(main._toast.get_global_rect().end.y, MainScreen.TOP_BAR)
+
+
+## Item 33: the gear menu takes the arrow keys and Enter while it is open,
+## skipping the greyed Difficulty row and, on its slot page, the current slot.
+func test_the_gear_menu_works_with_the_arrow_keys_and_enter() -> void:
+	main._input(_key(KEY_DOWN))
+	assert_eq(main.gear.keys.lit, -1, "closed, it reads no keys")
+	main.gear.open()
+	for i in 4:
+		main._input(_key(KEY_DOWN))
+	assert_eq(main.gear.keys.lit_button().text, "Settings", "Close, Save, Save as copy, past Difficulty")
+	main._input(_key(KEY_UP))
+	main._input(_key(KEY_ENTER))
+	assert_true(main.gear.is_showing_slots(), "Save as copy")
+	assert_eq(main.gear.keys.lit, -1, "the slot page starts unlit")
+	main._input(_key(KEY_DOWN))
+	assert_eq(main.gear.keys.lit_button().text, "Slot 2 · empty", "the current slot is skipped")
+	main._input(_key(KEY_ENTER))
+	assert_false(main.gear.visible)
+	assert_true(SaveGame.instance().slot_exists(2))
+	assert_eq(main.toast_text(), "Copied to slot 2")
 
 
 func test_copy_to_an_empty_slot_writes_without_asking() -> void:

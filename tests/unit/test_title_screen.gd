@@ -70,6 +70,39 @@ func test_the_game_opens_on_the_title_screen() -> void:
 	assert_is(game.screen, TitleScreen)
 
 
+## A real key press and release, through the viewport.
+func _press_key(code: Key) -> void:
+	for pressed in [true, false]:
+		var key := InputEventKey.new()
+		key.keycode = code
+		key.physical_keycode = code
+		key.pressed = pressed
+		Input.parse_input_event(key)
+	Input.flush_buffered_events()
+
+
+## Item 33: the arrow keys and Enter work the title menu and its pages; Load
+## game is skipped while there is nothing to load.
+func test_the_arrow_keys_and_enter_work_the_title_pages() -> void:
+	var title := _title()
+	assert_true(title.load_button.disabled)
+	_press_key(KEY_DOWN)
+	_press_key(KEY_DOWN)
+	assert_eq(title.keys.lit_button(), title.find_button("Settings"), "past Load game")
+	_press_key(KEY_UP)
+	_press_key(KEY_ENTER)
+	assert_true(title.is_showing_slots(), "Start new game")
+	assert_eq(title.keys.lit, -1, "a page starts unlit")
+	_press_key(KEY_DOWN)
+	_press_key(KEY_KP_ENTER)
+	assert_true(title.is_showing_difficulty(), "empty slot 1")
+	_press_key(KEY_UP)
+	assert_eq(title.keys.lit_button().text, "Back")
+	_press_key(KEY_ENTER)
+	assert_true(title.is_showing_slots())
+	assert_eq(game.screen, title, "nothing started")
+
+
 # --- The backdrop: the night scene and the three figures -------------------------
 
 

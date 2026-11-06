@@ -4,7 +4,8 @@ extends CanvasLayer
 ## the stage's name under MENU, then Resume, Settings, Leave this stage and
 ## Exit the game. The last two only emit; under the game root they ask first
 ## (Leave / Cancel, Yes / No / Cancel), and Cancel comes back to this menu,
-## still paused.
+## still paused. The ScreenSwitcher passes it the arrow keys and Enter
+## (`keys`); nothing is lit each time it opens.
 
 signal resume_requested
 signal settings_requested
@@ -19,6 +20,8 @@ const LEAVE_ICON := preload("res://assets/art/ui/menu_leave.svg")
 const EXIT_ICON := preload("res://assets/art/ui/menu_exit.svg")
 
 var card := MenuCard.new("MENU")
+## Arrow keys and Enter on the entries.
+var keys := MenuKeys.new()
 
 var _leave: MenuEntry
 
@@ -54,6 +57,8 @@ func _build() -> void:
 	_entry("Settings", SETTINGS_ICON, MenuEntry.Kind.NORMAL, SETTINGS_HINT, settings_requested.emit)
 	_leave = _entry("Leave this stage", LEAVE_ICON, MenuEntry.Kind.DANGER, "", leave_requested.emit)
 	_entry("Exit the game", EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
+	keys.set_buttons(MenuKeys.buttons_in(card.content))
+	visibility_changed.connect(keys.clear)
 
 
 func _entry(label: String, icon: Texture2D, kind: MenuEntry.Kind, hint: String, action: Callable) -> MenuEntry:

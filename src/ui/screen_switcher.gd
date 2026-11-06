@@ -4,7 +4,8 @@ extends Node
 ## (the backpack in shop mode, opened by walking to the merchant), the menu on
 ## ESC and the settings over the menu. The only place that pauses the game.
 ## Keys are read in _input, so a focused text field can never swallow them.
-## ESC first drops a cast being aimed (normal cast), if any.
+## ESC first drops a cast being aimed (normal cast), if any. While the menu
+## is open, the arrow keys and Enter work it.
 
 ## The plain backpack opened or closed. The shop never docks the debug table
 ## right, since the shop panel takes that side.
@@ -44,6 +45,8 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"open_backpack") and not menu.visible:
 		set_backpack_open(not backpack.visible)
+		get_viewport().set_input_as_handled()
+	elif menu.visible and menu.keys.handle(event):
 		get_viewport().set_input_as_handled()
 
 

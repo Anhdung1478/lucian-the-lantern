@@ -3,7 +3,8 @@ extends CanvasLayer
 ## A question over everything else, on a MenuCard over the blurred screen: Yes / No (ask), Yes / No / Cancel
 ## (ask_or_cancel) or an action / Cancel (confirm). Swallows all keys while
 ## open. ESC is Cancel when the question has one; on a Yes / No question it
-## answers No when the question allows it.
+## answers No when the question allows it. The arrow keys pick a button and
+## Enter presses it; Yes (or the action) starts lit, so Enter confirms at once.
 
 const BUTTON_SIZE := Vector2(200, 56)
 ## Above the menus. A pop-up that must stay on top of another one (Game's
@@ -20,6 +21,8 @@ var _message: Label
 var _yes: Button
 var _no: Button
 var _cancel: Button
+## Arrow keys and Enter on the buttons shown.
+var _keys := MenuKeys.new()
 
 
 func _init(on_layer := LAYER) -> void:
@@ -54,6 +57,7 @@ func _build() -> void:
 	_yes = _button(row, "Yes", answer.bind(true))
 	_no = _button(row, "No", answer.bind(false))
 	_cancel = _button(row, "Cancel", cancel)
+	_keys.set_buttons(MenuKeys.buttons_in(row))
 
 
 func _button(row: HBoxContainer, text: String, action: Callable) -> Button:
@@ -103,6 +107,7 @@ func _open(text: String, yes_label: String, with_no: bool, with_cancel: bool) ->
 	_on_cancel = Callable()
 	_escape_means_no = false
 	visible = true
+	_keys.light(0)
 
 
 func is_open() -> bool:
@@ -140,4 +145,6 @@ func _input(event: InputEvent) -> void:
 				cancel()
 			elif _escape_means_no:
 				answer(false)
+		else:
+			_keys.handle(event)
 		get_viewport().set_input_as_handled()

@@ -6,6 +6,7 @@ extends Control
 ## the difficulty page picks Easy, Normal, Hard or Extreme and the slot is
 ## written at once. Nothing is unsaved here, so Exit (and the
 ## window's X) only ask "Exit the game?": Exit / Cancel, from the game root.
+## The arrow keys and Enter work each page as the mouse does (MenuKeys).
 ## Behind it all, the TitleBackdrop tells the story: Lucian and Senna facing
 ## Thresh under the Shadow Isles moon.
 
@@ -33,6 +34,8 @@ var notice_label := UiStyle.label("", 22, UiStyle.ERROR_COLOR)
 
 ## The difficulty page's buttons, by Difficulty level.
 var difficulty_buttons: Array[Button] = []
+## Arrow keys and Enter on the page shown.
+var keys := MenuKeys.new()
 
 var _menu: VBoxContainer
 var _slots_page: VBoxContainer
@@ -59,6 +62,7 @@ func show_menu() -> void:
 		load_button.set_meta(&"hover_text", "No saved games yet")
 	elif load_button.has_meta(&"hover_text"):
 		load_button.remove_meta(&"hover_text")
+	keys.set_buttons(MenuKeys.buttons_in(_menu))
 
 
 ## The slot list: for a new game (every slot), or to load (used slots only).
@@ -69,6 +73,7 @@ func show_slots(loading: bool) -> void:
 	_menu.visible = false
 	_difficulty_page.visible = false
 	_slots_page.visible = true
+	keys.set_buttons(MenuKeys.buttons_in(_slots_page))
 
 
 func is_showing_slots() -> bool:
@@ -82,6 +87,7 @@ func show_difficulty(slot: int) -> void:
 	_menu.visible = false
 	_slots_page.visible = false
 	_difficulty_page.visible = true
+	keys.set_buttons(MenuKeys.buttons_in(_difficulty_page))
 
 
 func is_showing_difficulty() -> bool:
@@ -95,8 +101,17 @@ func find_button(text: String) -> Button:
 	return null
 
 
+## The arrow keys and Enter work the page shown; ESC goes back a page.
+## Settings and the pop-up read their own keys.
 func _input(event: InputEvent) -> void:
-	if not event.is_action_pressed(&"open_menu") or settings.visible or confirm.is_open():
+	if settings.visible or confirm.is_open():
+		return
+	# Enter may swap this screen out (a game loaded), so the viewport is kept.
+	var viewport := get_viewport()
+	if keys.handle(event):
+		viewport.set_input_as_handled()
+		return
+	if not event.is_action_pressed(&"open_menu"):
 		return
 	if is_showing_difficulty():
 		show_slots(false)

@@ -89,6 +89,40 @@ func _entries(node: Node) -> Dictionary:
 	return out
 
 
+func _key(code: Key) -> InputEventKey:
+	var key := InputEventKey.new()
+	key.keycode = code
+	key.physical_keycode = code
+	key.pressed = true
+	return key
+
+
+## Item 33: the stage's ESC menu takes the arrow keys and Enter, and opens
+## unlit each time. Run alone, the stage greys Leave this stage: it is skipped.
+func test_the_stage_menu_works_with_the_arrow_keys_and_enter() -> void:
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	add_child_autofree(stage)
+	var screens := stage.screens
+	screens._input(_key(KEY_DOWN))
+	assert_eq(screens.menu.keys.lit, -1, "closed, it reads no keys")
+	screens.set_menu_open(true)
+	screens._input(_key(KEY_UP))
+	assert_eq(screens.menu.keys.lit_button().text, "Exit the game", "Up starts at the bottom")
+	screens._input(_key(KEY_UP))
+	assert_eq(screens.menu.keys.lit_button().text, "Settings", "past the greyed Leave this stage")
+	screens._input(_key(KEY_ENTER))
+	assert_true(screens.settings.visible)
+	assert_false(screens.menu.visible)
+	screens.set_settings_open(false)
+	assert_true(screens.menu.visible)
+	assert_eq(screens.menu.keys.lit, -1, "it opens unlit")
+	screens._input(_key(KEY_DOWN))
+	screens._input(_key(KEY_ENTER))
+	assert_false(screens.menu.visible, "Resume")
+	assert_false(get_tree().paused)
+	get_tree().paused = false
+
+
 func test_the_stage_menu_is_a_card_with_resume_first() -> void:
 	var menu := GameMenu.new()
 	add_child_autofree(menu)

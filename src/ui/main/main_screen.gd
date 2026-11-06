@@ -7,8 +7,8 @@ extends Control
 ##
 ## ESC: a section's open pop-up closes first (a section opts in with
 ## `close_popup() -> bool`, true when it closed something), then the gear
-## menu's slot list or difficulty page, then the gear menu; otherwise ESC
-## opens the gear menu.
+## menu's slot list, then the gear menu; otherwise ESC opens the gear menu.
+## While the gear menu is open, the arrow keys and Enter work its page.
 
 signal start_requested(run: StageSetup)
 signal exit_requested
@@ -77,10 +77,13 @@ func toast_text() -> String:
 
 
 func _input(event: InputEvent) -> void:
-	if not event.is_action_pressed(&"open_menu"):
-		return
-	# Settings and the Yes / No pop-up read their own ESC.
+	# Settings and the Yes / No pop-up read their own keys.
 	if settings.visible or confirm.is_open():
+		return
+	if gear.visible and gear.keys.handle(event):
+		get_viewport().set_input_as_handled()
+		return
+	if not event.is_action_pressed(&"open_menu"):
 		return
 	if not _close_section_popup():
 		if gear.is_showing_slots():
