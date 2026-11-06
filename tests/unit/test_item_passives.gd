@@ -340,3 +340,35 @@ func test_rfc_ring_gives_up_when_the_shot_never_lands() -> void:
 	lucian.basic_attack(dummy)
 	await wait_seconds(1.2)
 	assert_false(lucian.passives.shows_rfc_ring())
+
+
+func _deaths_dance_buff() -> Dictionary:
+	for buff in lucian.passives.buffs():
+		if buff.id == &"deaths_dance":
+			return buff
+	return {}
+
+
+func test_ignore_pain_shows_in_the_buff_row_until_the_bleed_ends() -> void:
+	equip(&"deaths_dance")
+	assert_true(_deaths_dance_buff().is_empty(), "nothing is owed before a hit")
+	lucian.take_damage(DamageInfo.create(100.0, DamageInfo.Type.TRUE, &"basic", dummy))
+	var shown := _deaths_dance_buff()
+	assert_eq(shown.name, "Ignore Pain")
+	assert_eq(shown.count, "30")
+	assert_almost_eq(shown.left, ItemPassives.IGNORE_PAIN_TIME, 0.01)
+	assert_eq(shown.duration, ItemPassives.IGNORE_PAIN_TIME)
+	lucian.passives._physics_process(1.5)
+	shown = _deaths_dance_buff()
+	assert_eq(shown.count, "15", "the count falls as the damage lands")
+	assert_almost_eq(shown.left, 1.5, 0.01)
+	lucian.passives._physics_process(1.6)
+	assert_true(_deaths_dance_buff().is_empty(), "gone when the bleed ends")
+
+
+func test_defys_cleanse_removes_the_ignore_pain_buff() -> void:
+	equip(&"deaths_dance")
+	lucian.take_damage(DamageInfo.create(100.0, DamageInfo.Type.TRUE, &"basic", dummy))
+	assert_false(_deaths_dance_buff().is_empty())
+	lucian.passives.on_kill()
+	assert_true(_deaths_dance_buff().is_empty())

@@ -479,6 +479,18 @@ func buffs() -> Array[Dictionary]:
 		found.append(_buff(&"slay", "Slay", _icon(&"immortal_path" if has(&"immortal_path") else &"gluttonous_greaves"),
 			"[hp]+%s%% omnivamp[/hp] from elite, mini boss and boss kills (up to %d)." % [TooltipText.number(SLAY_OMNIVAMP * slay_stacks * 100.0), SLAY_MAX],
 			str(slay_stacks) if slay_stacks > 0 else "", slay_stacks == SLAY_MAX))
+	if not _bleeds.is_empty():
+		var coming := 0.0
+		var longest := 0.0
+		for entry in _bleeds:
+			coming += entry.rate * entry.left
+			longest = maxf(longest, entry.left)
+		var ignore_pain := _buff(&"deaths_dance", "Ignore Pain", _icon(&"deaths_dance"),
+			"%d%% of damage taken is dealt over %d s instead. This is the damage still to come." % [roundi(IGNORE_PAIN * 100.0), roundi(IGNORE_PAIN_TIME)],
+			str(roundi(coming)), false)
+		ignore_pain.left = longest
+		ignore_pain.duration = IGNORE_PAIN_TIME
+		found.append(ignore_pain)
 	for noxian in [
 		[&"chainlaced_crushers", &"persistence", "Noxian Persistence", "[magic]magic damage[/magic]"],
 		[&"armored_advance", &"endurance", "Noxian Endurance", "[phys]physical damage[/phys]"],
