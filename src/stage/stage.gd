@@ -223,14 +223,16 @@ func jump_to_last_wave() -> void:
 	runner.skip_to_last_wave()
 
 
-## A jump's sweep: every enemy goes, and a summon or split still on its way
+## A jump's sweep: every enemy goes, even a boss mid-dash, mid-Rappel or
+## mid-Sky Dive (untargetable, so out of the "enemies" group), and a summon or split still on its way
 ## never comes (_jumps): the jump reset the wave's count, so it would come
 ## uncounted, and its death would end the next wave one enemy early.
 func _remove_every_enemy() -> void:
 	_jumps += 1
-	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
-		enemy.remove_from_group(&"enemies")
-		enemy.queue_free()
+	for node: Node in $World.get_children():
+		if node is EnemyUnit:
+			node.remove_from_group(&"enemies")
+			node.queue_free()
 
 
 ## The result panel over a paused game; ESC and P stop working. Endless's

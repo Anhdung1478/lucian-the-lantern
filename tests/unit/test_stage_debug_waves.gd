@@ -277,6 +277,20 @@ func test_a_summon_pending_at_a_jump_never_comes() -> void:
 	assert_eq(stage.runner.alive(), _enemies().size(), "the last wave counts what is there")
 
 
+func test_jump_removes_an_untargetable_boss_and_the_next_wave_counts_its_enemies() -> void:
+	var stage: Stage = await _stage(5, 2)
+	stage.skip_break()
+	var boss := stage.spawn_enemy(&"maokai", stage.lucian.global_position + Vector2(600, 0))
+	boss.set_untargetable(true)
+	assert_false(_enemies().has(boss), "mid-dash: out of the enemies group")
+	_press(stage, "Jump to the last wave")
+	await wait_physics_frames(3)
+	assert_false(is_instance_valid(boss), "the boss is gone")
+	for i in 30:
+		stage.runner.tick(WaveRunner.GROUP_GAP)
+	assert_eq(stage.runner.alive(), _enemies().size(), "the last wave counts what is there")
+
+
 func test_jump_to_the_last_wave_does_nothing_in_training() -> void:
 	var stage: Stage = await _stage(2, 1)
 	stage.runner = null
