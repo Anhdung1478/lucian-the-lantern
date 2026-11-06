@@ -52,6 +52,15 @@ func item_at(slot: int) -> ItemData:
 	return items[slot]
 
 
+## An open (unlocked) slot is still for sale, so a refresh has something to
+## re-roll. Locked slots never count: they are never sold.
+func has_unsold() -> bool:
+	for i in unlocked:
+		if not _sold[i]:
+			return true
+	return false
+
+
 func mark_sold(slot: int) -> void:
 	_sold[slot] = true
 	changed.emit()

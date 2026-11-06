@@ -424,7 +424,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
   - **Items:** fragments and legendary items.
   - **Potions:** HP and MP potions.
 - **Items tab:** always shows **4 slots** in a row. Slots not yet unlocked (Evolution Tree) are covered by a **chain lock**.
-- **Refresh** button in the **bottom-right corner** of the shop (costs stage gold).
+- **Refresh** button in the **bottom-right corner** of the shop (costs stage gold). *(V1.3.1: greyed out, and refused for free, once every open slot is sold: there is nothing left to re-roll.)*
 
 ### Built in Phase 3
 - **Opening:** right-click the merchant. Lucian walks over; the shop opens once he is within 250 units (right away if he already is). Hovering the merchant shows a gold ring.

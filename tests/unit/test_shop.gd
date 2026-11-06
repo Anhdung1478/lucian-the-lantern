@@ -105,6 +105,18 @@ func test_refresh_costs_gold() -> void:
 	assert_eq(wallet.gold, 0)
 
 
+func test_a_refresh_with_every_open_slot_sold_is_refused_for_free() -> void:
+	wallet.add(MerchantStock.REFRESH_COST)
+	assert_true(shop.can_refresh())
+	for i in stock.unlocked:
+		stock.mark_sold(i)
+	var before := stock.items.duplicate()
+	assert_false(shop.can_refresh())
+	assert_eq(shop.refresh(), Result.NOTHING_TO_REFRESH)
+	assert_eq(wallet.gold, MerchantStock.REFRESH_COST, "no gold taken")
+	assert_eq(stock.items, before, "nothing re-rolled")
+
+
 func test_a_refresh_costs_what_the_shop_says() -> void:
 	shop.refresh_cost = 50
 	wallet.add(120)

@@ -12,6 +12,7 @@ const MESSAGES := {
 	Shop.Result.CELL_LOCKED: "That cell is locked",
 	Shop.Result.CELL_TAKEN: "That cell is taken",
 	Shop.Result.SOLD_OUT: "Already sold",
+	Shop.Result.NOTHING_TO_REFRESH: "Nothing left to refresh",
 }
 
 var screen: BackpackScreen
@@ -120,6 +121,8 @@ func _process(delta: float) -> void:
 	if screen == null or screen.shop == null:
 		return
 	_gold_label.text = str(screen.shop.wallet.gold)
+	# Greyed once every open slot is sold: a refresh would change nothing.
+	_refresh.disabled = not screen.shop.can_refresh()
 	# The dragged icon covers the sell slot, so its price shows here too.
 	var preview := screen.sell_preview()
 	if preview > 0:

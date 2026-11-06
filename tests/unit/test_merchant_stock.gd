@@ -59,6 +59,16 @@ func test_refresh_rerolls_unsold_slots() -> void:
 	assert_true(changed)
 
 
+func test_has_unsold_counts_open_slots_only() -> void:
+	assert_true(stock.has_unsold())
+	stock.mark_sold(0)
+	assert_true(stock.has_unsold())
+	stock.mark_sold(1)
+	assert_false(stock.has_unsold(), "both open slots sold; the locked ones don't count")
+	stock.unlocked = 3
+	assert_true(stock.has_unsold(), "a slot just unlocked is for sale")
+
+
 func test_locked_slots_sell_nothing() -> void:
 	assert_null(stock.item_at(3))
 	stock.unlocked = 4

@@ -126,6 +126,20 @@ func test_refused_purchase_shows_a_message() -> void:
 	assert_eq(screen.shop_panel()._message.text, "Not enough gold")
 
 
+func test_refresh_greys_out_once_every_open_slot_is_sold() -> void:
+	var panel := screen.shop_panel()
+	panel._process(0.0)
+	assert_false(panel._refresh.disabled)
+	for i in stock.unlocked:
+		assert_eq(screen.shop.buy_slot(i), Shop.Result.OK)
+	panel._process(0.0)
+	assert_true(panel._refresh.disabled, "nothing left to re-roll")
+	var gold := wallet.gold
+	screen.refresh_shop()
+	assert_eq(wallet.gold, gold, "a refused refresh costs nothing")
+	assert_eq(panel._message.text, "Nothing left to refresh")
+
+
 func test_closing_ends_shop_mode() -> void:
 	screen.close()
 	assert_false(screen.is_shopping())

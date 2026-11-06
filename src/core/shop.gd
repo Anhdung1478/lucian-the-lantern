@@ -4,7 +4,7 @@ extends RefCounted
 ## MerchantStock slot) or the Potions tab, selling, and refreshing, all for
 ## stage gold. Nothing is paid when a purchase does not fit.
 
-enum Result { OK, NO_GOLD, NO_ROOM, CELL_LOCKED, CELL_TAKEN, SOLD_OUT }
+enum Result { OK, NO_GOLD, NO_ROOM, CELL_LOCKED, CELL_TAKEN, SOLD_OUT, NOTHING_TO_REFRESH }
 
 var stock: MerchantStock
 var inventory: Inventory
@@ -51,7 +51,16 @@ func sell(index: int) -> int:
 	return value
 
 
+## A refresh would change something: an open slot is still unsold.
+func can_refresh() -> bool:
+	return stock.has_unsold()
+
+
+## Re-rolls the unsold slots for refresh_cost. Refused for free when every
+## open slot is sold, since nothing would change.
 func refresh() -> Result:
+	if not can_refresh():
+		return Result.NOTHING_TO_REFRESH
 	if not wallet.spend(refresh_cost):
 		return Result.NO_GOLD
 	stock.refresh()
