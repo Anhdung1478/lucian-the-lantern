@@ -136,6 +136,12 @@ func refresh() -> void:
 	tabs.refresh(tree)
 	info.refresh()
 	reset_button.disabled = not tree.can_reset(essences)
+	if tree.spent() == Vector2i.ZERO:
+		reset_button.set_meta(&"hover_text", "Nothing to refund: no blue or orange essence spent")
+	elif reset_button.disabled:
+		reset_button.set_meta(&"hover_text", "Needs %d purple essence" % EvolutionTree.RESET_COST)
+	elif reset_button.has_meta(&"hover_text"):
+		reset_button.remove_meta(&"hover_text")
 
 
 ## The first branch with a free upgrade, else the first branch.
@@ -163,7 +169,21 @@ func _on_visibility_changed() -> void:
 
 
 func _ask_reset() -> void:
-	confirm.ask("Reset the Evolution Tree for %d purple essence? Every blue and orange essence spent comes back." % EvolutionTree.RESET_COST, _reset)
+	if tree.can_reset(essences):
+		confirm.ask(reset_question(), _reset)
+
+
+## Reset tree's question, with what comes back: "Reset the Evolution Tree for
+## 5 purple essence? 1200 blue and 10 orange essence come back."
+func reset_question() -> String:
+	var refund := tree.spent()
+	var parts: PackedStringArray = []
+	if refund.x > 0:
+		parts.append("%d blue" % refund.x)
+	if refund.y > 0:
+		parts.append("%d orange" % refund.y)
+	return "Reset the Evolution Tree for %d purple essence? %s essence %s back." % [
+		EvolutionTree.RESET_COST, " and ".join(parts), "come" if parts.size() > 1 else "comes"]
 
 
 func _reset() -> void:

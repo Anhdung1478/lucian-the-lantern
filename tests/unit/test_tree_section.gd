@@ -735,6 +735,32 @@ func test_reset_asks_first_and_yes_refunds_every_node() -> void:
 	assert_true(section.reset_button.disabled)
 
 
+func test_free_levels_alone_leave_reset_off_and_say_why() -> void:
+	_save().set_cleared(Journey.all_stage_ids(1))
+	assert_true(_save().tree.buy(&"ghost", _save().essences))
+	_save().essences.add(Essences.PURPLE, EvolutionTree.RESET_COST)
+	assert_true(section.reset_button.disabled, "E and Ghost were free: nothing would come back")
+	assert_eq(section.reset_button.get_meta(&"hover_text", ""), "Nothing to refund: no blue or orange essence spent")
+	section.reset_button.pressed.emit()
+	assert_false(confirm.is_open())
+	assert_eq(_save().essences.amount(Essences.PURPLE), EvolutionTree.RESET_COST)
+	_buy(&"stat_ad")
+	assert_false(section.reset_button.disabled)
+	assert_false(section.reset_button.has_meta(&"hover_text"))
+	_save().essences.set_amount(Essences.PURPLE, 0)
+	assert_eq(section.reset_button.get_meta(&"hover_text", ""), "Needs 5 purple essence")
+
+
+func test_the_reset_question_names_what_comes_back() -> void:
+	_buy(&"stat_ad", 4)
+	_save().essences.add(Essences.PURPLE, EvolutionTree.RESET_COST)
+	section.reset_button.pressed.emit()
+	assert_true(confirm.is_open())
+	assert_eq(confirm._message.text, "Reset the Evolution Tree for 5 purple essence? 700 blue and 3 orange essence come back.")
+	confirm.answer(false)
+	assert_eq(section.reset_question(), "Reset the Evolution Tree for 5 purple essence? 700 blue and 3 orange essence come back.")
+
+
 func test_reset_no_keeps_the_tree() -> void:
 	_buy(&"stat_ad")
 	_save().essences.add(Essences.PURPLE, 5)
@@ -813,6 +839,7 @@ func test_claiming_ghost_clears_the_badges() -> void:
 func test_a_reset_shows_free_on_skills_and_summoners() -> void:
 	_save().set_cleared(Journey.all_stage_ids(1))
 	assert_true(_save().tree.buy(&"ghost", _save().essences))
+	_buy(&"stat_ad")
 	_save().essences.add(Essences.PURPLE, EvolutionTree.RESET_COST)
 	assert_true(_save().tree.reset(_save().essences))
 	assert_eq(_free_tabs(), [&"skills", &"summoners"] as Array[StringName])

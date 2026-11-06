@@ -118,6 +118,18 @@ func test_reset_costs_5_purple_and_refunds_blue_and_orange() -> void:
 	assert_eq(tree.level(&"stat_ad"), 0)
 
 
+func test_free_levels_alone_cant_be_reset() -> void:
+	essences.set_amount(Essences.PURPLE, 5)
+	tree.acts_cleared = 1
+	assert_true(tree.buy(&"ghost", essences), "Ghost is free after Act 1")
+	assert_true(tree.has_bought())
+	assert_eq(tree.spent(), Vector2i.ZERO)
+	assert_false(tree.can_reset(essences), "nothing would come back")
+	assert_false(tree.reset(essences))
+	assert_eq(essences.amount(Essences.PURPLE), 5, "no purple taken")
+	assert_eq(tree.level(&"ghost"), 1)
+
+
 func test_reset_refused_without_purple_or_purchases() -> void:
 	essences.set_amount(Essences.PURPLE, 5)
 	assert_false(tree.can_reset(essences))

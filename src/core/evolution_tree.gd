@@ -176,8 +176,11 @@ func has_bought() -> bool:
 	return not _levels.is_empty()
 
 
+## Something would come back (a level bought for blue or orange) and the
+## purple is there. Free levels alone (E after Act 1, Ghost) give nothing
+## back, so they are never worth RESET_COST.
 func can_reset(essences: Essences) -> bool:
-	return has_bought() and essences.can_afford(0, 0, RESET_COST)
+	return spent() != Vector2i.ZERO and essences.can_afford(0, 0, RESET_COST)
 
 
 ## Pays RESET_COST purple, gives back everything spent and empties the tree.

@@ -205,6 +205,10 @@ func test_overwrite_and_reset_tree_still_ask_yes_or_no() -> void:
 	assert_true(main.confirm.is_open())
 	assert_eq(_choices(main.confirm), "Yes / No")
 	main.confirm.answer(false)
+	var essences := SaveGame.instance().essences
+	essences.add(Essences.BLUE, 1000)
+	essences.add(Essences.PURPLE, EvolutionTree.RESET_COST)
+	assert_true(SaveGame.instance().tree.buy(&"stat_ad", essences))
 	(main.sections[MainScreen.SECTION_TREE] as TreeSection).reset_button.pressed.emit()
 	assert_true(main.confirm.is_open())
 	assert_eq(_choices(main.confirm), "Yes / No")
