@@ -2,8 +2,8 @@ class_name SaveGame
 extends RefCounted
 ## Permanent progress in one of 3 save slots (user://save_slot_N.json, each
 ## with a _backup.json). Nothing saves by itself on the main screen: the game
-## saves when a stage is done, from the gear menu, and on "Save before
-## leaving?". Not an autoload (like GameSettings), so tests and -s scripts work.
+## saves at Start (before the stage), when a stage is done, from the gear menu,
+## and on "Save before leaving?". Not an autoload (like GameSettings), so tests and -s scripts work.
 
 signal changed
 

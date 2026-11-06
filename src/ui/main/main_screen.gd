@@ -2,8 +2,8 @@ class_name MainScreen
 extends Control
 ## The screen after a slot is picked: essences and the gear menu on top, the
 ## Evolution Tree / Skin Shop / Journey sections in the middle, their buttons
-## at the bottom. Nothing here saves by itself; only the gear menu's Save and
-## Save as copy write files.
+## at the bottom. Nothing here saves by itself; only Start (which saves the
+## slot before the stage) and the gear menu's Save and Save as copy write files.
 ##
 ## ESC: while the gear menu shows it goes first (back from its slot list,
 ## else close), even over a section's pop-up hidden beneath it. Otherwise a
