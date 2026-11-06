@@ -433,6 +433,36 @@ func test_record_endless_keeps_the_best() -> void:
 	assert_false(save_game.slot_exists(1), "nothing is written by itself")
 
 
+func test_the_endless_map_round_trips_without_a_refresh() -> void:
+	assert_eq(save_game.endless_map, EndlessPlan.RANDOM, "a new game is on Random")
+	watch_signals(save_game)
+	save_game.set_endless_map(3)
+	assert_eq(save_game.endless_map, 3)
+	assert_signal_not_emitted(save_game, "changed", "the Journey doesn't refresh for it")
+	assert_false(save_game.slot_exists(1), "nothing is written by itself")
+	assert_true(save_game.save())
+	var loaded := SaveGame.new(PREFIX)
+	loaded.load_slot(1)
+	assert_eq(loaded.endless_map, 3)
+	assert_typeof(loaded.endless_map, TYPE_INT)
+	loaded.reset()
+	assert_eq(loaded.endless_map, EndlessPlan.RANDOM, "a new game")
+
+
+func test_a_bad_endless_map_loads_as_random() -> void:
+	var last := Journey.ENDLESS_MAPS.size() - 1
+	_write_text(save_game.path(1), JSON.stringify({"endless_map": last}))
+	save_game.load_slot(1)
+	assert_eq(save_game.endless_map, last, "the last map is valid")
+	for bad: Variant in [Journey.ENDLESS_MAPS.size(), -1, 2.5, "3", null, [3]]:
+		_write_text(save_game.path(1), JSON.stringify({"endless_map": bad}))
+		save_game.load_slot(1)
+		assert_eq(save_game.endless_map, EndlessPlan.RANDOM, "%s" % [bad])
+	_write_text(save_game.path(1), JSON.stringify({"endless_best": 3}))
+	save_game.load_slot(1)
+	assert_eq(save_game.endless_map, EndlessPlan.RANDOM, "a save from before the choice")
+
+
 func test_the_endless_best_survives_save_and_load() -> void:
 	save_game.record_endless(12)
 	assert_true(save_game.save())

@@ -343,9 +343,11 @@ func _build_endless() -> void:
 
 
 ## Endless's map chip `index` (a Journey.ENDLESS_MAPS index) is the chosen
-## one, with its thumbnail, as a click on it does.
+## one, with its thumbnail, as a click on it does. The save keeps the choice
+## (the next save writes it), so the Journey opens on it again.
 func choose_map(index: int) -> void:
 	_choice = index
+	SaveGame.instance().set_endless_map(index)
 	for i in map_buttons.size():
 		map_buttons[i].set_pressed_no_signal(i == index)
 	_style_chips()

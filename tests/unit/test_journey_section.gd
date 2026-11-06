@@ -468,6 +468,29 @@ func test_the_main_screen_can_open_the_journey_on_endless() -> void:
 	assert_false(journey.panel.stage_box.visible)
 
 
+## Item 32: the save keeps Endless's map, so the Journey opens on it.
+func test_the_endless_map_chip_from_the_save_is_lit() -> void:
+	_save().set_endless_map(3)
+	var journey := JourneySection.new()
+	add_child_autofree(journey)
+	var panel := journey.panel
+	assert_eq(panel.map_choice(), 3)
+	assert_eq(panel.thumbnail.choice, 3)
+	for i in panel.map_buttons.size():
+		var chip := panel.map_buttons[i]
+		assert_eq(chip.button_pressed, i == 3, "chip %d pressed" % i)
+		var lit := (chip.get_theme_stylebox(&"normal") as StyleBoxFlat).border_color == UiStyle.BORDER_COLOR
+		assert_eq(lit, i == 3, "chip %d lit" % i)
+
+
+func test_a_map_chip_stores_its_choice_in_the_save() -> void:
+	section.panel.map_buttons[5].pressed.emit()
+	assert_eq(_save().endless_map, 5)
+	assert_false(_save().slot_exists(1), "the next save writes it")
+	_save().set_cleared(Journey.all_stage_ids(1))
+	assert_eq(section.panel.map_choice(), 5, "a refresh keeps it")
+
+
 func test_focus_on_a_locked_endless_opens_as_usual() -> void:
 	var journey := JourneySection.new()
 	journey.focus_endless = true

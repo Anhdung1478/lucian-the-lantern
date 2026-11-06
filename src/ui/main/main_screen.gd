@@ -28,8 +28,6 @@ var sections: Array[Control] = []
 var focus_act := 0
 ## Journey opens on Endless instead (after an Endless run).
 var focus_endless := false
-## The Endless map chosen in the Journey (the last run's choice).
-var endless_map := EndlessPlan.RANDOM
 ## Drawn behind every section: the night grove, or the Skin Shop's gallery.
 var backdrop := MainBackdrop.new()
 var essence_bar := EssenceBar.new()
@@ -120,7 +118,6 @@ func _build() -> void:
 	var journey := JourneySection.new()
 	journey.focus_act = focus_act
 	journey.focus_endless = focus_endless
-	journey.endless_map = endless_map
 	journey.start_training.connect(_start_training)
 	journey.start_stage.connect(_start_stage)
 	journey.start_endless.connect(_start_endless)

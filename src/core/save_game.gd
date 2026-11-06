@@ -27,6 +27,9 @@ var owned_skins: Array[StringName] = [CLASSIC]
 var skin := CLASSIC
 ## Spell ids on D and F (&"" for none), picked in Journey.
 var loadout: Array[StringName] = [&"", &""]
+## Endless's map choice in the Journey (a Journey.ENDLESS_MAPS index; 0 is
+## Random), so the Journey opens on it again.
+var endless_map := EndlessPlan.RANDOM
 ## Stage ids ("1-1" ... "6-5") cleared at least once.
 var cleared: Array[String] = []
 var endless_best := 0
@@ -129,6 +132,7 @@ func reset() -> void:
 	owned_skins = [CLASSIC]
 	skin = CLASSIC
 	loadout = [&"", &""]
+	endless_map = EndlessPlan.RANDOM
 	cleared = []
 	endless_best = 0
 	bosses = []
@@ -233,6 +237,13 @@ func set_loadout(index: int, id: StringName) -> void:
 	changed.emit()
 
 
+## Chooses Endless's map (a Journey.ENDLESS_MAPS index; anything else is
+## Random), in memory: the next save writes it (Start makes one). It emits no
+## `changed`, so the Journey doesn't refresh for a chip it already shows.
+func set_endless_map(index: int) -> void:
+	endless_map = index if index >= 0 and index < Journey.ENDLESS_MAPS.size() else EndlessPlan.RANDOM
+
+
 ## Buys skin `id` with purple essence (it is not equipped). False when it is
 ## unknown, already owned or too expensive.
 func buy_skin(id: StringName) -> bool:
@@ -261,6 +272,7 @@ func to_dict() -> Dictionary:
 		"tree": tree.to_dict(),
 		"skins": {"owned": owned_skins.map(func(id: StringName) -> String: return String(id)), "equipped": String(skin)},
 		"loadout": loadout.map(func(id: StringName) -> String: return String(id)),
+		"endless_map": endless_map,
 		"cleared": cleared.duplicate(),
 		"endless_best": endless_best,
 		"bosses": bosses.duplicate(),
@@ -339,6 +351,11 @@ func _apply(data: Dictionary) -> void:
 			var id: Variant = saved_loadout[i]
 			if id is String and StringName(id) in StageSetup.SPELL_IDS and not StringName(id) in loadout:
 				loadout[i] = StringName(id)
+	# A whole number in range; anything else, or a save from before the choice
+	# was kept, is Random.
+	var map: Variant = data.get("endless_map", EndlessPlan.RANDOM)
+	var whole := (map is int or map is float) and float(map) == float(int(map))
+	set_endless_map(int(map) if whole else EndlessPlan.RANDOM)
 	cleared = []
 	var saved_cleared: Variant = data.get("cleared", [])
 	if saved_cleared is Array:

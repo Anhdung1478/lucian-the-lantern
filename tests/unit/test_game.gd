@@ -455,9 +455,11 @@ func test_a_failed_save_after_a_game_over_shows_on_the_title() -> void:
 	assert_eq((game.screen as TitleScreen).notice_label.text, "Could not save")
 
 
-## An Endless run under the Game (Act 3 cleared, so Endless is open).
+## An Endless run under the Game (Act 3 cleared, so Endless is open), on
+## `choice`, which the save keeps as the Journey's map chip does.
 func _endless_run(choice := JUNGLE) -> Stage:
 	SaveGame.instance().set_cleared(Journey.all_stage_ids(Journey.ENDLESS_ACT))
+	SaveGame.instance().set_endless_map(choice)
 	game.start_stage(StageSetup.for_endless(SaveGame.instance(), choice, RandomNumberGenerator.new()))
 	await wait_process_frames(2)
 	return game.screen as Stage
@@ -517,6 +519,30 @@ func test_main_screen_after_a_run_keeps_its_map_chosen() -> void:
 	stage.result.main_button.pressed.emit()
 	await wait_process_frames(2)
 	var panel := _journey().panel
+	assert_eq(panel.map_choice(), JUNGLE)
+	assert_eq(panel.thumbnail.choice, JUNGLE)
+	assert_true(panel.map_buttons[JUNGLE].button_pressed)
+	assert_false(panel.map_buttons[EndlessPlan.RANDOM].button_pressed)
+
+
+## Item 32: the save keeps the map, so a story stage in between keeps it too,
+## and Start writes it to the disk.
+func test_main_screen_after_a_story_stage_keeps_the_endless_map() -> void:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(Journey.ENDLESS_ACT))
+	game.show_main_screen()
+	var panel := _journey().panel
+	panel.map_buttons[JUNGLE].pressed.emit()
+	_journey().pick(_journey().map.node_for("4-1"))
+	panel.start_button.pressed.emit()
+	await wait_process_frames(2)
+	var stage := game.screen as Stage
+	assert_eq(stage.run.stage_id, "4-1")
+	assert_eq(_on_disk().endless_map, JUNGLE, "Start saved the choice")
+	stage.show_result(false)
+	stage.result.main_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, MainScreen)
+	panel = _journey().panel
 	assert_eq(panel.map_choice(), JUNGLE)
 	assert_eq(panel.thumbnail.choice, JUNGLE)
 	assert_true(panel.map_buttons[JUNGLE].button_pressed)

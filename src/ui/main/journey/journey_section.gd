@@ -26,8 +26,6 @@ var picked: JourneyNode
 var focus_act := 0
 ## The map opens on Endless instead (after an Endless run), when it is open.
 var focus_endless := false
-## Endless's chosen map when the section opens (the last run's choice).
-var endless_map := EndlessPlan.RANDOM
 
 
 func _ready() -> void:
@@ -39,7 +37,6 @@ func _ready() -> void:
 	panel.position = PANEL_RECT.position
 	panel.start_pressed.connect(_on_start)
 	add_child(panel)
-	panel.choose_map(endless_map)
 	SaveGame.instance().changed.connect(refresh)
 	refresh()
 	if focus_endless and not map.endless.locked:
@@ -76,12 +73,15 @@ func close_popup() -> bool:
 	return loadout.close_menu()
 
 
-## Locks, opens and marks the map from the save, and refills the panel; a
-## pick that has locked falls back as open_on() does.
+## Locks, opens and marks the map from the save, and refills the panel with
+## Endless's best and its map choice from the save; a pick that has locked
+## falls back as open_on() does.
 func refresh() -> void:
 	var save := SaveGame.instance()
 	map.refresh(save.cleared, save.endless_best, Skins.find(save.skin).portrait)
 	panel.show_best(save.endless_best)
+	if panel.map_choice() != save.endless_map:
+		panel.choose_map(save.endless_map)
 	if picked == null or picked.locked:
 		open_on()
 	else:

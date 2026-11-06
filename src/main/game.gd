@@ -83,13 +83,11 @@ func _leave(save: bool) -> void:
 
 
 ## `focus_act`: the act the Journey opens on; `focus_endless`: it opens on
-## Endless instead (after a run), with `endless_map` (the run's map choice)
-## still chosen.
-func show_main_screen(focus_act := 0, focus_endless := false, endless_map := EndlessPlan.RANDOM) -> void:
+## Endless instead (after a run). Endless's map choice comes from the save.
+func show_main_screen(focus_act := 0, focus_endless := false) -> void:
 	var main := MainScreen.new()
 	main.focus_act = focus_act
 	main.focus_endless = focus_endless
-	main.endless_map = endless_map
 	main.start_requested.connect(start_stage)
 	main.exit_requested.connect(ask_to_quit)
 	main.leave_requested.connect(ask_to_leave)
@@ -212,7 +210,7 @@ func _end_run(result: StringName, then: StringName) -> void:
 	if saved and then == &"retry":
 		start_stage.call_deferred(StageSetup.for_endless(SaveGame.instance(), _run.map_choice, _rng))
 		return
-	show_main_screen.call_deferred(0, true, _run.map_choice)
+	show_main_screen.call_deferred(0, true)
 	if not saved:
 		_report_save_failed.call_deferred()
 
