@@ -255,6 +255,45 @@ func test_death_clears_an_order_kept_through_a_stun() -> void:
 	assert_eq(lucian._order, Lucian.Order.NONE)
 
 
+func test_death_clears_a_queued_cast() -> void:
+	lucian.lock_cast(0.3)
+	assert_false(lucian.try_cast(Slot.W, Vector2(600, 0)))
+	assert_eq(lucian.queued_cast(), Slot.W)
+	lucian.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_true(lucian.dead)
+	assert_eq(lucian.queued_cast(), -1)
+	assert_true(lucian._queued.is_empty())
+	await wait_physics_frames(30)
+	assert_true(lucian.skills[Slot.W].cooldown.is_ready(), "W never fired")
+
+
+func test_a_cast_queued_before_a_guardian_angel_revive_never_fires() -> void:
+	lucian.lock_cast(0.3)
+	assert_false(lucian.use_summoner(0, Vector2(0, -1000)))
+	assert_false(lucian._queued.is_empty(), "Flash waits for the cast time")
+	lucian.enter_stasis(0.2, 100.0, 0.0)
+	assert_true(lucian._queued.is_empty())
+	await wait_physics_frames(30)
+	assert_false(lucian.in_stasis(), "revived")
+	assert_true(lucian.summoners.cooldown(&"flash").is_ready(), "Flash never fired")
+	assert_eq(lucian.global_position, Vector2.ZERO)
+
+
+func test_a_visit_given_during_a_stun_walks_to_the_merchant_after_it() -> void:
+	var merchant := Merchant.new()
+	merchant.position = Vector2(600, 0)
+	add_child_autofree(merchant)
+	var reached := [0]
+	lucian.merchant_reached.connect(func(_merchant: Merchant) -> void: reached[0] += 1)
+	lucian.add_cc(Kind.STUN, 0.3)
+	lucian.command_visit(merchant)
+	assert_eq(lucian._order, Lucian.Order.VISIT)
+	await wait_physics_frames(10)
+	assert_eq(lucian.global_position, Vector2.ZERO, "no step while stunned")
+	await wait_seconds(1.5)
+	assert_eq(reached[0], 1, "walked over, then the shop opened")
+
+
 func test_a_stun_drops_a_walk_to_a_cast() -> void:
 	var far := _enemy(Vector2(1200, 0), 5000.0)
 	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"hextech_gunblade"))

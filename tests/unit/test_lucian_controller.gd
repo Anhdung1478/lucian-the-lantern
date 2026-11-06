@@ -115,6 +115,26 @@ func test_a_right_click_during_a_stun_walks_on_after_it() -> void:
 	assert_lt(lucian.global_position.distance_to(cursor), 280.0, "walking to the click once it ends")
 
 
+func test_a_merchant_clicked_in_reach_during_a_stun_opens_once_it_ends() -> void:
+	var merchant := Merchant.new()
+	merchant.position = lucian.get_global_mouse_position()
+	add_child_autofree(merchant)
+	lucian.global_position = merchant.position + Vector2(150, 0)
+	var reached: Array[Merchant] = []
+	lucian.merchant_reached.connect(func(visited: Merchant) -> void: reached.append(visited))
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.3)
+	right_click()
+	Input.action_release(&"move")
+	assert_eq(lucian._order, Lucian.Order.VISIT, "the visit waits")
+	assert_eq(reached, [] as Array[Merchant], "no shop while stunned")
+	await wait_physics_frames(10)
+	assert_eq(reached, [] as Array[Merchant], "still none")
+	await wait_physics_frames(20)
+	assert_false(lucian.has_cc(CrowdControl.Kind.STUN))
+	assert_eq(reached, [merchant] as Array[Merchant], "the shop opens once it ends")
+	assert_eq(lucian._order, Lucian.Order.NONE)
+
+
 func test_a_right_click_held_through_a_stun_keeps_steering() -> void:
 	right_click()
 	lucian.add_cc(CrowdControl.Kind.STUN, 0.3)

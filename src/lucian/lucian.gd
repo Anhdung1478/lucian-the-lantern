@@ -278,10 +278,11 @@ func command_attack_move(point: Vector2) -> void:
 
 
 ## Walks to `merchant`; merchant_reached fires once he is in range (right
-## away if he already is).
+## away if he already is). Under crowd control the visit waits like any order:
+## the shop opens once it ends, not during it.
 func command_visit(merchant: Merchant) -> void:
 	_cancel_windup()
-	if global_position.distance_to(merchant.global_position) <= Merchant.INTERACT_RANGE:
+	if can_act() and global_position.distance_to(merchant.global_position) <= Merchant.INTERACT_RANGE:
 		_order = Order.NONE
 		merchant_reached.emit(merchant)
 		return
