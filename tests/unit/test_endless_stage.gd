@@ -147,6 +147,18 @@ func test_kills_pay_like_the_act_of_their_wave() -> void:
 	assert_eq(stage.wallet.gold, gold + roundi(data.gold * data.reward_scale(3)))
 
 
+func test_a_tier_2_boss_kill_pays_130_blue_and_a_tier_1_boss_100() -> void:
+	var stage: Stage = await _endless()
+	var blue: int = stage.collected[Essences.BLUE]
+	stage.runner.spawn_requested.emit(&"akshan", 10)
+	_unit(&"akshan").take_damage(_lethal())
+	assert_eq(stage.collected[Essences.BLUE], blue + 100, "tier 1")
+	blue = stage.collected[Essences.BLUE]
+	stage.runner.spawn_requested.emit(&"akshan", 20)
+	_unit(&"akshan").take_damage(_lethal())
+	assert_eq(stage.collected[Essences.BLUE], blue + 130, "tier 2")
+
+
 func test_a_boss_comes_at_the_boss_point_with_its_waves_hp_and_scaled_skill_hits() -> void:
 	var stage: Stage = await _endless()
 	stage.runner.spawn_requested.emit(&"akshan", 20)

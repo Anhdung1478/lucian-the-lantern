@@ -738,10 +738,11 @@ func _on_enemy_died(enemy: Enemy) -> void:
 	enemy_died.emit(unit)
 
 
-## A kill's gold, XP and blue and orange (a summon's are small), and its
-## place in the kill count.
+## A kill's gold, XP and blue and orange (a summon's are small; an Endless
+## boss's essence grows with its tier), and its place in the kill count.
 func _pay_kill(unit: EnemyUnit) -> void:
-	var reward := KillRewards.roll(unit.data, _reward_act(unit), run, rng, unit.summoned)
+	var boss_scale := EndlessPlan.reward_scale(unit.data.kind, unit.wave) if endless else 1.0
+	var reward := KillRewards.roll(unit.data, _reward_act(unit), run, rng, unit.summoned, boss_scale)
 	wallet.add(reward.gold)
 	stats.gold_earned += reward.gold
 	stats.kills += 1

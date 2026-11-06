@@ -135,6 +135,18 @@ static func mini_boss_power(w: int) -> float:
 	return 1.0 + TIER_POWER * (_mini_boss_tier(w) - 1)
 
 
+## What a boss or mini boss in wave `w` pays more blue and orange essence
+## than in the story: the same factor as its HP, 1 at tier 1 and +0.3 a tier.
+## Anything else pays 1.0.
+static func reward_scale(kind: StringName, w: int) -> float:
+	match kind:
+		&"boss":
+			return 1.0 + TIER_HP * (_boss_tier(w) - 1)
+		&"mini_boss":
+			return 1.0 + TIER_HP * (_mini_boss_tier(w) - 1)
+	return 1.0
+
+
 ## The act whose gold, XP and blue a kill in wave `w` pays.
 static func reward_act(w: int) -> int:
 	return 1 + maxi(w - 1, 0) / REWARD_ACT_WAVES

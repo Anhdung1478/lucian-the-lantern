@@ -241,3 +241,17 @@ func test_random_rolls_each_real_map() -> void:
 	assert_eq(seen.size(), 6)
 	for choice in range(1, 7):
 		assert_eq(EndlessPlan.resolve_map(choice, rng), choice)
+
+
+func test_reward_scale_follows_the_tier_for_bosses_and_mini_bosses() -> void:
+	assert_eq(EndlessPlan.reward_scale(&"boss", 10), 1.0)
+	assert_almost_eq(EndlessPlan.reward_scale(&"boss", 20), 1.3, 0.0001)
+	assert_almost_eq(EndlessPlan.reward_scale(&"boss", 30), 1.6, 0.0001)
+	assert_eq(EndlessPlan.reward_scale(&"mini_boss", 5), 1.0)
+	assert_almost_eq(EndlessPlan.reward_scale(&"mini_boss", 15), 1.3, 0.0001)
+	assert_eq(EndlessPlan.reward_scale(&"boss", 1), 1.0, "called up early is tier 1")
+
+
+func test_reward_scale_is_1_for_anything_else() -> void:
+	for kind in [&"normal", &"elite"]:
+		assert_eq(EndlessPlan.reward_scale(kind, 40), 1.0, str(kind))

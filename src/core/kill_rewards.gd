@@ -19,8 +19,11 @@ const SUMMON_SHARE := 0.25
 
 
 ## A `summoned` enemy pays SUMMON_SHARE of its gold and XP, rounded, and no
-## essence at all (its kind's and its data's extra included).
-static func roll(data: EnemyData, act: int, run: StageSetup, rng: RandomNumberGenerator, summoned := false) -> Dictionary:
+## essence at all (its kind's and its data's extra included). A boss's or
+## mini boss's base blue and sure orange are multiplied by `boss_scale`
+## (Endless's tier, EndlessPlan.reward_scale), rounded; gold, XP and the
+## data's extras are not.
+static func roll(data: EnemyData, act: int, run: StageSetup, rng: RandomNumberGenerator, summoned := false, boss_scale := 1.0) -> Dictionary:
 	var scale := data.reward_scale(act) * (SUMMON_SHARE if summoned else 1.0)
 	var reward := {
 		"gold": roundi(data.gold * scale * (1.0 + run.gold_bonus) * run.gold_mult),
@@ -32,11 +35,11 @@ static func roll(data: EnemyData, act: int, run: StageSetup, rng: RandomNumberGe
 		return reward
 	var blue := act
 	if data.kind == &"boss":
-		blue = BOSS_BLUE
-		reward.orange = BOSS_ORANGE
+		blue = roundi(BOSS_BLUE * boss_scale)
+		reward.orange = roundi(BOSS_ORANGE * boss_scale)
 	elif data.kind == &"mini_boss":
-		blue = MINI_BOSS_BLUE
-		reward.orange = MINI_BOSS_ORANGE
+		blue = roundi(MINI_BOSS_BLUE * boss_scale)
+		reward.orange = roundi(MINI_BOSS_ORANGE * boss_scale)
 	else:
 		if data.kind == &"elite":
 			blue = act * ELITE_BLUE

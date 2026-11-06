@@ -60,6 +60,28 @@ func test_a_mini_boss_gives_50_blue_and_3_orange_in_any_act() -> void:
 		assert_eq(reward.orange, 3, "act %d" % act)
 
 
+func test_a_boss_scale_multiplies_a_bosss_blue_and_sure_orange() -> void:
+	var boss := _mini_boss()
+	boss.kind = &"boss"
+	var tiers := {1.0: [100, 5], 1.3: [130, 7], 1.6: [160, 8]}
+	for scale: float in tiers:
+		var reward := KillRewards.roll(boss, 1, StageSetup.new(), rng, false, scale)
+		assert_eq([reward.blue, reward.orange], tiers[scale], "×%s" % scale)
+	assert_eq(KillRewards.roll(boss, 1, StageSetup.new(), rng).blue, 100, "unscaled by default")
+
+
+func test_a_boss_scale_multiplies_a_mini_bosss_blue_and_orange_but_not_gold() -> void:
+	var reward := KillRewards.roll(_mini_boss(), 1, StageSetup.new(), rng, false, 1.3)
+	assert_eq([reward.blue, reward.orange], [65, 4])
+	assert_eq(reward.gold, 400)
+	assert_eq(reward.xp, 200)
+
+
+func test_a_boss_scale_leaves_normals_and_summons_alone() -> void:
+	assert_eq(KillRewards.roll(SIEGE, 2, StageSetup.new(), rng, false, 2.0).blue, 10)
+	assert_eq(KillRewards.roll(_mini_boss(), 1, StageSetup.new(), rng, true, 2.0).blue, 0)
+
+
 func test_a_mini_boss_reward_does_not_scale_by_act() -> void:
 	assert_eq(KillRewards.roll(_mini_boss(), 3, StageSetup.new(), rng).gold, 400)
 	assert_eq(_mini_boss().hp_scale(3, 4), 1.0)
