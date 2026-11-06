@@ -27,10 +27,10 @@ const STAGE_LIMIT := 2400.0
 const BUY_ORDER := [
 	[&"ghost", 1], [&"skill_e", 1],
 	[&"skill_q", 1], [&"skill_w", 1], [&"passive", 1],
-	[&"stat_hp", 1], [&"stat_ad", 1], [&"heal", 1], [&"equip_slots", 1], [&"backpack_slots", 1],
+	[&"stat_hp", 1], [&"stat_ad", 1], [&"heal", 1], [&"equip_slots", 1], [&"backpack_slots", 1], [&"boots", 1],
 	[&"skill_q", 2], [&"skill_w", 2], [&"stat_armor", 1], [&"stat_attack_speed", 1],
 	[&"skill_r", 1], [&"stat_hp", 2], [&"stat_ad", 2], [&"skill_e", 2], [&"summoner_slot_2", 1], [&"flash", 1],
-	[&"skill_q", 3], [&"skill_w", 3], [&"stat_mr", 1], [&"equip_slots", 2], [&"stat_armor", 2], [&"backpack_slots", 2],
+	[&"skill_q", 3], [&"skill_w", 3], [&"stat_mr", 1], [&"equip_slots", 2], [&"boots", 2], [&"stat_armor", 2], [&"backpack_slots", 2],
 	[&"stat_attack_speed", 2], [&"heal_upgrade", 1], [&"skill_e", 3], [&"equip_slots", 3], [&"stat_hp", 3], [&"stat_ad", 3],
 	[&"skill_r", 2], [&"skill_q", 4], [&"skill_w", 4], [&"stat_mr", 2], [&"stat_hp_regen", 1], [&"stage_gold", 1],
 	[&"stat_armor", 3], [&"stat_attack_speed", 3], [&"skill_q", 5], [&"skill_e", 4], [&"skill_w", 5],
@@ -516,12 +516,14 @@ class Bot extends Node:
 				if again:
 					break
 
-	## The priciest items go into the open equip slots; potions stay in the backpack.
+	## The priciest items go into the open equip slots; potions stay in their
+	## cells and the backpack, and the boots in theirs.
 	func _equip() -> void:
 		var inv := lucian.inventory
 		var gear: Array[int] = []
 		for i in Inventory.SIZE:
-			if not inv.is_locked(i) and inv.item_at(i) and not inv.item_at(i).is_potion():
+			var item := inv.item_at(i)
+			if not inv.is_locked(i) and item and not item.is_potion() and not item.is_boots():
 				gear.append(i)
 		gear.sort_custom(func(x: int, y: int) -> bool: return inv.item_at(x).cost > inv.item_at(y).cost)
 		var slot := 0

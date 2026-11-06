@@ -103,7 +103,7 @@ Numbers at wave 1 (`data/enemies/*.tres`). Each later wave adds **+10% HP and da
 ### The tutorial (first play)
 Until 1-1 is cleared, Act 1 is the tutorial:
 - Lucian has **one gun**: his body shows only the left pistol (`lucian_body_one_gun.svg`), and every shot leaves it. He shows both guns once he takes up Senna's, in the cutscene.
-- **No skill ranks, no passive, no summoner spells** at the start. Items, tree stats, equip slots and the skin still apply.
+- **No skill ranks, no passive, no summoner spells** at the start. Items, tree stats, equip slots, the boots (V1.4) and the skin still apply.
 - **Q and W are locked** until Act 1 is cleared. Hovering their HUD slots says "Locked: clear Act 1 to unlock it in the Evolution Tree."
 - **Senna** fights beside him.
 - **Senna teaches E at the first break** (before wave 2), in a short scene: the black bars close in, she dashes to the side and back, and says "Dash, then shoot." Lucian learns E at rank 1 for the rest of the stage. The break's countdown waits for the scene; Skip ends it, and he still learns E. Then the tip "E to dash toward the cursor. Your next shot is ready when you land." shows.

@@ -10,7 +10,7 @@ const SAVE_PREFIX := "user://screenshot_save_slot_"
 const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "title_settings", "the_end",
 	"journey_map", "journey_endless", "endless_wave", "endless_boss", "endless_pick", "endless_run_over",
 	"exit_cancel", "tree_icons", "tree_free", "tree_rules", "backpack_slots",
-	"skin_preview"]
+	"skin_preview", "tree_boots"]
 ## Endless map choices (Journey.ENDLESS_MAPS indices) for the Endless scenarios.
 const RANDOM_MAP := 0
 const TRAINING_GROUND := 2
@@ -132,6 +132,12 @@ func _run(scenario: String) -> void:
 			await scenario_potions()
 		"shop":
 			await scenario_shop()
+		"gear":
+			await scenario_gear()
+		"boots_shop":
+			await scenario_boots_shop()
+		"tree_boots":
+			await scenario_tree_boots()
 		"settings":
 			await scenario_settings()
 		"buffs":
@@ -779,32 +785,34 @@ func mouse_right_click(canvas_pos: Vector2) -> void:
 
 func scenario_potions() -> void:
 	var inventory := lucian.inventory
+	# 9 + 3 Health: the cell fills first, the rest goes to backpack cell 0;
+	# 9 + 4 Mana: its cell, then backpack cell 1.
 	inventory.add(lucian.item_catalog.find(&"hp_potion"), 12)
-	inventory.add(lucian.item_catalog.find(&"mp_potion"), 4)
-	inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"hp_potion"))
-	inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"hp_potion"))
+	inventory.add(lucian.item_catalog.find(&"mp_potion"), 13)
+	print("potion cells (expect 9 9), backpack (expect 3 4): ", inventory.count_at(Inventory.HP_POTION_CELL), " ",
+		inventory.count_at(Inventory.MP_POTION_CELL), ", ", inventory.count_at(0), " ", inventory.count_at(1))
 	lucian.hp = 150.0
 	lucian.mana = 40.0
 	await press_key(KEY_P, true)
 	await press_key(KEY_P, false)
 	await wait(0.3)
 	var backpack: BackpackScreen = stage.get_node("Screens/Backpack")
-	await mouse_right_click(control_center(backpack._cells[2]))
+	await mouse_right_click(control_center(backpack._cells[1]))
 	await wait(0.1)
-	print("use offered for cell (expect 2): ", backpack.use_index())
+	print("use offered for cell (expect 1): ", backpack.use_index())
 	await shot("potions_0_use")
 	await mouse_move(control_center(backpack._use_button))
 	await mouse_button(control_center(backpack._use_button), true)
 	await mouse_button(control_center(backpack._use_button), false)
-	print("mana potions left (expect 3): ", inventory.count_at(2))
+	print("mana potions left in cell 1 (expect 3): ", inventory.count_at(1))
 	var mana := lucian.mana
 	await wait(0.5)
 	print("no mana while paused (expect true): ", is_equal_approx(mana, lucian.mana))
 	await press_key(KEY_P, true)
 	await press_key(KEY_P, false)
-	await press_key(KEY_1, true)
-	await press_key(KEY_1, false)
-	print("slot 1 potions left (expect 1): ", inventory.count_at(Inventory.EQUIP_START))
+	await press_key(KEY_7, true)
+	await press_key(KEY_7, false)
+	print("Health cell after 7 (expect 8): ", inventory.count_at(Inventory.HP_POTION_CELL))
 	await wait(2.0)
 	print("hp after 2 s (expect ~230+): ", roundi(lucian.hp), "  mana (expect ~100+): ", roundi(lucian.mana))
 	await shot("potions_1_drinking")
@@ -862,6 +870,141 @@ func scenario_shop() -> void:
 	await press_key(KEY_ESCAPE, true)
 	await press_key(KEY_ESCAPE, false)
 	print("ESC closes the shop (expect false false): ", game.screens.is_shopping(), " ", paused)
+
+
+## V1.4's gear strip and HUD gear column: empty (faded potions and Boots of
+## Speed), then filled; the boots' card; the HUD column.
+func scenario_gear() -> void:
+	var inventory := lucian.inventory
+	lucian.boots_level = 0
+	inventory.set_boots(null)
+	give([&"bf_sword", &"recurve_bow", &"chain_vest"])
+	inventory.apply_drop(0, Inventory.EQUIP_START, false)
+	await wait(0.2)
+	await shot("gear_0_hud_empty")
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	await wait(0.3)
+	var backpack: BackpackScreen = stage.get_node("Screens/Backpack")
+	print("cells in index order, sell slot last (expect true -1): ",
+		range(Inventory.SIZE).all(func(i: int) -> bool: return backpack._cells[i].index == i), " ", backpack._cells.back().index)
+	await mouse_move(control_center(backpack._cells[Inventory.BOOTS_CELL]))
+	await wait_for_tooltip(backpack._cells[Inventory.BOOTS_CELL])
+	await shot("gear_1_backpack_empty_cells")
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	lucian.boots_level = 2
+	inventory.set_boots(lucian.item_catalog.find(&"gluttonous_greaves"))
+	inventory.add(lucian.item_catalog.find(&"hp_potion"), 5)
+	inventory.add(lucian.item_catalog.find(&"mp_potion"), 2)
+	print("move speed with Gluttonous + Slightly Quicker (expect 400): ", roundi(lucian.stats.move_speed))
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	await wait(0.3)
+	await mouse_move(control_center(backpack._cells[Inventory.BOOTS_CELL]))
+	await wait_for_tooltip(backpack._cells[Inventory.BOOTS_CELL])
+	await shot("gear_2_backpack_boots_card")
+	# Boots never leave their cell.
+	await mouse_move(control_center(backpack._cells[Inventory.BOOTS_CELL]))
+	await mouse_button(control_center(backpack._cells[Inventory.BOOTS_CELL]), true)
+	for step in 5:
+		await mouse_move(lerp(control_center(backpack._cells[Inventory.BOOTS_CELL]), control_center(backpack._cells[3]), (step + 1) / 5.0), true)
+	await mouse_button(control_center(backpack._cells[3]), false)
+	print("boots still in their cell (expect gluttonous_greaves): ", inventory.boots().id)
+	await press_key(KEY_P, true)
+	await press_key(KEY_P, false)
+	await mouse_move(Vector2(960, 300))
+	await wait(0.3)
+	await shot("gear_3_hud_column")
+	var hud: Hud = stage.get_node("Hud")
+	var slots := hud.gear_slots()
+	await mouse_move(control_center(slots[0]))
+	await wait_for_tooltip(slots[0])
+	await shot("gear_4_hud_potion_card")
+	await mouse_move(Vector2(960, 300))
+	await press_key(KEY_7, true)
+	await press_key(KEY_7, false)
+	print("7 drinks (expect 4 left): ", inventory.count_at(Inventory.HP_POTION_CELL))
+
+
+## V1.4's merchant Boots tab: empty, the boots and a fragment dragged in, the
+## upgrade, and boots refused by the sell slot.
+func scenario_boots_shop() -> void:
+	var game := stage as Stage
+	var inventory := lucian.inventory
+	game.wallet.add(2000)
+	give([&"recurve_bow", &"bf_sword", &"giants_belt"])
+	await mouse_right_click(world_to_canvas(game.merchant.global_position))
+	await wait(3.0)
+	var backpack := game.screens.backpack
+	var panel := backpack.shop_panel()
+	panel.show_tab(ShopPanel.BOOTS_TAB)
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.3)
+	await shot("boots_shop_0_empty")
+	await drag_cell(backpack, Inventory.BOOTS_CELL, control_center(panel.boots_input()))
+	await drag_cell(backpack, 2, control_center(panel.fragment_input()))
+	await wait(0.2)
+	print("Giant's Belt sits in the slot but makes nothing (expect 2 null): ", panel.fragment_input().index, " ", panel.upgrade_preview())
+	await drag_cell(backpack, 0, control_center(panel.fragment_input()))
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.2)
+	print("inputs (expect 62 0), preview (expect Berserker's Greaves): ", panel.boots_input().index, " ",
+		panel.fragment_input().index, " ", panel.upgrade_preview().display_name)
+	await shot("boots_shop_1_ready")
+	await click(panel._upgrade)
+	await wait(0.2)
+	print("upgraded (expect berserkers_greaves, gold 1700, fragment gone): ", inventory.boots().id, " ",
+		game.wallet.gold, " ", inventory.item_at(0))
+	await drag_cell(backpack, 1, control_center(panel.fragment_input()))
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.2)
+	await shot("boots_shop_2_wrong_fragment")
+	# Boots over the sell slot read NO.
+	var sell_cell: ItemCell = backpack._cells.back()
+	await mouse_move(control_center(backpack._cells[Inventory.BOOTS_CELL]))
+	await mouse_button(control_center(backpack._cells[Inventory.BOOTS_CELL]), true)
+	for step in 5:
+		await mouse_move(lerp(control_center(backpack._cells[Inventory.BOOTS_CELL]), control_center(sell_cell), (step + 1) / 5.0), true)
+	await wait(0.1)
+	await shot("boots_shop_3_cant_sell")
+	await mouse_button(control_center(sell_cell), false)
+	print("boots kept (expect berserkers_greaves): ", inventory.boots().id)
+
+
+## Drags inventory cell `from` to `to` (screen point) with the mouse held.
+func drag_cell(backpack: BackpackScreen, from: int, to: Vector2) -> void:
+	var start := control_center(backpack._cells[from])
+	await mouse_move(start)
+	await mouse_button(start, true)
+	for step in 6:
+		await mouse_move(lerp(start, to, (step + 1) / 6.0), true)
+	await wait(0.05)
+	await mouse_button(to, false)
+
+
+## V1.4's Boots node on the tree's Backpack page: not bought, then each level.
+func scenario_tree_boots() -> void:
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	section.show_branch(&"backpack")
+	await mouse_move(Vector2(960, 1060))
+	await wait(0.3)
+	await shot("tree_boots_0_none")
+	var save := SaveGame.instance()
+	save.essences.add(Essences.BLUE, 2000)
+	save.essences.add(Essences.ORANGE, 20)
+	print("buy level 1 (expect true): ", save.tree.buy(&"boots", save.essences))
+	section.refresh()
+	section.select(&"boots")
+	await wait(0.3)
+	print("info (expect Boots of Speed → Slightly Magical Boots): ", section.info.value_label.text)
+	await shot("tree_boots_1_speed")
+	print("buy level 2 (expect true): ", save.tree.buy(&"boots", save.essences))
+	section.refresh()
+	section.select(&"boots")
+	await wait(0.3)
+	await shot("tree_boots_2_magical")
 
 
 func click(control: Control) -> void:
@@ -923,8 +1066,8 @@ func scenario_buffs() -> void:
 	var game := stage as Stage
 	var dummy: TrainingDummy = stage.get_node("World/TrainingDummy")
 	game.set_dummy_count(3)
-	equip_all([&"kraken_slayer", &"statikk_shiv", &"essence_reaver", &"black_cleaver", &"spear_of_shojin", &"hp_potion"])
-	lucian.inventory.put(Inventory.EQUIP_START + 5, lucian.item_catalog.find(&"hp_potion"))
+	equip_all([&"kraken_slayer", &"statikk_shiv", &"essence_reaver", &"black_cleaver", &"spear_of_shojin"])
+	lucian.inventory.add(lucian.item_catalog.find(&"hp_potion"), 2)
 	lucian.progress.set_level(5)
 	lucian.try_rank_up(ChampionProgress.Slot.Q)
 	lucian.try_rank_up(ChampionProgress.Slot.W)
@@ -1598,7 +1741,7 @@ func scenario_main_tree_max() -> void:
 	await mouse_move(Vector2(960, 1060))
 	await wait(0.2)
 	var maxed := section.views.values().filter(func(view: TreeNodeView) -> bool: return view.state() == &"maxed").size()
-	print("maxed nodes (expect 34): ", maxed)
+	print("maxed nodes (expect 35): ", maxed)
 	for i in EvolutionTree.BRANCHES.size():
 		section.show_branch(EvolutionTree.BRANCHES[i])
 		await wait(0.2)

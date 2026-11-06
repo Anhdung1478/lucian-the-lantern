@@ -136,7 +136,7 @@ Clicking a node opens a panel (bottom-right, like the reference): *(Phase 10: a 
 
 **31 nodes** in five groves, left to right: Skills, Stats, Equipment, Economy, Summoners. Costs and what each level gives are in the game design doc §11; this table is where each node sits. Grid = (column, row up from the ground); one cell is 150 px.
 
-*(Phase 10: 34 nodes on five pages, Equipment renamed Backpack, and new grids; see "Built in Phase 10". R's and Ghost's requirements changed too (game design doc §11).)*
+*(Phase 10: 34 nodes on five pages, Equipment renamed Backpack, and new grids; see "Built in Phase 10". R's and Ghost's requirements changed too (game design doc §11). V1.4 adds the Boots node: 35.)*
 
 | Grove | Node (id) | Grid | Levels | Requires |
 |---|---|---|---|---|
@@ -208,7 +208,7 @@ A node with a level is never hidden (this only matters after the debug table's M
 |---|---|
 | Skills | Q, W and E along the bottom, the passive above W, and R crowning the trunk. R wears a ring of 13 segments, lit up to the Q + W + E total, with marks at 5, 9 and 13. |
 | Stats | Three boughs of three, with captions: OFFENSE (AD, AP, Attack Speed), DEFENSE on the trunk (Health, Armor, Magic Resist) and SUSTAIN (Mana, Health Regen, Mana Regen). |
-| Backpack | Equip Slots and Backpack Slots, each over a plaque. Equip Slots shows the 6 slots: open ones lit, the rest locked, with "Act 2" under slots 3–4 and "Act 4" under slots 5–6 (green once that level is open). Backpack Slots shows the 9 × 6 backpack with the open cells lit ("5 / 54"). The next level's slots or cells are outlined once it can be bought. |
+| Backpack | Equip Slots, Boots (since V1.4, on the trunk between them) and Backpack Slots, each over a plaque. Equip Slots shows the 6 slots: open ones lit, the rest locked, with "Act 2" under slots 3–4 and "Act 4" under slots 5–6 (green once that level is open). Boots shows Boots of Speed and Slightly Magical Boots, each lit once bought ("1 / 2"). Backpack Slots shows the 9 × 6 backpack with the open cells lit ("5 / 54"). The next level's slots or cells are outlined once it can be bought. |
 | Economy | REWARDS (Stage Gold, Bonus XP, Essence Drops) and MERCHANT (Merchant Stock, Cheaper Refresh). |
 | Summoners | The six spells along the bottom, each spell's upgrade above it, and the Second Summoner Slot at the top of the trunk. |
 
@@ -261,6 +261,14 @@ A node with a level is never hidden (this only matters after the debug table's M
 
 - A note: "Only Reset tree gives essence back."
 - **Buy** (gold) buys one level with the coin sound and closes; it is off while the level can't be bought. **Cancel** or **ESC** closes it and keeps the pick. Hiding the tree closes it.
+
+### Built in V1.4
+
+**The Boots node** (`data/tree/boots.tres`) joins the Backpack page: 35 nodes, and "Backpack 0 / 14".
+- **Where:** grid (2, 1.5), on the trunk between the Equip Slots and Backpack Slots plaques, with 20 px between the three plaques.
+- **Levels:** 1 Boots of Speed (300 blue), 2 Slightly Magical Boots (800 blue + 10 orange). The info panel reads "None → Boots of Speed → Slightly Magical Boots" (the node's `level_texts`).
+- **Its plaque:** BOOTS and "level / 2", the two boots side by side with their names (faded until bought, the next one outlined when it can be bought), and "Worn on every map."
+- **The page's blurb:** "Equip slots for gear, boots to wear, and cells to carry more."
 
 ---
 

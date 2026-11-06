@@ -36,9 +36,10 @@
 - **Hover a skill or the passive** for about **1 second** to see its card, like LoL: name, key, rank, mana cost and cooldown per rank, and a description where per-rank values show the current rank lit up and scalings in their stat color (AD orange, AP blue). The max rank bonus is listed last and lights up once reached.
   - A skill with no rank bought starts its card with a red line saying why: "Locked: buy it in the Evolution Tree." In Act 1's tutorial, Q and W say "Locked: clear Act 1 to unlock it in the Evolution Tree.", and E says "Locked: Senna teaches it at the first break." until she does.
 - **Summoner spells** (D / F): 48 px icons right of R, with a cooldown sweep and seconds and the key. Hover one for its card (name, key, cooldown, effect, and a green "Upgraded: …" line once its upgrade is bought). An empty key shows only its frame ("No spell: pick one in Journey before starting."); F shows a chain until the 2nd slot is bought.
-- **Item slots 1–6:** in a 3 × 2 grid right of the HP / mana bars. Only unlocked slots are shown, with cooldowns for active items (sweep and seconds) and a potion stack's count. Hovering one shows the item's card.
+- **Item slots 1–6:** in a 3 × 2 grid right of the HP / mana bars. Only unlocked slots are shown, with cooldowns for active items (sweep and seconds). Hovering one shows the item's card.
+- **Gear column** *(since V1.4)*: right of the item slots (its own column, not in their grid). On top, the Health and Mana potion cells (keys 7 and 8) with their stack counts; an empty one shows its potion faded. Under them, the boots, with no key, and nothing at all while there are none. Hovering shows the card.
 - **Range on hover:** hovering a learned skill, an item with an aimed active (Galeforce, Rocketbelt, Gunblade) or Flash / Smite shows its range around Lucian at once, pointing where he faces: a ray for Q, W (ending in its cross), E and the item dashes (ending in a ring where Lucian lands), two dashed rays for R, a circle for Gunblade, Smite and Flash (Flash's shows the landing ring while aiming). Drawn in pale blue under Lucian.
-- **Key labels** (skills and item slots) follow the bindings in Settings.
+- **Key labels** (skills, item slots and potion cells) follow the bindings in Settings.
 - **Built in Phase 9:** the Evolution Tree shows these same skill and summoner icons (`main_screen.md`). Learning a rank plays `rank_up`, and Q, W and E each have a cast sound (§8).
 
 ### Buff icons (above the skill bar)
@@ -368,7 +369,19 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 ### Potions
 - Up to **9 potions** stack in one cell.
 - **Right-click → Use.** The game is paused, so healing **starts when the backpack is closed**.
-- Or place it in an equip slot and press **1–6** during play.
+- Or put it in its potion cell and press **7** (Health) or **8** (Mana) during play. *(Since V1.4; before, any equip slot and 1–6. Potions no longer go in equip slots.)*
+
+### Built in V1.4
+```
+  [1][2][3][4][5][6][S]   <- equip strip
+  [B]          [7][8]     <- gear strip, as wide
+```
+- **The gear strip** sits under the equip strip, in the same dark style: the **boots cell** on the left (steel border), then the **Health** and **Mana potion cells** on the right (red-brown border, keys 7 and 8 in the corner). None of them is ever locked.
+- **Empty cells show what goes in them, faded** (about 30%): the potion cells their potion, the boots cell Boots of Speed. Hovering an empty one says "Health potions go here: press 7 to drink one" or "Buy Boots in the Evolution Tree".
+- **Potion cells** take only their own potion (Health or Mana), 9 at most. Bought potions fill them first, then the backpack. They are never refilled by themselves.
+- **Equip slots refuse potions**, both ways: a potion dropped on one goes back, and so does a swap that would send one there. A potion bought onto one says "That item can't go there".
+- **The boots never move.** Dragging them anywhere sends them back, except onto the merchant's Boots tab (§3). Dropped on the sell slot, they read **NO** and "Boots can't be sold".
+- The screen keeps one cell per inventory index in order (0–62), then the sell slot.
 
 ### Recipe table
 - Shown automatically when the backpack is open, in the **top-left of the screen**. The backpack sits in the **center**.
@@ -434,6 +447,14 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Refused purchase** (not enough gold, no room): a red message in the bottom row and the price flashes red, with an error sound.
 - **Selling:** the 7th equip-row cell turns red and reads **SELL**. Dragging an item over it shows "+N" and "Sells for N gold"; releasing sells it (a whole potion stack at once).
 - **Closing:** ESC or P. The game stays paused while the shop is open.
+
+### Built in V1.4
+- **Three tabs:** Items, Potions and **Boots**. Refresh shows on Items only. The hint line under the tab follows it.
+- **The Boots tab:** `[boots] + [fragment] → [new boots]`, the fee (coin and gold, red when it can't be paid), an **Upgrade** button and a note line.
+  - Drag the boots (from their cell) onto the first slot and a fragment (from any cell) onto the second. Anything else is refused: "Only boots go there" / "Only a fragment goes there". A right-click empties a slot.
+  - The slots hold the inventory cell, not the item, so nothing has to be given back: they are emptied when the shop closes and whenever their cell no longer holds what they take.
+  - The third slot shows what the two make. **Upgrade** is off until they make something; pressing it pays the fee, uses up the fragment, puts the new boots in the boots cell and plays the craft sound.
+  - The note: "No boots: buy them in the Evolution Tree" with an empty boots cell; otherwise what to drag next, "That fragment doesn't upgrade …", "… are fully upgraded." or "Old → New".
 
 ---
 

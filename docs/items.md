@@ -4,16 +4,17 @@
 > `data/items/**/*.tres`; keep this list in sync when tuning.
 
 Each legendary's stats follow its LoL item, adjusted so it usually carries the stat types
-of the two fragments it is crafted from. Only items in **equip slots 1–6** give stats and
-passives; the backpack is storage. Each item's passive counts **once**, however many copies
-are equipped. Since Phase 3 most passives and all three actives work in combat; see
-*What works in combat* at the end.
+of the two fragments it is crafted from. Only items in **equip slots 1–6** and the **boots
+cell** give stats and passives; the backpack is storage. Each item's passive counts **once**,
+however many copies are equipped. Since Phase 3 most passives and all three actives work in
+combat; see *What works in combat* at the end.
 
 **Energized** attacks work like LoL: moving and attacking build stacks; at 100 the next attack is Energized.
 In this game: +9 per basic attack, +1 per 24 units walked, and dashes count double (Flash doesn't
 count). The charge only builds while an Energized item is equipped.
 
-The merchant buys items back for **70%** of their cost (**Guardian Angel: 40%**).
+The merchant buys items back for **70%** of their cost (**Guardian Angel: 40%**). Boots are
+never sold.
 
 ## Fragments
 
@@ -35,9 +36,49 @@ The merchant buys items back for **70%** of their cost (**Guardian Angel: 40%**)
 | Health Potion | Restores 200 HP over 5 s | 50 | 9 per cell |
 | Mana Potion | Restores 150 mana over 5 s | 50 | 9 per cell |
 
-- Drink: right-click it in the backpack → **Use**, or put it in equip slot 1–6 and press its key.
+- Since V1.4 each potion has its own **potion cell** under the equip slots: Health on key **7**,
+  Mana on key **8** (both rebindable). A cell holds 9, like a backpack cell, and is never locked.
+- Bought potions fill their potion cell first, then the backpack. The cells are not refilled
+  from the backpack: drag more in by hand. An empty cell shows its potion faded.
+- Potions can't go in equip slots 1–6. Drink one with its key, or right-click it anywhere in
+  the backpack → **Use**.
 - Several drinks run at the same time. Healing is raised by heal & shield power (Spirit Visage).
 - Nothing is restored while the game is paused, so a potion drunk from the backpack starts on close.
+
+## Boots
+
+Added in V1.4. Stats and passives follow LoL (patch 26.x); the live values are in
+`data/items/boots/*.tres`.
+
+- **Tier 1** is bought once in the Evolution Tree (Backpack branch, the **Boots** node) and kept
+  forever: level 1 is Boots of Speed (300 blue), level 2 Slightly Magical Boots (800 blue +
+  10 orange). Lucian starts **every map** wearing them: story stages, the tutorial, Training and
+  Endless.
+- Boots sit in their own **boots cell**, under the equip slots. It has no key; the boots give
+  stats and passives only. Boots never leave it: they can't be dragged out, sold, bought or
+  dropped, and the merchant never sells them.
+- They are upgraded only at the merchant's **Boots** tab: drag the boots and a fragment into its
+  two slots and pay the fee. The fragment is used up. Tier 2 comes from either tier-1 pair plus
+  its line's fragment; tier 3 from that tier 2 plus the same fragment. Giant's Belt has no line.
+- *Slightly Quicker:* Slightly Magical Boots give +10 move speed over Boots of Speed, and every
+  pair upgraded from them keeps it (it comes from the tree level, so a save needs nothing new).
+
+| Line (fragment) | Tier 2 (fee) | Tier-2 stats / passive | Tier 3 (fee) | Tier-3 stats / passive |
+|---|---|---|---|---|
+| AS (Recurve Bow) | Berserker's Greaves (300) | +30% AS, +45 MS | Gunmetal Greaves (500) | +45% AS, +5% life steal, +45 MS |
+| CR (Cloak of Agility) | Boots of Swiftness (700) | +55 MS, +25% slow resist | Swiftmarch (500) | +65 MS, +25% slow resist; *Noxian Fervor* |
+| AD (B.F. Sword) | Gluttonous Greaves (800) | +45 MS, +4% omnivamp; *Slay* | Immortal Path (500) | the same plus *Now and Forever* |
+| MP (Tear) | Ionian Boots of Lucidity (350) | +10 AH, +45 MS, +10 summoner haste | Crimson Lucidity (500) | +20 AH, +45 MS, +20 summoner haste; *Noxian Haste* |
+| MR (Negatron Cloak) | Mercury's Treads (550) | +20 MR, +45 MS, +30% tenacity | Chainlaced Crushers (500) | +25 MR, +45 MS, +30% tenacity; *Noxian Persistence* |
+| AR (Chain Vest) | Plated Steelcaps (600) | +25 AR, +45 MS; *Plating* | Armored Advance (500) | +35 AR, +45 MS; *Plating*, *Noxian Endurance* |
+| AP (Rod) | Sorcerer's Shoes (800) | +12 flat magic pen, +45 MS | Spellslinger's Shoes (500) | +20 flat magic pen, +8% magic pen, +45 MS |
+
+Tier 1 gives +25 MS. LoL's pages don't say whether Chainlaced Crushers keep the tenacity and
+Armored Advance keep Plating; here they do, so a tier 3 is never weaker than its tier 2.
+
+New stats for boots: **slow resist** (a 40% slow with 25% slow resist slows 30%), **summoner
+spell haste** (shortens summoner cooldowns like ability haste does skills: 100 halves them) and
+**flat magic penetration** (taken off the target's magic resist after the percent, never below 0).
 
 ## Legendaries
 
@@ -378,13 +419,24 @@ enemies started hitting Lucian.
 | Death's Dance | *Ignore Pain:* 30% of each hit is taken over the next 3 s instead. *Defy:* a kill clears the damage still to come and heals 15% max HP over 2 s. |
 | Guardian Angel | *Rebirth:* instead of dying, Lucian is held in gold stasis for 4 s (nothing can hurt him; enemies wait), then comes back with 50% base HP and 30% max mana. 300 s cooldown. Stasis ends his burns, slows and crowd control, and none land while it holds. |
 | Kaenic Rookern | *Magebane:* after 15 s without magic damage, a shield against magic damage only, 15% max HP. Any magic damage restarts the wait. |
+| Slightly Magical Boots | *Slightly Quicker:* +10 move speed, kept by every pair upgraded from them. A buff icon shows it. |
+| Gluttonous Greaves, Immortal Path | *Slay:* each elite, mini boss or boss kill gives +0.6% omnivamp, up to 10 stacks. The stacks last for the stage and carry over to Immortal Path. Buff icon shows the count. |
+| Immortal Path | *Now and Forever:* at 50% HP or more, Lucian deals 4% more damage. Below 50%, healing, shields and health regen are 12% stronger (on top of heal & shield power). |
+| Swiftmarch | *Noxian Fervor:* adaptive force equal to 5% of move speed (his stat, not buffs or slows): 0.6 AD per point, or 1 AP when his bonus AP is higher than his bonus AD. |
+| Crimson Lucidity | *Noxian Haste:* a skill hit (Q, W, R) or a summoner spell gives +8% move speed for 4 s, once every 4 s. |
+| Chainlaced Crushers, Armored Advance | *Noxian Persistence / Endurance:* taking magic (Persistence) or physical (Endurance) damage gives a shield against that damage type of 100 (level 1) to 200 (level 18) +8% bonus HP for 5 s. 15 s cooldown. |
+| Plated Steelcaps, Armored Advance | *Plating:* enemy basic attacks deal 10% less damage. Burn ticks don't count. |
+| Boots of Swiftness, Swiftmarch | Slow resist weakens every slow on Lucian (the Slowed buff shows the weakened amount). |
+| Ionian Boots, Crimson Lucidity | Summoner spell haste shortens Flash, Ghost, Barrier, Heal, Clarity and Smite (after Flash's and Ghost's tree upgrades). |
+| Sorcerer's Shoes, Spellslinger's Shoes | Flat magic penetration on every hit Lucian deals. |
 
 Actives share one cooldown per item (every copy), which keeps running after selling. The debug
 "No cooldowns" cheat also refreshes item cooldowns that are already running.
 "On hit" effects use basic attacks and Lightslinger shots; counters and "next attack"
 effects (Kraken Slayer, Energized, Spellblade, Navori, Runaan's) use the main shot only.
 
-**Shields** take a hit in this order: Kaenic Rookern's Magebane (magic only), Shieldbow's
+**Shields** take a hit in this order: Kaenic Rookern's Magebane (magic only), Chainlaced
+Crushers' Persistence (magic only), Armored Advance's Endurance (physical only), Shieldbow's
 Lifeline, Barrier, Fimbulwinter's Everlasting, Bloodthirster's Ichorshield.
 
 Void Staff has no passive.

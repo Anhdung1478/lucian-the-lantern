@@ -24,8 +24,12 @@ var _crit_toggle: CheckBox
 var _crit_value: SpinBox
 var _item_picker: OptionButton
 var _enemy_picker: OptionButton
-## The picker's items, A to Z.
+## The picker's items, A to Z (boots have their own picker).
 var _picker_items: Array[ItemData] = []
+var _boots_picker: OptionButton
+## The boots picker's entries after "None": the two tier-1 boots, then the
+## upgraded ones A to Z.
+var _picker_boots: Array[ItemData] = []
 var _backpack_slots: SpinBox
 var _equip_slots: SpinBox
 var _shop_slots: SpinBox
@@ -61,9 +65,17 @@ func setup(owner_stage: Stage) -> void:
 		_max_hp.set_value_no_signal(dummy.max_hp)
 	else:
 		_tabs.set_tab_hidden(_dummy_tab, true)
-	_picker_items = lucian.item_catalog.by_name()
+	_picker_items.assign(lucian.item_catalog.by_name().filter(func(item: ItemData) -> bool: return not item.is_boots()))
 	for item in _picker_items:
 		_item_picker.add_item(item.display_name)
+	for id in Lucian.BOOTS_IDS.slice(1):
+		_picker_boots.append(lucian.item_catalog.find(id))
+	for boots in lucian.item_catalog.by_name():
+		if boots.is_boots() and boots.boots_tier > 1:
+			_picker_boots.append(boots)
+	for boots in _picker_boots:
+		_boots_picker.add_item(boots.display_name)
+	_boots_picker.select(_picker_boots.find(lucian.inventory.boots()) + 1)
 	_backpack_slots.set_value_no_signal(lucian.inventory.unlocked_backpack)
 	_equip_slots.set_value_no_signal(lucian.inventory.unlocked_equip)
 	_shop_slots.set_value_no_signal(stage.shop_slots)
@@ -134,6 +146,20 @@ func _apply_dummy(_value: float) -> void:
 
 func _give_picked_item() -> void:
 	lucian.inventory.add(_picker_items[_item_picker.selected])
+
+
+## Puts the picked boots in the boots cell. The two tier-1 boots also set the
+## Boots level (Slightly Magical Boots: 2, for Slightly Quicker); an upgraded
+## pair keeps it, at least 1. "None" empties the cell.
+func _pick_boots(index: int) -> void:
+	var boots: ItemData = _picker_boots[index - 1] if index > 0 else null
+	if boots == null:
+		lucian.boots_level = 0
+	elif boots.boots_tier == 1:
+		lucian.boots_level = Lucian.BOOTS_IDS.find(boots.id)
+	else:
+		lucian.boots_level = maxi(lucian.boots_level, 1)
+	lucian.inventory.set_boots(boots)
 
 
 ## Picking the spell the other key has swaps the two, so both pickers follow.
@@ -258,6 +284,14 @@ func _build() -> void:
 	_item_picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(_item_picker)
 	_button(row, "Give", _give_picked_item)
+	row = _row(box)
+	_label(row, "Boots")
+	_boots_picker = OptionButton.new()
+	_boots_picker.focus_mode = Control.FOCUS_NONE
+	_boots_picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_boots_picker.add_item("None")
+	_boots_picker.item_selected.connect(_pick_boots)
+	row.add_child(_boots_picker)
 	row = _row(box)
 	_button(row, "Random fragment", _give_random_fragment)
 	_button(row, "Clear items", func() -> void: lucian.inventory.clear())

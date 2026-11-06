@@ -173,7 +173,7 @@ Acts 3 and 4 play this way too (`act3_the_jungle.md`, `act4_the_darkness.md`): p
 **Walking around walls:** enemies and Lucian walk straight while nothing blocks the line to their goal. When a wall does, they follow a path baked from the map's walls (agent radius 36), asked again every 0.4 s or when the goal moves 120. Lucian's moves, attack chases, merchant visits and cast walks use it; a click inside a wall walks to the closest reachable point. The enemies' sidestep stays as a fallback. Until the map's navigation is ready, and whenever a path comes back empty, everyone walks straight. Acts 1–2 benefit too.
 
 **Status effects:**
-- **Slows** work on Lucian and on enemies. The strongest one wins; tenacity doesn't shorten them. Gunblade's 40% uses the same rule.
+- **Slows** work on Lucian and on enemies. The strongest one wins; tenacity doesn't shorten them. Gunblade's 40% uses the same rule. *(Since V1.4, Lucian's slow resist from boots weakens the slow: × (1 − slow resist).)*
 - **Burns** deal damage every 0.5 s for their time, physical, magic or true (armor and MR lower them as usual). A tick makes no hit sound and no flash. It isn't a basic attack or a skill, so it triggers no on-hit effect, no Thornmail, and Banshee's Veil doesn't spend itself on one.
 - On Lucian they show in the buff row ("Slowed", "Burning", the strongest slow); on an enemy, as icons over its HP bar.
 - **Timed stat buffs** (the jungle buffs) raise HP regen, mana regen and ability haste for their time.
@@ -272,6 +272,8 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 ### Backpack & equipment
 - **Backpack:** 49 slots (7 × 7). *(Since Phase 10: 54 cells (9 × 6), and only 5 are open at the start. The Evolution Tree's Backpack Slots opens the rest (§11).)*
 - **Equip slots:** start with 1, unlock up to 6 in the Evolution Tree. *(Since Phase 10, slots 3–4 need Act 2 cleared and slots 5–6 need Act 4 (§11).)*
+- **Potion cells** *(since V1.4)*: one for Health potions on key 7 and one for Mana potions on key 8, never locked, 9 each. Bought potions fill them first; the player refills them by hand. Potions can't go in equip slots.
+- **Boots cell** *(since V1.4)*: the boots bought in the Evolution Tree, worn on every map. They give stats and passives, have no key and never leave the cell. The merchant's Boots tab upgrades them with a fragment and a gold fee (`items.md`, Boots).
 - Items can be **sold** to the merchant for **70%** of their buy price (**Guardian Angel: 40%**). Legendary items **cannot be broken** back into fragments.
 - **Crafting:** drag one fragment onto another that forms a recipe and hold for a short time (see `ui_design.md`).
 - **Shared item cooldowns:** every copy of the same item shares **one cooldown** (e.g. all Galeforces, all Guardian Angels). Selling an item on cooldown and getting another copy does **not** reset it.
@@ -566,7 +568,7 @@ A node opens once **all of its requirements** are bought (or any 1 / any 2 of th
 
 **Reset:** costs **5 purple** and refunds all blue and orange essence.
 
-**Nodes have levels** (built in Phase 5; 31 nodes, laid out in `main_screen.md`). *(34 since Phase 10: Health Regen, Mana Regen and Backpack Slots are new.)*
+**Nodes have levels** (built in Phase 5; 31 nodes, laid out in `main_screen.md`). *(34 since Phase 10: Health Regen, Mana Regen and Backpack Slots are new. 35 since V1.4: Boots.)*
 - Q, W and E are one node each with 5 levels, R one node with 3. Equip slots are one node with 5 levels (slots 2–6), Merchant stock one node with 2 (3 and 4 items). Each level costs what the tables below say for that rank, slot or step.
 - A node opens once its requirements have level 1; its later levels need nothing more. *(Since Phase 10 a level can have rules of its own: R's ranks need 5, 9 and 13 levels in Q + W + E, and equip slots 3–4 and 5–6 need Act 2 and Act 4 cleared. A level opens only when all of its rules are met.)*
 - **Q, W and E** stay hidden until Act 1 is cleared. Clearing it puts **E at level 1** for free (Senna taught it). A reset takes it back like any level, and it is free to buy again.
@@ -600,6 +602,13 @@ A node opens once **all of its requirements** are bought (or any 1 / any 2 of th
 | Equip slot 6 | 1500B + 30O | Clear Act 4 |
 
 *(The act rules since Phase 10.)*
+
+**Boots** (since V1.4): two levels, bought once and kept forever. Lucian starts every map in them (story stages, the tutorial, Training, Endless). The node must never cost nothing: the FREE badge tests count on it.
+
+| Level | Boots | Cost |
+|---|---|---|
+| 1 | Boots of Speed (+25 move speed) | 300B |
+| 2 | Slightly Magical Boots (+25 move speed, +10 kept through every upgrade) | 800B + 10O |
 
 **Backpack Slots** (since Phase 10): the backpack has 54 cells, and a new game opens 5. Each level opens more. The equip slots don't count. No act rule.
 
@@ -671,13 +680,14 @@ Stage gold, bonus XP and essence drops work since Phase 6: +10% gold, XP or blue
 - **Old saves keep their levels**, even above the new rules: an R at rank 2 with fewer than 13 Q + W + E levels, or equip slots past the acts cleared. Such a node shows as bought, with a small lock, and its next level reads LOCKED. A reset refunds from today's tables, so a Ghost bought for 150B gives back nothing.
 - **Backpack Slots** sets how many backpack cells are open in a stage: 5 on a new save, 16 after two levels. Items only go into open cells. With them full, loot stays on the ground ("Backpack full"). A locked cell shows a chain; hovering it says "Buy Backpack Slots in the Evolution Tree". A stage run on its own opens all 54, and the stage debug table has a "Backpack slots" spinner (`ui_design.md` §2).
 - **Health Regen and Mana Regen** add to Lucian's regen per second from the start of every stage.
-- **34 nodes, 114 levels:**
+- **Boots** put Boots of Speed (level 1) or Slightly Magical Boots (level 2) in the boots cell at the start of every stage. The node sits on the Backpack page's trunk, between the Equip Slots and Backpack plaques, with a plaque of its own.
+- **35 nodes, 116 levels:**
 
 | Branch | Nodes | Levels |
 |---|---|---|
 | Skills | 5 | 19 |
 | Stats | 9 | 45 |
-| Backpack | 2 | 12 |
+| Backpack | 3 | 14 |
 | Economy | 5 | 13 |
 | Summoners | 13 | 25 |
 
