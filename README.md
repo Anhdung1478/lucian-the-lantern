@@ -9,7 +9,7 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 ## Download and play
 
 1. Open the [latest release](https://github.com/Anhdung1478/lucian-the-lantern/releases/latest).
-2. Download `LucianTheLantern-v1.3.1-windows-x64.zip`.
+2. Download `LucianTheLantern-v1.4.0-windows-x64.zip`.
 3. Unzip it anywhere and run `LucianTheLantern.exe`.
 
 - Needs Windows 10 or 11, 64-bit.
@@ -31,6 +31,7 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 
 - **Lucian's kit:** Piercing Light (Q), Ardent Blaze (W), Relentless Pursuit (E), The Culling (R) and Lightslinger (passive). He fires his own pistol and Senna's relic gun in turn.
 - **In a stage:** waves, a merchant between waves, items you craft in your backpack, and level-ups that put skill points into ranks you bought.
+- **Boots:** buy Boots of Speed or Slightly Magical Boots once in the Evolution Tree and start every map in them. Upgrade them at the merchant's Boots tab with a fragment and gold into 14 LoL boots, each with its own stats and passive.
 - **Evolution Tree:** spend the essences you earn on skill ranks, stats, backpack and equip slots, a better economy, and summoner spells. The spells are Flash, Ghost, Barrier, Heal, Clarity and Smite.
 - **Skin Shop:** five skins, Classic, High Noon, PROJECT, Pulsefire and Vampire, each with its own strengths and weaknesses, and its own look and sounds for Q, W, E, R and basic attacks. Preview plays them in the shop.
 - **Endless mode:** opens after Act 3. Waves keep getting stronger, with a mini boss every 5 waves, a boss every 10, and a modifier pick after each boss.
@@ -54,6 +55,7 @@ Every key can be changed in **Settings → Controls**.
 | Skills | Q, W, E, R |
 | Summoner spells | D, F |
 | Item slots | 1–6 |
+| Health / Mana potion | 7 / 8 |
 | Backpack | P |
 | Stats panel | C (Ctrl + C toggles, hold for more) |
 | Camera mode | Y |
