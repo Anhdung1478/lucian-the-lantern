@@ -29,6 +29,11 @@ func stop() -> void:
 	_shots_left = 0
 
 
+## The stream stops; bullets already flying still hit.
+func cancel() -> void:
+	stop()
+
+
 func execute(aim: Vector2) -> void:
 	_direction = lucian.aim_direction(aim)
 	_channel_left = duration

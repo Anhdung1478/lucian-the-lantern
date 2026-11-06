@@ -135,6 +135,26 @@ func test_galeforce_dashes_then_fires_missiles() -> void:
 	assert_eq(sources.count(&"galeforce"), ItemActives.GALEFORCE_MISSILES)
 
 
+func test_a_stun_mid_galeforce_dash_fires_no_missiles() -> void:
+	equip(&"galeforce")
+	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
+	await wait_physics_frames(2)
+	assert_true(lucian.is_dashing())
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.3)
+	await wait_seconds(1.5)
+	assert_eq(sources.count(&"galeforce"), 0)
+
+
+func test_death_mid_galeforce_dash_fires_no_missiles() -> void:
+	equip(&"galeforce")
+	assert_true(lucian.use_equip_slot(0, Vector2(0, -400)))
+	await wait_physics_frames(2)
+	lucian.lose_hp(lucian.hp + 1.0, DamageInfo.Type.TRUE)
+	assert_true(lucian.dead)
+	await wait_seconds(1.5)
+	assert_eq(sources.count(&"galeforce"), 0)
+
+
 func test_galeforce_lets_lucian_walk_once_the_dash_lands() -> void:
 	equip(&"galeforce")
 	assert_almost_eq(ItemActives.GALEFORCE_DASH_SPEED, 1260.0, 0.01)

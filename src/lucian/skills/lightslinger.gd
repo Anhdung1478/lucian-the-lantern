@@ -40,6 +40,12 @@ func fire_basic_attack(target: Enemy) -> void:
 		_second_shot_in = second_shot_delay
 
 
+## The second shot still waiting never fires (death, stasis, a stun).
+func cancel() -> void:
+	_second_shot_in = 0.0
+	_second_shot_target = null
+
+
 func _physics_process(delta: float) -> void:
 	if _second_shot_in <= 0.0:
 		return

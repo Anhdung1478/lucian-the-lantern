@@ -32,6 +32,12 @@ func execute(_aim: Vector2) -> void:
 	pass
 
 
+## Drops a shot still waiting to fire (death, stasis, a stun: see
+## Lucian._drop_in_flight). Mana and cooldown stay spent.
+func cancel() -> void:
+	pass
+
+
 ## The range indicator's shape at the current rank.
 func cast_range() -> CastRange:
 	return null

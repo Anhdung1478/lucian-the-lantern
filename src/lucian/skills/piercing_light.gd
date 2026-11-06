@@ -31,6 +31,11 @@ func is_casting() -> bool:
 	return _fire_in > 0.0
 
 
+## The beam still waiting for its cast time never fires.
+func cancel() -> void:
+	_fire_in = 0.0
+
+
 func describe() -> String:
 	return TooltipText.colorize(
 		"After a [kw]%s s[/kw] cast, Lucian fires a piercing beam of light toward the cursor, dealing %s to every enemy in a line."

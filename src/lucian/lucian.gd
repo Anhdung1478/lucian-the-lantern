@@ -809,14 +809,18 @@ func bonus_armor() -> float:
 
 
 ## Ends whatever Lucian was in the middle of: windup, queued cast, cast lock,
-## R, a dash (its trail finishes), a displacement and a throw. A throw cut
-## short puts him at its walkable destination at once, never mid-air over a
-## wall.
+## R, a shot still waiting to fire (Q's beam, W's missile, the passive's
+## second shot, Galeforce's missiles), a dash (its trail finishes), a
+## displacement and a throw. A throw cut short puts him at its walkable
+## destination at once, never mid-air over a wall.
 func _drop_in_flight() -> void:
 	_cancel_windup()
 	_queued_slot = -1
 	_cast_lock_left = 0.0
-	(skills[ChampionProgress.Slot.R] as TheCulling).stop()
+	for skill in skills:
+		skill.cancel()
+	passive.cancel()
+	actives.cancel()
 	_dash_left = 0.0
 	if is_instance_valid(_dash_trail):
 		_dash_trail.finish()

@@ -356,3 +356,49 @@ func test_r_below_max_rank_stops_at_first_enemy() -> void:
 	lucian.try_cast(Slot.R, dummy.position)
 	await wait_seconds(0.6)
 	assert_eq(second_hits.size(), 0)
+
+
+# --- A shot still waiting to fire is dropped by death, stasis and a stun ----
+
+
+func test_a_stun_in_q_s_cast_time_fires_no_beam() -> void:
+	_rank(Slot.Q, 1)
+	assert_true(lucian.try_cast(Slot.Q, dummy.position))
+	await wait_physics_frames(2)
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.2)
+	assert_false((lucian.skills[Slot.Q] as PiercingLight).is_casting())
+	await wait_seconds(0.5)
+	assert_eq(_sources(), [])
+
+
+func test_death_in_q_s_cast_time_fires_no_beam() -> void:
+	_rank(Slot.Q, 1)
+	assert_true(lucian.try_cast(Slot.Q, dummy.position))
+	lucian.lose_hp(lucian.hp + 1.0, DamageInfo.Type.TRUE)
+	assert_true(lucian.dead)
+	await wait_seconds(0.5)
+	assert_eq(_sources(), [])
+
+
+func test_stasis_in_q_s_cast_time_fires_no_beam() -> void:
+	_rank(Slot.Q, 1)
+	assert_true(lucian.try_cast(Slot.Q, dummy.position))
+	lucian.enter_stasis(1.0, 100.0, 0.0)
+	await wait_seconds(0.5)
+	assert_eq(_sources(), [])
+
+
+func test_a_stun_in_w_s_cast_time_fires_no_missile() -> void:
+	_rank(Slot.W, 1)
+	assert_true(lucian.try_cast(Slot.W, dummy.position))
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.2)
+	await wait_seconds(1.0)
+	assert_eq(_sources(), [])
+
+
+func test_a_stun_before_the_second_shot_drops_it() -> void:
+	lucian.passive.charge()
+	lucian.passive.fire_basic_attack(dummy)
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.2)
+	await wait_seconds(0.8)
+	assert_eq(_sources(), [&"basic"], "the shot already fired lands, the second never fires")

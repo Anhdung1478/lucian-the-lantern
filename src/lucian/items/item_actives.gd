@@ -85,6 +85,12 @@ func use(item: ItemData, aim: Vector2) -> bool:
 	return true
 
 
+## Galeforce's missiles never fire when its dash is cut short by death,
+## stasis, a stun or a displacement (Lucian._drop_in_flight).
+func cancel() -> void:
+	_galeforce_pending = false
+
+
 func _physics_process(_delta: float) -> void:
 	if _galeforce_pending and not lucian.is_dashing():
 		_galeforce_pending = false

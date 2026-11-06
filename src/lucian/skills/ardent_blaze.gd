@@ -27,6 +27,12 @@ func execute(aim: Vector2) -> void:
 	_fire_in = cast_time
 
 
+## The missile still waiting for its cast time never launches; one already
+## flying still bursts.
+func cancel() -> void:
+	_fire_in = 0.0
+
+
 ## The missile's flight, ending in the cross it bursts into.
 func cast_range() -> CastRange:
 	var shape := CastRange.line(Lucian.GUN_REACH + missile_range, 32.0)
