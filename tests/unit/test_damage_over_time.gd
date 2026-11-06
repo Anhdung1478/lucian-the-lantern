@@ -76,6 +76,23 @@ func test_the_same_id_refreshes_instead_of_stacking() -> void:
 	assert_almost_eq(_total(hits), 7.5, 0.001)
 
 
+func test_a_lower_dps_cannot_lower_a_burn_that_still_lasts() -> void:
+	dots.add(&"burning_ground", 30.0, 0.5, DamageInfo.Type.MAGIC)
+	dots.add(&"burning_ground", 25.0, 0.5, DamageInfo.Type.MAGIC)
+	assert_almost_eq(dots.total_dps(), 30.0, 0.001)
+	assert_almost_eq(_total(dots.tick(0.5)), 15.0, 0.001, "still the 30")
+
+
+func test_a_higher_dps_replaces_and_a_lower_one_takes_over_after_expiry() -> void:
+	dots.add(&"burning_ground", 25.0, 0.5, DamageInfo.Type.MAGIC)
+	dots.add(&"burning_ground", 30.0, 0.5, DamageInfo.Type.MAGIC)
+	assert_almost_eq(dots.total_dps(), 30.0, 0.001, "the stronger replaces")
+	dots.tick(0.5)
+	assert_false(dots.has(&"burning_ground"))
+	dots.add(&"burning_ground", 25.0, 0.5, DamageInfo.Type.MAGIC)
+	assert_almost_eq(dots.total_dps(), 25.0, 0.001, "the weaker takes over")
+
+
 func test_refreshing_every_frame_keeps_ticking() -> void:
 	# Standing in lava refreshes a short burn every frame.
 	var count := 0

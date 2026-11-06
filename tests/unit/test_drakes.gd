@@ -219,6 +219,19 @@ func test_a_story_drake_burns_at_its_listed_values() -> void:
 	assert_eq(dps, [30.0, 25.0])
 
 
+func test_a_meteor_inside_the_cone_keeps_the_cones_30() -> void:
+	var drake := _infernal(Vector2.ZERO)
+	lucian.global_position = Vector2(400, 0)
+	drake._burn_cone(Vector2.ZERO, Vector2.RIGHT)
+	drake._burn_circle(Vector2(400, 0))
+	await wait_physics_frames(3)
+	assert_almost_eq(lucian._burns.total_dps(), 30.0, 0.001, "the stronger burn, not the last one laid")
+	lucian.global_position = Vector2(400, 1000)
+	drake._burn_circle(Vector2(400, 1000))
+	await wait_seconds(0.7)
+	assert_almost_eq(lucian._burns.total_dps(), 25.0, 0.001, "once the cone's burn ran out, the meteor's own 25")
+
+
 func test_fire_breath_misses_lucian_once_he_leaves_the_cone() -> void:
 	var drake := _infernal(Vector2.ZERO)
 	lucian.global_position = Vector2(400, 0)

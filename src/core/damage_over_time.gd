@@ -4,7 +4,9 @@ extends RefCounted
 ## its time, in a tick every TICK seconds of burning (a short last tick when
 ## the time isn't a whole number of ticks). Adding an id that is already
 ## burning refreshes it and keeps its tick clock, so a burn refreshed every
-## frame (standing in lava) still ticks. The unit ticks it from physics and
+## frame (standing in lava) still ticks. Of two burns with one id the
+## strongest wins: a weaker one can't lower it while it lasts, and takes over
+## once it has run out. The unit ticks it from physics and
 ## takes each hit through its take_damage.
 
 const TICK := 0.5
@@ -19,8 +21,11 @@ var _running := {}
 
 
 ## Burns for `dps` of `type` per second for `seconds`, credited to `attacker`.
-## The same id replaces the old burn.
+## The same id replaces the old burn, unless that one is stronger and still
+## has time left.
 func add(id: StringName, dps: float, seconds: float, type: DamageInfo.Type, attacker: Node = null) -> void:
+	if _running.has(id) and dps < _running[id].dps and _running[id].left > EPSILON:
+		return
 	var burned: float = _running[id].burned if _running.has(id) else 0.0
 	_running[id] = {"dps": dps, "type": type, "attacker": attacker, "left": seconds,
 		"duration": maxf(seconds, 0.01), "burned": burned}
