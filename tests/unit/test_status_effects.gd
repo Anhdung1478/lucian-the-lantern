@@ -244,6 +244,21 @@ func test_red_makes_attacks_burn_and_slow_and_skills_slow() -> void:
 	assert_eq(item.slow_amount(), 0.0)
 
 
+func test_reds_slow_triggers_fimbulwinters_shield_on_its_cooldown() -> void:
+	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"fimbulwinter"))
+	lucian.add_jungle_buff(JungleBuffs.RED)
+	var dummy := _dummy(Vector2(600, 0))
+	lucian.on_damage_dealt(dummy, lucian.make_damage(10.0, DamageInfo.Type.PHYSICAL, &"basic"), 8.0)
+	assert_true(lucian.shields.has(&"everlasting"), "a red slow is a slow: Everlasting shields")
+	lucian.shields.clear()
+	lucian.on_damage_dealt(dummy, lucian.make_damage(10.0, DamageInfo.Type.MAGIC, &"q"), 8.0)
+	assert_false(lucian.shields.has(&"everlasting"), "8 s cooldown")
+	var item := _dummy(Vector2(600, 400))
+	lucian.item_cooldown(&"fimbulwinter").start(0.0)
+	lucian.on_damage_dealt(item, lucian.make_damage(10.0, DamageInfo.Type.MAGIC, &"nashors_tooth"), 8.0)
+	assert_false(lucian.shields.has(&"everlasting"), "item damage doesn't slow, so it doesn't shield")
+
+
 func test_reds_burn_does_not_refresh_itself() -> void:
 	lucian.add_jungle_buff(JungleBuffs.RED)
 	var dummy := _dummy(Vector2(600, 0))

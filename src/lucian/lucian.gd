@@ -390,13 +390,15 @@ func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> vo
 
 
 ## The Red buff: basic attacks burn the target, basic attacks and skills slow
-## it. Item damage carries neither.
+## it. Item damage carries neither. Its slow is a slow like any other, so it
+## triggers Fimbulwinter's shield.
 func _red_on_hit(target: Enemy, info: DamageInfo) -> void:
 	var attack := ItemPassives.ATTACK_SOURCES.has(info.source)
 	if attack:
 		target.add_burn(JungleBuffs.RED, JungleBuffs.RED_BURN, JungleBuffs.RED_BURN_TIME, DamageInfo.Type.TRUE, self)
 	if attack or ItemPassives.SKILL_SOURCES.has(info.source):
 		target.add_slow(JungleBuffs.RED, JungleBuffs.RED_SLOW, JungleBuffs.RED_SLOW_TIME)
+		passives.on_enemy_slowed()
 
 
 ## Called once by an enemy Lucian killed: the skin's kill heal, E's max
