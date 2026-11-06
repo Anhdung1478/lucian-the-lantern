@@ -5,9 +5,10 @@ extends Control
 ## at the bottom. Nothing here saves by itself; only the gear menu's Save and
 ## Save as copy write files.
 ##
-## ESC: a section's open pop-up closes first (a section opts in with
-## `close_popup() -> bool`, true when it closed something), then the gear
-## menu's slot list, then the gear menu; otherwise ESC opens the gear menu.
+## ESC: while the gear menu shows it goes first (back from its slot list,
+## else close), even over a section's pop-up hidden beneath it. Otherwise a
+## section's open pop-up closes (a section opts in with `close_popup() -> bool`,
+## true when it closed something); with none open ESC opens the gear menu.
 ## While the gear menu is open, the arrow keys and Enter work its page.
 
 signal start_requested(run: StageSetup)
@@ -85,13 +86,14 @@ func _input(event: InputEvent) -> void:
 		return
 	if not event.is_action_pressed(&"open_menu"):
 		return
-	if not _close_section_popup():
-		if gear.is_showing_slots():
-			gear.open()
-		elif gear.visible:
-			gear.close()
-		else:
-			gear.open()
+	# The gear menu is on top of a section's pop-up (its button is in the top
+	# bar), so while it shows ESC belongs to it first.
+	if gear.is_showing_slots():
+		gear.open()
+	elif gear.visible:
+		gear.close()
+	elif not _close_section_popup():
+		gear.open()
 	get_viewport().set_input_as_handled()
 
 

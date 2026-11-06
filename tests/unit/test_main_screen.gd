@@ -494,3 +494,44 @@ func test_the_yes_no_popup_sits_on_a_card_over_the_blur() -> void:
 	var cards := main.confirm.find_children("*", "PanelContainer", true, false).filter(func(node: Node) -> bool: return node is MenuCard)
 	assert_eq(cards.size(), 1)
 	assert_true(main.confirm.get_child(0) is MenuBackdrop)
+
+
+func test_esc_closes_the_gear_menu_before_a_pop_up_hidden_under_it() -> void:
+	main.show_section(MainScreen.SECTION_TREE)
+	var section: TreeSection = main.sections[MainScreen.SECTION_TREE]
+	SaveGame.instance().tree.acts_cleared = 1
+	SaveGame.instance().essences.add(Essences.BLUE, 1000)
+	section.select(&"skill_q")
+	section.info.cost_bar.pressed.emit()
+	assert_not_null(section.purchase, "the cost bar asks first")
+	main.gear.open()
+	_esc()
+	assert_false(main.gear.visible, "the first ESC closes the menu")
+	assert_not_null(section.purchase, "the pop-up under it stays")
+	_esc()
+	assert_null(section.purchase, "the next ESC closes the pop-up")
+
+
+func test_esc_closes_the_gear_menu_before_a_picked_node() -> void:
+	main.show_section(MainScreen.SECTION_TREE)
+	var section: TreeSection = main.sections[MainScreen.SECTION_TREE]
+	SaveGame.instance().tree.acts_cleared = 1
+	section.select(&"skill_q")
+	main.gear.open()
+	_esc()
+	assert_false(main.gear.visible, "the first ESC closes the menu")
+	assert_eq(section.info.id, &"skill_q", "the pick stays")
+
+
+func test_esc_in_the_slot_list_over_a_pop_up_goes_back_first() -> void:
+	main.show_section(MainScreen.SECTION_SKINS)
+	var shop: SkinShop = main.sections[MainScreen.SECTION_SKINS]
+	SaveGame.instance().essences.add(Essences.PURPLE, 100)
+	shop.cards[1].button.pressed.emit()
+	main.gear.open()
+	_press("Save as copy")
+	assert_true(main.gear.is_showing_slots())
+	_esc()
+	assert_false(main.gear.is_showing_slots(), "back to the menu page")
+	assert_true(main.gear.visible)
+	assert_not_null(shop.purchase)
