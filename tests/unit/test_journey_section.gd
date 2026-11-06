@@ -259,6 +259,25 @@ func test_the_token_wears_the_equipped_skin() -> void:
 	assert_eq(section.map.token_texture, Skins.find(&"high_noon").portrait)
 
 
+func test_a_spell_pick_does_not_redraw_the_map() -> void:
+	await wait_process_frames(2)
+	watch_signals(section.map)
+	_save().tree._levels[&"flash"] = 1
+	_save().set_loadout(0, &"flash")
+	await wait_process_frames(2)
+	assert_signal_emit_count(section.map, "draw", 0)
+	assert_not_null(section.loadout.picks[0].icon, "but the panel follows")
+
+
+func test_a_new_clear_redraws_the_map() -> void:
+	await wait_process_frames(2)
+	watch_signals(section.map)
+	_save().set_cleared(Journey.all_stage_ids(1))
+	await wait_process_frames(2)
+	assert_signal_emit_count(section.map, "draw", 1)
+	assert_true(_node("1-1").cleared)
+
+
 # --- Picking and the panel ---------------------------------------------------------
 
 

@@ -27,6 +27,10 @@ var focus_act := 0
 ## The map opens on Endless instead (after an Endless run), when it is open.
 var focus_endless := false
 
+## What the map was last refreshed from: [cleared, endless_best, skin id].
+## Empty until the first refresh.
+var _map_inputs := []
+
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -73,12 +77,17 @@ func close_popup() -> bool:
 	return loadout.close_menu()
 
 
-## Locks, opens and marks the map from the save, and refills the panel with
-## Endless's best and its map choice from the save; a pick that has locked
-## falls back as open_on() does.
+## Locks, opens and marks the map from the save, only when the stages cleared,
+## Endless's best or the equipped skin changed since the last time (a spell
+## pick leaves the map alone), and refills the panel with Endless's best and
+## its map choice from the save; a pick that has locked falls back as
+## open_on() does.
 func refresh() -> void:
 	var save := SaveGame.instance()
-	map.refresh(save.cleared, save.endless_best, Skins.find(save.skin).portrait)
+	var inputs := [save.cleared, save.endless_best, save.skin]
+	if inputs != _map_inputs:
+		map.refresh(save.cleared, save.endless_best, Skins.find(save.skin).portrait)
+		_map_inputs = [save.cleared.duplicate(), save.endless_best, save.skin]
 	panel.show_best(save.endless_best)
 	if panel.map_choice() != save.endless_map:
 		panel.choose_map(save.endless_map)
