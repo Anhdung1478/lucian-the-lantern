@@ -99,13 +99,13 @@ func _attack() -> void:
 ## Fire Breath's warning ended: the cone burns, unless the drake is dead.
 func _burn_cone(from: Vector2, toward: Vector2) -> void:
 	if not dead:
-		_lay(HazardZone.burning(BREATH_BURN, DamageInfo.Type.MAGIC, BURN_TIME).set_polygon(cone_outline(from, toward, BREATH_LENGTH, BREATH_ANGLE)))
+		_lay(HazardZone.burning(BREATH_BURN * skill_scale, DamageInfo.Type.MAGIC, BURN_TIME).set_polygon(cone_outline(from, toward, BREATH_LENGTH, BREATH_ANGLE)))
 
 
 ## A meteor landed: its circle burns, unless the drake is dead.
 func _burn_circle(at: Vector2) -> void:
 	if not dead:
-		_lay(HazardZone.burning(METEOR_BURN, DamageInfo.Type.MAGIC, BURN_TIME).set_circle(at, METEOR_RADIUS))
+		_lay(HazardZone.burning(METEOR_BURN * skill_scale, DamageInfo.Type.MAGIC, BURN_TIME).set_circle(at, METEOR_RADIUS))
 
 
 ## Burning ground on the warnings' layer, under the units.

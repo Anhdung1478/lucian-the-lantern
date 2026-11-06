@@ -210,6 +210,15 @@ func test_fire_breath_hits_in_its_cone_and_leaves_it_burning_for_3_seconds() -> 
 	assert_eq(_effects(HazardZone).size(), 0, "gone after 3 s")
 
 
+func test_a_story_drake_burns_at_its_listed_values() -> void:
+	var drake := _infernal(Vector2.ZERO)
+	assert_eq(drake.skill_scale, 1.0)
+	drake._burn_cone(Vector2.ZERO, Vector2.RIGHT)
+	drake._burn_circle(Vector2(500, 0))
+	var dps: Array = _effects(HazardZone).map(func(zone: HazardZone) -> float: return zone.dps)
+	assert_eq(dps, [30.0, 25.0])
+
+
 func test_fire_breath_misses_lucian_once_he_leaves_the_cone() -> void:
 	var drake := _infernal(Vector2.ZERO)
 	lucian.global_position = Vector2(400, 0)

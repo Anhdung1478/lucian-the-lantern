@@ -185,6 +185,24 @@ func test_a_mini_boss_has_its_tiers_hp_and_power_and_keeps_its_spawn_point() -> 
 	assert_almost_eq(maokai.skill_hit(100.0, DamageInfo.Type.MAGIC, &"test").amount, 115.0, 0.01)
 
 
+func test_a_tier_3_endless_infernal_drake_burns_130_percent() -> void:
+	var stage: Stage = await _endless()
+	stage.runner.spawn_requested.emit(&"infernal_drake", 25)
+	var drake := _unit(&"infernal_drake") as InfernalDrake
+	assert_not_null(drake)
+	assert_almost_eq(drake.skill_scale, 1.3, 0.0001)
+	drake._burn_cone(Vector2.ZERO, Vector2.RIGHT)
+	drake._burn_circle(Vector2(500, 0))
+	var dps: Array = []
+	for zone: Node in drake.warning_parent.get_children():
+		if zone is HazardZone:
+			dps.append(snappedf((zone as HazardZone).dps, 0.001))
+	assert_eq(dps, [snappedf(30.0 * 1.3, 0.001), snappedf(25.0 * 1.3, 0.001)], "breath and meteor burns")
+	drake.target = stage.lucian
+	drake.apply_on_hit()
+	assert_almost_eq(stage.lucian._burns.total_dps(), 10.0 * 1.3, 0.001, "the fireball's burn")
+
+
 func test_a_story_boss_keeps_its_hp_and_skill_hits() -> void:
 	var stage: Stage = await _story(2, 1)
 	var akshan := stage.spawn_enemy(&"akshan", stage.arena.boss_point) as Boss

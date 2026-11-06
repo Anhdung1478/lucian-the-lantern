@@ -208,7 +208,7 @@ func _keep_defile() -> void:
 	if not revived:
 		return
 	if _defile == null:
-		_defile = HazardZone.burning(DEFILE_DPS, DamageInfo.Type.MAGIC)
+		_defile = HazardZone.burning(DEFILE_DPS * skill_scale, DamageInfo.Type.MAGIC)
 		_defile.id = DEFILE_ID
 		_defile.lucian = target
 		# Invisible: the ring is drawn by Karthus (_draw), so it needs no look option.

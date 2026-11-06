@@ -605,6 +605,14 @@ func test_defile_is_a_purple_ring_aura_burning_inside_350() -> void:
 	assert_eq(boss.defile_ring_radius(), 350.0)
 
 
+func test_defile_burns_harder_with_skill_scale() -> void:
+	var boss := _revived(Vector2.ZERO)
+	boss.skill_scale = 1.3
+	await wait_physics_frames(2)
+	var zone: HazardZone = _zones()[0]
+	assert_almost_eq(zone.dps, 80.0 * 1.3, 0.001)
+
+
 func test_defile_hurts_only_inside_350_every_half_second() -> void:
 	var boss := _revived(Vector2.ZERO)
 	lucian.global_position = Vector2(340, 0)
