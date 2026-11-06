@@ -273,13 +273,13 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 - **Backpack:** 49 slots (7 × 7). *(Since Phase 10: 54 cells (9 × 6), and only 5 are open at the start. The Evolution Tree's Backpack Slots opens the rest (§11).)*
 - **Equip slots:** start with 1, unlock up to 6 in the Evolution Tree. *(Since Phase 10, slots 3–4 need Act 2 cleared and slots 5–6 need Act 4 (§11).)*
 - **Potion cells** *(since V1.4)*: one for Health potions on key 7 and one for Mana potions on key 8, never locked, 9 each. Bought potions fill them first; the player refills them by hand. Potions can't go in equip slots.
-- **Boots cell** *(since V1.4)*: the boots bought in the Evolution Tree, worn on every map. They give stats and passives, have no key and never leave the cell. The merchant's Boots tab upgrades them with a fragment and a gold fee (`items.md`, Boots).
+- **Boots cell** *(since V1.4)*: the boots bought in the Evolution Tree, worn on every map. They give stats and passives, have no key and never leave the cell. The merchant's Boots tab (the Craft tab since V1.4.1) upgrades them with a fragment and a gold fee (`items.md`, Boots).
 - Items can be **sold** to the merchant for **70%** of their buy price (**Guardian Angel: 40%**). Legendary items **cannot be broken** back into fragments.
-- **Crafting:** drag one fragment onto another that forms a recipe and hold for a short time (see `ui_design.md`).
+- **Crafting:** ~~drag one fragment onto another that forms a recipe and hold for a short time~~. Since V1.4.1, only at the merchant's **Craft** tab: two fragments and a fee of the legendary's cost minus the fragments' costs, so crafting then selling never makes gold (see `ui_design.md` §3 and `items.md`).
 - **Shared item cooldowns:** every copy of the same item shares **one cooldown** (e.g. all Galeforces, all Guardian Angels). Selling an item on cooldown and getting another copy does **not** reset it.
 - **Duplicates allowed.** Stats stack, but each **unique effect only counts once**.
 - **Energized attacks** work like LoL (moving and attacking build stacks; at 100 the next attack is energized).
-- A **crafting recipe table** is shown in game so players can plan builds.
+- A **crafting recipe table** is shown in game so players can plan builds (beside the backpack, and since V1.4.1 at the merchant too).
 - Stats, costs and passive / active text of every item: `items.md`.
 
 ### Sources

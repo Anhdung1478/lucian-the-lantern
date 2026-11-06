@@ -344,7 +344,7 @@ Built in Phase 9. After each Endless boss wave (10, 20, …) the break waits for
 | **Left-click (press and release quickly)** | Does nothing, for all items |
 | **Hold left-click** | Picks up the item to drag it (the only left-click action): after 0.2 s, or as soon as the mouse moves |
 | **Release the hold** | Drops the item |
-| **Right-click a potion** | Shows a small pop-up **Use** button beside the cell; click it to use the potion. Any other click hides it |
+| **Right-click a potion** | ~~Shows a small pop-up **Use** button~~ Does nothing since V1.4.1: potions are drunk with keys 7 and 8 |
 
 ### Drag and drop
 | Drop target | Result |
@@ -353,11 +353,13 @@ Built in Phase 9. After each Endless boss wave (10, 20, …) the break waits for
 | Outside the backpack | Item returns to its original cell |
 | Locked equip slot | Item returns to its original cell |
 | Same type of potion | Stacks into the target cell (max **9** per cell); the rest returns to the original cell |
-| An item it can **craft** with | See *Crafting* below |
+| An item it can **craft** with | ~~See *Crafting* below~~ Since V1.4.1 they just swap: crafting is the merchant's Craft tab (§3) |
 | Any other item | The two items **swap** places |
 | Sell slot (shop open) | Item is **sold immediately** |
 
 ### Crafting
+*(Until V1.4.1. Since then, crafting is only at the merchant's **Craft** tab, for a fee (§3): a fragment dropped on its partner swaps, and the pop-up below is gone.)*
+
 1. Drag an item onto another item that forms a valid recipe.
 2. While hovering, a **small pop-up table** shows the legendary item that would be crafted, so the player can read it and decide.
 3. A **line runs around the pop-up's border**, starting at the top-left, going all the way around and back to the top-left. This is the **minimum hold time** to craft: **1 second**.
@@ -368,8 +370,8 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 
 ### Potions
 - Up to **9 potions** stack in one cell.
-- **Right-click → Use.** The game is paused, so healing **starts when the backpack is closed**.
-- Or put it in its potion cell and press **7** (Health) or **8** (Mana) during play. *(Since V1.4; before, any equip slot and 1–6. Potions no longer go in equip slots.)*
+- ~~**Right-click → Use.** The game is paused, so healing **starts when the backpack is closed**.~~ *(Removed in V1.4.1.)*
+- Put it in its potion cell and press **7** (Health) or **8** (Mana) during play; nothing happens while Lucian can't act. *(Since V1.4; before, any equip slot and 1–6. Potions no longer go in equip slots.)*
 
 ### Built in V1.4
 ```
@@ -380,12 +382,12 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Empty cells show what goes in them, faded** (about 30%): the potion cells their potion, the boots cell Boots of Speed. Hovering an empty one says "Health potions go here: press 7 to drink one" or "Buy Boots in the Evolution Tree".
 - **Potion cells** take only their own potion (Health or Mana), 9 at most. Bought potions fill them first, then the backpack. They are never refilled by themselves.
 - **Equip slots refuse potions**, both ways: a potion dropped on one goes back, and so does a swap that would send one there. A potion bought onto one says "That item can't go there".
-- **The boots never move.** Dragging them anywhere sends them back, except onto the merchant's Boots tab (§3). Dropped on the sell slot, they read **NO** and "Boots can't be sold".
+- **The boots never move.** Dragging them anywhere sends them back, except onto the merchant's Boots tab (§3; the Craft tab since V1.4.1). Dropped on the sell slot, they read **NO** and "Boots can't be sold".
 - The screen keeps one cell per inventory index in order (0–62), then the sell slot.
 
 ### Recipe table
 - Shown automatically when the backpack is open, in the **top-left of the screen**. The backpack sits in the **center**.
-- **Hidden** while the merchant's shop is open.
+- ~~**Hidden** while the merchant's shop is open.~~ *(Since V1.4.1 it stays while the shop is open, since crafting happens there; it sits clear of the backpack.)*
 - Each line shows only: **item + item = item** (e.g. `[B.F. Sword] + [B.F. Sword] = [Infinity Edge]`).
 - Scrollable, since there are 33 recipes.
 
@@ -423,7 +425,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 
 ```
 +---------------------+   +-----------------------------+
-|      BACKPACK       |   |  [ Items ]  [ Potions ]     |
+|      BACKPACK       |   | [ Items ] [ Potions ] [Craft]|
 |  (same as section 2)|   +-----------------------------+
 |                     |   |  [item][item][lock][lock]   |
 |                     |   |                             |
@@ -455,6 +457,17 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
   - The slots hold the inventory cell, not the item, so nothing has to be given back: they are emptied when the shop closes and whenever their cell no longer holds what they take.
   - The third slot shows what the two make. **Upgrade** is off until they make something; pressing it pays the fee, uses up the fragment, puts the new boots in the boots cell and plays the craft sound.
   - The note: "No boots: buy them in the Evolution Tree" with an empty boots cell; otherwise what to drag next, "That fragment doesn't upgrade …", "… are fully upgraded." or "Old → New".
+
+### Built in V1.4.1
+- **The Boots tab becomes the Craft tab**, for both crafts: `[input] + [input] → [result]`, the fee, a **Craft** button and a note line. The backpack no longer crafts.
+  - **Two fragments** make their legendary. The fee is the legendary's cost minus the two fragments' costs, so crafting never makes gold when the legendary is sold. The legendary takes the first input's cell (an equip slot stays equipped); the second is emptied.
+  - **The boots and a fragment** (either way round) make the upgraded boots, for their old fee.
+  - Each input takes a fragment or the boots; anything else says "Only fragments and boots are crafted". The placeholder reads ITEM. A right-click empties an input; they are emptied when the shop closes.
+  - **Craft** is off until the two make something; the fee is red when it can't be paid ("Not enough gold"). Pressing it pays the fee, uses both items up and plays the craft sound.
+  - The note: "Drag in two fragments, or your boots and a fragment.", "Now drag in a fragment.", "… are fully upgraded.", "X doesn't upgrade …", "No legendary is made from X and Y." or "X + Y → Z".
+- **The recipe table stays** beside the backpack while the shop is open.
+- **Cards:** a fragment's says "Craft it with another fragment at the merchant's Craft tab."; a legendary's "Recipe: X + Y + N gold at the merchant."
+- **No Use button** in the backpack (see §2, Potions).
 
 ---
 
@@ -524,7 +537,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 ## 6. Screens to design
 
 - [x] Backpack layout
-- [x] Crafting (drag and drop)
+- [x] Crafting (drag and drop; at the merchant's Craft tab since V1.4.1)
 - [x] Recipe table
 - [x] Item info pop-up
 - [x] Merchant's shop layout (built in Phase 3)
@@ -592,7 +605,7 @@ All 24 sounds are placeholders, generated in code by `Sfx` (`src/audio/sfx.gd`):
 | `potion` | A potion drunk; Ghost, Barrier, Heal or Clarity cast; a Honeyfruit eaten | 0 dB | Four rising blips |
 | `refresh` | The Evolution Tree reset; Hextech Rocketbelt | 0 dB; Rocketbelt −2 | A noisy rising sweep |
 | `error` | A refused buy, sale or refresh in the shop; a save that failed on the main screen | 0 dB | A low buzz |
-| `craft` | Two items crafted into a legendary | 0 dB | Three rising notes |
+| `craft` | A craft at the merchant's Craft tab (a legendary, or upgraded boots) | 0 dB | Three rising notes |
 | `zap` | Flash, Smite, Hextech Gunblade, an Energized hit; Dark Lucian's Piercing Light | 0 dB; Dark Lucian −4 (pitch ×0.6) | An electric zap with a flutter |
 | `hurt` | Lucian takes a hit (not a burn tick, not in stasis) | −8 dB | A short low grunt |
 | `hook` | Thresh's Death Sentence (Act 1 and the final fight); the hook in Act 1's cutscene | 0 dB | A falling whir |

@@ -16,6 +16,13 @@ count). The charge only builds while an Energized item is equipped.
 The merchant buys items back for **70%** of their cost (**Guardian Angel: 40%**). Boots are
 never sold.
 
+**Crafting** *(since V1.4.1)* happens only at the merchant's **Craft** tab, never in the
+backpack. Two fragments make their legendary for a **fee: the legendary's cost minus the two
+fragments' costs** (Muramana: 2900 − 400 − 400 = 2100), so a crafted legendary costs what buying
+it would. The legendary takes the first fragment's cell. Selling a crafted legendary always pays
+less than selling its two fragments, so crafting and then selling never makes gold. The same tab
+upgrades the boots (see *Boots*).
+
 ## Fragments
 
 | Code | Fragment | Stat | Cost |
@@ -40,10 +47,10 @@ never sold.
   Mana on key **8** (both rebindable). A cell holds 9, like a backpack cell, and is never locked.
 - Bought potions fill their potion cell first, then the backpack. The cells are not refilled
   from the backpack: drag more in by hand. An empty cell shows its potion faded.
-- Potions can't go in equip slots 1–6. Drink one with its key, or right-click it anywhere in
-  the backpack → **Use**.
+- Potions can't go in equip slots 1–6. Drink one with its key (7 or 8), from its potion cell.
+  *(Since V1.4.1 the backpack has no right-click **Use** button: it let Lucian drink while
+  stunned, feared, in stasis or dead.)* A potion can't be drunk while Lucian can't act.
 - Several drinks run at the same time. Healing is raised by heal & shield power (Spirit Visage).
-- Nothing is restored while the game is paused, so a potion drunk from the backpack starts on close.
 
 ## Boots
 
@@ -57,7 +64,7 @@ Added in V1.4. Stats and passives follow LoL (patch 26.x); the live values are i
 - Boots sit in their own **boots cell**, under the equip slots. It has no key; the boots give
   stats and passives only. Boots never leave it: they can't be dragged out, sold, bought or
   dropped, and the merchant never sells them.
-- They are upgraded only at the merchant's **Boots** tab: drag the boots and a fragment into its
+- They are upgraded only at the merchant's **Boots** tab (the **Craft** tab since V1.4.1): drag the boots and a fragment into its
   two slots and pay the fee. The fragment is used up. Tier 2 comes from either tier-1 pair plus
   its line's fragment; tier 3 from that tier 2 plus the same fragment. Giant's Belt has no line.
 - *Slightly Quicker:* Slightly Magical Boots give +10 move speed over Boots of Speed, and every
