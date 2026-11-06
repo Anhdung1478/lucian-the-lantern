@@ -393,7 +393,9 @@ func drop_loot(item: ItemData, at: Vector2) -> void:
 	var drop := LootDrop.new()
 	drop.item = item
 	drop.lucian = lucian
-	drop.position = at + Vector2(rng.randf_range(-30, 30), rng.randf_range(-30, 30))
+	var spot := at + Vector2(rng.randf_range(-30, 30), rng.randf_range(-30, 30))
+	# Off the ground (a perched enemy's ledge, a wall), it would be out of reach.
+	drop.position = arena.walkable_toward(spot, arena.merchant_point, LootDrop.GROUND_MARGIN)
 	$World.add_child(drop)
 
 

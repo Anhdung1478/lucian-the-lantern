@@ -9,6 +9,17 @@ const SYNC_FRAMES := 180
 const SAMPLE_STEP := 10.0
 
 
+func test_walkable_toward_steps_a_point_off_the_abyss_onto_the_ground() -> void:
+	var map := _domain(1)
+	autofree(map)
+	var ledge: Vector2 = map.ledge_points[0]
+	assert_false(map.is_walkable(ledge, 20.0))
+	var spot := map.walkable_toward(ledge, map.merchant_point, 20.0)
+	assert_true(map.is_walkable(spot, 20.0))
+	assert_lt(spot.distance_to(ledge), ledge.distance_to(map.merchant_point), "the first ground on the way, not the merchant")
+	assert_lt(spot.distance_to(map.walkable_toward(spot, map.merchant_point, 20.0)), 0.01, "ground stays put")
+
+
 func test_every_point_is_walkable_and_inside() -> void:
 	for act_stage in STAGES:
 		var map := StageMaps.create(act_stage[0], act_stage[1])

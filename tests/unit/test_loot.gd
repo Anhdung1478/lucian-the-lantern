@@ -95,6 +95,44 @@ func _drops() -> Array[Node]:
 	return stage.get_node("World").get_children().filter(func(node: Node) -> bool: return node is LootDrop)
 
 
+## Story stage `act`-`number`, with Lucian out of harm's way.
+func _story_stage(act: int, number: int) -> Stage:
+	stage = load("res://src/stage/stage.tscn").instantiate()
+	stage.setup(StageSetup.for_stage(SaveGame.instance(), act, number))
+	add_child_autofree(stage)
+	await wait_process_frames(2)
+	stage.lucian.invulnerable = true
+	return stage
+
+
+## A perched Chain Warden dies on a ledge over the abyss: its loot falls back
+## onto the plateau, toward the merchant, where Lucian can reach it.
+func test_loot_from_an_act_6_ledge_lands_where_lucian_can_reach_it() -> void:
+	await _story_stage(6, 3)
+	var map := stage.arena
+	var sword := stage.lucian.item_catalog.find(&"bf_sword")
+	assert_eq(map.ledge_points.size(), 4)
+	for ledge in map.ledge_points:
+		assert_false(map.is_walkable(ledge, 0.0), "the ledge is over the abyss")
+		stage.drop_loot(sword, ledge)
+	var drops := _drops()
+	assert_eq(drops.size(), map.ledge_points.size())
+	for drop: LootDrop in drops:
+		var at := drop.global_position
+		assert_true(map.is_walkable(at, LootDrop.GROUND_MARGIN), "on the ground: %s" % at)
+		var stand := at.move_toward(map.merchant_point, LootDrop.PICKUP_RANGE - 5.0)
+		assert_true(map.is_walkable(stand, Lucian.HIT_RADIUS + 6.0), "Lucian can stand in pickup range of %s" % at)
+
+
+func test_loot_on_open_ground_stays_where_it_fell() -> void:
+	_stage()
+	var at := Vector2(1700, 600)
+	assert_true(stage.arena.is_walkable(at, 80.0))
+	stage.drop_loot(stage.lucian.item_catalog.find(&"bf_sword"), at)
+	var drop: LootDrop = _drops()[0]
+	assert_lt(drop.global_position.distance_to(at), 30.0 * sqrt(2.0) + 0.01, "only the scatter")
+
+
 func test_the_kill_that_ends_the_stage_drops_nothing() -> void:
 	stage = load("res://src/stage/stage.tscn").instantiate()
 	stage.setup(StageSetup.for_stage(SaveGame.instance(), 2, 3))

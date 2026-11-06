@@ -110,6 +110,15 @@ func is_walkable(point: Vector2, margin := 40.0) -> bool:
 	return true
 
 
+## `spot`, or moved `step` at a time toward `toward` until it is walkable
+## with `margin`; `toward` itself if the way there never is (geometry only).
+## Loot off the ground (a ledge) and boss landings use it.
+func walkable_toward(spot: Vector2, toward: Vector2, margin: float, step := 20.0) -> Vector2:
+	while not is_walkable(spot, margin) and spot.distance_to(toward) > step:
+		spot = spot.move_toward(toward, step)
+	return spot if is_walkable(spot, margin) else toward
+
+
 func border_rects() -> Array[Rect2]:
 	var t := WALL_THICKNESS
 	return [

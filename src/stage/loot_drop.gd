@@ -3,8 +3,12 @@ extends Node2D
 ## An item on the ground where an enemy died. Lucian picks it up by walking
 ## within PICKUP_RANGE, into the backpack. With no room it stays and says
 ## so, at most every FULL_NOTE_GAP seconds. It stays until the stage ends.
+## One that would land off the ground (a ledge over the abyss, a wall) lands
+## on the first ground toward the merchant instead (Stage.drop_loot).
 
 const PICKUP_RANGE := 60.0
+## A drop lands at least this far inside walkable ground.
+const GROUND_MARGIN := 20.0
 const FULL_NOTE_GAP := 3.0
 const ICON_SIZE := 44.0
 const GLOW := Color(0.6, 0.85, 1.0, 0.35)

@@ -34,10 +34,7 @@ func add_skill(id: StringName, cooldown: float, reach: float, first_delay: float
 static func landing_spot(spot: Vector2, map: StageMap, body_radius: float) -> Vector2:
 	if map == null:
 		return spot
-	var middle := map.boss_point
-	while not map.is_walkable(spot, body_radius) and spot.distance_to(middle) > LANDING_STEP:
-		spot = spot.move_toward(middle, LANDING_STEP)
-	return spot if map.is_walkable(spot, body_radius) else middle
+	return map.walkable_toward(spot, map.boss_point, body_radius, LANDING_STEP)
 
 
 ## A skill's hit of `amount`, times skill_scale.
