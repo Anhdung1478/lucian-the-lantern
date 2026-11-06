@@ -171,6 +171,25 @@ func test_smite_on_an_enemy_out_of_reach_walks_over_then_casts() -> void:
 	assert_almost_eq(lucian.global_position.x, 900.0 - SummonerSpells.SMITE_RANGE - dummy.radius, 10.0, "walked only until in reach")
 
 
+## The cursor on a boss out of reach, a minion in reach: Smite walks to the
+## boss, not onto the minion.
+func test_smite_goes_to_the_enemy_under_the_cursor_not_one_nearer_in_reach() -> void:
+	dummy.position = Vector2(900, 0)
+	var minion := Enemy.new()
+	minion.radius = 20.0
+	minion.max_hp = 5000.0
+	minion.position = Vector2(150, 150)
+	add_child_autofree(minion)
+	await wait_physics_frames(2)
+	lucian.summoners.set_spell(0, &"smite")
+	assert_false(lucian.use_summoner(0, dummy.position), "not the minion in reach")
+	assert_eq(minion.hp, minion.max_hp)
+	assert_true(lucian.summoners.cooldown(&"smite").is_ready(), "nothing spent")
+	await wait_seconds(1.5)
+	assert_eq(sources, [&"smite"], "the hovered one, once in reach")
+	assert_eq(minion.hp, minion.max_hp)
+
+
 ## A Blast Cone is clickable (enemy_at) but no Smite target: no walk to it.
 func test_smite_aimed_at_a_blast_cone_out_of_reach_does_not_walk() -> void:
 	var cone := BlastCone.new()

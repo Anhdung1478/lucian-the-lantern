@@ -97,7 +97,8 @@ func _physics_process(_delta: float) -> void:
 		_galeforce_missiles()
 
 
-## Lightning Bolt: the enemy nearest the cursor within range of Lucian.
+## Lightning Bolt: the enemy under the cursor, else the one nearest it,
+## within range of Lucian (Lucian.enemy_near_cursor).
 func _gunblade(aim: Vector2) -> bool:
 	var target := lucian.enemy_near_cursor(aim, GUNBLADE_RANGE)
 	if target == null:

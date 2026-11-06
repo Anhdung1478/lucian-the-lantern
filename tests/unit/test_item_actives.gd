@@ -97,6 +97,23 @@ func test_gunblade_on_an_enemy_out_of_range_walks_over_then_casts() -> void:
 	assert_almost_eq(lucian.global_position.x, 1000.0 - ItemActives.GUNBLADE_RANGE - dummy.radius, 10.0, "walked only until in range")
 
 
+func test_gunblade_goes_to_the_enemy_under_the_cursor_not_one_nearer_in_range() -> void:
+	dummy.position = Vector2(1000, 0)
+	var minion := Enemy.new()
+	minion.radius = 20.0
+	minion.max_hp = 5000.0
+	minion.position = Vector2(150, 150)
+	add_child_autofree(minion)
+	await wait_physics_frames(2)
+	equip(&"hextech_gunblade")
+	assert_false(lucian.use_equip_slot(0, dummy.position), "not the minion in range")
+	assert_eq(minion.hp, minion.max_hp)
+	assert_true(lucian.item_cooldown(&"hextech_gunblade").is_ready(), "nothing spent")
+	await wait_seconds(1.2)
+	assert_eq(sources, [&"hextech_gunblade"], "the hovered one, once in range")
+	assert_eq(minion.hp, minion.max_hp)
+
+
 func test_galeforce_and_rocketbelt_dash_only_as_far_as_the_cursor() -> void:
 	equip(&"galeforce")
 	equip(&"hextech_rocketbelt", 1)

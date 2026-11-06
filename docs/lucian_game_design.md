@@ -76,7 +76,7 @@ Casts with no aim (potions, Ghost, Barrier, Heal, Clarity) and casts that aren't
 
 **Dashes** (E, Galeforce, Rocketbelt) go as far as the cursor, up to their range, so a cursor right on Lucian dashes 0.
 
-**Targeted casts** (Gunblade, Smite) hit the enemy nearest the cursor within range. Aimed at an enemy out of range, Lucian walks over and casts once it is in range; any new order (move, attack) drops it, a dash or Flash doesn't.
+**Targeted casts** (Gunblade, Smite) hit the enemy nearest the cursor within range. Aimed at an enemy out of range, Lucian walks over and casts once it is in range; any new order (move, attack) drops it, a dash or Flash doesn't. *(V1.3.1: the enemy under the cursor comes first, even with another one in range: out of range, he walks to it.)*
 
 **Key bindings** can be changed in Settings → Controls (all but ESC and the debug F3 + Q).
 
@@ -392,7 +392,7 @@ Placeholder numbers. Ability haste doesn't shorten them, and each spell keeps it
 | Barrier | 60 s | Shield of 95 + 18 × level for 2.5 s; heal and shield power makes it stronger. A golden bubble shows around Lucian while it lasts. |
 | Heal | 60 s | Heal 80 + 15 × level, +30% move speed fading over 1 s. A green ring spreads out and crosses rise around Lucian. |
 | Clarity | 45 s | Restore 50% of max mana. Blue motes spiral into Lucian. |
-| Smite | 30 s | 450 true damage to the enemy nearest the cursor within 500, heal 10% of max HP. |
+| Smite | 30 s | 450 true damage to the enemy under the cursor (walking into reach), else the one nearest the cursor within 500, heal 10% of max HP. |
 
 ### Built in Phase 5
 - **Every spell is bought in the Evolution Tree** (its own node, 150B). A new game has none.

@@ -1001,9 +1001,14 @@ func attack_move_target(point: Vector2) -> Enemy:
 	return weakest if weakest else nearest
 
 
-## The enemy nearest the cursor among those within `reach` of Lucian
-## (Gunblade, Smite), or null.
+## Who a targeted cast (Gunblade, Smite) aimed at `aim` hits: the enemy under
+## the cursor, if it is within `reach` of Lucian; null if it isn't (the cast
+## then walks him to it: _walk_into_reach). With none under the cursor, the
+## enemy nearest the cursor among those within `reach`, or null.
 func enemy_near_cursor(aim: Vector2, reach: float) -> Enemy:
+	var hovered := enemy_at(aim, [&"enemies"])
+	if is_target(hovered):
+		return hovered if global_position.distance_to(hovered.global_position) <= reach + hovered.radius else null
 	var best: Enemy = null
 	var best_distance := INF
 	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):

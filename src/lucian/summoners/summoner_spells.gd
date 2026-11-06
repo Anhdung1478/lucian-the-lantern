@@ -194,7 +194,8 @@ func _flash(aim: Vector2) -> void:
 	Sfx.play(&"zap")
 
 
-## True damage to the enemy nearest the cursor, and a heal.
+## True damage to the enemy under the cursor, else the one nearest it, within
+## reach (Lucian.enemy_near_cursor), and a heal.
 func _smite(aim: Vector2, effect: float) -> bool:
 	var target := lucian.enemy_near_cursor(aim, SMITE_RANGE)
 	if target == null:
