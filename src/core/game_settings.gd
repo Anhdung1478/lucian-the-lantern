@@ -69,6 +69,18 @@ const MOUSE_LABELS := {
 	MOUSE_BUTTON_XBUTTON1: "Mouse 4", MOUSE_BUTTON_XBUTTON2: "Mouse 5",
 	MOUSE_BUTTON_WHEEL_UP: "Wheel up", MOUSE_BUTTON_WHEEL_DOWN: "Wheel down",
 }
+## Short forms of key names, for the HUD and backpack where a full name wouldn't fit.
+const SHORT_KEY_LABELS := {
+	"Backspace": "Bcksp", "Space": "Spc", "Escape": "Esc", "Enter": "Ent", "Delete": "Del",
+	"Insert": "Ins", "PageUp": "PgUp", "PageDown": "PgDn", "CapsLock": "Caps",
+	"Up": "Up", "Down": "Dn", "Left": "Lt", "Right": "Rt", "QuoteLeft": "`",
+}
+const SHORT_MOUSE_LABELS := {
+	MOUSE_BUTTON_LEFT: "LMB", MOUSE_BUTTON_RIGHT: "RMB", MOUSE_BUTTON_MIDDLE: "MMB",
+	MOUSE_BUTTON_XBUTTON1: "M4", MOUSE_BUTTON_XBUTTON2: "M5",
+	MOUSE_BUTTON_WHEEL_UP: "WhU", MOUSE_BUTTON_WHEEL_DOWN: "WhD",
+}
+const SHORT_LABEL_MAX := 5
 const MSAA := {"low": Viewport.MSAA_DISABLED, "medium": Viewport.MSAA_2X, "high": Viewport.MSAA_4X}
 
 static var _instance: GameSettings
@@ -133,6 +145,11 @@ func binding(action: StringName) -> InputEvent:
 ## The key or mouse button shown for an action, e.g. "Q" or "RMB".
 func key_label(action: StringName) -> String:
 	return event_label(binding(action))
+
+
+## The short name shown in tight spots (HUD slots, backpack cells), e.g. "M4".
+func short_key_label(action: StringName) -> String:
+	return short_label(binding(action))
 
 
 ## Binds `event` to `action`. An action that had the same input gets the
@@ -294,6 +311,18 @@ static func event_label(event: InputEvent) -> String:
 		var index := (event as InputEventMouseButton).button_index
 		return MOUSE_LABELS.get(index, "Mouse %d" % index)
 	return "-"
+
+
+## A short form of `event_label`: "M4" for Mouse 4, "Bcksp" for BackSpace, "Num 1"
+## for Kp 1, and anything else cut to five characters.
+static func short_label(event: InputEvent) -> String:
+	if event is InputEventMouseButton:
+		var index := (event as InputEventMouseButton).button_index
+		return SHORT_MOUSE_LABELS.get(index, "M%d" % index)
+	var label := event_label(event)
+	if label.begins_with("Kp "):
+		return ("Num " + label.substr(3)).left(SHORT_LABEL_MAX)
+	return SHORT_KEY_LABELS.get(label, label.left(SHORT_LABEL_MAX))
 
 
 static func event_to_dict(event: InputEvent) -> Dictionary:

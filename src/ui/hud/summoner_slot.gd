@@ -76,7 +76,7 @@ func _icon_rect() -> Rect2:
 
 
 func _key() -> String:
-	return GameSettings.instance().key_label(LucianController.SUMMONER_ACTIONS[slot])
+	return GameSettings.instance().short_key_label(LucianController.SUMMONER_ACTIONS[slot])
 
 
 func _text(at: Vector2, text: String, align: HorizontalAlignment, width: float, font_size: int) -> void:

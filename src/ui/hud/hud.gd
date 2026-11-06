@@ -95,7 +95,7 @@ func setup(target: Lucian, stage_wallet: Wallet, stage_node: Stage = null) -> vo
 	_add_skill_slot(null, PASSIVE_ICON, "", SkillSlot.PASSIVE_SIZE)
 	var settings := GameSettings.instance()
 	for i in SKILL_ICONS.size():
-		_add_skill_slot(target.skills[i], SKILL_ICONS[i], settings.key_label(SKILL_ACTIONS[i]))
+		_add_skill_slot(target.skills[i], SKILL_ICONS[i], settings.short_key_label(SKILL_ACTIONS[i]))
 	var gap := Control.new()
 	gap.custom_minimum_size.x = SUMMONER_GAP
 	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -239,7 +239,7 @@ func _on_setting_changed(key: StringName) -> void:
 	if key != &"bindings":
 		return
 	for i in _skill_slots.size():
-		_skill_slots[i].set_key(GameSettings.instance().key_label(SKILL_ACTIONS[i]))
+		_skill_slots[i].set_key(GameSettings.instance().short_key_label(SKILL_ACTIONS[i]))
 	for slot in item_grid.get_children():
 		slot.queue_redraw()
 	for slot in gear_slots():

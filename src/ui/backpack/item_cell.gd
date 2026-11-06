@@ -107,7 +107,7 @@ func _draw() -> void:
 	var action := Inventory.key_action(index) if index >= 0 else &""
 	if action != &"":
 		var font := ThemeDB.fallback_font
-		var key := GameSettings.instance().key_label(action)
+		var key := GameSettings.instance().short_key_label(action)
 		draw_string_outline(font, Vector2(5, 15), key, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 4, Color.BLACK)
 		draw_string(font, Vector2(5, 15), key, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, KEY_COLOR)
 

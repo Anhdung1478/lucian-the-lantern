@@ -45,6 +45,28 @@ func test_the_stage_info_fits_training() -> void:
 	assert_almost_eq(info.size.x, info.get_combined_minimum_size().x, 1.0, "no room left for the hidden Skip")
 
 
+func test_a_skill_slot_shows_the_short_key_name() -> void:
+	var shared := GameSettings._instance
+	GameSettings._instance = GameSettings.new("user://test_stage_hud_settings.json")
+	GameSettings._instance.rebind(&"skill_q", _mouse_four())
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	hud.setup(lucian, Wallet.new())
+	await wait_process_frames(1)
+	var shown := hud._skill_slots[0]._key_label.text
+	GameSettings._instance = shared
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_stage_hud_settings.json"))
+	assert_eq(shown, "M4")
+
+
+func _mouse_four() -> InputEventMouseButton:
+	var event := InputEventMouseButton.new()
+	event.button_index = MOUSE_BUTTON_XBUTTON1
+	return event
+
+
 func test_skip_on_the_hud_starts_the_wave() -> void:
 	SaveGame.instance().reset()
 	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()

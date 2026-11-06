@@ -47,6 +47,32 @@ func test_default_bindings_come_from_the_project() -> void:
 	assert_eq(settings.key_label(&"center_camera"), "Space")
 
 
+func test_short_labels_fit_tight_spots() -> void:
+	assert_eq(GameSettings.short_label(mouse(MOUSE_BUTTON_XBUTTON1)), "M4")
+	assert_eq(GameSettings.short_label(mouse(MOUSE_BUTTON_XBUTTON2)), "M5")
+	assert_eq(GameSettings.short_label(mouse(MOUSE_BUTTON_WHEEL_UP)), "WhU")
+	assert_eq(GameSettings.short_label(mouse(MOUSE_BUTTON_WHEEL_DOWN)), "WhD")
+	assert_eq(GameSettings.short_label(mouse(MOUSE_BUTTON_RIGHT)), "RMB")
+	assert_eq(GameSettings.short_label(key(KEY_BACKSPACE)), "Bcksp")
+	assert_eq(GameSettings.short_label(key(KEY_SPACE)), "Spc")
+	assert_eq(GameSettings.short_label(key(KEY_PAGEDOWN)), "PgDn")
+	assert_eq(GameSettings.short_label(key(KEY_KP_1)), "Num 1")
+	assert_eq(GameSettings.short_label(key(KEY_DOWN)), "Dn")
+	assert_eq(GameSettings.short_label(key(KEY_QUOTELEFT)), "`")
+	assert_eq(GameSettings.short_label(key(KEY_Q)), "Q")
+	assert_eq(GameSettings.short_label(key(KEY_PRINT)).length(), 5, "long names are cut to 5")
+	assert_eq(GameSettings.short_label(null), "-")
+
+
+func test_short_key_label_follows_the_binding_and_key_label_stays_full() -> void:
+	settings.rebind(&"skill_e", mouse(MOUSE_BUTTON_XBUTTON1))
+	assert_eq(settings.short_key_label(&"skill_e"), "M4")
+	assert_eq(settings.key_label(&"skill_e"), "Mouse 4")
+	settings.rebind(&"skill_q", key(KEY_BACKSPACE))
+	assert_eq(settings.short_key_label(&"skill_q"), "Bcksp")
+	assert_eq(settings.key_label(&"skill_q"), "Backspace")
+
+
 func test_changes_are_saved_with_a_version() -> void:
 	watch_signals(settings)
 	settings.set_value(&"music_volume", 35)
