@@ -72,7 +72,7 @@ func take_damage(info: DamageInfo) -> float:
 	var attacker: Node = info.attacker if is_instance_valid(info.attacker) else null
 	if attacker and attacker.has_method(&"before_damage"):
 		attacker.before_damage(self, info)
-	var final_amount := DamageCalc.mitigate(info.amount, info.type, effective_armor(), effective_mr(), info.armor_pen, info.magic_pen)
+	var final_amount := DamageCalc.mitigate(info.amount, info.type, effective_armor(), effective_mr(), info.armor_pen, info.magic_pen, info.magic_pen_flat)
 	if attacker:
 		last_attacker = attacker
 	var hp_before := hp

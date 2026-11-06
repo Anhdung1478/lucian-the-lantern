@@ -63,8 +63,13 @@ const FEAR_SPEED := 0.6
 const LAUNCH_RISE := 0.25
 const SPEED_BUFF_NAMES := {
 	&"ardent_blaze": "Ardent Blaze", &"fervor": "Fervor", &"stormrazor": "Bolt",
-	&"ghost": "Ghost", &"heal": "Heal",
+	&"ghost": "Ghost", &"heal": "Heal", &"noxian_haste": "Noxian Haste",
 }
+## The tier-1 boots per Evolution Tree Boots level (StageSetup.boots_level).
+const BOOTS_IDS: Array[StringName] = [&"", &"boots_of_speed", &"slightly_magical_boots"]
+## Slightly Magical Boots' Slightly Quicker: flat move speed that every boot
+## upgraded from them keeps.
+const SLIGHTLY_QUICKER := 10.0
 ## Bloodthirster's Ichorshield: the most it holds, and how fast it fades out
 ## of combat (per second).
 const ICHORSHIELD_MAX := 300.0
@@ -90,6 +95,9 @@ var summoners := SummonerSpells.new()
 var indicator := RangeIndicator.new()
 ## Item id -> Cooldown, shared by every copy of the item.
 var item_cooldowns := {}
+## The Evolution Tree's Boots level he started with: 1 Boots of Speed, 2
+## Slightly Magical Boots (Slightly Quicker, kept through upgrades).
+var boots_level := 0
 var stats: StatBlock
 var hp := 0.0
 var mana := 0.0
@@ -368,7 +376,7 @@ func on_damage_dealt(target: Enemy, info: DamageInfo, final_amount: float) -> vo
 		heal(final_amount * stats.omnivamp)
 	if stats.lifesteal > 0.0 and (info.source == &"basic" or info.source == &"lightslinger"):
 		var healing := final_amount * stats.lifesteal
-		var overheal := healing * (1.0 + stats.heal_shield_power) - heal(healing)
+		var overheal := healing * (1.0 + stats.heal_shield_power) * passives.heal_scale() - heal(healing)
 		if passives.has(&"bloodthirster") and overheal > 0.0:
 			shield = shield + overheal
 	passives.on_damage_dealt(target, info, final_amount)
@@ -399,7 +407,7 @@ func on_kill(enemy: Enemy) -> void:
 	var e := skills[ChampionProgress.Slot.E]
 	if e.rank() >= ChampionProgress.MAX_RANKS[ChampionProgress.Slot.E]:
 		e.cooldown.reduce(RelentlessPursuit.KILL_CUT)
-	passives.on_kill()
+	passives.on_kill(enemy)
 	enemy_killed.emit(enemy)
 
 
@@ -408,13 +416,13 @@ static func is_target(enemy: Variant) -> bool:
 	return is_instance_valid(enemy) and enemy.is_alive() and not enemy.untargetable
 
 
-## Heals, made stronger by heal and shield power. Returns the HP gained
-## (none while dead).
+## Heals, made stronger by heal and shield power (and Immortal Path below
+## half health). Returns the HP gained (none while dead).
 func heal(amount: float) -> float:
 	if dead:
 		return 0.0
 	var before := hp
-	hp = minf(hp + amount * (1.0 + stats.heal_shield_power), stats.max_hp)
+	hp = minf(hp + amount * (1.0 + stats.heal_shield_power) * passives.heal_scale(), stats.max_hp)
 	return hp - before
 
 
@@ -438,6 +446,9 @@ func apply_setup(setup: StageSetup) -> void:
 	summoners.open_slots = setup.summoner_slots
 	summoners.upgrades = setup.summoner_upgrades.duplicate()
 	tree_bonus = setup.stat_bonus.duplicate()
+	boots_level = clampi(setup.boots_level, 0, BOOTS_IDS.size() - 1)
+	var boots_id := BOOTS_IDS[boots_level]
+	inventory.set_boots(item_catalog.find(boots_id) if item_catalog and boots_id != &"" else null)
 	tutorial = setup.tutorial
 	one_gun = setup.tutorial
 	damage_taken_scale = Difficulty.scale(setup.difficulty)
@@ -618,21 +629,23 @@ func add_barrier(amount: float, seconds: float) -> void:
 	add_shield(&"barrier", amount, seconds)
 
 
-## A shield made stronger by heal and shield power (Barrier, Lifeline,
-## Everlasting, Magebane).
-func add_shield(id: StringName, amount: float, seconds: float, magic_only := false) -> void:
-	shields.add(id, amount * (1.0 + stats.heal_shield_power), seconds, magic_only)
+## A shield made stronger by heal and shield power, and by Immortal Path below
+## half health (Barrier, Lifeline, Everlasting, Magebane, the Noxian boots).
+func add_shield(id: StringName, amount: float, seconds: float, magic_only := false, physical_only := false) -> void:
+	shields.add(id, amount * (1.0 + stats.heal_shield_power) * passives.heal_scale(), seconds, magic_only, physical_only)
 
 
 ## A hit from an enemy. False when it is refused: Lucian is dead, in stasis
-## or untouchable. The difficulty scales it (damage_taken_scale), armor or
-## magic resist lower it, then the shields and HP take it. A burn tick (`over_time`) makes no hurt sound and no flash.
+## or untouchable. The difficulty scales it (damage_taken_scale), Plating
+## lowers a basic attack, armor or magic resist lower it, then the shields
+## and HP take it. A burn tick (`over_time`) makes no hurt sound and no flash.
 func take_damage(info: DamageInfo) -> bool:
 	if dead or invulnerable or in_stasis():
 		return false
 	if not passives.before_damage_taken(info):
 		return false
-	var amount := DamageCalc.mitigate(info.amount * damage_taken_scale, info.type, stats.armor, stats.mr, info.armor_pen, info.magic_pen)
+	var raw := info.amount * damage_taken_scale * passives.damage_taken_multiplier(info)
+	var amount := DamageCalc.mitigate(raw, info.type, stats.armor, stats.mr, info.armor_pen, info.magic_pen, info.magic_pen_flat)
 	damage_received.emit(info, amount)
 	lose_hp(passives.delay_damage(amount), info.type)
 	passives.on_damage_taken(info, amount)
@@ -650,12 +663,12 @@ func add_slow(id: StringName, pct: float, seconds: float) -> void:
 	_slows[id] = {"pct": pct, "left": seconds, "duration": maxf(seconds, 0.01)}
 
 
-## The strongest slow on Lucian, 0 when none.
+## The strongest slow on Lucian, weakened by slow resist; 0 when none.
 func slow_amount() -> float:
 	var strongest := 0.0
 	for slow: Dictionary in _slows.values():
 		strongest = maxf(strongest, slow.pct)
-	return strongest
+	return strongest * (1.0 - clampf(stats.slow_resist, 0.0, 1.0))
 
 
 ## A burn of `dps` damage of `type` per second for `seconds` (lava, poison),
@@ -812,6 +825,11 @@ func can_move() -> bool:
 ## Armor above what his level alone gives (Thornmail).
 func bonus_armor() -> float:
 	return maxf(stats.armor - base_stats.at_level(progress.level).armor, 0.0)
+
+
+## Max HP over his level alone: items, the tree, buffs and passives.
+func bonus_hp() -> float:
+	return maxf(stats.max_hp - base_stats.at_level(progress.level).max_hp, 0.0)
 
 
 ## Ends whatever Lucian was in the middle of: windup, queued cast, cast lock,
@@ -1056,12 +1074,17 @@ func buffs() -> Array[Dictionary]:
 			"text": "A shield that absorbs %d damage." % roundi(barrier),
 			"count": str(roundi(barrier)), "left": shields.time_left(&"barrier"),
 			"duration": shields.duration(&"barrier"), "ready": false})
+	if has_slightly_quicker():
+		var magical := item_catalog.find(&"slightly_magical_boots") if item_catalog else null
+		found.append({"id": &"slightly_quicker", "name": "Slightly Quicker", "icon": magical.icon if magical else MOVE_SPEED_ICON,
+			"text": TooltipText.colorize("[ms]+%d move speed[/ms] from Slightly Magical Boots, kept by every boot upgraded from them." % roundi(SLIGHTLY_QUICKER)),
+			"count": "", "left": 0.0, "duration": 0.0, "ready": false})
 	found.append_array(passives.buffs())
 	var strongest := _strongest_slow()
 	if strongest != &"":
 		var slow: Dictionary = _slows[strongest]
 		found.append({"id": SLOWED, "name": "Slowed", "icon": SLOW_ICON,
-			"text": TooltipText.colorize("[ms]-%d%% move speed[/ms]." % roundi(slow.pct * 100.0)), "count": "",
+			"text": TooltipText.colorize("[ms]-%d%% move speed[/ms]." % roundi(slow_amount() * 100.0)), "count": "",
 			"left": slow.left, "duration": slow.duration, "ready": false})
 	for kind: CrowdControl.Kind in CC_DEBUFFS:
 		if _cc.has(kind):
@@ -1175,6 +1198,7 @@ func make_damage(amount: float, type: DamageInfo.Type, source: StringName, crit 
 	var info := DamageInfo.create(amount, type, source, self, crit)
 	info.armor_pen = stats.armor_pen
 	info.magic_pen = stats.magic_pen
+	info.magic_pen_flat = stats.magic_pen_flat
 	return info
 
 
@@ -1236,7 +1260,7 @@ func _physics_process(delta: float) -> void:
 			mana = _revive.y
 			visuals.modulate = Color.WHITE
 		return
-	hp = minf(hp + stats.hp_regen * delta, stats.max_hp)
+	hp = minf(hp + stats.hp_regen * passives.heal_scale() * delta, stats.max_hp)
 	mana = stats.max_mana if cheat_infinite_mana else minf(mana + stats.mana_regen * delta, stats.max_mana)
 	if not restores.is_empty():
 		var restored := restores.tick(delta)
@@ -1352,10 +1376,18 @@ func _track_movement(dashing: bool) -> void:
 		passives.on_moved(moved, dashing)
 
 
-## Items, tree, skin and stat buff flat stats together, for
-## UnitStats.at_level().
+## Slightly Magical Boots were bought (Boots level 2) and he wears boots:
+## +10 move speed, whatever they were upgraded into.
+func has_slightly_quicker() -> bool:
+	return boots_level >= 2 and inventory.boots() != null
+
+
+## Items, tree, skin and stat buff flat stats together, plus Slightly
+## Quicker, for UnitStats.at_level().
 func _stat_bonus() -> Dictionary:
 	var total := inventory.equipped_bonus()
+	if has_slightly_quicker():
+		total[&"move_speed"] = total.get(&"move_speed", 0.0) + SLIGHTLY_QUICKER
 	var sources: Array[Dictionary] = [tree_bonus, skin.flat]
 	for stat_buff: Dictionary in _stat_buffs.values():
 		sources.append(stat_buff.bonus)

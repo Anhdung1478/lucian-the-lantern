@@ -68,6 +68,19 @@ func test_pen_leaves_negative_resist_alone() -> void:
 		DamageCalc.mitigate(200.0, Type.PHYSICAL, -50.0, 0.0), 0.001)
 
 
+func test_flat_magic_pen_comes_after_the_percent() -> void:
+	assert_almost_eq(DamageCalc.mitigate(100.0, Type.MAGIC, 0.0, 62.0, 0.0, 0.0, 12.0), 100.0 * 100.0 / 150.0, 0.001)
+	# 50 x (1 - 8%) = 46, then - 20 = 26.
+	assert_almost_eq(DamageCalc.mitigate(100.0, Type.MAGIC, 0.0, 50.0, 0.0, 0.08, 20.0), 100.0 * 100.0 / 126.0, 0.001)
+
+
+func test_flat_magic_pen_never_goes_below_zero_or_touches_negative_mr() -> void:
+	assert_almost_eq(DamageCalc.mitigate(100.0, Type.MAGIC, 0.0, 10.0, 0.0, 0.0, 20.0), 100.0, 0.001)
+	assert_almost_eq(DamageCalc.mitigate(100.0, Type.MAGIC, 0.0, -20.0, 0.0, 0.0, 20.0),
+		DamageCalc.mitigate(100.0, Type.MAGIC, 0.0, -20.0), 0.001)
+	assert_almost_eq(DamageCalc.mitigate(100.0, Type.PHYSICAL, 50.0, 0.0, 0.0, 0.0, 20.0), 100.0 * 100.0 / 150.0, 0.001, "magic only")
+
+
 func test_pen_only_matches_its_damage_type() -> void:
 	assert_almost_eq(DamageCalc.mitigate(200.0, Type.PHYSICAL, 100.0, 100.0, 0.0, 0.9), 100.0, 0.001)
 	assert_almost_eq(DamageCalc.mitigate(200.0, Type.MAGIC, 100.0, 100.0, 0.9, 0.0), 100.0, 0.001)

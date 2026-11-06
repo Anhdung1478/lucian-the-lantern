@@ -2,7 +2,8 @@ class_name SummonerSpells
 extends Node
 ## Summoner spells on D and F (the Journey loadout; the debug table can pick
 ## too). Each spell has its own cooldown, which moves with it to the
-## other key and counts down with the game. Ability haste doesn't shorten it.
+## other key and counts down with the game. Ability haste doesn't shorten it;
+## summoner spell haste (Ionian Boots of Lucidity) does.
 
 const SPELLS: Array[SummonerData] = [
 	preload("res://data/summoners/flash.tres"),
@@ -64,11 +65,14 @@ func spell_in(slot: int) -> SummonerData:
 	return find(slots[slot]) if slot < open_slots else null
 
 
-## The cooldown `spell` starts with: Flash and Ghost shortened by their upgrade.
+## The cooldown `spell` starts with: Flash and Ghost shortened by their
+## upgrade, then every spell by Lucian's summoner spell haste.
 func cooldown_of(spell: SummonerData) -> float:
+	var base := spell.cooldown
 	if spell.id in COOLDOWN_UPGRADES:
-		return spell.cooldown * (1.0 + upgrades.get(spell.id, 0.0))
-	return spell.cooldown
+		base *= 1.0 + upgrades.get(spell.id, 0.0)
+	var haste := lucian.stats.summoner_haste if lucian and lucian.stats else 0.0
+	return Cooldown.hasted(base, haste)
 
 
 ## "Upgraded: ..." for the spell's card, or "" when it has no upgrade.
@@ -151,6 +155,7 @@ func use(slot: int, aim: Vector2) -> bool:
 			if not _smite(aim, _effect(spell.id)):
 				return false
 	cooldown(spell.id).start(0.0 if lucian.cheat_no_cooldowns else cooldown_of(spell))
+	lucian.passives.on_summoner_used()
 	return true
 
 

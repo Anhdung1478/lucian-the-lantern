@@ -13,6 +13,8 @@ var is_crit := false
 ## The attacker's percent penetration, copied when the hit is made.
 var armor_pen := 0.0
 var magic_pen := 0.0
+## Flat magic resist ignored after the percent (Sorcerer's Shoes).
+var magic_pen_flat := 0.0
 ## Item effects this basic attack carries to its target, e.g. &"energized",
 ## &"kraken_slayer", &"spellblade".
 var procs: Array[StringName] = []

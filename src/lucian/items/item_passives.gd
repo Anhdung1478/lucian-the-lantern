@@ -1,7 +1,7 @@
 class_name ItemPassives
 extends Node
-## The item passives that work in combat, for Lucian's equipped items only.
-## Each item counts once however many copies are equipped.
+## The item passives that work in combat, for Lucian's equipped items and
+## boots only. Each item counts once however many copies are equipped.
 ##
 ## Lucian calls the hooks: adjust_stats (stat passives), on_cast, on_moved,
 ## on_basic_attack (counters and "next attack" effects, as the shot leaves
@@ -10,8 +10,10 @@ extends Node
 ## uses the item's id as its source and never triggers on-hit effects again.
 ## Defensive passives react to hits on Lucian: before_damage_taken (Banshee's),
 ## delay_damage (Death's Dance), before_hp_loss (Shieldbow), on_damage_taken
-## (Thornmail, Kaenic Rookern), on_lethal (Guardian Angel), on_kill (Death's
-## Dance) and on_enemy_slowed (Fimbulwinter).
+## (Thornmail, Kaenic Rookern, the Noxian shields), on_lethal (Guardian
+## Angel), on_kill (Death's Dance, Slay) and on_enemy_slowed (Fimbulwinter).
+## Boots add damage_taken_multiplier (Plating), heal_scale (Now and Forever)
+## and on_summoner_used (Noxian Haste). "Champion" triggers count any enemy.
 
 const ENERGIZED: Array[StringName] = [&"statikk_shiv", &"rapid_firecannon", &"stormrazor"]
 const ATTACK_SOURCES: Array[StringName] = [&"basic", &"lightslinger"]
@@ -93,6 +95,27 @@ const REBIRTH_MANA := 0.3
 const REBIRTH_COOLDOWN := 300.0
 const MAGEBANE_WAIT := 15.0
 const MAGEBANE_SHIELD := 0.15
+# Boots (docs/items.md, Boots).
+const SLAY_BOOTS: Array[StringName] = [&"gluttonous_greaves", &"immortal_path"]
+const SLAY_KINDS: Array[StringName] = [&"elite", &"mini_boss", &"boss"]
+const SLAY_OMNIVAMP := 0.006
+const SLAY_MAX := 10
+const FOREVER_HP := 0.5
+const FOREVER_DAMAGE := 1.04
+const FOREVER_HEAL := 1.12
+## Swiftmarch: adaptive force per point of move speed, and the AD one point gives.
+const NOXIAN_FERVOR := 0.05
+const ADAPTIVE_AD := 0.6
+const NOXIAN_HASTE_SPEED := 0.08
+const NOXIAN_HASTE_TIME := 4.0
+const NOXIAN_HASTE_COOLDOWN := 4.0
+const NOXIAN_SHIELD_MIN := 100.0
+const NOXIAN_SHIELD_MAX := 200.0
+const NOXIAN_SHIELD_HP := 0.08
+const NOXIAN_SHIELD_TIME := 5.0
+const NOXIAN_SHIELD_COOLDOWN := 15.0
+const PLATING_BOOTS: Array[StringName] = [&"plated_steelcaps", &"armored_advance"]
+const PLATING := 0.9
 
 var lucian: Lucian
 var energize := EnergizeCharge.new()
@@ -103,6 +126,9 @@ var shojin_stacks := 0
 var mana_charge := 0.0
 var jaksho_stacks := 0
 var spellblade_ready := false
+## Gluttonous Greaves and Immortal Path's Slay: elite, mini boss and boss
+## kills this stage (up to SLAY_MAX). Kept through the upgrade.
+var slay_stacks := 0
 
 ## Equipped item ids.
 var _owned := {}
@@ -165,6 +191,14 @@ func refresh() -> void:
 		_bleeds.clear()
 	if not has(&"kaenic_rookern"):
 		_magebane_wait = 0.0
+	# Gluttonous Greaves becoming Immortal Path keeps the stacks.
+	if not has_slay():
+		slay_stacks = 0
+
+
+## Slay: Gluttonous Greaves or Immortal Path is worn.
+func has_slay() -> bool:
+	return SLAY_BOOTS.any(has)
 
 
 ## Stat passives, applied after the level and item stats.
@@ -185,6 +219,41 @@ func adjust_stats(stats: StatBlock) -> void:
 	if jaksho_stacks > 0:
 		stats.armor *= 1.0 + JAKSHO_PER_STACK * jaksho_stacks
 		stats.mr *= 1.0 + JAKSHO_PER_STACK * jaksho_stacks
+	if slay_stacks > 0 and has_slay():
+		stats.omnivamp += SLAY_OMNIVAMP * slay_stacks
+	# Swiftmarch's Noxian Fervor, after the other passives: adaptive force from
+	# move speed, as AD unless his bonus AP is higher than his bonus AD.
+	if has(&"swiftmarch"):
+		var force := stats.move_speed * NOXIAN_FERVOR
+		if stats.ap > stats.ad - lucian.base_ad():
+			stats.ap += force
+		else:
+			stats.ad += force * ADAPTIVE_AD
+
+
+## Immortal Path's Now and Forever: deals more damage at half health or more.
+func now_and_forever_damage() -> bool:
+	return has(&"immortal_path") and lucian.hp >= lucian.stats.max_hp * FOREVER_HP
+
+
+## How much stronger heals, shields and health regen are (Now and Forever
+## below half health: x1.12); 1 otherwise. On top of heal and shield power.
+func heal_scale() -> float:
+	if has(&"immortal_path") and lucian.stats and lucian.hp < lucian.stats.max_hp * FOREVER_HP:
+		return FOREVER_HEAL
+	return 1.0
+
+
+## Plating: enemy basic attacks deal 10% less (burn ticks are not attacks).
+func damage_taken_multiplier(info: DamageInfo) -> float:
+	if info.source == &"basic" and not info.over_time and PLATING_BOOTS.any(has):
+		return PLATING
+	return 1.0
+
+
+## A summoner spell was cast (Noxian Haste).
+func on_summoner_used() -> void:
+	_noxian_haste()
 
 
 ## Extra ability haste for one skill's cooldown (Malignance: R).
@@ -251,6 +320,8 @@ func before_damage(target: Enemy, info: DamageInfo) -> void:
 		multiplier += CINDERBLOOM_BONUS
 	if shojin_stacks > 0 and SKILL_SOURCES.has(info.source):
 		multiplier += SHOJIN_PER_STACK * shojin_stacks
+	if now_and_forever_damage():
+		multiplier *= FOREVER_DAMAGE
 	info.amount *= multiplier
 
 
@@ -286,11 +357,16 @@ func before_hp_loss(amount: float) -> void:
 
 
 ## Thornmail answers a basic attack; any magic damage resets Kaenic
-## Rookern's wait. Being hit counts as being in combat.
+## Rookern's wait. Magic damage raises Chainlaced Crushers' shield, physical
+## damage Armored Advance's. Being hit counts as being in combat.
 func on_damage_taken(info: DamageInfo, _amount: float) -> void:
 	_combat_left = COMBAT_TIME
 	if info.type == DamageInfo.Type.MAGIC:
 		_magebane_wait = 0.0
+		if has(&"chainlaced_crushers"):
+			_noxian_shield(&"chainlaced_crushers", &"persistence", true)
+	elif info.type == DamageInfo.Type.PHYSICAL and has(&"armored_advance"):
+		_noxian_shield(&"armored_advance", &"endurance", false)
 	if not has(&"thornmail") or info.source != &"basic" or not is_instance_valid(info.attacker):
 		return
 	var attacker := info.attacker as Enemy
@@ -312,11 +388,15 @@ func on_lethal() -> bool:
 
 
 ## Death's Dance (Defy): a kill clears the delayed damage and heals 15%
-## max HP over 2 s.
-func on_kill() -> void:
+## max HP over 2 s. Slay: an elite, mini boss or boss kill adds a stack.
+func on_kill(enemy: Enemy = null) -> void:
 	if has(&"deaths_dance"):
 		_bleeds.clear()
 		lucian.restores.start_amount(&"deaths_dance", lucian.stats.max_hp * DEFY_HEAL, 0.0, DEFY_TIME)
+	var unit := enemy as EnemyUnit
+	if has_slay() and slay_stacks < SLAY_MAX and unit and unit.data and unit.data.kind in SLAY_KINDS:
+		slay_stacks += 1
+		lucian.refresh_stats()
 
 
 ## Fimbulwinter (Everlasting): slowing an enemy shields Lucian.
@@ -395,6 +475,30 @@ func buffs() -> Array[Dictionary]:
 			buff.left = lucian.shields.time_left(shield[0])
 			buff.duration = lucian.shields.duration(shield[0])
 			found.append(buff)
+	if has_slay():
+		found.append(_buff(&"slay", "Slay", _icon(&"immortal_path" if has(&"immortal_path") else &"gluttonous_greaves"),
+			"[hp]+%s%% omnivamp[/hp] from elite, mini boss and boss kills (up to %d)." % [TooltipText.number(SLAY_OMNIVAMP * slay_stacks * 100.0), SLAY_MAX],
+			str(slay_stacks) if slay_stacks > 0 else "", slay_stacks == SLAY_MAX))
+	for noxian in [
+		[&"chainlaced_crushers", &"persistence", "Noxian Persistence", "[magic]magic damage[/magic]"],
+		[&"armored_advance", &"endurance", "Noxian Endurance", "[phys]physical damage[/phys]"],
+	]:
+		if not has(noxian[0]):
+			continue
+		var buff := _buff(noxian[1], noxian[2], _icon(noxian[0]),
+			"Taking %s grants a shield against it for %d s." % [noxian[3], roundi(NOXIAN_SHIELD_TIME)], "", false)
+		var cooldown := lucian.item_cooldown(noxian[0])
+		if lucian.shields.has(noxian[1]):
+			buff.count = str(roundi(lucian.shields.amount(noxian[1])))
+			buff.left = lucian.shields.time_left(noxian[1])
+			buff.duration = lucian.shields.duration(noxian[1])
+			buff.ready = true
+		elif not cooldown.is_ready():
+			buff.left = cooldown.remaining
+			buff.duration = cooldown.duration
+		else:
+			buff.ready = true
+		found.append(buff)
 	return found
 
 
@@ -456,6 +560,7 @@ func _on_attack_hit(target: Enemy, info: DamageInfo) -> void:
 
 
 func _on_skill_hit(target: Enemy, info: DamageInfo) -> void:
+	_noxian_haste()
 	if has(&"muramana"):
 		_deal(target, MURAMANA_SKILL * lucian.stats.max_mana, DamageInfo.Type.PHYSICAL, &"muramana")
 	if _shojin_armed:
@@ -472,6 +577,25 @@ func _on_skill_hit(target: Enemy, info: DamageInfo) -> void:
 		var zone := HatefogZone.new()
 		zone.setup(lucian, target.global_position, _icon(&"malignance"))
 		lucian.spawn(zone)
+
+
+## Crimson Lucidity: +8% move speed for 4 s, once every 4 s.
+func _noxian_haste() -> void:
+	if not has(&"crimson_lucidity") or not lucian.item_cooldown(&"crimson_lucidity").is_ready():
+		return
+	lucian.add_speed_buff(&"noxian_haste", 0.0, NOXIAN_HASTE_SPEED, NOXIAN_HASTE_TIME)
+	lucian.item_cooldown(&"crimson_lucidity").start(0.0 if lucian.cheat_no_cooldowns else NOXIAN_HASTE_COOLDOWN)
+
+
+## Chainlaced Crushers / Armored Advance: a shield against the damage type
+## just taken, 100 at level 1 to 200 at 18 plus 8% bonus health, for 5 s.
+func _noxian_shield(item: StringName, id: StringName, magic: bool) -> void:
+	if not lucian.item_cooldown(item).is_ready():
+		return
+	var share := (lucian.progress.level - 1) / float(ChampionProgress.MAX_LEVEL - 1)
+	var amount := lerpf(NOXIAN_SHIELD_MIN, NOXIAN_SHIELD_MAX, share) + NOXIAN_SHIELD_HP * lucian.bonus_hp()
+	lucian.add_shield(id, amount, NOXIAN_SHIELD_TIME, magic, not magic)
+	lucian.item_cooldown(item).start(0.0 if lucian.cheat_no_cooldowns else NOXIAN_SHIELD_COOLDOWN)
 
 
 func _energized_hit(target: Enemy) -> void:

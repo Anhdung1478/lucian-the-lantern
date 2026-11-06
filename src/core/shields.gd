@@ -2,21 +2,26 @@ class_name Shields
 extends RefCounted
 ## Lucian's shields: each has an id, an amount and a time left (0 = until it
 ## is used up). A hit is taken out of them in ORDER; a magic-only shield
-## takes only magic damage. Every id used must be in ORDER.
+## takes only magic damage and a physical-only one only physical damage.
+## Every id used must be in ORDER.
 
-## First to absorb first: Kaenic Rookern (magic only), Shieldbow, Barrier,
+## First to absorb first: Kaenic Rookern (magic only), Chainlaced Crushers
+## (magic only), Armored Advance (physical only), Shieldbow, Barrier,
 ## Fimbulwinter, then Bloodthirster's Ichorshield, which lasts.
-const ORDER: Array[StringName] = [&"magebane", &"lifeline", &"barrier", &"everlasting", &"ichorshield"]
+const ORDER: Array[StringName] = [
+	&"magebane", &"persistence", &"endurance", &"lifeline", &"barrier", &"everlasting", &"ichorshield",
+]
 
-## Id -> {amount, left, duration, magic_only}.
+## Id -> {amount, left, duration, magic_only, physical_only}.
 var _shields := {}
 
 
 ## A new shield replaces an older one with the same id.
-func add(id: StringName, amount: float, seconds := 0.0, magic_only := false) -> void:
+func add(id: StringName, amount: float, seconds := 0.0, magic_only := false, physical_only := false) -> void:
 	if amount <= 0.0:
 		return
-	_shields[id] = {"amount": amount, "left": seconds, "duration": seconds, "magic_only": magic_only}
+	_shields[id] = {"amount": amount, "left": seconds, "duration": seconds,
+		"magic_only": magic_only, "physical_only": physical_only}
 
 
 ## Changes a shield's amount (it is added, lasting, if missing); 0 removes it.
@@ -69,6 +74,8 @@ func absorb(damage: float, type: DamageInfo.Type) -> float:
 			continue
 		var shield: Dictionary = _shields[id]
 		if shield.magic_only and type != DamageInfo.Type.MAGIC:
+			continue
+		if shield.physical_only and type != DamageInfo.Type.PHYSICAL:
 			continue
 		var taken := minf(shield.amount, damage)
 		shield.amount -= taken

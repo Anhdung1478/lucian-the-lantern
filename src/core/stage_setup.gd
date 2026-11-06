@@ -23,6 +23,9 @@ var bought: Array[int] = [5, 5, 5, 3]
 var passive := true
 ## Lucian's level at the start (Training, Endless and the sandbox: 1).
 var start_level := 1
+## The Evolution Tree's Boots level: 0 none, 1 Boots of Speed, 2 Slightly
+## Magical Boots. Lucian starts every map wearing them (the sandbox: 2).
+var boots_level := 2
 ## The save's Difficulty level: enemy HP and the damage Lucian takes.
 var difficulty := Difficulty.NORMAL
 var backpack_slots := Inventory.BACKPACK_SIZE
@@ -60,12 +63,14 @@ var orange_mult := 1.0
 var purple_mult := 1.0
 
 
-## The setup a save's tree, equipped skin and loadout give.
+## The setup a save's tree, equipped skin and loadout give (Training uses it
+## as it is).
 static func from_save(save: SaveGame) -> StageSetup:
 	var tree := save.tree
 	var setup := StageSetup.new()
 	setup.bought = [tree.level(&"skill_q"), tree.level(&"skill_w"), tree.level(&"skill_e"), tree.level(&"skill_r")]
 	setup.passive = tree.level(&"passive") > 0
+	setup.boots_level = tree.level(&"boots")
 	setup.backpack_slots = int(tree.value(&"backpack_slots"))
 	setup.equip_slots = int(tree.value(&"equip_slots"))
 	setup.shop_slots = int(tree.value(&"merchant_stock"))
@@ -92,6 +97,7 @@ static func from_save(save: SaveGame) -> StageSetup:
 
 ## A Journey stage: the save's setup plus the stage, its boss, and the
 ## tutorial's limits on Act 1's first play. Thresh only comes that first time.
+## The boots stay, even in the tutorial.
 static func for_stage(save: SaveGame, act_number: int, stage_number: int) -> StageSetup:
 	var setup := from_save(save)
 	setup.act = act_number

@@ -6,7 +6,7 @@ extends Resource
 @export var id: StringName
 @export var display_name := ""
 @export var icon: Texture2D
-## Seconds. Ability haste doesn't shorten it.
+## Seconds. Ability haste doesn't shorten it; summoner spell haste does.
 @export var cooldown := 60.0
 ## Tooltip markup (TooltipText.colorize tags).
 @export_multiline var description := ""
