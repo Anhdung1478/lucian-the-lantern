@@ -49,3 +49,66 @@ func test_a_ring_strikes_lucian_on_its_band() -> void:
 	var hp := lucian.hp
 	await wait_physics_frames(12)
 	assert_almost_eq(lucian.hp, hp - 100.0, 1.0)
+
+
+# --- A warning dies with its caster -----------------------------------------
+
+
+func _lucian() -> Lucian:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	return lucian
+
+
+func _caster() -> Enemy:
+	var enemy := Enemy.new()
+	enemy.max_hp = 100.0
+	enemy.position = Vector2(300, 0)
+	add_child_autofree(enemy)
+	return enemy
+
+
+## A circle on Lucian, firing after `seconds`, that strikes him for 100 from
+## `caster`.
+func _struck(lucian: Lucian, caster: Enemy, seconds: float) -> GroundWarning:
+	var warning := GroundWarning.circle(Vector2.ZERO, 100.0, seconds)
+	warning.strike(DamageInfo.create(100.0, DamageInfo.Type.TRUE, &"test", caster), lucian)
+	add_child_autofree(warning)
+	return warning
+
+
+func test_a_warning_goes_without_striking_once_its_caster_dies() -> void:
+	var lucian := _lucian()
+	var caster := _caster()
+	var warning := _struck(lucian, caster, 0.3)
+	var fired := [0]
+	warning.fired.connect(func() -> void: fired[0] += 1)
+	var hp := lucian.hp
+	await wait_physics_frames(2)
+	caster.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_false(caster.is_alive())
+	await wait_physics_frames(2)
+	assert_true(not is_instance_valid(warning) or warning.is_queued_for_deletion(), "it goes at once")
+	await wait_seconds(0.4)
+	assert_eq(lucian.hp, hp, "no strike")
+	assert_eq(fired[0], 0, "and no fired")
+
+
+func test_a_warning_whose_caster_is_freed_never_strikes() -> void:
+	var lucian := _lucian()
+	var caster := _caster()
+	var warning := _struck(lucian, caster, 0.3)
+	var hp := lucian.hp
+	caster.free()
+	await wait_seconds(0.5)
+	assert_false(is_instance_valid(warning))
+	assert_eq(lucian.hp, hp)
+
+
+func test_a_living_caster_s_warning_still_strikes() -> void:
+	var lucian := _lucian()
+	var caster := _caster()
+	_struck(lucian, caster, 0.1)
+	var hp := lucian.hp
+	await wait_physics_frames(12)
+	assert_almost_eq(lucian.hp, hp - 100.0, 1.0)

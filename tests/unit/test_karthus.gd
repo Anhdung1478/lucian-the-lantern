@@ -570,6 +570,20 @@ func test_the_revived_lay_waste_is_four_circles_of_120() -> void:
 		assert_eq([hit[0].amount, hit[0].type, hit[0].from_skill], [120.0, DamageInfo.Type.MAGIC, true])
 
 
+func test_the_revived_lay_waste_goes_when_he_dies() -> void:
+	var boss := _revived(Vector2(500, 0))
+	lucian.global_position = Vector2.ZERO
+	boss.lay_waste()
+	await wait_seconds(0.5)
+	assert_eq(_effects(GroundWarning).size(), 4, "all four are laid")
+	boss.take_damage(DamageInfo.create(999999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_true(boss.dead)
+	await wait_physics_frames(2)
+	assert_eq(_effects(GroundWarning).size(), 0, "his circles go with him")
+	await wait_seconds(1.0)
+	assert_eq(_hits(&"lay_waste").size(), 0)
+
+
 func test_the_act_5_lay_waste_is_unchanged() -> void:
 	var boss := _karthus(Vector2(500, 0))
 	assert_eq(boss.lay_spots(Vector2.ZERO).size(), 5)

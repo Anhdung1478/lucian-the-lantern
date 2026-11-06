@@ -473,6 +473,29 @@ func test_shots_that_interrupt_and_kill_the_ocean_drake_cause_no_engine_errors()
 	assert_engine_error_count(0)
 
 
+func test_a_dead_infernal_drake_s_breath_and_meteors_never_hit() -> void:
+	var stage: Stage = await _stage(3, 2)
+	stage.lucian.invulnerable = false
+	var sources: Array[StringName] = []
+	stage.lucian.damage_received.connect(func(info: DamageInfo, _amount: float) -> void: sources.append(info.source))
+	var drake := stage.spawn_enemy(&"infernal_drake", stage.arena.camps[&"drake"]) as InfernalDrake
+	assert_not_null(drake)
+	_quiet(drake)
+	stage.lucian.global_position = drake.global_position + Vector2(300, 0)
+	await wait_physics_frames(1)
+	drake.meteor_fall()
+	drake.fire_breath()
+	_shoot(stage, drake, 99999.0)
+	await wait_physics_frames(3)
+	assert_true(drake.dead)
+	var warnings := stage.get_node("Warnings").get_children().filter(
+		func(node: Node) -> bool: return node is GroundWarning and not node.is_queued_for_deletion())
+	assert_eq(warnings.size(), 0, "its warnings go with it")
+	await wait_seconds(1.4)
+	assert_false(sources.has(&"fire_breath"))
+	assert_false(sources.has(&"meteor_fall"))
+
+
 func test_a_shot_that_kills_the_infernal_drake_mid_skill_causes_no_engine_errors() -> void:
 	var stage: Stage = await _stage(3, 2)
 	var drake := stage.spawn_enemy(&"infernal_drake", stage.arena.camps[&"drake"]) as InfernalDrake

@@ -535,6 +535,20 @@ func test_the_mark_goes_away_if_lucian_is_in_stasis() -> void:
 	assert_eq(_hits(&"elder_mark").size(), 0)
 
 
+func test_a_dead_dragon_s_breath_never_lands() -> void:
+	var dragon := _elder(Vector2.ZERO)
+	lucian.global_position = Vector2(0, 500)
+	await wait_physics_frames(1)
+	dragon.elder_breath()
+	await wait_physics_frames(2)
+	dragon.take_damage(DamageInfo.create(999999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_true(dragon.dead)
+	await wait_physics_frames(2)
+	assert_eq(_effects(GroundWarning).size(), 0, "gone with the dragon")
+	await wait_seconds(1.2)
+	assert_eq(_hits(&"elder_breath").size(), 0)
+
+
 func test_the_mark_goes_away_if_the_dragon_dies() -> void:
 	var dragon := _elder(Vector2(600, 0))
 	await wait_physics_frames(1)

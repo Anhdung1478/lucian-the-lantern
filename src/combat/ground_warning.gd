@@ -4,7 +4,9 @@ extends Node2D
 ## (from the origin along `direction`), a cone, a lock line that follows a
 ## node, or a ring (a band round a circle). Its fill grows over `warn_time`;
 ## then `fired` and it goes. With a strike set, Lucian takes the hit if he
-## is inside when it fires.
+## is inside when it fires. A strike from an enemy dies with it: once its
+## caster is dead or gone, the warning goes at once, with no hit, no sound
+## and no `fired` (as Elder's Mark does).
 
 signal fired
 
@@ -32,6 +34,10 @@ var sound := &""
 var _elapsed := 0.0
 var _hit: DamageInfo
 var _victim: Lucian
+## The strike's attacker, when it is an enemy; _has_caster tells a caster
+## freed since from none at all.
+var _caster: Enemy
+var _has_caster := false
 
 
 static func circle(at: Vector2, radius: float, seconds: float) -> GroundWarning:
@@ -87,10 +93,13 @@ static func ring(at: Vector2, radius: float, band_width: float, seconds: float) 
 	return warning
 
 
-## Lucian takes `hit` if he is inside when the warning fires.
+## Lucian takes `hit` if he is inside when the warning fires. The hit's
+## attacker (Boss.skill_hit, EnemyUnit.make_hit) becomes its caster.
 func strike(hit: DamageInfo, victim: Lucian) -> void:
 	_hit = hit
 	_victim = victim
+	_caster = hit.attacker as Enemy
+	_has_caster = _caster != null
 
 
 ## How far the warning has filled, 0 to 1.
@@ -113,6 +122,9 @@ func covers(point: Vector2, radius := 0.0) -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	if _has_caster and not (is_instance_valid(_caster) and _caster.is_alive()):
+		queue_free()
+		return
 	_elapsed += delta
 	if shape == Shape.LOCK and is_instance_valid(follow):
 		direction = global_position.direction_to(follow.global_position)
