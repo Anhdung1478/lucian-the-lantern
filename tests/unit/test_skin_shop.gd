@@ -46,6 +46,13 @@ func test_new_save_shows_classic_equipped_and_others_to_buy() -> void:
 		assert_true(card.button.disabled, card.skin.id)
 
 
+func test_the_equipped_button_keeps_the_disabled_text_color() -> void:
+	var classic := _card(SaveGame.CLASSIC)
+	assert_eq(classic.button.get_theme_color(&"font_disabled_color"), UiStyle.DISABLED_FONT)
+	var unaffordable: SkinCard = shop.cards.filter(func(card: SkinCard) -> bool: return card.skin.id != SaveGame.CLASSIC)[0]
+	assert_eq(unaffordable.button.get_theme_color(&"font_disabled_color"), UiStyle.ERROR_COLOR, "a price you can't pay stays red")
+
+
 func test_purchase_button_follows_essences_alone() -> void:
 	var noon := _card(&"high_noon")
 	assert_true(noon.button.disabled)

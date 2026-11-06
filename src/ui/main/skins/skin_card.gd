@@ -33,7 +33,7 @@ func refresh(save: SaveGame) -> void:
 	var border := UiStyle.GOLD_COLOR if equipped else UiStyle.BORDER_COLOR
 	add_theme_stylebox_override(&"panel", UiStyle.panel(UiStyle.PANEL_COLOR, border, 5 if equipped else 2, 16.0))
 	button.icon = null
-	button.remove_theme_color_override(&"font_disabled_color")
+	button.add_theme_color_override(&"font_disabled_color", UiStyle.DISABLED_FONT)
 	if equipped:
 		button.text = "Equipped"
 		button.disabled = true
