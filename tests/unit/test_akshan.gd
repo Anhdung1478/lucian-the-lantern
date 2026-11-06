@@ -59,6 +59,30 @@ func test_swing_bolts_fly_outward() -> void:
 		assert_gt(bolt.direction.dot(outward), 0.9)
 
 
+## Lucian by the top wall of 2-3: the swing's circle runs into the border
+## wall, and Akshan slides along its edge instead of going through it.
+func test_the_swing_keeps_him_on_open_ground() -> void:
+	var map := StageMaps.create(2, 3)
+	autofree(map)
+	lucian.global_position = Vector2(2600, 150)
+	var akshan := _akshan(Vector2(2600, 600))
+	akshan.arena = map
+	akshan._attack_left = 1000.0
+	for id: StringName in akshan._cooldowns:
+		akshan._cooldowns[id] = 1000.0
+	await wait_physics_frames(1)
+	var center := Vector2(2600, 300)
+	assert_false(map.is_walkable(center + Vector2.UP * Akshan.SWING_RADIUS, akshan.radius), "the circle crosses the wall")
+	akshan.start_swing(center)
+	var frames := ceili(Akshan.SWING_TIME * Engine.physics_ticks_per_second)
+	var off_ground: Array[Vector2] = []
+	for i in frames:
+		await wait_physics_frames(1)
+		if not map.is_walkable(akshan.global_position, akshan.radius):
+			off_ground.append(akshan.global_position)
+	assert_eq(off_ground, [] as Array[Vector2], "never in the wall")
+
+
 func test_a_pillar_stops_comeuppance() -> void:
 	var akshan := _akshan(Vector2.ZERO)
 	akshan.move_speed = 0.0

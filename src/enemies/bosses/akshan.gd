@@ -102,7 +102,9 @@ func _physics_process(delta: float) -> void:
 	if _swing_left > 0.0:
 		_swing_left -= delta
 		_swing_angle += TAU / SWING_TIME * delta
-		global_position = _swing_center + Vector2.from_angle(_swing_angle) * SWING_RADIUS
+		# Round the circle, kept on open ground: where it crosses a wall, a
+		# pillar or the abyss, he slides along its edge (Boss.landing_spot).
+		global_position = landing_spot(_swing_center + Vector2.from_angle(_swing_angle) * SWING_RADIUS, arena, radius)
 		face(global_position + Vector2.from_angle(_swing_angle))
 		_swing_shot_left -= delta
 		if _swing_shot_left <= 0.0:
