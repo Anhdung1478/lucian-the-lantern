@@ -10,6 +10,9 @@ var controller: LucianController
 
 
 func before_each() -> void:
+	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real settings.
+	if GameSettings._instance == null or GameSettings._instance.path == GameSettings.DEFAULT_PATH:
+		GameSettings._instance = GameSettings.new("user://test_lucian_controller_settings.json")
 	lucian = load("res://src/lucian/lucian.tscn").instantiate()
 	# Trails and sparks go here, so they are freed with the test.
 	var effects := Node2D.new()
