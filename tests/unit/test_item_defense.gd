@@ -107,6 +107,28 @@ func test_guardian_angel_holds_him_then_revives() -> void:
 	assert_signal_emitted(lucian, "died")
 
 
+func test_guardian_angel_clears_burns_slows_and_cc_and_refuses_new_ones() -> void:
+	_equip(&"guardian_angel")
+	lucian.add_burn(&"fire", 60.0, 10.0, DamageInfo.Type.TRUE)
+	lucian.add_slow(&"water", 0.3, 10.0)
+	lucian.add_cc(CrowdControl.Kind.STUN, 10.0)
+	lucian.take_damage(_hit(99999.0))
+	assert_true(lucian.in_stasis())
+	assert_false(lucian._burns.has(&"fire"), "stasis puts out the burn")
+	assert_eq(lucian.slow_amount(), 0.0, "and ends the slow")
+	assert_false(lucian.has_cc(CrowdControl.Kind.STUN), "and the stun")
+	lucian.add_burn(&"lava", 60.0, 10.0, DamageInfo.Type.TRUE)
+	lucian.add_slow(&"mud", 0.5, 10.0)
+	assert_false(lucian._burns.has(&"lava"), "no burn lands in stasis")
+	assert_eq(lucian.slow_amount(), 0.0, "no slow lands in stasis")
+	watch_signals(lucian)
+	await wait_seconds(ItemPassives.REBIRTH_STASIS + 1.0)
+	assert_false(lucian.in_stasis())
+	assert_true(lucian.can_act(), "he comes back free to act")
+	assert_false(lucian.dead)
+	assert_signal_not_emitted(lucian, "died")
+
+
 func test_kaenic_rookern_shields_after_15_quiet_seconds() -> void:
 	_equip(&"kaenic_rookern")
 	lucian.passives._magebane_wait = ItemPassives.MAGEBANE_WAIT - 0.05

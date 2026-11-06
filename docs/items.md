@@ -376,7 +376,7 @@ enemies started hitting Lucian.
 | Thornmail | *Thorns:* an enemy's basic attack on Lucian deals 20 (+10% bonus armor) magic damage back to it and applies Grievous Wounds for 3 s. |
 | Immortal Shieldbow | *Lifeline:* a hit that would leave Lucian under 30% HP first gives a shield of 300 (level 1) to 650 (level 18) for 3 s. 90 s cooldown. |
 | Death's Dance | *Ignore Pain:* 30% of each hit is taken over the next 3 s instead. *Defy:* a kill clears the damage still to come and heals 15% max HP over 2 s. |
-| Guardian Angel | *Rebirth:* instead of dying, Lucian is held in gold stasis for 4 s (nothing can hurt him; enemies wait), then comes back with 50% base HP and 30% max mana. 300 s cooldown. |
+| Guardian Angel | *Rebirth:* instead of dying, Lucian is held in gold stasis for 4 s (nothing can hurt him; enemies wait), then comes back with 50% base HP and 30% max mana. 300 s cooldown. Stasis ends his burns, slows and crowd control, and none land while it holds. |
 | Kaenic Rookern | *Magebane:* after 15 s without magic damage, a shield against magic damage only, 15% max HP. Any magic damage restarts the wait. |
 
 Actives share one cooldown per item (every copy), which keeps running after selling. The debug

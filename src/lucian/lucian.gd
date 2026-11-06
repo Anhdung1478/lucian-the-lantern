@@ -643,9 +643,9 @@ func take_damage(info: DamageInfo) -> bool:
 
 ## A slow of `pct` (0.3 = 30%) for `seconds` (an enemy's hit, shallow water).
 ## The same id replaces the old one; the strongest slow counts. Tenacity
-## doesn't shorten it, as in LoL. Ignored while dead.
+## doesn't shorten it, as in LoL. Ignored while dead or in stasis.
 func add_slow(id: StringName, pct: float, seconds: float) -> void:
-	if dead:
+	if dead or in_stasis():
 		return
 	_slows[id] = {"pct": pct, "left": seconds, "duration": maxf(seconds, 0.01)}
 
@@ -660,9 +660,10 @@ func slow_amount() -> float:
 
 ## A burn of `dps` damage of `type` per second for `seconds` (lava, poison),
 ## credited to `attacker`. It ticks every 0.5 s through take_damage, so magic
-## resist lowers a magic burn. The same id refreshes it. Ignored while dead.
+## resist lowers a magic burn. The same id refreshes it. Ignored while dead
+## or in stasis.
 func add_burn(id: StringName, dps: float, seconds: float, type: DamageInfo.Type, attacker: Node = null) -> void:
-	if dead:
+	if dead or in_stasis():
 		return
 	_burns.add(id, dps, seconds, type, attacker)
 
@@ -777,12 +778,17 @@ func is_launched() -> bool:
 
 
 ## Guardian Angel: `seconds` of stasis, then back with these HP and mana.
+## It ends his burns, slows and crowd control, and none land while it holds,
+## so he comes back free (they would only wait, frozen, for the revive).
 func enter_stasis(seconds: float, revive_hp: float, revive_mana: float) -> void:
 	_stasis_left = seconds
 	_revive = Vector2(revive_hp, revive_mana)
 	hp = 0.0
 	_order = Order.NONE
 	_drop_in_flight()
+	_slows.clear()
+	_burns.clear()
+	_cc.clear()
 	_stop_hurt_flash()
 	visuals.modulate = STASIS_TINT
 
