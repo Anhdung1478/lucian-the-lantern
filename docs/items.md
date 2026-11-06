@@ -97,7 +97,7 @@ spell haste** (shortens summoner cooldowns like ability haste does skills: 100 h
 - +40 Attack Damage
 - +70 Ability Power
 - +10% Omnivamp
-- *Active — Lightning Bolt (60 s cooldown):* Blasts the target enemy for 175 (+30% AP) magic damage and slows it by 25% for 2 s.
+- *Active — Lightning Bolt (60 s cooldown):* Blasts the target enemy for 175 (+30% AP) magic damage and slows it by 40% for 2 s.
 
 ### Kraken Slayer
 

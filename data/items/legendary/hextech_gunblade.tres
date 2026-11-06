@@ -9,7 +9,7 @@ script = ExtResource("1_opr52")
 effect_name = "Lightning Bolt"
 active = true
 cooldown = 60.0
-description = "Blasts the target enemy for [magic]175 (+30% AP) magic damage[/magic] and slows it by 25% for 2 s."
+description = "Blasts the target enemy for [magic]175 (+30% AP) magic damage[/magic] and slows it by 40% for 2 s."
 
 [resource]
 script = ExtResource("3_stpkp")

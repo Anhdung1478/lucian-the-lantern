@@ -232,3 +232,10 @@ func test_turning_on_no_cooldowns_refreshes_item_cooldowns() -> void:
 func test_items_without_actives_do_nothing() -> void:
 	equip(&"bf_sword")
 	assert_false(lucian.use_equip_slot(0, dummy.position))
+
+
+func test_gunblades_card_says_the_slow_the_code_uses() -> void:
+	var gunblade := lucian.item_catalog.find(&"hextech_gunblade")
+	var said := "slows it by %d%%" % roundi(ItemActives.GUNBLADE_SLOW_AMOUNT * 100.0)
+	assert_string_contains(gunblade.effects[0].description, said)
+	assert_eq(said, "slows it by 40%")
