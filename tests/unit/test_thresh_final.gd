@@ -802,6 +802,23 @@ func test_dark_passage_brings_3_summoned_souls_counted_in_the_wave() -> void:
 	assert_engine_error_count(0)
 
 
+func test_in_6_5_he_comes_in_the_boss_wave_and_his_souls_get_its_scaling() -> void:
+	var stage: Stage = await _stage()
+	var boss := await _boss_wave(stage)
+	assert_eq(boss.wave, 8, "6-5's 7 waves, then the boss wave")
+	assert_eq(boss.max_hp, 16000.0, "a boss's own stats ignore the wave")
+	await _to_phase_2(boss)
+	var souls := await _souls(stage, boss)
+	assert_eq(souls.size(), 3)
+	# Act 6, wave 8: HP x 2.25 x 1.7 and damage x 1.75 x 1.7 (Normal), as for
+	# the boss wave's other enemies, not wave 1's x 2.25 / x 1.75.
+	for soul: EnemyUnit in souls:
+		assert_eq(soul.wave, 8)
+		assert_almost_eq(soul.max_hp, 150.0 * 2.25 * 1.7, 0.01)
+		assert_almost_eq(soul.damage, 22.0 * 1.75 * 1.7, 0.01)
+	assert_engine_error_count(0)
+
+
 func test_his_fall_frees_every_summoned_soul_and_6_5_pays_20_purple_then_4() -> void:
 	var stage: Stage = await _stage()
 	assert_eq(stage.run.boss, &"thresh_final")

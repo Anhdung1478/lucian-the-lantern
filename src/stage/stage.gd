@@ -449,7 +449,9 @@ func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 	if data.is_boss_kind():
 		Sfx.play(&"boss")
 	if id == run.boss:
-		boss_unit = spawn_enemy(id, arena.boss_point)
+		# With its wave, though a boss's own stats ignore it: what it summons
+		# (the final Thresh's Lantern Souls) gets the boss wave's scaling.
+		boss_unit = spawn_enemy(id, arena.boss_point, wave)
 		# Act 1's cutscene, for a plain Thresh only (spawn_unit wires a final one's fall).
 		if boss_unit is Thresh and not (boss_unit is ThreshFinal):
 			## Deferred: a shot's physics callback can bring him to half HP, and the freeze can't disable bodies mid-flush.
