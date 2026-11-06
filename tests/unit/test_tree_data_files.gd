@@ -28,6 +28,7 @@ const COSTS := {
 	&"flash_upgrade": [UP_B, UP_O], &"ghost_upgrade": [UP_B, UP_O], &"barrier_upgrade": [UP_B, UP_O],
 	&"heal_upgrade": [UP_B, UP_O], &"clarity_upgrade": [UP_B, UP_O], &"smite_upgrade": [UP_B, UP_O],
 	&"summoner_slot_2": [[400], [5]],
+	&"boots": [[300, 800], [0, 10]],
 }
 
 var nodes: Array[TreeNodeData]
@@ -37,8 +38,8 @@ func before_all() -> void:
 	nodes = EvolutionTree.new().nodes()
 
 
-func test_34_nodes_with_unique_ids() -> void:
-	assert_eq(nodes.size(), 34)
+func test_35_nodes_with_unique_ids() -> void:
+	assert_eq(nodes.size(), 35)
 	var seen := {}
 	for data in nodes:
 		assert_false(seen.has(data.id), "duplicate %s" % data.id)
@@ -83,7 +84,7 @@ func test_requirements_exist() -> void:
 
 
 func test_costs_match_the_table() -> void:
-	assert_eq(COSTS.size(), 34)
+	assert_eq(COSTS.size(), 35)
 	for data in nodes:
 		assert_true(COSTS.has(data.id), str(data.id))
 		var expected: Array = COSTS[data.id]
@@ -133,6 +134,18 @@ func test_level_sums_acts_and_values_match_max_level() -> void:
 
 func _cell(branch: StringName, grid: Vector2) -> String:
 	return "%s %s" % [branch, grid]
+
+
+func test_boots_node_reads_by_level() -> void:
+	var data := EvolutionTree.new().node(&"boots")
+	assert_eq(data.branch, &"backpack")
+	assert_eq(data.max_level, 2)
+	assert_eq(data.grid, Vector2(2, 1.5), "on the trunk between the two plaques")
+	assert_eq(data.icon.resource_path, "res://assets/art/tree/boots.svg")
+	assert_eq(data.value_text(0), "None")
+	assert_eq(data.value_text(1), "Boots of Speed")
+	assert_eq(data.value_text(2), "Slightly Magical Boots")
+	assert_gt(data.blue[0], 0, "never free: the FREE badge tests count on it")
 
 
 func test_backpack_slots_values_and_text() -> void:

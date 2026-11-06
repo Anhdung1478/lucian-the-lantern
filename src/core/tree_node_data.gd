@@ -45,6 +45,9 @@ extends Resource
 @export var percent := false
 ## How the value reads; "{v}" is the number.
 @export var format := ""
+## What each level 0..max_level reads as, in place of `format` (Boots: "None",
+## "Boots of Speed", "Slightly Magical Boots"); empty to use `format`.
+@export var level_texts: Array[String] = []
 
 
 ## The value at `level`: `level_values` when set, else base + per_level x level.
@@ -54,9 +57,12 @@ func value(level: int) -> float:
 	return base + per_level * level
 
 
-## What `level` gives, through `format` ("{v}" is the value). Level 0 of a
-## node whose value there is 0 reads "None".
+## What `level` gives: its `level_texts` entry when set, else through
+## `format` ("{v}" is the value). Level 0 of a node whose value there is 0
+## reads "None".
 func value_text(level: int) -> String:
+	if not level_texts.is_empty():
+		return level_texts[clampi(level, 0, level_texts.size() - 1)]
 	if level == 0 and value(0) == 0.0:
 		return "None"
 	var shown := value(level) * (100.0 if percent else 1.0)

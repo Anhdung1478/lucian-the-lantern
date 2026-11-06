@@ -76,8 +76,8 @@ func _tab(branch: StringName) -> Button:
 # --- Pages and tabs ----------------------------------------------------------------
 
 
-func test_34_views_across_5_pages_and_one_page_shows() -> void:
-	assert_eq(section.views.size(), 34)
+func test_35_views_across_5_pages_and_one_page_shows() -> void:
+	assert_eq(section.views.size(), 35)
 	assert_eq(section.pages.size(), 5)
 	var shown := 0
 	for branch: StringName in EvolutionTree.BRANCHES:

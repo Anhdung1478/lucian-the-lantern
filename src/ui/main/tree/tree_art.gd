@@ -479,7 +479,7 @@ func _blocked(rect: Rect2) -> bool:
 		var center: Vector2 = page.centers[id]
 		if rect.intersects(Rect2(center - Vector2(TreePage.CELL.x * 0.5 + 6.0, 60.0), Vector2(TreePage.CELL.x + 12.0, 160.0))):
 			return true
-		if id in [TreePage.EQUIP_ID, TreePage.BACKPACK_ID] and rect.intersects(TreePage.plaque_rect(center)):
+		if id in [TreePage.EQUIP_ID, TreePage.BACKPACK_ID, TreePage.BOOTS_ID] and rect.intersects(TreePage.plaque_rect(center)):
 			return true
 	return rect.end.y > TreePage.GROUND_Y - 20.0
 

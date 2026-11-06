@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TreeNodeData" format=3]
+
+[ext_resource type="Script" path="res://src/core/tree_node_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/art/tree/boots.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"boots"
+display_name = "Boots"
+description = "Lucian starts every map in his boots, for [ms]move speed[/ms]. The merchant's Boots tab upgrades them."
+icon = ExtResource("2_icon")
+branch = &"backpack"
+grid = Vector2(2, 1.5)
+max_level = 2
+blue = Array[int]([300, 800])
+orange = Array[int]([0, 10])
+per_level = 1.0
+level_texts = Array[String](["None", "Boots of Speed", "Slightly Magical Boots"])

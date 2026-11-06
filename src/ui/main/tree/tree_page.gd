@@ -66,6 +66,14 @@ const MINI_GAP := 4.0
 const MINI_COLUMNS := BackpackScreen.COLUMNS
 const EQUIP_ID := &"equip_slots"
 const BACKPACK_ID := &"backpack_slots"
+const BOOTS_ID := &"boots"
+## The Boots plaque's two boots, one per level, and their slots.
+const BOOTS_ICONS: Array[Texture2D] = [
+	preload("res://assets/art/items/boots_of_speed.svg"),
+	preload("res://assets/art/items/slightly_magical_boots.svg"),
+]
+const BOOTS_SLOT := 64.0
+const BOOTS_SPREAD := 160.0
 ## Light motes drifting up: how many, how fast.
 const MOTES := 28
 const MOTE_SPEED := 9.0
@@ -84,7 +92,7 @@ const NAMES := {
 const BLURBS := {
 	&"skills": "Q, W and E open the passive; their ranks open R.",
 	&"stats": "Offense, defense and sustain for Lucian himself.",
-	&"backpack": "Equip slots for gear, and cells to carry more.",
+	&"backpack": "Equip slots for gear, boots to wear, and cells to carry more.",
 	&"economy": "More gold, XP and essence, and a better merchant.",
 	&"summoners": "Summoner spells, their upgrades, a second slot.",
 }
@@ -348,6 +356,8 @@ func _draw() -> void:
 		_draw_equip_preview(centers[EQUIP_ID])
 	if views.has(BACKPACK_ID):
 		_draw_backpack_preview(centers[BACKPACK_ID])
+	if views.has(BOOTS_ID):
+		_draw_boots_preview(centers[BOOTS_ID])
 	_draw_group_captions()
 	_draw_header()
 	# The Journey map's frame, open on the right where the info column stands.
@@ -466,6 +476,24 @@ func _draw_backpack_preview(center: Vector2) -> void:
 	for i in Inventory.BACKPACK_SIZE:
 		var at := left + Vector2(i % MINI_COLUMNS, i / MINI_COLUMNS) * (MINI_CELL + MINI_GAP)
 		_draw_slot(Rect2(at, Vector2.ONE * MINI_CELL), i < open, i >= open and i < next, 4)
+
+
+## Under Boots: Boots of Speed and Slightly Magical Boots, each lit once its
+## level is bought and outlined when it is the next level open to buy.
+func _draw_boots_preview(center: Vector2) -> void:
+	var data := tree.node(BOOTS_ID)
+	var level := tree.level(BOOTS_ID)
+	var next := level + 1 if tree.next_level_open(data.id) else level
+	var plaque := _draw_plaque(center, "BOOTS", "%d / %d" % [level, data.max_level])
+	for i in data.max_level:
+		var slot_center := Vector2(center.x + (i - (data.max_level - 1) * 0.5) * BOOTS_SPREAD, plaque.position.y + 92.0)
+		var rect := Rect2(slot_center - Vector2.ONE * BOOTS_SLOT * 0.5, Vector2.ONE * BOOTS_SLOT)
+		_draw_slot(rect, i < level, i >= level and i < next)
+		var tint := Color.WHITE if i < level else Color(1, 1, 1, 0.3)
+		draw_texture_rect(BOOTS_ICONS[i], rect.grow(-6.0), false, tint)
+		var color := UiStyle.TITLE_COLOR if i < level else UiStyle.DIM_COLOR
+		JourneyMap.draw_text(self, data.value_text(i + 1), Vector2(slot_center.x, rect.end.y + 24.0), 15, color, true)
+	JourneyMap.draw_text(self, "Worn on every map.", Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), 15, UiStyle.DIM_COLOR)
 
 
 ## One slot of a preview: lit when open, outlined when the next level opens it.
