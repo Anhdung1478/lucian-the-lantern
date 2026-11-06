@@ -134,3 +134,15 @@ func test_crafting_cards_send_the_player_to_the_merchant() -> void:
 	card = TooltipCard.item(catalog.find(&"muramana"), catalog)
 	assert_string_contains(card_text(card), "Recipe: Tear of the Goddess + Tear of the Goddess + 2100 gold at the merchant.")
 	card.free()
+
+
+func test_skill_cards_show_the_cooldown_with_ability_haste() -> void:
+	var q := lucian.skills[ChampionProgress.Slot.Q]
+	var card := TooltipCard.skill(lucian, q, null, "Q")
+	assert_string_contains(card_text(card), "Cooldown: 9/8/7/6/5 s")
+	assert_false(card_text(card).contains("ability haste"), "none to name")
+	card.free()
+	lucian.add_jungle_buff(JungleBuffs.BLUE)
+	card = TooltipCard.skill(lucian, q, null, "Q")
+	assert_string_contains(card_text(card), "Cooldown: 7.5/6.7/5.8/5/4.2 s (20 ability haste)")
+	card.free()

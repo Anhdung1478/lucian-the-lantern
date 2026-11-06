@@ -150,6 +150,14 @@ func tooltip_content() -> Control:
 	return TooltipCard.skill(lucian, skill, _icon.texture, _key)
 
 
+## What the card shows that can change while it is hovered: the haste, the
+## rank and the lock. HoverTip rebuilds the card when it changes.
+func tooltip_version() -> Variant:
+	if skill == null:
+		return null
+	return [lucian.skill_haste(skill.slot), skill.rank(), lucian.skill_lock_note(skill.slot)]
+
+
 func tooltip_place() -> HoverTip.Place:
 	return HoverTip.Place.ABOVE
 

@@ -114,7 +114,7 @@ static func skill(lucian: Lucian, shown: LucianSkill, icon_texture: Texture2D, k
 	var costs: PackedStringArray = []
 	if data.mana_cost.any(func(value: float) -> bool: return value > 0.0):
 		costs.append(TooltipText.color("Cost: ", TooltipText.DIM) + TooltipText.ranked(data.mana_cost, rank) + TooltipText.colorize(" [mana]Mana[/mana]"))
-	costs.append(TooltipText.color("Cooldown: ", TooltipText.DIM) + TooltipText.ranked(data.cooldown, rank) + " s")
+	costs.append(TooltipText.color("Cooldown: ", TooltipText.DIM) + cooldown_text(lucian, shown))
 	_body(card, "
 ".join(costs))
 	_separator(card)
@@ -125,6 +125,19 @@ static func skill(lucian: Lucian, shown: LucianSkill, icon_texture: Texture2D, k
 		_body(card, TooltipText.color("Rank %d: " % data.max_rank, TooltipText.GOLD if reached else TooltipText.DIM)
 			+ TooltipText.color(bonus, TooltipText.TEXT if reached else TooltipText.DIM))
 	return card
+
+
+## A skill's cooldown per rank with Lucian's ability haste for it applied,
+## as a cast would start it: "7.5/6.7/5.8 s (20 ability haste)".
+static func cooldown_text(lucian: Lucian, shown: LucianSkill) -> String:
+	var haste := lucian.skill_haste(shown.slot)
+	var hasted: Array[float] = []
+	for base: float in shown.data.cooldown:
+		hasted.append(snappedf(Cooldown.hasted(base, haste), 0.1))
+	var text := TooltipText.ranked(hasted, shown.rank()) + " s"
+	if haste > 0.0:
+		text += TooltipText.color(" (%s ability haste)" % TooltipText.number(haste), TooltipText.DIM)
+	return text
 
 
 ## A summoner spell's card: icon, name, key, `cooldown` (Lucian's, after any

@@ -60,3 +60,19 @@ func test_the_passive_slot_locks_when_not_learned() -> void:
 	lucian.passive.learned = false
 	await wait_process_frames(1)
 	assert_true(ui._lock.visible, "unlearned: locked")
+
+
+func test_the_cards_version_follows_haste_and_rank() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var ui := SkillSlot.new()
+	ui.setup(lucian, lucian.skills[Slot.Q], null, "Q")
+	add_child_autofree(ui)
+	var before: Variant = ui.tooltip_version()
+	assert_eq(ui.tooltip_version(), before, "nothing changed")
+	lucian.add_jungle_buff(JungleBuffs.BLUE)
+	assert_ne(ui.tooltip_version(), before, "Blue's haste")
+	before = ui.tooltip_version()
+	lucian.progress.set_level(3)
+	lucian.try_rank_up(Slot.Q)
+	assert_ne(ui.tooltip_version(), before, "a rank")

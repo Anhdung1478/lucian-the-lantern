@@ -323,7 +323,7 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 			_queued_aim = aim
 		return false
 	mana -= skill.mana_cost()
-	skill.cooldown.start(0.0 if cheat_no_cooldowns else skill.cooldown_seconds(), stats.ability_haste + passives.skill_haste(slot))
+	skill.cooldown.start(0.0 if cheat_no_cooldowns else skill.cooldown_seconds(), skill_haste(slot))
 	_cancel_windup()
 	skill.execute(aim)
 	passive.charge()
@@ -488,6 +488,12 @@ func teach_skill(slot: ChampionProgress.Slot) -> void:
 	progress.bought[slot] = maxi(progress.bought[slot], 1)
 	if progress.ranks[slot] == 0:
 		progress.rank_up(slot)
+
+
+## The ability haste a cast of the skill on `slot` gets: the stat, plus an
+## item's haste for that one skill (Malignance on R).
+func skill_haste(slot: ChampionProgress.Slot) -> float:
+	return stats.ability_haste + passives.skill_haste(slot)
 
 
 ## Why the skill on `slot` can't be ranked yet, for its HUD card; "" once a
