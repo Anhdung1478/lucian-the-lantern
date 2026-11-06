@@ -118,12 +118,19 @@ func test_a_root_refuses_item_dashes_without_spending_them() -> void:
 func test_a_root_leaves_actives_that_do_not_move_him() -> void:
 	var enemy := _enemy(Vector2(300, 0), 5000.0)
 	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"hextech_gunblade"))
-	lucian.inventory.put(Inventory.EQUIP_START + 1, lucian.item_catalog.find(&"hp_potion"))
+	lucian.inventory.add(lucian.item_catalog.find(&"hp_potion"))
 	lucian.add_cc(Kind.ROOT, 1.0)
 	assert_true(lucian.use_equip_slot(0, enemy.global_position), "Gunblade")
 	assert_lt(enemy.hp, enemy.max_hp)
-	assert_true(lucian.use_equip_slot(1, Vector2.ZERO), "a potion")
+	assert_true(lucian.use_potion_cell(Inventory.HP_POTION_CELL), "a potion (key 7)")
 	assert_eq(lucian.restores.count(&"hp_potion"), 1)
+
+
+func test_a_stun_stops_the_potion_keys() -> void:
+	lucian.inventory.add(lucian.item_catalog.find(&"hp_potion"))
+	lucian.add_cc(Kind.STUN, 1.0)
+	assert_false(lucian.use_potion_cell(Inventory.HP_POTION_CELL))
+	assert_eq(lucian.inventory.count_at(Inventory.HP_POTION_CELL), 1)
 
 
 func test_e_pressed_while_rooted_is_not_queued() -> void:

@@ -91,3 +91,30 @@ func test_a_right_click_after_flash_walks_on() -> void:
 	var landed := lucian.global_position
 	await wait_seconds(0.3)
 	assert_gt(lucian.global_position.distance_to(landed), 20.0, "walking to the new click")
+
+
+func _press(action: StringName) -> void:
+	var event := InputEventAction.new()
+	event.action = action
+	event.pressed = true
+	controller._unhandled_input(event)
+
+
+func test_keys_7_and_8_drink_from_the_potion_cells() -> void:
+	var catalog := lucian.item_catalog
+	lucian.inventory.add(catalog.find(&"hp_potion"), 2)
+	lucian.inventory.add(catalog.find(&"mp_potion"), 1)
+	_press(&"potion_hp")
+	assert_eq(lucian.inventory.count_at(Inventory.HP_POTION_CELL), 1)
+	_press(&"potion_mp")
+	assert_null(lucian.inventory.item_at(Inventory.MP_POTION_CELL))
+	assert_eq(lucian.restores.count(&"mp_potion"), 1)
+
+
+func test_an_empty_potion_cell_key_does_nothing() -> void:
+	lucian.inventory.add(lucian.item_catalog.find(&"hp_potion"), 3)
+	_press(&"potion_mp")
+	assert_eq(lucian.restores.count(&"hp_potion"), 0)
+	assert_eq(lucian.inventory.count_at(Inventory.HP_POTION_CELL), 3, "7's cell is left alone")
+	assert_false(GameSettings.CASTABLE.has(&"potion_hp"), "no cast mode")
+	assert_true(GameSettings.REBINDABLE.has(&"potion_mp"))

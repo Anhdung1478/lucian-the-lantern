@@ -12,6 +12,8 @@ extends Node
 ## Holding move re-issues the order once the cursor has moved this far.
 const REISSUE_DISTANCE := 8.0
 const ITEM_ACTIONS: Array[StringName] = [&"item_1", &"item_2", &"item_3", &"item_4", &"item_5", &"item_6"]
+## Keys 7 and 8 drink from the potion cells: no cast mode, no aim.
+const POTION_ACTIONS := {&"potion_hp": Inventory.HP_POTION_CELL, &"potion_mp": Inventory.MP_POTION_CELL}
 const SUMMONER_ACTIONS: Array[StringName] = [&"summoner_d", &"summoner_f"]
 const SKILL_ACTIONS := {
 	&"skill_q": ChampionProgress.Slot.Q,
@@ -53,6 +55,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				lucian.try_rank_up(SKILL_ACTIONS[action])
 			else:
 				_press_cast(action)
+			get_viewport().set_input_as_handled()
+			return
+	for action: StringName in POTION_ACTIONS:
+		if event.is_action_pressed(action):
+			lucian.use_potion_cell(POTION_ACTIONS[action])
 			get_viewport().set_input_as_handled()
 			return
 	if event.is_action_pressed(&"move"):

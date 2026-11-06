@@ -508,6 +508,14 @@ func _show_body() -> void:
 	($Visuals/Body as Sprite2D).texture = body
 
 
+## Keys 7 and 8: drinks from the Health (Inventory.HP_POTION_CELL) or Mana
+## potion cell. False when it is empty or Lucian can't act.
+func use_potion_cell(index: int) -> bool:
+	if not can_act():
+		return false
+	return use_item(index)
+
+
 ## Drinks the potion in inventory cell `index`. False when there is none.
 func use_item(index: int) -> bool:
 	var item := inventory.item_at(index)
@@ -519,8 +527,8 @@ func use_item(index: int) -> bool:
 	return true
 
 
-## Keys 1-6: drinks the potion, or uses the item active, in equip slot `slot`
-## (0-5). No item dash while rooted.
+## Keys 1-6: uses the item active in equip slot `slot` (0-5). No item dash
+## while rooted. Potions never sit in equip slots: they have keys 7 and 8.
 func use_equip_slot(slot: int, aim: Vector2) -> bool:
 	if not can_act():
 		return false
