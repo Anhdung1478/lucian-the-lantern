@@ -87,8 +87,9 @@ func _senna_kills(senna: Senna, hp: float) -> Enemy:
 
 
 func test_sennas_last_hit_is_lucians_kill() -> void:
-	var senna: Senna = autofree(Senna.new())
+	var senna := Senna.new()
 	senna.lucian = lucian
+	add_child_autofree(senna)
 	lucian.progress.set_level(9)
 	for i in 5:
 		assert_true(lucian.try_rank_up(ChampionProgress.Slot.E))
@@ -103,8 +104,9 @@ func test_sennas_last_hit_is_lucians_kill() -> void:
 
 
 func test_a_kill_after_lucian_died_is_nobodys() -> void:
-	var senna: Senna = autofree(Senna.new())
+	var senna := Senna.new()
 	senna.lucian = lucian
+	add_child_autofree(senna)
 	watch_signals(lucian)
 	lucian.dead = true
 	_senna_kills(senna, 10.0)
