@@ -585,6 +585,44 @@ func test_killed_mid_stream_he_stops_firing() -> void:
 	assert_engine_error_count(0)
 
 
+func test_a_faint_band_shows_the_line_while_the_culling_fires_and_moves_with_him() -> void:
+	var boss := _dark(Vector2.ZERO)
+	lucian.global_position = Vector2(600, 0)
+	await wait_physics_frames(1)
+	boss.busy_left = boss.the_culling()
+	await wait_seconds(0.4)
+	assert_null(boss._culling_band, "none during the warning")
+	await wait_seconds(0.8)
+	var band: Node2D = boss._culling_band
+	assert_not_null(band, "while it fires")
+	if band == null:
+		return
+	assert_true(band.visible)
+	assert_eq(band.z_index, HazardZone.Z, "under the units")
+	assert_eq(band.get_parent(), boss)
+	assert_almost_eq(band.global_position, boss.global_position, Vector2(0.01, 0.01), "from his position")
+	await wait_seconds(0.5)
+	assert_almost_eq(band.global_position, boss.global_position, Vector2(0.01, 0.01), "he strafed and it followed")
+	assert_gt(boss.global_position.length(), 20.0)
+	await wait_seconds(2.6)
+	assert_false(boss.is_culling())
+	assert_false(band.visible, "gone after the stream")
+	assert_engine_error_count(0)
+
+
+func test_the_culling_band_is_gone_when_he_dies_mid_stream() -> void:
+	var boss := _dark(Vector2.ZERO)
+	lucian.global_position = Vector2(-600, 0)
+	await wait_physics_frames(1)
+	boss.busy_left = boss.the_culling()
+	await wait_seconds(1.5)
+	var band: Node2D = boss._culling_band
+	assert_true(band.visible)
+	boss.take_damage(_true(99999.0))
+	assert_false(band.visible)
+	assert_engine_error_count(0)
+
+
 # --- on the dark lane --------------------------------------------------------
 
 

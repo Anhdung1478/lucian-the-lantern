@@ -7,7 +7,7 @@ extends Boss
 ## miss: sideways once he has taken a lot of damage lately, or at Lucian
 ## when Lucian is far. The Culling (R, at or below 80% HP): a wide line
 ## warning at Lucian, then a stream of bullets along that fixed line while
-## he strafes across it.
+## he strafes across it; a faint band under him marks that line while it fires.
 ##
 ## The damage is recorded in _lose_hp; the dodge comes from _think, and the
 ## dash and the stream run in _physics_process, never inside a damage path.
@@ -38,6 +38,9 @@ const CULLING_WARN := 0.8
 const CULLING_TIME := 3.0
 const CULLING_SHOTS := 24
 const CULLING_GAP := CULLING_TIME / CULLING_SHOTS
+## The faint band under him while The Culling fires: as long and wide as its
+## line, drawn under the units.
+const CULLING_BAND := Color(0.7, 0.4, 1.0, 0.12)
 ## A bullet flies up to this far off the line, either way (4°).
 const CULLING_SPREAD := PI / 45.0
 const CULLING_DAMAGE := 30.0
@@ -76,6 +79,8 @@ var _culling_left := 0.0
 var _culling_shots := 0
 var _culling_gap_left := 0.0
 var _culling_direction := Vector2.RIGHT
+## The band that shows the stream's line; a child, so it moves with him.
+var _culling_band: Node2D
 
 
 func _ready() -> void:
@@ -223,6 +228,8 @@ func _physics_process(delta: float) -> void:
 			_culling_gap_left = 0.0
 	if _culling_left > 0.0:
 		_cull(delta)
+	else:
+		_hide_culling_band()
 
 
 ## A basic shot at Lucian from the gun on `gun`'s side (-1 or 1).
@@ -259,6 +266,7 @@ func _cull(delta: float) -> void:
 	move_and_slide()
 	velocity = Vector2.ZERO
 	face(global_position + _culling_direction)
+	_show_culling_band()
 	_culling_gap_left -= delta
 	while _culling_shots > 0 and _culling_gap_left <= 0.0:
 		_culling_gap_left += CULLING_GAP
@@ -270,6 +278,40 @@ func _cull(delta: float) -> void:
 	if _culling_left <= 0.0:
 		_culling_left = 0.0
 		_culling_shots = 0
+		_hide_culling_band()
+
+
+## Shows the band from his position along the stream's line (redrawn each
+## frame; made on the first).
+func _show_culling_band() -> void:
+	if _culling_band == null:
+		_culling_band = Node2D.new()
+		_culling_band.z_index = HazardZone.Z
+		_culling_band.draw.connect(_draw_culling_band)
+		add_child(_culling_band)
+	_culling_band.visible = true
+	_culling_band.queue_redraw()
+
+
+## The band's rectangle, in the band's own space (it sits on him).
+func _draw_culling_band() -> void:
+	_culling_band.draw_set_transform(Vector2.ZERO, _culling_direction.angle())
+	_culling_band.draw_rect(Rect2(0.0, -CULLING_WIDTH / 2.0, CULLING_LENGTH, CULLING_WIDTH), CULLING_BAND)
+
+
+## Hides the band: the stream ended or he died.
+func _hide_culling_band() -> void:
+	if is_instance_valid(_culling_band):
+		_culling_band.visible = false
+
+
+func _die() -> void:
+	_hide_culling_band()
+	super()
+
+
+func _exit_tree() -> void:
+	_hide_culling_band()
 
 
 ## The dark laser along Q's line, and its hit on Lucian if he is in it. A
