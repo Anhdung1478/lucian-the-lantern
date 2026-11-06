@@ -73,6 +73,19 @@ func test_normal_cast_aims_on_press_and_casts_on_left_click() -> void:
 	assert_null(lucian.indicator.aimed)
 
 
+func test_a_normal_cast_aim_waits_out_a_stun() -> void:
+	mode(&"skill_q", "normal")
+	press(&"skill_q", KEY_Q)
+	Input.action_release(&"skill_q")
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.2)
+	click(MOUSE_BUTTON_LEFT)
+	assert_false(q_cast(), "no cast while stunned")
+	assert_eq(controller.aiming(), &"skill_q", "the aim is still there")
+	await wait_seconds(0.3)
+	click(MOUSE_BUTTON_LEFT)
+	assert_true(q_cast(), "cast once it ends")
+
+
 func test_normal_cast_right_click_cancels_without_moving() -> void:
 	mode(&"skill_q", "normal")
 	press(&"skill_q", KEY_Q)

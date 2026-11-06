@@ -475,9 +475,10 @@ func test_no_acting_in_flight() -> void:
 	assert_false(lucian.can_act())
 	assert_false(lucian.try_cast(Slot.Q, Vector2(600, 0)))
 	assert_false(lucian.use_summoner(0, Vector2(0, -300)))
+	assert_eq(lucian._order, Lucian.Order.MOVE, "the move waits for the landing")
 	await wait_seconds(0.4)
 	assert_true(lucian.can_act())
-	assert_eq(lucian._order, Lucian.Order.NONE, "the throw drops the move")
+	assert_gt(lucian.global_position.y, 5.0, "walks on once he lands")
 
 
 func test_ghost_ending_mid_flight_does_not_reset_the_mask() -> void:

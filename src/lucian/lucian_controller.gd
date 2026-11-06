@@ -8,6 +8,10 @@ extends Node
 ## the key is held and fires on release; normal cast shows it on press and
 ## fires on left-click. Right-click or ESC cancels an aim. Casts with no aim,
 ## or not ready, always fire on press.
+##
+## Stunned, feared, moved by force or in stasis, Lucian ignores the cast and
+## potion keys but still takes clicks: like LoL, the last order runs once it
+## ends.
 
 ## Holding move re-issues the order once the cursor has moved this far.
 const REISSUE_DISTANCE := 8.0
@@ -39,7 +43,7 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not lucian.can_act():
+	if lucian.dead:
 		return
 	if event is InputEventMouseButton and event.pressed:
 		# A focused debug SpinBox would otherwise keep eating Q/W/E/R.
@@ -47,21 +51,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _aiming != &"" and _aim_input(event):
 		get_viewport().set_input_as_handled()
 		return
-	for action in GameSettings.CASTABLE:
-		if event.is_action_pressed(action):
-			# Ctrl+Q also matches skill_q, so the rank-up check comes first.
-			var with_ctrl := event is InputEventWithModifiers and (event as InputEventWithModifiers).ctrl_pressed
-			if SKILL_ACTIONS.has(action) and with_ctrl:
-				lucian.try_rank_up(SKILL_ACTIONS[action])
-			else:
-				_press_cast(action)
-			get_viewport().set_input_as_handled()
-			return
-	for action: StringName in POTION_ACTIONS:
-		if event.is_action_pressed(action):
-			lucian.use_potion_cell(POTION_ACTIONS[action])
-			get_viewport().set_input_as_handled()
-			return
+	# Crowd control stops the keys only: a click still gives the order.
+	if lucian.can_act() and _key_input(event):
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed(&"move"):
 		_set_attack_move_armed(false)
 		var merchant := _merchant_under_cursor()
@@ -84,6 +77,25 @@ func _unhandled_input(event: InputEvent) -> void:
 	else:
 		return
 	get_viewport().set_input_as_handled()
+
+
+## A skill (Ctrl for its rank-up), item, summoner or potion key. True when the
+## event was one.
+func _key_input(event: InputEvent) -> bool:
+	for action in GameSettings.CASTABLE:
+		if event.is_action_pressed(action):
+			# Ctrl+Q also matches skill_q, so the rank-up check comes first.
+			var with_ctrl := event is InputEventWithModifiers and (event as InputEventWithModifiers).ctrl_pressed
+			if SKILL_ACTIONS.has(action) and with_ctrl:
+				lucian.try_rank_up(SKILL_ACTIONS[action])
+			else:
+				_press_cast(action)
+			return true
+	for action: StringName in POTION_ACTIONS:
+		if event.is_action_pressed(action):
+			lucian.use_potion_cell(POTION_ACTIONS[action])
+			return true
+	return false
 
 
 ## A pause screen opening drops the held move, the armed attack-move and the
@@ -136,15 +148,15 @@ func _press_cast(action: StringName) -> void:
 
 
 ## While aiming: right-click cancels (without moving). Left-click fires in
-## normal cast and does nothing while a quick cast with indicator is held.
-## Another cast key takes over the aim (the caller handles it). True when the
-## event was used.
+## normal cast (the aim waits out crowd control) and does nothing while a
+## quick cast with indicator is held. Another cast key takes over the aim (the
+## caller handles it). True when the event was used.
 func _aim_input(event: InputEvent) -> bool:
 	if event.is_action_pressed(&"move"):
 		cancel_aim()
 		return true
 	if event.is_action_pressed(&"attack"):
-		if _aim_mode == "normal":
+		if _aim_mode == "normal" and lucian.can_act():
 			_fire_aim()
 		return true
 	return false
@@ -185,7 +197,8 @@ func _ready_to_cast(action: StringName) -> bool:
 
 
 func _physics_process(_delta: float) -> void:
-	if not lucian.can_act():
+	# Crowd control doesn't end a held right-click: it steers on after it.
+	if lucian.dead:
 		_move_held = false
 	if not _move_held:
 		return

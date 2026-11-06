@@ -69,15 +69,18 @@ func test_restore_for_gives_that_much_regen_at_once() -> void:
 	assert_almost_eq(lucian.mana, minf(lucian.stats.mana_regen * 10.0, lucian.stats.max_mana), 0.01)
 
 
-func test_displace_moves_him_and_drops_his_move() -> void:
-	lucian.command_move(Vector2(0, 2000))
+func test_displace_moves_him_and_keeps_his_move_for_after() -> void:
+	lucian.command_move(Vector2(300, 2000))
 	lucian.displace(Vector2(300, 0), 3000.0)
 	assert_true(lucian.is_displaced())
 	assert_false(lucian.can_act())
-	await wait_physics_frames(12)
+	assert_eq(lucian._order, Lucian.Order.MOVE, "kept")
+	await wait_physics_frames(3)
+	assert_almost_eq(lucian.global_position.y, 0.0, 0.5, "no walking while pulled")
+	await wait_physics_frames(9)
 	assert_almost_eq(lucian.global_position.x, 300.0, 2.0)
-	assert_almost_eq(lucian.global_position.y, 0.0, 2.0)
 	assert_false(lucian.is_displaced())
+	assert_gt(lucian.global_position.y, 10.0, "walks on once he lands")
 
 
 func test_displace_stops_at_a_wall() -> void:

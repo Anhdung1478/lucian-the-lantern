@@ -1,6 +1,7 @@
 extends GutTest
 ## Player input around dashes and Flash: a move from before them is dropped,
-## a right-click during the dash or after it is kept.
+## a right-click during the dash or after it is kept. Clicks during crowd
+## control are kept too; the cast keys are not.
 
 const Slot := ChampionProgress.Slot
 
@@ -23,6 +24,7 @@ func before_each() -> void:
 func after_each() -> void:
 	Input.action_release(&"move")
 	get_viewport().canvas_transform = Transform2D.IDENTITY
+	GameSettings.instance().set_value(&"cast_modes", {})
 
 
 func right_click() -> void:
@@ -91,6 +93,55 @@ func test_a_right_click_after_flash_walks_on() -> void:
 	var landed := lucian.global_position
 	await wait_seconds(0.3)
 	assert_gt(lucian.global_position.distance_to(landed), 20.0, "walking to the new click")
+
+
+func left_click() -> void:
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	controller._unhandled_input(press)
+
+
+func test_a_right_click_during_a_stun_walks_on_after_it() -> void:
+	var cursor := lucian.get_global_mouse_position()
+	lucian.global_position = cursor + Vector2(300, 0)
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.3)
+	right_click()
+	Input.action_release(&"move")
+	assert_eq(lucian._order, Lucian.Order.MOVE, "the click is kept")
+	await wait_physics_frames(10)
+	assert_almost_eq(lucian.global_position.distance_to(cursor), 300.0, 0.5, "no step while stunned")
+	await wait_seconds(0.4)
+	assert_lt(lucian.global_position.distance_to(cursor), 280.0, "walking to the click once it ends")
+
+
+func test_a_right_click_held_through_a_stun_keeps_steering() -> void:
+	right_click()
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.3)
+	await wait_physics_frames(5)
+	assert_true(controller._move_held, "the stun doesn't end the hold")
+	assert_eq(lucian._order, Lucian.Order.MOVE)
+
+
+func test_a_left_click_on_an_enemy_during_a_stun_is_kept() -> void:
+	var enemy := Enemy.new()
+	enemy.radius = 20.0
+	enemy.max_hp = 5000.0
+	enemy.position = lucian.get_global_mouse_position()
+	add_child_autofree(enemy)
+	lucian.global_position = enemy.position + Vector2(300, 0)
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.3)
+	left_click()
+	assert_eq(lucian._order, Lucian.Order.ATTACK)
+	assert_eq(lucian._target, enemy)
+
+
+func test_cast_keys_are_ignored_during_a_stun() -> void:
+	assert_true(lucian.try_rank_up(Slot.W))
+	GameSettings.instance().set_cast_mode(&"skill_w", "normal")
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.3)
+	_press(&"skill_w")
+	assert_eq(controller.aiming(), &"", "no aim opened")
 
 
 func _press(action: StringName) -> void:

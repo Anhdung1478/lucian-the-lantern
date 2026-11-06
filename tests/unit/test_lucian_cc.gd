@@ -1,6 +1,7 @@
 extends GutTest
-## Root, stun and fear on Lucian (add_cc): what each one stops, tenacity,
-## what refuses it, the debuffs and the word under his health bar.
+## Root, stun and fear on Lucian (add_cc): what each one stops, the orders
+## it keeps, tenacity, what refuses it, the debuffs and the word under his
+## health bar.
 
 const Slot := ChampionProgress.Slot
 const Kind := CrowdControl.Kind
@@ -207,16 +208,74 @@ func test_a_stun_ends_a_dash_where_he_is() -> void:
 	assert_eq(lucian.global_position, stopped)
 
 
-func test_a_stun_drops_the_windup_and_the_attack_order() -> void:
+func test_a_stun_drops_the_windup_and_keeps_the_attack_order() -> void:
 	var near := _enemy(Vector2(lucian.attack_range() * 0.5, 0), 5000.0)
 	lucian.command_attack(near)
 	await wait_physics_frames(2)
 	assert_gt(lucian._windup_left, 0.0, "winding up")
 	lucian.add_cc(Kind.STUN, 0.3)
 	assert_eq(lucian._windup_left, 0.0)
-	assert_eq(lucian._order, Lucian.Order.NONE)
+	assert_eq(lucian._order, Lucian.Order.ATTACK, "the order is kept")
+	await wait_physics_frames(15)
+	assert_eq(near.hp, near.max_hp, "no shot while stunned")
+	await wait_seconds(1.0)
+	assert_false(lucian.has_cc(Kind.STUN))
+	assert_lt(near.hp, near.max_hp, "he shoots once it ends")
+
+
+# --- Orders through crowd control (LoL: the last click runs once it ends) ---
+
+
+func test_a_move_order_survives_a_stun_and_runs_after_it() -> void:
+	lucian.command_move(Vector2(400, 0))
+	lucian.add_cc(Kind.STUN, 0.3)
+	assert_eq(lucian._order, Lucian.Order.MOVE, "kept")
+	await wait_physics_frames(10)
+	assert_eq(lucian.global_position, Vector2.ZERO, "no step while stunned")
 	await wait_physics_frames(30)
-	assert_eq(near.hp, near.max_hp, "no shot")
+	assert_false(lucian.has_cc(Kind.STUN))
+	assert_gt(lucian.global_position.x, 20.0, "walks on once it ends")
+
+
+func test_a_click_during_a_stun_replaces_the_order_before_it() -> void:
+	lucian.command_move(Vector2(400, 0))
+	lucian.add_cc(Kind.STUN, 0.3)
+	lucian.command_move(Vector2(-400, 0))
+	await wait_physics_frames(10)
+	assert_eq(lucian.global_position, Vector2.ZERO, "no step while stunned")
+	await wait_physics_frames(30)
+	assert_lt(lucian.global_position.x, -20.0, "walks to the newer click")
+
+
+func test_death_clears_an_order_kept_through_a_stun() -> void:
+	lucian.command_move(Vector2(400, 0))
+	lucian.add_cc(Kind.STUN, 0.3)
+	lucian.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_true(lucian.dead)
+	assert_eq(lucian._order, Lucian.Order.NONE)
+
+
+func test_a_stun_drops_a_walk_to_a_cast() -> void:
+	var far := _enemy(Vector2(1200, 0), 5000.0)
+	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"hextech_gunblade"))
+	assert_false(lucian.use_equip_slot(0, far.global_position), "out of reach: he walks over")
+	assert_eq(lucian._order, Lucian.Order.CAST)
+	lucian.add_cc(Kind.STUN, 0.2)
+	assert_eq(lucian._order, Lucian.Order.NONE)
+	await wait_seconds(0.5)
+	assert_eq(lucian.global_position, Vector2.ZERO, "no walking after it either")
+	assert_true(lucian.item_cooldown(&"hextech_gunblade").is_ready())
+
+
+func test_stasis_keeps_the_move_order_for_after_it() -> void:
+	lucian.command_move(Vector2(400, 0))
+	lucian.enter_stasis(0.2, 100.0, 0.0)
+	assert_eq(lucian._order, Lucian.Order.MOVE)
+	await wait_physics_frames(8)
+	assert_eq(lucian.global_position, Vector2.ZERO, "no step in stasis")
+	await wait_physics_frames(30)
+	assert_false(lucian.in_stasis())
+	assert_gt(lucian.global_position.x, 20.0, "walks on after it")
 
 
 func test_a_stun_during_a_pull_lets_the_pull_finish_then_holds_him() -> void:
@@ -234,10 +293,8 @@ func test_a_stun_during_a_pull_lets_the_pull_finish_then_holds_him() -> void:
 
 func test_fear_walks_him_straight_away_from_the_source() -> void:
 	assert_eq(Lucian.FEAR_SPEED, 0.6)
-	lucian.command_move(Vector2(0, 400))
 	lucian.add_cc(Kind.FEAR, 0.5, Vector2(-100, 0))
 	assert_false(lucian.can_act())
-	assert_eq(lucian._order, Lucian.Order.NONE, "the move is dropped")
 	await wait_physics_frames(15)
 	var expected := lucian.current_move_speed() * Lucian.FEAR_SPEED * 15.0 / 60.0
 	assert_almost_eq(lucian.global_position.x, expected, 4.0, "at 60% of his speed")
@@ -246,7 +303,18 @@ func test_fear_walks_him_straight_away_from_the_source() -> void:
 	assert_false(lucian.has_cc(Kind.FEAR))
 	var stopped := lucian.global_position
 	await wait_physics_frames(5)
-	assert_eq(lucian.global_position, stopped, "stands once it ends")
+	assert_eq(lucian.global_position, stopped, "stands once it ends: no order")
+
+
+func test_a_move_order_waits_out_a_fear_then_runs() -> void:
+	lucian.command_move(Vector2(0, 400))
+	lucian.add_cc(Kind.FEAR, 0.5, Vector2(-100, 0))
+	assert_eq(lucian._order, Lucian.Order.MOVE, "kept")
+	await wait_physics_frames(15)
+	assert_almost_eq(lucian.global_position.y, 0.0, 0.5, "the fear steers, not the order")
+	await wait_physics_frames(30)
+	assert_false(lucian.has_cc(Kind.FEAR))
+	assert_gt(lucian.global_position.y, 20.0, "walks on to the click once it ends")
 
 
 func test_fear_builds_no_energize() -> void:

@@ -2,8 +2,9 @@ class_name Lucian
 extends CharacterBody2D
 ## The player champion. Holds one standing order (move / attack / attack-move
 ## / visit the merchant) and carries it out every physics frame. Attack
-## windups pause the order. Item passives and actives live in the
-## ItemPassives and ItemActives children, summoner spells in SummonerSpells.
+## windups and crowd control pause the order. Item passives and actives live
+## in the ItemPassives and ItemActives children, summoner spells in
+## SummonerSpells.
 
 ## Clicks this close to an enemy's edge count as clicking it.
 const CLICK_SLACK := 10.0
@@ -700,17 +701,16 @@ func add_burn(id: StringName, dps: float, seconds: float, type: DamageInfo.Type,
 
 ## A root, stun or fear for `seconds`, shortened by tenacity; a fear runs from
 ## `from`. The same kind keeps the longer time. Refused while dead, in stasis,
-## invulnerable or thrown. A stun or fear drops his orders, windup, queued
-## cast, dash and R, as a displacement does; one landing mid-pull lets the
-## pull finish (it has dropped them already).
+## invulnerable or thrown. A stun or fear ends what he was in the middle of
+## (_interrupt), as a displacement does, and keeps his move, attack or visit
+## order for when it ends; one landing mid-pull lets the pull finish (it has
+## done that already).
 func add_cc(kind: CrowdControl.Kind, seconds: float, from := Vector2.ZERO) -> void:
 	if dead or invulnerable or in_stasis() or is_launched():
 		return
 	_cc.add(kind, seconds, stats.tenacity, from)
 	if kind != CrowdControl.Kind.ROOT and _cc.has(kind) and not is_displaced():
-		_order = Order.NONE
-		_drop_in_flight()
-		move_dropped.emit()
+		_interrupt()
 
 
 ## A root, stun or fear (add_cc) is on him.
@@ -763,19 +763,18 @@ func restore_for(seconds: float) -> void:
 
 
 ## Forced movement (Thresh's hook, Flay): Lucian slides to `to` and can't
-## move, attack or cast until he lands. Walls and the abyss stop him. Drops
-## his orders, windup and queued cast, and stops R. No trail, no Energize.
-## Ignored while he is thrown (launch).
+## move, attack or cast until he lands. Walls and the abyss stop him. Ends
+## what he was in the middle of (_interrupt), R included; his move, attack or
+## visit order runs again once he lands. No trail, no Energize. Ignored while
+## he is thrown (launch).
 func displace(to: Vector2, speed: float) -> void:
 	if dead or in_stasis() or is_launched():
 		return
 	var offset := to - global_position
-	_order = Order.NONE
-	_drop_in_flight()
+	_interrupt()
 	_displace_velocity = offset.normalized() * speed if offset.length() > 1.0 else Vector2.ZERO
 	_displace_left = offset.length() / speed
 	collision_mask = Layers.WORLD | Layers.CHASM
-	move_dropped.emit()
 
 
 func is_displaced() -> bool:
@@ -784,22 +783,21 @@ func is_displaced() -> bool:
 
 ## Thrown (a Blast Cone): Lucian flies straight to `to` in `seconds`, over
 ## walls and enemies, looking bigger at the peak for height. He can't act in
-## flight and a displacement can't move him. Drops his orders, windup, queued
-## cast and dash, and stops R. Builds no Energize. The caller picks a
-## walkable `to`. A throw in flight turns into this one, from where he is.
+## flight and a displacement can't move him. Ends what he was in the middle
+## of (_interrupt), the dash and R included; his move, attack or visit order
+## runs again once he lands. Builds no Energize. The caller picks a walkable
+## `to`. A throw in flight turns into this one, from where he is.
 func launch(to: Vector2, seconds: float) -> void:
 	if dead or in_stasis():
 		return
-	_order = Order.NONE
 	# Not cut short: the new throw ends somewhere walkable too.
 	_launch_left = 0.0
-	_drop_in_flight()
+	_interrupt()
 	_launch_from = global_position
 	_launch_to = to
 	_launch_time = maxf(seconds, 0.01)
 	_launch_left = _launch_time
 	collision_mask = _body_mask()
-	move_dropped.emit()
 
 
 ## In flight from a throw (launch).
@@ -809,13 +807,14 @@ func is_launched() -> bool:
 
 ## Guardian Angel: `seconds` of stasis, then back with these HP and mana.
 ## It ends his burns, slows and crowd control, and none land while it holds,
-## so he comes back free (they would only wait, frozen, for the revive).
+## so he comes back free (they would only wait, frozen, for the revive). It
+## ends what he was in the middle of (_interrupt); his move, attack or visit
+## order runs again after it.
 func enter_stasis(seconds: float, revive_hp: float, revive_mana: float) -> void:
 	_stasis_left = seconds
 	_revive = Vector2(revive_hp, revive_mana)
 	hp = 0.0
-	_order = Order.NONE
-	_drop_in_flight()
+	_interrupt()
 	_slows.clear()
 	_burns.clear()
 	_cc.clear()
@@ -847,6 +846,16 @@ func bonus_armor() -> float:
 ## Max HP over his level alone: items, the tree, buffs and passives.
 func bonus_hp() -> float:
 	return maxf(stats.max_hp - base_stats.at_level(progress.level).max_hp, 0.0)
+
+
+## A stun, fear, displacement, throw or stasis: ends what Lucian was in the
+## middle of (_drop_in_flight) and a walk to a cast (Order.CAST). A move,
+## attack or visit order is kept: like LoL, it runs again once he is free,
+## or is replaced by a click given meanwhile.
+func _interrupt() -> void:
+	if _order == Order.CAST:
+		_order = Order.NONE
+	_drop_in_flight()
 
 
 ## Ends whatever Lucian was in the middle of: windup, queued cast, cast lock,
