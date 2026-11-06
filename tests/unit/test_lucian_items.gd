@@ -33,7 +33,7 @@ func give_equipped(id: StringName, slot := 0) -> void:
 	for i in Inventory.BACKPACK_SIZE:
 		if inventory.item_at(i) and inventory.item_at(i).id == id:
 			from = i
-	inventory.apply_drop(from, Inventory.EQUIP_START + slot, false)
+	inventory.apply_drop(from, Inventory.EQUIP_START + slot)
 
 
 func test_inventory_uses_the_item_catalog() -> void:
@@ -68,8 +68,8 @@ func test_equipping_health_keeps_the_health_share() -> void:
 func test_swapping_mana_items_gives_no_free_mana() -> void:
 	give_equipped(&"tear_of_the_goddess")
 	lucian.mana = 0.0
-	lucian.inventory.apply_drop(Inventory.EQUIP_START, 10, false)
-	lucian.inventory.apply_drop(10, Inventory.EQUIP_START, false)
+	lucian.inventory.apply_drop(Inventory.EQUIP_START, 10)
+	lucian.inventory.apply_drop(10, Inventory.EQUIP_START)
 	assert_almost_eq(lucian.mana, 0.0, 0.001)
 
 

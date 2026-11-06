@@ -1,13 +1,13 @@
-class_name UpgradeSlot
+class_name CraftSlot
 extends Control
-## One slot of the merchant's Boots tab: the boots to upgrade, the fragment
-## to upgrade them with, or the boots they would become. An input holds an
-## inventory index, not the item, so nothing has to be given back when the
-## shop closes; items are dragged in from the backpack and a right-click
-## empties it. Mouse input outside that goes to nobody: the backpack screen
-## finds the input under a drag itself.
+## One slot of the merchant's Craft tab: one of the two inputs (a fragment or
+## the boots) or the item they would make. An input holds an inventory index,
+## not the item, so nothing has to be given back when the shop closes; items
+## are dragged in from the backpack and a right-click empties it. Mouse input
+## outside that goes to nobody: the backpack screen finds the input under a
+## drag itself.
 
-enum Kind { BOOTS, FRAGMENT, RESULT }
+enum Kind { INPUT, RESULT }
 
 const SIZE := 64.0
 const ICON_INSET := 5.0
@@ -18,43 +18,40 @@ const RESULT_BORDER := Color("c9a45c")
 const PLACEHOLDER := Color(1, 1, 1, 0.3)
 
 var screen: BackpackScreen
-var kind := Kind.BOOTS
+var kind := Kind.INPUT
+## The drop target the backpack screen gives this input
+## (BackpackScreen.CRAFT_FIRST or CRAFT_SECOND); -1 for the result.
+var drop_target := -1
 ## The inventory cell an input shows, or -1 while it is empty.
 var index := -1
 
 
-func _init(owner_screen: BackpackScreen, slot_kind: Kind) -> void:
+func _init(owner_screen: BackpackScreen, slot_kind: Kind, target := -1) -> void:
 	screen = owner_screen
 	kind = slot_kind
+	drop_target = target
 	custom_minimum_size = Vector2(SIZE, SIZE)
 	mouse_filter = MOUSE_FILTER_STOP
 
 
-## The drop target the backpack screen gives this input
-## (BackpackScreen.UPGRADE_BOOTS or UPGRADE_FRAGMENT); -1 for the result.
 func target() -> int:
-	match kind:
-		Kind.BOOTS:
-			return BackpackScreen.UPGRADE_BOOTS
-		Kind.FRAGMENT:
-			return BackpackScreen.UPGRADE_FRAGMENT
-	return -1
+	return drop_target
 
 
-## What it shows: the item in its inventory cell, or for the result the
-## boots the two inputs would make (null when they make none).
+## What it shows: the item in its inventory cell, or for the result what the
+## two inputs would make (null when they make nothing).
 func item() -> ItemData:
 	if kind == Kind.RESULT:
-		return screen.shop_panel().upgrade_preview()
+		return screen.shop_panel().craft_preview()
 	return screen.inventory.item_at(index) if index >= 0 else null
 
 
-## Whether `candidate` may go in: boots in the boots input, a fragment in the
-## fragment input, nothing in the result.
+## Whether `candidate` may go in: an input takes a fragment or the boots, the
+## result nothing.
 func takes(candidate: ItemData) -> bool:
 	if candidate == null or kind == Kind.RESULT:
 		return false
-	return candidate.is_boots() if kind == Kind.BOOTS else candidate.is_fragment()
+	return candidate.is_fragment() or candidate.is_boots()
 
 
 ## Shows inventory cell `cell` when it holds what this input takes.
@@ -84,11 +81,8 @@ func tooltip_content() -> Control:
 	var shown := item()
 	if shown:
 		return TooltipCard.item(shown, screen.inventory.catalog)
-	match kind:
-		Kind.BOOTS:
-			return TooltipCard.note("Drag your boots here from the backpack screen")
-		Kind.FRAGMENT:
-			return TooltipCard.note("Drag a fragment here: it picks the boots you get")
+	if kind == Kind.INPUT:
+		return TooltipCard.note("Drag a fragment or your boots here from the backpack screen")
 	return null
 
 
@@ -116,7 +110,5 @@ func _draw() -> void:
 	if shown and not (kind != Kind.RESULT and index == screen.dragged_index()):
 		ItemIcon.draw_item(self, shown, rect.grow(-ICON_INSET))
 		return
-	if kind == Kind.BOOTS and screen.inventory.catalog:
-		ItemIcon.draw_item(self, screen.inventory.catalog.find(&"boots_of_speed"), rect.grow(-ICON_INSET), PLACEHOLDER)
-	elif kind == Kind.FRAGMENT:
-		draw_string(ThemeDB.fallback_font, Vector2(0, rect.size.y * 0.5 + 4.0), "FRAGMENT", HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 11, PLACEHOLDER)
+	if kind == Kind.INPUT:
+		draw_string(ThemeDB.fallback_font, Vector2(0, rect.size.y * 0.5 + 4.0), "ITEM", HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 11, PLACEHOLDER)

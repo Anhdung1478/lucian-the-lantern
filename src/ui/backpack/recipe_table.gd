@@ -1,6 +1,7 @@
 class_name RecipeTable
 extends PanelContainer
-## The crafting recipes shown beside the backpack: one scrollable line per
+## The crafting recipes shown beside the backpack, shop or not (they are
+## crafted at the merchant's Craft tab, for a fee): one scrollable line per
 ## legendary, "[fragment] + [fragment] = [legendary]". Every icon has its card.
 
 const ICON_SIZE := 40.0

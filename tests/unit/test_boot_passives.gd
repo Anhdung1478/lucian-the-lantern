@@ -119,7 +119,7 @@ func test_slay_carries_over_to_immortal_path() -> void:
 	var shop := Shop.new(MerchantStock.new(lucian.item_catalog, 1), lucian.inventory, Wallet.new())
 	shop.wallet.add(500)
 	lucian.inventory.add(lucian.item_catalog.find(&"bf_sword"))
-	assert_eq(shop.upgrade_boots(Inventory.BOOTS_CELL, 0), Shop.Result.OK)
+	assert_eq(shop.craft(Inventory.BOOTS_CELL, 0), Shop.Result.OK)
 	assert_eq(lucian.inventory.boots().id, &"immortal_path")
 	assert_eq(lucian.passives.slay_stacks, 4)
 	lucian.inventory.set_boots(lucian.item_catalog.find(&"boots_of_speed"))

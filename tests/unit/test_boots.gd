@@ -40,11 +40,11 @@ func item(id: StringName) -> ItemData:
 func test_boots_never_leave_their_cell() -> void:
 	inventory.set_boots(item(&"boots_of_speed"))
 	inventory.add(item(&"bf_sword"))
-	assert_eq(inventory.drop_outcome(BOOTS, 5, true), Drop.RETURN, "onto an empty backpack cell")
-	assert_eq(inventory.drop_outcome(BOOTS, EQUIP, true), Drop.RETURN, "onto an equip slot")
-	assert_eq(inventory.drop_outcome(BOOTS, 0, true), Drop.RETURN, "onto an item")
-	assert_eq(inventory.drop_outcome(0, BOOTS, true), Drop.RETURN, "nothing is dropped onto them")
-	assert_eq(inventory.apply_drop(0, BOOTS, true), Drop.RETURN)
+	assert_eq(inventory.drop_outcome(BOOTS, 5), Drop.RETURN, "onto an empty backpack cell")
+	assert_eq(inventory.drop_outcome(BOOTS, EQUIP), Drop.RETURN, "onto an equip slot")
+	assert_eq(inventory.drop_outcome(BOOTS, 0), Drop.RETURN, "onto an item")
+	assert_eq(inventory.drop_outcome(0, BOOTS), Drop.RETURN, "nothing is dropped onto them")
+	assert_eq(inventory.apply_drop(0, BOOTS), Drop.RETURN)
 	assert_eq(inventory.boots(), item(&"boots_of_speed"))
 	assert_eq(inventory.item_at(0), item(&"bf_sword"))
 
@@ -92,11 +92,11 @@ func test_potions_are_refused_by_the_equip_slots_both_ways() -> void:
 	inventory.add(potion, 9 + 2)
 	assert_eq(inventory.item_at(0), potion)
 	assert_false(inventory.can_put(EQUIP, potion))
-	assert_eq(inventory.drop_outcome(0, EQUIP, false), Drop.RETURN, "a potion into an equip slot")
+	assert_eq(inventory.drop_outcome(0, EQUIP), Drop.RETURN, "a potion into an equip slot")
 	inventory.put(EQUIP, item(&"bf_sword"))
-	assert_eq(inventory.drop_outcome(EQUIP, 0, false), Drop.RETURN, "a swap would send the potion back into the slot")
-	assert_eq(inventory.drop_outcome(0, EQUIP, false), Drop.RETURN)
-	assert_eq(inventory.drop_outcome(0, 3, false), Drop.MOVE, "the backpack still takes it")
+	assert_eq(inventory.drop_outcome(EQUIP, 0), Drop.RETURN, "a swap would send the potion back into the slot")
+	assert_eq(inventory.drop_outcome(0, EQUIP), Drop.RETURN)
+	assert_eq(inventory.drop_outcome(0, 3), Drop.MOVE, "the backpack still takes it")
 
 
 func test_each_potion_cell_takes_only_its_potion() -> void:
@@ -108,8 +108,8 @@ func test_each_potion_cell_takes_only_its_potion() -> void:
 	assert_false(Inventory.accepts(Inventory.MP_POTION_CELL, red))
 	assert_false(Inventory.accepts(Inventory.HP_POTION_CELL, item(&"bf_sword")))
 	inventory.put(0, blue)
-	assert_eq(inventory.drop_outcome(0, Inventory.HP_POTION_CELL, false), Drop.RETURN)
-	assert_eq(inventory.drop_outcome(0, Inventory.MP_POTION_CELL, false), Drop.MOVE)
+	assert_eq(inventory.drop_outcome(0, Inventory.HP_POTION_CELL), Drop.RETURN)
+	assert_eq(inventory.drop_outcome(0, Inventory.MP_POTION_CELL), Drop.MOVE)
 
 
 func test_key_actions() -> void:
@@ -141,29 +141,31 @@ func test_wrong_upgrades_give_nothing() -> void:
 	assert_null(catalog.boots_upgrade(item(&"boots_of_speed"), item(&"infinity_edge")), "a legendary")
 	assert_null(catalog.boots_upgrade(item(&"bf_sword"), item(&"recurve_bow")), "no boots")
 	assert_null(catalog.boots_upgrade(null, item(&"recurve_bow")))
-	assert_null(catalog.combine(item(&"boots_of_speed"), item(&"recurve_bow")), "crafting never makes boots")
+	assert_null(catalog.combine(item(&"boots_of_speed"), item(&"recurve_bow")), "fragments never make boots")
 
 
 func test_the_merchant_upgrades_for_the_fee_and_takes_the_fragment() -> void:
 	inventory.set_boots(item(&"boots_of_speed"))
 	inventory.add(item(&"recurve_bow"))
 	wallet.add(1000)
-	assert_eq(shop.upgrade_result(BOOTS, 0), item(&"berserkers_greaves"))
-	assert_eq(shop.upgrade_boots(BOOTS, 0), Result.OK)
+	assert_eq(shop.craft_result(BOOTS, 0), item(&"berserkers_greaves"))
+	assert_eq(shop.craft_fee(BOOTS, 0), 300)
+	assert_eq(shop.craft(BOOTS, 0), Result.OK)
 	assert_eq(wallet.gold, 700)
 	assert_null(inventory.item_at(0), "the fragment is used up")
 	assert_eq(inventory.boots(), item(&"berserkers_greaves"))
 	inventory.add(item(&"recurve_bow"))
-	assert_eq(shop.upgrade_boots(BOOTS, 0), Result.OK)
+	assert_eq(shop.craft(0, BOOTS), Result.OK, "the boots can be the second input")
 	assert_eq(wallet.gold, 200)
 	assert_eq(inventory.boots(), item(&"gunmetal_greaves"))
+	assert_null(inventory.item_at(0))
 
 
 func test_an_upgrade_without_gold_changes_nothing() -> void:
 	inventory.set_boots(item(&"boots_of_speed"))
 	inventory.add(item(&"cloak_of_agility"))
 	wallet.add(699)
-	assert_eq(shop.upgrade_boots(BOOTS, 0), Result.NO_GOLD)
+	assert_eq(shop.craft(BOOTS, 0), Result.NO_GOLD)
 	assert_eq(wallet.gold, 699)
 	assert_eq(inventory.item_at(0), item(&"cloak_of_agility"))
 	assert_eq(inventory.boots(), item(&"boots_of_speed"))
@@ -172,12 +174,12 @@ func test_an_upgrade_without_gold_changes_nothing() -> void:
 func test_an_upgrade_that_doesnt_fit_is_refused() -> void:
 	wallet.add(5000)
 	inventory.add(item(&"giants_belt"))
-	assert_eq(shop.upgrade_boots(BOOTS, 0), Result.NO_BOOTS, "no boots bought")
+	assert_eq(shop.craft(BOOTS, 0), Result.NO_RECIPE, "no boots bought")
 	inventory.set_boots(item(&"gunmetal_greaves"))
-	assert_eq(shop.upgrade_boots(BOOTS, 0), Result.NOT_UPGRADABLE)
+	assert_eq(shop.craft(BOOTS, 0), Result.NO_RECIPE)
 	inventory.add(item(&"recurve_bow"))
-	assert_eq(shop.upgrade_boots(BOOTS, 1), Result.NOT_UPGRADABLE, "tier 3 is the top")
-	assert_eq(shop.upgrade_boots(BOOTS, -1), Result.NOT_UPGRADABLE, "no fragment")
+	assert_eq(shop.craft(BOOTS, 1), Result.NO_RECIPE, "tier 3 is the top")
+	assert_eq(shop.craft(BOOTS, -1), Result.NO_RECIPE, "no fragment")
 	assert_eq(wallet.gold, 5000)
 	assert_eq(inventory.boots(), item(&"gunmetal_greaves"))
 

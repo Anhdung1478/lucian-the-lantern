@@ -1,24 +1,26 @@
 class_name ShopPanel
 extends PanelContainer
 ## The merchant's shop, beside the backpack while it is open: a gold readout,
-## the Items, Potions and Boots tabs, a hint line and the Refresh button in
+## the Items, Potions and Craft tabs, a hint line and the Refresh button in
 ## the bottom-right corner (Items only). Refused purchases flash a red
 ## message.
 ##
-## The Boots tab upgrades the boots: [boots] + [fragment] -> [new boots], the
-## fee and an Upgrade button. Its two inputs are filled by dragging from the
-## backpack; they hold inventory indexes, are emptied when the shop closes and
-## re-checked whenever the inventory changes.
+## The Craft tab: [input] + [input] -> [result], the fee and a Craft button.
+## Two fragments make their legendary, for the legendary's cost minus the
+## fragments'; the boots and a fragment make the upgraded boots, for their
+## upgrade_cost. Its two inputs are filled by dragging from the backpack; they
+## hold inventory indexes, are emptied when the shop closes and re-checked
+## whenever the inventory changes.
 
 const SLOT_GAP := 12
 const MESSAGE_TIME := 1.6
-const TAB_NAMES: Array[String] = ["Items", "Potions", "Boots"]
+const TAB_NAMES: Array[String] = ["Items", "Potions", "Craft"]
 const ITEMS_TAB := 0
-const BOOTS_TAB := 2
+const CRAFT_TAB := 2
 const HINTS: Array[String] = [
 	"Right-click or drag to buy.\nDrag an item onto the red slot to sell it.",
 	"Right-click or drag to buy. Potions fill\ncells 7 and 8 first, then the backpack.",
-	"Drag your boots and a fragment into the\nslots, then pay the fee to upgrade them.",
+	"Drag two fragments, or your boots and a\nfragment, into the slots, then pay the fee.",
 ]
 const MESSAGES := {
 	Shop.Result.NO_GOLD: "Not enough gold",
@@ -27,11 +29,9 @@ const MESSAGES := {
 	Shop.Result.CELL_TAKEN: "That cell is taken",
 	Shop.Result.SOLD_OUT: "Already sold",
 	Shop.Result.NOTHING_TO_REFRESH: "Nothing left to refresh",
-	Shop.Result.NOT_UPGRADABLE: "That fragment doesn't upgrade these boots",
-	Shop.Result.NO_BOOTS: "Put your boots in first",
+	Shop.Result.NO_RECIPE: "Those don't craft into anything",
 	Shop.Result.WRONG_CELL: "That item can't go there",
 }
-const NO_BOOTS := "No boots: buy them in the Evolution Tree"
 
 var screen: BackpackScreen
 
@@ -43,12 +43,12 @@ var _hint: Label
 var _message: Label
 var _refresh: Button
 var _message_left := 0.0
-var _boots_input: UpgradeSlot
-var _fragment_input: UpgradeSlot
-var _result_slot: UpgradeSlot
+var _first_input: CraftSlot
+var _second_input: CraftSlot
+var _result_slot: CraftSlot
 var _fee_label: Label
-var _boots_note: Label
-var _upgrade: Button
+var _craft_note: Label
+var _craft_button: Button
 
 
 func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
@@ -93,9 +93,9 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	for potion in potions:
 		potion_row.add_child(ShopSlot.new(screen, -1, potion))
 	box.add_child(potion_row)
-	var boots_page := _build_boots_page()
-	box.add_child(boots_page)
-	_pages = [items, potion_row, boots_page]
+	var craft_page := _build_craft_page()
+	box.add_child(craft_page)
+	_pages = [items, potion_row, craft_page]
 
 	_hint = UiStyle.label(HINTS[0], 14, UiStyle.DIM_COLOR)
 	box.add_child(_hint)
@@ -136,7 +136,7 @@ func current_tab() -> int:
 	return _tab
 
 
-## Shows why a purchase, refresh or upgrade failed, and flashes the slot's
+## Shows why a purchase, refresh or craft failed, and flashes the slot's
 ## price red.
 func refuse(result: Shop.Result, slot: ShopSlot = null) -> void:
 	show_message(MESSAGES.get(result, ""))
@@ -150,7 +150,7 @@ func show_message(text: String) -> void:
 	_message_left = MESSAGE_TIME
 
 
-## The shop slots on `tab` (none on the Boots tab).
+## The shop slots on `tab` (none on the Craft tab).
 func slots(tab: int) -> Array[ShopSlot]:
 	var found: Array[ShopSlot] = []
 	for child in _pages[tab].get_children():
@@ -159,50 +159,61 @@ func slots(tab: int) -> Array[ShopSlot]:
 	return found
 
 
-func boots_input() -> UpgradeSlot:
-	return _boots_input
+func first_input() -> CraftSlot:
+	return _first_input
 
 
-func fragment_input() -> UpgradeSlot:
-	return _fragment_input
+func second_input() -> CraftSlot:
+	return _second_input
 
 
-func result_slot() -> UpgradeSlot:
+func result_slot() -> CraftSlot:
 	return _result_slot
 
 
-## The Boots tab input under `point` while that tab shows, or null.
-func upgrade_input_at(point: Vector2) -> UpgradeSlot:
-	if not visible or _tab != BOOTS_TAB:
+func craft_button() -> Button:
+	return _craft_button
+
+
+## The Craft tab input under `point` while that tab shows, or null.
+func craft_input_at(point: Vector2) -> CraftSlot:
+	if not visible or _tab != CRAFT_TAB:
 		return null
-	for input in [_boots_input, _fragment_input]:
+	for input in [_first_input, _second_input]:
 		if input.get_global_rect().has_point(point):
 			return input
 	return null
 
 
 ## Puts inventory cell `cell` into the input `target` names
-## (BackpackScreen.UPGRADE_BOOTS or UPGRADE_FRAGMENT). False, with a message,
-## when the input doesn't take that item.
+## (BackpackScreen.CRAFT_FIRST or CRAFT_SECOND). False, with a message, when
+## the item is never crafted (a legendary or a potion).
 func load_input(target: int, cell: int) -> bool:
-	var input := _boots_input if target == BackpackScreen.UPGRADE_BOOTS else _fragment_input
+	var input := _first_input if target == BackpackScreen.CRAFT_FIRST else _second_input
 	if input.load_cell(cell):
 		return true
-	show_message("Only boots go there" if input.kind == UpgradeSlot.Kind.BOOTS else "Only a fragment goes there")
+	show_message("Only fragments and boots are crafted")
 	return false
 
 
 ## Empties both inputs (the shop closed).
-func clear_upgrade() -> void:
-	_boots_input.clear()
-	_fragment_input.clear()
+func clear_craft() -> void:
+	_first_input.clear()
+	_second_input.clear()
 
 
-## The boots the two inputs would make, or null.
-func upgrade_preview() -> ItemData:
+## What the two inputs would make, or null.
+func craft_preview() -> ItemData:
 	if screen.shop == null:
 		return null
-	return screen.shop.upgrade_result(_boots_input.index, _fragment_input.index)
+	return screen.shop.craft_result(_first_input.index, _second_input.index)
+
+
+## The fee for what is in the two inputs (0 when they make nothing).
+func craft_fee() -> int:
+	if screen.shop == null:
+		return 0
+	return screen.shop.craft_fee(_first_input.index, _second_input.index)
 
 
 func _process(delta: float) -> void:
@@ -211,8 +222,8 @@ func _process(delta: float) -> void:
 	_gold_label.text = str(screen.shop.wallet.gold)
 	# Greyed once every open slot is sold: a refresh would change nothing.
 	_refresh.disabled = not screen.shop.can_refresh()
-	if _tab == BOOTS_TAB:
-		_show_upgrade()
+	if _tab == CRAFT_TAB:
+		_show_craft()
 	# The dragged icon covers the sell slot, so its price shows here too.
 	if screen.sell_refused():
 		_message.text = "Boots can't be sold"
@@ -234,40 +245,52 @@ func _process(delta: float) -> void:
 		_message.text = ""
 
 
-## The Boots tab's fee, note and Upgrade button for what is in the inputs.
-func _show_upgrade() -> void:
-	var result := upgrade_preview()
-	var boots := _boots_input.item()
-	_fee_label.text = str(result.upgrade_cost) if result else "–"
-	var affordable := result != null and screen.shop.wallet.can_afford(result.upgrade_cost)
+## The Craft tab's fee, note and Craft button for what is in the inputs.
+func _show_craft() -> void:
+	var result := craft_preview()
+	var fee := craft_fee()
+	_fee_label.text = str(fee) if result else "–"
+	var affordable := result != null and screen.shop.wallet.can_afford(fee)
 	_fee_label.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if affordable or result == null else UiStyle.ERROR_COLOR)
-	_upgrade.disabled = result == null
-	if screen.inventory.boots() == null:
-		_boots_note.text = NO_BOOTS
-	elif boots == null:
-		_boots_note.text = "Drag your boots into the first slot."
-	elif boots.boots_tier >= 3:
-		_boots_note.text = "%s are fully upgraded." % boots.display_name
-	elif _fragment_input.index < 0:
-		_boots_note.text = "Now drag in a fragment."
-	elif result == null:
-		_boots_note.text = "That fragment doesn't upgrade %s." % boots.display_name
-	else:
-		_boots_note.text = "%s → %s" % [boots.display_name, result.display_name]
+	_craft_button.disabled = result == null
+	_craft_note.text = craft_note()
 
 
-func _build_boots_page() -> VBoxContainer:
+## The Craft tab's note line for what is in the inputs.
+func craft_note() -> String:
+	var first := _first_input.item()
+	var second := _second_input.item()
+	if first == null and second == null:
+		return "Drag in two fragments, or your boots and a fragment."
+	if first == null or second == null:
+		var one := first if first else second
+		if one.is_boots() and one.boots_tier >= 3:
+			return "%s are fully upgraded." % one.display_name
+		return "Now drag in a fragment."
+	var result := craft_preview()
+	if result:
+		return "%s + %s → %s" % [first.display_name, second.display_name, result.display_name]
+	if first.is_boots() or second.is_boots():
+		var boots := first if first.is_boots() else second
+		if boots.boots_tier >= 3:
+			return "%s are fully upgraded." % boots.display_name
+		var other := second if boots == first else first
+		return "%s doesn't upgrade %s." % [other.display_name, boots.display_name]
+	return "No legendary is made from %s and %s." % [first.display_name, second.display_name]
+
+
+func _build_craft_page() -> VBoxContainer:
 	var page := VBoxContainer.new()
 	page.add_theme_constant_override(&"separation", 10)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 10)
 	page.add_child(row)
-	_boots_input = UpgradeSlot.new(screen, UpgradeSlot.Kind.BOOTS)
-	_fragment_input = UpgradeSlot.new(screen, UpgradeSlot.Kind.FRAGMENT)
-	_result_slot = UpgradeSlot.new(screen, UpgradeSlot.Kind.RESULT)
-	row.add_child(_boots_input)
+	_first_input = CraftSlot.new(screen, CraftSlot.Kind.INPUT, BackpackScreen.CRAFT_FIRST)
+	_second_input = CraftSlot.new(screen, CraftSlot.Kind.INPUT, BackpackScreen.CRAFT_SECOND)
+	_result_slot = CraftSlot.new(screen, CraftSlot.Kind.RESULT)
+	row.add_child(_first_input)
 	row.add_child(_sign("+"))
-	row.add_child(_fragment_input)
+	row.add_child(_second_input)
 	row.add_child(_sign("→"))
 	row.add_child(_result_slot)
 
@@ -284,18 +307,18 @@ func _build_boots_page() -> VBoxContainer:
 	_fee_label = UiStyle.label("–", 18, UiStyle.GOLD_COLOR)
 	_fee_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	fee_row.add_child(_fee_label)
-	_upgrade = Button.new()
-	_upgrade.text = "Upgrade"
-	_upgrade.custom_minimum_size = Vector2(140, 38)
-	UiStyle.style_button(_upgrade, 17)
-	_upgrade.pressed.connect(func() -> void: screen.upgrade_boots())
-	fee_row.add_child(_upgrade)
+	_craft_button = Button.new()
+	_craft_button.text = "Craft"
+	_craft_button.custom_minimum_size = Vector2(140, 38)
+	UiStyle.style_button(_craft_button, 17)
+	_craft_button.pressed.connect(func() -> void: screen.craft())
+	fee_row.add_child(_craft_button)
 
-	_boots_note = UiStyle.label("", 15, UiStyle.TEXT_COLOR)
-	# Long boot names wrap instead of widening the shop.
-	_boots_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_boots_note.custom_minimum_size = Vector2(0, 40)
-	page.add_child(_boots_note)
+	_craft_note = UiStyle.label("", 15, UiStyle.TEXT_COLOR)
+	# Long item names wrap instead of widening the shop.
+	_craft_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_craft_note.custom_minimum_size = Vector2(0, 40)
+	page.add_child(_craft_note)
 	return page
 
 
@@ -306,5 +329,5 @@ func _sign(text: String) -> Label:
 
 
 func _recheck_inputs() -> void:
-	_boots_input.recheck()
-	_fragment_input.recheck()
+	_first_input.recheck()
+	_second_input.recheck()

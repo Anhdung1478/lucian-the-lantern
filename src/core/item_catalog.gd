@@ -37,7 +37,7 @@ func boots() -> Array[ItemData]:
 	return _of_kind(ItemData.Kind.BOOTS)
 
 
-## What the merchant's Boots tab makes from `current` boots and `fragment`,
+## What the merchant's Craft tab makes from `current` boots and `fragment`,
 ## or null: tier-1 boots and a line's fragment give that line's tier 2; tier 2
 ## and its own fragment give its tier 3. Anything else (a tier 3, a fragment
 ## with no boots line such as Giant's Belt) gives null.
@@ -50,6 +50,31 @@ func boots_upgrade(current: ItemData, fragment: ItemData) -> ItemData:
 		if current.boots_tier == 1 or item.upgrade_from == current.id:
 			return item
 	return null
+
+
+## What the merchant's Craft tab makes from `a` and `b` in either order:
+## boots and a fragment give the upgraded boots (boots_upgrade), two
+## fragments their legendary (combine). Null when they make nothing.
+func craft(a: ItemData, b: ItemData) -> ItemData:
+	var made := boots_upgrade(a, b)
+	if made == null:
+		made = boots_upgrade(b, a)
+	if made == null:
+		made = combine(a, b)
+	return made
+
+
+## The gold the Craft tab charges to make craft(a, b): the upgraded boots'
+## upgrade_cost, or a legendary's cost minus its two fragments' (so crafting
+## costs what buying it would, and selling it never pays more than selling
+## the fragments). 0 when they make nothing.
+func craft_fee(a: ItemData, b: ItemData) -> int:
+	var made := craft(a, b)
+	if made == null:
+		return 0
+	if made.is_boots():
+		return made.upgrade_cost
+	return maxi(made.cost - a.cost - b.cost, 0)
 
 
 ## The legendary crafted from fragments `a` and `b` in either order, or null.

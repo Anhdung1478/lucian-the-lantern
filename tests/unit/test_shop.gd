@@ -139,3 +139,58 @@ func test_no_room_counts_only_the_open_cells() -> void:
 	inventory.add(catalog.find(&"belt"), 1)
 	assert_eq(shop.buy_slot(0), Result.NO_ROOM)
 	assert_eq(wallet.gold, 5000)
+
+
+# --- The Craft tab ---------------------------------------------------------------
+
+
+func _real_shop() -> Shop:
+	var real := load("res://data/items/catalog.tres") as ItemCatalog
+	return Shop.new(MerchantStock.new(real, 1), Inventory.new(real), Wallet.new())
+
+
+func test_crafting_two_fragments_pays_the_fee_and_puts_the_legendary_in_the_first_cell() -> void:
+	var real_shop := _real_shop()
+	var bag := real_shop.inventory
+	var tear := bag.catalog.find(&"tear_of_the_goddess")
+	bag.add(tear)
+	bag.put(EQUIP, tear)
+	real_shop.wallet.add(2500)
+	assert_eq(real_shop.craft_result(EQUIP, 0), bag.catalog.find(&"muramana"))
+	assert_eq(real_shop.craft_fee(EQUIP, 0), 2100)
+	assert_eq(real_shop.craft(EQUIP, 0), Result.OK)
+	assert_eq(real_shop.wallet.gold, 400)
+	assert_eq(bag.item_at(EQUIP), bag.catalog.find(&"muramana"), "it stays equipped where the first input was")
+	assert_null(bag.item_at(0), "the second fragment is used up")
+
+
+func test_a_craft_without_the_fee_changes_nothing() -> void:
+	var real_shop := _real_shop()
+	var bag := real_shop.inventory
+	bag.add(bag.catalog.find(&"bf_sword"))
+	bag.add(bag.catalog.find(&"cloak_of_agility"))
+	var fee := real_shop.craft_fee(0, 1)
+	assert_gt(fee, 0)
+	real_shop.wallet.add(fee - 1)
+	assert_eq(real_shop.craft(0, 1), Result.NO_GOLD)
+	assert_eq(real_shop.wallet.gold, fee - 1)
+	assert_eq(bag.item_at(0), bag.catalog.find(&"bf_sword"))
+	assert_eq(bag.item_at(1), bag.catalog.find(&"cloak_of_agility"))
+
+
+func test_a_craft_needs_two_different_open_cells_that_make_something() -> void:
+	var real_shop := _real_shop()
+	var bag := real_shop.inventory
+	var tear := bag.catalog.find(&"tear_of_the_goddess")
+	bag.add(tear)
+	bag.add(tear)
+	bag.add(bag.catalog.find(&"giants_belt"))
+	bag.add(bag.catalog.find(&"giants_belt"))
+	real_shop.wallet.add(9999)
+	assert_eq(real_shop.craft(0, 0), Result.NO_RECIPE, "one tear is not two")
+	assert_eq(real_shop.craft(0, 5), Result.NO_RECIPE, "an empty cell")
+	assert_eq(real_shop.craft(0, -1), Result.NO_RECIPE)
+	assert_eq(real_shop.craft(2, 3), Result.NO_RECIPE, "two Giant's Belts make nothing")
+	bag.unlocked_backpack = 1
+	assert_eq(real_shop.craft(0, 1), Result.NO_RECIPE, "a locked cell")
+	assert_eq(real_shop.wallet.gold, 9999)

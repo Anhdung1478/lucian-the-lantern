@@ -12,7 +12,7 @@ extends RefCounted
 signal changed
 
 ## What dropping a dragged item on a cell does.
-enum Drop { RETURN, MOVE, SWAP, CRAFT, STACK }
+enum Drop { RETURN, MOVE, SWAP, STACK }
 
 const BACKPACK_SIZE := 54
 const EQUIP_SIZE := 6
@@ -212,25 +212,25 @@ func boots() -> ItemData:
 
 
 ## Puts `item` in the boots cell, replacing what was there (null empties it).
-## Only the stage setup, the merchant's upgrade and the debug table call it.
+## Only the stage setup, the merchant's Craft tab and the debug table call it.
 func set_boots(item: ItemData) -> void:
 	_set_cell(BOOTS_CELL, item, 1)
 	changed.emit()
 
 
-## The legendary that the items in `from` and `to` craft into, or null. One
-## item never crafts with itself, even when its recipe uses two of it.
-func craft_result(from: int, to: int) -> ItemData:
-	if catalog == null or from == to:
-		return null
-	return catalog.combine(items[from], items[to])
+## A craft at the merchant: cell `keep` now holds `made` and cell `use_up`
+## is emptied (the boots cell can be `keep`, for upgraded boots).
+func craft_into(keep: int, use_up: int, made: ItemData) -> void:
+	_set_cell(keep, made, 1)
+	_set_cell(use_up, null, 0)
+	changed.emit()
 
 
 ## What dropping the item from `from` onto `to` does. `to` is -1 outside any
-## cell. `craft_ready` is true once the craft pop-up's line has gone around.
-## Boots never move, and a cell that doesn't accept the item moving in (or,
-## on a swap, the item coming back) sends it back.
-func drop_outcome(from: int, to: int, craft_ready: bool) -> Drop:
+## cell. Boots never move, and a cell that doesn't accept the item moving in
+## (or, on a swap, the item coming back) sends it back. Crafting happens only
+## at the merchant (Shop.craft), never by dropping.
+func drop_outcome(from: int, to: int) -> Drop:
 	if to < 0 or to >= SIZE or to == from or items[from] == null or is_locked(to) or is_locked(from):
 		return Drop.RETURN
 	if from == BOOTS_CELL or to == BOOTS_CELL or not accepts(to, items[from]):
@@ -239,23 +239,18 @@ func drop_outcome(from: int, to: int, craft_ready: bool) -> Drop:
 		return Drop.MOVE
 	if items[to] == items[from] and counts[to] < items[to].max_stack:
 		return Drop.STACK
-	if craft_ready and craft_result(from, to) != null:
-		return Drop.CRAFT
 	if not accepts(from, items[to]):
 		return Drop.RETURN
 	return Drop.SWAP
 
 
-## Carries out the drop and returns what happened. A crafted legendary lands
-## in `to` and `from` is emptied. Stacking moves what fits; the rest stays.
-func apply_drop(from: int, to: int, craft_ready: bool) -> Drop:
-	var outcome := drop_outcome(from, to, craft_ready)
+## Carries out the drop and returns what happened. Stacking moves what fits;
+## the rest stays.
+func apply_drop(from: int, to: int) -> Drop:
+	var outcome := drop_outcome(from, to)
 	match outcome:
 		Drop.RETURN:
 			return outcome
-		Drop.CRAFT:
-			_set_cell(to, craft_result(from, to), 1)
-			_set_cell(from, null, 0)
 		Drop.STACK:
 			var moved := mini(counts[from], items[to].max_stack - counts[to])
 			counts[to] += moved

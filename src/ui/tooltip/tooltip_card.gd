@@ -42,36 +42,45 @@ static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 		_body(card, "\n\n".join(effects))
 	var footer := ""
 	if shown.is_fragment():
-		footer = "Drag onto another fragment to craft a legendary."
+		footer = "Craft it with another fragment at the merchant's Craft tab."
 	elif shown.is_potion():
 		var key := GameSettings.instance().key_label(Inventory.key_action(Inventory.potion_cell(shown)))
 		footer = "Right-click it in the backpack to drink, or put it in its potion cell and press %s. Stacks up to %d." % [key, shown.max_stack]
 	elif shown.is_boots():
 		footer = boots_footer(shown, catalog)
 	elif catalog and shown.components.size() == 2:
-		footer = "Recipe: %s + %s" % [
-			catalog.find(shown.components[0]).display_name, catalog.find(shown.components[1]).display_name]
+		footer = recipe_footer(shown, catalog)
 	if footer != "":
 		_separator(card)
 		_body(card, TooltipText.color(footer, TooltipText.DIM))
 	return card
 
 
-## How `shown` boots upgrade at the merchant's Boots tab, or "Fully upgraded."
+## A legendary's recipe and the merchant's fee: "Recipe: Tear of the Goddess +
+## Tear of the Goddess + 2100 gold at the merchant."
+static func recipe_footer(shown: ItemData, catalog: ItemCatalog) -> String:
+	var a := catalog.find(shown.components[0])
+	var b := catalog.find(shown.components[1])
+	if a == null or b == null:
+		return ""
+	return "Recipe: %s + %s + %d gold at the merchant." % [a.display_name, b.display_name, catalog.craft_fee(a, b)]
+
+
+## How `shown` boots upgrade at the merchant's Craft tab, or "Fully upgraded."
 static func boots_footer(shown: ItemData, catalog: ItemCatalog) -> String:
 	if catalog == null or shown.boots_tier >= 3:
 		return "Fully upgraded."
 	if shown.boots_tier == 1:
 		var lines := catalog.boots().map(func(boots: ItemData) -> StringName: return boots.upgrade_fragment)
 		var others := catalog.fragments().filter(func(fragment: ItemData) -> bool: return not lines.has(fragment.id))
-		var text := "Upgrade at the merchant's Boots tab with a fragment: each one makes its own boots"
+		var text := "Upgrade at the merchant's Craft tab with a fragment: each one makes its own boots"
 		if others.is_empty():
 			return text + "."
 		return text + " (all but %s)." % ", ".join(others.map(func(fragment: ItemData) -> String: return fragment.display_name))
 	for boots in catalog.boots():
 		if boots.upgrade_from == shown.id:
 			var fragment := catalog.find(boots.upgrade_fragment)
-			return "Upgrade at the merchant with a %s (%d gold) into %s." % [
+			return "Upgrade at the merchant's Craft tab with a %s (%d gold) into %s." % [
 				fragment.display_name if fragment else String(boots.upgrade_fragment), boots.upgrade_cost, boots.display_name]
 	return "Fully upgraded."
 

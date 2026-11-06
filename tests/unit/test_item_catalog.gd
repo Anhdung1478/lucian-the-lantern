@@ -48,3 +48,44 @@ func test_by_name_sorts_a_to_z() -> void:
 	assert_eq(names[2], "B.F. Sword")
 	for i in names.size() - 1:
 		assert_true(names[i].nocasecmp_to(names[i + 1]) <= 0, "%s before %s" % [names[i], names[i + 1]])
+
+
+func test_craft_makes_a_legendary_or_upgraded_boots_in_either_order() -> void:
+	var real := load("res://data/items/catalog.tres") as ItemCatalog
+	var bow := real.find(&"recurve_bow")
+	var speed := real.find(&"boots_of_speed")
+	var tear := real.find(&"tear_of_the_goddess")
+	assert_eq(real.craft(tear, tear), real.find(&"muramana"))
+	assert_eq(real.craft(speed, bow), real.find(&"berserkers_greaves"))
+	assert_eq(real.craft(bow, speed), real.find(&"berserkers_greaves"), "the boots can come second")
+	assert_null(real.craft(real.find(&"muramana"), tear), "a legendary is never crafted")
+	assert_null(real.craft(speed, null))
+
+
+func test_a_legendarys_fee_is_its_cost_minus_its_fragments() -> void:
+	var real := load("res://data/items/catalog.tres") as ItemCatalog
+	var tear := real.find(&"tear_of_the_goddess")
+	assert_eq(real.craft_fee(tear, tear), 2900 - 400 - 400, "Muramana")
+	for legendary in real.legendaries():
+		var a := real.find(legendary.components[0])
+		var b := real.find(legendary.components[1])
+		var fee := real.craft_fee(a, b)
+		assert_eq(fee, legendary.cost - a.cost - b.cost, String(legendary.id))
+		assert_gt(fee, 0, "%s costs more than its fragments" % legendary.id)
+
+
+func test_crafting_then_selling_never_beats_selling_the_fragments() -> void:
+	var real := load("res://data/items/catalog.tres") as ItemCatalog
+	for legendary in real.legendaries():
+		var a := real.find(legendary.components[0])
+		var b := real.find(legendary.components[1])
+		var crafted := legendary.sell_price() - real.craft_fee(a, b)
+		assert_lt(crafted, a.sell_price() + b.sell_price(), String(legendary.id))
+
+
+func test_a_boots_fee_is_its_upgrade_cost_and_nothing_costs_nothing() -> void:
+	var real := load("res://data/items/catalog.tres") as ItemCatalog
+	var bow := real.find(&"recurve_bow")
+	assert_eq(real.craft_fee(real.find(&"boots_of_speed"), bow), 300)
+	assert_eq(real.craft_fee(bow, real.find(&"berserkers_greaves")), 500, "Gunmetal Greaves")
+	assert_eq(real.craft_fee(real.find(&"giants_belt"), real.find(&"boots_of_speed")), 0, "no line: nothing made")

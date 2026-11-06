@@ -120,8 +120,6 @@ func _run(scenario: String) -> void:
 			await scenario_tooltip()
 		"backpack":
 			await scenario_backpack()
-		"craft":
-			await scenario_craft()
 		"hud_items":
 			await scenario_hud_items()
 		"icons":
@@ -134,8 +132,8 @@ func _run(scenario: String) -> void:
 			await scenario_shop()
 		"gear":
 			await scenario_gear()
-		"boots_shop":
-			await scenario_boots_shop()
+		"craft_shop":
+			await scenario_craft_shop()
 		"tree_boots":
 			await scenario_tree_boots()
 		"settings":
@@ -604,8 +602,8 @@ func scenario_backpack() -> void:
 		&"giants_belt", &"tear_of_the_goddess", &"negatron_cloak", &"chain_vest", &"infinity_edge",
 		&"kraken_slayer", &"guardian_angel"])
 	var inventory := lucian.inventory
-	inventory.apply_drop(9, Inventory.EQUIP_START, false)
-	inventory.apply_drop(10, Inventory.EQUIP_START + 1, false)
+	inventory.apply_drop(9, Inventory.EQUIP_START)
+	inventory.apply_drop(10, Inventory.EQUIP_START + 1)
 	inventory.unlocked_equip = 4
 	(stage.get_node("DebugTable") as DebugTable).visible = true
 	await press_key(KEY_P, true)
@@ -650,58 +648,12 @@ func hover_tip() -> HoverTip:
 	return null
 
 
-func scenario_craft() -> void:
-	give([&"bf_sword", &"needlessly_large_rod", &"bf_sword", &"giants_belt"])
-	await press_key(KEY_P, true)
-	await press_key(KEY_P, false)
-	await wait(0.3)
-	var backpack: BackpackScreen = stage.get_node("Screens/Backpack")
-	var inventory := lucian.inventory
-	var cell := func(index: int) -> Vector2: return backpack._cells[index].get_global_rect().get_center()
-	# Pick up the sword at 0, carry it over the rod at 1 and hold.
-	await mouse_move(cell.call(0))
-	await mouse_button(cell.call(0), true)
-	for step in 6:
-		await mouse_move(lerp(cell.call(0), cell.call(1), (step + 1) / 6.0), true)
-	await wait(0.5)
-	print("popup visible (expect true): ", backpack._craft_popup.visible, "  progress ~0.5: %.2f" % backpack._craft_popup.progress)
-	await shot("craft_0_half")
-	await wait(0.6)
-	await shot("craft_1_full")
-	await mouse_button(cell.call(1), false)
-	await wait(0.1)
-	print("crafted (expect hextech_gunblade, empty): ", inventory.item_at(1).id, ", ", inventory.item_at(0))
-	await shot("craft_2_done")
-	# Early release swaps: sword at 2 onto the belt at 3 is no recipe, so try
-	# the gunblade's partner-free swap with a quick drop instead.
-	await mouse_move(cell.call(2))
-	await mouse_button(cell.call(2), true)
-	await mouse_move(cell.call(3), true)
-	await wait(0.3)
-	await mouse_button(cell.call(3), false)
-	print("swapped (expect giants_belt, bf_sword): ", inventory.item_at(2).id, ", ", inventory.item_at(3).id)
-	# Equip the gunblade into slot 1, then drop the belt outside the backpack.
-	var ad := lucian.stats.ad
-	await mouse_move(cell.call(1))
-	await mouse_button(cell.call(1), true)
-	await mouse_move(cell.call(Inventory.EQUIP_START), true)
-	await mouse_button(cell.call(Inventory.EQUIP_START), false)
-	print("equipped (expect hextech_gunblade, AD +40): ", inventory.item_at(Inventory.EQUIP_START).id, ", +", lucian.stats.ad - ad)
-	await mouse_move(cell.call(2))
-	await mouse_button(cell.call(2), true)
-	await mouse_move(Vector2(1700, 1000), true)
-	await mouse_button(Vector2(1700, 1000), false)
-	print("dropped outside, still there (expect giants_belt): ", inventory.item_at(2).id)
-	await wait(0.2)
-	await shot("craft_3_equipped")
-
-
 func scenario_hud_items() -> void:
 	give([&"infinity_edge", &"kraken_slayer", &"bf_sword", &"guardian_angel"])
 	var inventory := lucian.inventory
-	inventory.apply_drop(0, Inventory.EQUIP_START, false)
-	inventory.apply_drop(1, Inventory.EQUIP_START + 1, false)
-	inventory.apply_drop(2, Inventory.EQUIP_START + 3, false)
+	inventory.apply_drop(0, Inventory.EQUIP_START)
+	inventory.apply_drop(1, Inventory.EQUIP_START + 1)
+	inventory.apply_drop(2, Inventory.EQUIP_START + 3)
 	await wait(0.2)
 	await shot("hud_items_0")
 	var grid: GridContainer = stage.get_node("Hud").item_grid
@@ -879,7 +831,7 @@ func scenario_gear() -> void:
 	lucian.boots_level = 0
 	inventory.set_boots(null)
 	give([&"bf_sword", &"recurve_bow", &"chain_vest"])
-	inventory.apply_drop(0, Inventory.EQUIP_START, false)
+	inventory.apply_drop(0, Inventory.EQUIP_START)
 	await wait(0.2)
 	await shot("gear_0_hud_empty")
 	await press_key(KEY_P, true)
@@ -927,39 +879,48 @@ func scenario_gear() -> void:
 	print("7 drinks (expect 4 left): ", inventory.count_at(Inventory.HP_POTION_CELL))
 
 
-## V1.4's merchant Boots tab: empty, the boots and a fragment dragged in, the
-## upgrade, and boots refused by the sell slot.
-func scenario_boots_shop() -> void:
+## V1.4.1's merchant Craft tab: empty, two fragments crafted into a legendary
+## for its fee, the boots and a fragment upgraded, a pair that makes nothing,
+## and boots refused by the sell slot. The recipe table stays beside the
+## backpack.
+func scenario_craft_shop() -> void:
 	var game := stage as Stage
 	var inventory := lucian.inventory
-	game.wallet.add(2000)
-	give([&"recurve_bow", &"bf_sword", &"giants_belt"])
+	game.wallet.add(3000)
+	give([&"bf_sword", &"needlessly_large_rod", &"recurve_bow", &"giants_belt"])
 	await mouse_right_click(world_to_canvas(game.merchant.global_position))
 	await wait(3.0)
 	var backpack := game.screens.backpack
 	var panel := backpack.shop_panel()
-	panel.show_tab(ShopPanel.BOOTS_TAB)
+	panel.show_tab(ShopPanel.CRAFT_TAB)
 	await mouse_move(Vector2(960, 1000))
 	await wait(0.3)
-	await shot("boots_shop_0_empty")
-	await drag_cell(backpack, Inventory.BOOTS_CELL, control_center(panel.boots_input()))
-	await drag_cell(backpack, 2, control_center(panel.fragment_input()))
-	await wait(0.2)
-	print("Giant's Belt sits in the slot but makes nothing (expect 2 null): ", panel.fragment_input().index, " ", panel.upgrade_preview())
-	await drag_cell(backpack, 0, control_center(panel.fragment_input()))
+	print("recipe table shown in shop mode (expect true): ", backpack._recipes.visible)
+	await shot("craft_shop_0_empty")
+	await drag_cell(backpack, 0, control_center(panel.first_input()))
+	await drag_cell(backpack, 1, control_center(panel.second_input()))
 	await mouse_move(Vector2(960, 1000))
 	await wait(0.2)
-	print("inputs (expect 62 0), preview (expect Berserker's Greaves): ", panel.boots_input().index, " ",
-		panel.fragment_input().index, " ", panel.upgrade_preview().display_name)
-	await shot("boots_shop_1_ready")
-	await click(panel._upgrade)
+	print("preview (expect Hextech Gunblade, fee 800): ", panel.craft_preview().display_name, " ", panel.craft_fee())
+	await shot("craft_shop_1_legendary")
+	await click(panel.craft_button())
 	await wait(0.2)
-	print("upgraded (expect berserkers_greaves, gold 1700, fragment gone): ", inventory.boots().id, " ",
-		game.wallet.gold, " ", inventory.item_at(0))
-	await drag_cell(backpack, 1, control_center(panel.fragment_input()))
+	print("crafted (expect hextech_gunblade in 0, 1 empty, gold 2200): ", inventory.item_at(0).id, " ", inventory.item_at(1), " ", game.wallet.gold)
+	await drag_cell(backpack, Inventory.BOOTS_CELL, control_center(panel.first_input()))
+	await drag_cell(backpack, 3, control_center(panel.second_input()))
 	await mouse_move(Vector2(960, 1000))
 	await wait(0.2)
-	await shot("boots_shop_2_wrong_fragment")
+	print("Giant's Belt makes nothing (expect null): ", panel.craft_preview(), "  note: ", panel.craft_note())
+	await shot("craft_shop_2_nothing")
+	await drag_cell(backpack, 2, control_center(panel.second_input()))
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.2)
+	print("preview (expect Berserker's Greaves, fee 300): ", panel.craft_preview().display_name, " ", panel.craft_fee())
+	await shot("craft_shop_3_boots")
+	await click(panel.craft_button())
+	await wait(0.2)
+	print("upgraded (expect berserkers_greaves, gold 1900, fragment gone): ", inventory.boots().id, " ",
+		game.wallet.gold, " ", inventory.item_at(2))
 	# Boots over the sell slot read NO.
 	var sell_cell: ItemCell = backpack._cells.back()
 	await mouse_move(control_center(backpack._cells[Inventory.BOOTS_CELL]))
@@ -967,7 +928,7 @@ func scenario_boots_shop() -> void:
 	for step in 5:
 		await mouse_move(lerp(control_center(backpack._cells[Inventory.BOOTS_CELL]), control_center(sell_cell), (step + 1) / 5.0), true)
 	await wait(0.1)
-	await shot("boots_shop_3_cant_sell")
+	await shot("craft_shop_4_cant_sell")
 	await mouse_button(control_center(sell_cell), false)
 	print("boots kept (expect berserkers_greaves): ", inventory.boots().id)
 

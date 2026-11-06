@@ -51,8 +51,8 @@ func test_add_never_fills_equip_slots() -> void:
 
 func test_drop_on_empty_cell_moves() -> void:
 	inventory.add(item(&"sword"))
-	assert_eq(inventory.drop_outcome(0, 10, false), Drop.MOVE)
-	assert_eq(inventory.apply_drop(0, 10, false), Drop.MOVE)
+	assert_eq(inventory.drop_outcome(0, 10), Drop.MOVE)
+	assert_eq(inventory.apply_drop(0, 10), Drop.MOVE)
 	assert_null(inventory.item_at(0))
 	assert_eq(inventory.item_at(10), item(&"sword"))
 
@@ -60,51 +60,36 @@ func test_drop_on_empty_cell_moves() -> void:
 func test_drop_on_item_swaps() -> void:
 	inventory.add(item(&"sword"))
 	inventory.add(item(&"belt"))
-	assert_eq(inventory.apply_drop(0, 1, false), Drop.SWAP)
+	assert_eq(inventory.apply_drop(0, 1), Drop.SWAP)
 	assert_eq(inventory.item_at(0), item(&"belt"))
 	assert_eq(inventory.item_at(1), item(&"sword"))
 
 
-func test_recipe_without_full_hold_swaps() -> void:
+func test_dropping_a_fragment_on_its_recipe_partner_only_swaps() -> void:
 	inventory.add(item(&"sword"))
 	inventory.add(item(&"rod"))
-	assert_eq(inventory.drop_outcome(0, 1, false), Drop.SWAP)
+	assert_eq(inventory.apply_drop(0, 1), Drop.SWAP, "crafting is the merchant's, never a drop")
+	assert_eq(inventory.item_at(0), item(&"rod"))
+	assert_eq(inventory.item_at(1), item(&"sword"))
 
 
-func test_recipe_with_full_hold_crafts_into_target() -> void:
+func test_craft_into_puts_the_made_item_in_keep_and_empties_use_up() -> void:
 	inventory.add(item(&"sword"))
 	inventory.add(item(&"rod"))
-	assert_eq(inventory.apply_drop(0, 1, true), Drop.CRAFT)
+	watch_signals(inventory)
+	inventory.craft_into(1, 0, item(&"gunblade"))
 	assert_null(inventory.item_at(0))
 	assert_eq(inventory.item_at(1), item(&"gunblade"))
-
-
-func test_full_hold_on_non_recipe_still_swaps() -> void:
-	inventory.add(item(&"rod"))
-	inventory.add(item(&"belt"))
-	assert_eq(inventory.drop_outcome(0, 1, true), Drop.SWAP)
-
-
-func test_craft_result() -> void:
-	inventory.add(item(&"sword"))
-	inventory.add(item(&"sword"))
-	inventory.add(item(&"belt"))
-	assert_eq(inventory.craft_result(0, 1), item(&"edge"))
-	assert_null(inventory.craft_result(0, 2))
-	assert_null(inventory.craft_result(0, 5), "empty target")
-
-
-func test_an_item_cannot_craft_with_itself() -> void:
-	inventory.add(item(&"sword"))
-	assert_null(inventory.craft_result(0, 0), "sword + sword is a recipe, but it is one sword")
+	assert_eq(inventory.count_at(1), 1)
+	assert_signal_emit_count(inventory, "changed", 1)
 
 
 func test_drop_returns_for_same_cell_outside_or_empty_source() -> void:
 	inventory.add(item(&"sword"))
-	assert_eq(inventory.drop_outcome(0, 0, true), Drop.RETURN)
-	assert_eq(inventory.drop_outcome(0, -1, true), Drop.RETURN)
-	assert_eq(inventory.drop_outcome(0, Inventory.SIZE, true), Drop.RETURN)
-	assert_eq(inventory.drop_outcome(3, 4, true), Drop.RETURN)
+	assert_eq(inventory.drop_outcome(0, 0), Drop.RETURN)
+	assert_eq(inventory.drop_outcome(0, -1), Drop.RETURN)
+	assert_eq(inventory.drop_outcome(0, Inventory.SIZE), Drop.RETURN)
+	assert_eq(inventory.drop_outcome(3, 4), Drop.RETURN)
 
 
 func test_drop_on_locked_equip_slot_returns() -> void:
@@ -112,21 +97,21 @@ func test_drop_on_locked_equip_slot_returns() -> void:
 	inventory.add(item(&"sword"))
 	assert_true(inventory.is_locked(EQUIP + 2))
 	assert_false(inventory.is_locked(EQUIP + 1))
-	assert_eq(inventory.apply_drop(0, EQUIP + 2, false), Drop.RETURN)
+	assert_eq(inventory.apply_drop(0, EQUIP + 2), Drop.RETURN)
 	assert_eq(inventory.item_at(0), item(&"sword"))
 
 
 func test_return_does_not_emit_changed() -> void:
 	inventory.add(item(&"sword"))
 	watch_signals(inventory)
-	inventory.apply_drop(0, 0, false)
+	inventory.apply_drop(0, 0)
 	assert_signal_not_emitted(inventory, "changed")
 
 
 func test_changes_emit_changed() -> void:
 	watch_signals(inventory)
 	inventory.add(item(&"sword"))
-	inventory.apply_drop(0, 5, false)
+	inventory.apply_drop(0, 5)
 	inventory.remove(5)
 	inventory.add(item(&"sword"))
 	inventory.clear()
@@ -136,7 +121,7 @@ func test_changes_emit_changed() -> void:
 func test_equipped_bonus_counts_only_equip_slots() -> void:
 	inventory.add(item(&"sword"))
 	inventory.add(item(&"rod"))
-	inventory.apply_drop(0, EQUIP, false)
+	inventory.apply_drop(0, EQUIP)
 	var bonus := inventory.equipped_bonus()
 	assert_almost_eq(bonus.get(&"ad", 0.0), 35.0, 0.001)
 	assert_false(bonus.has(&"ap"), "the rod is still in the backpack")
@@ -145,16 +130,16 @@ func test_equipped_bonus_counts_only_equip_slots() -> void:
 func test_equipped_duplicates_stack() -> void:
 	inventory.add(item(&"sword"))
 	inventory.add(item(&"sword"))
-	inventory.apply_drop(0, EQUIP, false)
-	inventory.apply_drop(1, EQUIP + 3, false)
+	inventory.apply_drop(0, EQUIP)
+	inventory.apply_drop(1, EQUIP + 3)
 	assert_almost_eq(inventory.equipped_bonus()[&"ad"], 70.0, 0.001)
 
 
 func test_lowering_unlocked_slots_returns_items_to_backpack() -> void:
 	inventory.add(item(&"sword"))
 	inventory.add(item(&"rod"))
-	inventory.apply_drop(0, EQUIP, false)
-	inventory.apply_drop(1, EQUIP + 4, false)
+	inventory.apply_drop(0, EQUIP)
+	inventory.apply_drop(1, EQUIP + 4)
 	inventory.unlocked_equip = 2
 	assert_eq(inventory.item_at(EQUIP), item(&"sword"))
 	assert_null(inventory.item_at(EQUIP + 4))
@@ -245,8 +230,8 @@ func test_drop_on_same_potion_stacks() -> void:
 	for i in 5:
 		inventory.put(0, item(&"red"))
 	assert_eq(inventory.count_at(0), 5)
-	assert_eq(inventory.drop_outcome(0, 5, false), Drop.STACK)
-	assert_eq(inventory.apply_drop(0, 5, false), Drop.STACK)
+	assert_eq(inventory.drop_outcome(0, 5), Drop.STACK)
+	assert_eq(inventory.apply_drop(0, 5), Drop.STACK)
 	assert_eq(inventory.count_at(5), 9)
 	assert_eq(inventory.count_at(0), 2, "the rest stays in the original cell")
 
@@ -254,10 +239,10 @@ func test_drop_on_same_potion_stacks() -> void:
 func test_drop_on_a_full_stack_swaps() -> void:
 	inventory.add(item(&"red"), 9)
 	inventory.add(item(&"red"), 2)
-	assert_eq(inventory.drop_outcome(0, HP_CELL, false), Drop.SWAP)
+	assert_eq(inventory.drop_outcome(0, HP_CELL), Drop.SWAP)
 	for i in 9:
 		inventory.put(5, item(&"red"))
-	assert_eq(inventory.drop_outcome(0, 5, false), Drop.SWAP)
+	assert_eq(inventory.drop_outcome(0, 5), Drop.SWAP)
 
 
 func test_drop_on_other_potion_swaps_counts_too() -> void:
@@ -265,7 +250,7 @@ func test_drop_on_other_potion_swaps_counts_too() -> void:
 		inventory.put(0, item(&"red"))
 	for i in 7:
 		inventory.put(1, item(&"blue"))
-	inventory.apply_drop(0, 1, false)
+	inventory.apply_drop(0, 1)
 	assert_eq(inventory.item_at(0), item(&"blue"))
 	assert_eq(inventory.count_at(0), 7)
 	assert_eq(inventory.count_at(1), 3)
@@ -274,7 +259,7 @@ func test_drop_on_other_potion_swaps_counts_too() -> void:
 func test_moving_a_stack_keeps_its_count() -> void:
 	for i in 4:
 		inventory.put(0, item(&"red"))
-	inventory.apply_drop(0, HP_CELL, false)
+	inventory.apply_drop(0, HP_CELL)
 	assert_eq(inventory.count_at(HP_CELL), 4)
 	assert_eq(inventory.count_at(0), 0)
 
@@ -300,7 +285,7 @@ func test_clear_resets_counts() -> void:
 
 func test_locking_a_slot_moves_its_item() -> void:
 	inventory.add(item(&"sword"))
-	inventory.apply_drop(0, EQUIP + 5, false)
+	inventory.apply_drop(0, EQUIP + 5)
 	inventory.unlocked_equip = 5
 	assert_eq(inventory.item_at(0), item(&"sword"))
 	assert_eq(inventory.count_at(0), 1)
@@ -358,7 +343,7 @@ func test_put_is_refused_on_a_locked_cell() -> void:
 func test_a_drop_to_or_from_a_locked_cell_returns() -> void:
 	inventory.add(item(&"sword"))
 	inventory.unlocked_backpack = 5
-	assert_eq(inventory.apply_drop(0, 5, false), Drop.RETURN)
+	assert_eq(inventory.apply_drop(0, 5), Drop.RETURN)
 	assert_eq(inventory.item_at(0), item(&"sword"))
 
 

@@ -64,9 +64,12 @@ func drag(from: Control, to: Control) -> void:
 	button(from, MOUSE_BUTTON_LEFT, false, center(to))
 
 
-func test_shop_mode_hides_the_recipe_table() -> void:
+func test_shop_mode_keeps_the_recipe_table() -> void:
 	assert_true(screen.is_shopping())
-	assert_false(screen._recipes.visible)
+	assert_true(screen._recipes.visible, "crafting is at the merchant, so the recipes show there")
+	var table := screen._recipes.get_global_rect()
+	var pack := screen._column.get_global_rect()
+	assert_true(table.end.x <= pack.position.x, "the table sits clear of the backpack: %s / %s" % [table, pack])
 
 
 func test_right_click_buys_into_the_first_empty_cell() -> void:
@@ -154,43 +157,77 @@ func test_boots_dragged_onto_a_cell_go_back() -> void:
 	assert_null(inventory.item_at(5))
 
 
-func test_the_boots_tab_upgrades_what_is_dragged_in() -> void:
+func test_the_craft_tab_upgrades_the_boots_dragged_in() -> void:
 	var catalog := inventory.catalog
 	catalog.items.append(Fixtures.boots(&"speed", 1))
 	var greaves := Fixtures.boots(&"sword_greaves", 2, &"sword", &"", 300)
 	catalog.items.append(greaves)
 	inventory.set_boots(catalog.find(&"speed"))
 	var panel := screen.shop_panel()
-	panel.show_tab(ShopPanel.BOOTS_TAB)
+	panel.show_tab(ShopPanel.CRAFT_TAB)
 	await wait_physics_frames(3)
-	assert_eq(panel.slots(ShopPanel.BOOTS_TAB).size(), 0, "no shop slots on the Boots tab")
+	assert_eq(panel.slots(ShopPanel.CRAFT_TAB).size(), 0, "no shop slots on the Craft tab")
 	assert_false(panel._refresh.visible)
-	drag(cell(0), panel.boots_input())
-	assert_eq(panel.boots_input().index, -1, "a fragment isn't boots")
-	assert_eq(panel._message.text, "Only boots go there")
-	drag(cell(Inventory.BOOTS_CELL), panel.boots_input())
-	drag(cell(0), panel.fragment_input())
-	assert_eq([panel.boots_input().index, panel.fragment_input().index], [Inventory.BOOTS_CELL, 0])
-	assert_eq(panel.upgrade_preview(), greaves)
+	drag(cell(Inventory.BOOTS_CELL), panel.first_input())
+	panel._process(0.0)
+	assert_eq(panel._craft_note.text, "Now drag in a fragment.")
+	drag(cell(0), panel.second_input())
+	assert_eq([panel.first_input().index, panel.second_input().index], [Inventory.BOOTS_CELL, 0])
+	assert_eq(panel.craft_preview(), greaves)
 	assert_eq(panel.result_slot().item(), greaves)
 	panel._process(0.0)
-	assert_false(panel._upgrade.disabled)
-	panel._upgrade.pressed.emit()
+	assert_eq(panel._fee_label.text, "300")
+	assert_eq(panel._craft_note.text, "speed + sword → sword_greaves")
+	assert_false(panel.craft_button().disabled)
+	panel.craft_button().pressed.emit()
 	assert_eq(inventory.boots(), greaves)
 	assert_null(inventory.item_at(0), "the fragment is used up")
 	assert_eq(wallet.gold, 4700)
-	assert_eq(panel.fragment_input().index, -1, "its cell is empty now")
-	assert_eq(panel.boots_input().index, Inventory.BOOTS_CELL)
+	assert_eq(panel.second_input().index, -1, "its cell is empty now")
+	assert_eq(panel.first_input().index, Inventory.BOOTS_CELL)
 	screen.close()
-	assert_eq(panel.boots_input().index, -1, "closing empties the inputs")
+	assert_eq(panel.first_input().index, -1, "closing empties the inputs")
 
 
-func test_the_boots_tab_says_when_there_are_no_boots() -> void:
+func test_the_craft_tab_makes_a_legendary_for_its_fee() -> void:
+	var catalog := inventory.catalog
+	var gunblade := catalog.find(&"gunblade")
+	gunblade.cost = 2600
+	inventory.add(catalog.find(&"rod"))
 	var panel := screen.shop_panel()
-	panel.show_tab(ShopPanel.BOOTS_TAB)
+	panel.show_tab(ShopPanel.CRAFT_TAB)
+	await wait_physics_frames(3)
+	drag(cell(0), panel.first_input())
+	drag(cell(1), panel.second_input())
 	panel._process(0.0)
-	assert_eq(panel._boots_note.text, ShopPanel.NO_BOOTS)
-	assert_true(panel._upgrade.disabled)
+	assert_eq(panel.craft_preview(), gunblade)
+	assert_eq(panel._fee_label.text, "600", "2600 minus two 1000-gold fragments")
+	panel.craft_button().pressed.emit()
+	assert_eq(inventory.item_at(0), gunblade, "the legendary goes where the first input was")
+	assert_null(inventory.item_at(1))
+	assert_eq(wallet.gold, 4400)
+
+
+func test_the_craft_tab_refuses_a_legendary_and_says_when_nothing_is_made() -> void:
+	var catalog := inventory.catalog
+	inventory.add(catalog.find(&"belt"))
+	inventory.add(catalog.find(&"edge"))
+	var panel := screen.shop_panel()
+	panel.show_tab(ShopPanel.CRAFT_TAB)
+	await wait_physics_frames(3)
+	panel._process(0.0)
+	assert_eq(panel._craft_note.text, "Drag in two fragments, or your boots and a fragment.")
+	assert_true(panel.craft_button().disabled)
+	drag(cell(2), panel.first_input())
+	assert_eq(panel.first_input().index, -1, "a legendary is never crafted")
+	assert_eq(panel._message.text, "Only fragments and boots are crafted")
+	drag(cell(0), panel.first_input())
+	drag(cell(1), panel.second_input())
+	panel._process(0.0)
+	assert_null(panel.craft_preview())
+	assert_eq(panel._craft_note.text, "No legendary is made from sword and belt.")
+	assert_true(panel.craft_button().disabled)
+	assert_eq(panel._fee_label.text, "–")
 
 
 func test_dropping_on_the_sell_slot_sells() -> void:

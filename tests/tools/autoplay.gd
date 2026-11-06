@@ -472,7 +472,9 @@ class Bot extends Node:
 		var catalog := lucian.item_catalog
 		var potion := catalog.find(&"hp_potion")
 		_note("gold %d" % stage.wallet.gold)
-		# Items first: the best fragment or legendary affordable, keeping 100 for potions.
+		# Crafts first, at the merchant's fee, then items.
+		_craft(shop)
+		# Items: the best fragment or legendary affordable, keeping 100 for potions.
 		for pass_count in 3:
 			var best := -1
 			for slot in MerchantStock.SLOTS:
@@ -485,7 +487,7 @@ class Bot extends Node:
 			var bought := shop.stock.item_at(best)
 			if shop.buy_slot(best) == Shop.Result.OK:
 				_note("buy %s (%d)" % [bought.display_name, bought.cost])
-		_craft()
+		_craft(shop)
 		# Potions: up to 4.
 		var have := 0
 		var index := _find(&"hp_potion")
@@ -495,8 +497,9 @@ class Bot extends Node:
 			have += 1
 		_equip()
 
-	## Crafts any two fragments into their legendary.
-	func _craft() -> void:
+	## Crafts any two fragments into their legendary at the merchant's Craft
+	## tab, while the fee leaves 100 gold for potions.
+	func _craft(shop: Shop) -> void:
 		var inv := lucian.inventory
 		var again := true
 		while again:
@@ -507,10 +510,10 @@ class Bot extends Node:
 				for b in Inventory.SIZE:
 					if b == a or inv.is_locked(b) or inv.item_at(b) == null or not inv.item_at(b).is_fragment():
 						continue
-					var made := inv.craft_result(a, b)
-					if made:
-						inv.apply_drop(a, b, true)
-						_note("craft " + made.display_name)
+					var made := shop.craft_result(a, b)
+					var fee := shop.craft_fee(a, b)
+					if made and stage.wallet.gold >= fee + 100 and shop.craft(a, b) == Shop.Result.OK:
+						_note("craft %s (fee %d)" % [made.display_name, fee])
 						again = true
 						break
 				if again:
@@ -534,7 +537,7 @@ class Bot extends Node:
 				break
 			var cell := Inventory.EQUIP_START + slot
 			if i != cell:
-				inv.apply_drop(i, cell, false)
+				inv.apply_drop(i, cell)
 			slot += 1
 		lucian.refresh_stats()
 

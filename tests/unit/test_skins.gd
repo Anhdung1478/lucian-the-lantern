@@ -26,7 +26,7 @@ func give_equipped(id: StringName) -> void:
 	for i in Inventory.BACKPACK_SIZE:
 		if inventory.item_at(i) and inventory.item_at(i).id == id:
 			from = i
-	inventory.apply_drop(from, Inventory.EQUIP_START, false)
+	inventory.apply_drop(from, Inventory.EQUIP_START)
 
 
 func test_five_skins_in_doc_order() -> void:

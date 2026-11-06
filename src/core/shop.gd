@@ -1,13 +1,14 @@
 class_name Shop
 extends RefCounted
 ## The merchant's rules for one open shop: buying from the Items tab (a
-## MerchantStock slot) or the Potions tab, upgrading boots on the Boots tab,
-## selling, and refreshing, all for stage gold. Nothing is paid when a
+## MerchantStock slot) or the Potions tab, crafting on the Craft tab (two
+## fragments into a legendary, or boots and a fragment into better boots, for
+## a fee), selling, and refreshing, all for stage gold. Nothing is paid when a
 ## purchase does not fit. Boots are never sold.
 
 enum Result {
 	OK, NO_GOLD, NO_ROOM, CELL_LOCKED, CELL_TAKEN, SOLD_OUT, NOTHING_TO_REFRESH,
-	NOT_UPGRADABLE, NO_BOOTS, WRONG_CELL,
+	NO_RECIPE, WRONG_CELL,
 }
 
 var stock: MerchantStock
@@ -60,30 +61,37 @@ func sell(index: int) -> int:
 	return value
 
 
-## The boots the Boots tab makes from the boots in `boots_index` and the
-## fragment in `fragment_index`, or null when they don't upgrade (see
-## ItemCatalog.boots_upgrade).
-func upgrade_result(boots_index: int, fragment_index: int) -> ItemData:
-	if inventory.catalog == null or boots_index < 0 or fragment_index < 0 or boots_index == fragment_index:
+## What the Craft tab makes from the items in cells `first` and `second`
+## (see ItemCatalog.craft), or null: both cells must be different, unlocked
+## and hold something.
+func craft_result(first: int, second: int) -> ItemData:
+	if not _craftable(first, second):
 		return null
-	if inventory.is_locked(fragment_index):
-		return null
-	return inventory.catalog.boots_upgrade(inventory.item_at(boots_index), inventory.item_at(fragment_index))
+	return inventory.catalog.craft(inventory.item_at(first), inventory.item_at(second))
 
 
-## The Boots tab's Upgrade: pays the new boots' fee, uses up the fragment and
-## puts the new boots in the boots cell.
-func upgrade_boots(boots_index: int, fragment_index: int) -> Result:
-	var boots := inventory.item_at(boots_index) if boots_index >= 0 else null
-	if boots == null or not boots.is_boots():
-		return Result.NO_BOOTS
-	var result := upgrade_result(boots_index, fragment_index)
-	if result == null:
-		return Result.NOT_UPGRADABLE
-	if not wallet.spend(result.upgrade_cost):
+## The gold crafting cells `first` and `second` costs (0 when they make
+## nothing): see ItemCatalog.craft_fee.
+func craft_fee(first: int, second: int) -> int:
+	if not _craftable(first, second):
+		return 0
+	return inventory.catalog.craft_fee(inventory.item_at(first), inventory.item_at(second))
+
+
+## The Craft tab's button: pays the fee, then uses up both items. Upgraded
+## boots go in the boots cell; a legendary goes in `first`'s cell and
+## `second`'s is emptied. NO_GOLD changes nothing.
+func craft(first: int, second: int) -> Result:
+	var made := craft_result(first, second)
+	if made == null:
+		return Result.NO_RECIPE
+	if not wallet.spend(craft_fee(first, second)):
 		return Result.NO_GOLD
-	inventory.remove(fragment_index)
-	inventory.set_boots(result)
+	if made.is_boots():
+		var fragment := second if inventory.item_at(first).is_boots() else first
+		inventory.craft_into(Inventory.BOOTS_CELL, fragment, made)
+	else:
+		inventory.craft_into(first, second, made)
 	return Result.OK
 
 
@@ -120,3 +128,12 @@ func _buy(item: ItemData, cell: int) -> Result:
 	else:
 		inventory.put(cell, item)
 	return Result.OK
+
+
+func _craftable(first: int, second: int) -> bool:
+	if inventory.catalog == null or first == second:
+		return false
+	for index in [first, second]:
+		if index < 0 or index >= Inventory.SIZE or inventory.is_locked(index) or inventory.item_at(index) == null:
+			return false
+	return true

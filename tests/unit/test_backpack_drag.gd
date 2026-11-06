@@ -85,47 +85,9 @@ func test_drop_on_empty_cell_moves() -> void:
 	assert_false(screen.is_dragging())
 
 
-func test_drop_on_partner_before_the_line_closes_swaps() -> void:
-	drag(1, 2, 0.6)
-	assert_eq(id_at(1), &"rod")
-	assert_eq(id_at(2), &"sword")
-
-
-func test_holding_on_partner_for_the_full_line_crafts() -> void:
-	drag(1, 2, 1.0)
-	assert_eq(id_at(1), &"")
-	assert_eq(id_at(2), &"gunblade")
-
-
-func test_craft_popup_follows_the_hold() -> void:
-	press(0)
-	move(0, center(1))
-	assert_true(screen._craft_popup.visible)
-	screen._process(0.5)
-	assert_almost_eq(screen._craft_popup.progress, 0.5, 0.001)
-
-
-func test_no_popup_back_over_the_source_cell() -> void:
-	press(0)
-	move(0, center(5))
-	move(0, center(0))
-	assert_false(screen._craft_popup.visible, "a sword is not its own recipe partner")
-
-
-func test_no_popup_without_a_recipe() -> void:
-	press(2)
-	move(2, center(3))
-	assert_false(screen._craft_popup.visible)
-
-
-func test_changing_target_restarts_the_line() -> void:
-	press(1)
-	move(1, center(0))
-	screen._process(0.8)
-	move(1, center(2))
-	screen._process(0.3)
-	release(1, center(2))
-	assert_eq(id_at(1), &"rod", "swapped, not crafted")
+func test_holding_on_a_recipe_partner_still_only_swaps() -> void:
+	drag(1, 2, 5.0)
+	assert_eq(id_at(1), &"rod", "crafting is at the merchant, never in the backpack")
 	assert_eq(id_at(2), &"sword")
 
 

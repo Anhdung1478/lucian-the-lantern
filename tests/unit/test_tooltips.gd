@@ -69,7 +69,7 @@ func test_buff_cards_build_for_every_buff() -> void:
 	for id in [&"kraken_slayer", &"statikk_shiv", &"spear_of_shojin", &"archangels_staff", &"black_cleaver"]:
 		lucian.inventory.add(lucian.item_catalog.find(id))
 	for i in 5:
-		lucian.inventory.apply_drop(i, Inventory.EQUIP_START + i, false)
+		lucian.inventory.apply_drop(i, Inventory.EQUIP_START + i)
 	lucian.passives.shojin_stacks = 2
 	lucian.passives.mana_charge = 30.0
 	lucian.add_speed_buff(&"fervor", 20.0, 0.0, 2.0)
@@ -110,7 +110,7 @@ func test_boots_cards_say_they_cant_be_sold_and_how_they_upgrade() -> void:
 	assert_string_contains(text, "all but Giant's Belt")
 	card.free()
 	card = TooltipCard.item(catalog.find(&"berserkers_greaves"), catalog)
-	assert_string_contains(card_text(card), "Upgrade at the merchant with a Recurve Bow (500 gold) into Gunmetal Greaves.")
+	assert_string_contains(card_text(card), "Upgrade at the merchant's Craft tab with a Recurve Bow (500 gold) into Gunmetal Greaves.")
 	card.free()
 	card = TooltipCard.item(catalog.find(&"immortal_path"), catalog)
 	text = card_text(card)
@@ -122,4 +122,14 @@ func test_boots_cards_say_they_cant_be_sold_and_how_they_upgrade() -> void:
 func test_potion_cards_point_to_their_key() -> void:
 	var card := TooltipCard.item(lucian.item_catalog.find(&"mp_potion"), lucian.item_catalog)
 	assert_string_contains(card_text(card), "put it in its potion cell and press 8")
+	card.free()
+
+
+func test_crafting_cards_send_the_player_to_the_merchant() -> void:
+	var catalog := lucian.item_catalog
+	var card := TooltipCard.item(catalog.find(&"tear_of_the_goddess"), catalog)
+	assert_string_contains(card_text(card), "Craft it with another fragment at the merchant's Craft tab.")
+	card.free()
+	card = TooltipCard.item(catalog.find(&"muramana"), catalog)
+	assert_string_contains(card_text(card), "Recipe: Tear of the Goddess + Tear of the Goddess + 2100 gold at the merchant.")
 	card.free()
