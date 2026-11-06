@@ -124,7 +124,9 @@ func is_listening() -> bool:
 	return _listening != &""
 
 
-## Starts waiting for the next key or mouse button for `action`.
+## Starts waiting for the next key or mouse button for `action`. The second
+## press of a double-click on the row is ignored, so it can't bind the left
+## button; a separate later click still binds its button.
 func listen(action: StringName) -> void:
 	_stop_listening()
 	_listening = action
@@ -147,7 +149,8 @@ func _input(event: InputEvent) -> void:
 			elif not MODIFIER_KEYS.has(key.physical_keycode):
 				_bind(key)
 			get_viewport().set_input_as_handled()
-		elif mouse and mouse.pressed and not WHEEL_BUTTONS.has(mouse.button_index) \
+		elif mouse and mouse.pressed and not mouse.double_click \
+				and not WHEEL_BUTTONS.has(mouse.button_index) \
 				and Engine.get_process_frames() != _listen_frame:
 			var button: Button = _bind_buttons[_listening]
 			if button.get_global_rect().has_point(button.get_global_mouse_position()):

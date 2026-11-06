@@ -168,6 +168,35 @@ func test_rebinding_a_key() -> void:
 	assert_eq(InputMap.action_get_events(&"skill_q")[0].physical_keycode, KEY_Z, "applied at once")
 
 
+## A mouse press over the Skill Q binding button, sent straight to the screen.
+func _click_binding(double_click: bool) -> void:
+	var button: Button = screen._bind_buttons[&"skill_q"]
+	button.global_position = button.get_global_mouse_position() - Vector2(2, 2)
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	click.double_click = double_click
+	screen._input(click)
+
+
+func test_a_double_click_on_the_row_does_not_bind_the_left_button() -> void:
+	screen.show_tab(1)
+	screen.listen(&"skill_q")
+	await wait_process_frames(1)
+	_click_binding(true)
+	assert_true(screen.is_listening(), "still waiting")
+	assert_eq(settings.key_label(&"skill_q"), "Q")
+
+
+func test_a_single_press_over_the_row_binds_the_mouse_button() -> void:
+	screen.show_tab(1)
+	screen.listen(&"skill_q")
+	await wait_process_frames(1)
+	_click_binding(false)
+	assert_false(screen.is_listening())
+	assert_eq(settings.key_label(&"skill_q"), "LMB")
+
+
 func test_reset_to_defaults_restores_keys_and_cast_modes() -> void:
 	screen.show_tab(1)
 	screen.listen(&"skill_q")
