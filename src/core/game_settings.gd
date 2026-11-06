@@ -74,6 +74,9 @@ const SHORT_KEY_LABELS := {
 	"Backspace": "Bcksp", "Space": "Spc", "Escape": "Esc", "Enter": "Ent", "Delete": "Del",
 	"Insert": "Ins", "PageUp": "PgUp", "PageDown": "PgDn", "CapsLock": "Caps",
 	"Up": "Up", "Down": "Dn", "Left": "Lt", "Right": "Rt", "QuoteLeft": "`",
+	"BracketLeft": "[", "BracketRight": "]", "BackSlash": "\\", "Slash": "/",
+	"Kp Multiply": "Num*", "Kp Divide": "Num/", "Kp Subtract": "Num-", "Kp Add": "Num+",
+	"Kp Period": "Num.", "Kp Enter": "NumEn",
 }
 const SHORT_MOUSE_LABELS := {
 	MOUSE_BUTTON_LEFT: "LMB", MOUSE_BUTTON_RIGHT: "RMB", MOUSE_BUTTON_MIDDLE: "MMB",
@@ -314,12 +317,15 @@ static func event_label(event: InputEvent) -> String:
 
 
 ## A short form of `event_label`: "M4" for Mouse 4, "Bcksp" for BackSpace, "Num 1"
-## for Kp 1, and anything else cut to five characters.
+## for Kp 1, "[" and "]" for the brackets, "Num+" for the keypad operators, and
+## anything else cut to five characters.
 static func short_label(event: InputEvent) -> String:
 	if event is InputEventMouseButton:
 		var index := (event as InputEventMouseButton).button_index
 		return SHORT_MOUSE_LABELS.get(index, "M%d" % index)
 	var label := event_label(event)
+	if SHORT_KEY_LABELS.has(label):
+		return SHORT_KEY_LABELS[label]
 	if label.begins_with("Kp "):
 		return ("Num " + label.substr(3)).left(SHORT_LABEL_MAX)
 	return SHORT_KEY_LABELS.get(label, label.left(SHORT_LABEL_MAX))

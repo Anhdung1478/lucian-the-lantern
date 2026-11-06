@@ -64,6 +64,20 @@ func test_short_labels_fit_tight_spots() -> void:
 	assert_eq(GameSettings.short_label(null), "-")
 
 
+func test_short_labels_keep_brackets_slashes_and_keypad_keys_apart() -> void:
+	var expected := {
+		KEY_BRACKETLEFT: "[", KEY_BRACKETRIGHT: "]", KEY_BACKSLASH: "\\", KEY_SLASH: "/",
+		KEY_KP_MULTIPLY: "Num*", KEY_KP_DIVIDE: "Num/", KEY_KP_SUBTRACT: "Num-",
+		KEY_KP_ADD: "Num+", KEY_KP_PERIOD: "Num.", KEY_KP_ENTER: "NumEn",
+	}
+	var seen := {}
+	for code in expected:
+		var label := GameSettings.short_label(key(code))
+		assert_eq(label, expected[code], OS.get_keycode_string(code))
+		assert_false(seen.has(label), "%s is its own label" % label)
+		seen[label] = true
+
+
 func test_short_key_label_follows_the_binding_and_key_label_stays_full() -> void:
 	settings.rebind(&"skill_e", mouse(MOUSE_BUTTON_XBUTTON1))
 	assert_eq(settings.short_key_label(&"skill_e"), "M4")
