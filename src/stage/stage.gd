@@ -119,7 +119,13 @@ func _ready() -> void:
 		_use_map(StageMaps.create(run.act, run.stage))
 	rng.randomize()
 	var settings := GameSettings.instance()
-	settings.apply()
+	# Under the Game the settings were applied at boot (and each change since,
+	# live), so the window stays as the player left it. Alone (F6, tests,
+	# screenshots) the stage sets the engine up itself.
+	if _runs_alone():
+		settings.apply()
+	else:
+		settings.apply_engine()
 	settings.changed.connect(_on_setting_changed)
 	lucian.queue_casts = settings.get_value(&"queue_casts")
 	screens.settings.setup(settings)
@@ -127,8 +133,8 @@ func _ready() -> void:
 	if not Sfx.exists():
 		add_child(Sfx.new())
 	screens.menu.leave_requested.connect(leave_requested.emit)
-	# Game connects `leave_requested` before adding the stage; alone, nobody would act on Leave.
-	screens.menu.set_leave_enabled(not leave_requested.get_connections().is_empty())
+	# Alone, nobody would act on Leave.
+	screens.menu.set_leave_enabled(not _runs_alone())
 	screens.menu.exit_requested.connect(_exit)
 	screens.menu.set_subtitle(run.display_name)
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED
@@ -156,6 +162,12 @@ func _ready() -> void:
 	hud.setup(lucian, wallet, self)
 	if run.tutorial:
 		_start_tutorial()
+
+
+## Run on its own (F6, tests, screenshots), not by the Game: the Game
+## connects `leave_requested` before it adds the stage.
+func _runs_alone() -> bool:
+	return leave_requested.get_connections().is_empty()
 
 
 ## Frees the mouse _ready confined, for the main screen and the title.

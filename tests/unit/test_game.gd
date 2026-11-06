@@ -9,6 +9,16 @@ const JUNGLE := 3
 var game: Game
 var quit_called := false
 var _prefix := ""
+## The settings _counting_settings swapped out, put back in after_each.
+var _old_settings: GameSettings
+
+
+## Counts the window resets (apply_resolution) asked for.
+class CountingSettings extends GameSettings:
+	var resolution_applies := 0
+
+	func apply_resolution() -> void:
+		resolution_applies += 1
 
 
 func before_each() -> void:
@@ -34,6 +44,9 @@ func after_each() -> void:
 		if FileAccess.file_exists(file):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 	SaveGame.instance().prefix = _prefix
+	if _old_settings:
+		GameSettings._instance = _old_settings
+		_old_settings = null
 
 
 func _leave_button(stage: Stage) -> Button:
@@ -290,6 +303,39 @@ func test_leave_works_under_the_game() -> void:
 	var leave := _leave_button(game.screen as Stage)
 	assert_false(leave.disabled)
 	assert_false(leave.has_meta(&"hover_text"))
+
+
+## Shared settings that count window resets, on a scratch file.
+func _counting_settings() -> CountingSettings:
+	_old_settings = GameSettings.instance()
+	var counting := CountingSettings.new("user://test_game_counting_settings.json")
+	GameSettings._instance = counting
+	return counting
+
+
+func test_start_retry_and_next_leave_the_window_alone() -> void:
+	var settings := _counting_settings()
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_process_frames(2)
+	var first := game.screen as Stage
+	first.show_result(true)
+	first.result.retry_button.pressed.emit()
+	await wait_process_frames(2)
+	var again := game.screen as Stage
+	assert_ne(again, first)
+	again.show_result(true)
+	again.result.next_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_eq((game.screen as Stage).run.stage_id, "2-2")
+	assert_eq(settings.resolution_applies, 0, "no stage un-maximizes, resizes or centers the window")
+
+
+func test_a_stage_run_alone_still_sets_the_window_up() -> void:
+	var settings := _counting_settings()
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	add_child_autofree(stage)
+	assert_eq(settings.resolution_applies, 1)
 
 
 func test_leave_is_disabled_when_the_stage_runs_alone() -> void:

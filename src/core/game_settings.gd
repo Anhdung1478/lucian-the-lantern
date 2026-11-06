@@ -169,12 +169,19 @@ func save() -> void:
 	file.store_string(JSON.stringify({"version": VERSION, "values": saved_values, "bindings": saved_bindings}, "\t"))
 
 
-## Pushes every setting into the engine.
+## Pushes every setting into the engine, the window's size and place too.
 func apply() -> void:
+	apply_engine()
+	apply_resolution()
+
+
+## Every setting but the window's size and place (apply_resolution): audio,
+## input and display. A stage under the Game uses this, so starting one never
+## un-maximizes, resizes or re-centers the window.
+func apply_engine() -> void:
 	apply_audio()
 	apply_input()
 	apply_display()
-	apply_resolution()
 
 
 func apply_audio() -> void:
