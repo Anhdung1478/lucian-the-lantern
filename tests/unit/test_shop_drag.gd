@@ -249,6 +249,21 @@ func test_dropping_on_the_sell_slot_sells() -> void:
 	assert_eq(wallet.gold, 5700)
 
 
+func test_undo_button_follows_the_sales() -> void:
+	var panel := screen.shop_panel()
+	panel._process(0.0)
+	assert_true(panel.undo_button().disabled, "nothing sold yet")
+	drag(cell(0), sell_cell())
+	panel._process(0.0)
+	assert_false(panel.undo_button().disabled)
+	assert_eq(panel.undo_button().tooltip_text, "Buy back sword for 700 gold")
+	panel.undo_button().pressed.emit()
+	panel._process(0.0)
+	assert_eq(inventory.item_at(0).id, &"sword")
+	assert_eq(wallet.gold, 5000)
+	assert_true(panel.undo_button().disabled)
+
+
 func test_sell_preview_while_over_the_sell_slot() -> void:
 	button(cell(0), MOUSE_BUTTON_LEFT, true, center(cell(0)))
 	mouse(cell(0), InputEventMouseMotion.new(), center(sell_cell()))

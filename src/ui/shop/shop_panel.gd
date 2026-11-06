@@ -1,9 +1,9 @@
 class_name ShopPanel
 extends PanelContainer
 ## The merchant's shop, beside the backpack while it is open: a gold readout,
-## the Items, Potions and Craft tabs, a hint line and the Refresh button in
-## the bottom-right corner (Items only). Refused purchases flash a red
-## message.
+## the Items, Potions and Craft tabs, a hint line, the Undo sale button (every
+## tab; it buys back the last sale) and the Refresh button (Items only) in
+## the bottom-right corner. Refused purchases flash a red message.
 ##
 ## The Craft tab: [input] + [input] -> [result], the fee and a Craft button.
 ## Two fragments make their legendary, for the legendary's cost minus the
@@ -30,6 +30,7 @@ const MESSAGES := {
 	Shop.Result.NOTHING_TO_REFRESH: "Nothing left to refresh",
 	Shop.Result.NO_RECIPE: "Those don't craft into anything",
 	Shop.Result.WRONG_CELL: "That item can't go there",
+	Shop.Result.NOTHING_TO_UNDO: "No sale to undo",
 }
 
 var screen: BackpackScreen
@@ -41,6 +42,7 @@ var _gold_label: Label
 var _hint: Label
 var _message: Label
 var _refresh: Button
+var _undo: Button
 var _message_left := 0.0
 var _first_input: CraftSlot
 var _second_input: CraftSlot
@@ -103,6 +105,12 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	_message = UiStyle.label("", 16, UiStyle.ERROR_COLOR)
 	_message.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(_message)
+	_undo = Button.new()
+	_undo.text = "Undo sale"
+	_undo.custom_minimum_size = Vector2(130, 40)
+	UiStyle.style_button(_undo, 17)
+	_undo.pressed.connect(func() -> void: screen.undo_sale())
+	bottom.add_child(_undo)
 	_refresh = Button.new()
 	_refresh.text = "Refresh"
 	_refresh.icon = ShopSlot.COIN
@@ -129,6 +137,10 @@ func show_tab(tab: int) -> void:
 		UiStyle.style_button(_tab_buttons[i], 18, i == tab)
 	_refresh.visible = tab == ITEMS_TAB
 	_hint.text = HINTS[tab]
+
+
+func undo_button() -> Button:
+	return _undo
 
 
 func current_tab() -> int:
@@ -221,6 +233,7 @@ func _process(delta: float) -> void:
 	_gold_label.text = str(screen.shop.wallet.gold)
 	# Greyed once every open slot is sold: a refresh would change nothing.
 	_refresh.disabled = not screen.shop.can_refresh()
+	_show_undo()
 	if _tab == CRAFT_TAB:
 		_show_craft()
 	# The dragged icon covers the sell slot, so its price shows here too.
@@ -242,6 +255,14 @@ func _process(delta: float) -> void:
 			_message.text = ""
 	elif _message.text.begins_with("Sells"):
 		_message.text = ""
+
+
+## Undo sale is greyed with nothing sold; its hover text names the item and
+## what buying it back costs.
+func _show_undo() -> void:
+	var sale := screen.shop.last_sale()
+	_undo.disabled = sale.is_empty()
+	_undo.tooltip_text = "" if sale.is_empty() else "Buy back %s for %d gold" % [sale.item.display_name, sale.price]
 
 
 ## The Craft tab's fee, note and Craft button for what is in the inputs.

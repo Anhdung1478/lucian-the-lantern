@@ -304,6 +304,19 @@ func test_moving_a_stack_keeps_its_count() -> void:
 	assert_eq(inventory.count_at(0), 0)
 
 
+func test_put_stack_restores_a_stack_into_an_empty_cell() -> void:
+	var red := catalog.find(&"red")
+	var fired := [0]
+	inventory.changed.connect(func() -> void: fired[0] += 1)
+	assert_true(inventory.put_stack(Inventory.HP_POTION_CELL, red, 3))
+	assert_eq(inventory.count_at(Inventory.HP_POTION_CELL), 3)
+	assert_eq(fired[0], 1)
+	assert_false(inventory.put_stack(Inventory.HP_POTION_CELL, red, 2), "taken")
+	assert_false(inventory.put_stack(0, catalog.find(&"sword"), 2), "too many for one stack")
+	assert_true(inventory.put_stack(Inventory.EQUIP_START, catalog.find(&"sword"), 1), "equip cells count")
+	assert_eq(fired[0], 2)
+
+
 func test_put_into_a_chosen_cell() -> void:
 	inventory.add(item(&"sword"))
 	assert_false(inventory.put(0, item(&"rod")), "occupied by another item")

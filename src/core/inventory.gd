@@ -186,6 +186,17 @@ func has_item(id: StringName) -> bool:
 	return items.any(func(item: ItemData) -> bool: return item != null and item.id == id)
 
 
+## Puts `count` of `item` back into cell `index` when it is empty, unlocked and
+## accepts the item (equip cells too), and `count` fits one stack. Changes
+## nothing and returns false otherwise. Emits `changed` once.
+func put_stack(index: int, item: ItemData, count: int) -> bool:
+	if count < 1 or count > item.max_stack or not can_put(index, item) or items[index] != null:
+		return false
+	_set_cell(index, item, count)
+	changed.emit()
+	return true
+
+
 ## Empties the cell and returns what it held (its count is lost).
 func remove(index: int) -> ItemData:
 	var item := items[index]

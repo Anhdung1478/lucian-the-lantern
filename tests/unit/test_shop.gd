@@ -90,6 +90,75 @@ func test_potion_dragged_onto_its_stack() -> void:
 	assert_eq(inventory.count_at(5), 2)
 
 
+func test_undoing_two_sales_goes_last_first() -> void:
+	inventory.add(catalog.find(&"sword"))
+	inventory.add(catalog.find(&"rod"))
+	shop.sell(0)
+	shop.sell(1)
+	assert_eq(wallet.gold, 1400)
+	assert_eq(shop.last_sale().item.id, &"rod")
+	assert_eq(shop.undo_sale(), Result.OK)
+	assert_eq(inventory.item_at(1).id, &"rod")
+	assert_null(inventory.item_at(0))
+	assert_eq(wallet.gold, 700, "paid back what the sale gave")
+	assert_eq(shop.undo_sale(), Result.OK)
+	assert_eq(inventory.item_at(0).id, &"sword")
+	assert_eq(wallet.gold, 0)
+	assert_eq(shop.undo_sale(), Result.NOTHING_TO_UNDO)
+
+
+func test_undo_restores_a_whole_stack_to_its_cell() -> void:
+	var red := catalog.find(&"red")
+	inventory.add(red, 3)
+	var cell := Inventory.HP_POTION_CELL
+	assert_eq(inventory.count_at(cell), 3)
+	shop.sell(cell)
+	wallet.add(1000)
+	assert_eq(shop.undo_sale(), Result.OK)
+	assert_eq(inventory.count_at(cell), 3)
+
+
+func test_undo_goes_to_a_free_cell_when_the_old_one_is_taken() -> void:
+	inventory.add(catalog.find(&"sword"))
+	shop.sell(0)
+	inventory.add(catalog.find(&"rod"))
+	assert_eq(shop.undo_sale(), Result.OK)
+	assert_eq(inventory.item_at(0).id, &"rod")
+	assert_eq(inventory.item_at(1).id, &"sword")
+
+
+func test_undo_without_gold_is_refused_and_kept() -> void:
+	inventory.add(catalog.find(&"sword"))
+	shop.sell(0)
+	wallet.reset()
+	assert_eq(shop.undo_sale(), Result.NO_GOLD)
+	assert_null(inventory.item_at(0))
+	wallet.add(700)
+	assert_eq(shop.undo_sale(), Result.OK)
+	assert_eq(wallet.gold, 0)
+
+
+func test_undo_with_no_room_is_refused_and_kept() -> void:
+	inventory.add(catalog.find(&"sword"))
+	shop.sell(0)
+	inventory.unlocked_backpack = 1
+	inventory.unlocked_equip = 1
+	inventory.add(catalog.find(&"rod"))
+	inventory.add(catalog.find(&"rod"))
+	assert_eq(shop.undo_sale(), Result.NO_ROOM)
+	assert_eq(wallet.gold, 700)
+	inventory.remove(0)
+	assert_eq(shop.undo_sale(), Result.OK)
+
+
+func test_a_new_shop_has_nothing_to_undo() -> void:
+	inventory.add(catalog.find(&"sword"))
+	shop.sell(0)
+	var next := Shop.new(stock, inventory, wallet)
+	assert_true(next.last_sale().is_empty())
+	assert_eq(next.undo_sale(), Result.NOTHING_TO_UNDO)
+
+
 func test_selling_pays_the_sell_price() -> void:
 	inventory.add(catalog.find(&"sword"))
 	assert_eq(shop.sell_value(0), 700)

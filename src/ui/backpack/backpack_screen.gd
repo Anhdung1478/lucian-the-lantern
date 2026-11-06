@@ -155,6 +155,12 @@ func refresh_shop() -> void:
 		_report(shop.refresh())
 
 
+## The shop's Undo sale button: buys back the last sale.
+func undo_sale() -> void:
+	if shop:
+		_report(shop.undo_sale())
+
+
 ## The Craft tab's Craft button: what is in its two inputs.
 func craft() -> void:
 	if shop:

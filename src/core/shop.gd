@@ -4,11 +4,12 @@ extends RefCounted
 ## MerchantStock slot) or the Potions tab, crafting on the Craft tab (two
 ## fragments into a legendary, or boots and a fragment into better boots, for
 ## a fee), selling, and refreshing, all for stage gold. Nothing is paid when a
-## purchase does not fit. Boots are never sold.
+## purchase does not fit. Boots are never sold. A sale can be undone, last
+## first, until this shop is dropped (the player leaves the merchant).
 
 enum Result {
 	OK, NO_GOLD, NO_ROOM, CELL_LOCKED, SOLD_OUT, NOTHING_TO_REFRESH,
-	NO_RECIPE, WRONG_CELL,
+	NO_RECIPE, WRONG_CELL, NOTHING_TO_UNDO,
 }
 
 var stock: MerchantStock
@@ -16,6 +17,8 @@ var inventory: Inventory
 var wallet: Wallet
 ## What a refresh costs (the Evolution Tree can lower it).
 var refresh_cost := MerchantStock.REFRESH_COST
+## This visit's sales, oldest first: {item, count, cell, price}.
+var _sales: Array[Dictionary] = []
 
 
 func _init(merchant_stock: MerchantStock, target_inventory: Inventory, stage_wallet: Wallet) -> void:
@@ -53,13 +56,43 @@ func sell_value(index: int) -> int:
 
 
 ## Sells everything in `index`. Returns the gold gained; boots are refused.
+## The sale can be undone (undo_sale).
 func sell(index: int) -> int:
 	if not can_sell(index):
 		return 0
 	var value := sell_value(index)
+	_sales.append({"item": inventory.item_at(index), "count": inventory.count_at(index), "cell": index, "price": value})
 	inventory.remove(index)
 	wallet.add(value)
 	return value
+
+
+## The last sale not yet undone, as {item, count, cell, price}; empty when
+## there is none.
+func last_sale() -> Dictionary:
+	return _sales.back() if not _sales.is_empty() else {}
+
+
+## Buys back the last sale for what it paid: the whole stack returns to its
+## old cell when that is still empty, otherwise to the first place it fits.
+## NO_GOLD and NO_ROOM change nothing and keep the sale to undo.
+func undo_sale() -> Result:
+	if _sales.is_empty():
+		return Result.NOTHING_TO_UNDO
+	var sale: Dictionary = _sales.back()
+	var item: ItemData = sale.item
+	var count: int = sale.count
+	if not wallet.can_afford(sale.price):
+		return Result.NO_GOLD
+	var cell: int = sale.cell
+	var home := inventory.can_put(cell, item) and inventory.item_at(cell) == null and count <= item.max_stack
+	if not home and inventory.space_for(item) < count:
+		return Result.NO_ROOM
+	wallet.spend(sale.price)
+	if not home or not inventory.put_stack(cell, item, count):
+		inventory.add(item, count)
+	_sales.pop_back()
+	return Result.OK
 
 
 ## What the Craft tab makes from the items in cells `first` and `second`
