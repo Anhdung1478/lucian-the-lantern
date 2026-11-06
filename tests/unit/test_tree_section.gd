@@ -504,6 +504,131 @@ func test_e_after_act_one_is_free() -> void:
 	assert_eq(_save().tree.level(&"skill_e"), 1)
 
 
+# --- Buying asks first (TreePurchasePopup) -----------------------------------
+
+
+## Q open and picked, with `blue` blue essence.
+func _pick_q(blue := 1000) -> void:
+	_save().tree.acts_cleared = 1
+	_save().essences.add(Essences.BLUE, blue)
+	section.select(&"skill_q")
+
+
+func _open_questions() -> Array:
+	return section.get_children().filter(
+		func(node: Node) -> bool: return node is TreePurchasePopup and not node.is_queued_for_deletion())
+
+
+func test_the_cost_bar_asks_first_and_buys_nothing() -> void:
+	_pick_q()
+	section.info.cost_bar.pressed.emit()
+	assert_not_null(section.purchase, "a click asks first")
+	assert_eq(_save().tree.level(&"skill_q"), 0, "nothing bought yet")
+	assert_eq(_save().essences.amount(Essences.BLUE), 1000)
+
+
+func test_buy_buys_one_level_and_closes_the_question() -> void:
+	_pick_q()
+	section.info.cost_bar.pressed.emit()
+	section.purchase.buy_button.pressed.emit()
+	assert_null(section.purchase, "the question closes")
+	assert_eq(_save().tree.level(&"skill_q"), 1)
+	assert_eq(_save().essences.amount(Essences.BLUE), 900)
+	assert_eq(section.info.level_label.text, "LVL 1 / 5")
+	assert_false(_save().slot_exists(1), "no file written")
+
+
+func test_a_double_click_buys_one_level() -> void:
+	_pick_q()
+	var bar := section.info.cost_bar
+	bar.pressed.emit()
+	bar.pressed.emit()
+	assert_eq(_open_questions().size(), 1, "one question")
+	var buy := section.purchase.buy_button
+	buy.pressed.emit()
+	buy.pressed.emit()
+	assert_eq(_save().tree.level(&"skill_q"), 1, "one level")
+	assert_eq(_save().essences.amount(Essences.BLUE), 900)
+
+
+func test_cancel_and_esc_spend_nothing() -> void:
+	_pick_q()
+	section.info.cost_bar.pressed.emit()
+	section.purchase.cancel_button.pressed.emit()
+	assert_null(section.purchase)
+	section.info.cost_bar.pressed.emit()
+	assert_true(section.close_popup(), "ESC closes it")
+	assert_null(section.purchase)
+	assert_eq(section.info.id, &"skill_q", "and keeps the pick")
+	assert_eq(_save().tree.level(&"skill_q"), 0)
+	assert_eq(_save().essences.amount(Essences.BLUE), 1000)
+
+
+func test_the_question_shows_level_effect_price_owned_and_after() -> void:
+	_save().essences.add(Essences.BLUE, 1000)
+	_save().essences.add(Essences.ORANGE, 10)
+	section.select(&"stat_ad")
+	section.info.cost_bar.pressed.emit()
+	var popup := section.purchase
+	var data := _save().tree.node(&"stat_ad")
+	var price := _save().tree.cost(&"stat_ad")
+	assert_eq(popup.card.title_label.text, "BUY UPGRADE")
+	assert_eq(popup.card.subtitle_label.text, data.display_name)
+	assert_eq(popup.level_label.text, "LVL 0 → 1 / %d" % data.max_level)
+	assert_eq(popup.effect_label.text, "%s → %s" % [data.value_text(0), data.value_text(1)])
+	assert_false(popup.free_label.visible)
+	assert_eq(popup.price_labels[Essences.BLUE].text, str(price.x))
+	assert_eq(popup.owned_labels[Essences.BLUE].text, "1000")
+	assert_eq(popup.after_labels[Essences.BLUE].text, str(1000 - price.x))
+	assert_eq(popup.after_labels[Essences.BLUE].get_theme_color(&"font_color"), UiStyle.TITLE_COLOR)
+	assert_eq(popup.price_labels[Essences.ORANGE].get_parent().visible, price.y > 0, "an essence the level doesn't need is hidden")
+	assert_eq(popup.buy_button.text, "Buy")
+
+
+func test_buy_is_off_while_the_level_cant_be_paid() -> void:
+	_pick_q()
+	section.info.cost_bar.pressed.emit()
+	var popup := section.purchase
+	assert_false(popup.buy_button.disabled)
+	_save().essences.set_amount(Essences.BLUE, 50)
+	assert_true(popup.buy_button.disabled)
+	assert_eq(popup.owned_labels[Essences.BLUE].text, "50")
+	assert_eq(popup.after_labels[Essences.BLUE].text, "-50")
+	assert_eq(popup.after_labels[Essences.BLUE].get_theme_color(&"font_color"), UiStyle.ERROR_COLOR)
+	popup.buy_button.pressed.emit()
+	assert_eq(_save().tree.level(&"skill_q"), 0, "a disabled Buy buys nothing")
+
+
+func test_a_free_level_asks_too_and_reads_free() -> void:
+	_save().tree.acts_cleared = 1
+	section.select(&"skill_e")
+	section.info.cost_bar.pressed.emit()
+	var popup := section.purchase
+	assert_true(popup.free_label.visible)
+	assert_false(popup.owned_labels[Essences.BLUE].get_parent().is_visible_in_tree(), "no You have row")
+	assert_false(popup.after_labels[Essences.BLUE].get_parent().is_visible_in_tree(), "no After purchase row")
+	popup.buy_button.pressed.emit()
+	assert_eq(_save().tree.level(&"skill_e"), 1)
+
+
+func test_a_hidden_tree_closes_the_question() -> void:
+	_pick_q()
+	section.info.cost_bar.pressed.emit()
+	section.visible = false
+	assert_null(section.purchase)
+
+
+func test_the_question_s_buttons_are_clear_of_the_cost_bar() -> void:
+	_pick_q()
+	section.info.cost_bar.pressed.emit()
+	await wait_process_frames(2)
+	var bar := section.info.cost_bar.get_global_rect()
+	for button: Button in [section.purchase.buy_button, section.purchase.cancel_button]:
+		assert_gt(button.size.x, 0.0)
+		assert_false(button.get_global_rect().intersects(bar),
+			"a double-click's second click can't land on %s" % button.text)
+
+
 func test_a_hidden_node_reads_unknown_locked_and_its_requirements() -> void:
 	section.select(&"passive")
 	assert_eq(section.info.name_label.text, "???")

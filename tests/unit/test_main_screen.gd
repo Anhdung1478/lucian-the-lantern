@@ -314,6 +314,20 @@ func test_esc_closes_the_skin_purchase_pop_up_and_not_the_menu() -> void:
 	assert_false(main.gear.visible, "and does not open the menu")
 
 
+func test_esc_closes_the_tree_purchase_pop_up_and_not_the_menu() -> void:
+	main.show_section(MainScreen.SECTION_TREE)
+	var section: TreeSection = main.sections[MainScreen.SECTION_TREE]
+	SaveGame.instance().tree.acts_cleared = 1
+	SaveGame.instance().essences.add(Essences.BLUE, 1000)
+	section.select(&"skill_q")
+	section.info.cost_bar.pressed.emit()
+	assert_not_null(section.purchase, "the cost bar asks first")
+	_esc()
+	assert_null(section.purchase, "the first ESC closes the pop-up")
+	assert_eq(section.info.id, &"skill_q", "and keeps the pick")
+	assert_false(main.gear.visible, "and does not open the menu")
+
+
 func test_buying_a_tree_node_writes_no_file() -> void:
 	var save := SaveGame.instance()
 	save.essences.add(Essences.BLUE, 1000)

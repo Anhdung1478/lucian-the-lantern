@@ -130,7 +130,7 @@ Clicking a node opens a panel (bottom-right, like the reference): *(Phase 10: a 
 - **Current value → next value** (e.g. `+40% → +60%`)
 - **Short description**
 - **Level:** e.g. `LVL 2 / 5`
-- **Cost bar:** shows owned essence against the cost, and works as the **buy button**
+- **Cost bar:** shows owned essence against the cost, and works as the **buy button** *(V1.3.1: it asks first; see "Built in V1.3.1")*
 
 ### Built in Phase 5
 
@@ -178,7 +178,7 @@ A node with a level is never hidden (this only matters after the debug table's M
 - The name, "LVL 2 / 5", and "+8 AD → +12 AD". A maxed node shows only its value, in green.
 - The description.
 - A hidden node reads "???" and adds a red line built from its requirements, e.g. "Requires: Q – Piercing Light, W – Ardent Blaze or E – Relentless Pursuit", "Requires: any 2 of …", "Requires: Clear Act 1".
-- **Cost bar** (400 × 56, the buy button): for each essence the next level needs, its icon and "owned / cost" (red when short). A gold fill shows how close the player is (the smallest share over the kinds needed). It can only be clicked when the level can be bought; a click buys it with a coin sound. It reads **MAXED** (green), **LOCKED** (grey) or **Free** (E's first level after Act 1). *(Since Phase 10 also Ghost after 1-1, and LOCKED for a bought node whose next level is closed.)*
+- **Cost bar** (400 × 56, the buy button): for each essence the next level needs, its icon and "owned / cost" (red when short). A gold fill shows how close the player is (the smallest share over the kinds needed). It can only be clicked when the level can be bought; a click buys it with a coin sound. *(V1.3.1: a click asks first, so a double-click can't buy two levels; see "Built in V1.3.1".)* It reads **MAXED** (green), **LOCKED** (grey) or **Free** (E's first level after Act 1). *(Since Phase 10 also Ghost after 1-1, and LOCKED for a bought node whose next level is closed.)*
 
 **Reset tree** (top-right): "Reset tree 5" with the purple icon. Disabled until something is bought and 5 purple are owned. It asks "Reset the Evolution Tree for 5 purple essence? Every blue and orange essence spent comes back." Buying and resetting never save by themselves.
 
@@ -244,6 +244,23 @@ A node with a level is never hidden (this only matters after the debug table's M
 - **The badge** under a node is a level bar: the number over one segment per level.
 - **FREE** still shows on a free upgrade, in place of ▲.
 - **The info column's list and portrait** show not-bought icons in greyscale too.
+
+### Built in V1.3.1
+
+**Buying a tree level asks first.** The cost bar opens a pop-up (`TreePurchasePopup`) over the tree, on the menus' ornate card. A double-click on the bar used to buy two levels; now its second click lands on the pop-up.
+- **Title:** **BUY UPGRADE**, with the node's name under it.
+- **A table:**
+
+| Row | Shows |
+|---|---|
+| Level | "LVL 2 → 3 / 5" |
+| Effect | the value now → after ("+8 AD → +12 AD") |
+| Price | the blue and orange it costs, or **Free** |
+| You have | blue and orange owned (hidden when free) |
+| After purchase | what is left, red if short (hidden when free) |
+
+- A note: "Only Reset tree gives essence back."
+- **Buy** (gold) buys one level with the coin sound and closes; it is off while the level can't be bought. **Cancel** or **ESC** closes it and keeps the pick. Hiding the tree closes it.
 
 ---
 

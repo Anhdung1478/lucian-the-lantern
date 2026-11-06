@@ -3,8 +3,8 @@ extends PanelContainer
 ## The menus' ornate card: a navy-to-teal gradient, a double gold frame with
 ## a diamond at each corner, a lantern medallion over its top edge, a spaced
 ## title and a subtitle between two short gold rules. Its rows go in
-## `content`. The ESC menus, the Yes / No pop-up and the skin purchase
-## question use it. It holds no buttons of its own.
+## `content`. The ESC menus, the Yes / No pop-up, the skin purchase
+## question and the tree's buy question use it. It holds no buttons of its own.
 
 const TOP_COLOR := Color("0b1220")
 const BOTTOM_COLOR := Color("0d2328")

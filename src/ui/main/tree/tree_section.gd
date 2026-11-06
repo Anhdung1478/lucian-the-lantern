@@ -4,8 +4,8 @@ extends Control
 ## the BranchTabs under them to switch pages, Reset tree at the top right of
 ## the page, and the NodeInfoPanel as a column on the right (as the Journey's
 ## map and panel). It opens on the first branch with a free upgrade, otherwise
-## on Skills. Buying and resetting change the save in memory only; nothing
-## here writes a file.
+## on Skills. The cost bar asks first (TreePurchasePopup). Buying and
+## resetting change the save in memory only; nothing here writes a file.
 
 ## In this section (the content area, y 72–992 on screen): the pages, the tabs
 ## hanging under them, and the info column right of both.
@@ -27,6 +27,8 @@ var info: NodeInfoPanel
 var reset_button: Button
 ## The main screen's Yes / No pop-up, set before the section is added.
 var confirm: ConfirmPopup
+## The open "buy this level?" question, or null.
+var purchase: TreePurchasePopup
 var tree: EvolutionTree
 var essences: Essences
 ## The branch whose page shows.
@@ -56,6 +58,7 @@ func _ready() -> void:
 	info = NodeInfoPanel.new(tree, essences)
 	info.position = PANEL_RECT.position
 	info.node_chosen.connect(select)
+	info.cost_bar.buy_asked.connect(ask_buy)
 	add_child(info)
 
 	reset_button = Button.new()
@@ -72,6 +75,7 @@ func _ready() -> void:
 
 	tree.changed.connect(refresh)
 	essences.changed.connect(refresh)
+	visibility_changed.connect(_on_visibility_changed)
 	refresh()
 	show_branch(_opening_branch())
 
@@ -98,8 +102,26 @@ func select(id: StringName) -> void:
 	info.show_node(id)
 
 
-## Clears the pick if there is one (the main screen's ESC calls this).
+## Asks before buying node `id`'s next level (the cost bar's click), closing
+## a question already open.
+func ask_buy(id: StringName) -> void:
+	if purchase:
+		purchase.close()
+	var opened := TreePurchasePopup.new(tree, id, essences)
+	purchase = opened
+	opened.confirmed.connect(_buy)
+	opened.closed.connect(func() -> void:
+		if purchase == opened:
+			purchase = null)
+	add_child(opened)
+
+
+## Closes the buy question, else clears the pick, if there is one (the main
+## screen's ESC calls this).
 func close_popup() -> bool:
+	if purchase:
+		purchase.close()
+		return true
 	if info.id == &"":
 		return false
 	_clear_pick()
@@ -127,6 +149,17 @@ func _opening_branch() -> StringName:
 func _clear_pick() -> void:
 	for view: TreeNodeView in views.values():
 		view.selected = false
+
+
+func _buy(id: StringName) -> void:
+	if info.cost_bar.id == id:
+		info.cost_bar.buy()
+
+
+## A hidden tree closes its question, so it never shows on another page.
+func _on_visibility_changed() -> void:
+	if not visible and purchase:
+		purchase.close()
 
 
 func _ask_reset() -> void:

@@ -2,8 +2,12 @@ class_name CostBar
 extends Button
 ## The buy button of the node info panel. It shows the essence owned against
 ## the next level's cost for each kind needed ("120 / 350", red when short)
-## over a fill of how much of it is there, and buys on a click when it can.
+## over a fill of how much of it is there. A click asks first (buy_asked:
+## TreeSection opens a TreePurchasePopup), so a double-click buys one level.
 ## A maxed node reads MAXED, a hidden one LOCKED, a cost of 0 Free.
+
+## The bar was clicked: ask before buying node `id`'s next level.
+signal buy_asked(id: StringName)
 
 const SIZE := Vector2(400, 56)
 const ICON_SIZE := 30.0
@@ -32,7 +36,7 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	essences = owned
 	custom_minimum_size = SIZE
 	UiStyle.style_button(self, FONT_SIZE)
-	pressed.connect(buy)
+	pressed.connect(func() -> void: buy_asked.emit(id))
 	_row = HBoxContainer.new()
 	_row.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -117,8 +121,9 @@ func fill() -> float:
 	return share
 
 
-## Buys the next level; false when it can't. Everything redraws from the
-## tree's and the essences' changed signals.
+## Buys the next level at once (TreeSection, once the question is answered);
+## false when it can't. Everything redraws from the tree's and the essences'
+## changed signals.
 func buy() -> bool:
 	if not tree.buy(id, essences):
 		return false
