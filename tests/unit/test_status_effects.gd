@@ -325,6 +325,47 @@ func test_an_enemy_burn_kills_with_lucians_credit() -> void:
 	assert_engine_error_count(0)
 
 
+func test_an_idle_enemy_health_bar_does_not_redraw() -> void:
+	var minion := _minion(Vector2(3000, 0))
+	await wait_process_frames(3)
+	watch_signals(minion.health_bar)
+	await wait_process_frames(10)
+	assert_signal_emit_count(minion.health_bar, "draw", 0)
+
+
+func test_an_enemy_health_bar_redraws_after_a_hit() -> void:
+	var minion := _minion(Vector2(3000, 0))
+	await wait_process_frames(3)
+	watch_signals(minion.health_bar)
+	minion.take_damage(lucian.make_damage(10.0, DamageInfo.Type.TRUE, &"q"))
+	await wait_process_frames(3)
+	assert_signal_emit_count(minion.health_bar, "draw", 1)
+
+
+func test_an_enemy_health_bar_redraws_on_a_new_status() -> void:
+	var minion := _minion(Vector2(3000, 0))
+	await wait_process_frames(3)
+	watch_signals(minion.health_bar)
+	minion.add_status(&"test_status", 5.0)
+	await wait_process_frames(3)
+	assert_signal_emit_count(minion.health_bar, "draw", 1)
+
+
+func test_a_status_on_an_enemy_bar_redraws_about_ten_times_a_second() -> void:
+	var minion := _minion(Vector2(3000, 0))
+	minion.add_status(&"test_status", 5.0)
+	await wait_process_frames(3)
+	var bar: EnemyHealthBar = minion.health_bar
+	bar._since_draw = 0.0
+	watch_signals(bar)
+	bar._process(EnemyHealthBar.REFRESH_TIME * 0.5)
+	await wait_process_frames(1)
+	assert_signal_emit_count(bar, "draw", 0, "too soon")
+	bar._process(EnemyHealthBar.REFRESH_TIME * 0.6)
+	await wait_process_frames(1)
+	assert_signal_emit_count(bar, "draw", 1, "the shading still moves")
+
+
 # --- Untargetable -----------------------------------------------------------
 
 

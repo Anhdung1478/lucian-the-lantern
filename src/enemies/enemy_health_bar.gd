@@ -2,10 +2,14 @@ class_name EnemyHealthBar
 extends Node2D
 ## HP bar drawn above an enemy, with its item statuses (armor shred, Grievous
 ## Wounds, ...) as small icons above it. Drawn by hand instead of using a
-## Control so it can never swallow clicks aimed at the enemy.
+## Control so it can never swallow clicks aimed at the enemy. It redraws only
+## when the health or the statuses change, and about every REFRESH_TIME while
+## a status shows, so the time-spent shading keeps moving.
 
 const STATUS_SIZE := 22.0
 const STATUS_GAP := 3.0
+## Seconds between redraws of the status shading.
+const REFRESH_TIME := 0.1
 
 @export var size := Vector2(90, 10)
 @export var fill_color := Color("c8312b")
@@ -14,19 +18,30 @@ const STATUS_GAP := 3.0
 var badge := false
 
 var _ratio := 1.0
+## The enemy's status_version at the last redraw, and the time since it.
+var _seen_version := 0
+var _since_draw := 0.0
 
 
 func set_health(current: float, maximum: float) -> void:
-	_ratio = clampf(current / maximum, 0.0, 1.0)
+	var ratio := clampf(current / maximum, 0.0, 1.0)
+	if is_equal_approx(ratio, _ratio):
+		return
+	_ratio = ratio
 	queue_redraw()
 
 
-func _process(_delta: float) -> void:
-	if get_parent() is Enemy:
+func _process(delta: float) -> void:
+	var enemy := get_parent() as Enemy
+	if enemy == null:
+		return
+	_since_draw += delta
+	if enemy.status_version != _seen_version or (enemy.has_any_status() and _since_draw >= REFRESH_TIME):
 		queue_redraw()
 
 
 func _draw() -> void:
+	_since_draw = 0.0
 	var rect := Rect2(-size * 0.5, size)
 	draw_rect(rect.grow(2.0), Color(0, 0, 0, 0.8))
 	draw_rect(Rect2(rect.position, Vector2(size.x * _ratio, size.y)), fill_color)
@@ -39,6 +54,7 @@ func _draw() -> void:
 	var enemy := get_parent() as Enemy
 	if enemy == null:
 		return
+	_seen_version = enemy.status_version
 	var statuses := enemy.statuses()
 	var x := -(statuses.size() * (STATUS_SIZE + STATUS_GAP) - STATUS_GAP) * 0.5
 	var font := ThemeDB.fallback_font

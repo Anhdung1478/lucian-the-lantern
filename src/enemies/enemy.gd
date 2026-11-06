@@ -46,6 +46,9 @@ var last_attacker: Node
 var _marks := {}
 ## Status id -> {stacks, left, duration, icon}.
 var _statuses := {}
+## Goes up whenever a status is added, changed or ends, so the health bar
+## knows when its icons are out of date.
+var status_version := 0
 ## Slow id -> {pct, left}. The strongest one counts.
 var _slows := {}
 var _burns := DamageOverTime.new()
@@ -167,6 +170,7 @@ func _leave_fight() -> void:
 	_burns.clear()
 	_statuses.erase(SLOW)
 	_statuses.erase(BURN)
+	status_version += 1
 
 
 ## A short fade, then the node goes.
@@ -210,10 +214,16 @@ func add_status(id: StringName, duration: float, max_stacks := 1, icon: Texture2
 	status.duration = duration
 	status.icon = icon
 	_statuses[id] = status
+	status_version += 1
 
 
 func has_status(id: StringName) -> bool:
 	return _statuses.has(id)
+
+
+## Whether any status is showing (each one runs out, so each one is timed).
+func has_any_status() -> bool:
+	return not _statuses.is_empty()
 
 
 func status_stacks(id: StringName) -> int:
@@ -242,6 +252,7 @@ func _show_hit() -> void:
 ## Shows status `id` (one stack) for `seconds`, the longest slow or burn.
 func _set_status(id: StringName, seconds: float, icon: Texture2D) -> void:
 	_statuses[id] = {"stacks": 1, "left": seconds, "duration": seconds, "icon": icon}
+	status_version += 1
 
 
 func _physics_process(delta: float) -> void:
@@ -254,6 +265,7 @@ func _physics_process(delta: float) -> void:
 		_statuses[id].left -= delta
 		if _statuses[id].left <= 0.0:
 			_statuses.erase(id)
+			status_version += 1
 	for id in _slows.keys():
 		_slows[id].left -= delta
 		if _slows[id].left <= 0.0:
