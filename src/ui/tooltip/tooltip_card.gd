@@ -80,8 +80,7 @@ static func recipe_hints(shown: ItemData, catalog: ItemCatalog, inventory: Inven
 	var upgraded := catalog.boots_upgrade(inventory.boots(), shown)
 	if upgraded != null:
 		shown_lines.append("Upgrades your Boots into %s" % upgraded.display_name)
-	return "
-".join(shown_lines)
+	return "\n".join(shown_lines)
 
 
 ## A legendary's recipe and the merchant's fee: "Recipe: Tear of the Goddess +
