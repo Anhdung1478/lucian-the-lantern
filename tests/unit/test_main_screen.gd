@@ -104,6 +104,33 @@ func test_save_writes_slot_one_and_toasts() -> void:
 	assert_eq(main.toast_text(), "Saved to slot 1")
 
 
+func test_start_writes_the_save_before_the_stage_opens() -> void:
+	var essences := SaveGame.instance().essences
+	essences.add(Essences.BLUE, 1000)
+	assert_true(SaveGame.instance().tree.buy(&"stat_ad", essences))
+	assert_false(SaveGame.instance().slot_exists(1), "nothing on disk yet")
+	var runs: Array[StageSetup] = []
+	main.start_requested.connect(runs.append)
+	main._start_training()
+	assert_eq(runs.size(), 1)
+	var loaded := SaveGame.new(SaveGame.instance().prefix)
+	loaded.load_slot(1)
+	assert_eq(loaded.tree.level(&"stat_ad"), 1, "the purchase is on disk")
+
+
+func test_a_failed_save_stops_every_kind_of_start_with_a_red_toast() -> void:
+	SaveGame.instance().prefix = "user://no_such_dir/test_main_screen_save_slot_"
+	var runs: Array[StageSetup] = []
+	main.start_requested.connect(runs.append)
+	main._start_training()
+	main._start_stage(1, 1)
+	main._start_endless(1)
+	assert_eq(runs.size(), 0, "nothing starts")
+	assert_eq(main.toast_text(), "Could not save, so the stage didn't start")
+	assert_eq(main._toast.get_theme_color(&"font_color"), UiStyle.ERROR_COLOR)
+	assert_push_warning_count(3)
+
+
 func test_a_failed_save_shows_a_red_toast() -> void:
 	# A folder that doesn't exist: the save fails.
 	SaveGame.instance().prefix = "user://no_such_dir/test_main_screen_save_slot_"

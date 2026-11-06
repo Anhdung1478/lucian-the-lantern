@@ -19,6 +19,7 @@ const SECTION_SKINS := 1
 const SECTION_JOURNEY := 2
 const TOP_BAR := 72.0
 const BOTTOM_BAR := 88.0
+const COULD_NOT_START := "Could not save, so the stage didn't start"
 const TOAST_TIME := 1.6
 
 ## The Evolution Tree, Skin Shop and Journey pages, in that order.
@@ -180,16 +181,27 @@ func _refresh_free_badge() -> void:
 
 
 func _start_training() -> void:
-	start_requested.emit(StageSetup.from_save(SaveGame.instance()))
+	_request_start(StageSetup.from_save(SaveGame.instance()))
 
 
 func _start_stage(act: int, stage: int) -> void:
-	start_requested.emit(StageSetup.for_stage(SaveGame.instance(), act, stage))
+	_request_start(StageSetup.for_stage(SaveGame.instance(), act, stage))
 
 
 ## `map_choice` is a Journey.ENDLESS_MAPS index; Random rolls its map here.
 func _start_endless(map_choice: int) -> void:
-	start_requested.emit(StageSetup.for_endless(SaveGame.instance(), map_choice, _rng))
+	_request_start(StageSetup.for_endless(SaveGame.instance(), map_choice, _rng))
+
+
+## Pressing Start writes the save first (the tree, the gear and the stage
+## progress are on disk before the stage opens). If it can't be written the
+## stage doesn't start: a red toast says so and the main screen stays.
+func _request_start(run: StageSetup) -> void:
+	if not SaveGame.instance().save():
+		show_toast(COULD_NOT_START, true)
+		Sfx.play(&"error")
+		return
+	start_requested.emit(run)
 
 
 func _open_settings() -> void:

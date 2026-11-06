@@ -13,16 +13,26 @@ func before_each() -> void:
 	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
 		SaveGame._instance = SaveGame.new(PREFIX)
 	SaveGame.instance().reset()
+	_remove_save_files()
 	section = JourneySection.new()
 	add_child_autofree(section)
 
 
 func after_each() -> void:
+	_remove_save_files()
 	if _settings:
 		GameSettings._instance = _settings
 		_settings = null
 	if FileAccess.file_exists(SETTINGS_PATH):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS_PATH))
+
+
+## Start through the main screen writes the save: leave no file behind.
+func _remove_save_files() -> void:
+	for n in range(1, SaveGame.SLOTS + 1):
+		for file in [_save().path(n), _save().backup_path(n)]:
+			if FileAccess.file_exists(file):
+				DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 
 
 func _save() -> SaveGame:
