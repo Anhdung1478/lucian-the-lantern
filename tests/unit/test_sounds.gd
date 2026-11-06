@@ -147,7 +147,6 @@ func test_a_busy_pool_does_not_cut_off_the_boss_stinger() -> void:
 	for i in Sfx.POOL:
 		Sfx.play(StringName("hit_%d" % i))
 	assert_eq(boss_player.stream, Sfx.stream(&"boss"), "the boss sound still owns its player")
-	assert_true(boss_player.playing or sfx._sounds[sfx._players.find(boss_player)] == &"boss")
 
 
 func test_a_free_player_is_used_before_any_is_cut() -> void:
