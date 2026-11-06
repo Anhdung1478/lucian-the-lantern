@@ -136,6 +136,51 @@ func test_crafting_cards_send_the_player_to_the_merchant() -> void:
 	card.free()
 
 
+func test_shop_fragment_cards_name_what_a_held_partner_builds() -> void:
+	var catalog := lucian.item_catalog
+	var tear := catalog.find(&"tear_of_the_goddess")
+	var card := TooltipCard.item(tear, catalog, lucian.inventory)
+	assert_string_contains(card_text(card), "Craft it with another fragment", "nothing held: the old footer")
+	card.free()
+	lucian.inventory.add(tear)
+	card = TooltipCard.item(tear, catalog, lucian.inventory)
+	assert_string_contains(card_text(card), "Builds into Muramana with Tear of the Goddess (you have it)")
+	card.free()
+	card = TooltipCard.item(tear, catalog)
+	assert_string_contains(card_text(card), "Craft it with another fragment", "no inventory: the old footer")
+	card.free()
+
+
+func test_shop_fragment_cards_cap_the_hints_at_three() -> void:
+	var catalog := lucian.item_catalog
+	for fragment in catalog.fragments():
+		lucian.inventory.add(fragment)
+	var most := catalog.fragments().filter(func(f: ItemData) -> bool: return catalog.builds_into(f).size() > 3)
+	assert_false(most.is_empty())
+	var card := TooltipCard.item(most[0], catalog, lucian.inventory)
+	var text := card_text(card)
+	assert_eq(text.count("Builds into"), 3)
+	assert_string_contains(text, "more")
+	card.free()
+
+
+func test_shop_fragment_cards_name_the_boots_upgrade() -> void:
+	var catalog := lucian.item_catalog
+	var boots := catalog.find(&"boots_of_speed")
+	lucian.inventory.set_boots(boots)
+	var fragment := catalog.find(boots_fragment_id(catalog, boots))
+	var card := TooltipCard.item(fragment, catalog, lucian.inventory)
+	assert_string_contains(card_text(card), "Upgrades your Boots into %s" % catalog.boots_upgrade(boots, fragment).display_name)
+	card.free()
+
+
+func boots_fragment_id(catalog: ItemCatalog, boots: ItemData) -> StringName:
+	for item in catalog.boots():
+		if item.boots_tier == boots.boots_tier + 1:
+			return item.upgrade_fragment
+	return &""
+
+
 func test_skill_cards_show_the_cooldown_with_ability_haste() -> void:
 	var q := lucian.skills[ChampionProgress.Slot.Q]
 	var card := TooltipCard.skill(lucian, q, null, "Q")

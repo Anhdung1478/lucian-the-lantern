@@ -13,13 +13,17 @@ const SUB_COLOR := Color("9aa3b2")
 const UPGRADE_COLOR := "7fd67f"
 ## A locked skill's note ("Locked: clear Act 1 to unlock it…").
 const LOCKED_COLOR := "ff6a5a"
+## Most "Builds into" lines on a shop fragment's card.
+const RECIPE_HINTS := 3
 const KIND_NAMES := {
 	ItemData.Kind.FRAGMENT: "Fragment", ItemData.Kind.LEGENDARY: "Legendary", ItemData.Kind.POTION: "Potion",
 	ItemData.Kind.BOOTS: "Boots",
 }
 
 
-static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
+## With an `inventory` (the shop's cards), a fragment's footer names what it
+## builds into with a partner the player already holds.
+static func item(shown: ItemData, catalog: ItemCatalog, inventory: Inventory = null) -> Control:
 	var icon := ItemIcon.new(shown)
 	icon.tooltips = false
 	var cost := TooltipText.color("%d gold" % shown.cost, TooltipText.GOLD)
@@ -43,6 +47,9 @@ static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 	var footer := ""
 	if shown.is_fragment():
 		footer = "Craft it with another fragment at the merchant's Craft tab."
+		var hints := recipe_hints(shown, catalog, inventory)
+		if hints != "":
+			footer = hints
 	elif shown.is_potion():
 		var key := GameSettings.instance().key_label(Inventory.key_action(Inventory.potion_cell(shown)))
 		footer = "Put it in its potion cell and press %s to drink. Stacks up to %d." % [key, shown.max_stack]
@@ -54,6 +61,27 @@ static func item(shown: ItemData, catalog: ItemCatalog) -> Control:
 		_separator(card)
 		_body(card, TooltipText.color(footer, TooltipText.DIM))
 	return card
+
+
+## What a fragment builds into with items the player holds, one line each (at
+## most RECIPE_HINTS, then "+N more"): "Builds into Muramana with Tear (you
+## have it)", plus "Upgrades your Boots into X" when the worn boots take it.
+## "" without an inventory or when nothing fits.
+static func recipe_hints(shown: ItemData, catalog: ItemCatalog, inventory: Inventory) -> String:
+	if catalog == null or inventory == null:
+		return ""
+	var lines: PackedStringArray = []
+	for recipe: Dictionary in catalog.builds_into(shown):
+		if inventory.has_item(recipe.partner.id):
+			lines.append("Builds into %s with %s (you have it)" % [recipe.made.display_name, recipe.partner.display_name])
+	var shown_lines := lines.slice(0, RECIPE_HINTS)
+	if lines.size() > RECIPE_HINTS:
+		shown_lines.append("+%d more" % (lines.size() - RECIPE_HINTS))
+	var upgraded := catalog.boots_upgrade(inventory.boots(), shown)
+	if upgraded != null:
+		shown_lines.append("Upgrades your Boots into %s" % upgraded.display_name)
+	return "
+".join(shown_lines)
 
 
 ## A legendary's recipe and the merchant's fee: "Recipe: Tear of the Goddess +

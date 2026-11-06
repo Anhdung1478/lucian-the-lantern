@@ -181,6 +181,11 @@ func put(index: int, item: ItemData) -> bool:
 	return true
 
 
+## Whether any backpack, equip, potion or boots cell holds the item `id`.
+func has_item(id: StringName) -> bool:
+	return items.any(func(item: ItemData) -> bool: return item != null and item.id == id)
+
+
 ## Empties the cell and returns what it held (its count is lost).
 func remove(index: int) -> ItemData:
 	var item := items[index]

@@ -90,6 +90,23 @@ func combine(a: ItemData, b: ItemData) -> ItemData:
 	return null
 
 
+## Every legendary `fragment` goes into, as {made, partner}: the reverse of
+## combine. A fragment that pairs with itself (two Tears) lists itself as the
+## partner.
+func builds_into(fragment: ItemData) -> Array:
+	var found: Array = []
+	if fragment == null or not fragment.is_fragment():
+		return found
+	for item in items:
+		var parts := item.components
+		if parts.size() != 2 or not parts.has(fragment.id):
+			continue
+		var partner := find(parts[1] if parts[0] == fragment.id else parts[0])
+		if partner != null:
+			found.append({"made": item, "partner": partner})
+	return found
+
+
 func _of_kind(kind: ItemData.Kind) -> Array[ItemData]:
 	var found: Array[ItemData] = []
 	for item in items:

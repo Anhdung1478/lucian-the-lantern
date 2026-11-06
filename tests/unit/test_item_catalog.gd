@@ -36,6 +36,20 @@ func test_combine_without_recipe_is_null() -> void:
 	assert_null(catalog.combine(catalog.find(&"sword"), null))
 
 
+func test_builds_into_lists_each_recipe_with_its_partner() -> void:
+	var sword := catalog.find(&"sword")
+	var found := catalog.builds_into(sword)
+	assert_eq(found.size(), 2)
+	var partners := {}
+	for recipe: Dictionary in found:
+		partners[recipe.made.id] = recipe.partner.id
+	assert_eq(partners[&"edge"], &"sword", "a fragment pairs with itself")
+	assert_eq(partners[&"gunblade"], &"rod")
+	assert_eq(catalog.builds_into(catalog.find(&"belt")).size(), 0)
+	assert_eq(catalog.builds_into(catalog.find(&"edge")).size(), 0, "legendaries build into nothing")
+	assert_eq(catalog.builds_into(null).size(), 0)
+
+
 func test_legendaries_never_combine() -> void:
 	assert_null(catalog.combine(catalog.find(&"edge"), catalog.find(&"sword")))
 

@@ -49,7 +49,7 @@ func is_sold() -> bool:
 
 func tooltip_content() -> Control:
 	var shown := item()
-	return TooltipCard.item(shown, screen.inventory.catalog) if shown and not screen.is_dragging() else null
+	return TooltipCard.item(shown, screen.inventory.catalog, screen.inventory) if shown and not screen.is_dragging() else null
 
 
 func _gui_input(event: InputEvent) -> void:
