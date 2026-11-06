@@ -86,10 +86,23 @@ func test_dragging_a_shop_item_onto_a_cell_buys_it_there() -> void:
 	assert_true(stock.is_sold(1))
 
 
-func test_dragging_onto_an_occupied_cell_buys_nothing() -> void:
+func test_dragging_onto_an_occupied_cell_buys_into_a_free_cell() -> void:
+	var item := stock.item_at(1)
+	drag(slot(0, 1), cell(0))
+	assert_eq(inventory.item_at(0).id, &"sword", "the taken cell is untouched")
+	assert_eq(inventory.item_at(1), item)
+	assert_eq(wallet.gold, 4000)
+	assert_true(stock.is_sold(1))
+
+
+func test_dragging_onto_an_occupied_cell_with_no_free_cell_buys_nothing() -> void:
+	inventory.unlocked_backpack = 1
+	inventory.unlocked_equip = 1
+	inventory.put(Inventory.EQUIP_START, inventory.catalog.find(&"belt"))
 	drag(slot(0, 1), cell(0))
 	assert_eq(wallet.gold, 5000)
 	assert_false(stock.is_sold(1))
+	assert_eq(screen.shop_panel()._message.text, "No room in the backpack")
 
 
 func test_dropping_a_shop_item_outside_buys_nothing() -> void:

@@ -26,7 +26,6 @@ const MESSAGES := {
 	Shop.Result.NO_GOLD: "Not enough gold",
 	Shop.Result.NO_ROOM: "No room in the backpack",
 	Shop.Result.CELL_LOCKED: "That cell is locked",
-	Shop.Result.CELL_TAKEN: "That cell is taken",
 	Shop.Result.SOLD_OUT: "Already sold",
 	Shop.Result.NOTHING_TO_REFRESH: "Nothing left to refresh",
 	Shop.Result.NO_RECIPE: "Those don't craft into anything",

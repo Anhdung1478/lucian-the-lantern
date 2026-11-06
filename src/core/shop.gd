@@ -7,7 +7,7 @@ extends RefCounted
 ## purchase does not fit. Boots are never sold.
 
 enum Result {
-	OK, NO_GOLD, NO_ROOM, CELL_LOCKED, CELL_TAKEN, SOLD_OUT, NOTHING_TO_REFRESH,
+	OK, NO_GOLD, NO_ROOM, CELL_LOCKED, SOLD_OUT, NOTHING_TO_REFRESH,
 	NO_RECIPE, WRONG_CELL,
 }
 
@@ -25,7 +25,8 @@ func _init(merchant_stock: MerchantStock, target_inventory: Inventory, stage_wal
 
 
 ## Buys what stock slot `slot` sells, into `cell` or (-1) the first cell
-## it fits.
+## it fits. When `cell` is already taken the item goes to the first free
+## cell instead; a locked cell or one that can't hold it is refused.
 func buy_slot(slot: int, cell := -1) -> Result:
 	var item := stock.item_at(slot)
 	if item == null:
@@ -114,14 +115,14 @@ func refresh() -> Result:
 func _buy(item: ItemData, cell: int) -> Result:
 	if not wallet.can_afford(item.cost):
 		return Result.NO_GOLD
-	if cell < 0 and inventory.space_for(item) <= 0:
-		return Result.NO_ROOM
 	if cell >= 0 and inventory.is_locked(cell):
 		return Result.CELL_LOCKED
 	if cell >= 0 and not Inventory.accepts(cell, item):
 		return Result.WRONG_CELL
 	if cell >= 0 and not inventory.can_put(cell, item):
-		return Result.CELL_TAKEN
+		cell = -1
+	if cell < 0 and inventory.space_for(item) <= 0:
+		return Result.NO_ROOM
 	wallet.spend(item.cost)
 	if cell < 0:
 		inventory.add(item)

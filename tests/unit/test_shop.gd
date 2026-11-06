@@ -57,9 +57,10 @@ func test_full_backpack_is_refused_without_paying() -> void:
 func test_buying_into_a_chosen_cell() -> void:
 	wallet.add(5000)
 	inventory.add(catalog.find(&"belt"))
-	assert_eq(shop.buy_slot(0, 0), Result.CELL_TAKEN, "occupied")
-	assert_eq(shop.buy_slot(0, EQUIP), Result.OK)
-	assert_eq(inventory.item_at(EQUIP), stock.items[0])
+	assert_eq(shop.buy_slot(0, 0), Result.OK, "occupied: bought into a free cell instead")
+	assert_eq(inventory.item_at(1), stock.items[0])
+	assert_eq(shop.buy_slot(1, EQUIP), Result.OK)
+	assert_eq(inventory.item_at(EQUIP), stock.items[1])
 
 
 func test_potions_stack_and_never_sell_out() -> void:
