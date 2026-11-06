@@ -15,8 +15,9 @@ func after_each() -> void:
 
 
 func _delete() -> void:
-	if FileAccess.file_exists(PATH):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
+	for file in [PATH, PATH + ".tmp"]:
+		if FileAccess.file_exists(file):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 
 
 func key(code: Key) -> InputEventKey:
@@ -53,6 +54,31 @@ func test_changes_are_saved_with_a_version() -> void:
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(PATH))
 	assert_eq(int(data.version), GameSettings.VERSION)
 	assert_eq(GameSettings.new(PATH).get_value(&"music_volume"), 35)
+
+
+func test_a_save_goes_through_a_temp_file_and_leaves_none() -> void:
+	settings.set_value(&"music_volume", 35)
+	assert_true(FileAccess.file_exists(PATH))
+	assert_false(FileAccess.file_exists(PATH + ".tmp"), "renamed over the file")
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+	assert_true(data is Dictionary, "a whole file")
+	assert_eq(GameSettings.new(PATH).get_value(&"music_volume"), 35)
+
+
+func test_a_leftover_temp_file_is_replaced() -> void:
+	var file := FileAccess.open(PATH + ".tmp", FileAccess.WRITE)
+	file.store_string("{half a fil")
+	file.close()
+	settings.set_value(&"sfx_volume", 12)
+	assert_false(FileAccess.file_exists(PATH + ".tmp"))
+	assert_eq(GameSettings.new(PATH).get_value(&"sfx_volume"), 12)
+
+
+func test_a_failed_save_warns_and_leaves_no_temp_file() -> void:
+	var nowhere := GameSettings.new("user://no_such_dir/test_settings.json")
+	nowhere.set_value(&"sfx_volume", 12)
+	assert_push_warning_count(1)
+	assert_false(FileAccess.file_exists("user://no_such_dir/test_settings.json.tmp"))
 
 
 func test_loaded_numbers_stay_ints() -> void:

@@ -164,11 +164,24 @@ func save() -> void:
 	var saved_values := {}
 	for key: StringName in _values:
 		saved_values[String(key)] = _values[key]
-	var file := FileAccess.open(path, FileAccess.WRITE)
+	# Written to "<path>.tmp" first, then renamed over the old file, so a crash
+	# mid-write leaves the old settings (and key bindings) whole.
+	var temp_path := path + ".tmp"
+	var file := FileAccess.open(temp_path, FileAccess.WRITE)
 	if file == null:
-		push_warning("Could not save settings to %s" % path)
+		_save_failed(temp_path)
 		return
-	file.store_string(JSON.stringify({"version": VERSION, "values": saved_values, "bindings": saved_bindings}, "\t"))
+	var written := file.store_string(JSON.stringify({"version": VERSION, "values": saved_values, "bindings": saved_bindings}, "\t")) \
+		and file.get_error() == OK
+	file.close()
+	if not written or DirAccess.rename_absolute(ProjectSettings.globalize_path(temp_path), ProjectSettings.globalize_path(path)) != OK:
+		_save_failed(temp_path)
+
+
+func _save_failed(temp_path: String) -> void:
+	push_warning("Could not save settings to %s" % path)
+	if FileAccess.file_exists(temp_path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(temp_path))
 
 
 ## Pushes every setting into the engine, the window's size and place too.
