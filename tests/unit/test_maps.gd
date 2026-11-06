@@ -491,6 +491,23 @@ func test_an_enemy_bolt_flies_over_the_abyss() -> void:
 	assert_eq(hit[0], 1, "over the abyss to Lucian")
 
 
+func test_a_wide_wave_flies_over_the_abyss() -> void:
+	_chasm_map(CHASM_STRIP)
+	var lucian := _lucian_at(Vector2(2000, 1000))
+	await wait_physics_frames(2)
+	var bolt := EnemyProjectile.new()
+	bolt.launch(Vector2(1000, 1000), Vector2.RIGHT, DamageInfo.create(20.0, DamageInfo.Type.MAGIC, &"test"), lucian)
+	bolt.speed = 1500.0
+	bolt.max_range = 1500.0
+	bolt.hit_radius = 90.0
+	bolt.front_width = 180.0
+	var hit := [0]
+	bolt.hit_lucian.connect(func() -> void: hit[0] += 1)
+	add_child_autofree(bolt)
+	await wait_physics_frames(50)
+	assert_eq(hit[0], 1, "the wave's width doesn't catch on the abyss")
+
+
 func test_an_enemy_body_stops_at_the_abyss() -> void:
 	_chasm_map(CHASM_STRIP)
 	var lucian := _lucian_at(Vector2(2000, 1000))

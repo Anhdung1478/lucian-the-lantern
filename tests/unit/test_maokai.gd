@@ -162,6 +162,30 @@ func test_a_tree_stops_the_vine_wave() -> void:
 	assert_false(lucian.has_cc(CrowdControl.Kind.ROOT))
 
 
+func test_a_tree_beside_the_vine_wave_s_line_stops_it_by_its_width() -> void:
+	var boss := _maokai(Vector2.ZERO)
+	_quiet(boss)
+	# Its edge is 30 off the line: clear of the center, inside the 140 width.
+	_wall(Vector2(300, 100))
+	lucian.global_position = Vector2(600, 0)
+	await wait_physics_frames(1)
+	boss.nature_grasp()
+	await wait_seconds(2.4)
+	assert_eq(_hits(&"nature_grasp").size(), 0)
+	assert_false(lucian.has_cc(CrowdControl.Kind.ROOT))
+
+
+func test_a_vine_wave_fired_beside_a_tree_still_travels() -> void:
+	var boss := _maokai(Vector2.ZERO)
+	_quiet(boss)
+	_wall(Vector2(0, 100))
+	lucian.global_position = Vector2(500, 0)
+	await wait_physics_frames(1)
+	boss.nature_grasp()
+	await wait_seconds(2.0)
+	assert_eq(_hits(&"nature_grasp").size(), 1, "it left the tree behind")
+
+
 func test_banshees_veil_blocks_the_vine_root_too() -> void:
 	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"banshees_veil"))
 	var boss := _maokai(Vector2.ZERO)

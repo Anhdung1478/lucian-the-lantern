@@ -3,6 +3,8 @@ extends Area2D
 ## An enemy's shot: flies straight and ends on Lucian (by distance, taken or
 ## blocked) or on a wall or pillar. A boomerang flies `max_range` out, then
 ## back to its thrower, and may hit once each way. It flies over the abyss.
+## A wave front (front_width) stops on a wall by its whole width, not just its
+## center.
 
 ## The shot hit Lucian and he took it (not blocked).
 signal hit_lucian
@@ -20,6 +22,8 @@ const FRONT_DEPTH := 58.0
 const WAKE_DEPTH := 56.0
 const FRONT_POINTS := 18
 const FOAM := Color("eafcff")
+## How thin the wall check across a wave's front is, along its travel.
+const WALL_CHECK_DEPTH := 12.0
 
 var info: DamageInfo
 var target: Lucian
@@ -30,7 +34,9 @@ var hit_radius := 12.0
 var color := Color("c47cff")
 ## Drawn as a wave front this wide across its travel (the Ocean Drake's Tidal
 ## Wave), a crest of foam bowing forward, instead of a ball. 0 = a ball. The
-## look only: it still hits within hit_radius of its center.
+## look and its reach at walls: it still hits Lucian within hit_radius of its
+## center, but a wall anywhere across this width stops it (once it has
+## travelled hit_radius, so a wave fired beside a wall still leaves).
 var front_width := 0.0
 ## Boomerang: flies back to this node after max_range.
 var return_to: Node2D
@@ -43,6 +49,7 @@ var _hit_this_pass := false
 ## It reached Lucian on its way out (taken or blocked): never a miss.
 var _reached := false
 var _missed := false
+var _wall_check: RectangleShape2D
 
 
 func launch(from: Vector2, toward: Vector2, hit: DamageInfo, foe: Lucian) -> void:
@@ -78,6 +85,10 @@ func _physics_process(delta: float) -> void:
 	global_position += direction * step
 	rotation = direction.angle()
 	_travelled += step
+	if _hits_wall_across_front():
+		_miss.call_deferred()
+		queue_free()
+		return
 	if tether:
 		queue_redraw()
 	if not _hit_this_pass and is_instance_valid(target) and global_position.distance_to(target.global_position) <= hit_radius + Lucian.HIT_RADIUS:
@@ -95,6 +106,22 @@ func _physics_process(delta: float) -> void:
 			_hit_this_pass = false
 		else:
 			queue_free()
+
+
+## True when a wave front's width, a thin strip across its travel, touches a
+## wall or pillar. Only once it has travelled hit_radius; never for a narrow
+## shot or over the abyss (not a wall).
+func _hits_wall_across_front() -> bool:
+	if front_width <= 0.0 or _travelled < hit_radius:
+		return false
+	if _wall_check == null:
+		_wall_check = RectangleShape2D.new()
+	_wall_check.size = Vector2(WALL_CHECK_DEPTH, front_width)
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = _wall_check
+	query.transform = global_transform
+	query.collision_mask = Layers.WORLD
+	return not get_world_2d().direct_space_state.intersect_shape(query, 1).is_empty()
 
 
 ## A wall or pillar stops it. The miss waits for the end of the physics

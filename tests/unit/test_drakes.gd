@@ -326,6 +326,28 @@ func test_tidal_wave_hits_pushes_300_along_the_line_and_slows() -> void:
 	assert_almost_eq(lucian.global_position, Vector2(700, 0), Vector2(5, 5), "pushed 300 along the line")
 
 
+func test_a_pillar_beside_the_wave_s_line_stops_it_by_its_width() -> void:
+	var drake := _ocean(Vector2.ZERO)
+	# Its edge is 40 off the line: clear of the center, inside the 180 width.
+	_wall(Vector2(400, 110), 70.0)
+	lucian.global_position = Vector2(700, 0)
+	await wait_physics_frames(1)
+	drake.tidal_wave()
+	await wait_seconds(2.4)
+	assert_eq(_hits(&"tidal_wave").size(), 0, "the wave stopped on the pillar")
+	assert_engine_error_count(0)
+
+
+func test_a_wave_fired_beside_a_wall_still_travels() -> void:
+	var drake := _ocean(Vector2.ZERO)
+	_wall(Vector2(0, 110), 70.0)
+	lucian.global_position = Vector2(500, 0)
+	await wait_physics_frames(1)
+	drake.tidal_wave()
+	var hit: bool = await wait_until(func() -> bool: return not _hits(&"tidal_wave").is_empty(), 3.0)
+	assert_true(hit, "it left the wall behind")
+
+
 func test_the_wave_is_wide() -> void:
 	var drake := _ocean(Vector2.ZERO)
 	lucian.global_position = Vector2(500, 0)
@@ -512,3 +534,16 @@ func test_a_shot_that_kills_the_infernal_drake_mid_skill_causes_no_engine_errors
 	var zones := stage.get_node("Warnings").get_children().filter(func(node: Node) -> bool: return node is HazardZone)
 	assert_eq(zones.size(), 0, "a dead drake's fire never lands")
 	assert_engine_error_count(0)
+
+
+## A round pillar on the walls' layer.
+func _wall(at: Vector2, radius: float) -> void:
+	var wall := StaticBody2D.new()
+	wall.collision_layer = Layers.WORLD
+	var shape := CollisionShape2D.new()
+	var circle := CircleShape2D.new()
+	circle.radius = radius
+	shape.shape = circle
+	wall.position = at
+	wall.add_child(shape)
+	add_child_autofree(wall)
