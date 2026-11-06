@@ -367,3 +367,45 @@ func test_a_used_slot_leaves_room_around_its_text() -> void:
 	var button := _title().slot_list.buttons[1]
 	# The text's own width (and the button's padding) must not set the width.
 	assert_lte(button.get_minimum_size().x + 40.0, SlotList.BUTTON_SIZE.x, button.text)
+
+
+func _break_slot(n: int) -> void:
+	var save := SaveGame.instance()
+	var file := FileAccess.open(save.path(n), FileAccess.WRITE)
+	file.store_string("{not json")
+	file.close()
+
+
+func test_a_broken_slot_says_so_and_loading_it_only_offers_a_new_game() -> void:
+	SaveGame.instance().essences.add(Essences.BLUE, 42)
+	_break_slot(2)
+	game.show_title()
+	await wait_process_frames(1)
+	assert_false(_title().load_button.disabled, "a broken slot still opens the list, to explain it")
+	_title().show_slots(true)
+	var button := _title().slot_list.buttons[1]
+	assert_eq(button.text, "Slot 2 · can't be read")
+	assert_false(button.disabled)
+	assert_eq(button.get_theme_color(&"font_color"), UiStyle.ERROR_COLOR)
+	button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, TitleScreen, "never loaded")
+	assert_eq(SaveGame.instance().slot, 1)
+	assert_eq(SaveGame.instance().essences.amount(Essences.BLUE), 42, "the game in memory is untouched")
+	assert_true(_title().confirm.is_open())
+	assert_eq(_title().confirm._message.text, TitleScreen.BROKEN_LOAD % 2)
+	assert_eq(_choices(_title().confirm), "New game / Cancel")
+	_title().confirm.answer(true)
+	assert_true(_title().is_showing_difficulty(), "New game goes on to the difficulty")
+	assert_eq(_title()._new_slot, 2)
+
+
+func test_a_new_game_on_a_broken_slot_asks_to_overwrite_it() -> void:
+	_break_slot(3)
+	_title().show_slots(false)
+	_title().slot_list.buttons[2].pressed.emit()
+	assert_true(_title().confirm.is_open())
+	assert_eq(_title().confirm._message.text, TitleScreen.BROKEN_OVERWRITE % 3)
+	_title().confirm.answer(true)
+	assert_true(_title().is_showing_difficulty())
+	assert_eq(_title()._new_slot, 3)

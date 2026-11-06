@@ -71,16 +71,29 @@ func slot_exists(of_slot: int) -> bool:
 	return FileAccess.file_exists(path(of_slot)) or FileAccess.file_exists(backup_path(of_slot))
 
 
-## Makes `of_slot` current and loads it: the main file, else its backup,
-## else a new game.
-func load_slot(of_slot: int) -> void:
+## A slot whose files exist but can't be read, neither the main file nor
+## its backup: it can't be loaded, only overwritten by a new game.
+func slot_broken(of_slot: int) -> bool:
+	if not slot_exists(of_slot):
+		return false
+	for file in [path(of_slot), backup_path(of_slot)]:
+		if not _read(file, true).is_empty():
+			return false
+	return true
+
+
+## Makes `of_slot` current and loads it: the main file, else its backup.
+## False, with a new game in memory, when neither can be read (an empty or
+## broken slot): the title screen never loads a broken slot.
+func load_slot(of_slot: int) -> bool:
 	slot = of_slot
 	reset()
 	for file in [path(of_slot), backup_path(of_slot)]:
 		var data := _read(file)
 		if not data.is_empty():
 			_apply(data)
-			return
+			return true
+	return false
 
 
 func save() -> bool:
@@ -298,12 +311,15 @@ func _write_failed(file_path: String, temp_path: String) -> bool:
 	return false
 
 
-func _read(file_path: String) -> Dictionary:
+## The file's data, or {} when it is missing or broken (with a warning,
+## unless `quiet`).
+func _read(file_path: String, quiet := false) -> Dictionary:
 	if not FileAccess.file_exists(file_path):
 		return {}
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(file_path)) != OK or not json.data is Dictionary:
-		push_warning("Save file %s is broken" % file_path)
+		if not quiet:
+			push_warning("Save file %s is broken" % file_path)
 		return {}
 	return json.data
 

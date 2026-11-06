@@ -15,6 +15,9 @@ signal exit_requested
 
 const LANTERN := preload("res://assets/art/ui/title_lantern.svg")
 const BUTTON_SIZE := Vector2(420, 64)
+const BROKEN_LOAD := "Slot %d's save can't be read, so it can't be loaded.
+You can only overwrite it with a new game."
+const BROKEN_OVERWRITE := "Slot %d's save can't be read. Overwrite it with a new game?"
 
 ## The night scene behind everything: Lucian and Senna facing Thresh.
 var backdrop := TitleBackdrop.new()
@@ -103,10 +106,19 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+## A broken slot (SaveGame.slot_broken) is never loaded: the player is told
+## and offered only to overwrite it with a new game.
 func _on_picked(slot: int, used: bool) -> void:
-	if _loading:
-		SaveGame.instance().load_slot(slot)
-		game_loaded.emit()
+	var broken := used and SaveGame.instance().slot_broken(slot)
+	if _loading and broken:
+		confirm.confirm(BROKEN_LOAD % slot, "New game", show_difficulty.bind(slot))
+	elif _loading:
+		if SaveGame.instance().load_slot(slot):
+			game_loaded.emit()
+		else:
+			error_label.text = "Could not read slot %d" % slot
+	elif broken:
+		confirm.ask(BROKEN_OVERWRITE % slot, show_difficulty.bind(slot))
 	elif used:
 		confirm.ask("Overwrite slot %d? Its progress will be lost." % slot, show_difficulty.bind(slot))
 	else:

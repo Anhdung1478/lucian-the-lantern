@@ -147,6 +147,23 @@ func test_both_files_broken_is_a_new_game() -> void:
 	assert_push_warning_count(2)
 
 
+func test_a_slot_is_broken_when_no_file_of_it_reads() -> void:
+	assert_false(save_game.slot_broken(1), "no file: empty, not broken")
+	save_game.save()
+	assert_false(save_game.slot_broken(1))
+	save_game.save()
+	assert_true(FileAccess.file_exists(save_game.backup_path(1)))
+	_write_text(save_game.path(1), "{not json")
+	assert_false(save_game.slot_broken(1), "the backup still reads")
+	_write_text(save_game.backup_path(1), "[1, 2")
+	assert_true(save_game.slot_broken(1), "neither file reads")
+	assert_push_warning_count(0, "checking is quiet")
+	assert_false(save_game.load_slot(1), "it can't be loaded")
+	assert_push_warning_count(2)
+	assert_false(save_game.load_slot(2), "an empty slot loads nothing either")
+	assert_false(save_game.slot_broken(2))
+
+
 func test_copy_to_writes_another_slot_and_keeps_the_current_one() -> void:
 	save_game.essences.add(Essences.BLUE, 321)
 	assert_true(save_game.copy_to(2))
