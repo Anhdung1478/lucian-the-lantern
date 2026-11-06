@@ -262,7 +262,10 @@ func _process(delta: float) -> void:
 func _show_undo() -> void:
 	var sale := screen.shop.last_sale()
 	_undo.disabled = sale.is_empty()
-	_undo.tooltip_text = "" if sale.is_empty() else "Buy back %s for %d gold" % [sale.item.display_name, sale.price]
+	if sale.is_empty():
+		_undo.remove_meta(&"hover_text")
+	else:
+		_undo.set_meta(&"hover_text", "Buy back %s for %d gold" % [sale.item.display_name, sale.price])
 
 
 ## The Craft tab's fee, note and Craft button for what is in the inputs.
