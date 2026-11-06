@@ -28,6 +28,8 @@ const TIP_MARGIN := 14.0
 const BUFF_GAP := 8.0
 ## Space between R and the summoner spells.
 const SUMMONER_GAP := 10.0
+## Between the two potion cells in the gear column.
+const GEAR_GAP := 6
 ## Endless's modifier in the buff row: its id and name. No timer; its card
 ## gives both lines.
 const MODIFIER_ROW := &"endless_modifier"
@@ -63,6 +65,8 @@ var _modifier_row := {}
 @onready var stats_panel: StatsPanel = %StatsPanel
 @onready var skill_row: HBoxContainer = %SkillRow
 @onready var item_grid: GridContainer = %ItemGrid
+## Beside item_grid (not in it): the two potion cells and the boots.
+@onready var gear_column: VBoxContainer = %GearColumn
 @onready var level_label: Label = %LevelLabel
 @onready var xp_bar: ProgressBar = %XpBar
 @onready var hp_bar: ProgressBar = %HpBar
@@ -99,9 +103,20 @@ func setup(target: Lucian, stage_wallet: Wallet, stage_node: Stage = null) -> vo
 	for i in LucianController.SUMMONER_ACTIONS.size():
 		skill_row.add_child(SummonerSlot.new(target, i))
 	for i in Inventory.EQUIP_SIZE:
-		var item_slot := HudItemSlot.new(target.inventory, i)
+		var item_slot := HudItemSlot.new(target.inventory, Inventory.EQUIP_START + i)
 		item_slot.lucian = target
 		item_grid.add_child(item_slot)
+	# Beside the equip slots: the potion cells (7 and 8) over the boots.
+	var potions := HBoxContainer.new()
+	potions.add_theme_constant_override(&"separation", GEAR_GAP)
+	gear_column.add_child(potions)
+	for cell in [Inventory.HP_POTION_CELL, Inventory.MP_POTION_CELL]:
+		var potion_slot := HudItemSlot.new(target.inventory, cell)
+		potion_slot.lucian = target
+		potions.add_child(potion_slot)
+	var boots_slot := HudItemSlot.new(target.inventory, Inventory.BOOTS_CELL)
+	boots_slot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	gear_column.add_child(boots_slot)
 	settings.changed.connect(_on_setting_changed)
 
 
@@ -227,6 +242,16 @@ func _on_setting_changed(key: StringName) -> void:
 		_skill_slots[i].set_key(GameSettings.instance().key_label(SKILL_ACTIONS[i]))
 	for slot in item_grid.get_children():
 		slot.queue_redraw()
+	for slot in gear_slots():
+		slot.queue_redraw()
+
+
+## The HUD's potion cells and boots, in that order.
+func gear_slots() -> Array[HudItemSlot]:
+	var found: Array[HudItemSlot] = []
+	for node in gear_column.find_children("*", "HudItemSlot", true, false):
+		found.append(node as HudItemSlot)
+	return found
 
 
 func _place_stats_panel() -> void:

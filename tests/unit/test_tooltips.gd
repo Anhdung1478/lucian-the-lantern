@@ -88,3 +88,38 @@ func test_summoner_cards_build() -> void:
 		var card := TooltipCard.summoner(spell, "D", spell.cooldown)
 		assert_not_null(card, str(spell.id))
 		card.free()
+
+
+## Every line of text on a card, tags removed.
+func card_text(card: Control) -> String:
+	var parts: PackedStringArray = []
+	for label: Label in card.find_children("*", "Label", true, false):
+		parts.append(label.text)
+	for rich: RichTextLabel in card.find_children("*", "RichTextLabel", true, false):
+		parts.append(rich.get_parsed_text())
+	return "\n".join(parts)
+
+
+func test_boots_cards_say_they_cant_be_sold_and_how_they_upgrade() -> void:
+	var catalog := lucian.item_catalog
+	var card := TooltipCard.item(catalog.find(&"boots_of_speed"), catalog)
+	var text := card_text(card)
+	assert_string_contains(text, "Boots")
+	assert_string_contains(text, "Can't be sold")
+	assert_false(text.contains("gold\n"), "no price")
+	assert_string_contains(text, "all but Giant's Belt")
+	card.free()
+	card = TooltipCard.item(catalog.find(&"berserkers_greaves"), catalog)
+	assert_string_contains(card_text(card), "Upgrade at the merchant with a Recurve Bow (500 gold) into Gunmetal Greaves.")
+	card.free()
+	card = TooltipCard.item(catalog.find(&"immortal_path"), catalog)
+	text = card_text(card)
+	assert_string_contains(text, "Fully upgraded.")
+	assert_string_contains(text, "Now and Forever")
+	card.free()
+
+
+func test_potion_cards_point_to_their_key() -> void:
+	var card := TooltipCard.item(lucian.item_catalog.find(&"mp_potion"), lucian.item_catalog)
+	assert_string_contains(card_text(card), "put it in its potion cell and press 8")
+	card.free()

@@ -1,8 +1,9 @@
 class_name BackpackScreen
 extends CanvasLayer
 ## The backpack (P): 9x6 tan cells, and below them, outside the backpack, the
-## dark equip row (slots 1-6 and the sell slot). The recipe table sits
-## top-left while it is open.
+## dark equip row (slots 1-6 and the sell slot) and the gear row (the boots
+## cell, then the Health and Mana potion cells on keys 7 and 8). The recipe
+## table sits top-left while it is open.
 ##
 ## Dragging: holding the left button on an item (or moving while holding)
 ## picks it up; releasing drops it, decided by Inventory.drop_outcome. Held
@@ -14,7 +15,8 @@ extends CanvasLayer
 ## Shop mode (open_shop): the merchant's shop sits right of the backpack and
 ## the recipe table is hidden. Shop items are bought by dragging them onto a
 ## cell or by right-clicking them, and items dropped on the red sell slot
-## are sold.
+## are sold (boots never are). On the Boots tab, the boots and a fragment are
+## dragged onto its two inputs.
 
 ## The Use button was pressed for the potion in inventory cell `index`.
 signal potion_used(index: int)
@@ -33,18 +35,24 @@ const STRIP_COLOR := Color("1f1812")
 const STRIP_BORDER := Color("8c6e45")
 const TITLE_COLOR := Color("f3e2b8")
 const MARGIN := 16.0
+## Between the equip strip and the gear strip under it.
+const GEAR_GAP := 10
 const HOLD_TO_PICK := 0.2
 const MOVE_TO_PICK := 6.0
 const CRAFT_HOLD := 1.0
 const GHOST_SIZE := 56.0
 ## Drop target of the sell slot while the shop is open.
 const SELL := -2
+## Drop targets of the Boots tab's boots and fragment inputs.
+const UPGRADE_BOOTS := -3
+const UPGRADE_FRAGMENT := -4
 
 var inventory: Inventory
 ## The open shop, or null outside shop mode.
 var shop: Shop
 
-## Added in inventory order, so _cells[i] is cell i; the sell slot comes last.
+## Added in inventory order, so _cells[i] is cell i (the potion and boots
+## cells included); the sell slot comes last.
 var _cells: Array[ItemCell] = []
 var _column: VBoxContainer
 var _recipes: RecipeTable
@@ -99,12 +107,14 @@ func open_shop(new_shop: Shop) -> void:
 	_place_column()
 
 
-## Closing mid-drag puts the item back. Also ends shop mode.
+## Closing mid-drag puts the item back. Also ends shop mode, emptying the
+## Boots tab's inputs.
 func close() -> void:
 	_end_drag()
 	_hide_use()
 	visible = false
 	shop = null
+	_shop_panel.clear_upgrade()
 	_shop_panel.visible = false
 	_recipes.visible = true
 	_place_column()
@@ -134,7 +144,7 @@ func dragged_shop_slot() -> ShopSlot:
 
 
 ## Index of the cell the dragged item is over, -1 for none, SELL for the
-## sell slot.
+## sell slot, UPGRADE_BOOTS / UPGRADE_FRAGMENT for the Boots tab's inputs.
 func target_index() -> int:
 	return _target if is_dragging() else -1
 
@@ -151,9 +161,23 @@ func sell_preview() -> int:
 	return shop.sell_value(_drag_index)
 
 
+## The dragged item is over the sell slot but can't be sold (boots).
+func sell_refused() -> bool:
+	return shop != null and _drag_index >= 0 and _target == SELL and not shop.can_sell(_drag_index)
+
+
 func refresh_shop() -> void:
 	if shop:
 		_report(shop.refresh())
+
+
+## The Boots tab's Upgrade button: the boots and fragment in its inputs.
+func upgrade_boots() -> void:
+	if shop:
+		var result := shop.upgrade_boots(_shop_panel.boots_input().index, _shop_panel.fragment_input().index)
+		if result == Shop.Result.OK:
+			Sfx.play(&"craft")
+		_report(result)
 
 
 func on_cell_input(cell: ItemCell, event: InputEvent) -> void:
@@ -252,8 +276,15 @@ func _release() -> void:
 			_buy(_drag_slot, _target)
 	elif _drag_index >= 0:
 		if _target == SELL:
-			shop.sell(_drag_index)
-			traded.emit(true)
+			if shop.can_sell(_drag_index):
+				shop.sell(_drag_index)
+				traded.emit(true)
+			else:
+				_shop_panel.show_message("Boots can't be sold")
+				traded.emit(false)
+		elif _target == UPGRADE_BOOTS or _target == UPGRADE_FRAGMENT:
+			if not _shop_panel.load_input(_target, _drag_index):
+				traded.emit(false)
 		else:
 			var craft_ready := _craft_popup.visible and _craft_time >= CRAFT_HOLD
 			if inventory.apply_drop(_drag_index, _target, craft_ready) == Inventory.Drop.CRAFT:
@@ -319,13 +350,18 @@ func _update_craft_popup() -> void:
 
 
 ## Inventory index of the cell at `point`; -1 outside any cell. The sell slot
-## is SELL while the shop is open and -1 otherwise.
+## is SELL while the shop is open and -1 otherwise; the Boots tab's inputs
+## are UPGRADE_BOOTS and UPGRADE_FRAGMENT for an item dragged from a cell.
 func _cell_index_at(point: Vector2) -> int:
 	for cell in _cells:
 		if cell.get_global_rect().has_point(point):
 			if cell.index >= 0:
 				return cell.index
 			return SELL if shop and _drag_index >= 0 else -1
+	if shop and _drag_index >= 0:
+		var input := _shop_panel.upgrade_input_at(point)
+		if input:
+			return input.target()
 	return -1
 
 
@@ -371,14 +407,33 @@ func _build() -> void:
 	for i in Inventory.BACKPACK_SIZE:
 		_add_cell(grid, i, ItemCell.Style.BACKPACK)
 
+	# The equip strip and, under it as wide, the gear strip.
+	var strips := VBoxContainer.new()
+	strips.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	strips.add_theme_constant_override(&"separation", GEAR_GAP)
+	_column.add_child(strips)
 	var strip := _panel(STRIP_COLOR, STRIP_BORDER, 2, 14)
-	strip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_column.add_child(strip)
+	strips.add_child(strip)
 	var equip_row := HBoxContainer.new()
 	equip_row.add_theme_constant_override(&"separation", CELL_GAP)
 	strip.add_child(equip_row)
 	for i in Inventory.EQUIP_SIZE:
 		_add_cell(equip_row, Inventory.EQUIP_START + i, ItemCell.Style.EQUIP)
+	# [Boots] ... [HP 7][MP 8], added in index order (60, 61, 62) so _cells
+	# stays in inventory order; the boots cell is then moved to the front.
+	var gear := _panel(STRIP_COLOR, STRIP_BORDER, 2, 14)
+	strips.add_child(gear)
+	var gear_row := HBoxContainer.new()
+	gear_row.add_theme_constant_override(&"separation", CELL_GAP)
+	gear.add_child(gear_row)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	gear_row.add_child(spacer)
+	_add_cell(gear_row, Inventory.HP_POTION_CELL, ItemCell.Style.POTION)
+	_add_cell(gear_row, Inventory.MP_POTION_CELL, ItemCell.Style.POTION)
+	_add_cell(gear_row, Inventory.BOOTS_CELL, ItemCell.Style.BOOTS)
+	gear_row.move_child(_cells.back(), 0)
 	_add_cell(equip_row, -1, ItemCell.Style.SELL)
 
 	var potions: Array[ItemData] = []

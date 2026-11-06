@@ -102,8 +102,95 @@ func test_potions_tab_buys_potions() -> void:
 	await wait_physics_frames(2)
 	button(slot(1, 0), MOUSE_BUTTON_RIGHT, true, center(slot(1, 0)))
 	button(slot(1, 0), MOUSE_BUTTON_RIGHT, true, center(slot(1, 0)))
-	assert_eq(inventory.item_at(1).id, &"red")
-	assert_eq(inventory.count_at(1), 2)
+	assert_eq(inventory.item_at(Inventory.HP_POTION_CELL).id, &"red", "into its potion cell first")
+	assert_eq(inventory.count_at(Inventory.HP_POTION_CELL), 2)
+	assert_null(inventory.item_at(1))
+
+
+func test_a_potion_dragged_onto_an_equip_slot_buys_nothing() -> void:
+	screen.shop_panel().show_tab(1)
+	await wait_physics_frames(2)
+	drag(slot(1, 0), cell(Inventory.EQUIP_START))
+	assert_null(inventory.item_at(Inventory.EQUIP_START))
+	assert_eq(wallet.gold, 5000)
+	assert_eq(screen.shop_panel()._message.text, "That item can't go there")
+
+
+func test_cells_stay_in_inventory_order_with_the_sell_slot_last() -> void:
+	assert_eq(screen._cells.size(), Inventory.SIZE + 1)
+	for i in Inventory.SIZE:
+		assert_eq(cell(i).index, i)
+	assert_eq(sell_cell().index, -1)
+	assert_eq(sell_cell().style, ItemCell.Style.SELL)
+	assert_eq(cell(Inventory.BOOTS_CELL).style, ItemCell.Style.BOOTS)
+	assert_eq(cell(Inventory.HP_POTION_CELL).style, ItemCell.Style.POTION)
+	var row := cell(Inventory.BOOTS_CELL).get_parent()
+	assert_eq(row.get_child(0), cell(Inventory.BOOTS_CELL), "the boots come first in their row")
+
+
+func _wear(id: StringName, tier: int) -> ItemData:
+	var worn := Fixtures.boots(id, tier)
+	inventory.set_boots(worn)
+	return worn
+
+
+func test_boots_on_the_sell_slot_are_refused() -> void:
+	var worn := _wear(&"speed", 1)
+	button(cell(Inventory.BOOTS_CELL), MOUSE_BUTTON_LEFT, true, center(cell(Inventory.BOOTS_CELL)))
+	mouse(cell(Inventory.BOOTS_CELL), InputEventMouseMotion.new(), center(sell_cell()))
+	screen._process(0.0)
+	assert_true(screen.sell_refused())
+	assert_eq(screen.sell_preview(), 0)
+	button(cell(Inventory.BOOTS_CELL), MOUSE_BUTTON_LEFT, false, center(sell_cell()))
+	assert_eq(inventory.boots(), worn)
+	assert_eq(wallet.gold, 5000)
+	assert_eq(screen.shop_panel()._message.text, "Boots can't be sold")
+
+
+func test_boots_dragged_onto_a_cell_go_back() -> void:
+	var worn := _wear(&"speed", 1)
+	drag(cell(Inventory.BOOTS_CELL), cell(5))
+	assert_eq(inventory.boots(), worn)
+	assert_null(inventory.item_at(5))
+
+
+func test_the_boots_tab_upgrades_what_is_dragged_in() -> void:
+	var catalog := inventory.catalog
+	catalog.items.append(Fixtures.boots(&"speed", 1))
+	var greaves := Fixtures.boots(&"sword_greaves", 2, &"sword", &"", 300)
+	catalog.items.append(greaves)
+	inventory.set_boots(catalog.find(&"speed"))
+	var panel := screen.shop_panel()
+	panel.show_tab(ShopPanel.BOOTS_TAB)
+	await wait_physics_frames(3)
+	assert_eq(panel.slots(ShopPanel.BOOTS_TAB).size(), 0, "no shop slots on the Boots tab")
+	assert_false(panel._refresh.visible)
+	drag(cell(0), panel.boots_input())
+	assert_eq(panel.boots_input().index, -1, "a fragment isn't boots")
+	assert_eq(panel._message.text, "Only boots go there")
+	drag(cell(Inventory.BOOTS_CELL), panel.boots_input())
+	drag(cell(0), panel.fragment_input())
+	assert_eq([panel.boots_input().index, panel.fragment_input().index], [Inventory.BOOTS_CELL, 0])
+	assert_eq(panel.upgrade_preview(), greaves)
+	assert_eq(panel.result_slot().item(), greaves)
+	panel._process(0.0)
+	assert_false(panel._upgrade.disabled)
+	panel._upgrade.pressed.emit()
+	assert_eq(inventory.boots(), greaves)
+	assert_null(inventory.item_at(0), "the fragment is used up")
+	assert_eq(wallet.gold, 4700)
+	assert_eq(panel.fragment_input().index, -1, "its cell is empty now")
+	assert_eq(panel.boots_input().index, Inventory.BOOTS_CELL)
+	screen.close()
+	assert_eq(panel.boots_input().index, -1, "closing empties the inputs")
+
+
+func test_the_boots_tab_says_when_there_are_no_boots() -> void:
+	var panel := screen.shop_panel()
+	panel.show_tab(ShopPanel.BOOTS_TAB)
+	panel._process(0.0)
+	assert_eq(panel._boots_note.text, ShopPanel.NO_BOOTS)
+	assert_true(panel._upgrade.disabled)
 
 
 func test_dropping_on_the_sell_slot_sells() -> void:
