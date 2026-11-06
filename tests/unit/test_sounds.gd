@@ -140,6 +140,35 @@ func test_a_refused_rank_up_is_quiet() -> void:
 	assert_false(sfx._last_played.has(&"rank_up"))
 
 
+func test_a_busy_pool_does_not_cut_off_the_boss_stinger() -> void:
+	var sfx := _sfx()
+	Sfx.play(&"boss")
+	var boss_player: AudioStreamPlayer = sfx._players.filter(func(p: AudioStreamPlayer) -> bool: return p.stream == Sfx.stream(&"boss"))[0]
+	for i in Sfx.POOL:
+		Sfx.play(StringName("hit_%d" % i))
+	assert_eq(boss_player.stream, Sfx.stream(&"boss"), "the boss sound still owns its player")
+	assert_true(boss_player.playing or sfx._sounds[sfx._players.find(boss_player)] == &"boss")
+
+
+func test_a_free_player_is_used_before_any_is_cut() -> void:
+	var sfx := _sfx()
+	Sfx.play(&"hit_a")
+	var first: int = sfx._sounds.find(&"hit_a")
+	Sfx.play(&"hit_b")
+	assert_ne(sfx._sounds.find(&"hit_b"), first, "the second sound takes a free player")
+	assert_eq(sfx._sounds[first], &"hit_a", "the first keeps playing")
+
+
+func test_when_every_player_has_a_stinger_the_earliest_is_cut() -> void:
+	var sfx := _sfx()
+	var now := Time.get_ticks_msec() / 1000.0
+	for i in Sfx.POOL:
+		sfx._sounds[i] = &"victory"
+		sfx._started[i] = now - i
+		sfx._ends[i] = now + 100.0
+	assert_eq(sfx.pick_player(now), Sfx.POOL - 1, "the one that started earliest")
+
+
 func test_q_plays_its_sound_when_the_beam_fires() -> void:
 	var sfx := _sfx()
 	var lucian := _lucian()

@@ -9,12 +9,19 @@ const POOL := 12
 const MIX_RATE := 22050
 ## The same sound never starts twice within this many seconds.
 const MIN_GAP := 0.035
+## Long sounds that mark a big moment. A busy pool never cuts one of these off
+## to make room, unless every player is playing one.
+const STINGERS: Array[StringName] = [&"boss", &"victory", &"defeat", &"wave", &"level_up", &"rank_up", &"freed"]
 
 static var _node: Sfx
 static var _streams := {}
 
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0
+## Per player: when its sound started and ends (seconds), and which sound it is.
+var _started: Array[float] = []
+var _ends: Array[float] = []
+var _sounds: Array[StringName] = []
 var _last_played := {}
 
 
@@ -43,6 +50,9 @@ func _ready() -> void:
 		player.bus = &"SFX"
 		add_child(player)
 		_players.append(player)
+		_started.append(0.0)
+		_ends.append(0.0)
+		_sounds.append(&"")
 	_node = self
 
 
@@ -56,12 +66,35 @@ func _play(sound: StringName, volume_db: float, pitch: float) -> void:
 	if now - _last_played.get(sound, -1.0) < MIN_GAP:
 		return
 	_last_played[sound] = now
-	var player := _players[_next]
-	_next = (_next + 1) % POOL
+	var index := pick_player(now)
+	var player := _players[index]
 	player.stream = stream(sound)
 	player.volume_db = volume_db
 	player.pitch_scale = pitch * randf_range(0.96, 1.04)
 	player.play()
+	_started[index] = now
+	_ends[index] = now + player.stream.get_length() / player.pitch_scale
+	_sounds[index] = sound
+
+
+## The player a new sound at `now` should use: a free one first; if all are busy,
+## the one that started earliest and isn't playing a stinger; a stinger is cut
+## only when every player is playing one.
+func pick_player(now: float) -> int:
+	var oldest := -1
+	var oldest_any := 0
+	for step in POOL:
+		var i := (_next + step) % POOL
+		if now >= _ends[i]:
+			_next = (i + 1) % POOL
+			return i
+		if _started[i] < _started[oldest_any]:
+			oldest_any = i
+		if not STINGERS.has(_sounds[i]) and (oldest == -1 or _started[i] < _started[oldest]):
+			oldest = i
+	var taken := oldest if oldest != -1 else oldest_any
+	_next = (taken + 1) % POOL
+	return taken
 
 
 ## True when `sound` has a recipe of its own, not the fallback beep.
