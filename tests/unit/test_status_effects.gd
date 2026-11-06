@@ -356,6 +356,8 @@ func test_a_status_on_an_enemy_bar_redraws_about_ten_times_a_second() -> void:
 	minion.add_status(&"test_status", 5.0)
 	await wait_process_frames(3)
 	var bar: EnemyHealthBar = minion.health_bar
+	# The bar's own _process would race the direct calls on a slow frame.
+	bar.set_process(false)
 	bar._since_draw = 0.0
 	watch_signals(bar)
 	bar._process(EnemyHealthBar.REFRESH_TIME * 0.5)
