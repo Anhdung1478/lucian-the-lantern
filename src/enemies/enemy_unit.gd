@@ -76,6 +76,10 @@ var attack_range := 0.0
 var move_speed := 0.0
 ## Its Boss.skill_hit damage times this (Endless's boss and mini boss power).
 var skill_scale := 1.0
+## Its basic attack's on-hit burn times this: in Endless, its damage over
+## the data's (EndlessDirector.scale), so the burn grows with the hit. 1.0 in
+## the story.
+var burn_scale := 1.0
 ## Where shots and ground warnings go; the parent when not set.
 var projectile_parent: Node
 var warning_parent: Node
@@ -296,14 +300,15 @@ func fire_bolt(hit: DamageInfo, speed: float, reach: float, toward := Vector2.ZE
 
 
 ## A basic attack landed on Lucian: the data's slow and burn (of its
-## burn_type, times skill_scale: an Endless boss burns harder), each under the data's id so one kind of enemy refreshes its own.
+## burn_type, times burn_scale: an Endless enemy burns harder), each under the
+## data's id so one kind of enemy refreshes its own.
 func apply_on_hit() -> void:
 	if not is_instance_valid(target):
 		return
 	if data.hit_slow > 0.0:
 		target.add_slow(data.id, data.hit_slow, data.hit_slow_time)
 	if data.hit_burn > 0.0:
-		target.add_burn(data.id, data.hit_burn * skill_scale, data.hit_burn_time, data.burn_type(), self)
+		target.add_burn(data.id, data.hit_burn * burn_scale, data.hit_burn_time, data.burn_type(), self)
 
 
 ## One step toward `point`: straight while no wall is in the way, else along

@@ -201,6 +201,40 @@ func test_a_tier_3_endless_infernal_drake_burns_130_percent() -> void:
 	drake.target = stage.lucian
 	drake.apply_on_hit()
 	assert_almost_eq(stage.lucian._burns.total_dps(), 10.0 * 1.3, 0.001, "the fireball's burn")
+	assert_almost_eq(drake.burn_scale, drake.skill_scale, 0.0001, "scaled once, by its power")
+
+
+## The burn `unit`'s basic attack leaves on Lucian, per second.
+func _hit_burn(stage: Stage, unit: EnemyUnit) -> float:
+	stage.lucian._burns.clear()
+	unit.target = stage.lucian
+	unit.apply_on_hit()
+	return stage.lucian._burns.total_dps()
+
+
+func test_an_endless_gromp_s_burn_grows_with_its_hit() -> void:
+	var stage: Stage = await _endless()
+	var at := stage.arena.spawn_points[0]
+	var first := stage.spawn_enemy(&"gromp", at, 1)
+	assert_almost_eq(_hit_burn(stage, first), 6.0, 0.001, "wave 1: as listed")
+	var fortieth := stage.spawn_enemy(&"gromp", at, 40)
+	var growth := EndlessPlan.damage_scale(40)
+	assert_almost_eq(fortieth.damage, 17.0 * growth, 0.01)
+	assert_almost_eq(_hit_burn(stage, fortieth), 6.0 * growth, 0.001, "wave 40: as much more as its hit")
+
+
+func test_an_endless_red_brambleback_s_burn_grows_with_its_wave() -> void:
+	var stage: Stage = await _endless()
+	var at := stage.arena.spawn_points[0]
+	var red := stage.spawn_enemy(WavePlan.RED_BRAMBLEBACK, at, 20)
+	assert_almost_eq(_hit_burn(stage, red), 8.0 * EndlessPlan.damage_scale(20), 0.001)
+
+
+func test_a_story_gromp_keeps_its_listed_burn() -> void:
+	var stage: Stage = await _story(3, 1)
+	var gromp := stage.spawn_enemy(&"gromp", stage.arena.spawn_points[0], 3)
+	assert_gt(gromp.damage, 17.0, "its hit grows with the act and wave")
+	assert_almost_eq(_hit_burn(stage, gromp), 6.0, 0.001, "its burn doesn't")
 
 
 func test_a_story_boss_keeps_its_hp_and_skill_hits() -> void:
