@@ -202,6 +202,15 @@ func freeze(on: bool) -> void:
 		lucian.invulnerable = _invulnerable_before_freeze
 
 
+## Ends the scene playing now, as its Skip button would (a quit that saves
+## mid-scene: Game._save). True when one was playing.
+func skip_cutscene() -> bool:
+	if not is_instance_valid(cutscene):
+		return false
+	cutscene.skip()
+	return true
+
+
 ## Debug and tests: every enemy goes (no rewards) and the boss wave comes next
 ## (in Endless, the next tenth wave).
 func jump_to_boss_wave() -> void:

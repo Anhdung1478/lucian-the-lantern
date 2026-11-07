@@ -619,6 +619,103 @@ func test_closing_the_window_on_stage_cleared_keeps_the_clear() -> void:
 	assert_true("2-1" in saved.cleared, str(saved.cleared))
 
 
+func _lethal() -> DamageInfo:
+	return DamageInfo.create(999999.0, DamageInfo.Type.TRUE, &"test")
+
+
+## 6-5 under the Game, every other stage cleared: the final Thresh floored
+## twice, his ending scene (17 s) playing.
+func _6_5_mid_ending() -> Stage:
+	var before := Journey.all_stage_ids(Journey.ACTS.size())
+	before.erase("6-5")
+	SaveGame.instance().set_cleared(before)
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 6, 5))
+	await wait_process_frames(2)
+	var stage := game.screen as Stage
+	stage.lucian.invulnerable = true
+	stage.jump_to_boss_wave()
+	stage.runner.tick(0.1)
+	stage.runner.tick(0.1)
+	var boss := stage.boss_unit as ThreshFinal
+	boss.take_damage(_lethal())
+	await wait_physics_frames(2)
+	boss._rise_left = 0.0
+	await wait_physics_frames(1)
+	boss.take_damage(_lethal())
+	await wait_physics_frames(2)
+	assert_is(stage.cutscene, SennaFreed, "the ending plays")
+	assert_false(stage.result.visible)
+	return stage
+
+
+func test_closing_the_window_mid_ending_keeps_6_5s_clear_and_thresh_s_rewards() -> void:
+	var stage: Stage = await _6_5_mid_ending()
+	game.notification(NOTIFICATION_WM_CLOSE_REQUEST)
+	game.prompt.answer(true)
+	assert_true(quit_called)
+	assert_null(stage.cutscene, "skipped")
+	assert_true(stage.result.visible, "the stage ended as a skip ends it")
+	var saved := _on_disk()
+	assert_true("6-5" in saved.cleared, str(saved.cleared))
+	assert_true("thresh_final" in saved.bosses)
+	assert_eq([saved.essences.amount(Essences.BLUE), saved.essences.amount(Essences.ORANGE), saved.essences.amount(Essences.PURPLE)],
+			[KillRewards.BOSS_BLUE, KillRewards.BOSS_ORANGE, 20], "his 100 blue, 5 orange and 20 purple")
+	assert_false(saved.ending_seen, "The End not seen yet")
+	# The next clear of 6-5 still ends on The End.
+	SaveGame.instance().load_slot(1)
+	get_tree().paused = false
+	game._on_stage_finished(&"cleared", &"main")
+	await wait_process_frames(2)
+	assert_is(game.screen, TheEndScreen)
+	assert_true(SaveGame.instance().ending_seen)
+
+
+func test_closing_the_window_mid_act_1_scene_keeps_the_clear_and_the_rewards() -> void:
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 1, 1))
+	await wait_process_frames(2)
+	var stage := game.screen as Stage
+	stage.lucian.invulnerable = true
+	stage.jump_to_boss_wave()
+	stage.runner.tick(0.1)
+	stage.runner.tick(0.1)
+	await wait_physics_frames(1)
+	stage.boss_unit.take_damage(DamageInfo.create(5000.0, DamageInfo.Type.TRUE, &"test"))
+	await wait_physics_frames(2)
+	assert_is(stage.cutscene, ThreshTakesSenna)
+	game.notification(NOTIFICATION_WM_CLOSE_REQUEST)
+	game.prompt.answer(true)
+	assert_true(quit_called)
+	assert_true(stage.result.visible)
+	var saved := _on_disk()
+	assert_true("1-1" in saved.cleared, str(saved.cleared))
+	assert_true("thresh_1" in saved.bosses)
+	assert_eq([saved.essences.amount(Essences.BLUE), saved.essences.amount(Essences.ORANGE), saved.essences.amount(Essences.PURPLE)],
+			[KillRewards.BOSS_BLUE, KillRewards.BOSS_ORANGE, 10])
+
+
+func test_cancel_mid_ending_lets_the_scene_play_on() -> void:
+	var stage: Stage = await _6_5_mid_ending()
+	game.notification(NOTIFICATION_WM_CLOSE_REQUEST)
+	game.prompt.cancel()
+	assert_is(stage.cutscene, SennaFreed, "still playing")
+	assert_false(stage.result.visible)
+	assert_false(get_tree().paused)
+	assert_false("6-5" in SaveGame.instance().cleared)
+
+
+func test_no_after_a_failed_save_mid_ending_keeps_the_result_paused() -> void:
+	var stage: Stage = await _6_5_mid_ending()
+	SaveGame.instance().prefix = BROKEN_PREFIX
+	game.notification(NOTIFICATION_WM_CLOSE_REQUEST)
+	game.prompt.answer(true)
+	assert_eq(game.prompt._message.text, "Could not save. Quit anyway?")
+	game.prompt.answer(false)
+	assert_false(quit_called)
+	assert_true(stage.result.visible)
+	assert_true(get_tree().paused, "the result panel pauses the game")
+	assert_push_warning_count(1)
+
+
 func test_the_esc_menu_names_the_stage() -> void:
 	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 1, 1))
 	await wait_physics_frames(2)

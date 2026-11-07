@@ -142,11 +142,19 @@ func _quit(save: bool) -> void:
 
 
 ## Saves the current slot (an Endless run's best with it: it is kept in
-## memory as each wave is won). On a stage's result panel the stage is done
-## first, as Continue would, so a clear is not lost; an Endless run has no
-## id to clear, so `cleared` never gets "endless".
+## memory as each wave is won). A stage's cutscene still playing is skipped
+## first, as its Skip button would: a boss's (Act 1's at half HP, 6-5's
+## ending) then ends the stage, with its rewards and its result panel. On a
+## stage's result panel the stage is done first, as Continue would, so a
+## clear is not lost; an Endless run has no id to clear, so `cleared` never
+## gets "endless". It never sets `ending_seen`: The End still shows on the
+## next clear of 6-5.
 func _save() -> bool:
 	var stage := screen as Stage
+	if stage and stage.skip_cutscene():
+		# The result panel it brought up pauses the game, also after "Could
+		# not save" and No.
+		_was_paused = _was_paused or stage.result.visible
 	if stage and stage.result.visible:
 		var id := "" if _run.endless else _run.stage_id
 		return SaveGame.instance().finish_stage(&"cleared" if stage.result.cleared else &"failed", id)
