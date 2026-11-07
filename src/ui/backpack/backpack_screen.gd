@@ -77,11 +77,28 @@ var _top := CanvasLayer.new()
 var _ghost := ItemIcon.new()
 ## The Craft button's question.
 var _confirm := ConfirmPopup.new()
+## The viewport whose size_changed places the column, while in the tree.
+var _viewport: Viewport
 
 
 func _ready() -> void:
 	layer = 30
 	visible = false
+
+
+## The window can change shape mid-stage (fullscreen from the pause menu's
+## Settings), so the column is placed again whenever the viewport resizes,
+## shown or not.
+func _enter_tree() -> void:
+	_viewport = get_viewport()
+	if not _viewport.size_changed.is_connected(_place_column):
+		_viewport.size_changed.connect(_place_column)
+
+
+func _exit_tree() -> void:
+	if _viewport and _viewport.size_changed.is_connected(_place_column):
+		_viewport.size_changed.disconnect(_place_column)
+	_viewport = null
 
 
 func setup(target_inventory: Inventory) -> void:
@@ -491,7 +508,8 @@ func _build() -> void:
 
 
 ## Centered above the HUD panel; with the shop open, the backpack and the
-## shop are centered side by side.
+## shop are centered side by side. Runs again when the column or the shop
+## resizes and when the viewport does.
 func _place_column() -> void:
 	if _column == null:
 		return

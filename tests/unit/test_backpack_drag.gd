@@ -154,6 +154,37 @@ func test_the_grid_has_9_columns_and_54_cells() -> void:
 	assert_eq(grid.get_child_count(), 54)
 
 
+## The column's centre x and the viewport's, for `on`'s backpack screen.
+func _centres(on: BackpackScreen) -> Vector2:
+	var column := on._column
+	var width := on.get_viewport().get_visible_rect().size.x
+	return Vector2(column.position.x + column.get_combined_minimum_size().x * 0.5, width * 0.5)
+
+
+func test_the_backpack_recentres_when_the_window_changes_shape() -> void:
+	# Its own viewport, so the test window keeps its size.
+	var view := SubViewport.new()
+	view.size = Vector2i(1920, 1080)
+	add_child_autofree(view)
+	var own := BackpackScreen.new()
+	view.add_child(own)
+	own.setup(inventory)
+	await wait_process_frames(2)
+	var centres := _centres(own)
+	assert_almost_eq(centres.x, centres.y, 1.0, "centred at first")
+	view.size = Vector2i(2520, 1080)
+	centres = _centres(own)
+	assert_almost_eq(centres.y, 1260.0, 1.0, "the viewport is wider")
+	assert_almost_eq(centres.x, centres.y, 1.0, "centred again at once, before being shown")
+	own.open()
+	view.size = Vector2i(1440, 1080)
+	centres = _centres(own)
+	assert_almost_eq(centres.x, centres.y, 1.0, "and while shown")
+	view.remove_child(own)
+	assert_false(view.size_changed.is_connected(own._place_column), "let go on leaving the tree")
+	own.free()
+
+
 ## The text of the first Label under `node`.
 func _label_text(node: Node) -> String:
 	if node is Label:
