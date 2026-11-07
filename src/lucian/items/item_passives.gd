@@ -141,7 +141,9 @@ var _combat_left := 0.0
 var _jaksho_tick := 0.0
 var _hatefog_left := 0.0
 var _rfc_shot_left := 0.0
-## Death's Dance's delayed damage: {rate, left}.
+## Death's Dance's delayed damage: {rate, left}. Owed until it lands, even
+## once the item is off; only Defy (on_kill) and Guardian Angel (on_lethal)
+## clear it.
 var _bleeds: Array[Dictionary] = []
 var _magebane_wait := 0.0
 
@@ -169,7 +171,9 @@ func in_combat() -> bool:
 	return _combat_left > 0.0
 
 
-## Re-reads the equipped items. Effects of items no longer equipped end.
+## Re-reads the equipped items. Effects of items no longer equipped end,
+## but Death's Dance's delayed damage still lands: taking it off for a moment
+## (or selling it and undoing the sale) never wipes what is owed.
 func refresh() -> void:
 	_owned.clear()
 	for item in lucian.inventory.equipped():
@@ -187,8 +191,6 @@ func refresh() -> void:
 		_mana_charge_armed = false
 	if not has(&"jaksho_the_protean"):
 		jaksho_stacks = 0
-	if not has(&"deaths_dance"):
-		_bleeds.clear()
 	if not has(&"kaenic_rookern"):
 		_magebane_wait = 0.0
 	# Gluttonous Greaves becoming Immortal Path keeps the stacks.

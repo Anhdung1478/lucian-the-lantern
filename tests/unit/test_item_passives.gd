@@ -372,3 +372,55 @@ func test_defys_cleanse_removes_the_ignore_pain_buff() -> void:
 	assert_false(_deaths_dance_buff().is_empty())
 	lucian.passives.on_kill()
 	assert_true(_deaths_dance_buff().is_empty())
+
+
+## Takes a 100 hit with Death's Dance on: 70 lands now, 30 is owed over 3 s.
+func _start_bleed() -> void:
+	equip(&"deaths_dance")
+	lucian.take_damage(DamageInfo.create(100.0, DamageInfo.Type.TRUE, &"basic", dummy))
+
+
+## HP lost while the whole bleed runs out.
+func _bleed_out() -> float:
+	var before := lucian.hp
+	lucian.passives._physics_process(ItemPassives.IGNORE_PAIN_TIME + 0.1)
+	return before - lucian.hp
+
+
+func test_taking_death_s_dance_off_and_on_mid_bleed_keeps_the_delayed_damage() -> void:
+	_start_bleed()
+	lucian.inventory.apply_drop(EQUIP, 0)
+	assert_false(lucian.passives.has(&"deaths_dance"), "in the backpack")
+	lucian.inventory.apply_drop(0, EQUIP)
+	assert_true(lucian.passives.has(&"deaths_dance"), "back on")
+	assert_almost_eq(_bleed_out(), 30.0, 0.01, "the whole 30 still lands")
+
+
+func test_the_delayed_damage_lands_with_death_s_dance_off_and_the_buff_shows_until_then() -> void:
+	_start_bleed()
+	lucian.inventory.apply_drop(EQUIP, 0)
+	var shown := _deaths_dance_buff()
+	assert_false(shown.is_empty(), "Ignore Pain shows while damage is owed")
+	assert_eq(shown.count, "30")
+	assert_almost_eq(_bleed_out(), 30.0, 0.01)
+	assert_true(_deaths_dance_buff().is_empty(), "gone once it has landed")
+
+
+func test_selling_death_s_dance_and_undoing_the_sale_keeps_the_delayed_damage() -> void:
+	var wallet := Wallet.new()
+	var shop := Shop.new(MerchantStock.new(lucian.item_catalog, 7), lucian.inventory, wallet)
+	_start_bleed()
+	shop.sell(EQUIP)
+	assert_false(lucian.passives.has(&"deaths_dance"), "sold")
+	assert_eq(shop.undo_sale(), Shop.Result.OK)
+	assert_true(lucian.passives.has(&"deaths_dance"), "bought back")
+	assert_almost_eq(_bleed_out(), 30.0, 0.01, "the whole 30 still lands")
+
+
+func test_without_death_s_dance_a_new_hit_is_not_delayed() -> void:
+	_start_bleed()
+	lucian.inventory.apply_drop(EQUIP, 0)
+	var before := lucian.hp
+	lucian.take_damage(DamageInfo.create(100.0, DamageInfo.Type.TRUE, &"basic", dummy))
+	assert_almost_eq(before - lucian.hp, 100.0, 0.01, "all of it lands now")
+	assert_almost_eq(_bleed_out(), 30.0, 0.01, "only the first hit's 30 is still owed")
