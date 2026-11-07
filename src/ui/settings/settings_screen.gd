@@ -4,8 +4,9 @@ extends CanvasLayer
 ## gear: Audio (volumes), Controls (rebinding, and a cast mode for each skill,
 ## item and summoner key), Graphics (window, resolution, VSync, FPS cap,
 ## quality, FPS counter) and Gameplay (skill queue). Every change applies at
-## once and is saved. ESC or Back returns to the menu; while waiting for a new
-## key, ESC cancels instead.
+## once and is saved; a volume slider being dragged saves once, when it is let
+## go. ESC or Back returns to the menu; while waiting for a new key, ESC
+## cancels instead.
 ##
 ## The look: a lantern emblem on the panel's top edge over "SETTINGS" and a
 ## gold rule; a rail of icon tabs on the left, the open one lit gold with an
@@ -90,6 +91,11 @@ var _resolution: OptionButton
 ## The action waiting for a new key, or &"".
 var _listening: StringName = &""
 var _listen_frame := -1
+## A volume slider is being dragged: its steps apply at once, unsaved until
+## it is let go (or the screen closes first).
+var _dragging := false
+## A step taken while dragging waits to be saved.
+var _unsaved := false
 
 
 func _ready() -> void:
@@ -111,6 +117,7 @@ func open() -> void:
 
 func close() -> void:
 	_stop_listening()
+	_end_drag()
 	visible = false
 
 
@@ -372,9 +379,28 @@ func _build_audio() -> Control:
 		row.add(value)
 		slider.value_changed.connect(func(volume_value: float) -> void:
 			value.text = str(int(volume_value))
-			settings.set_value(key, int(volume_value)))
-		slider.drag_ended.connect(func(_changed: bool) -> void: Sfx.play(&"coin"))
+			_set_volume(key, int(volume_value)))
+		slider.drag_started.connect(func() -> void: _dragging = true)
+		slider.drag_ended.connect(func(_changed: bool) -> void:
+			_end_drag()
+			Sfx.play(&"coin"))
 	return page
+
+
+## A volume step applies at once. It is saved now unless a slider is being
+## dragged (the mouse wheel or a key change it without one).
+func _set_volume(key: StringName, volume: int) -> void:
+	settings.set_value(key, volume, not _dragging)
+	_unsaved = _unsaved or _dragging
+
+
+## A drag is over (or the screen closes during one): what it changed is
+## saved, once.
+func _end_drag() -> void:
+	_dragging = false
+	if _unsaved:
+		_unsaved = false
+		settings.save()
 
 
 func _build_controls() -> Control:

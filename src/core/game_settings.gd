@@ -2,8 +2,10 @@ class_name GameSettings
 extends RefCounted
 ## The player's settings: volumes, graphics, gameplay options and key
 ## bindings. Saved to user://settings.json (shared by every save slot) on
-## every change, with a "version" field. Missing or unknown entries fall back
-## to the defaults, and a broken file loads as all defaults.
+## every change (a slider being dragged: once, when let go), with a
+## "version" field. Missing or unknown entries fall back to the defaults. A
+## missing or broken file loads "<path>.tmp" instead, a save whose rename
+## failed; with neither, all defaults.
 ##
 ## Not an autoload: the game uses the shared instance(); tests make their own
 ## with a scratch path. Nothing touches the engine until an apply_* call.
@@ -113,12 +115,16 @@ func get_value(key: StringName) -> Variant:
 	return _values.get(key)
 
 
-## Stores, saves and announces a setting. Unknown keys are ignored.
-func set_value(key: StringName, value: Variant) -> void:
+## Stores, saves and announces a setting. Unknown keys are ignored. With
+## `save_now` false it is stored and announced (so it applies at once) but
+## not saved: a slider's steps while it is dragged, saved once when it is
+## let go (save()).
+func set_value(key: StringName, value: Variant, save_now := true) -> void:
 	if not DEFAULTS.has(key):
 		return
 	_values[key] = value
-	save()
+	if save_now:
+		save()
 	changed.emit(key)
 
 
@@ -187,22 +193,33 @@ func save() -> void:
 		saved_values[String(key)] = _values[key]
 	# Written to "<path>.tmp" first, then renamed over the old file, so a crash
 	# mid-write leaves the old settings (and key bindings) whole.
-	var temp_path := path + ".tmp"
+	var temp_path := _temp_path()
 	var file := FileAccess.open(temp_path, FileAccess.WRITE)
 	if file == null:
-		_save_failed(temp_path)
+		# Not opened, so not ours to remove.
+		_save_failed(false)
 		return
 	var written := file.store_string(JSON.stringify({"version": VERSION, "values": saved_values, "bindings": saved_bindings}, "\t")) \
 		and file.get_error() == OK
 	file.close()
-	if not written or DirAccess.rename_absolute(ProjectSettings.globalize_path(temp_path), ProjectSettings.globalize_path(path)) != OK:
-		_save_failed(temp_path)
+	if not written:
+		_save_failed(true)
+	elif DirAccess.rename_absolute(ProjectSettings.globalize_path(temp_path), ProjectSettings.globalize_path(path)) != OK:
+		# The rename can fail with the old file already gone (on Windows it is
+		# removed first): the whole temp file stays, and _load reads it.
+		_save_failed(false)
 
 
-func _save_failed(temp_path: String) -> void:
+## Warns. A half-written temp file (`drop_temp`) goes; any other stays: after
+## a failed rename it may be the only whole copy.
+func _save_failed(drop_temp: bool) -> void:
 	push_warning("Could not save settings to %s" % path)
-	if FileAccess.file_exists(temp_path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(temp_path))
+	if drop_temp and FileAccess.file_exists(_temp_path()):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(_temp_path()))
+
+
+func _temp_path() -> String:
+	return path + ".tmp"
 
 
 ## Pushes every setting into the engine, the window's size and place too.
@@ -351,14 +368,14 @@ static func dict_to_event(data: Dictionary) -> InputEvent:
 	return null
 
 
+## The file's settings, or the temp file's when the file is missing or
+## broken (a save whose rename failed); with neither, the defaults stay.
 func _load() -> void:
-	if not FileAccess.file_exists(path):
+	var data := _read(path)
+	if data.is_empty():
+		data = _read(_temp_path())
+	if data.is_empty():
 		return
-	var json := JSON.new()
-	if json.parse(FileAccess.get_file_as_string(path)) != OK or not json.data is Dictionary:
-		push_warning("Settings file %s is broken; using defaults" % path)
-		return
-	var data: Dictionary = json.data
 	var values: Dictionary = data.get("values", {})
 	for key: String in values:
 		var name := StringName(key)
@@ -395,6 +412,18 @@ func _load() -> void:
 			if other != action and _bindings.has(other) and _same_input(_bindings[other], _bindings[action]):
 				_bindings.erase(action)
 				break
+
+
+## The settings in `file`, or {} when it is missing or broken (with a
+## warning).
+func _read(file: String) -> Dictionary:
+	if not FileAccess.file_exists(file):
+		return {}
+	var json := JSON.new()
+	if json.parse(FileAccess.get_file_as_string(file)) != OK or not json.data is Dictionary:
+		push_warning("Settings file %s is broken" % file)
+		return {}
+	return json.data
 
 
 ## A plain copy of the input: only the key or button, no modifiers, so a

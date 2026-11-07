@@ -121,6 +121,49 @@ func test_a_failed_save_warns_and_leaves_no_temp_file() -> void:
 	assert_false(FileAccess.file_exists("user://no_such_dir/test_settings.json.tmp"))
 
 
+## Settings with sfx 12 and Q on Backspace, left as `file` alone (the main
+## file is moved there).
+func _saved_as(file: String) -> void:
+	settings.set_value(&"sfx_volume", 12)
+	settings.rebind(&"skill_q", key(KEY_BACKSPACE))
+	DirAccess.rename_absolute(ProjectSettings.globalize_path(PATH), ProjectSettings.globalize_path(file))
+	assert_false(FileAccess.file_exists(PATH))
+
+
+## B19: a rename that failed with the old file gone left only the temp file:
+## its settings load, key bindings and all.
+func test_with_only_the_temp_file_left_its_settings_load() -> void:
+	_saved_as(PATH + ".tmp")
+	var loaded := GameSettings.new(PATH)
+	assert_eq(loaded.get_value(&"sfx_volume"), 12)
+	assert_eq(loaded.key_label(&"skill_q"), "Backspace")
+
+
+func test_a_broken_file_falls_back_to_the_temp_file() -> void:
+	_saved_as(PATH + ".tmp")
+	var file := FileAccess.open(PATH, FileAccess.WRITE)
+	file.store_string("{not json")
+	file.close()
+	assert_eq(GameSettings.new(PATH).get_value(&"sfx_volume"), 12)
+	assert_push_warning_count(1)
+
+
+## A folder in the file's place makes the rename fail: the whole temp file
+## stays, and the next load reads it.
+func test_a_failed_rename_keeps_the_temp_file() -> void:
+	var blocker := ProjectSettings.globalize_path(PATH)
+	DirAccess.make_dir_absolute(blocker)
+	var inside := FileAccess.open(PATH + "/keep", FileAccess.WRITE)
+	inside.store_string("x")
+	inside.close()
+	settings.set_value(&"sfx_volume", 12)
+	DirAccess.remove_absolute(blocker + "/keep")
+	DirAccess.remove_absolute(blocker)
+	assert_push_warning_count(1)
+	assert_true(FileAccess.file_exists(PATH + ".tmp"), "kept")
+	assert_eq(GameSettings.new(PATH).get_value(&"sfx_volume"), 12)
+
+
 func test_loaded_numbers_stay_ints() -> void:
 	settings.set_value(&"max_fps", 144)
 	assert_typeof(GameSettings.new(PATH).get_value(&"max_fps"), TYPE_INT)

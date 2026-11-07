@@ -5,13 +5,22 @@ extends GutTest
 
 const PATH := "user://test_settings_screen.json"
 
-var settings: GameSettings
+var settings: CountingSettings
 var screen: SettingsScreen
+
+
+## Counts its saves.
+class CountingSettings extends GameSettings:
+	var saves := 0
+
+	func save() -> void:
+		saves += 1
+		super()
 
 
 func before_each() -> void:
 	_delete()
-	settings = GameSettings.new(PATH)
+	settings = CountingSettings.new(PATH)
 	screen = SettingsScreen.new()
 	add_child_autofree(screen)
 	screen.setup(settings)
@@ -27,8 +36,9 @@ func after_each() -> void:
 
 
 func _delete() -> void:
-	if FileAccess.file_exists(PATH):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
+	for file in [PATH, PATH + ".tmp"]:
+		if FileAccess.file_exists(file):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 
 
 ## The control of type `type` on the row card labelled `text`.
@@ -119,16 +129,49 @@ func test_the_theme_reaches_the_switches_and_the_scroll_bar() -> void:
 	assert_same(scroll.get_v_scroll_bar().get_theme_stylebox(&"grabber"), theme.get_stylebox(&"grabber", &"VScrollBar"))
 
 
+## A step with no drag (the mouse wheel, a key) is saved at once.
 func test_a_slider_writes_its_volume_and_letting_go_plays_a_test_sound() -> void:
 	var slider := _control("Master volume", "HSlider") as HSlider
 	slider.value = 35
 	assert_eq(settings.get_value(&"master_volume"), 35)
 	assert_eq(GameSettings.new(PATH).get_value(&"master_volume"), 35, "saved")
+	assert_eq(settings.saves, 1)
 	var sfx := Sfx.new()
 	add_child_autofree(sfx)
 	sfx._last_played.clear()
 	slider.drag_ended.emit(true)
 	assert_true(sfx._last_played.has(&"coin"))
+
+
+## B19: a drag applies every step at once (the bus volume follows) and is
+## saved once, when let go.
+func test_a_slider_drag_applies_every_step_and_saves_once() -> void:
+	var slider := _control("Master volume", "HSlider") as HSlider
+	var bus := AudioServer.get_bus_index("Master")
+	slider.drag_started.emit()
+	for volume in [10, 20, 30]:
+		slider.value = volume
+	assert_eq(settings.get_value(&"master_volume"), 30)
+	assert_almost_eq(AudioServer.get_bus_volume_db(bus), linear_to_db(0.3), 0.01, "live")
+	assert_eq(settings.saves, 0, "nothing written while dragging")
+	assert_eq(GameSettings.new(PATH).get_value(&"master_volume"), 80)
+	slider.drag_ended.emit(true)
+	assert_eq(settings.saves, 1, "once, when let go")
+	assert_eq(GameSettings.new(PATH).get_value(&"master_volume"), 30)
+	slider.drag_started.emit()
+	slider.drag_ended.emit(false)
+	assert_eq(settings.saves, 1, "a drag that changed nothing writes nothing")
+
+
+func test_closing_the_screen_mid_drag_saves_it() -> void:
+	var slider := _control("Sound effects volume", "HSlider") as HSlider
+	slider.drag_started.emit()
+	slider.value = 25
+	screen.close()
+	assert_eq(settings.saves, 1)
+	assert_eq(GameSettings.new(PATH).get_value(&"sfx_volume"), 25)
+	slider.value = 26
+	assert_eq(settings.saves, 2, "the drag is over: a later step saves at once")
 
 
 func test_a_dropdown_writes_its_value_and_greys_the_resolution() -> void:

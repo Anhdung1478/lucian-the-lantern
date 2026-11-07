@@ -7,8 +7,10 @@ const SAVE_PREFIX := "user://test_run_save_slot_"
 
 
 func run() -> void:
-	if FileAccess.file_exists(PATH):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
+	# The temp file too: a missing file would load it.
+	for file in [PATH, PATH + ".tmp"]:
+		if FileAccess.file_exists(file):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 	GameSettings._instance = GameSettings.new(PATH)
 	var save := SaveGame.new(SAVE_PREFIX)
 	for n in range(1, SaveGame.SLOTS + 1):
