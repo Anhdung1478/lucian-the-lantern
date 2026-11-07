@@ -16,7 +16,9 @@ extends CanvasLayer
 ## Shop items are bought by dragging them onto a cell or by right-clicking
 ## them, and items dropped on the red sell slot are sold (boots never are).
 ## On the Craft tab, two fragments (or the boots and a fragment) are dragged
-## onto its two inputs.
+## onto its two inputs. An item in an input leaves the backpack view (in_craft)
+## until it is dragged back out, the tab changes or the shop closes; Craft
+## asks first.
 
 ## A purchase, sale or refresh went through (true) or was refused (false).
 signal traded(ok: bool)
@@ -62,6 +64,9 @@ var _target := -1
 ## The same for a shop slot being pressed or dragged.
 var _press_slot: ShopSlot
 var _drag_slot: ShopSlot
+## The same for a Craft tab input being pressed or dragged.
+var _press_input: CraftSlot
+var _drag_input: CraftSlot
 var _press_position := Vector2.ZERO
 var _press_time := 0.0
 ## Last mouse position seen by the pressed cell, which gets every mouse event
@@ -70,6 +75,8 @@ var _mouse := Vector2.ZERO
 ## The dragged icon sits above the debug table.
 var _top := CanvasLayer.new()
 var _ghost := ItemIcon.new()
+## The Craft button's question.
+var _confirm := ConfirmPopup.new()
 
 
 func _ready() -> void:
@@ -79,13 +86,13 @@ func _ready() -> void:
 
 func setup(target_inventory: Inventory) -> void:
 	inventory = target_inventory
-	inventory.changed.connect(_redraw_cells)
+	inventory.changed.connect(redraw_cells)
 	_build()
 
 
 func open() -> void:
 	visible = true
-	_redraw_cells()
+	redraw_cells()
 
 
 ## Opens the backpack beside the merchant's shop.
@@ -98,10 +105,12 @@ func open_shop(new_shop: Shop) -> void:
 	_place_column()
 
 
-## Closing mid-drag puts the item back. Also ends shop mode, emptying the
-## Craft tab's inputs.
+## Closing mid-drag puts the item back. Also ends shop mode: the Craft tab's
+## inputs give their items back and an open Craft question is dropped.
 func close() -> void:
 	_end_drag()
+	if _confirm.is_open():
+		_confirm.answer(false)
 	visible = false
 	shop = null
 	_shop_panel.clear_craft()
@@ -117,9 +126,27 @@ func shop_panel() -> ShopPanel:
 	return _shop_panel
 
 
-## Index of the item being dragged, or -1 (also while dragging from the shop).
+## Index of the item being dragged, or -1 (also while dragging from the shop
+## or a Craft input).
 func dragged_index() -> int:
 	return _drag_index
+
+
+## The Craft input being dragged from, or null.
+func dragged_input() -> CraftSlot:
+	return _drag_input
+
+
+## Whether the item in cell `index` sits in a Craft input: the cell draws
+## empty and takes no drag, drop or purchase until the item comes back. The
+## item stays in the cell in the Inventory.
+func in_craft(index: int) -> bool:
+	return shop != null and _shop_panel.holds(index)
+
+
+## The Craft button's Yes / No question.
+func craft_confirm() -> ConfirmPopup:
+	return _confirm
 
 
 ## The shop slot being dragged, or null.
@@ -134,7 +161,7 @@ func target_index() -> int:
 
 
 func is_dragging() -> bool:
-	return _drag_index >= 0 or _drag_slot != null
+	return _drag_index >= 0 or _drag_slot != null or _drag_input != null
 
 
 ## Gold the dragged item would sell for when dropped now; 0 when it is not
@@ -161,8 +188,24 @@ func undo_sale() -> void:
 		_report(shop.undo_sale())
 
 
-## The Craft tab's Craft button: what is in its two inputs.
+## The Craft tab's Craft button: asks "Craft Muramana from ... for 1470
+## gold?" and Yes crafts what is in its two inputs; No changes nothing. Inputs
+## that make nothing, or a fee the wallet can't pay, are refused at once.
 func craft() -> void:
+	if shop == null:
+		return
+	var first := _shop_panel.first_input().index
+	var second := _shop_panel.second_input().index
+	if shop.craft_result(first, second) == null:
+		_report(Shop.Result.NO_RECIPE)
+	elif not shop.wallet.can_afford(shop.craft_fee(first, second)):
+		_report(Shop.Result.NO_GOLD)
+	else:
+		_confirm.ask(_shop_panel.craft_question(), _craft_now)
+
+
+## Yes to the Craft question.
+func _craft_now() -> void:
 	if shop:
 		var result := shop.craft(_shop_panel.first_input().index, _shop_panel.second_input().index)
 		if result == Shop.Result.OK:
@@ -184,6 +227,29 @@ func on_cell_input(cell: ItemCell, event: InputEvent) -> void:
 		elif not button.pressed:
 			_release()
 	elif event is InputEventMouseMotion and _press_index >= 0 and _drag_index < 0 \
+			and _mouse.distance_to(_press_position) > MOVE_TO_PICK:
+		_pick_up()
+
+
+## A Craft tab input: a right-click empties it (its item comes back to the
+## backpack) and its item is dragged out like a cell's (_drop_from_input).
+func on_craft_input(input: CraftSlot, event: InputEvent) -> void:
+	var mouse_event := event as InputEventMouse
+	if mouse_event == null or shop == null:
+		return
+	_mouse = mouse_event.global_position
+	var button := event as InputEventMouseButton
+	if button and button.pressed and button.button_index == MOUSE_BUTTON_RIGHT:
+		if not is_dragging():
+			input.clear()
+	elif button and button.button_index == MOUSE_BUTTON_LEFT:
+		if button.pressed and input.index >= 0:
+			_press_input = input
+			_press_position = _mouse
+			_press_time = 0.0
+		elif not button.pressed:
+			_release()
+	elif event is InputEventMouseMotion and _press_input and _drag_input == null \
 			and _mouse.distance_to(_press_position) > MOVE_TO_PICK:
 		_pick_up()
 
@@ -210,7 +276,7 @@ func on_shop_slot_input(slot: ShopSlot, event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
-	if _press_index < 0 and _press_slot == null:
+	if _press_index < 0 and _press_slot == null and _press_input == null:
 		return
 	if not is_dragging():
 		_press_time += delta
@@ -221,7 +287,7 @@ func _process(delta: float) -> void:
 	var target := _cell_index_at(_mouse)
 	if target != _target:
 		_target = target
-		_redraw_cells()
+		redraw_cells()
 
 
 ## Alt-tabbing away mid-drag puts the item back.
@@ -235,19 +301,25 @@ func _pick_up() -> void:
 		_drag_slot = _press_slot
 		_target = -1
 		_ghost.item = _drag_slot.item()
+	elif _press_input:
+		_drag_input = _press_input
+		_target = _drag_input.target()
+		_ghost.item = _drag_input.item()
 	else:
 		_drag_index = _press_index
 		_target = _press_index
 		_ghost.item = inventory.item_at(_drag_index)
 	_ghost.position = _mouse - _ghost.size * 0.5
 	_ghost.visible = true
-	_redraw_cells()
+	redraw_cells()
 
 
 func _release() -> void:
 	if _drag_slot:
 		if _target >= 0:
 			_buy(_drag_slot, _target)
+	elif _drag_input:
+		_drop_from_input(_drag_input, _target)
 	elif _drag_index >= 0:
 		if _target == SELL:
 			if shop.can_sell(_drag_index):
@@ -259,9 +331,25 @@ func _release() -> void:
 		elif _target == CRAFT_FIRST or _target == CRAFT_SECOND:
 			if not _shop_panel.load_input(_target, _drag_index):
 				traded.emit(false)
-		else:
+		elif not in_craft(_target):
 			inventory.apply_drop(_drag_index, _target)
 	_end_drag()
+
+
+## An item dragged out of a Craft input: dropped on the other input it moves
+## there (trading places with what that held), on its own input it stays, on
+## a free cell that takes it it moves into that cell, and anywhere else it
+## comes back to its own cell.
+func _drop_from_input(input: CraftSlot, target: int) -> void:
+	if input.index < 0 or target == input.target():
+		return
+	if target == CRAFT_FIRST or target == CRAFT_SECOND:
+		_shop_panel.move_input(input, target)
+		return
+	var cell := input.index
+	input.clear()
+	if target >= 0 and inventory.drop_outcome(cell, target) == Inventory.Drop.MOVE:
+		inventory.apply_drop(cell, target)
 
 
 func _end_drag() -> void:
@@ -269,9 +357,11 @@ func _end_drag() -> void:
 	_drag_index = -1
 	_press_slot = null
 	_drag_slot = null
+	_press_input = null
+	_drag_input = null
 	_target = -1
 	_ghost.visible = false
-	_redraw_cells()
+	redraw_cells()
 
 
 func _buy(slot: ShopSlot, cell: int) -> void:
@@ -291,21 +381,24 @@ func _report(result: Shop.Result, slot: ShopSlot = null) -> void:
 
 ## Inventory index of the cell at `point`; -1 outside any cell. The sell slot
 ## is SELL while the shop is open and -1 otherwise; the Craft tab's inputs
-## are CRAFT_FIRST and CRAFT_SECOND for an item dragged from a cell.
+## are CRAFT_FIRST and CRAFT_SECOND for an item dragged from a cell or an
+## input.
 func _cell_index_at(point: Vector2) -> int:
 	for cell in _cells:
 		if cell.get_global_rect().has_point(point):
 			if cell.index >= 0:
 				return cell.index
 			return SELL if shop and _drag_index >= 0 else -1
-	if shop and _drag_index >= 0:
+	if shop and (_drag_index >= 0 or _drag_input):
 		var input := _shop_panel.craft_input_at(point)
 		if input:
 			return input.target()
 	return -1
 
 
-func _redraw_cells() -> void:
+## Every cell draws again (an item moved, or left or came back from a Craft
+## input).
+func redraw_cells() -> void:
 	for cell in _cells:
 		cell.queue_redraw()
 
@@ -391,6 +484,7 @@ func _build() -> void:
 	_ghost.size = Vector2(GHOST_SIZE, GHOST_SIZE)
 	_ghost.visible = false
 	_top.add_child(_ghost)
+	add_child(_confirm)
 
 
 ## Centered above the HUD panel; with the shop open, the backpack and the

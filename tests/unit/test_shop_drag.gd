@@ -44,6 +44,8 @@ func mouse(target: Control, event: InputEventMouse, at: Vector2) -> void:
 	event.global_position = at
 	if target is ShopSlot:
 		screen.on_shop_slot_input(target, event)
+	elif target is CraftSlot:
+		target._gui_input(event)
 	else:
 		screen.on_cell_input(target, event)
 
@@ -193,13 +195,17 @@ func test_the_craft_tab_upgrades_the_boots_dragged_in() -> void:
 	assert_eq(panel._craft_note.text, "speed + sword → sword_greaves")
 	assert_false(panel.craft_button().disabled)
 	panel.craft_button().pressed.emit()
+	assert_true(screen.craft_confirm().is_open(), "Craft asks first")
+	screen.craft_confirm().answer(true)
 	assert_eq(inventory.boots(), greaves)
 	assert_null(inventory.item_at(0), "the fragment is used up")
 	assert_eq(wallet.gold, 4700)
 	assert_eq(panel.second_input().index, -1, "its cell is empty now")
-	assert_eq(panel.first_input().index, Inventory.BOOTS_CELL)
+	assert_eq(panel.first_input().index, Inventory.BOOTS_CELL, "the upgraded boots stay in the input")
+	assert_null(cell(Inventory.BOOTS_CELL).item(), "and out of the boots cell")
 	screen.close()
 	assert_eq(panel.first_input().index, -1, "closing empties the inputs")
+	assert_eq(cell(Inventory.BOOTS_CELL).item(), greaves, "the boots are back in their cell")
 
 
 func test_the_craft_tab_makes_a_legendary_for_its_fee() -> void:
@@ -216,9 +222,13 @@ func test_the_craft_tab_makes_a_legendary_for_its_fee() -> void:
 	assert_eq(panel.craft_preview(), gunblade)
 	assert_eq(panel._fee_label.text, "600", "2600 minus two 1000-gold fragments")
 	panel.craft_button().pressed.emit()
+	assert_eq(screen.craft_confirm()._message.text, "Craft gunblade from sword and rod for 600 gold?")
+	screen.craft_confirm().answer(true)
 	assert_eq(inventory.item_at(0), gunblade, "the legendary goes where the first input was")
+	assert_eq(cell(0).item(), gunblade, "and shows there")
 	assert_null(inventory.item_at(1))
 	assert_eq(wallet.gold, 4400)
+	assert_eq([panel.first_input().index, panel.second_input().index], [-1, -1])
 
 
 func test_the_craft_tab_refuses_a_legendary_and_says_when_nothing_is_made() -> void:
@@ -241,6 +251,211 @@ func test_the_craft_tab_refuses_a_legendary_and_says_when_nothing_is_made() -> v
 	assert_eq(panel._craft_note.text, "No legendary is made from sword and belt.")
 	assert_true(panel.craft_button().disabled)
 	assert_eq(panel._fee_label.text, "–")
+
+
+## The Craft tab, laid out.
+func craft_tab() -> ShopPanel:
+	var panel := screen.shop_panel()
+	panel.show_tab(ShopPanel.CRAFT_TAB)
+	await wait_physics_frames(3)
+	return panel
+
+
+func id_at(index: int) -> StringName:
+	var item := inventory.item_at(index)
+	return item.id if item else &""
+
+
+## The text of the first Label under `node`.
+func _label_text(node: Node) -> String:
+	if node is Label:
+		return node.text
+	for child in node.get_children():
+		var text := _label_text(child)
+		if text != "":
+			return text
+	return ""
+
+
+func test_an_item_in_a_craft_input_leaves_the_backpack_view() -> void:
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	assert_eq(panel.first_input().index, 0)
+	assert_true(screen.in_craft(0))
+	assert_null(cell(0).item(), "the cell draws empty")
+	assert_eq(id_at(0), &"sword", "the inventory keeps it in its cell, so a save loses nothing")
+	assert_eq(panel.first_input().item().id, &"sword")
+	var card: Control = cell(0).tooltip_content()
+	assert_eq(_label_text(card), "In the Craft tab: drag it back here, or right-click its input")
+	card.free()
+	button(cell(0), MOUSE_BUTTON_LEFT, true, center(cell(0)))
+	screen._process(0.3)
+	assert_false(screen.is_dragging(), "a held cell can't be picked up, so it can't be sold either")
+	button(cell(0), MOUSE_BUTTON_LEFT, false, center(sell_cell()))
+	assert_eq(id_at(0), &"sword")
+	assert_eq(wallet.gold, 5000)
+
+
+func test_one_cell_cannot_fill_both_inputs() -> void:
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	drag(cell(0), panel.second_input())
+	assert_eq([panel.first_input().index, panel.second_input().index], [0, -1], "the held cell isn't dragged again")
+	panel._process(0.0)
+	assert_eq(panel._craft_note.text, "Now drag in a fragment.")
+	assert_true(panel.craft_button().disabled)
+	assert_true(panel.load_input(BackpackScreen.CRAFT_SECOND, 0))
+	assert_eq([panel.first_input().index, panel.second_input().index], [-1, 0], "loading it again moves it")
+	inventory.add(inventory.catalog.find(&"sword"))
+	drag(cell(1), panel.first_input())
+	panel._process(0.0)
+	assert_eq(panel.craft_preview().id, &"edge", "two swords from two cells make their legendary")
+
+
+func test_a_held_cell_refuses_drops_and_purchases() -> void:
+	inventory.add(inventory.catalog.find(&"rod"))
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	drag(cell(1), cell(0))
+	assert_eq([id_at(0), id_at(1)], [&"sword", &"rod"], "nothing is dropped on the held cell")
+	assert_eq(panel.first_input().index, 0)
+	var bought := stock.item_at(1)
+	assert_eq(screen.shop.buy_slot(1, 0), Shop.Result.OK)
+	assert_eq(id_at(0), &"sword", "the held cell counts as taken")
+	assert_eq(inventory.item_at(2), bought, "the purchase goes to the first free cell")
+
+
+func test_changing_tab_gives_the_items_back() -> void:
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	panel._tab_buttons[ShopPanel.CRAFT_TAB].pressed.emit()
+	assert_eq(panel.first_input().index, 0, "the tab already showing changes nothing")
+	panel._tab_buttons[ShopPanel.ITEMS_TAB].pressed.emit()
+	assert_eq(panel.first_input().index, -1)
+	assert_false(screen.in_craft(0))
+	assert_eq(cell(0).item().id, &"sword")
+
+
+func test_closing_gives_the_items_back() -> void:
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	screen.close()
+	screen.open_shop(Shop.new(stock, inventory, wallet))
+	assert_eq(panel.first_input().index, -1)
+	assert_eq(cell(0).item().id, &"sword")
+
+
+func test_dragging_an_input_back_onto_its_cell_gives_it_back() -> void:
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	drag(panel.first_input(), cell(0))
+	assert_eq(panel.first_input().index, -1)
+	assert_eq(cell(0).item().id, &"sword")
+
+
+func test_dragging_an_input_onto_a_free_cell_moves_it_there() -> void:
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	drag(panel.first_input(), cell(7))
+	assert_eq(panel.first_input().index, -1)
+	assert_eq([id_at(0), id_at(7)], [&"", &"sword"])
+	assert_eq(cell(7).item().id, &"sword")
+
+
+func test_dragging_an_input_anywhere_else_gives_it_back() -> void:
+	inventory.add(inventory.catalog.find(&"rod"))
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	drag(panel.first_input(), cell(1))
+	assert_eq(panel.first_input().index, -1, "a taken cell: it comes back")
+	assert_eq([id_at(0), id_at(1)], [&"sword", &"rod"])
+	drag(cell(0), panel.first_input())
+	drag(panel.first_input(), sell_cell())
+	assert_eq(panel.first_input().index, -1)
+	assert_eq(id_at(0), &"sword", "never sold from an input")
+	assert_eq(wallet.gold, 5000)
+	drag(cell(0), panel.first_input())
+	var input := panel.first_input()
+	button(input, MOUSE_BUTTON_LEFT, true, center(input))
+	mouse(input, InputEventMouseMotion.new(), Vector2(5, 5))
+	screen._process(0.0)
+	button(input, MOUSE_BUTTON_LEFT, false, Vector2(5, 5))
+	assert_eq(input.index, -1, "dropped outside: it comes back")
+	assert_eq(cell(0).item().id, &"sword")
+
+
+func test_dragging_from_one_input_to_the_other_moves_it() -> void:
+	inventory.add(inventory.catalog.find(&"rod"))
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	drag(panel.first_input(), panel.second_input())
+	assert_eq([panel.first_input().index, panel.second_input().index], [-1, 0])
+	assert_true(screen.in_craft(0), "still held")
+	drag(cell(1), panel.first_input())
+	drag(panel.second_input(), panel.first_input())
+	assert_eq([panel.first_input().index, panel.second_input().index], [0, 1], "onto a full input they trade places")
+	var input := panel.first_input()
+	button(input, MOUSE_BUTTON_LEFT, true, center(input))
+	screen._process(0.3)
+	assert_eq(screen.dragged_input(), input, "held still, it is picked up")
+	screen._process(0.0)
+	button(input, MOUSE_BUTTON_LEFT, false, center(input))
+	assert_eq(input.index, 0, "dropped on its own input it stays")
+
+
+func test_a_right_click_on_an_input_gives_its_item_back() -> void:
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	button(panel.first_input(), MOUSE_BUTTON_RIGHT, true, center(panel.first_input()))
+	assert_eq(panel.first_input().index, -1)
+	assert_eq(cell(0).item().id, &"sword")
+
+
+func test_craft_asks_first_and_no_changes_nothing() -> void:
+	inventory.catalog.find(&"gunblade").cost = 2600
+	inventory.add(inventory.catalog.find(&"rod"))
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	drag(cell(1), panel.second_input())
+	panel.craft_button().pressed.emit()
+	var confirm := screen.craft_confirm()
+	assert_true(confirm.is_open())
+	assert_eq(id_at(0), &"sword", "nothing is crafted before Yes")
+	confirm.answer(false)
+	assert_false(confirm.is_open())
+	assert_eq([id_at(0), id_at(1)], [&"sword", &"rod"])
+	assert_eq(wallet.gold, 5000)
+	assert_eq([panel.first_input().index, panel.second_input().index], [0, 1], "No keeps the inputs")
+	panel.craft_button().pressed.emit()
+	confirm.answer(true)
+	assert_eq(id_at(0), &"gunblade")
+	assert_eq(wallet.gold, 4400)
+
+
+func test_craft_without_the_gold_is_refused_without_asking() -> void:
+	inventory.catalog.find(&"gunblade").cost = 2600
+	inventory.add(inventory.catalog.find(&"rod"))
+	wallet.reset()
+	wallet.add(100)
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	drag(cell(1), panel.second_input())
+	panel.craft_button().pressed.emit()
+	assert_false(screen.craft_confirm().is_open())
+	assert_eq(panel._message.text, "Not enough gold")
+	assert_eq(id_at(0), &"sword")
+
+
+func test_closing_drops_an_open_craft_question() -> void:
+	inventory.add(inventory.catalog.find(&"rod"))
+	var panel: ShopPanel = await craft_tab()
+	drag(cell(0), panel.first_input())
+	drag(cell(1), panel.second_input())
+	panel.craft_button().pressed.emit()
+	screen.close()
+	assert_false(screen.craft_confirm().is_open())
+	assert_eq([id_at(0), id_at(1)], [&"sword", &"rod"])
+	assert_eq(wallet.gold, 5000)
 
 
 func test_dropping_on_the_sell_slot_sells() -> void:

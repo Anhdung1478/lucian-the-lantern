@@ -8,9 +8,10 @@ extends PanelContainer
 ## The Craft tab: [input] + [input] -> [result], the fee and a Craft button.
 ## Two fragments make their legendary, for the legendary's cost minus the
 ## fragments'; the boots and a fragment make the upgraded boots, for their
-## upgrade_cost. Its two inputs are filled by dragging from the backpack; they
-## hold inventory indexes, are emptied when the shop closes and re-checked
-## whenever the inventory changes.
+## upgrade_cost. Its two inputs are filled by dragging from the backpack: an
+## item in an input leaves the backpack view until it comes back (see
+## CraftSlot), and changing tabs gives both back. The Craft button asks first
+## (BackpackScreen.craft).
 
 const SLOT_GAP := 12
 const MESSAGE_TIME := 1.6
@@ -130,7 +131,10 @@ func show_refresh_cost(cost: int) -> void:
 	_refresh.text = "Refresh  %d" % cost
 
 
+## Switching tabs gives the Craft inputs' items back to the backpack.
 func show_tab(tab: int) -> void:
+	if tab != _tab:
+		clear_craft()
 	_tab = tab
 	for i in _pages.size():
 		_pages[i].visible = i == tab
@@ -196,18 +200,44 @@ func craft_input_at(point: Vector2) -> CraftSlot:
 	return null
 
 
-## Puts inventory cell `cell` into the input `target` names
-## (BackpackScreen.CRAFT_FIRST or CRAFT_SECOND). False, with a message, when
-## the item is never crafted (a legendary or a potion).
+## The input `target` names: BackpackScreen.CRAFT_FIRST or CRAFT_SECOND.
+func input_for(target: int) -> CraftSlot:
+	return _first_input if target == BackpackScreen.CRAFT_FIRST else _second_input
+
+
+## Whether a Craft input holds the item in inventory cell `cell`.
+func holds(cell: int) -> bool:
+	return cell >= 0 and (_first_input.index == cell or _second_input.index == cell)
+
+
+## Puts the item in inventory cell `cell` into the input `target` names; what
+## that input held comes back to the backpack. One cell is never in both
+## inputs: the other input lets go of it. False, with a message, when the item
+## is never crafted (a legendary or a potion).
 func load_input(target: int, cell: int) -> bool:
-	var input := _first_input if target == BackpackScreen.CRAFT_FIRST else _second_input
-	if input.load_cell(cell):
-		return true
-	show_message("Only fragments and boots are crafted")
-	return false
+	var input := input_for(target)
+	if not input.load_cell(cell):
+		show_message("Only fragments and boots are crafted")
+		return false
+	var other := _second_input if input == _first_input else _first_input
+	if other.index == cell:
+		other.clear()
+	return true
 
 
-## Empties both inputs (the shop closed).
+## Moves what input `from` holds into the input `target` names; what that
+## one held goes the other way.
+func move_input(from: CraftSlot, target: int) -> void:
+	var to := input_for(target)
+	if to == from:
+		return
+	var held := to.index
+	to.index = from.index
+	from.index = held
+
+
+## Empties both inputs: their items come back to the backpack (the tab
+## changed or the shop closed).
 func clear_craft() -> void:
 	_first_input.clear()
 	_second_input.clear()
@@ -277,6 +307,14 @@ func _show_craft() -> void:
 	_fee_label.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if affordable or result == null else UiStyle.ERROR_COLOR)
 	_craft_button.disabled = result == null
 	_craft_note.text = craft_note()
+
+
+## The Craft button's question: "Craft Muramana from Tear of the Goddess and
+## Tear of the Goddess for 1470 gold?" Only asked when the inputs make
+## something.
+func craft_question() -> String:
+	return "Craft %s from %s and %s for %d gold?" % [craft_preview().display_name,
+		_first_input.item().display_name, _second_input.item().display_name, craft_fee()]
 
 
 ## The Craft tab's note line for what is in the inputs.

@@ -4,7 +4,8 @@ extends Control
 ## (with its key number, or a chain when locked), a potion cell (its key; its
 ## potion faded while empty), the boots cell (Boots of Speed faded while
 ## empty) or the sell slot (red while the shop is open). Draws the item from
-## the inventory and passes mouse input to the screen.
+## the inventory, or nothing while that item sits in a Craft input, and
+## passes mouse input to the screen.
 
 enum Style { BACKPACK, EQUIP, SELL, POTION, BOOTS }
 
@@ -40,8 +41,12 @@ func _init(cell_index: int, cell_style: Style, owner_screen: BackpackScreen) -> 
 	custom_minimum_size = Vector2(SIZE, SIZE)
 
 
+## The item the cell shows: null while it sits in a Craft input
+## (BackpackScreen.in_craft), so the cell looks empty and can't be picked up.
 func item() -> ItemData:
-	return screen.inventory.item_at(index) if index >= 0 else null
+	if index < 0 or screen.in_craft(index):
+		return null
+	return screen.inventory.item_at(index)
 
 
 func is_locked() -> bool:
@@ -51,6 +56,8 @@ func is_locked() -> bool:
 func tooltip_content() -> Control:
 	if style == Style.SELL and screen.is_shopping() and not screen.is_dragging():
 		return TooltipCard.note("Drop an item here to sell it for 70% of its cost (Guardian Angel: 40%).")
+	if screen.in_craft(index):
+		return null if screen.is_dragging() else TooltipCard.note("In the Craft tab: drag it back here, or right-click its input")
 	if is_locked() and style == Style.BACKPACK:
 		return TooltipCard.note("Buy Backpack Slots in the Evolution Tree")
 	var shown := item()
