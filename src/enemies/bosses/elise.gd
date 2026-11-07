@@ -30,6 +30,9 @@ const WEB := Color("e8e8f0")
 
 var _rappel_time := -1.0
 var _rappel_warning: GroundWarning
+## Her Cocoon webs in the air: each counts until it leaves the tree (it hit,
+## was blocked, hit a wall or ran its length).
+var _webs_flying := 0
 var _rappel_spot := Vector2.ZERO
 var _fade: Tween
 
@@ -63,6 +66,18 @@ func _spit_web(toward: Vector2) -> void:
 	bolt.hit_radius = COCOON_WIDTH * 0.5
 	bolt.color = WEB
 	bolt.hit_lucian.connect(_web_hit)
+	_webs_flying += 1
+	bolt.tree_exited.connect(_web_gone)
+
+
+func _web_gone() -> void:
+	_webs_flying -= 1
+
+
+## True while one of her Cocoon webs is still in the air: its stun may yet
+## land.
+func web_in_flight() -> bool:
+	return _webs_flying > 0
 
 
 func _web_hit() -> void:
@@ -87,13 +102,16 @@ func rappel() -> float:
 	return RAPPEL_TIME + RECOVER
 
 
-## Rappel waits for 85% HP, and never starts while Lucian is stunned (he
-## couldn't step out of its circle); she tries something else, and Rappel
+## Rappel waits for 85% HP, and never starts while Lucian is stunned or one
+## of her Cocoon webs is still flying (its stun could land as the circle
+## locks, and he couldn't step out); she tries something else, and Rappel
 ## keeps its cooldown.
 func _can_use(id: StringName) -> bool:
 	if id != &"rappel":
 		return true
-	return hp <= max_hp * RAPPEL_HP and not (is_instance_valid(target) and target.has_cc(CrowdControl.Kind.STUN))
+	if web_in_flight() or (is_instance_valid(target) and target.has_cc(CrowdControl.Kind.STUN)):
+		return false
+	return hp <= max_hp * RAPPEL_HP
 
 
 ## Nothing while she is up: no walking, no shots, no skills.

@@ -163,6 +163,40 @@ func test_no_rappel_while_lucian_is_stunned_and_it_comes_after() -> void:
 	assert_gt(boss._cooldowns[&"rappel"], 15.8)
 
 
+func test_no_rappel_while_a_cocoon_web_flies_and_it_comes_after() -> void:
+	var boss := _elise(Vector2.ZERO)
+	_quiet(boss)
+	boss.hp = boss.max_hp * 0.5
+	lucian.global_position = Vector2(900, 0)
+	await wait_physics_frames(1)
+	boss.cocoon()
+	await wait_seconds(0.75)
+	assert_eq(_effects(EnemyProjectile).size(), 1, "the web is out")
+	assert_true(boss.web_in_flight())
+	lucian.global_position = Vector2(0, 400)
+	boss._cooldowns[&"rappel"] = 0.0
+	await wait_physics_frames(5)
+	assert_false(boss.untargetable, "no Rappel while the web flies")
+	assert_eq(boss._cooldowns[&"rappel"], 0.0, "its cooldown isn't spent")
+	await wait_seconds(0.8)
+	assert_eq(_effects(EnemyProjectile).size(), 0, "the web ran its length")
+	assert_false(boss.web_in_flight())
+	assert_false(lucian.has_cc(CrowdControl.Kind.STUN), "it missed")
+	assert_true(boss.untargetable, "Rappel once the web is gone")
+	assert_gt(boss._cooldowns[&"rappel"], 15.0)
+
+
+func test_a_web_that_hits_stops_counting_as_in_flight() -> void:
+	var boss := _elise(Vector2.ZERO)
+	_quiet(boss)
+	lucian.global_position = Vector2(500, 0)
+	await wait_physics_frames(1)
+	boss.cocoon()
+	await wait_seconds(1.2)
+	assert_eq(_hits(&"cocoon").size(), 1)
+	assert_false(boss.web_in_flight())
+
+
 func test_rappel_waits_for_85_percent_and_the_skills_have_cooldowns() -> void:
 	var boss := _elise(Vector2.ZERO)
 	boss._cooldowns[&"rappel"] = 0.0
