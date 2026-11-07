@@ -165,6 +165,15 @@ func _init() -> void:
 	add_child(token)
 
 
+func _ready() -> void:
+	_sync_process()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_VISIBILITY_CHANGED and is_inside_tree():
+		_sync_process()
+
+
 func _process(delta: float) -> void:
 	_time += delta
 	token.position = _token_base + Vector2(0, sin(_time * TOKEN_BOB_SPEED) * TOKEN_BOB)
@@ -204,7 +213,7 @@ func refresh(cleared: Array[String], best: int, portrait: Texture2D) -> void:
 	lit_offset = road.get_closest_offset(node_for(lit_stage).center) if lit_stage != "" else 0.0
 	token_texture = portrait
 	token.visible = token_node != null
-	set_process(token.visible)
+	_sync_process()
 	if token_node:
 		_token_base = token_node.center - Vector2(token.size.x * 0.5, TOKEN_SIZE * 0.5 + 8.0 + token_node.radius() + TOKEN_LIFT)
 		token.position = _token_base
@@ -337,6 +346,12 @@ static func _radial(offsets: PackedFloat32Array, colors: PackedColorArray) -> Gr
 	texture.fill_from = Vector2(0.5, 0.5)
 	texture.fill_to = Vector2(1.0, 0.5)
 	return texture
+
+
+## The token bobs only while it shows and the map is on screen: another
+## section shown stops it.
+func _sync_process() -> void:
+	set_process(token.visible and is_visible_in_tree())
 
 
 func _add_place(place: JourneyNode) -> void:

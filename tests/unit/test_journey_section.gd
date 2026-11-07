@@ -252,6 +252,28 @@ func test_lucians_token_sits_on_the_next_stage() -> void:
 	assert_false(map.token.visible)
 
 
+## B15: the open stages' pulse, the open portal's swirl and the token's bob
+## run only while the Journey shows, as the Tree's pages do.
+func test_the_journey_animates_only_while_it_shows() -> void:
+	_clear(3)
+	var map := section.map
+	assert_true(_node("4-1").is_processing(), "an open stage pulses")
+	assert_true(map.endless.is_processing(), "the open portal swirls")
+	assert_true(map.is_processing(), "the token bobs")
+	assert_false(_node("3-5").is_processing(), "a cleared stage stands still")
+	section.visible = false
+	assert_false(_node("4-1").is_processing(), "hidden: no pulse")
+	assert_false(map.endless.is_processing(), "hidden: no swirl")
+	assert_false(map.is_processing(), "hidden: no bob")
+	_clear(4)
+	assert_false(_node("5-1").is_processing(), "a stage that opens while hidden waits too")
+	section.visible = true
+	assert_true(_node("5-1").is_processing(), "shown again: 5-1 pulses")
+	assert_true(map.endless.is_processing(), "shown again: the portal swirls")
+	assert_true(map.is_processing(), "shown again: the token bobs")
+	assert_false(_node("4-1").is_processing(), "4-1, cleared meanwhile, stands still")
+
+
 func test_the_token_wears_the_equipped_skin() -> void:
 	assert_eq(section.map.token_texture, Skins.find(SaveGame.CLASSIC).portrait)
 	_save().owned_skins.append(&"high_noon")

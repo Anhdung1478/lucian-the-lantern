@@ -356,6 +356,64 @@ func test_settings_hides_the_menu_and_back_returns() -> void:
 	assert_true(main.gear.visible)
 
 
+## B15: only the section shown animates; the Journey stops while the Tree or
+## the Skin Shop is open.
+func test_another_section_stops_the_journey_animating() -> void:
+	var journey := main.sections[MainScreen.SECTION_JOURNEY] as JourneySection
+	var stage := journey.map.node_for("1-1")
+	assert_true(stage.is_processing(), "an open stage pulses")
+	assert_true(journey.map.is_processing(), "the token bobs")
+	for index in [MainScreen.SECTION_TREE, MainScreen.SECTION_SKINS]:
+		main.show_section(index)
+		assert_false(stage.is_processing(), "section %d shown" % index)
+		assert_false(journey.map.is_processing(), "section %d shown" % index)
+	main.show_section(MainScreen.SECTION_JOURNEY)
+	assert_true(stage.is_processing())
+	assert_true(journey.map.is_processing())
+
+
+## B15: Settings only dims the main screen, so the sections stand still under
+## it (nothing in them processes) and go on once it closes.
+func test_settings_stops_every_section_until_it_closes() -> void:
+	main.gear.open()
+	_press("Settings")
+	for i in main.sections.size():
+		assert_false(main.sections[i].can_process(), "section %d under Settings" % i)
+	main.settings.back_requested.emit()
+	for i in main.sections.size():
+		assert_true(main.sections[i].can_process(), "section %d after Settings" % i)
+	main.gear.close()
+	main.settings.open()
+	assert_false(main.sections[MainScreen.SECTION_JOURNEY].can_process(), "however Settings opens")
+	main.settings.close()
+	assert_true(main.sections[MainScreen.SECTION_JOURNEY].can_process())
+
+
+func test_under_settings_the_journey_and_the_tree_neither_move_nor_redraw() -> void:
+	var stage := (main.sections[MainScreen.SECTION_JOURNEY] as JourneySection).map.node_for("1-1")
+	var tree := main.sections[MainScreen.SECTION_TREE] as TreeSection
+	var page: TreePage = tree.pages[tree.branch]
+	await _check_settings_freezes("the Journey's 1-1", stage, stage)
+	main.show_section(MainScreen.SECTION_TREE)
+	await _check_settings_freezes("the Tree's motes", page, page._motes)
+
+
+## While Settings is open, `node`'s clock stands still and `canvas` is not
+## redrawn; after it closes both go on.
+func _check_settings_freezes(what: String, node: Node, canvas: CanvasItem) -> void:
+	await wait_process_frames(2)
+	main.settings.open()
+	var before: float = node._time
+	watch_signals(canvas)
+	await wait_process_frames(3)
+	assert_eq(node._time, before, "%s stand still under Settings" % what)
+	assert_signal_emit_count(canvas, "draw", 0, "%s are not redrawn" % what)
+	main.settings.close()
+	await wait_process_frames(3)
+	assert_gt(node._time, before, "%s go on after Settings" % what)
+	assert_signal_emitted(canvas, "draw", "%s are redrawn again" % what)
+
+
 func test_esc_opens_and_closes_the_gear_menu() -> void:
 	_esc()
 	assert_true(main.gear.visible)

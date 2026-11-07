@@ -6,7 +6,8 @@ extends Control
 ## enemy's art, with the id on a plate below. Its state shows: cleared (a
 ## gold rim and a green check), open (a soft pulse), locked (dim, a small
 ## lock), fogged (its act is locked: the map's fog covers it), picked (a white
-## outline). A click on an open place emits `chosen`. The hover text says the
+## outline). The pulse (and the portal's swirl) runs only while the place is
+## on screen. A click on an open place emits `chosen`. The hover text says the
 ## stage and its waves, or what to clear first.
 
 ## An open place was clicked.
@@ -127,7 +128,12 @@ static func waves_line(act_number: int, stage_number: int, with_boss := true) ->
 func _ready() -> void:
 	mouse_entered.connect(_set_hovered.bind(true))
 	mouse_exited.connect(_set_hovered.bind(false))
-	set_process(_animated())
+	_sync_process()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_VISIBILITY_CHANGED and is_inside_tree():
+		_sync_process()
 
 
 func _process(delta: float) -> void:
@@ -185,7 +191,7 @@ func set_state(is_locked: bool, is_fogged: bool, is_cleared: bool) -> void:
 		modulate = Color.WHITE
 	mouse_default_cursor_shape = Control.CURSOR_ARROW if locked else Control.CURSOR_POINTING_HAND
 	set_meta(&"hover_text", _hover_text())
-	set_process(_animated())
+	_sync_process()
 	queue_redraw()
 
 
@@ -239,6 +245,12 @@ func _animated() -> bool:
 	if kind == ENDLESS:
 		return not locked
 	return is_stage() and not locked and not cleared
+
+
+## The pulse and the swirl run only while the place is on screen: another
+## section shown stops them.
+func _sync_process() -> void:
+	set_process(_animated() and is_visible_in_tree())
 
 
 func _set_hovered(on: bool) -> void:

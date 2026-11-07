@@ -4,6 +4,7 @@ extends Control
 ## Evolution Tree / Skin Shop / Journey sections in the middle, their buttons
 ## at the bottom. Nothing here saves by itself; only Start (which saves the
 ## slot before the stage) and the gear menu's Save and Save as copy write files.
+## Only the section shown animates, and none does while Settings is open.
 ##
 ## ESC: while the gear menu shows it goes first (back from its slot list,
 ## else close), even over a section's pop-up hidden beneath it. Otherwise a
@@ -37,6 +38,8 @@ var gear := GearMenu.new()
 var settings := SettingsScreen.new()
 var confirm := ConfirmPopup.new()
 
+## Holds the three sections; it stops processing while Settings is open.
+var _section_area := Control.new()
 var _toast: Label
 var _toast_tween: Tween
 ## Rolls an Endless run's map when the choice is Random.
@@ -107,18 +110,17 @@ func _close_section_popup() -> bool:
 func _build() -> void:
 	add_child(backdrop)
 
-	var area := Control.new()
-	area.set_anchors_preset(Control.PRESET_FULL_RECT)
-	area.offset_top = TOP_BAR
-	area.offset_bottom = -BOTTOM_BAR
-	area.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(area)
+	_section_area.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_section_area.offset_top = TOP_BAR
+	_section_area.offset_bottom = -BOTTOM_BAR
+	_section_area.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_section_area)
 	var tree_section := TreeSection.new()
 	tree_section.confirm = confirm
-	area.add_child(tree_section)
+	_section_area.add_child(tree_section)
 	sections.append(tree_section)
 	var skin_shop := SkinShop.new()
-	area.add_child(skin_shop)
+	_section_area.add_child(skin_shop)
 	sections.append(skin_shop)
 	var journey := JourneySection.new()
 	journey.focus_act = focus_act
@@ -126,7 +128,7 @@ func _build() -> void:
 	journey.start_training.connect(_start_training)
 	journey.start_stage.connect(_start_stage)
 	journey.start_endless.connect(_start_endless)
-	area.add_child(journey)
+	_section_area.add_child(journey)
 	sections.append(journey)
 
 	var top := Control.new()
@@ -209,10 +211,14 @@ func _request_start(run: StageSetup) -> void:
 
 
 ## The Skin Shop's preview stands still while the gear menu, Settings or a
-## Yes / No pop-up covers it.
+## Yes / No pop-up covers it. Settings only dims the screen (the sections
+## still show under it), so while it is open every section stands still: no
+## section processes or redraws (the Tree's motes, the Journey's pulses and
+## token) until it closes.
 func _update_covered() -> void:
 	var shop := sections[SECTION_SKINS] as SkinShop
 	shop.set_covered(gear.visible or settings.visible or confirm.is_open())
+	_section_area.process_mode = Node.PROCESS_MODE_DISABLED if settings.visible else Node.PROCESS_MODE_INHERIT
 
 
 func _open_settings() -> void:
