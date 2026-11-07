@@ -191,6 +191,8 @@ func undo_sale() -> void:
 ## The Craft tab's Craft button: asks "Craft Muramana from ... for 1470
 ## gold?" and Yes crafts what is in its two inputs; No changes nothing. Inputs
 ## that make nothing, or a fee the wallet can't pay, are refused at once.
+## A craft uses up both inputs' items, so both inputs empty and what it made
+## shows in its cell (upgraded boots in the boots cell).
 func craft() -> void:
 	if shop == null:
 		return
@@ -209,6 +211,7 @@ func _craft_now() -> void:
 	if shop:
 		var result := shop.craft(_shop_panel.first_input().index, _shop_panel.second_input().index)
 		if result == Shop.Result.OK:
+			_shop_panel.clear_craft()
 			Sfx.play(&"craft")
 		_report(result)
 

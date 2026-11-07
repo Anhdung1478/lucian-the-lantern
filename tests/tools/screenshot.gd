@@ -929,9 +929,7 @@ func scenario_craft_shop() -> void:
 	await wait(0.2)
 	print("upgraded (expect berserkers_greaves, gold 1900, fragment gone): ", inventory.boots().id, " ",
 		game.wallet.gold, " ", inventory.item_at(2))
-	# A right-click on the input gives the boots back to their cell.
-	await mouse_right_click(control_center(panel.first_input()))
-	await wait(0.1)
+	print("inputs emptied (expect -1 -1): ", panel.first_input().index, " ", panel.second_input().index)
 	# Boots over the sell slot read NO.
 	var sell_cell: ItemCell = backpack._cells.back()
 	await mouse_move(control_center(backpack._cells[Inventory.BOOTS_CELL]))

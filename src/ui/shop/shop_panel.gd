@@ -237,7 +237,7 @@ func move_input(from: CraftSlot, target: int) -> void:
 
 
 ## Empties both inputs: their items come back to the backpack (the tab
-## changed or the shop closed).
+## changed or the shop closed), or a craft used them up.
 func clear_craft() -> void:
 	_first_input.clear()
 	_second_input.clear()

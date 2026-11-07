@@ -7,8 +7,9 @@ extends Control
 ## drops, sales and purchases (BackpackScreen.in_craft). The item stays in its
 ## cell in the Inventory, so a save or a crash loses nothing. It comes back
 ## when it is dragged out of the input, on a right-click on the input, when
-## the merchant's tab changes and when the shop closes. An input's mouse input
-## goes to the backpack screen, which runs the drags.
+## the merchant's tab changes and when the shop closes. A craft empties both
+## inputs, so what it made shows in its cell. An input's mouse input goes to
+## the backpack screen, which runs the drags.
 
 enum Kind { INPUT, RESULT }
 
@@ -75,8 +76,8 @@ func clear() -> void:
 	index = -1
 
 
-## Empties the input once its cell no longer holds what it takes: a craft used
-## the item up or made a legendary there.
+## Empties the input once its cell no longer holds what it takes (the debug
+## table cleared the backpack).
 func recheck() -> void:
 	if index >= 0 and not takes(item()):
 		clear()
