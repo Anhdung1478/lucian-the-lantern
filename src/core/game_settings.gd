@@ -370,10 +370,14 @@ static func dict_to_event(data: Dictionary) -> InputEvent:
 
 ## The file's settings, or the temp file's when the file is missing or
 ## broken (a save whose rename failed); with neither, the defaults stay.
+## A temp file that loads becomes the file again at once, so the next save,
+## which writes the temp file first, can't spoil the only whole copy.
 func _load() -> void:
 	var data := _read(path)
 	if data.is_empty():
 		data = _read(_temp_path())
+		if not data.is_empty():
+			DirAccess.rename_absolute(ProjectSettings.globalize_path(_temp_path()), ProjectSettings.globalize_path(path))
 	if data.is_empty():
 		return
 	var values: Dictionary = data.get("values", {})

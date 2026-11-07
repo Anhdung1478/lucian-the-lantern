@@ -139,6 +139,20 @@ func test_with_only_the_temp_file_left_its_settings_load() -> void:
 	assert_eq(loaded.key_label(&"skill_q"), "Backspace")
 
 
+## The temp file that loaded is the file again, so the next save writes a new
+## temp file instead of emptying the only whole copy.
+func test_a_temp_file_that_loads_becomes_the_file() -> void:
+	_saved_as(PATH + ".tmp")
+	var loaded := GameSettings.new(PATH)
+	assert_true(FileAccess.file_exists(PATH), "renamed back")
+	assert_false(FileAccess.file_exists(PATH + ".tmp"))
+	loaded.set_value(&"music_volume", 35)
+	var again := GameSettings.new(PATH)
+	assert_eq(again.get_value(&"sfx_volume"), 12)
+	assert_eq(again.get_value(&"music_volume"), 35)
+	assert_eq(again.key_label(&"skill_q"), "Backspace")
+
+
 func test_a_broken_file_falls_back_to_the_temp_file() -> void:
 	_saved_as(PATH + ".tmp")
 	var file := FileAccess.open(PATH, FileAccess.WRITE)
@@ -146,6 +160,9 @@ func test_a_broken_file_falls_back_to_the_temp_file() -> void:
 	file.close()
 	assert_eq(GameSettings.new(PATH).get_value(&"sfx_volume"), 12)
 	assert_push_warning_count(1)
+	assert_false(FileAccess.file_exists(PATH + ".tmp"), "renamed over the broken file")
+	assert_eq(GameSettings.new(PATH).get_value(&"sfx_volume"), 12)
+	assert_push_warning_count(1, "the file is whole again")
 
 
 ## A folder in the file's place makes the rename fail: the whole temp file
