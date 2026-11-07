@@ -11,7 +11,9 @@ extends Node
 ##
 ## Stunned, feared, moved by force or in stasis, Lucian ignores the cast and
 ## potion keys but still takes clicks: like LoL, the last order runs once it
-## ends.
+## ends. An aim already shown waits it out too: a normal cast still needs its
+## left-click once it ends, and a quick cast with indicator let go meanwhile
+## fires then. Death drops the aim.
 
 ## Holding move re-issues the order once the cursor has moved this far.
 const REISSUE_DISTANCE := 8.0
@@ -125,8 +127,12 @@ func cancel_aim() -> bool:
 func _process(_delta: float) -> void:
 	if _aiming == &"":
 		return
-	# Quick cast with indicator fires once the key is let go.
-	if _aim_mode == "indicator" and not Input.is_action_pressed(_aiming):
+	if lucian.dead:
+		cancel_aim()
+		return
+	# Quick cast with indicator fires once the key is let go, or, let go under
+	# crowd control, once Lucian can act again.
+	if _aim_mode == "indicator" and not Input.is_action_pressed(_aiming) and lucian.can_act():
 		_fire_aim()
 		return
 	lucian.indicator.aim_point = _cursor()

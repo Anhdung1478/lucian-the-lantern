@@ -136,6 +136,49 @@ func test_quick_cast_with_indicator_casts_on_release() -> void:
 	assert_null(lucian.indicator.aimed)
 
 
+func test_a_quick_cast_with_indicator_let_go_in_a_stun_fires_once_it_ends() -> void:
+	mode(&"skill_q", "indicator")
+	press(&"skill_q", KEY_Q)
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.2)
+	Input.action_release(&"skill_q")
+	await wait_process_frames(3)
+	assert_false(q_cast(), "no cast while stunned")
+	assert_eq(controller.aiming(), &"skill_q", "the aim is still there")
+	assert_not_null(lucian.indicator.aimed)
+	await wait_seconds(0.3)
+	assert_true(q_cast(), "cast once it ends")
+	assert_eq(controller.aiming(), &"")
+	assert_null(lucian.indicator.aimed)
+
+
+func test_a_quick_cast_with_indicator_waiting_out_a_stun_can_be_cancelled() -> void:
+	mode(&"skill_q", "indicator")
+	press(&"skill_q", KEY_Q)
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.2)
+	Input.action_release(&"skill_q")
+	await wait_process_frames(2)
+	Input.action_press(&"move")
+	click(MOUSE_BUTTON_RIGHT)
+	Input.action_release(&"move")
+	assert_eq(controller.aiming(), &"", "right-click cancels")
+	await wait_seconds(0.3)
+	assert_false(q_cast(), "nothing fires after the stun")
+
+
+func test_death_drops_a_quick_cast_with_indicator_waiting_out_a_stun() -> void:
+	mode(&"skill_q", "indicator")
+	press(&"skill_q", KEY_Q)
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.2)
+	Input.action_release(&"skill_q")
+	lucian.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_true(lucian.dead)
+	await wait_process_frames(2)
+	assert_eq(controller.aiming(), &"")
+	assert_null(lucian.indicator.aimed)
+	await wait_seconds(0.3)
+	assert_false(q_cast())
+
+
 func test_a_skill_that_is_not_ready_is_not_aimed() -> void:
 	mode(&"skill_q", "normal")
 	lucian.skills[Slot.Q].cooldown.start(5.0)
