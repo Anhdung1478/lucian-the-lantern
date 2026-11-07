@@ -165,6 +165,31 @@ func test_a_quick_cast_with_indicator_waiting_out_a_stun_can_be_cancelled() -> v
 	assert_false(q_cast(), "nothing fires after the stun")
 
 
+## Held, the aim swallows a left-click; let go under a stun it only waits, so
+## a left-click on an enemy is an attack order like any click during crowd
+## control, and the cast still fires once the stun ends.
+func test_a_left_click_while_a_quick_cast_with_indicator_waits_gives_its_order() -> void:
+	var enemy := Enemy.new()
+	enemy.radius = 20.0
+	enemy.max_hp = 5000.0
+	enemy.position = lucian.get_global_mouse_position()
+	add_child_autofree(enemy)
+	lucian.global_position = enemy.position + Vector2(300, 0)
+	mode(&"skill_q", "indicator")
+	press(&"skill_q", KEY_Q)
+	click(MOUSE_BUTTON_LEFT)
+	assert_ne(lucian._order, Lucian.Order.ATTACK, "held: the click is swallowed")
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.2)
+	Input.action_release(&"skill_q")
+	await wait_process_frames(2)
+	click(MOUSE_BUTTON_LEFT)
+	assert_eq(lucian._order, Lucian.Order.ATTACK, "let go: the click gives its order")
+	assert_eq(lucian._target, enemy)
+	assert_eq(controller.aiming(), &"skill_q", "the aim still waits")
+	await wait_seconds(0.3)
+	assert_true(q_cast(), "cast once it ends")
+
+
 func test_death_drops_a_quick_cast_with_indicator_waiting_out_a_stun() -> void:
 	mode(&"skill_q", "indicator")
 	press(&"skill_q", KEY_Q)

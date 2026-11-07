@@ -155,13 +155,17 @@ func _press_cast(action: StringName) -> void:
 
 ## While aiming: right-click cancels (without moving). Left-click fires in
 ## normal cast (the aim waits out crowd control) and does nothing while a
-## quick cast with indicator is held. Another cast key takes over the aim (the
-## caller handles it). True when the event was used.
+## quick cast with indicator is held. Let go under crowd control, that aim is
+## only waiting, so a left-click gives its order as any click during crowd
+## control does. Another cast key takes over the aim (the caller handles it).
+## True when the event was used.
 func _aim_input(event: InputEvent) -> bool:
 	if event.is_action_pressed(&"move"):
 		cancel_aim()
 		return true
 	if event.is_action_pressed(&"attack"):
+		if _aim_mode == "indicator" and not Input.is_action_pressed(_aiming):
+			return false
 		if _aim_mode == "normal" and lucian.can_act():
 			_fire_aim()
 		return true
