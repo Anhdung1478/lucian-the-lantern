@@ -2,11 +2,10 @@ class_name GearMenu
 extends CanvasLayer
 ## The gear button's menu: an ornate card (MenuCard) over the blurred main
 ## screen, the slot and its play time under MENU, then Close, Save, Save as
-## copy, Difficulty, Settings, Leave to main menu and Exit the game. Save as
-## copy swaps the rows for a slot list. Difficulty is only shown (greyed, with
-## the level): it is picked when a game starts and can't change later. Only
-## Save and Save as copy write files. The main screen passes it the arrow
-## keys and Enter (`keys`), which skip the greyed Difficulty row.
+## copy, Settings, Leave to main menu and Exit the game. Save as copy swaps
+## the rows for a slot list. Difficulty is not here: it is picked only on the
+## title screen when a new game starts. Only Save and Save as copy write
+## files. The main screen passes it the arrow keys and Enter (`keys`).
 
 signal settings_requested
 signal exit_requested
@@ -18,7 +17,6 @@ const CLOSE_ICON := preload("res://assets/art/ui/menu_close.svg")
 const SAVE_ICON := preload("res://assets/art/ui/menu_save.svg")
 const COPY_ICON := preload("res://assets/art/ui/menu_copy.svg")
 const BACK_ICON := preload("res://assets/art/ui/menu_back.svg")
-const DIFFICULTY_ICON := preload("res://assets/art/ui/skull.svg")
 
 ## Asked "Overwrite slot N?"; the main screen sets it. Without one the copy just happens.
 var confirm: ConfirmPopup
@@ -31,7 +29,6 @@ var _slot_page: VBoxContainer
 var _slot_list := SlotList.new()
 var _save_entry: MenuEntry
 var _showing_slots := false
-var _difficulty_entry: MenuEntry
 
 
 func _ready() -> void:
@@ -89,8 +86,6 @@ func _build() -> void:
 	_entry(_menu_page, "Close", CLOSE_ICON, MenuEntry.Kind.PRIMARY, "", close)
 	_save_entry = _entry(_menu_page, "Save", SAVE_ICON, MenuEntry.Kind.NORMAL, "", _save)
 	_entry(_menu_page, "Save as copy", COPY_ICON, MenuEntry.Kind.NORMAL, "To another slot", show_slots)
-	_difficulty_entry = _entry(_menu_page, "Difficulty", DIFFICULTY_ICON, MenuEntry.Kind.NORMAL, "", Callable())
-	_difficulty_entry.disable("Set when this game started")
 	_entry(_menu_page, "Settings", GameMenu.SETTINGS_ICON, MenuEntry.Kind.NORMAL, GameMenu.SETTINGS_HINT, settings_requested.emit)
 	_entry(_menu_page, "Leave to main menu", GameMenu.LEAVE_ICON, MenuEntry.Kind.DANGER, "Title screen", leave_requested.emit)
 	_entry(_menu_page, "Exit the game", GameMenu.EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
@@ -115,7 +110,6 @@ func _show_menu() -> void:
 	card.set_title("MENU")
 	card.set_subtitle("Slot %d · %s" % [save.slot, SaveGame.play_time_text(int(save.play_time))])
 	_save_entry.set_hint("Slot %d" % save.slot)
-	_difficulty_entry.set_hint(Difficulty.name_of(save.difficulty))
 	_menu_page.visible = true
 	_slot_page.visible = false
 	keys.set_buttons(MenuKeys.buttons_in(_menu_page))
@@ -123,8 +117,7 @@ func _show_menu() -> void:
 
 func _entry(parent: Control, label: String, icon: Texture2D, kind: MenuEntry.Kind, hint: String, action: Callable) -> MenuEntry:
 	var entry := MenuEntry.new(label, icon, kind, hint)
-	if action.is_valid():
-		entry.pressed.connect(action)
+	entry.pressed.connect(action)
 	parent.add_child(entry)
 	return entry
 

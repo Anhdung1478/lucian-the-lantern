@@ -278,14 +278,14 @@ func test_the_toast_stays_in_the_top_bar() -> void:
 
 
 ## Item 33: the gear menu takes the arrow keys and Enter while it is open,
-## skipping the greyed Difficulty row and, on its slot page, the current slot.
+## skipping, on its slot page, the current slot.
 func test_the_gear_menu_works_with_the_arrow_keys_and_enter() -> void:
 	main._input(_key(KEY_DOWN))
 	assert_eq(main.gear.keys.lit, -1, "closed, it reads no keys")
 	main.gear.open()
 	for i in 4:
 		main._input(_key(KEY_DOWN))
-	assert_eq(main.gear.keys.lit_button().text, "Settings", "Close, Save, Save as copy, past Difficulty")
+	assert_eq(main.gear.keys.lit_button().text, "Settings", "Close, Save, Save as copy, Settings")
 	main._input(_key(KEY_UP))
 	main._input(_key(KEY_ENTER))
 	assert_true(main.gear.is_showing_slots(), "Save as copy")
@@ -514,23 +514,18 @@ func test_the_gear_menu_shows_the_slot_and_its_rows() -> void:
 	assert_eq(main.gear.card.title_label.text, "MENU")
 
 
-func test_the_difficulty_row_shows_the_saves_level() -> void:
-	main.gear.open()
-	var row := main.gear.find_button("Difficulty") as MenuEntry
-	assert_not_null(row)
-	assert_eq(row.hint_label.text, "Normal")
+## Change 1: difficulty is picked only on the title screen when a new game
+## starts; the gear menu has no Difficulty row, not even a greyed one.
+func test_the_gear_menu_has_no_difficulty_row() -> void:
 	SaveGame.instance().difficulty = Difficulty.EXTREME
 	main.gear.open()
-	assert_eq(row.hint_label.text, "Extreme")
-
-
-func test_the_difficulty_row_is_disabled_and_explains_itself() -> void:
-	main.gear.open()
-	var row := main.gear.find_button("Difficulty") as MenuEntry
-	assert_true(row.disabled)
-	assert_eq(row.get_meta(&"hover_text", ""), "Set when this game started")
-	row.pressed.emit()
-	assert_eq(main.gear.card.title_label.text, "MENU", "pressing it goes nowhere")
+	var rows: Array[String] = []
+	for button in main.gear.keys.buttons:
+		rows.append(button.text)
+		assert_false((button as MenuEntry).disabled, "%s can be pressed" % button.text)
+		assert_ne((button as MenuEntry).hint_label.text, "Extreme", "%s does not show the level" % button.text)
+	assert_eq(rows, ["Close", "Save", "Save as copy", "Settings", "Leave to main menu", "Exit the game"] as Array[String])
+	assert_null(main.gear.find_button("Difficulty"))
 
 
 func test_esc_has_no_difficulty_page_to_go_back_from() -> void:
