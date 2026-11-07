@@ -124,6 +124,46 @@ func test_shots_alternate_guns() -> void:
 	assert_eq(sides, ["L", "R", "L", "R", "L"] as Array[String])
 
 
+func test_a_charged_attack_inside_the_delay_fires_the_waiting_second_shot_first() -> void:
+	var e_cooldown := lucian.skills[Slot.E].cooldown
+	e_cooldown.start(10.0)
+	lucian.passive.charge()
+	lucian.passive.fire_basic_attack(dummy)
+	await wait_physics_frames(1)
+	# E reset the attack timer: the next charged attack comes before 0.15 s.
+	lucian.passive.charge()
+	lucian.passive.fire_basic_attack(dummy)
+	await wait_seconds(1.0)
+	assert_eq(_sources().count(&"basic"), 2)
+	assert_eq(_sources().count(&"lightslinger"), 2, "both second shots land")
+	var waited := 10.0 - e_cooldown.remaining - 2.0 * lucian.passive.e_cooldown_reduction
+	assert_almost_eq(waited, 1.0, 0.1, "E lost 1 s per second shot on top of the time")
+
+
+func test_a_waiting_second_shot_cut_short_skips_a_target_gone() -> void:
+	var effects := Node2D.new()
+	add_child_autofree(effects)
+	lucian.projectile_parent = effects
+	var shots := [0]
+	effects.child_entered_tree.connect(func(node: Node) -> void:
+		if node is AttackProjectile:
+			shots[0] += 1)
+	var other: TrainingDummy = load("res://src/enemies/training_dummy.tscn").instantiate()
+	other.position = Vector2(0, 600)
+	add_child_autofree(other)
+	var other_hits: Array[StringName] = []
+	other.damage_taken.connect(func(info: DamageInfo, _final: float) -> void: other_hits.append(info.source))
+	lucian.passive.charge()
+	lucian.passive.fire_basic_attack(dummy)
+	dummy.free()
+	lucian.passive.charge()
+	lucian.passive.fire_basic_attack(other)
+	assert_eq(shots[0], 2, "both attacks, and no shot at the dummy gone")
+	await wait_seconds(0.5)
+	assert_eq(shots[0], 3, "the new second shot still fires")
+	assert_eq(other_hits, [&"basic", &"lightslinger"] as Array[StringName])
+
+
 func test_failed_cast_does_not_charge_passive() -> void:
 	lucian.try_cast(Slot.Q, dummy.position)
 	assert_false(lucian.passive.charged)

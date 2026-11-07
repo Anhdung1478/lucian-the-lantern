@@ -31,8 +31,12 @@ func charge() -> void:
 	charged = true
 
 
-## Lucian's basic attack: one shot, or two when charged.
+## Lucian's basic attack: one shot, or two when charged. A charged attack
+## that comes while the last second shot is still waiting (a fast attack
+## after E's reset) fires that shot first, so it is never thrown away.
 func fire_basic_attack(target: Enemy) -> void:
+	if charged and _second_shot_in > 0.0:
+		_fire_second_shot()
 	lucian.fire_attack_projectile(lucian.next_gun(), target, lucian.basic_attack(target))
 	if charged:
 		charged = false
@@ -50,6 +54,14 @@ func _physics_process(delta: float) -> void:
 	if _second_shot_in <= 0.0:
 		return
 	_second_shot_in -= delta
-	if _second_shot_in <= 0.0 and Lucian.is_target(_second_shot_target):
-		var info := lucian.roll_attack(second_shot_ratio, &"lightslinger")
-		lucian.fire_attack_projectile(lucian.next_gun(), _second_shot_target, info)
+	if _second_shot_in <= 0.0:
+		_fire_second_shot()
+
+
+## The waiting second shot goes now, at its target if it is still one.
+func _fire_second_shot() -> void:
+	var target := _second_shot_target
+	_second_shot_in = 0.0
+	_second_shot_target = null
+	if Lucian.is_target(target):
+		lucian.fire_attack_projectile(lucian.next_gun(), target, lucian.roll_attack(second_shot_ratio, &"lightslinger"))
