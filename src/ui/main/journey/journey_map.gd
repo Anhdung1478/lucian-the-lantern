@@ -5,8 +5,9 @@ extends Control
 ## play order), Training beside 1-1 and the Endless portal in the
 ## bottom-right corner, off the road. The road glows gold up to the latest
 ## cleared stage and is dim beyond; a locked act lies under fog with a chain;
-## Lucian's token (the equipped skin's portrait) floats over the next stage.
-## A click on an open place emits `node_chosen`. Nothing here saves.
+## Lucian's token (the equipped skin's portrait) floats over the picked place
+## and moves with the pick. A click on an open place emits `node_chosen`.
+## Nothing here saves.
 
 ## An open place was clicked.
 signal node_chosen(node: JourneyNode)
@@ -117,9 +118,12 @@ var road := Curve2D.new()
 ## that glow's length along the road.
 var lit_stage := ""
 var lit_offset := 0.0
-## The stage Lucian's token floats over: the first open one not yet cleared
-## (null once every stage is).
-var token_node: JourneyNode
+## The first open stage not yet cleared, where the Journey opens (null once
+## every stage is).
+var next_node: JourneyNode
+## The picked place (white outline), which Lucian's token floats over; null
+## until one is picked.
+var selected: JourneyNode
 var token := Control.new()
 ## The equipped skin's portrait, on the token.
 var token_texture: Texture2D
@@ -161,6 +165,7 @@ func _init() -> void:
 	add_child(_overlay)
 	token.size = Vector2(TOKEN_SIZE + 16.0, TOKEN_SIZE + 28.0)
 	token.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	token.visible = false
 	token.draw.connect(_draw_token)
 	add_child(token)
 
@@ -176,7 +181,7 @@ func _notification(what: int) -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
-	token.position = _token_base + Vector2(0, sin(_time * TOKEN_BOB_SPEED) * TOKEN_BOB)
+	token.position = _token_base + _bob()
 
 
 ## The stage with this id, or null.
@@ -199,33 +204,35 @@ func refresh(cleared: Array[String], best: int, portrait: Texture2D) -> void:
 		elif regions[act - 1].has_meta(&"hover_text"):
 			regions[act - 1].remove_meta(&"hover_text")
 	lit_stage = ""
-	token_node = null
+	next_node = null
 	for node in nodes:
 		var open := Journey.is_stage_open(node.act, node.stage, cleared)
 		node.set_state(not open, is_fogged(node.act), node.stage_id in cleared)
 		if node.cleared:
 			lit_stage = node.stage_id
-		if token_node == null and open and not node.cleared:
-			token_node = node
+		if next_node == null and open and not node.cleared:
+			next_node = node
 	training.set_state(false, false, false)
 	endless.set_state(not Journey.is_endless_open(cleared), false, false)
 	endless.set_best(best)
 	lit_offset = road.get_closest_offset(node_for(lit_stage).center) if lit_stage != "" else 0.0
 	token_texture = portrait
-	token.visible = token_node != null
-	_sync_process()
-	if token_node:
-		_token_base = token_node.center - Vector2(token.size.x * 0.5, TOKEN_SIZE * 0.5 + 8.0 + token_node.radius() + TOKEN_LIFT)
-		token.position = _token_base
 	queue_redraw()
 	_overlay.queue_redraw()
 	token.queue_redraw()
 
 
-## Lights `node` (white outline) and no other place.
+## Lights `node` (white outline) and no other place, and floats Lucian's
+## token over it. Only the token moves: the map is not redrawn.
 func select(node: JourneyNode) -> void:
+	selected = node
 	for place in places():
 		place.set_selected(place == node)
+	token.visible = node != null
+	if node:
+		_token_base = node.center - Vector2(token.size.x * 0.5, TOKEN_SIZE * 0.5 + 8.0 + node.radius() + TOKEN_LIFT)
+		token.position = _token_base + _bob()
+	_sync_process()
 
 
 ## Every place: the stages, Training and Endless.
@@ -352,6 +359,11 @@ static func _radial(offsets: PackedFloat32Array, colors: PackedColorArray) -> Gr
 ## section shown stops it.
 func _sync_process() -> void:
 	set_process(token.visible and is_visible_in_tree())
+
+
+## How far the token has bobbed from its place over the picked medallion.
+func _bob() -> Vector2:
+	return Vector2(0, sin(_time * TOKEN_BOB_SPEED) * TOKEN_BOB)
 
 
 func _add_place(place: JourneyNode) -> void:
@@ -661,8 +673,6 @@ func _draw_overlay() -> void:
 
 
 func _draw_token() -> void:
-	if token_node == null:
-		return
 	var middle := Vector2(token.size.x * 0.5, TOKEN_SIZE * 0.5 + 8.0)
 	var radius := TOKEN_SIZE * 0.5
 	var tip := middle + Vector2(0, radius + 16.0)

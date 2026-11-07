@@ -3683,8 +3683,9 @@ func scenario_guardian_angel() -> void:
 ## The Journey's world map in three progress states: a new save (Acts 2–6
 ## fogged, Endless chained, the token on 1-1); the debug table's "Acts
 ## cleared" at 3 with their bosses paid and a best of 14 (Acts 1–3 lit, Act 4
-## open, Acts 5–6 fogged, the portal open), then a boss picked and a fogged
-## stage hovered; then every act cleared (the whole road lit, Training picked).
+## open, Acts 5–6 fogged, the portal open), then a boss picked (the token
+## follows it) and a fogged stage hovered; then every act cleared (the whole
+## road lit, Training picked with the token over it).
 func scenario_journey_map() -> void:
 	var section := journey()
 	var map := section.map
@@ -3692,7 +3693,7 @@ func scenario_journey_map() -> void:
 	await mouse_move(Vector2(960, 1000))
 	await wait(0.3)
 	print("new save: locked (expect Act 2-6 and Endless): ", locked_place_names(section),
-		"  token on (expect 1-1): ", map.token_node.stage_id, "  picked (expect 1-1): ", section.picked.stage_id)
+		"  token on (expect 1-1): ", map.selected.stage_id, "  picked (expect 1-1): ", section.picked.stage_id)
 	await shot("journey_map_0_new_save")
 	var spin: SpinBox = main_debug().find_children("*", "SpinBox", true, false)[0]
 	spin.value = 3
@@ -3701,7 +3702,7 @@ func scenario_journey_map() -> void:
 	section.open_on()
 	await wait(0.3)
 	print("Acts cleared 3: locked (expect Act 5, Act 6): ", locked_place_names(section),
-		"  token on (expect 4-1): ", map.token_node.stage_id, "  road lit to (expect 3-5): ", map.lit_stage,
+		"  token on (expect 4-1): ", map.selected.stage_id, "  road lit to (expect 3-5): ", map.lit_stage,
 		"  portal best (expect 14): ", map.endless.best)
 	await shot("journey_map_1_mid_game")
 	section.pick(map.node_for("3-5"))
@@ -3720,7 +3721,7 @@ func scenario_journey_map() -> void:
 	spin.value = Journey.ACTS.size()
 	section.open_on()
 	await wait(0.3)
-	print("all cleared: locked (expect []): ", locked_place_names(section), "  token (expect none): ", map.token_node,
+	print("all cleared: locked (expect []): ", locked_place_names(section), "  token on (expect training): ", map.selected.kind,
 		"  picked (expect training): ", section.picked.kind, "  road lit to (expect 6-5): ", map.lit_stage)
 	await shot("journey_map_4_all_cleared")
 

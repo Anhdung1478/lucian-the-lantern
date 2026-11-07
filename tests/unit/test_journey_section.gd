@@ -61,6 +61,20 @@ func _name(node: JourneyNode) -> String:
 	return node.stage_id if node.stage_id != "" else String(node.kind)
 
 
+## Lucian's token shows over `node`, the picked place: centred on it, its tip
+## at the medallion's top, give or take the bob.
+func _assert_token_over(node: JourneyNode, why := "") -> void:
+	var what := "%s %s" % [_name(node), why]
+	var map := section.map
+	assert_eq(map.selected, node, what)
+	assert_true(node.selected, what)
+	assert_true(map.token.visible, what)
+	var rect := map.token.get_rect()
+	assert_almost_eq(rect.get_center().x, node.center.x, 0.01, "centred: %s" % what)
+	assert_lt(rect.end.y, node.center.y, "above the middle: %s" % what)
+	assert_gt(rect.end.y, node.center.y - node.radius() - JourneyMap.TOKEN_BOB, "on the top: %s" % what)
+
+
 # --- The map: places, layout, locks ---------------------------------------------
 
 
@@ -239,17 +253,75 @@ func test_the_road_runs_through_every_stage_in_order() -> void:
 		last = at
 
 
-func test_lucians_token_sits_on_the_next_stage() -> void:
+## Change 2: the Journey opens on the next stage (the first open one not
+## yet cleared), so Lucian's token starts there; with every stage cleared it
+## opens on Training, and the token waits over it.
+func test_lucians_token_starts_on_the_next_stage() -> void:
 	var map := section.map
-	assert_eq(map.token_node, _node("1-1"))
-	assert_true(map.token.visible)
+	assert_eq(map.next_node, _node("1-1"))
+	_assert_token_over(_node("1-1"))
 	_clear(1)
-	assert_eq(map.token_node, _node("2-1"))
+	assert_eq(map.next_node, _node("2-1"))
+	_assert_token_over(_node("1-1"), "a refresh keeps the pick, and the token with it")
 	_clear(2, ["3-1"] as Array[String])
-	assert_eq(map.token_node, _node("3-2"))
+	assert_eq(map.next_node, _node("3-2"))
+	section.open_on()
+	_assert_token_over(_node("3-2"))
 	_clear(6)
-	assert_null(map.token_node, "every stage is cleared")
-	assert_false(map.token.visible)
+	assert_null(map.next_node, "every stage is cleared")
+	section.open_on()
+	_assert_token_over(map.training)
+
+
+## Change 2: the token floats over the picked place and moves with the pick,
+## Training and the Endless portal included; the next stage keeps no token
+## of its own, and a locked place, which can't be picked, never gets it.
+func test_lucians_token_follows_the_picked_place() -> void:
+	var map := section.map
+	_clear(3, ["4-1"] as Array[String])
+	assert_eq(map.next_node, _node("4-2"))
+	section.pick(_node("2-2"))
+	_assert_token_over(_node("2-2"), "a cleared stage")
+	section.pick(_node("3-5"))
+	_assert_token_over(_node("3-5"), "a boss stage")
+	section.pick(map.endless)
+	_assert_token_over(map.endless)
+	section.pick(map.training)
+	_assert_token_over(map.training)
+	_node("5-1")._gui_input(_click())
+	_assert_token_over(map.training, "a locked stage is not picked")
+	_node("4-2")._gui_input(_click())
+	_assert_token_over(_node("4-2"), "a click picks too")
+
+
+func test_the_token_fits_on_the_map_over_every_place() -> void:
+	_clear(6)
+	var inside := Rect2(Vector2.ZERO, JourneyMap.SIZE)
+	for place in section.map.places():
+		section.pick(place)
+		_assert_token_over(place)
+		var reach := section.map.token.get_rect().grow_individual(0, JourneyMap.TOKEN_BOB, 0, JourneyMap.TOKEN_BOB)
+		assert_true(inside.encloses(reach), "over %s" % _name(place))
+
+
+func test_the_token_bobs_over_the_picked_place() -> void:
+	var map := section.map
+	section.pick(map.training)
+	var first := map.token.position.y
+	await wait_process_frames(5)
+	assert_ne(map.token.position.y, first, "it bobs")
+	_assert_token_over(map.training)
+
+
+## Fix 44 still holds: moving the token to another pick redraws no map.
+func test_moving_the_token_does_not_redraw_the_map() -> void:
+	_clear(1)
+	await wait_process_frames(2)
+	watch_signals(section.map)
+	section.pick(_node("2-1"))
+	await wait_process_frames(2)
+	assert_signal_emit_count(section.map, "draw", 0)
+	_assert_token_over(_node("2-1"))
 
 
 ## B15: the open stages' pulse, the open portal's swirl and the token's bob

@@ -3,8 +3,8 @@ extends Control
 ## The Journey page of the main screen: a painted world map (JourneyMap) of
 ## the six acts on one road, with Training and the Endless portal, and beside
 ## it a panel (JourneyPanel) with the picked place, Start and the D/F spells.
-## Places open along the Journey chain; a locked one can't be picked.
-## Nothing here saves.
+## Lucian's token floats over the picked place. Places open along the Journey
+## chain; a locked one can't be picked. Nothing here saves.
 
 signal start_training
 signal start_stage(act: int, stage: int)
@@ -60,7 +60,7 @@ func open_on(act := 0) -> void:
 			stage += 1
 		pick(map.node_for(Journey.stage_id(act, stage)))
 		return
-	pick(map.token_node if map.token_node else map.training)
+	pick(map.next_node if map.next_node else map.training)
 
 
 ## Shows `node` in the panel and outlines it; a locked place stays unpicked.
