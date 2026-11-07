@@ -1313,9 +1313,16 @@ func aim_direction(aim: Vector2) -> Vector2:
 	return offset.normalized() if offset.length() > 1.0 else Vector2.from_angle(visuals.rotation)
 
 
+## Guardian Angel's stasis holds his buff timers (Barrier's shield time
+## among them), his regen and his heals over time, never his cooldowns: the
+## attack timer and the item cooldowns tick here first, and skills and
+## summoner spells tick on their own nodes.
 func _physics_process(delta: float) -> void:
 	if dead:
 		return
+	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
+	for cooldown: Cooldown in item_cooldowns.values():
+		cooldown.reduce(delta)
 	if _stasis_left > 0.0:
 		_stasis_left -= delta
 		if _stasis_left <= 0.0:
@@ -1329,7 +1336,6 @@ func _physics_process(delta: float) -> void:
 		var restored := restores.tick(delta)
 		heal(restored.x)
 		restore_mana(restored.y)
-	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	_tick_buffs(delta)
 	if not _burns.is_empty():
 		for hit in _burns.tick(delta):
@@ -1417,8 +1423,6 @@ func _tick_buffs(delta: float) -> void:
 			expired = true
 	if expired:
 		_refresh_stats(true)
-	for cooldown: Cooldown in item_cooldowns.values():
-		cooldown.reduce(delta)
 	if shield > 0.0 and not passives.in_combat():
 		shield = maxf(shield - ICHORSHIELD_DECAY * delta, 0.0)
 	shields.tick(delta)

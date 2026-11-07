@@ -129,6 +129,28 @@ func test_guardian_angel_clears_burns_slows_and_cc_and_refuses_new_ones() -> voi
 	assert_signal_not_emitted(lucian, "died")
 
 
+func test_guardian_angel_s_stasis_runs_every_cooldown_and_holds_the_buff_timers() -> void:
+	_equip(&"guardian_angel")
+	lucian.inventory.put(Inventory.EQUIP_START + 1, lucian.item_catalog.find(&"hextech_gunblade"))
+	lucian.item_cooldown(&"hextech_gunblade").start(10.0)
+	lucian.skills[ChampionProgress.Slot.Q].cooldown.start(10.0)
+	lucian.summoners.cooldown(&"flash").start(10.0)
+	lucian.add_speed_buff(&"test", 0.0, 0.2, 10.0)
+	lucian.add_stat_buff(&"test", {&"ad": 10.0}, 10.0)
+	lucian.add_barrier(100.0, 5.0)
+	assert_true(lucian.passives.on_lethal(), "Guardian Angel saves him")
+	assert_true(lucian.in_stasis())
+	await wait_seconds(1.0)
+	assert_true(lucian.in_stasis(), "still held")
+	assert_almost_eq(lucian.item_cooldown(&"hextech_gunblade").remaining, 9.0, 0.1, "an item cooldown runs")
+	assert_almost_eq(lucian.item_cooldown(&"guardian_angel").remaining, ItemPassives.REBIRTH_COOLDOWN - 1.0, 0.1, "Guardian Angel's own too")
+	assert_almost_eq(lucian.skills[ChampionProgress.Slot.Q].cooldown.remaining, 9.0, 0.1, "a skill cooldown runs")
+	assert_almost_eq(lucian.summoners.cooldown(&"flash").remaining, 9.0, 0.1, "a summoner cooldown runs")
+	assert_eq(lucian._speed_buffs[&"test"].left, 10.0, "a move speed buff keeps its time")
+	assert_eq(lucian._stat_buffs[&"test"].left, 10.0, "a stat buff keeps its time")
+	assert_eq(lucian.shields.time_left(&"barrier"), 5.0, "Barrier keeps its time")
+
+
 func test_kaenic_rookern_shields_after_15_quiet_seconds() -> void:
 	_equip(&"kaenic_rookern")
 	lucian.passives._magebane_wait = ItemPassives.MAGEBANE_WAIT - 0.05
