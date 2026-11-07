@@ -311,7 +311,8 @@ func remove_merchant() -> void:
 
 
 ## An act's map in place of the sandbox arena, its terrain (lava, water,
-## plants) added to the world; the training dummy goes.
+## plants) added to the world, a Blast Cone's ground marks to Warnings; the
+## training dummy goes.
 func _use_map(map: StageMap) -> void:
 	remove_child(arena)
 	arena.queue_free()
@@ -320,6 +321,9 @@ func _use_map(map: StageMap) -> void:
 	move_child(map, 0)
 	arena = map
 	for node in map.build_terrain(lucian):
+		if node is BlastCone:
+			# Its reach and landing marks lie with the ground warnings.
+			(node as BlastCone).ground_parent = $Warnings
 		$World.add_child(node)
 	if not map.mist.is_empty():
 		var black_mist := BlackMist.new()

@@ -2596,7 +2596,8 @@ func whole_map(file_name: String) -> void:
 
 
 ## 3-2's jungle: the whole map with its lava and Blast Cones; then Lucian
-## shoots a cone beside a loop and flies over its jungle.
+## beside a cone (its reach ring lit, the landing mark where he would land)
+## shoots it and flies over its jungle.
 func scenario_act3_jungle() -> void:
 	var game := game_stage()
 	print("stage info (expect Stage 3-2 · The Jungle  Wave 1 in …): ", info_text())
@@ -2607,6 +2608,7 @@ func scenario_act3_jungle() -> void:
 	game.camera.zoom = Vector2(0.6, 0.6)
 	game.camera.mode = StageCamera.Mode.FOLLOW
 	await wait(0.3)
+	print("in reach, landing marked (expect true true): ", cone.lucian_in_reach(), " ", cone.marks_landing(), " at ", cone.landing_mark())
 	await shot("act3_jungle_1_cone")
 	lucian.command_attack(cone)
 	while not lucian.is_launched():

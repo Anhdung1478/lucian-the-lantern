@@ -277,14 +277,21 @@ func test_an_act_3_stage_puts_its_terrain_in_the_world() -> void:
 	var cones := get_tree().get_nodes_in_group(&"plants")
 	assert_eq(zones.size(), 5)
 	assert_eq(cones.size(), 4)
+	var warnings := stage.get_node("Warnings")
 	for cone: BlastCone in cones:
 		assert_eq(cone.lucian, stage.lucian)
 		assert_eq(cone.arena, stage.arena)
+		assert_eq(cone._guide.get_parent(), warnings, "its reach and landing marks lie with the ground warnings")
+		assert_eq(cone._guide.global_position, cone.global_position)
 	for zone: HazardZone in zones:
 		assert_eq(zone.lucian, stage.lucian)
 	assert_eq(get_tree().get_nodes_in_group(&"enemies").size(), 0, "plants are not enemies")
 	assert_lt(stage.arena.z_index, zones[0].z_index, "the lava draws over the floor")
 	assert_lt(zones[0].z_index, stage.lucian.z_index, "and under the units")
+	# The marks: over the lava (a higher z), under the units (same z, drawn first).
+	assert_lt(zones[0].z_index, warnings.z_index + (cones[0] as BlastCone)._guide.z_index)
+	assert_eq(warnings.z_index + (cones[0] as BlastCone)._guide.z_index, stage.lucian.z_index)
+	assert_lt(warnings.get_index(), stage.get_node("World").get_index())
 
 
 ## How much of the line from `from` to `to` runs through walls.

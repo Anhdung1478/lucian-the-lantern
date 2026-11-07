@@ -264,6 +264,94 @@ func test_it_regrows_at_20_s() -> void:
 	assert_false(lucian.is_launched(), "the first pop was out of reach")
 
 
+## B10: ripe, it rings its reach (brighter with Lucian inside) and marks
+## where a shot now would land him, following him at once; popped, nothing.
+func test_ripe_it_rings_its_reach_and_marks_where_a_throw_would_land() -> void:
+	var map := _map()
+	lucian.global_position = PLANT_AT - Vector2(BlastCone.REACH + 30.0, 0)
+	var cone := _cone(map)
+	await wait_physics_frames(2)
+	assert_true(cone._guide.visible, "ripe: its reach ring")
+	assert_false(cone.lucian_in_reach(), "faint: he is outside")
+	assert_false(cone.marks_landing(), "out of reach: no landing mark")
+	lucian.global_position = PLANT_AT + Vector2(150, 0)
+	await wait_physics_frames(1)
+	assert_true(cone.lucian_in_reach(), "brighter: he is inside")
+	assert_true(cone.marks_landing())
+	assert_eq(cone.landing_mark(), BlastCone.landing_spot(cone.global_position, lucian.global_position, map))
+	assert_almost_eq(cone.landing_mark(), PLANT_AT + Vector2(150 + BlastCone.THROW_DISTANCE, 0), Vector2(1, 1))
+	lucian.global_position = PLANT_AT + Vector2(0, 200)
+	await wait_physics_frames(1)
+	assert_eq(cone.landing_mark(), BlastCone.landing_spot(cone.global_position, lucian.global_position, map), "it follows him")
+	assert_almost_eq(cone.landing_mark(), Vector2(1000, 1950), Vector2(1, 1), "stepped back off the map's edge")
+	cone.take_damage(_hit())
+	assert_false(cone._guide.visible, "popped: nothing")
+	assert_false(cone.marks_landing())
+	assert_false(cone.lucian_in_reach())
+	await wait_physics_frames(2)
+	assert_false(cone._guide.visible, "nothing while it regrows")
+	assert_false(cone.marks_landing())
+	cone._physics_process(BlastCone.REGROW_TIME)
+	assert_true(cone._guide.visible, "regrown: its ring again")
+	assert_engine_error_count(0)
+
+
+func test_no_landing_mark_where_no_throw_would_happen() -> void:
+	var map := _map([PackedVector2Array([Vector2(1700, 0), Vector2(3000, 0), Vector2(3000, 2000), Vector2(1700, 2000)])])
+	lucian.global_position = PLANT_AT + Vector2(150, 0)
+	var cone := _cone(map)
+	await wait_physics_frames(2)
+	assert_true(cone.lucian_in_reach())
+	assert_false(cone.marks_landing(), "landing_spot keeps him where he is")
+
+
+func test_its_marks_lie_on_its_ground_parent_and_go_with_it() -> void:
+	var cone := BlastCone.new()
+	cone.lucian = lucian
+	cone.arena = _map()
+	cone.position = PLANT_AT
+	cone.ground_parent = effects
+	add_child(cone)
+	var marks := cone._guide
+	assert_eq(marks.get_parent(), effects)
+	assert_eq(marks.global_position, PLANT_AT)
+	cone.queue_free()
+	await wait_process_frames(2)
+	assert_false(is_instance_valid(marks))
+
+
+## A fallen Thresh's Stage._clear_fight frees what lies in Warnings, the
+## marks too: they come back, nothing breaks.
+func test_marks_freed_under_it_are_made_again() -> void:
+	var cone := BlastCone.new()
+	cone.lucian = lucian
+	cone.arena = _map()
+	cone.position = PLANT_AT
+	cone.ground_parent = effects
+	add_child_autofree(cone)
+	lucian.global_position = PLANT_AT + Vector2(150, 0)
+	await wait_physics_frames(1)
+	var first := cone._guide
+	first.queue_free()
+	await wait_physics_frames(2)
+	assert_false(is_instance_valid(first))
+	assert_true(is_instance_valid(cone._guide), "made again")
+	assert_eq(cone._guide.get_parent(), effects)
+	assert_true(cone.marks_landing())
+	cone._guide.free()
+	cone.take_damage(_hit())
+	cone._guide.free()
+	cone._physics_process(BlastCone.REGROW_TIME)
+	assert_true(cone._guide.visible, "regrown, with new marks")
+	assert_engine_error_count(0)
+
+
+func test_without_a_ground_parent_its_marks_are_under_the_units() -> void:
+	var cone := _cone(_map())
+	assert_eq(cone._guide.get_parent(), cone)
+	assert_lt(cone._guide.z_index, lucian.z_index)
+
+
 ## Its art is 108 px wide: a click on a leaf tip, 46 from its middle, picks
 ## it; one just past the leaves doesn't.
 func test_a_click_on_a_leaf_tip_picks_it() -> void:

@@ -12,7 +12,14 @@ extends Enemy
 ## and the hitboxes, until it regrows after REGROW_TIME. It never dies: no
 ## kill, no on-kill effects. Units walk through it.
 ##
-## Set `lucian` and `arena` (the map, for walkable ground) before adding it.
+## Ripe, it marks the ground in its own soft yellow, never red (red is enemy
+## danger): a faint ring at REACH, brighter while Lucian stands inside it;
+## and while a shot now would throw him, a ring his body's size where he
+## would land, with a faint dashed line from him to it, redrawn every frame
+## as he moves. Popped, it marks nothing.
+##
+## Set `lucian` and `arena` (the map, for walkable ground) before adding it,
+## and `ground_parent` for its ground marks.
 
 ## Drawn 108 px wide (its leaves reach about 46 from the middle).
 const ART := preload("res://assets/art/stage/blast_cone.svg")
@@ -38,9 +45,23 @@ const OUTLINE := Color("1a1d24")
 const GLOW := Color("f2f56a")
 const GLOW_RADIUS := 66.0
 const GLOW_PULSE := 0.6
+## The reach ring's alpha (Lucian outside it, inside it) and width.
+const REACH_ALPHA := 0.16
+const REACH_LIT_ALPHA := 0.38
+const REACH_WIDTH := 3.0
+## The landing ring's alpha and fill, and the dashed line's alpha.
+const LANDING_ALPHA := 0.75
+const LANDING_FILL := 0.14
+const LANDING_LINE_ALPHA := 0.32
+const LANDING_WIDTH := 3.0
+const LANDING_DASH := 14.0
 
 var lucian: Lucian
 var arena: StageMap
+## Where its ground marks are drawn: the stage's Warnings (with the ground
+## warnings: over the lava, under the units). Unset (tests, a stage without
+## it), its own child, under the units.
+var ground_parent: Node
 
 var _regrow_left := 0.0
 ## Seconds ripe, for the glow's breathing.
@@ -48,6 +69,14 @@ var _ripe_time := 0.0
 ## Built in _ready (a cone freed unadded leaves nothing behind).
 var _hurtbox: Hurtbox
 var _bulb: Sprite2D
+## Draws its reach and landing marks (_draw_guide): on `ground_parent`, or
+## its own child.
+var _guide: Node2D
+## Lucian is within REACH of it, ripe.
+var _lucian_in_reach := false
+## A shot now would throw him, to _landing.
+var _throws := false
+var _landing := Vector2.ZERO
 
 
 ## Where a throw lands Lucian, standing at `from`, thrown away from a plant
@@ -91,11 +120,56 @@ func _ready() -> void:
 	_bulb = Sprite2D.new()
 	_bulb.texture = ART
 	add_child(_bulb)
+	_make_guide()
+
+
+## Its marks' node, on `ground_parent` at the plant, or its own child under
+## the units.
+func _make_guide() -> void:
+	_guide = Node2D.new()
+	_guide.draw.connect(_draw_guide)
+	if ground_parent:
+		ground_parent.add_child(_guide)
+		_guide.global_position = global_position
+	else:
+		_guide.z_index = HazardZone.Z
+		add_child(_guide)
+
+
+## Its marks shown or hidden. Made again first if the ground was cleared
+## under them (a fallen Thresh's Stage._clear_fight frees what lies in
+## Warnings: a debug one in 3-2).
+func _show_guide(on: bool) -> void:
+	if not is_instance_valid(_guide):
+		_make_guide()
+	_guide.visible = on
+
+
+## Its ground marks go with it.
+func _exit_tree() -> void:
+	if is_instance_valid(_guide) and _guide.get_parent() != self:
+		_guide.queue_free()
 
 
 ## Ripe and waiting to be shot.
 func is_ripe() -> bool:
 	return not dead
+
+
+## Lucian stands within REACH of it while it is ripe: its ring is brighter.
+func lucian_in_reach() -> bool:
+	return _lucian_in_reach
+
+
+## A shot now would throw Lucian: the landing ring is shown, at landing_mark.
+func marks_landing() -> bool:
+	return _throws
+
+
+## Where the landing ring is (landing_spot for Lucian where he stands);
+## meaningful while marks_landing.
+func landing_mark() -> Vector2:
+	return _landing
 
 
 ## A hit pops it (once) and maybe throws Lucian; it takes no damage itself.
@@ -116,6 +190,18 @@ func _physics_process(delta: float) -> void:
 	else:
 		_ripe_time += delta
 		queue_redraw()
+		_update_guide()
+
+
+## Where a throw would land Lucian now, if he is within REACH (landing_spot's
+## map checks only then), and the marks redrawn to match.
+func _update_guide() -> void:
+	var near := is_instance_valid(lucian) and not lucian.dead and global_position.distance_to(lucian.global_position) <= REACH
+	_lucian_in_reach = near
+	_landing = landing_spot(global_position, lucian.global_position, arena) if near else Vector2.ZERO
+	_throws = near and _landing != lucian.global_position
+	_show_guide(true)
+	_guide.queue_redraw()
 
 
 func _pop() -> void:
@@ -124,6 +210,9 @@ func _pop() -> void:
 	remove_from_group(GROUP)
 	_hurtbox.collision_layer = 0
 	_bulb.visible = false
+	_lucian_in_reach = false
+	_throws = false
+	_show_guide(false)
 	Sfx.play(&"shell", -6.0)
 	queue_redraw()
 	# Not here: the hit may land inside a physics callback.
@@ -148,6 +237,7 @@ func _regrow() -> void:
 	add_to_group(GROUP)
 	_hurtbox.collision_layer = Layers.ENEMY_HURTBOX
 	_bulb.visible = true
+	_show_guide(true)
 	queue_redraw()
 
 
@@ -166,3 +256,19 @@ func _draw() -> void:
 		draw_line(Vector2(0, 8), Vector2(12 * side, 2), STALK, 3.0, true)
 	draw_circle(Vector2(0, -6), 4.0 + 6.0 * grown, BUD)
 	draw_arc(Vector2(0, -6), 4.0 + 6.0 * grown, 0.0, TAU, 20, OUTLINE, 2.0, true)
+
+
+## On _guide, in its space (it sits on the plant): the reach ring, then the
+## landing ring and the dashed line to it from Lucian's body edge.
+func _draw_guide() -> void:
+	if dead:
+		return
+	_guide.draw_arc(Vector2.ZERO, REACH, 0.0, TAU, 96, Color(GLOW, REACH_LIT_ALPHA if _lucian_in_reach else REACH_ALPHA), REACH_WIDTH, true)
+	if not _throws or not is_instance_valid(lucian):
+		return
+	var to := _guide.to_local(_landing)
+	var from := _guide.to_local(lucian.global_position)
+	var along := from.direction_to(to)
+	_guide.draw_dashed_line(from + along * Lucian.HIT_RADIUS, to - along * Lucian.HIT_RADIUS, Color(GLOW, LANDING_LINE_ALPHA), LANDING_WIDTH, LANDING_DASH, true, true)
+	_guide.draw_circle(to, Lucian.HIT_RADIUS, Color(GLOW, LANDING_FILL))
+	_guide.draw_arc(to, Lucian.HIT_RADIUS, 0.0, TAU, 40, Color(GLOW, LANDING_ALPHA), LANDING_WIDTH, true)
