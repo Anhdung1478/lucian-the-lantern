@@ -194,12 +194,13 @@ func _physics_process(delta: float) -> void:
 
 
 ## Where a throw would land Lucian now, if he is within REACH (landing_spot's
-## map checks only then), and the marks redrawn to match.
+## map checks only then), and the marks redrawn to match. In stasis nothing
+## throws him (Lucian.launch refuses), so no landing is marked.
 func _update_guide() -> void:
 	var near := is_instance_valid(lucian) and not lucian.dead and global_position.distance_to(lucian.global_position) <= REACH
 	_lucian_in_reach = near
 	_landing = landing_spot(global_position, lucian.global_position, arena) if near else Vector2.ZERO
-	_throws = near and _landing != lucian.global_position
+	_throws = near and not lucian.in_stasis() and _landing != lucian.global_position
 	_show_guide(true)
 	_guide.queue_redraw()
 

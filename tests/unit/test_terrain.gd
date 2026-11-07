@@ -305,6 +305,19 @@ func test_no_landing_mark_where_no_throw_would_happen() -> void:
 	assert_false(cone.marks_landing(), "landing_spot keeps him where he is")
 
 
+## In Guardian Angel's stasis a pop doesn't throw him, so no landing shows.
+func test_no_landing_mark_while_lucian_is_in_stasis() -> void:
+	var map := _map()
+	lucian.global_position = PLANT_AT + Vector2(150, 0)
+	var cone := _cone(map)
+	await wait_physics_frames(2)
+	assert_true(cone.marks_landing(), "a throw would happen")
+	lucian.enter_stasis(1.0, 100.0, 0.0)
+	await wait_physics_frames(1)
+	assert_true(cone.lucian_in_reach(), "still in reach")
+	assert_false(cone.marks_landing(), "in stasis: no throw, no mark")
+
+
 func test_its_marks_lie_on_its_ground_parent_and_go_with_it() -> void:
 	var cone := BlastCone.new()
 	cone.lucian = lucian
