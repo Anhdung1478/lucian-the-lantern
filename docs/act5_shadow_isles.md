@@ -175,7 +175,7 @@ Last in wave 6, out of her camp. Ranged bolt, 70 magic (900 px/s), range 550, ev
 | Skill | Numbers |
 |---|---|
 | **Cocoon** | A red line (950 × 60) for 0.7 s, then a web bolt at 1300 px/s. A hit: 100 magic and a **stun of 1.25 s**. Cooldown 11 s, first use 3 s in. |
-| **Rappel** | Used at 85% HP or less. She rises and is **untargetable** for 1.9 s; her art and bar fade out in 0.3 s, and her name stays on the boss bar. A circle (r 180) follows Lucian for 1.0 s, then locks on a walkable spot. At 1.9 s she drops there for 160 magic. Cooldown 16 s. Lucian has 0.9 s after the lock to step out. *(V1.4.2: she doesn't start Rappel while Lucian is stunned. She tries Cocoon or a basic attack instead and keeps Rappel's cooldown, so it comes after the stun ends.)* |
+| **Rappel** | Used at 85% HP or less. She rises and is **untargetable** for 1.9 s; her art and bar fade out in 0.3 s, and her name stays on the boss bar. A circle (r 180) follows Lucian for 1.0 s, then locks on a walkable spot. At 1.9 s she drops there for 160 magic. Cooldown 16 s. Lucian has 0.9 s after the lock to step out. *(V1.4.2: she doesn't start Rappel while Lucian is stunned. She tries Cocoon or a basic attack instead and keeps Rappel's cooldown, so it comes after the stun ends. V1.4.3: nor while her Cocoon web is still in flight, so a web can't stun him just as the circle locks.)* |
 
 ### Karthus (`karthus`, boss, stage 5-5)
 Boss wave. Ranged bolt, 80 magic (900 px/s), range 600, every 1.5 s. 20000 HP, armor 30, MR 60, speed 280, radius 46. Pays 300 gold, 100 blue, 5 orange and **10 purple the first time, 2 after**. No passive, no E.

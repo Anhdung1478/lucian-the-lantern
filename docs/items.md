@@ -24,6 +24,11 @@ less than its two fragments sell for plus the craft fee paid (Muramana sells for
 sell for 560, plus the 2100 fee), so crafting and then selling never makes gold. The same tab
 upgrades the boots (see *Boots*).
 
+**Craft inputs** *(since V1.4.3)*: an item dragged into a Craft input leaves the backpack view
+until it comes back (dragged out, a right-click on the input, a tab change, or the merchant
+closing). **Craft** asks first ("Craft Muramana from Tear of the Goddess and Tear of the Goddess
+for 2100 gold?"), and a fee you can't pay is refused at once. A craft empties both inputs.
+
 **Buyback** *(since V1.4.2)*: the merchant's **Undo sale** button buys back what you sold, last
 sale first, for the gold you got, until you leave the merchant. The item goes back to its old
 cell if that is empty, or to a free cell. Stacks and cooldowns of an equipped item that was sold
@@ -78,7 +83,8 @@ Added in V1.4. Stats and passives follow LoL (patch 26.x); the live values are i
   stats and passives only. Boots never leave it: they can't be dragged out, sold, bought or
   dropped, and the merchant never sells them.
 - They are upgraded only at the merchant's **Boots** tab (the **Craft** tab since V1.4.1): drag the boots and a fragment into its
-  two slots and pay the fee. The fragment is used up. Tier 2 comes from either tier-1 pair plus
+  two slots, press Craft and confirm (it asks since V1.4.3), and pay the fee. The fragment is used
+  up, and the new boots show in the boots cell. Tier 2 comes from either tier-1 pair plus
   its line's fragment; tier 3 from that tier 2 plus the same fragment. Giant's Belt has no line.
 - *Slightly Quicker:* Slightly Magical Boots give +10 move speed over Boots of Speed, and every
   pair upgraded from them keeps it (it comes from the tree level, so a save needs nothing new).
@@ -305,7 +311,7 @@ spell haste** (shortens summoner cooldowns like ability haste does skills: 100 h
 - +40 Attack Damage
 - +40 Armor
 - +250 Health
-- *Passive — Ignore Pain:* 30% of damage taken is delayed and taken over 3 s instead. *(Since V1.4.2 an **Ignore Pain** icon shows in the buff row while damage is still to come: the number is the damage left, and it goes when the bleed ends or Defy clears it.)*
+- *Passive — Ignore Pain:* 30% of damage taken is delayed and taken over 3 s instead. *(Since V1.4.2 an **Ignore Pain** icon shows in the buff row while damage is still to come: the number is the damage left, and it goes when the bleed ends or Defy clears it. Since V1.4.3 the damage still to come, and its icon, stay when the item comes off (unequipped, or sold and bought back): only Defy and Guardian Angel clear it. A hit taken without the item isn't delayed.)*
 - *Passive — Defy:* Killing an enemy clears the delayed damage and restores 15% max health over 2 s.
 
 ### Fimbulwinter
@@ -325,7 +331,7 @@ spell haste** (shortens summoner cooldowns like ability haste does skills: 100 h
 - +40 Attack Damage
 - +40 Armor
 - +30 Magic Resist
-- *Passive — Rebirth:* When Lucian would die, he is held in stasis for 4 s and revives with 50% base health and 30% max mana. 300 s cooldown.
+- *Passive — Rebirth:* When Lucian would die, he is held in stasis for 4 s and revives with 50% base health and 30% max mana. 300 s cooldown. *(Since V1.4.3 his cooldowns keep counting down in stasis; only his buff timers stop. See "What works in combat".)*
 
 ### Rapid Firecannon
 
@@ -436,8 +442,8 @@ enemies started hitting Lucian.
 | Banshee's Veil | *Annul:* blocks the next enemy skill hit whole (Thresh's hook with its pull, Flay, Akshan's skills). It comes back 40 s after it breaks. Basic attacks and the siege shell aren't skills. |
 | Thornmail | *Thorns:* an enemy's basic attack on Lucian deals 20 (+10% bonus armor) magic damage back to it and applies Grievous Wounds for 3 s. |
 | Immortal Shieldbow | *Lifeline:* a hit that would leave Lucian under 30% HP first gives a shield of 300 (level 1) to 650 (level 18) for 3 s. 90 s cooldown. |
-| Death's Dance | *Ignore Pain:* 30% of each hit is taken over the next 3 s instead. *Defy:* a kill clears the damage still to come and heals 15% max HP over 2 s. |
-| Guardian Angel | *Rebirth:* instead of dying, Lucian is held in gold stasis for 4 s (nothing can hurt him; enemies wait), then comes back with 50% base HP and 30% max mana. 300 s cooldown. Stasis ends his burns, slows and crowd control, and none land while it holds. |
+| Death's Dance | *Ignore Pain:* 30% of each hit is taken over the next 3 s instead. *Defy:* a kill clears the damage still to come and heals 15% max HP over 2 s. Since V1.4.3 the damage still to come lands even after the item comes off; only Defy and Rebirth clear it. |
+| Guardian Angel | *Rebirth:* instead of dying, Lucian is held in gold stasis for 4 s (nothing can hurt him; enemies wait), then comes back with 50% base HP and 30% max mana. 300 s cooldown. Stasis ends his burns, slows and crowd control, and none land while it holds. *(V1.4.3: skill, summoner spell and item cooldowns and the attack timer keep counting down in stasis. Only buff timers stop: speed and stat buffs, shields (Barrier's time too), Ghost, potions and heals over time, and item buffs such as Spear of Shojin's Focused Will. Item waits that work like cooldowns keep running: Kaenic Rookern's Magebane wait, Malignance's Hatefog cooldown, Rapid Firecannon's ring wait and the combat timer behind Jak'Sho. HP and mana regen stay stopped, as before.)* |
 | Kaenic Rookern | *Magebane:* after 15 s without magic damage, a shield against magic damage only, 15% max HP. Any magic damage restarts the wait. |
 | Slightly Magical Boots | *Slightly Quicker:* +10 move speed, kept by every pair upgraded from them. A buff icon shows it. |
 | Gluttonous Greaves, Immortal Path | *Slay:* each elite, mini boss or boss kill gives +0.6% omnivamp, up to 10 stacks. The stacks last for the stage and carry over to Immortal Path. Buff icon shows the count. |

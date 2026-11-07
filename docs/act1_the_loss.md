@@ -134,7 +134,7 @@ He rises from the river for the boss wave. Bosses don't scale with the wave.
 
 | | |
 |---|---|
-| HP | 3000. His HP never goes under half: at 50% the fight stops and the cutscene plays. |
+| HP | 3000. His HP never goes under half: at 50% the fight stops and the cutscene plays. *(V1.4.3: a Thresh spawned from the debug list, not the stage's boss, leaves at 50% with his blue and orange, with no cutscene, and the fight goes on.)* |
 | Armor / MR | 30 / 30 |
 | Basic attack | A 30 physical bolt (900 px/s), range 450, every 1.8 s. Walks at 300. |
 | **Death Sentence (Q)** | A line warning (1000 × 70) for 0.9 s, then the hook at 1400 px/s. On a hit: 80 magic, and Lucian is pulled to 120 in front of Thresh. Cooldown 9 s (first use after 2 s). |
@@ -153,7 +153,7 @@ His skill hits count as skills, so Banshee's Veil blocks one (the hook's pull to
 7. The camera goes back to Lucian. He walks to where she fell, and her body fades.
 8. He picks up her gun (his body now shows two guns): "Lucian takes up Senna's gun."
 
-- A caption stays 3.5 s. Space or a left-click moves on. **Skip** (top right) ends the scene at once; he still gets her gun.
+- A caption stays 3.5 s. Space or a left-click moves on. **Skip** (top right) ends the scene at once; he still gets her gun. *(V1.4.3: closing the window during the scene and answering Yes to "Save before leaving?" skips it the same way first, so the clear and Thresh's rewards are saved.)*
 - Then **STAGE CLEARED**, with "Lucian takes Senna's gun: two guns from now on", "E – Relentless Pursuit: level 1 in the Evolution Tree", "Q – Piercing Light and W – Ardent Blaze can now be bought in the Evolution Tree", "+10 purple essence (first clear)" and "Act 2 is open". Thresh's blue and orange rise where he sank.
 - The save then has E at level 1 in the Evolution Tree (free, nothing to buy), and Q and W open there.
 - *Since Phase 10:* a line follows the Q and W one: "Ghost is free to claim in the Evolution Tree". Ghost then costs nothing, but it isn't given: the player clicks it in the tree. A FREE badge on the main screen's Evolution Tree button, the Summoners tab and the Ghost node points to it (`main_screen.md`).

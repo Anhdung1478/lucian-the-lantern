@@ -45,13 +45,13 @@
 ### Buff icons (above the skill bar)
 - **Very small icons** (36 px) in a row just above the HUD panel, starting over the portrait, like LoL.
 - Shows: Blue / Red buff (with timer), current Endless modifier, status effects (slow, stun, burn, etc.).
-- **Death's Dance (V1.4.2):** an **Ignore Pain** icon shows while its delayed damage is still to come. The number is the damage left, it counts down as the bleed ticks, and a sweep shows the time left. It leaves when the bleed ends, or when Defy's cleanse removes it.
+- **Death's Dance (V1.4.2):** an **Ignore Pain** icon shows while its delayed damage is still to come. The number is the damage left, it counts down as the bleed ticks, and a sweep shows the time left. It leaves when the bleed ends, or when Defy's cleanse removes it. *(V1.4.3: it stays when the item comes off, unequipped or sold, since the damage still lands. Only Defy and Guardian Angel clear it.)*
 - **Phase 3 shows:** potions being drunk, move speed buffs (W, Fervor, Stormrazor, and since Phase 4 Ghost and Heal), the Bloodthirster shield, Barrier, and item passive states:
   - **Energized** (only while an Energized item is equipped): the charge 0–100; glows gold at 100.
   - **Kraken Slayer**: the hit count; glows before the 3rd hit.
   - Spellblade ready, Spear of Shojin stacks, Jak'Sho stacks, Archangel's mana charge.
 - A dark sweep shows the time that has run out; a number shows stacks, charge or shield.
-- **Hover** the cursor over an icon to see its effect.
+- **Hover** the cursor over an icon to see its effect. *(V1.4.3: the card stays live while hovered. The time left, counts and values update, and when another buff moves into the hovered icon, the card shows that one.)*
 - **Built in Phase 8:** three crowd-control debuffs, in the style of `debuff_slow.svg` (64 × 64, a tinted dark backdrop, `#1a1d24` outlines): **Rooted** (a boot bound by green vines), **Stunned** (yellow stars circling a head) and **Feared** (a frightened purple ghost). Each has a sweep for its time and a one-line text on hover. They sit after "Slowed", the strongest first (stun, fear, root).
 - **Enemy statuses** (Carve stacks, Grievous Wounds, slow, Hatefog) show as tiny icons above the enemy's HP bar. *(V1.4.2: an enemy's bar redraws only when its health or a status changes, and about 10 times a second while a timed status is shown, so the time-spent shading still moves.)*
 - **Built in Phase 7:** the **Blue** and **Red** jungle buffs (a blue rune shield, a red flame shield) with their 60 s sweep; **Slowed** (the strongest slow on Lucian) and **Burning** while a burn ticks on him. Over an enemy's bar, slow and burn icons.
@@ -64,7 +64,7 @@
 - **Ctrl + C** toggles it on or off.
 - **Hold C** to show the extra stats above it (in its place when it is hidden), also 2 × 4: Health / mana regen (one cell, "0.8 / 1.6" per second) | Heal & shield power, Armor pen | Magic pen, Life steal | Omnivamp, Attack range | Tenacity.
 - A value shows in **yellow** when something adds to what Lucian's level alone gives: items, item passives, buffs (move speed counts its buffs, attack range counts Rapid Firecannon), or the debug crit cheat.
-- **Hover a stat** for 1 second: a card with its icon, name and value, then the split, e.g. "60 base + 22 bonus" with the bonus in yellow (regen has a health and a mana line), and what the stat does.
+- **Hover a stat** for 1 second: a card with its icon, name and value, then the split, e.g. "60 base + 22 bonus" with the bonus in yellow (regen has a health and a mana line), and what the stat does. *(V1.4.3: the card updates while hovered when the value or its split changes.)*
 
 | Stat | Icon | Color |
 |---|---|---|
@@ -194,7 +194,7 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 - **Sky Dive:** only a dark shadow shows while the dragon is up.
 - The Tidal Wave is a wide wave front with a foam crest, not a ball (visual pass).
 - Floating text: "Escaped!" over a Scuttler that gets away, "Interrupted!" in gold over the Ocean Drake, with stars circling its head while it is dazed.
-- **Terrain:** lava pools (a molten orange glow with a dark crust), shallow water (pale blue with ripples), Honeyfruit (golden fruit; an empty stalk while it regrows), Blast Cones (a yellow-green bulb, 108 px, glowing while ripe; a bud swelling back while it regrows).
+- **Terrain:** lava pools (a molten orange glow with a dark crust), shallow water (pale blue with ripples), Honeyfruit (golden fruit; an empty stalk while it regrows), Blast Cones (a yellow-green bulb, 108 px, glowing while ripe; a bud swelling back while it regrows). *(V1.4.3: a ripe cone also draws a faint ring in its soft yellow at its 350 reach, brighter while Lucian stands inside. While a shot would throw him, a ring his body's size marks where he would land, with a faint dashed line from him to it. The marks lie over the lava and under the units, and none show while it regrows.)*
 - **A + Left-click:** pressing A shows Lucian's attack range as a ring and turns the cursor into a cross until the click.
 
 **Built in Phase 8:**
@@ -329,6 +329,7 @@ Built in Phase 9. After each Endless boss wave (10, 20, …) the break waits for
 - Can be opened at any time, including during a wave.
 - While open, the player **cannot use skills or item actives**.
 - Title at the top: **BACKPACK**.
+- *(V1.4.3)* It recentres whenever the window changes size (fullscreen from the ESC menu's Settings, say), shown or not, with the merchant's shop beside it when that is open.
 
 ```
 +-----------------------------+
@@ -396,10 +397,10 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
   [B]          [7][8]     <- gear strip, as wide
 ```
 - **The gear strip** sits under the equip strip, in the same dark style: the **boots cell** on the left (steel border), then the **Health** and **Mana potion cells** on the right (red-brown border, keys 7 and 8 in the corner). None of them is ever locked.
-- **Empty cells show what goes in them, faded** (about 30%): the potion cells their potion, the boots cell Boots of Speed. Hovering an empty one says "Health potions go here: press 7 to drink one" or "Buy Boots in the Evolution Tree".
+- **Empty cells show what goes in them, faded** (about 30%): the potion cells their potion, the boots cell Boots of Speed. Hovering an empty one says "Health potions go here: press 7 to drink one" or "Buy Boots in the Evolution Tree". *(V1.4.3: a cell whose item sits in a merchant's Craft input draws empty too, and can't be dragged, sold or dropped on. Hovering it says "In the Craft tab: drag it back here, or right-click its input". §3.)*
 - **Potion cells** take only their own potion (Health or Mana), 9 at most. Bought potions fill them first, then the backpack. They are never refilled by themselves.
 - **Equip slots refuse potions**, both ways: a potion dropped on one goes back, and so does a swap that would send one there. A potion bought onto one says "That item can't go there".
-- **The boots never move.** Dragging them anywhere sends them back, except onto the merchant's Boots tab (§3; the Craft tab since V1.4.1). Dropped on the sell slot, they read **NO** and "Boots can't be sold".
+- **The boots never move.** Dragging them anywhere sends them back, except onto the merchant's Boots tab (§3; the Craft tab since V1.4.1). *(V1.4.3: while they sit in a Craft input, the boots cell shows the faded Boots placeholder.)* Dropped on the sell slot, they read **NO** and "Boots can't be sold".
 - The screen keeps one cell per inventory index in order (0–62), then the sell slot.
 
 ### Recipe table
@@ -456,12 +457,12 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Tabs at the top of the shop:**
   - **Items:** fragments and legendary items.
   - **Potions:** HP and MP potions.
-- **Items tab:** always shows **4 slots** in a row. Slots not yet unlocked (Evolution Tree) are covered by a **chain lock**.
+- **Items tab:** always shows **4 slots** in a row. Slots not yet unlocked (Evolution Tree) are covered by a **chain lock**. *(V1.4.3: right-clicking one says "That slot is locked", not "Already sold", and hovering it says "Buy Merchant Stock in the Evolution Tree".)*
 - **Refresh** button in the **bottom-right corner** of the shop (costs stage gold). *(V1.3.1: greyed out, and refused for free, once every open slot is sold: there is nothing left to re-roll.)*
 
 ### Built in Phase 3
 - **Opening:** right-click the merchant. Lucian walks over; the shop opens once he is within 250 units (right away if he already is). Hovering the merchant shows a gold ring.
-- **Header:** "MERCHANT" and the stage gold. The recipe table is hidden; the backpack and the shop are centered side by side.
+- **Header:** "MERCHANT" and the stage gold. ~~The recipe table is hidden;~~ *(it stays since V1.4.1)* the backpack and the shop are centered side by side.
 - **Slots:** 64 px, the price with a coin under each (red when it can't be afforded). A bought slot shows **SOLD** for the rest of the visit, even after a refresh.
 - **Buying:** right-click a shop item to buy it into the first cell it fits, or **hold-drag** it onto a backpack or equip cell. Dropping it on an occupied cell (other than a stack of the same potion with room) buys nothing. *(V1.4.2: a drop on a taken cell buys into a free cell instead, and says "No room in the backpack" only when none is free. A locked or wrong cell keeps its message.)*
 - **Refused purchase** (not enough gold, no room): a red message in the bottom row and the price flashes red, with an error sound.
@@ -472,7 +473,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Three tabs:** Items, Potions and **Boots**. Refresh shows on Items only. The hint line under the tab follows it.
 - **The Boots tab:** `[boots] + [fragment] → [new boots]`, the fee (coin and gold, red when it can't be paid), an **Upgrade** button and a note line.
   - Drag the boots (from their cell) onto the first slot and a fragment (from any cell) onto the second. Anything else is refused: "Only boots go there" / "Only a fragment goes there". A right-click empties a slot.
-  - The slots hold the inventory cell, not the item, so nothing has to be given back: they are emptied when the shop closes and whenever their cell no longer holds what they take.
+  - The slots hold the inventory cell, not the item, so nothing has to be given back: they are emptied when the shop closes and whenever their cell no longer holds what they take. *(Replaced in V1.4.3: an item in an input leaves the backpack view until it is given back; see "Built in V1.4.3".)*
   - The third slot shows what the two make. **Upgrade** is off until they make something; pressing it pays the fee, uses up the fragment, puts the new boots in the boots cell and plays the craft sound.
   - The note: "No boots: buy them in the Evolution Tree" with an empty boots cell; otherwise what to drag next, "That fragment doesn't upgrade …", "… are fully upgraded." or "Old → New".
 
@@ -480,8 +481,8 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **The Boots tab becomes the Craft tab**, for both crafts: `[input] + [input] → [result]`, the fee, a **Craft** button and a note line. The backpack no longer crafts.
   - **Two fragments** make their legendary. The fee is the legendary's cost minus the two fragments' costs, so crafting never makes gold when the legendary is sold. The legendary takes the first input's cell (an equip slot stays equipped); the second is emptied.
   - **The boots and a fragment** (either way round) make the upgraded boots, for their old fee.
-  - Each input takes a fragment or the boots; anything else says "Only fragments and boots are crafted". The placeholder reads ITEM. A right-click empties an input; they are emptied when the shop closes.
-  - **Craft** is off until the two make something; the fee is red when it can't be paid ("Not enough gold"). Pressing it pays the fee, uses both items up and plays the craft sound.
+  - Each input takes a fragment or the boots; anything else says "Only fragments and boots are crafted". The placeholder reads ITEM. A right-click empties an input; they are emptied when the shop closes. *(V1.4.3: also when the tab changes, and the item comes back to its cell; see below.)*
+  - **Craft** is off until the two make something; the fee is red when it can't be paid ("Not enough gold"). Pressing it pays the fee, uses both items up and plays the craft sound. *(V1.4.3: it asks first, and a craft empties both inputs; see below.)*
   - The note: "Drag in two fragments, or your boots and a fragment.", "Now drag in a fragment.", "… are fully upgraded.", "X doesn't upgrade …", "No legendary is made from X and Y." or "X + Y → Z".
 - **The recipe table stays** beside the backpack while the shop is open.
 - **Cards:** a fragment's says "Craft it with another fragment at the merchant's Craft tab."; a legendary's "Recipe: X + Y + N gold at the merchant."
@@ -492,6 +493,15 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
   - Each press buys back the **last** thing you sold, and again for the one before it, until you leave the merchant. A new visit starts with nothing to undo.
   - It costs the gold you got for it. Without enough gold it says "Not enough gold" and keeps the sale. The item returns to its old cell if that is still empty and fits; otherwise to any free cell, or "No room in the backpack".
   - **Limits:** the stacks and cooldowns of an equipped item that is sold and bought back are not restored.
+
+### Built in V1.4.3
+- **A Craft input holds its item out of the backpack.** An item dragged into an input leaves the backpack view: its cell draws empty and can't be dragged, sold or dropped on, so one fragment can't fill both inputs. Hovering the cell says "In the Craft tab: drag it back here, or right-click its input". The boots cell shows its faded Boots placeholder. The item stays in its inventory cell, which still counts as taken.
+  - **It comes back** when it is dragged out of the input (onto a free cell it moves there; anywhere else it returns), on a right-click on the input, when the merchant's tab changes, and when the merchant closes.
+  - Dragging one input onto the other moves it there, or swaps the two when both are full.
+- **Craft asks first:** "Craft Muramana from Tear of the Goddess and Tear of the Goddess for 2100 gold?" Yes crafts; No (or ESC) changes nothing. Enter is Yes. A fee you can't pay is refused at once with "Not enough gold", without asking.
+- **A craft empties both inputs.** The legendary shows in the first input's cell, and upgraded boots in the boots cell.
+- **A locked slot:** right-clicking a chained Items slot says "That slot is locked" (it said "Already sold"). Hovering it says "Buy Merchant Stock in the Evolution Tree", the tree node that opens it.
+- **The Potions tab's hint** names the potion keys as bound now, in full ("Potions fill the 7 and 8 cells first, then the backpack."), and follows a rebind.
 
 ---
 
@@ -526,12 +536,12 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 ## 5. Settings (from the ESC menu)
 
 - Replaces the menu while open; **Back** or ESC returns to it. The game stays paused.
-- Every change applies right away and is saved to `user://settings.json`.
+- Every change applies right away and is saved to `user://settings.json`. *(V1.4.3: it is written to `settings.json.tmp` and renamed. A failed rename keeps the `.tmp`, and loading falls back to it when `settings.json` is missing or broken; a `.tmp` that loads is renamed back to `settings.json` at once.)*
 - **Tabs:**
 
 | Tab | Contents |
 |---|---|
-| Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. No music yet. |
+| Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. *(V1.4.3: a slider applies live while it is dragged and is saved once, when let go; a wheel or key step is saved at once.)* No music yet. |
 | Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A double-click doesn't bind the left button (the second press is ignored); a separate later click still does. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. Each skill, summoner and item key also has a **cast mode** picker: Quick cast, Quick + indicator, Normal cast (Reset to defaults sets them back to Quick cast). |
 | Graphics | Window mode (windowed, borderless fullscreen, fullscreen), Resolution (1280×720, 1366×768, 1600×900, 1920×1080, 2560×1440, 3840×2160; sizes too big for a window on this screen, title bar included, are greyed out and marked "too big"; sets and centers the window, greyed out in borderless/fullscreen; *V1.3.1:* only at launch and when changed here, so starting a stage leaves a maximized or resized window alone), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails, muzzle flashes or summoner spell effects (Flash sparks, Ghost afterimages, Barrier bubble, Heal and Clarity bursts); Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
 | Gameplay | Cast queue (on by default; see the game design doc §2). It was called Skill queue before V1.4.2. |

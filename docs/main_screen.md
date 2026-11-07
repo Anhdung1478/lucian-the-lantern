@@ -23,7 +23,6 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 | **Close** | Closes the pop-up |
 | **Save** | Saves to the current save slot |
 | **Save as copy** | Copies the current progress into another slot (asks before overwriting) |
-| **Difficulty** | A greyed info row: it shows the save's level and can't be pressed. Difficulty is set when a new game starts (V1.4.2) |
 | **Settings** | Opens the game settings |
 | **Leave to main menu** | Asks **"Save before leaving?"** (Yes / No / Cancel), then returns to the title screen / save slot selection. Cancel stays, with the menu open |
 | **Exit the game** | Asks **"Save before leaving?"** (Yes / No / Cancel), then closes the game. Cancel stays, with the menu open |
@@ -35,9 +34,10 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
   - Close is gold. Save shows "Slot N". Save as copy shows "To another slot". Leave to main menu shows "Title screen".
   - Leave and Exit turn red on hover.
   - Save as copy's page is titled **SAVE AS COPY**, "Pick a slot", with a Back row.
-- **Built in V1.3, locked in V1.4.2:** a **Difficulty** row (skull icon) after Save as copy; its hint names the current level (Easy ×0.8, Normal ×1.0, Hard ×1.1, Extreme ×1.3).
-  - V1.3 let you change it here, on a page titled **DIFFICULTY**. Since V1.4.2 the row is greyed and can't be pressed. Its hover text says "Set when this game started". The level is picked once, on the title screen's new-game page, and an old save keeps the level it has.
+- **Built in V1.3, locked in V1.4.2, removed in V1.4.3:** a **Difficulty** row (skull icon) after Save as copy; its hint named the current level (Easy ×0.8, Normal ×1.0, Hard ×1.1, Extreme ×1.3).
+  - V1.3 let you change it here, on a page titled **DIFFICULTY**. In V1.4.2 the row was greyed and couldn't be pressed. Its hover text said "Set when this game started". The level is picked once, on the title screen's new-game page, and an old save keeps the level it has.
   - The DIFFICULTY page, its toast and its ESC step are gone.
+  - **Since V1.4.3 the row is gone too.** Difficulty is chosen only on the title's difficulty page after "New game", and is never shown or changed during a game. The rows are Close, Save, Save as copy, Settings, Leave to main menu and Exit the game.
 
 ### Navigation
 - **Sections** (Evolution Tree, Skin Shop, Journey): switched with a bar at the **bottom** of the screen.
@@ -65,8 +65,8 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
   3. The slot list goes back to the menu; an open gear menu closes.
   4. Otherwise ESC opens the gear menu.
   - *(V1.4.2: while the gear menu is open, ESC goes to it first, before a pop-up that is hidden under it. So a tree purchase pop-up stays open when the menu closes.)*
-- **Arrow keys and Enter (V1.4.2):** with the gear menu open, Up and Down light a row (greyed and hidden rows are skipped, and the list wraps) and Enter presses it. The slot page works the same. Nothing is lit until the first arrow key. Space is untouched: it is still Center camera. Confirm pop-ups open with their first button lit, so Enter answers it; Left and Right move across the buttons (`ui_design.md`, "Menu keys").
-- **The skin preview stops while covered (V1.4.2):** an open Skin Shop preview is frozen while the gear menu, Settings or a confirm pop-up covers it, and resumes when it is closed.
+- **Arrow keys and Enter (V1.4.2):** with the gear menu open, Up and Down light a row (the list wraps) and Enter presses it. The slot page works the same, and skips the greyed current slot. Nothing is lit until the first arrow key. Space is untouched: it is still Center camera. Confirm pop-ups open with their first button lit, so Enter answers it; Left and Right move across the buttons (`ui_design.md`, "Menu keys").
+- **The skin preview stops while covered (V1.4.2):** an open Skin Shop preview is frozen while the gear menu, Settings or a confirm pop-up covers it, and resumes when it is closed. *(V1.4.3: Settings' backdrop is see-through, so while it is open the Tree, the Skin Shop and the Journey all stop moving and redrawing, and resume when it closes.)*
 - **Debug table (F3 + Q, hidden by default):** an **Essences** tab (blue +100 / +1000 / +10000, orange and purple +1 / +10 / +100, Reset for each) and a **Progress** tab (Acts cleared 0–6, Max tree (free), Clear tree (no refund), Reset progress: a new game in memory). Nothing there saves.
 
 ### Built in Phase 6
@@ -480,11 +480,12 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 | Hovered | A faint outline |
 
 - The Endless portal is chained and dim, with a lock, until Act 3 is cleared.
+- *(V1.4.3)* The pulses, the portal's swirl and the token's bob run only while the Journey shows. On the Tree or the Skin Shop they stop, and a place that opens meanwhile starts when the Journey shows again.
 - **Hover texts:**
   - A stage: its name and waves ("Stage 3-4 · The Jungle", "5 waves + mini boss"), plus "Clear 3-3 first" when it is locked in an open act.
   - A locked act, its region or its stages: "Clear Act 4 first".
   - Training: "Training". Endless: "Endless" and "Best wave: 22", or "Clear Act 3 first" while locked.
-- **Lucian's token:** the equipped skin's portrait (48 px, a gold ring and a pointer) bobs over the next stage, the first open one not yet cleared. Once every stage is cleared, it is gone.
+- **Lucian's token:** the equipped skin's portrait (48 px, a gold ring and a pointer) bobs over the next stage, the first open one not yet cleared. Once every stage is cleared, it is gone. *(V1.4.3: it floats over the picked place instead, a stage, Training or the Endless portal, and moves when another is picked. The next stage has no mark of its own: the Journey opens on it (below), or on Training once every stage is cleared, so the token starts there.)*
 - A click on an open place picks it. A locked place can't be picked.
 
 **The side panel**, by what is picked. A soft glow in the place's color falls from its top.
@@ -510,7 +511,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 **Which place opens:**
 1. After a story stage: the act just played, at its first open stage not cleared yet (its last when all are).
 2. After an Endless run (Main screen, Leave, or a failed save on Retry): Endless, with the run's map still chosen, if Endless is open.
-3. Otherwise (a loaded slot, after Training): the next stage, where the token is.
+3. Otherwise (a loaded slot, after Training): the next stage, the first open one not yet cleared. *(Since V1.4.3 the token floats over the pick, so it starts there.)*
 4. With every stage cleared: Training.
 
 A pick that becomes locked (the debug table) falls back the same way. Nothing here saves.
