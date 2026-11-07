@@ -516,15 +516,13 @@ func buffs() -> Array[Dictionary]:
 	return found
 
 
+## Guardian Angel's stasis holds the buff timers (_tick_buff_timers), as it
+## holds Lucian's own. The waits and internal cooldowns run on: Magebane's
+## wait, the combat timer (and Jak'Sho's stacks with it), Hatefog's cooldown
+## and the Rapid Firecannon ring's wait.
 func _physics_process(delta: float) -> void:
-	if not _bleeds.is_empty():
-		var bleed := 0.0
-		for entry in _bleeds:
-			var step := minf(delta, entry.left)
-			bleed += entry.rate * step
-			entry.left -= step
-		_bleeds.assign(_bleeds.filter(func(entry: Dictionary) -> bool: return entry.left > 0.0))
-		lucian.lose_hp(bleed, DamageInfo.Type.TRUE)
+	if not lucian.in_stasis():
+		_tick_buff_timers(delta)
 	if has(&"kaenic_rookern"):
 		if not lucian.shields.has(&"magebane"):
 			_magebane_wait += delta
@@ -533,10 +531,6 @@ func _physics_process(delta: float) -> void:
 	elif lucian.shields.has(&"magebane"):
 		lucian.shields.remove(&"magebane")
 		_magebane_wait = 0.0
-	if _shojin_left > 0.0:
-		_shojin_left -= delta
-		if _shojin_left <= 0.0:
-			shojin_stacks = 0
 	_hatefog_left = maxf(_hatefog_left - delta, 0.0)
 	_rfc_shot_left = maxf(_rfc_shot_left - delta, 0.0)
 	if _combat_left > 0.0:
@@ -552,6 +546,23 @@ func _physics_process(delta: float) -> void:
 		jaksho_stacks = 0
 		_jaksho_tick = 0.0
 		lucian.refresh_stats()
+
+
+## The timers shown in the buff row: Ignore Pain's delayed damage lands and
+## Focused Will runs out.
+func _tick_buff_timers(delta: float) -> void:
+	if not _bleeds.is_empty():
+		var bleed := 0.0
+		for entry in _bleeds:
+			var step := minf(delta, entry.left)
+			bleed += entry.rate * step
+			entry.left -= step
+		_bleeds.assign(_bleeds.filter(func(entry: Dictionary) -> bool: return entry.left > 0.0))
+		lucian.lose_hp(bleed, DamageInfo.Type.TRUE)
+	if _shojin_left > 0.0:
+		_shojin_left -= delta
+		if _shojin_left <= 0.0:
+			shojin_stacks = 0
 
 
 func _on_attack_hit(target: Enemy, info: DamageInfo) -> void:

@@ -424,3 +424,24 @@ func test_without_death_s_dance_a_new_hit_is_not_delayed() -> void:
 	lucian.take_damage(DamageInfo.create(100.0, DamageInfo.Type.TRUE, &"basic", dummy))
 	assert_almost_eq(before - lucian.hp, 100.0, 0.01, "all of it lands now")
 	assert_almost_eq(_bleed_out(), 30.0, 0.01, "only the first hit's 30 is still owed")
+
+
+func test_focused_will_keeps_its_time_through_a_stasis_while_waits_run_on() -> void:
+	equip(&"spear_of_shojin")
+	equip(&"kaenic_rookern", 1)
+	lucian.passives.on_cast(Slot.Q)
+	skill_hit(&"q")
+	assert_eq(lucian.passives.shojin_stacks, 1)
+	lucian.passives._hatefog_left = ItemPassives.HATEFOG_COOLDOWN
+	lucian.enter_stasis(1.0, 100.0, 0.0)
+	await wait_seconds(0.5)
+	assert_true(lucian.in_stasis())
+	var focused_will: Dictionary = lucian.passives.buffs().filter(
+		func(buff: Dictionary) -> bool: return buff.id == &"spear_of_shojin")[0]
+	assert_eq(focused_will.left, ItemPassives.SHOJIN_DURATION, "Focused Will keeps its time")
+	assert_eq(lucian.passives.shojin_stacks, 1, "and its stack")
+	assert_almost_eq(lucian.passives._hatefog_left, ItemPassives.HATEFOG_COOLDOWN - 0.5, 0.1, "Hatefog's cooldown runs")
+	assert_almost_eq(lucian.passives._magebane_wait, 0.5, 0.1, "Magebane's wait runs")
+	await wait_seconds(1.0)
+	assert_false(lucian.in_stasis())
+	assert_almost_eq(lucian.passives._shojin_left, ItemPassives.SHOJIN_DURATION - 0.5, 0.1, "it runs again after")
