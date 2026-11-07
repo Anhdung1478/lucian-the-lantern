@@ -15,6 +15,32 @@ func test_a_cone_covers_its_angle_and_length() -> void:
 	assert_false(GroundWarning.in_cone(Vector2.ZERO, Vector2.RIGHT, 400.0, wide, Vector2(500, 0)))
 
 
+func test_a_cone_counts_a_body_reaching_over_its_side() -> void:
+	var warning := GroundWarning.cone(Vector2.ZERO, Vector2.RIGHT, 400.0, deg_to_rad(60.0), 1.0)
+	add_child_autofree(warning)
+	# The side edge runs at 30°. Lucian's 30 px body 300 out covers asin(30 / 300) ≈ 5.7° more.
+	var just_out := Vector2.from_angle(deg_to_rad(34.0)) * 300.0
+	assert_false(warning.covers(just_out), "his center is outside the edge")
+	assert_true(warning.covers(just_out, Lucian.HIT_RADIUS), "but his body reaches over it")
+	var farther := Vector2.from_angle(deg_to_rad(37.0)) * 300.0
+	assert_false(warning.covers(farther, Lucian.HIT_RADIUS), "farther out, his body is clear")
+	assert_true(warning.covers(Vector2(-20, 10), Lucian.HIT_RADIUS), "a body over the tip")
+	assert_true(warning.covers(Vector2(420, 0), Lucian.HIT_RADIUS), "a body over the far edge")
+	assert_false(warning.covers(Vector2(440, 0), Lucian.HIT_RADIUS), "a body past the far edge")
+
+
+func test_a_cone_strikes_lucian_standing_half_over_its_side() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	lucian.position = Vector2.from_angle(deg_to_rad(34.0)) * 300.0
+	add_child_autofree(lucian)
+	var warning := GroundWarning.cone(Vector2.ZERO, Vector2.RIGHT, 400.0, deg_to_rad(60.0), 0.1)
+	warning.strike(DamageInfo.create(100.0, DamageInfo.Type.TRUE, &"test"), lucian)
+	add_child_autofree(warning)
+	var hp := lucian.hp
+	await wait_physics_frames(12)
+	assert_almost_eq(lucian.hp, hp - 100.0, 1.0)
+
+
 func test_it_fires_once_after_its_time_and_goes() -> void:
 	var warning := GroundWarning.circle(Vector2.ZERO, 100.0, 0.3)
 	var fired := [0]

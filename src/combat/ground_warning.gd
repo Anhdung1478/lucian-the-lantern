@@ -154,11 +154,18 @@ static func in_ring(center: Vector2, radius: float, band_width: float, point: Ve
 	return absf(center.distance_to(point) - radius) <= band_width * 0.5 + point_radius
 
 
+## Within `length` of `from` and `angle` wide round `toward`. A body of
+## `point_radius` counts once it reaches over a side: its half-angle widens
+## by the angle the body covers seen from the tip. A body on the tip is in.
 static func in_cone(from: Vector2, toward: Vector2, length: float, angle: float, point: Vector2, point_radius := 0.0) -> bool:
 	var offset := point - from
-	if offset.length() > length + point_radius:
+	var distance := offset.length()
+	if distance > length + point_radius:
 		return false
-	return offset.length() <= point_radius or absf(toward.angle_to(offset)) <= angle * 0.5
+	if distance <= point_radius:
+		return true
+	var margin := asin(minf(1.0, point_radius / distance))
+	return absf(toward.angle_to(offset)) <= angle * 0.5 + margin
 
 
 func _draw() -> void:
