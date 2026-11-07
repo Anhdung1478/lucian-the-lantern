@@ -352,6 +352,63 @@ func test_no_cutscene_or_boss_purple_after_a_defeat() -> void:
 	assert_true(SaveGame.instance().bosses.is_empty())
 
 
+## 2-1's first wave all out, then a Thresh from the debug list (spawned and
+## counted as DebugTable._spawn does), quiet.
+func _debug_thresh_in_2_1() -> Array:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	stage.setup(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	add_child_autofree(stage)
+	await wait_physics_frames(2)
+	stage.lucian.invulnerable = true
+	stage.skip_break()
+	for i in 20:
+		stage.runner.tick(WaveRunner.GROUP_GAP)
+	stage.debug_table._spawn(&"thresh_1")
+	var thresh: Thresh = get_tree().get_nodes_in_group(&"enemies").filter(func(node: Node) -> bool: return node is Thresh)[0]
+	thresh._attack_left = 1000.0
+	for id: StringName in thresh._cooldowns:
+		thresh._cooldowns[id] = 1000.0
+	await wait_physics_frames(1)
+	return [stage, thresh]
+
+
+## B18: a debug Act 1 Thresh at half HP no longer freezes his wave: he leaves
+## with his blue and orange, counted out, and the fight goes on (no scene).
+func test_a_debug_thresh_at_half_hp_leaves_and_the_wave_goes_on() -> void:
+	var made: Array = await _debug_thresh_in_2_1()
+	var stage: Stage = made[0]
+	var thresh: Thresh = made[1]
+	var alive := stage.runner.alive()
+	assert_gt(alive, 1, "the wave's own enemies too")
+	thresh.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	await wait_physics_frames(2)
+	assert_false(is_instance_valid(thresh), "he leaves the map")
+	assert_null(stage.cutscene)
+	assert_eq(stage.runner.alive(), alive - 1, "counted out")
+	assert_eq(stage.runner.state, WaveRunner.State.FIGHT)
+	assert_false(stage.result.visible)
+	assert_eq(stage.collected[Essences.BLUE], KillRewards.BOSS_BLUE)
+	assert_eq(stage.collected[Essences.ORANGE], KillRewards.BOSS_ORANGE)
+	assert_engine_error_count(0)
+
+
+func test_a_debug_thresh_last_in_his_wave_ends_the_wave_not_the_stage() -> void:
+	var made: Array = await _debug_thresh_in_2_1()
+	var stage: Stage = made[0]
+	var thresh: Thresh = made[1]
+	for enemy: Enemy in get_tree().get_nodes_in_group(&"enemies"):
+		if enemy != thresh:
+			enemy.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	assert_eq(stage.runner.alive(), 1, "only he is left")
+	thresh.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	await wait_physics_frames(2)
+	assert_false(is_instance_valid(thresh))
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK, "his wave is done")
+	assert_false(stage.result.visible, "2-1 goes on")
+	assert_engine_error_count(0)
+
+
 ## Act 1 up to its next break: the wave spawned and killed.
 func _to_next_break(stage: Stage) -> void:
 	stage.skip_break()

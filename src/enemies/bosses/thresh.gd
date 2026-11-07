@@ -2,7 +2,8 @@ class_name Thresh
 extends Boss
 ## Act 1's Thresh, scripted. Death Sentence: a hook along a line warning
 ## that pulls Lucian in. Flay: a cone that pushes him away. At half HP the
-## fight stops: `phase_ended` starts the cutscene, and nothing hurts him.
+## fight stops: `phase_ended` starts the cutscene (a debug one just leaves),
+## and nothing hurts him.
 ## The skill numbers are vars that start at these constants; Act 6's Thresh
 ## (ThreshFinal) sets his own and never stops (`stop_share` 0).
 

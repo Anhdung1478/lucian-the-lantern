@@ -351,7 +351,8 @@ func set_dummy_count(count: int) -> void:
 
 
 ## Puts an enemy of type `id` on the map at `at`, wired for damage numbers,
-## the debug meter, rewards, escapes and summons.
+## the debug meter, rewards, escapes, summons and a Thresh's end (Act 1's at
+## half HP, the final one's fall).
 func spawn_enemy(id: StringName, at: Vector2, wave := 1) -> EnemyUnit:
 	return spawn_unit(load(ENEMY_PATH % id), at, wave)
 
@@ -381,6 +382,9 @@ func spawn_unit(data: EnemyData, at: Vector2, wave := 1) -> EnemyUnit:
 	if unit is ThreshFinal:
 		## Deferred: a shot's physics callback can bring his fall. Any final Thresh, the debug list's too.
 		(unit as ThreshFinal).fell.connect(_on_thresh_fell, CONNECT_DEFERRED)
+	elif unit is Thresh:
+		## Deferred: a shot's physics callback can bring him to half HP, and the freeze can't disable bodies mid-flush. Any Act 1 Thresh, the debug list's too.
+		(unit as Thresh).phase_ended.connect(_on_thresh_phase_ended.bind(unit), CONNECT_DEFERRED)
 	debug_table.watch(unit)
 	return unit
 
@@ -467,10 +471,6 @@ func _spawn_wave_enemy(id: StringName, wave: int) -> void:
 		# With its wave, though a boss's own stats ignore it: what it summons
 		# (the final Thresh's Lantern Souls) gets the boss wave's scaling.
 		boss_unit = spawn_enemy(id, arena.boss_point, wave)
-		# Act 1's cutscene, for a plain Thresh only (spawn_unit wires a final one's fall).
-		if boss_unit is Thresh and not (boss_unit is ThreshFinal):
-			## Deferred: a shot's physics callback can bring him to half HP, and the freeze can't disable bodies mid-flush.
-			(boss_unit as Thresh).phase_ended.connect(_on_thresh_phase_ended, CONNECT_DEFERRED)
 		return
 	if data.kind == &"boss":
 		spawn_unit(data, arena.boss_point, wave)
@@ -639,9 +639,14 @@ func _tip(id: StringName) -> void:
 	hud.tips.show_tip(id, TIPS[id][0] % keys)
 
 
-## Thresh at half HP: the fight stops and the cutscene plays.
-func _on_thresh_phase_ended() -> void:
-	if lucian.dead or result.visible:
+## An Act 1 Thresh at half HP. The boss wave's: the fight stops and the
+## cutscene plays. Another (the debug list's): he leaves with his rewards,
+## counted out of his wave, and the fight goes on.
+func _on_thresh_phase_ended(thresh: Thresh) -> void:
+	if lucian.dead or result.visible or not is_instance_valid(thresh):
+		return
+	if thresh != boss_unit:
+		_thresh_leaves(thresh)
 		return
 	_clear_fight()
 	cutscene = ThreshTakesSenna.new()

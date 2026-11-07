@@ -310,6 +310,12 @@ func _die() -> void:
 	super()
 
 
+## Freed mid-dash (a debug wave jump): his trail lies under warning_parent,
+## not on him, so it fades out as a dash's end would have it.
+func _exit_tree() -> void:
+	_finish_trail()
+
+
 ## The dark laser along Q's line, and its hit on Lucian if he is in it. A
 ## dead Dark Lucian fires nothing.
 func _fire_laser(from: Vector2, toward: Vector2) -> void:

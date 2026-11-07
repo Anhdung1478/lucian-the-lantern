@@ -691,3 +691,23 @@ func test_a_real_shot_dodge_on_the_dark_lane_lands_on_open_ground() -> void:
 	assert_gt(boss.global_position.distance_to(map.boss_point), 300.0, "he got away")
 	assert_false(boss.untargetable)
 	assert_engine_error_count(0)
+
+
+## B18: a debug wave jump frees him mid-dash (Fix J); his violet trail, under
+## the stage's Warnings, fades and goes too.
+func test_a_wave_jump_mid_dash_leaves_no_trail_behind() -> void:
+	var stage: Stage = await _stage()
+	var boss := stage.spawn_enemy(&"dark_lucian", stage.arena.boss_point) as DarkLucian
+	_quiet(boss)
+	await wait_physics_frames(1)
+	boss.busy_left = boss.dash(Vector2.DOWN)
+	await wait_physics_frames(2)
+	var warnings := stage.get_node("Warnings")
+	var trails := func() -> int:
+		return warnings.get_children().filter(func(node: Node) -> bool: return node is DashTrail and not node.is_queued_for_deletion()).size()
+	assert_eq(trails.call(), 1, "a violet trail")
+	stage.jump_to_last_wave()
+	await wait_seconds(DashTrail.LIFETIME + 0.2)
+	assert_false(is_instance_valid(boss), "the jump freed him")
+	assert_eq(trails.call(), 0, "and his trail")
+	assert_engine_error_count(0)
