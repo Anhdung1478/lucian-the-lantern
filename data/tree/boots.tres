@@ -7,7 +7,7 @@
 script = ExtResource("1_data")
 id = &"boots"
 display_name = "Boots"
-description = "Lucian starts every map in his boots, for [ms]move speed[/ms]. The merchant's Boots tab upgrades them."
+description = "Lucian starts every map in his boots, for [ms]move speed[/ms]. The merchant's Craft tab upgrades them."
 icon = ExtResource("2_icon")
 branch = &"backpack"
 grid = Vector2(2, 1.5)

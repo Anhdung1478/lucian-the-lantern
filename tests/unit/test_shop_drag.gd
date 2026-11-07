@@ -148,6 +148,34 @@ func test_potions_tab_buys_potions() -> void:
 	assert_null(inventory.item_at(1))
 
 
+## The Potions tab's hint names the potion keys as bound, in full, and follows
+## a rebind made while the shop is open.
+func test_the_potions_hint_names_the_potion_keys_as_bound() -> void:
+	var shared := GameSettings._instance
+	GameSettings._instance = GameSettings.new("user://test_shop_drag_settings.json")
+	var own := BackpackScreen.new()
+	add_child_autofree(own)
+	own.setup(inventory)
+	own.open_shop(Shop.new(stock, inventory, wallet))
+	var panel := own.shop_panel()
+	panel.show_tab(ShopPanel.POTIONS_TAB)
+	var first := panel._hint.text
+	var mouse_four := InputEventMouseButton.new()
+	mouse_four.button_index = MOUSE_BUTTON_XBUTTON1
+	GameSettings._instance.rebind(&"potion_mp", mouse_four)
+	var rebound := panel._hint.text
+	panel.show_tab(ShopPanel.ITEMS_TAB)
+	var items_hint := panel._hint.text
+	panel.show_tab(ShopPanel.POTIONS_TAB)
+	var shown_again := panel._hint.text
+	GameSettings._instance = shared
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_shop_drag_settings.json"))
+	assert_string_contains(first, "the 7 and 8 cells first")
+	assert_string_contains(rebound, "the 7 and Mouse 4 cells first", "a rebind shows at once")
+	assert_eq(items_hint, ShopPanel.HINTS[ShopPanel.ITEMS_TAB])
+	assert_eq(shown_again, rebound)
+
+
 func test_a_potion_dragged_onto_an_equip_slot_buys_nothing() -> void:
 	screen.shop_panel().show_tab(1)
 	await wait_physics_frames(2)

@@ -19,8 +19,9 @@ never sold.
 **Crafting** *(since V1.4.1)* happens only at the merchant's **Craft** tab, never in the
 backpack. Two fragments make their legendary for a **fee: the legendary's cost minus the two
 fragments' costs** (Muramana: 2900 − 400 − 400 = 2100), so a crafted legendary costs what buying
-it would. The legendary takes the first fragment's cell. Selling a crafted legendary always pays
-less than selling its two fragments, so crafting and then selling never makes gold. The same tab
+it would. The legendary takes the first fragment's cell. A crafted legendary always sells for
+less than its two fragments sell for plus the craft fee paid (Muramana sells for 2030; two Tears
+sell for 560, plus the 2100 fee), so crafting and then selling never makes gold. The same tab
 upgrades the boots (see *Boots*).
 
 **Buyback** *(since V1.4.2)*: the merchant's **Undo sale** button buys back what you sold, last

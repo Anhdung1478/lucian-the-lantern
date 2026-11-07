@@ -17,10 +17,12 @@ const SLOT_GAP := 12
 const MESSAGE_TIME := 1.6
 const TAB_NAMES: Array[String] = ["Items", "Potions", "Craft"]
 const ITEMS_TAB := 0
+const POTIONS_TAB := 1
 const CRAFT_TAB := 2
+## One hint line per tab; the Potions tab's names the potion keys (hint()).
 const HINTS: Array[String] = [
 	"Right-click or drag to buy.\nDrag an item onto the red slot to sell it.",
-	"Right-click or drag to buy. Potions fill\ncells 7 and 8 first, then the backpack.",
+	"Right-click or drag to buy. Potions fill\nthe %s and %s cells first, then the backpack.",
 	"Drag two fragments, or your boots and a\nfragment, into the slots, then pay the fee.",
 ]
 const MESSAGES := {
@@ -102,6 +104,7 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 
 	_hint = UiStyle.label(HINTS[0], 14, UiStyle.DIM_COLOR)
 	box.add_child(_hint)
+	GameSettings.instance().changed.connect(_on_setting_changed)
 	var bottom := HBoxContainer.new()
 	box.add_child(bottom)
 	_message = UiStyle.label("", 16, UiStyle.ERROR_COLOR)
@@ -141,7 +144,25 @@ func show_tab(tab: int) -> void:
 		_pages[i].visible = i == tab
 		UiStyle.style_button(_tab_buttons[i], 18, i == tab)
 	_refresh.visible = tab == ITEMS_TAB
-	_hint.text = HINTS[tab]
+	_hint.text = hint(tab)
+
+
+## Tab `tab`'s hint line. The Potions tab's names the potion keys as bound
+## now, in full ("Mouse 4"): it is a sentence, not a slot label.
+static func hint(tab: int) -> String:
+	if tab != POTIONS_TAB:
+		return HINTS[tab]
+	var settings := GameSettings.instance()
+	return HINTS[tab] % [
+		settings.key_label(Inventory.key_action(Inventory.HP_POTION_CELL)),
+		settings.key_label(Inventory.key_action(Inventory.MP_POTION_CELL)),
+	]
+
+
+## A rebound potion key shows in the hint at once.
+func _on_setting_changed(key: StringName) -> void:
+	if key == &"bindings":
+		_hint.text = hint(_tab)
 
 
 func undo_button() -> Button:

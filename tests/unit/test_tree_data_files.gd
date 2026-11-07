@@ -146,6 +146,8 @@ func test_boots_node_reads_by_level() -> void:
 	assert_eq(data.value_text(1), "Boots of Speed")
 	assert_eq(data.value_text(2), "Slightly Magical Boots")
 	assert_gt(data.blue[0], 0, "never free: the FREE badge tests count on it")
+	assert_string_contains(data.description, "merchant's Craft tab", "the Boots tab became the Craft tab")
+	assert_false(data.description.contains("Boots tab"))
 
 
 func test_backpack_slots_values_and_text() -> void:

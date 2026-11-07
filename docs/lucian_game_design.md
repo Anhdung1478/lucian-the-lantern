@@ -976,7 +976,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 | `bosses` | Bosses that already gave their first-time purple: `["thresh_1", "akshan"]` |
 | `endless_best` | Best Endless wave: the most waves cleared in one run (dying in wave 23 records 22) |
 | `play_time` | Whole seconds played in this slot: `3720` |
-| `endless_map` | The Endless map choice: 0–6, 6 meaning Random (V1.4.2). Anything else loads as Random |
+| `endless_map` | The Endless map choice (V1.4.2): 0 is Random, 1–6 the maps in act order, 1 Mid lane to 6 Thresh's domain (`Journey.ENDLESS_MAPS`). Anything else loads as Random |
 | `difficulty` | `"easy"`, `"normal"`, `"hard"` or `"extreme"` (V1.3) |
 
 - Numbers are converted back with `int()` when loading (JSON numbers load as floats). Unknown keys, node ids, skins, spell ids and stage ids are dropped, so an old or edited file still loads.

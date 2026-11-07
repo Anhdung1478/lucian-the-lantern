@@ -67,7 +67,7 @@ func craft(a: ItemData, b: ItemData) -> ItemData:
 ## The gold the Craft tab charges to make craft(a, b): the upgraded boots'
 ## upgrade_cost, or a legendary's cost minus its two fragments' (so crafting
 ## costs what buying it would, and selling it never pays more than selling
-## the fragments). 0 when they make nothing.
+## the fragments plus this fee). 0 when they make nothing.
 func craft_fee(a: ItemData, b: ItemData) -> int:
 	var made := craft(a, b)
 	if made == null:
