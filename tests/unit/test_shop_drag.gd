@@ -81,6 +81,29 @@ func test_right_click_buys_into_the_first_empty_cell() -> void:
 	assert_eq(wallet.gold, 4000)
 
 
+func test_right_clicking_a_locked_slot_says_it_is_locked() -> void:
+	assert_true(slot(0, 3).is_locked(), "two slots open, the last two chained")
+	watch_signals(screen)
+	button(slot(0, 3), MOUSE_BUTTON_RIGHT, true, center(slot(0, 3)))
+	assert_eq(screen.shop_panel()._message.text, "That slot is locked", "not \"Already sold\"")
+	assert_signal_emitted_with_parameters(screen, "traded", [false])
+	assert_eq(wallet.gold, 5000)
+
+
+func test_a_locked_slot_names_the_tree_node_that_opens_it() -> void:
+	var node: TreeNodeData = load("res://data/tree/merchant_stock.tres")
+	var card := slot(0, 3).tooltip_content()
+	assert_not_null(card, "a chained slot explains itself")
+	var text := (card.find_children("*", "Label", true, false)[0] as Label).text
+	assert_string_contains(text, node.display_name)
+	assert_string_contains(text, "Evolution Tree")
+	card.free()
+	card = slot(0, 0).tooltip_content()
+	for label: Label in card.find_children("*", "Label", true, false):
+		assert_ne(label.text, text, "an open slot shows its item")
+	card.free()
+
+
 func test_dragging_a_shop_item_onto_a_cell_buys_it_there() -> void:
 	var item := stock.item_at(1)
 	drag(slot(0, 1), cell(20))

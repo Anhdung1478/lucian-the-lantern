@@ -32,6 +32,7 @@ const MESSAGES := {
 	Shop.Result.NO_RECIPE: "Those don't craft into anything",
 	Shop.Result.WRONG_CELL: "That item can't go there",
 	Shop.Result.NOTHING_TO_UNDO: "No sale to undo",
+	Shop.Result.SLOT_LOCKED: "That slot is locked",
 }
 
 var screen: BackpackScreen

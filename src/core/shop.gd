@@ -10,6 +10,7 @@ extends RefCounted
 enum Result {
 	OK, NO_GOLD, NO_ROOM, CELL_LOCKED, SOLD_OUT, NOTHING_TO_REFRESH,
 	NO_RECIPE, WRONG_CELL, NOTHING_TO_UNDO,
+	SLOT_LOCKED,
 }
 
 var stock: MerchantStock
@@ -29,8 +30,11 @@ func _init(merchant_stock: MerchantStock, target_inventory: Inventory, stage_wal
 
 ## Buys what stock slot `slot` sells, into `cell` or (-1) the first cell
 ## it fits. When `cell` is already taken the item goes to the first free
-## cell instead; a locked cell or one that can't hold it is refused.
+## cell instead; a locked cell or one that can't hold it is refused. A
+## locked (chained) slot is SLOT_LOCKED, a bought one SOLD_OUT.
 func buy_slot(slot: int, cell := -1) -> Result:
+	if stock.is_locked(slot):
+		return Result.SLOT_LOCKED
 	var item := stock.item_at(slot)
 	if item == null:
 		return Result.SOLD_OUT

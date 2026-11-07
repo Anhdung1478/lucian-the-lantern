@@ -42,7 +42,8 @@ func test_a_sold_or_locked_slot_cannot_be_bought() -> void:
 	wallet.add(5000)
 	shop.buy_slot(0)
 	assert_eq(shop.buy_slot(0), Result.SOLD_OUT)
-	assert_eq(shop.buy_slot(3), Result.SOLD_OUT, "locked")
+	assert_eq(shop.buy_slot(3), Result.SLOT_LOCKED, "a chained slot is locked, not sold")
+	assert_false(stock.is_sold(3))
 	assert_eq(wallet.gold, 4000)
 
 

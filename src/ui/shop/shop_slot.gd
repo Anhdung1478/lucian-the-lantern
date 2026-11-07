@@ -1,8 +1,9 @@
 class_name ShopSlot
 extends Control
 ## One item for sale in the merchant's shop, with its price under it: a slot
-## of the Items tab (chained while locked, SOLD once bought) or a potion of the
-## Potions tab. Mouse input goes to the backpack screen, which runs the drag.
+## of the Items tab (chained while locked, with a note naming the Evolution
+## Tree node that opens it; SOLD once bought) or a potion of the Potions tab.
+## Mouse input goes to the backpack screen, which runs the drag.
 
 const SIZE := 64.0
 const PRICE_HEIGHT := 26.0
@@ -13,6 +14,8 @@ const PRICE_COLOR := Color("ffcf5a")
 const TOO_EXPENSIVE := Color("ff6a5a")
 const CHAIN := preload("res://assets/art/ui/chain.svg")
 const COIN := preload("res://assets/art/ui/gold.svg")
+## A chained slot's hover note: the Evolution Tree node that opens it.
+const LOCKED_NOTE := "Buy Merchant Stock in the Evolution Tree"
 
 var screen: BackpackScreen
 ## Items tab slot, or -1 for a potion.
@@ -48,6 +51,8 @@ func is_sold() -> bool:
 
 
 func tooltip_content() -> Control:
+	if is_locked() and not screen.is_dragging():
+		return TooltipCard.note(LOCKED_NOTE)
 	var shown := item()
 	return TooltipCard.item(shown, screen.inventory.catalog, screen.inventory) if shown and not screen.is_dragging() else null
 
