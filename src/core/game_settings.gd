@@ -150,7 +150,8 @@ func key_label(action: StringName) -> String:
 	return event_label(binding(action))
 
 
-## The short name shown in tight spots (HUD slots, backpack cells), e.g. "M4".
+## The short name shown in tight spots (HUD slots and their hover cards,
+## backpack cells), e.g. "M4". Sentences use key_label's full name.
 func short_key_label(action: StringName) -> String:
 	return short_label(binding(action))
 

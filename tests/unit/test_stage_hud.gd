@@ -45,10 +45,15 @@ func test_the_stage_info_fits_training() -> void:
 	assert_almost_eq(info.size.x, info.get_combined_minimum_size().x, 1.0, "no room left for the hidden Skip")
 
 
-func test_a_skill_slot_shows_the_short_key_name() -> void:
+## The slots and their hover cards both use the short name, so a long one
+## like "Backspace" never overflows a card's header.
+func test_skill_and_summoner_slots_and_their_cards_show_the_short_key_name() -> void:
 	var shared := GameSettings._instance
 	GameSettings._instance = GameSettings.new("user://test_stage_hud_settings.json")
 	GameSettings._instance.rebind(&"skill_q", _mouse_four())
+	var backspace := InputEventKey.new()
+	backspace.keycode = KEY_BACKSPACE
+	GameSettings._instance.rebind(&"summoner_d", backspace)
 	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
 	add_child_autofree(lucian)
 	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
@@ -56,9 +61,32 @@ func test_a_skill_slot_shows_the_short_key_name() -> void:
 	hud.setup(lucian, Wallet.new())
 	await wait_process_frames(1)
 	var shown := hud._skill_slots[0]._key_label.text
+	var skill_card := hud._skill_slots[0].tooltip_content()
+	var summoner: SummonerSlot = null
+	for child in hud.skill_row.get_children():
+		if child is SummonerSlot and summoner == null:
+			summoner = child
+	var summoner_card := summoner.tooltip_content()
+	var skill_text := _card_text(skill_card)
+	var summoner_text := _card_text(summoner_card)
+	skill_card.free()
+	summoner_card.free()
 	GameSettings._instance = shared
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_stage_hud_settings.json"))
 	assert_eq(shown, "M4")
+	assert_string_contains(skill_text, "[M4]")
+	assert_string_contains(summoner_text, "[Bcksp]")
+	assert_false(summoner_text.contains("Backspace"), "the card keeps the short name too")
+
+
+## Every label's text on a card.
+func _card_text(card: Control) -> String:
+	var parts: PackedStringArray = []
+	for label: Label in card.find_children("*", "Label", true, false):
+		parts.append(label.text)
+	for rich: RichTextLabel in card.find_children("*", "RichTextLabel", true, false):
+		parts.append(rich.get_parsed_text())
+	return "\n".join(parts)
 
 
 func _mouse_four() -> InputEventMouseButton:

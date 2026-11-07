@@ -89,7 +89,7 @@
 Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
 
 ### Short key names (V1.4.2)
-The labels on the HUD's item and potion slots, skill slots, summoner slots and the backpack's cells are small, so a long key name is shortened there (`GameSettings.short_label`). Settings, tooltips, stage tips, the cutscene and the Journey's D / F labels keep the full name.
+The labels on the HUD's item and potion slots, skill slots, summoner slots and the backpack's cells are small, so a long key name is shortened there (`GameSettings.short_key_label`). The skill and summoner slots' hover cards use the same short name in their header ("[M4]", "Summoner spell [Bcksp]"), because a long name such as "Backspace" would overflow a skill card's box (V1.4.3). Settings, sentence-style hints and tips (the potion cards' and empty potion cells' "press 7 to drink", stage tips, the cutscene) and the Journey's D / F labels keep the full name (`GameSettings.key_label`).
 
 | Key | Short label |
 |---|---|
