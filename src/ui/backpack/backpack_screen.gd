@@ -205,7 +205,7 @@ func undo_sale() -> void:
 		_report(shop.undo_sale())
 
 
-## The Craft tab's Craft button: asks "Craft Muramana from ... for 1470
+## The Craft tab's Craft button: asks "Craft Muramana from ... for 2100
 ## gold?" and Yes crafts what is in its two inputs; No changes nothing. Inputs
 ## that make nothing, or a fee the wallet can't pay, are refused at once.
 ## A craft uses up both inputs' items, so both inputs empty and what it made

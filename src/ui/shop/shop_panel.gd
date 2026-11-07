@@ -332,7 +332,7 @@ func _show_craft() -> void:
 
 
 ## The Craft button's question: "Craft Muramana from Tear of the Goddess and
-## Tear of the Goddess for 1470 gold?" Only asked when the inputs make
+## Tear of the Goddess for 2100 gold?" Only asked when the inputs make
 ## something.
 func craft_question() -> String:
 	return "Craft %s from %s and %s for %d gold?" % [craft_preview().display_name,
