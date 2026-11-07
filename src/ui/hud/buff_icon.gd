@@ -26,6 +26,16 @@ func tooltip_content() -> Control:
 	return TooltipCard.buff(buff) if not buff.is_empty() else null
 
 
+## What the card shows that can change while it is hovered: which buff it
+## is (the bar reuses its icons), the count, the seconds left to 0.1 s and
+## the text (a shield's amount, a stack count). HoverTip rebuilds the card
+## when it changes.
+func tooltip_version() -> Variant:
+	if buff.is_empty():
+		return null
+	return [buff.id, buff.count, snappedf(buff.left, 0.1), buff.text]
+
+
 func tooltip_place() -> HoverTip.Place:
 	return HoverTip.Place.ABOVE
 

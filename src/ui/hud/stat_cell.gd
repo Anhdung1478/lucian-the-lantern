@@ -50,5 +50,11 @@ func tooltip_content() -> Control:
 	return TooltipCard.stat(key, _value.text, _breakdown)
 
 
+## What the card shows that can change while it is hovered: the shown value
+## and its breakdown. HoverTip rebuilds the card when it changes.
+func tooltip_version() -> Variant:
+	return [_value.text, _breakdown]
+
+
 func tooltip_place() -> HoverTip.Place:
 	return HoverTip.Place.ABOVE

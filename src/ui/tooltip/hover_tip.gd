@@ -6,8 +6,9 @@ extends CanvasLayer
 ## placement with tooltip_place() -> Place. A "hover_text" meta gives a small
 ## note at the cursor. Hidden while the left button is held, so drags never
 ## show tooltips. A control whose card can change while it is shown (a
-## skill's cooldown with ability haste) adds tooltip_version() -> Variant:
-## when the value changes, the card is built again in place, with no blink.
+## skill's cooldown with ability haste, a buff's time left, a stat's value)
+## adds tooltip_version() -> Variant: when the value changes, the card is
+## built again in place, with no blink.
 
 enum Place { BESIDE, ABOVE, CURSOR }
 
