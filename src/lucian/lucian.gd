@@ -612,9 +612,11 @@ func _move_refused(shape: CastRange) -> bool:
 
 ## A targeted cast (Gunblade, Smite) aimed at an enemy out of reach: Lucian
 ## walks over and casts once it is in reach. Never at a plant: the cast
-## (enemy_near_cursor) only finds enemies.
+## (enemy_near_cursor) only finds enemies. Never during a cast time or a dash:
+## with queue_casts on the press was queued instead, and with it off it is
+## refused, as one in reach is, and his order is kept.
 func _walk_into_reach(aim: Vector2, shape: CastRange, cast: Callable) -> void:
-	if shape == null or not shape.targets_enemy:
+	if shape == null or not shape.targets_enemy or is_cast_locked() or is_dashing():
 		return
 	var target := enemy_at(aim, [&"enemies"])
 	if target and global_position.distance_to(target.global_position) > shape.reach + target.radius:

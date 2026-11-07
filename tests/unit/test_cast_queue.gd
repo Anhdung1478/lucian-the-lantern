@@ -169,6 +169,39 @@ func test_turned_off_no_item_or_summoner_is_queued() -> void:
 	assert_eq(lucian.global_position, Vector2.ZERO)
 
 
+func test_turned_off_gunblade_and_smite_out_of_reach_in_a_cast_time_are_refused_and_keep_the_attack() -> void:
+	lucian.queue_casts = false
+	dummy.position = Vector2(1500, 0)
+	await wait_physics_frames(2)
+	equip(&"hextech_gunblade")
+	lucian.summoners.set_spell(1, &"smite")
+	lucian.command_attack(dummy)
+	assert_true(lucian.try_cast(Slot.Q, dummy.position))
+	assert_false(lucian.use_equip_slot(0, dummy.position), "Gunblade: refused in Q's cast time")
+	assert_eq(lucian._order, Lucian.Order.ATTACK, "the attack order is kept")
+	assert_false(lucian.use_summoner(1, dummy.position), "Smite: refused too")
+	assert_eq(lucian._order, Lucian.Order.ATTACK)
+	assert_true(lucian._queued.is_empty())
+	await wait_seconds(0.8)
+	assert_true(lucian.item_cooldown(&"hextech_gunblade").is_ready(), "no Gunblade after the cast time")
+	assert_true(lucian.summoners.cooldown(&"smite").is_ready(), "no Smite either")
+	assert_eq(lucian._order, Lucian.Order.ATTACK)
+	assert_gt(lucian.global_position.x, 0.0, "he walks on to attack")
+
+
+func test_turned_off_smite_out_of_reach_during_the_e_dash_is_refused() -> void:
+	lucian.queue_casts = false
+	dummy.position = Vector2(1500, 0)
+	await wait_physics_frames(2)
+	lucian.summoners.set_spell(1, &"smite")
+	lucian.command_attack(dummy)
+	assert_true(lucian.try_cast(Slot.E, Vector2(0, -400)))
+	assert_false(lucian.use_summoner(1, dummy.position))
+	assert_eq(lucian._order, Lucian.Order.ATTACK, "the attack order is kept")
+	await wait_seconds(0.5)
+	assert_true(lucian.summoners.cooldown(&"smite").is_ready())
+
+
 func test_items_and_summoners_on_cooldown_are_not_queued() -> void:
 	equip(&"hextech_gunblade")
 	lucian.item_cooldown(&"hextech_gunblade").start(5.0)
