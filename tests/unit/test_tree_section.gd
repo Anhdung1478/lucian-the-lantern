@@ -416,7 +416,8 @@ func test_a_picked_node_lists_each_level_with_its_value_and_cost() -> void:
 
 
 func test_r_shows_its_q_w_e_ranks() -> void:
-	# R is hidden (and shows no sum) until it opens: the passive and 5 ranks.
+	# R is hidden (and shows no sum) until it opens: Act 2, the passive and 5 ranks.
+	_save().tree.acts_cleared = 2
 	_save().tree.from_dict({"skill_q": 3, "skill_w": 2, "passive": 1})
 	section.select(&"skill_r")
 	var info := section.info
@@ -677,7 +678,7 @@ func test_the_info_column_fits_its_panel_for_every_branch_and_node() -> void:
 func test_requirement_lines_for_all_any_two_and_an_act() -> void:
 	var tree := _save().tree
 	assert_eq(tree.requirement_text(&"skill_r", 0),
-		"Requires: Passive – Lightslinger and 5 levels in Q + W + E (now 0)")
+		"Requires: Passive – Lightslinger and Clear Act 2 and 5 levels in Q + W + E (now 0)")
 	assert_eq(tree.requirement_text(&"summoner_slot_2", 0),
 		"Requires: any 2 of Flash, Ghost, Barrier, Heal, Clarity or Smite")
 	assert_eq(tree.requirement_text(&"skill_e", 0), "Requires: Clear Act 1")
@@ -827,6 +828,22 @@ func test_after_1_1_the_summoners_tab_and_ghost_show_free() -> void:
 	_save().set_cleared(Journey.all_stage_ids(1))
 	assert_eq(_free_tabs(), [&"summoners"] as Array[StringName])
 	assert_eq(_free_nodes(), [&"ghost"] as Array[StringName])
+
+
+## V1.5 (P5): R's rank 1 is a free claim once Act 2 is cleared, the passive
+## learned and Q + W + E at 5 ranks.
+func test_after_act_2_r_shows_free_once_its_ranks_and_passive_are_there() -> void:
+	_save().set_cleared(Journey.all_stage_ids(2))
+	_save().tree.from_dict({"skill_q": 3, "skill_e": 1, "ghost": 1})
+	assert_eq(_free_nodes().size(), 0, "no passive, 4 ranks")
+	_save().tree.from_dict({"skill_q": 3, "skill_w": 1, "skill_e": 1, "passive": 1, "ghost": 1})
+	assert_eq(_free_nodes(), [&"skill_r"] as Array[StringName])
+	assert_eq(_free_tabs(), [&"skills"] as Array[StringName])
+	section.select(&"skill_r")
+	assert_eq(section.info.cost_bar.status.text, "Free")
+	assert_true(section.info.cost_bar.buy())
+	assert_eq(_save().tree.level(&"skill_r"), 1)
+	assert_eq(_free_nodes().size(), 0)
 
 
 func test_claiming_ghost_clears_the_badges() -> void:

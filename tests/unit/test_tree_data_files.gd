@@ -3,7 +3,7 @@ extends GutTest
 
 const STAT_B := [50, 100, 200, 350, 500]
 const STAT_O := [0, 0, 0, 3, 8]
-const SKILL_B := [100, 200, 350, 500, 800]
+const SKILL_B := [100, 150, 250, 500, 800]
 const SKILL_O := [0, 0, 0, 5, 10]
 const UP_B := [150, 300, 400]
 const UP_O := [0, 0, 5]
@@ -13,8 +13,8 @@ const SPELLS := [&"flash", &"ghost", &"barrier", &"heal", &"clarity", &"smite"]
 ## id -> [blue, orange] per level.
 const COSTS := {
 	&"skill_q": [SKILL_B, SKILL_O], &"skill_w": [SKILL_B, SKILL_O],
-	&"skill_e": [[0, 200, 350, 500, 800], SKILL_O],
-	&"passive": [[150], [0]], &"skill_r": [[600, 1200, 2000], [10, 20, 30]],
+	&"skill_e": [[0, 150, 250, 500, 800], SKILL_O],
+	&"passive": [[150], [0]], &"skill_r": [[0, 1200, 2000], [0, 20, 30]],
 	&"stat_ad": [STAT_B, STAT_O], &"stat_ap": [STAT_B, STAT_O], &"stat_hp": [STAT_B, STAT_O],
 	&"stat_armor": [STAT_B, STAT_O], &"stat_mr": [STAT_B, STAT_O],
 	&"stat_attack_speed": [STAT_B, STAT_O], &"stat_mana": [STAT_B, STAT_O],

@@ -16,7 +16,7 @@ func test_buying_spends_and_levels_up() -> void:
 	assert_true(tree.buy(&"skill_q", essences))
 	assert_eq(tree.level(&"skill_q"), 1)
 	assert_eq(essences.amount(Essences.BLUE), 10000 - 100)
-	assert_eq(tree.cost(&"skill_q"), Vector2i(200, 0))
+	assert_eq(tree.cost(&"skill_q"), Vector2i(150, 0))
 
 
 func test_q_and_w_open_once_act_1_is_cleared() -> void:
@@ -36,7 +36,7 @@ func test_passive_needs_any_one_basic_skill() -> void:
 
 
 func test_r_needs_the_passive_and_5_levels_in_q_w_e() -> void:
-	tree.acts_cleared = 1
+	tree.acts_cleared = 2
 	tree.from_dict({"skill_q": 4, "skill_e": 1})
 	assert_false(tree.is_open(&"skill_r"), "no passive yet")
 	tree.from_dict({"skill_q": 4, "skill_e": 1, "passive": 1})
@@ -71,7 +71,7 @@ func test_old_save_keeps_r_at_3_with_the_next_level_closed() -> void:
 
 func test_r_panel_texts() -> void:
 	assert_eq(tree.next_requirement_text(&"skill_r"),
-		"Requires: Passive – Lightslinger and 5 levels in Q + W + E (now 0)")
+		"Requires: Passive – Lightslinger and Clear Act 2 and 5 levels in Q + W + E (now 0)")
 	tree.acts_cleared = 1
 	tree.from_dict({"skill_q": 4, "skill_w": 2, "skill_e": 1, "passive": 1, "skill_r": 1})
 	assert_eq(tree.next_requirement_text(&"skill_r"), "Requires: 9 levels in Q + W + E (now 7)")
@@ -82,6 +82,55 @@ func test_e_rank_1_is_free_after_act_1() -> void:
 	tree.acts_cleared = 1
 	assert_eq(tree.cost(&"skill_e"), Vector2i.ZERO)
 	assert_true(tree.buy(&"skill_e", Essences.new()))
+
+
+## V1.5 (P5): Q, W and E ranks 2 and 3 cost 150 and 250 blue.
+func test_q_w_and_e_ranks_2_and_3_cost_150_and_250_blue() -> void:
+	tree.acts_cleared = 1
+	for id in [&"skill_q", &"skill_w", &"skill_e"]:
+		tree.from_dict({String(id): 1})
+		assert_eq(tree.cost(id), Vector2i(150, 0), "%s rank 2" % id)
+		assert_true(tree.buy(id, essences))
+		assert_eq(tree.cost(id), Vector2i(250, 0), "%s rank 3" % id)
+
+
+## V1.5 (P5): R's rank 1 costs nothing and opens once Act 2 is cleared, with
+## the passive and 5 Q + W + E ranks as before: a free claim.
+func test_r_rank_1_is_a_free_claim_after_act_2() -> void:
+	tree.acts_cleared = 1
+	tree.from_dict({"skill_q": 4, "skill_e": 1, "passive": 1})
+	assert_false(tree.is_open(&"skill_r"), "Act 1 is not enough")
+	assert_eq(tree.next_requirement_text(&"skill_r"), "Requires: Clear Act 2")
+	assert_false(tree.is_free(&"skill_r"))
+	assert_false(tree.buy(&"skill_r", essences))
+	tree.acts_cleared = 2
+	assert_eq(tree.cost(&"skill_r"), Vector2i.ZERO)
+	assert_true(tree.is_free(&"skill_r"))
+	assert_has(tree.free_ids(&"skills"), &"skill_r")
+	assert_true(tree.buy(&"skill_r", Essences.new()), "no essence needed")
+	assert_eq(tree.level(&"skill_r"), 1)
+	assert_false(tree.is_free(&"skill_r"), "rank 2 costs")
+	assert_eq(tree.cost(&"skill_r"), Vector2i(1200, 20))
+
+
+func test_r_rank_1_after_act_2_still_needs_the_passive_and_5_ranks() -> void:
+	tree.acts_cleared = 2
+	tree.from_dict({"skill_q": 4, "skill_e": 1})
+	assert_false(tree.is_free(&"skill_r"), "no passive")
+	tree.from_dict({"skill_q": 3, "skill_e": 1, "passive": 1})
+	assert_false(tree.is_free(&"skill_r"), "4 ranks")
+	assert_eq(tree.next_requirement_text(&"skill_r"), "Requires: 5 levels in Q + W + E (now 4)")
+
+
+## An old save that bought R before Act 2 keeps it, and its ranks 2 and 3
+## need no act.
+func test_an_old_save_with_r_before_act_2_keeps_it_and_ranks_2_and_3_have_no_act() -> void:
+	tree.acts_cleared = 1
+	tree.from_dict({"skill_q": 4, "skill_w": 3, "skill_e": 2, "passive": 1, "skill_r": 1})
+	assert_eq(tree.level(&"skill_r"), 1)
+	assert_true(tree.can_buy(&"skill_r", essences), "rank 2 at 9 ranks")
+	assert_true(tree.buy(&"skill_r", essences))
+	assert_eq(tree.level(&"skill_r"), 2)
 
 
 func test_second_summoner_slot_needs_two_spells() -> void:
