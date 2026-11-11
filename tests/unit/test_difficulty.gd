@@ -44,15 +44,15 @@ func test_four_levels_with_their_numbers() -> void:
 	assert_eq(Difficulty.LEVELS.map(func(level: int) -> String: return Difficulty.name_of(level)), ["Easy", "Normal", "Hard", "Extreme"])
 	assert_eq(Difficulty.LEVELS.map(func(level: int) -> float: return Difficulty.scale(level)), [0.8, 1.0, 1.1, 1.3])
 	assert_eq(Difficulty.LEVELS.map(func(level: int) -> String: return Difficulty.scale_text(level)), ["×0.8", "×1.0", "×1.1", "×1.3"])
-	assert_eq(Difficulty.LEVELS.map(func(level: int) -> float: return Difficulty.blue_scale(level)), [1.0, 1.0, 1.2, 1.5])
+	assert_eq(Difficulty.LEVELS.map(func(level: int) -> float: return Difficulty.essence_scale(level)), [1.0, 1.0, 1.2, 1.5])
 	assert_eq(Difficulty.describe(Difficulty.EASY), "Enemies have 80% HP and deal 80% damage.")
-	assert_eq(Difficulty.describe(Difficulty.HARD), "Enemies have 110% HP and deal 110% damage. Blue essence ×1.2.")
-	assert_eq(Difficulty.describe(Difficulty.EXTREME), "Enemies have 130% HP and deal 130% damage. Blue essence ×1.5.")
+	assert_eq(Difficulty.describe(Difficulty.HARD), "Enemies have 110% HP and deal 110% damage. Blue and orange essence ×1.2.")
+	assert_eq(Difficulty.describe(Difficulty.EXTREME), "Enemies have 130% HP and deal 130% damage. Blue and orange essence ×1.5.")
 
 
 func test_an_unknown_level_or_key_is_normal() -> void:
 	assert_eq(Difficulty.scale(7), 1.0)
-	assert_eq(Difficulty.blue_scale(-1), 1.0)
+	assert_eq(Difficulty.essence_scale(-1), 1.0)
 	assert_eq(Difficulty.name_of(-1), "Normal")
 	assert_eq(Difficulty.from_key("extreme"), Difficulty.EXTREME)
 	for key: Variant in ["", "nightmare", 3, null]:
@@ -141,7 +141,7 @@ func test_lucian_takes_the_difficultys_share_of_every_hit() -> void:
 		await wait_process_frames(1)
 
 
-func test_hard_and_extreme_pay_more_blue_and_nothing_else() -> void:
+func test_hard_and_extreme_pay_more_blue_and_orange_and_the_same_gold_and_xp() -> void:
 	var data: EnemyData = load("res://data/enemies/siege_minion.tres")
 	var rng := RandomNumberGenerator.new()
 	var normal := StageSetup.new()
@@ -152,12 +152,38 @@ func test_hard_and_extreme_pay_more_blue_and_nothing_else() -> void:
 		var reward := KillRewards.roll(data, 4, run, rng)
 		rng.seed = 7
 		var base := KillRewards.roll(data, 4, normal, rng)
-		assert_eq(reward.blue, roundi(base.blue * Difficulty.blue_scale(level)), Difficulty.name_of(level))
-		assert_eq([reward.gold, reward.xp, reward.orange], [base.gold, base.xp, base.orange], Difficulty.name_of(level))
+		assert_eq(reward.blue, roundi(base.blue * Difficulty.essence_scale(level)), Difficulty.name_of(level))
+		assert_eq([reward.gold, reward.xp], [base.gold, base.xp], Difficulty.name_of(level))
+		assert_almost_eq(KillRewards.orange_chance(data.kind, 4, run), KillRewards.orange_chance(data.kind, 4, normal) * Difficulty.essence_scale(level),
+			0.00001, "the orange chance on %s" % Difficulty.name_of(level))
 	var hard := StageSetup.new()
 	hard.difficulty = Difficulty.HARD
 	hard.blue_mult = 1.15
 	assert_eq(KillRewards.roll(data, 4, hard, rng).blue, roundi(20 * 1.15 * 1.2), "on top of an Endless modifier")
+
+
+## V1.5 (P8): a boss's 5 and a mini boss's 3 sure orange, and the data's
+## extra (the Rift Scuttler's 4), × the essence scale, rounded.
+func test_hard_and_extreme_raise_a_boss_s_and_a_mini_boss_s_sure_orange() -> void:
+	var rng := RandomNumberGenerator.new()
+	var boss: EnemyData = load("res://data/enemies/akshan.tres")
+	var mini_boss: EnemyData = load("res://data/enemies/infernal_drake.tres")
+	var scuttler: EnemyData = load("res://data/enemies/rift_scuttler.tres")
+	var expected := {Difficulty.EASY: [5, 3, 4], Difficulty.NORMAL: [5, 3, 4], Difficulty.HARD: [6, 4, 5], Difficulty.EXTREME: [8, 5, 6]}
+	for level: int in expected:
+		var run := StageSetup.new()
+		run.difficulty = level
+		run.orange_mult = 0.0
+		var got := [KillRewards.roll(boss, 2, run, rng).orange, KillRewards.roll(mini_boss, 3, run, rng).orange,
+			KillRewards.roll(scuttler, 3, run, rng).orange]
+		assert_eq(got, expected[level], Difficulty.name_of(level))
+
+
+func test_the_essence_scale_stacks_with_an_endless_boss_tier() -> void:
+	var run := StageSetup.new()
+	run.difficulty = Difficulty.EXTREME
+	var boss: EnemyData = load("res://data/enemies/akshan.tres")
+	assert_eq(KillRewards.roll(boss, 2, run, RandomNumberGenerator.new(), false, 1.3).orange, roundi(5 * 1.3 * 1.5), "9.75")
 
 
 func test_armor_lowers_the_scaled_hit() -> void:
