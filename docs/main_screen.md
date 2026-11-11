@@ -499,6 +499,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
   - The waves, with the old cards' strings ("5 waves + mini boss", "5 waves + boss wave").
   - The act's story line.
   - "Cleared" (green, with a check) or "Not cleared yet".
+  - *(V2.0)* **Resolve:** while the stage has Resolve stacks, a green line with the Resolve icon under the status: "Resolve 3 / 5: +30% damage, -30% taken" (the share follows the difficulty: 10% a stack on Easy and Normal, 5% on Hard). Hovering it says "Lucian fell here 3 times." and "Each defeat makes this stage a little easier, up to 5 times, until it is cleared." There is no line with no stacks, on a cleared stage, with the Gameplay setting off or on Extreme. Game design doc §3.
   - **ENEMIES:** a 44 px round icon for each of the stage's enemies, once each, in wave order (the mini boss is in the portrait). Each icon's hover is its name.
   - **Start:** "Start" for Act 1's one stage, else "Start stage 4".
 - **Training:** "PRACTICE", "TRAINING", the dummy, the text (as before) and **Start Training**.
