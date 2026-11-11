@@ -9,7 +9,7 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 ## Download and play
 
 1. Open the [latest release](https://github.com/Anhdung1478/lucian-the-lantern/releases/latest).
-2. Download `LucianTheLantern-v1.5.0-windows-x64.zip`.
+2. Download `LucianTheLantern-v2.0.0-windows-x64.zip`.
 3. Unzip it anywhere and run `LucianTheLantern.exe`.
 
 - Needs Windows 10 or 11, 64-bit.
@@ -44,7 +44,9 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 
 | | |
 |---|---|
-| ![A fight in Endless](docs/report/phase9/endless_wave_0_fight.png) | ![The Journey map](docs/report/phase10/journey_map_1_mid_game.png) |
+| ![A fight in Endless](docs/report/v2.0.0/endless_wave_0_fight.png) | ![The backpack and the merchant](docs/report/v2.0.0/shop_1_items.png) |
+| ![Dark Lucian in Act 4](docs/report/v2.0.0/dark_lucian_q_0_warning.png) | ![The final platform](docs/report/v2.0.0/map_act6_final_1_spot.png) |
+| ![The Journey map](docs/report/phase10/journey_map_1_mid_game.png) | ![The end of a stage](docs/report/v2.0.0/act1_result_0.png) |
 | ![The Evolution Tree](docs/report/phase10/main_tree_4_skills.png) | ![The Skin Shop](docs/report/phase10/main_skins_1_vampire.png) |
 
 ## Controls
