@@ -18,6 +18,9 @@ const SCALES: Array[float] = [0.8, 1.0, 1.1, 1.3]
 ## Every kill's blue essence, its orange drop chance and a boss's or mini
 ## boss's sure orange are multiplied by this (KillRewards).
 const ESSENCE_SCALES: Array[float] = [1.0, 1.0, 1.2, 1.5]
+## What one stack of Resolve is worth: that share more damage dealt and less
+## damage taken (Resolve). Extreme has none.
+const RESOLVE_STEPS: Array[float] = [0.1, 0.1, 0.05, 0.0]
 
 
 static func is_level(level: int) -> bool:
@@ -32,6 +35,11 @@ static func scale(level: int) -> float:
 ## Blue and orange essence from kills are multiplied by this.
 static func essence_scale(level: int) -> float:
 	return ESSENCE_SCALES[level] if is_level(level) else 1.0
+
+
+## One stack of Resolve gives this share more damage dealt and less taken.
+static func resolve_step(level: int) -> float:
+	return RESOLVE_STEPS[level] if is_level(level) else RESOLVE_STEPS[NORMAL]
 
 
 static func name_of(level: int) -> String:
