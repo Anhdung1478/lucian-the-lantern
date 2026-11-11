@@ -191,14 +191,20 @@ const STAGES := {
 const BOSSES := {"1-1": &"thresh_1", "2-3": &"akshan", "3-5": &"elder_dragon", "4-3": &"dark_lucian", "5-5": &"karthus", "6-5": THRESH_FINAL}
 ## Stage id -> enemy id -> its share of HP in that stage only. The first
 ## stage of every act is gentler: its normal enemies (and Act 2's elites)
-## have 20% less HP.
+## have 20% less HP. The second is a little gentler: its normal enemies have
+## 10% less.
 const HP_SHARES := {
 	"1-1": {MELEE: 0.8, RANGED: 0.8},
 	"2-1": {MELEE: 0.8, RANGED: 0.8, SIEGE: 0.8, SUPER: 0.8},
+	"2-2": {MELEE: 0.9, RANGED: 0.9},
 	"3-1": {&"raptor": 0.8, &"raptor_big": 0.8, &"murkwolf": 0.8, &"murkwolf_big": 0.8, &"krug": 0.8, &"krug_big": 0.8, &"gromp": 0.8},
+	"3-2": {&"raptor": 0.9, &"raptor_big": 0.9, &"murkwolf": 0.9, &"murkwolf_big": 0.9, &"krug": 0.9, &"krug_big": 0.9, &"gromp": 0.9},
 	"4-1": {SHADOW_MELEE: 0.8, SHADOW_RANGED: 0.8},
+	"4-2": {SHADOW_MELEE: 0.9, SHADOW_RANGED: 0.9},
 	"5-1": {SPIDERLING: 0.8, SAPLING: 0.8},
+	"5-2": {SPIDERLING: 0.9, SAPLING: 0.9},
 	"6-1": {MIST_WALKER: 0.8, LANTERN_SOUL: 0.8},
+	"6-2": {MIST_WALKER: 0.9, LANTERN_SOUL: 0.9},
 }
 ## Stage id -> enemy id -> its share of damage in that stage only. The
 ## tutorial's minions hit 25% softer.

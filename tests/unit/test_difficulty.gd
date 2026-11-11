@@ -120,7 +120,7 @@ func test_every_enemy_has_its_hp_scaled_bosses_too() -> void:
 		var stage: Stage = await _stage(level, 2, 2)
 		var scale := Difficulty.scale(level)
 		var minion := stage.spawn_enemy(&"melee_minion", Vector2(300, 300), 2)
-		assert_almost_eq(minion.max_hp, minion.data.max_hp * minion.data.hp_scale(2, 2) * scale, 0.01, "a minion on %s" % Difficulty.name_of(level))
+		assert_almost_eq(minion.max_hp, minion.data.max_hp * minion.data.hp_scale(2, 2) * WavePlan.hp_share("2-2", minion.data.id) * scale, 0.01, "a minion on %s" % Difficulty.name_of(level))
 		assert_almost_eq(minion.hp, minion.max_hp, 0.01, "full HP")
 		var boss := stage.spawn_enemy(&"akshan", Vector2(700, 300))
 		assert_almost_eq(boss.max_hp, boss.data.max_hp * scale, 0.01, "Akshan on %s" % Difficulty.name_of(level))

@@ -193,15 +193,39 @@ func test_act_1_minions_hit_25_percent_softer() -> void:
 	assert_almost_eq(stage.spawn_enemy(WavePlan.SIEGE, at).damage, 40.0 * 0.75, 0.01)
 
 
-func test_the_first_stage_of_act_2_is_gentler_and_the_next_is_not() -> void:
+func test_the_first_stage_of_act_2_is_gentler_and_the_second_a_little() -> void:
 	var stage: Stage = await _stage(2, 1)
 	var at := stage.arena.spawn_points[0]
 	var act_2 := 1.0 + EnemyData.ACT_HP
 	assert_almost_eq(stage.spawn_enemy(WavePlan.MELEE, at).max_hp, 240.0 * act_2 * 0.8, 0.01)
 	assert_almost_eq(stage.spawn_enemy(WavePlan.SUPER, at).max_hp, 1150.0 * act_2 * 0.8, 0.01)
 	assert_almost_eq(stage.spawn_enemy(WavePlan.MELEE, at).damage, 12.0 * (1.0 + EnemyData.ACT_DAMAGE), 0.01, "damage stays")
-	var next: Stage = await _stage(2, 2)
-	assert_almost_eq(next.spawn_enemy(WavePlan.MELEE, next.arena.spawn_points[0]).max_hp, 240.0 * act_2, 0.01)
+	var second: Stage = await _stage(2, 2)
+	at = second.arena.spawn_points[0]
+	var melee := second.spawn_enemy(WavePlan.MELEE, at)
+	assert_almost_eq(melee.max_hp, 240.0 * act_2 * 0.9, 0.01)
+	assert_almost_eq(melee.hp, melee.max_hp, 0.01, "full HP")
+	assert_almost_eq(second.spawn_enemy(WavePlan.SUPER, at).max_hp, 1150.0 * act_2, 0.01, "an elite has its full HP")
+	assert_almost_eq(melee.damage, 12.0 * (1.0 + EnemyData.ACT_DAMAGE), 0.01, "damage stays")
+	assert_eq(second.lucian.progress.level, StageSetup.ACT_START_LEVELS[1], "no extra start level")
+
+
+## V1.5 (P4): in every act's second stage, each normal enemy of its waves
+## has 90% HP; elites, mini bosses and bosses keep theirs.
+func test_every_second_stage_s_normal_enemies_have_90_percent_hp() -> void:
+	for act in range(2, Journey.ACTS.size() + 1):
+		var id := Journey.stage_id(act, 2)
+		var seen := 0
+		for wave: Array in WavePlan.waves(id):
+			for enemy_id: StringName in wave:
+				var data: EnemyData = load("res://data/enemies/%s.tres" % enemy_id)
+				var share := 0.9 if data.kind == &"normal" else 1.0
+				assert_eq(WavePlan.hp_share(id, enemy_id), share, "%s %s" % [id, enemy_id])
+				seen += 1
+				if data.split_into != &"":
+					assert_eq(WavePlan.hp_share(id, data.split_into), 0.9, "%s %s" % [id, data.split_into])
+		assert_gt(seen, 0, id)
+		assert_eq(WavePlan.hp_share(Journey.stage_id(act, 3), WavePlan.waves(id)[0][0]), 1.0, "%d-3 is not" % act)
 
 
 func test_lucian_starts_at_the_acts_level_with_its_skill_points() -> void:
