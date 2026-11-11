@@ -105,6 +105,32 @@ func test_water_slows_lucian_by_a_quarter_while_inside() -> void:
 	assert_almost_eq(lucian.current_move_speed(), speed, 0.01)
 
 
+func test_lava_gets_cracks_and_water_gets_deeper_steps() -> void:
+	var lava := _zone(HazardZone.burning(HazardZone.LAVA_DPS, DamageInfo.Type.MAGIC).set_circle(Vector2(300, 0), 140.0))
+	var water := _zone(HazardZone.slowing(HazardZone.WATER_SLOW).set_circle(Vector2(900, 0), 140.0))
+	assert_gt(lava._cracks.size(), 2)
+	assert_eq(lava._inner.size(), 1, "the rock")
+	assert_true(water._cracks.is_empty())
+	assert_eq(water._inner.size(), HazardZone.WATER_BANDS)
+
+
+func test_a_zone_keeps_its_size_and_its_look_is_steady() -> void:
+	var first := HazardZone.burning(HazardZone.LAVA_DPS, DamageInfo.Type.MAGIC).set_circle(Vector2(300, 0), 140.0)
+	var second := HazardZone.burning(HazardZone.LAVA_DPS, DamageInfo.Type.MAGIC).set_circle(Vector2(700, 0), 140.0)
+	assert_eq(first.radius, 140.0)
+	assert_true(first.contains(Vector2(300 + 139, 0)))
+	assert_false(first.contains(Vector2(300 + 141, 0)))
+	assert_eq(first._cracks, second._cracks, "seeded by the shape")
+	first.free()
+	second.free()
+
+
+func test_a_zone_stands_still_without_juice() -> void:
+	var lava := _zone(HazardZone.burning(HazardZone.LAVA_DPS, DamageInfo.Type.MAGIC).set_circle(Vector2(300, 0), 140.0))
+	await wait_physics_frames(3)
+	assert_eq(lava._clock(), 0.0)
+
+
 func test_a_zone_tells_inside_from_outside() -> void:
 	var pool := HazardZone.burning(10.0, DamageInfo.Type.MAGIC).set_circle(Vector2(100, 100), 50.0)
 	assert_true(pool.contains(Vector2(130, 100)))
