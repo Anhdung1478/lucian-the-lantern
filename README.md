@@ -36,6 +36,9 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 - **Skin Shop:** five skins, Classic, High Noon, PROJECT, Pulsefire and Vampire, each with its own strengths and weaknesses, and its own look and sounds for Q, W, E, R and basic attacks. Preview plays them in the shop.
 - **Endless mode:** opens after Act 3. Waves keep getting stronger, with a mini boss every 5 waves, a boss every 10, and a modifier pick after each boss. Its enemies come from the acts you've cleared, and the first wins of waves 10, 20, 30 and 40 pay extra essence.
 - **Difficulty:** Easy, Normal, Hard or Extreme, picked with a new game and fixed from then on (nothing in the game shows or changes it after that). It scales enemy HP and the damage Lucian takes (×0.8 to ×1.3), and Hard and Extreme pay more blue and orange essence.
+- **Resolve:** each time a story stage beats you, it gets a little easier for your next try (up to 5 times, until you clear it): more damage dealt and less taken, on every difficulty but Extreme. It can be turned off in Settings → Gameplay.
+- **Between waves and after a defeat:** the break shows what the next wave brings, and a defeat shows what hit you most, with a tip.
+- **Look:** from V2.0 the HUD, the backpack, the merchant, the end screens and every map were redrawn in the same look as the title: navy and gold, with the lantern's teal light, soft shadows and small effects (the effects are off on Low quality).
 - **Music:** a score made in code, one piece per act, that follows the fight: its drums grow with the enemies left, and a boss brings its own layer.
 - **Other:** three save slots, rebindable keys, and three cast modes for each key.
 
