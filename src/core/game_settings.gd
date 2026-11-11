@@ -29,6 +29,9 @@ const DEFAULTS := {
 	&"quality": "high",
 	&"show_fps": false,
 	&"queue_casts": true,
+	## Resolve (Resolve.SETTING): each defeat on a stage makes it a little
+	## easier. Off, the defeats are still counted.
+	&"resolve": true,
 	## Key (action name) -> "indicator" or "normal". Keys not listed use quick
 	## cast. See CAST_MODES.
 	&"cast_modes": {},

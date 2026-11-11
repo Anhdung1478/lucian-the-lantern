@@ -3,10 +3,10 @@ extends CanvasLayer
 ## Settings, opened from the ESC menu, the title screen or the main screen's
 ## gear: Audio (volumes), Controls (rebinding, and a cast mode for each skill,
 ## item and summoner key), Graphics (window, resolution, VSync, FPS cap,
-## quality, FPS counter) and Gameplay (skill queue). Every change applies at
-## once and is saved; a volume slider being dragged saves once, when it is let
-## go. ESC or Back returns to the menu; while waiting for a new key, ESC
-## cancels instead.
+## quality, FPS counter) and Gameplay (cast queue, Resolve). Every change
+## applies at once and is saved; a volume slider being dragged saves once,
+## when it is let go. ESC or Back returns to the menu; while waiting for a
+## new key, ESC cancels instead.
 ##
 ## The look: a lantern emblem on the panel's top edge over "SETTINGS" and a
 ## gold rule; a rail of icon tabs on the left, the open one lit gold with an
@@ -35,7 +35,7 @@ const TAB_BLURBS := [
 	"Volumes change at once. Letting go of a slider plays a test sound.",
 	"Click a binding, then press a key or click it again with a mouse button.",
 	"The window, the frame rate and how much the effects cost.",
-	"How Lucian takes your orders.",
+	"How Lucian takes your orders, and what a defeat gives him.",
 ]
 const TAB_ICONS := [
 	preload("res://assets/art/ui/settings_audio.svg"),
@@ -483,6 +483,8 @@ func _build_gameplay() -> Control:
 	var page := _page(3)
 	_toggle(page, "Cast queue", &"queue_casts",
 		"A skill, item active or summoner spell pressed during a cast time or a dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept.")
+	_toggle(page, "Resolve", Resolve.SETTING,
+		"After each defeat on a stage, Lucian deals more damage and takes less there (up to %d times)." % Resolve.MAX_STACKS)
 	return page
 
 

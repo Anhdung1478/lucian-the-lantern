@@ -325,3 +325,16 @@ func test_the_panel_and_every_page_fit_the_screen() -> void:
 		screen.show_tab(tab)
 		var page := screen._pages[tab]
 		assert_lte(page.get_combined_minimum_size().y, page.size.y, "page %d fits" % tab)
+
+
+## R1: the Gameplay page turns Resolve off and on.
+func test_the_gameplay_page_has_a_resolve_switch_that_starts_on() -> void:
+	var toggle := _control("Resolve", "CheckButton") as CheckButton
+	assert_true(screen._pages[3].is_ancestor_of(toggle), "on the Gameplay page")
+	assert_true(toggle.button_pressed, "on by default")
+	var notes := toggle.get_parent().find_children("*", "Label", true, false).map(func(label: Label) -> String: return label.text)
+	assert_has(notes, "After each defeat on a stage, Lucian deals more damage and takes less there (up to 5 times).")
+	toggle.button_pressed = false
+	assert_eq(settings.get_value(Resolve.SETTING), false)
+	toggle.button_pressed = true
+	assert_eq(settings.get_value(Resolve.SETTING), true)

@@ -317,3 +317,13 @@ func test_unknown_cast_modes_and_keys_are_dropped() -> void:
 	assert_eq(loaded.cast_mode(&"skill_q"), "normal")
 	assert_eq(loaded.cast_mode(&"skill_w"), "quick")
 	assert_eq(loaded.get_value(&"cast_modes"), {"skill_q": "normal"})
+
+
+## R1: Resolve is a setting, on by default.
+func test_resolve_is_on_by_default_and_is_saved() -> void:
+	assert_eq(Resolve.SETTING, &"resolve")
+	assert_eq(settings.get_value(Resolve.SETTING), true)
+	watch_signals(settings)
+	settings.set_value(Resolve.SETTING, false)
+	assert_signal_emitted_with_parameters(settings, "changed", [Resolve.SETTING])
+	assert_eq(GameSettings.new(PATH).get_value(Resolve.SETTING), false)

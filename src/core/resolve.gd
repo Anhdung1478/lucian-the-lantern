@@ -5,9 +5,17 @@ extends RefCounted
 ## cleared gives one stack there, up to MAX_STACKS. A stack raises the damage
 ## Lucian deals and lowers the damage he takes by the difficulty's step
 ## (Difficulty.resolve_step: none on Extreme). Clearing the stage ends it;
-## replays of a cleared stage, Training and Endless never have it.
+## replays of a cleared stage, Training and Endless never have it. With the
+## Gameplay setting off the defeats are still counted, but nothing applies.
 
 const MAX_STACKS := 5
+## The Gameplay setting's key (GameSettings), on by default.
+const SETTING := &"resolve"
+
+
+## The setting is on in the game's shared settings.
+static func enabled() -> bool:
+	return GameSettings.instance().get_value(SETTING)
 
 
 ## The stacks `defeats` defeats give on `difficulty`: one each, up to
