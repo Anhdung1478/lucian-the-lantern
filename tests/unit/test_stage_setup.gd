@@ -206,3 +206,59 @@ func test_backpack_levels_reach_the_setup() -> void:
 
 func test_the_sandbox_has_the_whole_backpack() -> void:
 	assert_eq(StageSetup.new().backpack_slots, Inventory.BACKPACK_SIZE)
+
+
+## R1: a story stage not yet cleared starts with a Resolve stack for each
+## defeat there, up to 5.
+func test_a_stage_carries_its_defeats_and_their_resolve_stacks() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	save.set_cleared(["1-1"] as Array[String])
+	var fresh := StageSetup.for_stage(save, 2, 1)
+	assert_eq([fresh.defeats, fresh.resolve], [0, 0], "no defeat yet")
+	for i in 3:
+		save.record_defeat("2-1")
+	var setup := StageSetup.for_stage(save, 2, 1)
+	assert_eq([setup.defeats, setup.resolve], [3, 3])
+	assert_eq(StageSetup.for_stage(save, 2, 2).resolve, 0, "another stage has its own")
+	for i in 4:
+		save.record_defeat("2-1")
+	setup = StageSetup.for_stage(save, 2, 1)
+	assert_eq([setup.defeats, setup.resolve], [7, 5], "at most 5 stacks")
+
+
+func test_resolve_stacks_on_hard_and_not_on_extreme() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	for i in 2:
+		save.record_defeat("1-1")
+	for level in [Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD]:
+		save.difficulty = level
+		assert_eq(StageSetup.for_stage(save, 1, 1).resolve, 2, Difficulty.name_of(level))
+	save.difficulty = Difficulty.EXTREME
+	var extreme := StageSetup.for_stage(save, 1, 1)
+	assert_eq([extreme.defeats, extreme.resolve], [2, 0], "Extreme has no Resolve")
+
+
+func test_the_tutorial_counts_like_any_stage() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	save.record_defeat("1-1")
+	var setup := StageSetup.for_stage(save, 1, 1)
+	assert_true(setup.tutorial)
+	assert_eq(setup.resolve, 1)
+
+
+func test_a_cleared_stage_training_endless_and_the_sandbox_have_no_resolve() -> void:
+	var save := SaveGame.new("user://test_setup_")
+	for i in 3:
+		save.record_defeat("1-1")
+		save.record_defeat("2-1")
+	save.finish_stage(&"cleared", "1-1")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(save.path(1)))
+	var replay := StageSetup.for_stage(save, 1, 1)
+	assert_eq([replay.defeats, replay.resolve], [0, 0], "a replay of a cleared stage")
+	var training := StageSetup.from_save(save)
+	assert_eq([training.defeats, training.resolve], [0, 0], "Training")
+	var endless := StageSetup.for_endless(save, 2, RandomNumberGenerator.new())
+	assert_eq([endless.defeats, endless.resolve], [0, 0], "Endless")
+	var sandbox := StageSetup.new()
+	assert_eq([sandbox.defeats, sandbox.resolve], [0, 0], "the sandbox")
+	assert_eq(StageSetup.for_stage(save, 2, 1).resolve, 3, "the stage not cleared keeps its own")

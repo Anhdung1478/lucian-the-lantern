@@ -156,9 +156,19 @@ var tree_bonus := {}
 ## Endless's modifier (#3, #4): stat multipliers keyed like a skin's scale,
 ## applied with it (set_run_scale).
 var run_scale := {}
-## The save's difficulty (Difficulty.scale): every hit he takes is
+## The save's difficulty: it scales the hits he takes and sets what a
+## Resolve stack is worth.
+var difficulty := Difficulty.NORMAL
+## Resolve on this try (set_resolve): its stacks, and how many times he fell
+## on this stage, for the buff row.
+var resolve := 0
+var defeats := 0
+## The difficulty's scale times Resolve's share: every hit he takes is
 ## multiplied by it before armor and magic resist.
 var damage_taken_scale := 1.0
+## Resolve's share: every hit he deals (attacks, skills, items and the ticks
+## of his burns) is multiplied by it before the enemy's armor and magic resist.
+var damage_dealt_scale := 1.0
 
 var _order := Order.NONE
 var _move_point := Vector2.ZERO
@@ -386,9 +396,10 @@ func _cast_queued() -> void:
 			use_summoner(queued.index, queued.aim)
 
 
-## Called by an enemy just before Lucian's hit is mitigated: item damage
-## multipliers.
+## Called by an enemy just before Lucian's hit is mitigated: Resolve's share
+## and the item damage multipliers.
 func before_damage(target: Enemy, info: DamageInfo) -> void:
+	info.amount *= damage_dealt_scale
 	passives.before_damage(target, info)
 
 
@@ -480,10 +491,20 @@ func apply_setup(setup: StageSetup) -> void:
 	inventory.set_boots(item_catalog.find(boots_id) if item_catalog and boots_id != &"" else null)
 	tutorial = setup.tutorial
 	one_gun = setup.tutorial
-	damage_taken_scale = Difficulty.scale(setup.difficulty)
+	difficulty = setup.difficulty
+	set_resolve(setup.resolve, setup.defeats)
 	apply_skin(setup.skin)
 	hp = stats.max_hp
 	mana = stats.max_mana
+
+
+## Resolve for this try: `stacks` raise the damage he deals and lower the
+## damage he takes (0: none). `fell` is how many times he fell on this stage.
+func set_resolve(stacks: int, fell := 0) -> void:
+	resolve = stacks
+	defeats = fell
+	damage_dealt_scale = Resolve.damage_dealt_scale(stacks, difficulty)
+	damage_taken_scale = Difficulty.scale(difficulty) * Resolve.damage_taken_scale(stacks, difficulty)
 
 
 ## The equipped skin's effect set: how Q, W, E, R and shots look and sound.

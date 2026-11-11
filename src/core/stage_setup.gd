@@ -28,6 +28,11 @@ var start_level := 1
 var boots_level := 2
 ## The save's Difficulty level: enemy HP and the damage Lucian takes.
 var difficulty := Difficulty.NORMAL
+## Resolve: how many times Lucian fell on this stage before clearing it, and
+## the stacks that gives this try (Resolve.stacks). A cleared stage,
+## Training, Endless and the sandbox have none.
+var defeats := 0
+var resolve := 0
 var backpack_slots := Inventory.BACKPACK_SIZE
 var equip_slots := Inventory.EQUIP_SIZE
 var shop_slots := 2
@@ -99,9 +104,9 @@ static func from_save(save: SaveGame) -> StageSetup:
 	return setup
 
 
-## A Journey stage: the save's setup plus the stage, its boss, and the
-## tutorial's limits on Act 1's first play. Thresh only comes that first time.
-## The boots stay, even in the tutorial.
+## A Journey stage: the save's setup plus the stage, its boss, its Resolve
+## and the tutorial's limits on Act 1's first play. Thresh only comes that
+## first time. The boots stay, even in the tutorial.
 static func for_stage(save: SaveGame, act_number: int, stage_number: int) -> StageSetup:
 	var setup := from_save(save)
 	setup.act = act_number
@@ -110,6 +115,8 @@ static func for_stage(save: SaveGame, act_number: int, stage_number: int) -> Sta
 	setup.display_name = Journey.stage_name(act_number, stage_number)
 	setup.boss = WavePlan.boss(setup.stage_id)
 	setup.start_level = ACT_START_LEVELS[act_number - 1]
+	setup.defeats = save.defeats_on(setup.stage_id)
+	setup.resolve = Resolve.stacks(setup.defeats, save.difficulty)
 	if setup.stage_id == TUTORIAL_STAGE:
 		if TUTORIAL_STAGE in save.cleared:
 			setup.boss = &""
