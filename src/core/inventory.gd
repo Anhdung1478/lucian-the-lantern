@@ -10,8 +10,9 @@ extends RefCounted
 ## slot. Boots live only in the boots cell: they never move by drag.
 ## Only one penetration item (ItemData.is_penetration) can be in the equip
 ## slots at a time: a put or drop that would equip a second one is refused
-## (pen_blocker). Picked-up and bought items go only into the backpack (and a
-## potion's own cell), never into an empty equip slot.
+## (pen_blocker). Picked-up items, and bought ones not dropped on an equip
+## slot, go only into the backpack (and a potion's own cell), never into an
+## empty equip slot.
 
 signal changed
 

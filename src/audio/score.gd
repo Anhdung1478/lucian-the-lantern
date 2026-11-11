@@ -29,8 +29,9 @@ const STEPS_PER_BAR := 16
 ## The drone repeats every this many bars.
 const TILE_BARS := 2
 ## Each layer is rendered at full scale; Music plays its loudest point this
-## loud. The drums are sparse, so they peak higher to be heard as well. All
-## five at full mix to well under 1.
+## loud. The drums are sparse, so they peak higher to be heard as well. The
+## peaks sum to 1.09, but they never line up: all five at full mix to about
+## 0.62–0.74 (test_score checks a whole loop stays under 1).
 const LAYER_PEAKS: Array[float] = [0.15, 0.3, 0.18, 0.14, 0.32]
 ## Samples from a layer's start copied after its loop end: the player reads
 ## past the loop point to interpolate, and a seamless loop needs them.
