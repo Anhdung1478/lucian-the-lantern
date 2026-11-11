@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | **Stages** | 3 (short act) |
-| **Waves** | Stage 1: 2 · Stage 2: 3 · Stage 3: 3 + boss wave |
+| **Waves** | Stage 1: 2 · Stage 2: 3 · Stage 3: 3 + boss wave *(V2.0: stage 1: 4 · stage 2: 5 · stage 3: 5 + boss wave)* |
 | **Map** | Sentinels of Light training ground |
 | **Teaches** | Target priority, dodging boss patterns |
 
@@ -20,6 +20,14 @@ m = melee, r = ranged, S = siege, U = super minion.
 | 1 | 6m 4r 1S · 6m 6r 1S 1U (the act's gentle stage: minions and elites have 20% less HP, V1.3) | — |
 | 2 | 6m 6r 1S · 6m 6r 2S · 6m 6r 1S 1U (melee and ranged minions have 10% less HP, V1.5.0) | — |
 | 3 | 6m 6r 2S · 6m 6r 1S 1U · 8m 6r 2S 1U | Akshan, alone |
+
+**V2.0 waves** (before V2.0: the table above; `WavePlan.STAGES`). The same minion and elite rules apply to each stage as above.
+
+| Stage | Waves | Boss wave |
+|---|---|---|
+| 1 | 6m 4r 1S · 6m 6r 1S · 6m 6r 1S 1U · 8m 6r 2S | — |
+| 2 | 6m 6r 1S · 6m 6r 2S · 6m 6r 1S 1U · 8m 6r 2S · 8m 6r 2S 1U | — |
+| 3 | 6m 6r 2S · 6m 6r 1S 1U · 8m 6r 2S 1U · 8m 8r 2S 1U · 10m 8r 2S 1U | Akshan, alone |
 
 ## Story
 
@@ -71,17 +79,27 @@ Minions use the Act 1 numbers (`act1_the_loss.md`), scaled. Bosses don't scale. 
 
 | | Per act after the first | Act 2 |
 |---|---|---|
-| HP | × (1 + 0.25 · (act − 1)) | × 1.25 |
+| HP | × (1 + 0.25 · (act − 1)) *(V2.0: 0.35)* | × 1.25 *(V2.0: × 1.35)* |
 | Damage | × (1 + 0.15 · (act − 1)) | × 1.15 |
 | Gold and XP | × (1 + 0.25 · (act − 1)) | × 1.25 |
 | Blue per kill | = act number (elites 5×) | 2 (elites 10) |
 
-Each wave after the first also adds **+10% HP and damage**. Act 2's melee minion at wave 1 has 300 HP and hits for 13.8 (in 2-1: 240 HP; in 2-2: 270 HP since V1.5.0, whose melee and ranged minions have 10% less HP). Lucian starts every Act 2 stage at **level 2**.
+Each wave after the first also adds **+10% HP and damage**. Act 2's melee minion at wave 1 has 300 HP and hits for 13.8 (in 2-1: 240 HP; in 2-2: 270 HP since V1.5.0, whose melee and ranged minions have 10% less HP). *(V2.0: 324 HP, 259 in 2-1 and 292 in 2-2; the damage is the same. The 10% a wave and the shares of 2-1 and 2-2 are unchanged.)*
+
+**Wave health in V2.0** (the stage budget tool: the summed health of the waves, the largest wave, Lucian's level at the end, gold and XP of the stage).
+
+| Stage | Waves | Sum of wave HP | Largest wave | Boss HP | XP | Level at the end | Gold |
+|---|---|---|---|---|---|---|---|
+| 2-1 | 4 | 18,202 | 6,009 | — | 2,150 | 7 | 4,125 |
+| 2-2 | 5 | 32,368 | 9,718 | — | 3,037 | 9 | 5,812 |
+| 2-3 | 5 | 42,103 | 11,774 | 7,500 | 3,612 | 10 | 6,862 |
+
+Health of each wave, in thousands: 2-1 3.0 · 3.7 · 5.5 · 6.0; 2-2 3.9 · 5.3 · 6.5 · 7.0 · 9.7; 2-3 5.1 · 6.3 · 8.8 · 10.1 · 11.8. Act 2 pays 5,700 gold in all, the boss's included. Lucian starts every Act 2 stage at **level 2**.
 
 ### Super minion
 | | Base (Act 1) | Act 2, wave 1 |
 |---|---|---|
-| HP | 1150 *(1400 before V1.3)* | 1438 |
+| HP | 1150 *(1400 before V1.3)* | 1438 *(V2.0: 1553)* |
 | Armor / MR | 40 / 20 | 40 / 20 |
 | Attack | 36 physical *(45 before V1.3)*, melee, range 130, every 1.4 s | 41.4 |
 | Speed | 260 | 260 |
@@ -94,7 +112,7 @@ He enters from the top gate in stage 3's boss wave, alone.
 
 | | |
 |---|---|
-| HP | 5000 |
+| HP | 5000 *(V2.0: 7500)* |
 | Armor / MR | 35 / 30 |
 | Basic attack | A 28 physical bolt (1200 px/s), range 550, every 1.4 s. Walks at 320. |
 | **Avengerang (Q)** | A line warning (900 long) for 0.8 s. Then the boomerang flies out 900 at 1000 px/s and comes back to him: 70 physical, at most once each way. Cooldown 8 s (first use after 2 s). |
