@@ -31,7 +31,7 @@ const SAVE_PREFIX := "user://screenshot_save_slot_"
 const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "title_settings", "the_end",
 	"journey_map", "journey_endless", "endless_wave", "endless_boss", "endless_pick", "endless_run_over",
 	"exit_cancel", "tree_icons", "tree_free", "tree_rules", "backpack_slots",
-	"skin_preview", "tree_boots"]
+	"skin_preview", "tree_boots", "title_difficulty"]
 ## Endless map choices (Journey.ENDLESS_MAPS indices) for the Endless scenarios.
 const RANDOM_MAP := 0
 const TRAINING_GROUND := 2
@@ -46,6 +46,7 @@ const ACT_SCENARIOS := {
 	"act1_lesson": [1, 1], "act1_thresh": [1, 1], "act1_cutscene": [1, 1], "act1_result": [1, 1], "game_over": [1, 1],
 	"act2_pillars": [2, 3], "act2_super": [2, 1], "akshan_e": [2, 3], "akshan_r": [2, 3],
 	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
+	"resolve": [2, 1],
 	"attack_pick": [2, 1],
 	"act3_packs": [3, 1], "act3_elites": [3, 1], "act3_result": [3, 2],
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
@@ -106,6 +107,11 @@ func _initialize() -> void:
 				DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 	save.load_slot(1)
 	SaveGame._instance = save
+	if scenario == "resolve":
+		# R1: stage 2-1 has beaten Lucian twice before this try.
+		save.set_cleared(Journey.all_stage_ids(1))
+		for i in 2:
+			save.record_defeat("2-1")
 	if scenario == "art_sheet":
 		# Art only: no stage, and no stretch, so a 32 px icon is 32 real pixels.
 		root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
@@ -239,6 +245,8 @@ func _run(scenario: String) -> void:
 			await scenario_title_slots()
 		"title_settings":
 			await scenario_title_settings()
+		"title_difficulty":
+			await scenario_title_difficulty()
 		"act1_start":
 			await scenario_act1_start()
 		"act1_wave":
@@ -267,6 +275,10 @@ func _run(scenario: String) -> void:
 			await scenario_akshan_r()
 		"defeat":
 			await scenario_defeat()
+		"resolve":
+			await scenario_resolve()
+		"main_resolve":
+			await scenario_main_resolve()
 		"loot":
 			await scenario_loot()
 		"skin_fx":
@@ -2115,6 +2127,20 @@ func hover(control: Control, timeout := 2.0) -> void:
 	await wait(0.1)
 
 
+## R1: the difficulty page, with the hover text of Normal (what it does to
+## Resolve on its second line), then of Extreme (no Resolve).
+func scenario_title_difficulty() -> void:
+	var title := game_root.screen as TitleScreen
+	title.show_difficulty(1)
+	await wait(0.2)
+	for level: int in [Difficulty.NORMAL, Difficulty.EXTREME]:
+		var button := title.difficulty_buttons[level]
+		print("%s hover text: %s" % [Difficulty.name_of(level), String(button.get_meta(&"hover_text")).replace("\n", " / ")])
+		await mouse_move(control_center(button))
+		await wait_for_tooltip(button)
+		await shot("title_difficulty_%d_%s" % [level, Difficulty.KEYS[level]])
+
+
 ## Slot 2 saved (with some play time): Start new game lists it, picking it
 ## asks first; Load game lists only slot 2.
 func scenario_title_slots() -> void:
@@ -3743,6 +3769,59 @@ func scenario_defeat() -> void:
 	await wait_for_result_count()
 	await shot("defeat_1_result")
 	paused = false
+
+
+## R1: stage 2-1 after two defeats: Resolve in the buff row with its card;
+## then Lucian falls again, and DEFEATED names the next try's Resolve.
+func scenario_resolve() -> void:
+	var game := game_stage()
+	await wait(0.3)
+	print("stacks, dealt, taken (expect 2, 1.2, 0.8): ", lucian.resolve, " ", lucian.damage_dealt_scale, " ", lucian.damage_taken_scale)
+	var icon := resolve_icon(game.hud)
+	print("icon's count (expect 2): ", icon.get("buff").count if icon else "no icon")
+	if icon:
+		await mouse_move(control_center(icon))
+		await wait_for_tooltip(icon)
+	await shot("resolve_0_buff")
+	lucian.take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test"))
+	await wait(Lucian.DEATH_FADE + 0.6)
+	print("result (expect DEFEATED): ", game.result.title.text)
+	print("rewards (expect Resolve 3 / 5: +30% damage, -30% damage taken on your next try): ", game.reward_lines)
+	await shot("resolve_1_defeated")
+	paused = false
+
+
+## The HUD's Resolve icon in the buff row under `node`, or null.
+func resolve_icon(node: Node) -> Control:
+	var control := node as Control
+	if control and control.is_visible_in_tree() and control.get("buff") is Dictionary and control.get("buff").get("id") == Resolve.BUFF:
+		return control
+	for child in node.get_children():
+		var found := resolve_icon(child)
+		if found:
+			return found
+	return null
+
+
+## R1: the Journey's panel on 3-2, a stage with a mini boss and a full
+## roster, after three defeats there: its Resolve line under "Not cleared
+## yet", and the line's hover text.
+func scenario_main_resolve() -> void:
+	var section := journey()
+	var save := SaveGame.instance()
+	var ids := Journey.all_stage_ids(2)
+	ids.append("3-1")
+	save.set_cleared(ids)
+	for i in 3:
+		save.record_defeat("3-2")
+	section.pick(section.map.node_for("3-2"))
+	await wait(0.3)
+	var panel := section.panel
+	print("line (expect Resolve 3 / 5: +30% damage, -30% taken): ", panel.resolve_label.text, "  shown: ", panel.resolve_row.visible)
+	await shot("main_resolve_0_journey")
+	await mouse_move(control_center(panel.resolve_row))
+	await wait_for_tooltip(panel.resolve_row)
+	await shot("main_resolve_1_hover")
 
 
 ## A fragment and a legendary on the ground; with the backpack full, walking
