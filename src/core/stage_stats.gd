@@ -27,12 +27,10 @@ func record_hit(info: DamageInfo, amount: float) -> void:
 	last_hit_with = info.source
 
 
-## The key a hit counts under: its enemy's id, else its source.
+## The key a hit counts under: its enemy's id (copied onto the hit when it
+## was made, so the enemy may be gone by now), else its source.
 static func source_of(info: DamageInfo) -> StringName:
-	var attacker := info.attacker as EnemyUnit
-	if is_instance_valid(attacker) and attacker.data:
-		return attacker.data.id
-	return info.source
+	return info.attacker_id if info.attacker_id != &"" else info.source
 
 
 ## "9,999" under 10,000; "41.2k" from there on.

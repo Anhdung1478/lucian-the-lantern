@@ -15,8 +15,9 @@ const SOURCE := &"burn"
 ## Float slack when the burned time reaches a tick.
 const EPSILON := 0.0001
 
-## Id -> {dps, type, attacker, left, duration, burned}. `burned`: seconds
-## burned since the last tick.
+## Id -> {dps, type, attacker, attacker_id, left, duration, burned}.
+## `attacker_id`: the enemy that set it, kept after it is freed (DamageInfo);
+## `burned`: seconds burned since the last tick.
 var _running := {}
 
 
@@ -28,6 +29,7 @@ func add(id: StringName, dps: float, seconds: float, type: DamageInfo.Type, atta
 		return
 	var burned: float = _running[id].burned if _running.has(id) else 0.0
 	_running[id] = {"dps": dps, "type": type, "attacker": attacker, "left": seconds,
+		"attacker_id": DamageInfo.create(0.0, type, SOURCE, attacker).attacker_id,
 		"duration": maxf(seconds, 0.01), "burned": burned}
 
 
@@ -94,5 +96,6 @@ func clear() -> void:
 func _hit(entry: Dictionary, seconds: float) -> DamageInfo:
 	var attacker: Node = entry.attacker if is_instance_valid(entry.attacker) else null
 	var info := DamageInfo.create(entry.dps * seconds, entry.type, SOURCE, attacker)
+	info.attacker_id = entry.attacker_id
 	info.over_time = true
 	return info

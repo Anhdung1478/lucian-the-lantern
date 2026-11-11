@@ -9,6 +9,9 @@ var type := Type.PHYSICAL
 ## What dealt the hit, e.g. &"basic", &"lightslinger", &"q". Shown in the hit log.
 var source: StringName
 var attacker: Node
+## The attacking enemy's id (its EnemyData's), copied when the hit is made:
+## a bolt or a burn can land after its enemy is gone. &"" for no enemy.
+var attacker_id: StringName
 var is_crit := false
 ## The attacker's percent penetration, copied when the hit is made.
 var armor_pen := 0.0
@@ -31,5 +34,7 @@ static func create(amount: float, type: Type, source: StringName, attacker: Node
 	info.type = type
 	info.source = source
 	info.attacker = attacker
+	if is_instance_valid(attacker) and attacker.get(&"data") is EnemyData:
+		info.attacker_id = attacker.get(&"data").id
 	info.is_crit = is_crit
 	return info
