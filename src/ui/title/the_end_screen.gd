@@ -1,13 +1,18 @@
 class_name TheEndScreen
 extends Control
 ## The story's end: shown by Game on the first clear of the last stage, after
-## the stage-end screen's button. "THE END", the lantern, the story time (the
-## slot's play time) and the credits. Continue goes where that button said.
+## the stage-end screen's button. The title's scene (Lucian and the freed
+## Senna; Thresh is gone) under a dawn tint, and on a card "THE END", "Senna is free.", the
+## story time (the slot's play time) and the credits. Continue goes where that button said.
 ## ESC does nothing here.
 
 signal continue_pressed
 
-const LANTERN := preload("res://assets/art/ui/title_lantern.svg")
+## The warm light laid over the title's night scene: dawn, not the night's teal.
+const DAWN_TINT := Color(1.0, 0.72, 0.38, 0.22)
+const FREE_COLOR := Color("8fe3b0")
+const TITLE_FONT := 72
+const SUBTITLE_FONT := 32
 const BUTTON_SIZE := Vector2(420, 64)
 const CREDITS: Array[String] = [
 	"Lucian: The Lantern",
@@ -15,6 +20,7 @@ const CREDITS: Array[String] = [
 	"A fan game. League of Legends characters belong to Riot Games.",
 ]
 
+var backdrop := TitleBackdrop.new()
 var time_label := UiStyle.label("", 28, UiStyle.TEXT_COLOR)
 var credit_labels: Array[Label] = []
 var continue_button := Button.new()
@@ -38,26 +44,23 @@ func _input(event: InputEvent) -> void:
 
 
 func _build() -> void:
-	var background := ColorRect.new()
-	background.color = Color(0.02, 0.03, 0.04)
-	background.set_anchors_preset(Control.PRESET_FULL_RECT)
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(background)
+	backdrop.thresh.visible = false
+	add_child(backdrop)
+	var dawn := ColorRect.new()
+	dawn.color = DAWN_TINT
+	dawn.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dawn.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(dawn)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(center)
-	var column := VBoxContainer.new()
+	var card := MenuCard.new("THE END", "Senna is free.")
+	card.title_label.add_theme_font_size_override(&"font_size", TITLE_FONT)
+	card.subtitle_label.add_theme_font_size_override(&"font_size", SUBTITLE_FONT)
+	card.subtitle_label.add_theme_color_override(&"font_color", FREE_COLOR)
+	center.add_child(card)
+	var column := card.content
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
-	column.add_theme_constant_override(&"separation", 16)
-	center.add_child(column)
-	var lantern := TextureRect.new()
-	lantern.texture = LANTERN
-	lantern.custom_minimum_size = Vector2(200, 200)
-	lantern.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	lantern.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	column.add_child(lantern)
-	column.add_child(_centered(UiStyle.label("THE END", 84, UiStyle.GOLD_COLOR)))
-	column.add_child(_centered(UiStyle.label("Senna is free.", 34, Color("8fe3b0"))))
 	time_label.text = "Story time: %s" % story_time(SaveGame.instance().play_time)
 	column.add_child(_centered(time_label))
 	for line in CREDITS:
