@@ -14,6 +14,10 @@ extends SceneTree
 ## prints a line of the fight that often, on each stage's first try.
 ## AUTOPLAY_DIFFICULTY=easy|normal|hard|extreme plays on that difficulty
 ## (default normal); each tier and difficulty has its own save files.
+## Skins: between stages it buys every skin its purple affords, in Skin Shop
+## order, and wears the last one bought. AUTOPLAY_SKIN=<id> (e.g. pulsefire,
+## or classic for none) saves up for that skin first and wears it once owned.
+## Each try prints the skin worn.
 ## Each try also prints its items: the gold at each merchant, what was bought,
 ## picked up and crafted (after how many waves), and what was equipped at
 ## the end.
@@ -46,6 +50,10 @@ var first_stage := "1-1"
 var trace_every := 0.0
 var difficulty := Difficulty.NORMAL
 var log_lines: PackedStringArray = []
+## AUTOPLAY_SKIN's skin id; empty wears the last one bought.
+var wanted_skin := &""
+## The last skin bought.
+var last_skin := &""
 
 
 func _initialize() -> void:
@@ -63,6 +71,10 @@ func _initialize() -> void:
 	SaveGame._instance = save
 	save.start_new(1, difficulty)
 	print("autoplay: %s on %s (%s)" % [skill, Difficulty.name_of(difficulty), Difficulty.scale_text(difficulty)])
+	wanted_skin = StringName(OS.get_environment("AUTOPLAY_SKIN").to_lower())
+	if wanted_skin != &"" and Skins.find(wanted_skin).id != wanted_skin:
+		print("autoplay: no skin %s; wearing the last one bought" % wanted_skin)
+		wanted_skin = &""
 	if first_stage != "1-1":
 		var before: Array[String] = []
 		for id in Journey.all_stage_ids(Journey.ACTS.size()):
@@ -103,14 +115,18 @@ func _campaign() -> void:
 			while true:
 				tries += 1
 				var bought := _spend(save)
+				var skins := _buy_skins(save)
 				var r: Dictionary = await _play(act, number, tries == 1)
 				total += r.time
 				act_time += r.time
-				_say("%s try %d: %s  time %s  waves %s  kills %d  minHP %d%%  lvl %d  pots %d  dodges %d  dealt %d  taken %d  gold %d  blue+%d  tree %s%s" % [
+				_say("%s try %d: %s  time %s  waves %s  kills %d  minHP %d%%  lvl %d  pots %d  dodges %d  dealt %d  taken %d  gold %d  blue+%d  tree %s  skin %s%s" % [
 					id, tries, "CLEARED" if r.cleared else "FAILED ", StageResult.clock(r.time), r.waves, r.kills, int(r.min_hp * 100), r.level,
-					r.potions, r.dodges, int(r.dealt), int(r.damage_taken), r.gold, r.blue, _tree_text(save), ("  died to " + r.killer) if not r.cleared else ""])
+					r.potions, r.dodges, int(r.dealt), int(r.damage_taken), r.gold, r.blue, _tree_text(save), Skins.find(save.skin).display_name,
+					("  died to " + r.killer) if not r.cleared else ""])
 				if bought != "":
 					_say("    bought: " + bought)
+				if skins != "":
+					_say("    bought skin: " + skins)
 				var parts: PackedStringArray = []
 				var by: Dictionary = r.taken_by
 				var ids := by.keys()
@@ -177,6 +193,32 @@ func _spend(save: SaveGame) -> String:
 		save.set_loadout(0, d)
 	if f != d and save.tree.level(f) > 0:
 		save.set_loadout(1, f)
+	return ", ".join(bought)
+
+
+## Buys skins with purple through the Skin Shop's SaveGame.buy_skin: every
+## one it can afford, in Skin Shop order, but AUTOPLAY_SKIN's first (saving
+## up for it). Wears AUTOPLAY_SKIN once owned, else the last one bought.
+## Returns the names bought.
+func _buy_skins(save: SaveGame) -> String:
+	var order: Array[StringName] = []
+	if wanted_skin != &"":
+		order.append(wanted_skin)
+	for skin in Skins.ALL:
+		if skin.id != wanted_skin:
+			order.append(skin.id)
+	var bought: PackedStringArray = []
+	for id in order:
+		if id in save.owned_skins:
+			continue
+		if save.buy_skin(id):
+			bought.append(Skins.find(id).display_name)
+			last_skin = id
+		elif id == wanted_skin:
+			break
+	var wear := wanted_skin if wanted_skin in save.owned_skins else last_skin
+	if wear != &"":
+		save.equip_skin(wear)
 	return ", ".join(bought)
 
 

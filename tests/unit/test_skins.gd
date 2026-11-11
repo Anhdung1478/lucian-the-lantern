@@ -6,7 +6,7 @@ extends GutTest
 const DOC := {
 	&"classic": [0, [], []],
 	&"high_noon": [25, ["+15% AD"], ["−15% Attack Speed"]],
-	&"project": [30, ["+20% Attack Speed", "+15% Move Speed"], ["−10% AD"]],
+	&"project": [30, ["+20% Attack Speed", "+8% Move Speed"], ["−10% AD"]],
 	&"pulsefire": [20, ["+30% W Damage", "+10 Ability Haste"], ["−10% Attack Speed"]],
 	&"vampire": [25, ["+15% Lifesteal", "Kills heal 2% max HP"], ["−20% max HP"]],
 }
@@ -99,7 +99,7 @@ func test_tree_bonus_adds_before_the_skin_scales() -> void:
 func test_project_moves_and_attacks_faster_for_less_ad() -> void:
 	var classic := lucian.stats
 	lucian.apply_skin(Skins.find(&"project"))
-	assert_almost_eq(lucian.stats.move_speed, classic.move_speed * 1.15, 0.001)
+	assert_almost_eq(lucian.stats.move_speed, classic.move_speed * 1.08, 0.001)
 	assert_almost_eq(lucian.stats.ad, classic.ad * 0.9, 0.001)
 	assert_gt(lucian.stats.attack_speed, classic.attack_speed)
 

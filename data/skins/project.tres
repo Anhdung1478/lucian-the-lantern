@@ -16,12 +16,12 @@ display_name = "PROJECT"
 cost = 30
 portrait = ExtResource("2_portrait")
 body = ExtResource("3_body")
-bonuses = PackedStringArray("+20% Attack Speed", "+15% Move Speed")
+bonuses = PackedStringArray("+20% Attack Speed", "+8% Move Speed")
 weaknesses = PackedStringArray("−10% AD")
 playstyle = "Fast, always moving, faster energized stacks"
 flat = Dictionary[StringName, float]({
 &"attack_speed": 0.2,
-&"move_speed_pct": 0.15
+&"move_speed_pct": 0.08
 })
 scale = Dictionary[StringName, float]({
 &"ad": 0.9
