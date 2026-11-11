@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | **Stages** | 5 |
-| **Waves** | Stage 1: 5 · Stage 2: 5 · Stage 3: 6 · Stage 4: 6 · Stage 5: 6 + boss wave |
+| **Waves** | Stage 1: 5 · Stage 2: 5 · Stage 3: 6 · Stage 4: 6 · Stage 5: 6 + boss wave *(V2.0: 6 · 6 · 7 · 7 · 7 + boss wave)* |
 | **Map** | Shadow Isles: dead forest, Black Mist |
 | **Mini bosses** | Maokai (stage 2), Elise (stage 4), appearing in the last wave |
 | **Boss** | Karthus (stage 5) |
@@ -102,7 +102,7 @@ All numbers are placeholders. A mini boss's or boss's skill hit counts as a skil
 ### Scaling
 | | Act 5 |
 |---|---|
-| HP | × 2.0 *(× 3.4 before V1.3)* |
+| HP | × 2.0 *(× 3.4 before V1.3; V2.0: × 2.4)* |
 | Damage | × 1.6 *(× 2.0 before V1.3)* |
 | Gold and XP | × 2.0 |
 | Blue per kill | 5 (elites 25) |
@@ -114,11 +114,11 @@ Base numbers (the data files). The last column shows wave 1 of Act 5, scaled.
 
 | Enemy | Kind | HP | Armor / MR | Attack | Range | Every | Speed | Radius | Gold / XP | Act 5, wave 1 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Sapling | normal | 110 | 0 / 10 | **Bomber** (below), 30 magic | 80 | — | 320 *(340)* | 22 | 30 / 15 | 220 HP, blast 48 |
-| Spiderling | normal | 130 | 5 / 5 | Fast melee, 8 physical | 90 | 0.9 s | 330 *(380)* | 20 | 25 / 12 | 260 HP, hits for 12.8 |
-| Ghoul (a summon) | normal | 90 | 0 / 0 | Melee, 8 physical | 90 | 1.0 s | 320 | 20 | 20 / 10, paid at 25% | 180 HP, hits for 12.8 |
-| Maiden of the Mist | elite | 1500 | 35 / 35 | Tanky melee, 40 physical. **Summons 2 ghouls every 7 s, at most 6 alive.** *(V1.5.0:)* **Drains:** heals 25% of the damage her basic attacks deal to Lucian (after his armor), and 2% of her max HP each time she calls ghouls | 130 | 1.5 s | 220 | 42 | 140 / 80 | 3000 HP, hits for 64 |
-| Broodmother | elite | 1100 | 20 / 40 | **Web spit:** a bolt at 600 px/s, 30 magic, slows Lucian 30% for 1.5 s. Keeps 450–600 away. **Summons 1 spiderling every 3.5 s, at most 5 alive** | 600 | 2.0 s | 200 | 48 | 150 / 90 | 2200 HP, bolt 48 |
+| Sapling | normal | 110 | 0 / 10 | **Bomber** (below), 30 magic | 80 | — | 320 *(340)* | 22 | 30 / 15 | 220 HP *(V2.0: 264)*, blast 48 |
+| Spiderling | normal | 130 | 5 / 5 | Fast melee, 8 physical | 90 | 0.9 s | 330 *(380)* | 20 | 25 / 12 | 260 HP *(V2.0: 312)*, hits for 12.8 |
+| Ghoul (a summon) | normal | 90 | 0 / 0 | Melee, 8 physical | 90 | 1.0 s | 320 | 20 | 20 / 10, paid at 25% | 180 HP *(V2.0: 216)*, hits for 12.8 |
+| Maiden of the Mist | elite | 1500 | 35 / 35 | Tanky melee, 40 physical. **Summons 2 ghouls every 7 s, at most 6 alive.** *(V1.5.0:)* **Drains:** heals 25% of the damage her basic attacks deal to Lucian (after his armor), and 2% of her max HP each time she calls ghouls | 130 | 1.5 s | 220 | 42 | 140 / 80 | 3000 HP *(V2.0: 3600)*, hits for 64 |
+| Broodmother | elite | 1100 | 20 / 40 | **Web spit:** a bolt at 600 px/s, 30 magic, slows Lucian 30% for 1.5 s. Keeps 450–600 away. **Summons 1 spiderling every 3.5 s, at most 5 alive** | 600 | 2.0 s | 200 | 48 | 150 / 90 | 2200 HP *(V2.0: 2640)*, bolt 48 |
 
 *(V1.3: the sapling and the spiderling run slower than Lucian's 345; the brackets hold the old speeds.)*
 
@@ -166,7 +166,7 @@ Base numbers (the data files). The last column shows wave 1 of Act 5, scaled.
 *(V2.0: the forest is redrawn with `MapArt`: cold grey-teal earth, black leafless tree lines, gnarled trees, Maokai's ring, the spider nest and Elise's camp. Karthus's graveyard has flagstones and tombstones (`MapArt.limbs`). Layout, counts and positions are as above. Game design doc §13, "Built in V2.0".)*
 
 ### Maokai (`maokai`, mini boss, stage 5-2)
-Last in wave 5, out of his camp. Melee, 90 physical, range 110, every 1.6 s. 8500 HP *(12000 before V1.5.0)*, armor 60, MR 40, speed 300, radius 54. Pays 300 gold, 50 blue, 3 orange and **5 purple the first time, 1 after**, on the kill.
+Last in wave 5, out of his camp. Melee, 90 physical, range 110, every 1.6 s. 8500 HP *(12000 before V1.5.0; V2.0: 10500)*, armor 60, MR 40, speed 300, radius 54. Pays 300 gold, 50 blue, 3 orange and **5 purple the first time, 1 after**, on the kill.
 
 | Skill | Numbers |
 |---|---|
@@ -176,7 +176,7 @@ Last in wave 5, out of his camp. Melee, 90 physical, range 110, every 1.6 s. 850
 He stands 0.3 s after each skill.
 
 ### Elise (`elise`, mini boss, stage 5-4)
-Last in wave 6, out of her camp. Ranged bolt, 70 magic (900 px/s), range 550, every 1.4 s. 13000 HP, armor 30, MR 50, speed 330, radius 44. Same rewards as Maokai.
+Last in wave 6, out of her camp. Ranged bolt, 70 magic (900 px/s), range 550, every 1.4 s. 13000 HP *(V2.0: 15000)*, armor 30, MR 50, speed 330, radius 44. Same rewards as Maokai.
 
 | Skill | Numbers |
 |---|---|
@@ -184,13 +184,13 @@ Last in wave 6, out of her camp. Ranged bolt, 70 magic (900 px/s), range 550, ev
 | **Rappel** | Used at 85% HP or less. She rises and is **untargetable** for 1.9 s; her art and bar fade out in 0.3 s, and her name stays on the boss bar. A circle (r 180) follows Lucian for 1.0 s, then locks on a walkable spot. At 1.9 s she drops there for 160 magic. Cooldown 16 s. Lucian has 0.9 s after the lock to step out. *(V1.4.2: she doesn't start Rappel while Lucian is stunned. She tries Cocoon or a basic attack instead and keeps Rappel's cooldown, so it comes after the stun ends. V1.4.3: nor while her Cocoon web is still in flight, so a web can't stun him just as the circle locks.)* |
 
 ### Karthus (`karthus`, boss, stage 5-5)
-Boss wave. Ranged bolt, 80 magic (900 px/s), range 600, every 1.5 s. 20000 HP, armor 30, MR 60, speed 280, radius 46. Pays 300 gold, 100 blue, 5 orange and **10 purple the first time, 2 after**. No passive, no E.
+Boss wave. Ranged bolt, 80 magic (900 px/s), range 600, every 1.5 s. 20000 HP *(V2.0: 23000)*, armor 30, MR 60, speed 280, radius 46. Pays 300 gold, 100 blue, 5 orange and **10 purple the first time, 2 after**. No passive, no E.
 
 | Skill | Numbers |
 |---|---|
 | **Lay Waste (Q)** | 5 circles (r 110): one on Lucian, four within 300 of him, laid 0.15 s apart. Each fills for 0.7 s and deals 110 magic. Reach 900. Cooldown 6 s, first use 2 s in. |
 | **Wall of Pain (W)** | A red line (900 × 60) across the way between them for 0.6 s, then a spectral wall for 5 s. Touching or crossing it **slows Lucian 70% for 2.5 s**, once per cast (a dash or Flash across it counts). It touches nobody while Lucian can't be hit (God mode, a cutscene, stasis), and that doesn't use it up. Cooldown 14 s, first use 5 s in. |
-| **Requiem (R)** | At 75%, 45% and 15% HP, once each. He stands and channels for 3 s: a pulsing purple ring on Lucian, a filling ring round him, and a thin **break bar** under the boss bar. **8% of his max HP (1600)** of damage during the channel breaks it ("Broken!"). Otherwise Lucian takes **900 magic**. One Requiem per burst: thresholds his HP has already passed (in a burst, or by the break itself) are spent. |
+| **Requiem (R)** | At 75%, 45% and 15% HP, once each. He stands and channels for 3 s: a pulsing purple ring on Lucian, a filling ring round him, and a thin **break bar** under the boss bar. **8% of his max HP (1600; V2.0: 1840)** of damage during the channel breaks it ("Broken!"). Otherwise Lucian takes **900 magic**. One Requiem per burst: thresholds his HP has already passed (in a burst, or by the break itself) are spent. |
 
 ### The waves
 The letters are the ones above (p sapling, s spiderling, M Maiden, B Broodmother). HP is each wave's total after scaling, summons not counted.
@@ -203,7 +203,27 @@ The letters are the ones above (p sapling, s spiderling, M Maiden, B Broodmother
 | 5-4 | 6 | 7.4k · 7.2k · 9.5k · 12.1k · 14.7k · 15.8k | 67k |
 | 5-5 | 6 + Karthus | 7.4k · 7.8k · 10.0k · 13.7k · 16.6k · 19.9k | 75k |
 
-The waves hold about **264k HP**, plus 41.5k for the three bosses (Maokai 8500, Elise 13000, Karthus 20000). *(V1.5.0: the table is recomputed from the code. It still held Phase 8's numbers, from before the V1.3 balance pass: 509k in all. 5-2's spiderlings and saplings now have 10% less HP, and Maokai went from 12000 to 8500, so the bosses were 45k.)*
+The waves hold about **264k HP**, plus 41.5k for the three bosses (Maokai 8500, Elise 13000, Karthus 20000). *(V2.0: about 408k, plus 48.5k for Maokai 10500, Elise 15000 and Karthus 23000; see below.)* *(V1.5.0: the table is recomputed from the code. It still held Phase 8's numbers, from before the V1.3 balance pass: 509k in all. 5-2's spiderlings and saplings now have 10% less HP, and Maokai went from 12000 to 8500, so the bosses were 45k.)*
+
+**Waves in V2.0** (before V2.0: the tables above). The same letters. HP is each wave's total after scaling (×2.4 for Act 5), summons and the mini bosses not counted; a mini boss's HP is the second figure of its wave.
+
+| Stage | Waves | Mini boss / boss |
+|---|---|---|
+| 5-1 | 8s 4p · 8s 6p · 8s 6p 1M · 10s 6p 1B · 10s 8p 1M · 10s 8p 1B | — |
+| 5-2 | 8s 6p · 10s 6p 1M · 10s 6p 1B · 10s 8p 1M · 10s 8p 1B · 10s 8p 1M 1B | **Maokai** last in wave 6 |
+| 5-3 | 10s 6p · 10s 6p 1M · 10s 8p 1B · 12s 8p 1M · 12s 8p 1B · 12s 8p 1M 1B · 12s 10p 1M 1B | — |
+| 5-4 | 10s 8p 1M · 10s 8p 1B · 12s 8p 1M · 12s 8p 2B · 12s 10p 1M 1B · 12s 10p 2M · 12s 10p 1M 1B | **Elise** last in wave 7 |
+| 5-5 | 10s 8p 1M · 12s 8p 1B · 12s 10p 1M · 12s 10p 1M 1B · 14s 10p 2M · 14s 10p 1M 2B · 14s 12p 2M 1B | boss wave: **Karthus** alone |
+
+| Stage | Waves | HP per wave | Total |
+|---|---|---|---|
+| 5-1 | 6 | 2.8k · 3.6k · 8.2k · 8.3k · 10.9k · 10.2k | 44k |
+| 5-2 | 6 | 3.7k · 8.6k · 8.2k · 10.8k · 10.3k · 16.4k + 10.5k | 58k |
+| 5-3 | 7 | 4.7k · 9.1k · 9.4k · 12.3k · 11.9k · 18.1k · 20.2k | 86k |
+| 5-4 | 7 | 8.8k · 8.7k · 11.3k · 14.5k · 17.7k · 20.4k · 20.2k + 15.0k | 102k |
+| 5-5 | 7 + Karthus | 8.8k · 9.3k · 12.0k · 16.4k · 19.9k · 23.8k · 27.8k | 118k |
+
+The waves hold about **408k HP**, plus 48.5k for the three bosses (Maokai 10500, Elise 15000, Karthus 23000). Act 5 has 33 waves. Lucian ends the stages at level 11, 12, 13, 14 and 15, with 6,140, 7,460, 9,460, 11,200 and 12,220 gold before the boss waves (an average of 9,356 a stage with the bosses' gold). The walls (a boss's health divided by the gold earned in its stage before its wave) are 1.88 for Maokai, 1.64 for Elise and 1.88 for Karthus.
 
 ### Art
 Hand-written SVGs, as Phase 7's: the sapling (a walking dead tree with a glowing green core), the spiderling (a dark spider with bone-pale legs and a pale mark, so it shows on the forest floor), the ghoul, the Maiden (a veiled ghost woman in a teal shroud), the Broodmother (a huge spider with a bone-white carapace), Maokai (a treant, 116 px), Elise (a spider-queen in red and black, 96 px) and Karthus (a robed lich with a skull staff, 100 px).
