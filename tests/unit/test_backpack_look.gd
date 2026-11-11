@@ -124,3 +124,29 @@ func test_a_corner_tag_sits_flush_in_its_corner() -> void:
 	var wide := ItemIcon.tag_rect("M4", rect, CORNER_TOP_LEFT)
 	assert_gt(wide.size.x, key.size.x, "it grows with its text")
 	assert_true(rect.encloses(wide))
+
+
+func test_the_equip_row_and_the_gear_row_sit_on_plain_plates() -> void:
+	for index: int in [Inventory.EQUIP_START, Inventory.BOOTS_CELL]:
+		var plate := cell(index).get_parent().get_parent() as Plate
+		assert_not_null(plate, "cell %d's row sits on a Plate" % index)
+		assert_false(plate.ornate, "only the backpack is ornate")
+	assert_eq(cell(Inventory.EQUIP_START).get_parent(), screen._cells.back().get_parent(), "the sell slot ends the equip row")
+
+
+func test_equip_slots_and_potion_cells_carry_their_key() -> void:
+	assert_eq(cell(Inventory.EQUIP_START).key_text(), "1")
+	assert_eq(cell(Inventory.EQUIP_START + 5).key_text(), "6")
+	assert_eq(cell(Inventory.HP_POTION_CELL).key_text(), "7")
+	assert_eq(cell(Inventory.MP_POTION_CELL).key_text(), "8")
+	assert_eq(cell(0).key_text(), "", "a backpack cell has no key")
+	assert_eq(cell(Inventory.BOOTS_CELL).key_text(), "")
+	assert_eq(screen._cells.back().key_text(), "", "nor has the sell slot")
+
+
+func test_an_empty_potion_cell_has_a_fainter_rim_of_its_potion() -> void:
+	assert_eq(cell(Inventory.HP_POTION_CELL).rim(), UiStyle.RIM_POTION, "nine of the potions went in")
+	var empty := cell(Inventory.MP_POTION_CELL).rim()
+	assert_eq(empty, Color(UiStyle.RIM_POTION, ItemCell.EMPTY_RIM_ALPHA))
+	inventory.set_boots(Fixtures.boots(&"speed", 1))
+	assert_eq(cell(Inventory.BOOTS_CELL).rim(), UiStyle.RIM_BOOTS)

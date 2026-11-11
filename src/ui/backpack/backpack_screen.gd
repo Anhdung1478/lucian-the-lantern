@@ -1,10 +1,10 @@
 class_name BackpackScreen
 extends CanvasLayer
 ## The backpack (P), in the Lantern look: an ornate plate headed BACKPACK
-## with 9x6 dark cells, and below it, outside the backpack, the equip row
-## (slots 1-6 and the sell slot) and the gear row (the boots cell, then the
-## Health and Mana potion cells on keys 7 and 8). The recipe table sits
-## top-left while it is open, shop or not.
+## with 9x6 dark cells, and below it, outside the backpack, two plain plates:
+## the equip row (slots 1-6 and the sell slot) and the gear row (the boots
+## cell, then the Health and Mana potion cells on keys 7 and 8). The recipe
+## table sits top-left while it is open, shop or not.
 ##
 ## Dragging: holding the left button on an item (or moving while holding)
 ## picks it up; releasing drops it, decided by Inventory.drop_outcome.
@@ -38,8 +38,8 @@ const SHOP_GAP := 36.0
 ## Between the backpack's frame and its cells, and under its heading.
 const PACK_PAD := 22.0
 const HEADING_GAP := 14
-const STRIP_COLOR := Color("1f1812")
-const STRIP_BORDER := Color("8c6e45")
+## Between a strip's frame (the equip row, the gear row) and its cells.
+const STRIP_PAD := 12.0
 const MARGIN := 16.0
 ## Between the equip strip and the gear strip under it.
 const GEAR_GAP := 10
@@ -515,7 +515,7 @@ func _build() -> void:
 	strips.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	strips.add_theme_constant_override(&"separation", GEAR_GAP)
 	_column.add_child(strips)
-	var strip := _panel(STRIP_COLOR, STRIP_BORDER, 2, 14)
+	var strip := Plate.new(STRIP_PAD, false)
 	strips.add_child(strip)
 	var equip_row := HBoxContainer.new()
 	equip_row.add_theme_constant_override(&"separation", CELL_GAP)
@@ -524,7 +524,7 @@ func _build() -> void:
 		_add_cell(equip_row, Inventory.EQUIP_START + i, ItemCell.Style.EQUIP)
 	# [Boots] ... [HP 7][MP 8], added in index order (60, 61, 62) so _cells
 	# stays in inventory order; the boots cell is then moved to the front.
-	var gear := _panel(STRIP_COLOR, STRIP_BORDER, 2, 14)
+	var gear := Plate.new(STRIP_PAD, false)
 	strips.add_child(gear)
 	var gear_row := HBoxContainer.new()
 	gear_row.add_theme_constant_override(&"separation", CELL_GAP)
@@ -580,15 +580,3 @@ func _add_cell(parent: Control, index: int, style: ItemCell.Style) -> void:
 	var cell := ItemCell.new(index, style, self)
 	parent.add_child(cell)
 	_cells.append(cell)
-
-
-func _panel(color: Color, border: Color, border_width: int, margin: float) -> PanelContainer:
-	var panel := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = color
-	style.border_color = border
-	style.set_border_width_all(border_width)
-	style.set_corner_radius_all(12)
-	style.set_content_margin_all(margin)
-	panel.add_theme_stylebox_override(&"panel", style)
-	return panel
