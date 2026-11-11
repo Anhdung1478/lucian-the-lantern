@@ -6,7 +6,7 @@ const WALL := [Vector2(0, 0), Vector2(400, 0), Vector2(400, 100), Vector2(100, 1
 
 
 ## Stages ([act, stage]) whose maps have ambient life.
-const AMBIENT_STAGES := [[1, 1], [4, 1]]
+const AMBIENT_STAGES := [[1, 1], [2, 1], [2, 3], [4, 1]]
 
 
 ## A small map with a firefly.

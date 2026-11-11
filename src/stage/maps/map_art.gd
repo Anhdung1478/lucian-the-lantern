@@ -414,18 +414,19 @@ static func crack(into: Facets, dice: RandomNumberGenerator, at: Vector2, length
 
 
 ## Stone slabs over `area`: rows of `tile`-sized slabs, every other row
-## moved half a slab along. Each slab is `color`, lighter or darker by up to
-## `spread`, with `joint_color` showing `joint` px wide between slabs, a lit
-## line along its top and left and a dark one along its bottom and right.
-## Rects: they batch.
-static func tiles(canvas: CanvasItem, dice: RandomNumberGenerator, area: Rect2, tile: Vector2, color: Color, joint_color: Color, spread := 0.04, joint := 4.0) -> void:
+## moved `stagger` of a slab along (0: a straight grid). Each slab is
+## `color`, lighter or darker by up to `spread`, with `joint_color` showing
+## `joint` px wide between slabs, a lit line along its top and left and a
+## dark one along its bottom and right. Rects: they batch.
+static func tiles(canvas: CanvasItem, dice: RandomNumberGenerator, area: Rect2, tile: Vector2, color: Color, joint_color: Color,
+		spread := 0.04, joint := 4.0, stagger := 0.5) -> void:
 	canvas.draw_rect(area, joint_color)
 	var lit := Color(1, 1, 1, 0.05)
 	var shaded := Color(SHADOW, 0.16)
 	var row := 0
 	var y := area.position.y
 	while y < area.end.y:
-		var x := area.position.x - (tile.x * 0.5 if row % 2 == 1 else 0.0)
+		var x := area.position.x - (tile.x * stagger if row % 2 == 1 else 0.0)
 		while x < area.end.x:
 			var slab := Rect2(x, y, tile.x, tile.y).grow(-joint * 0.5).intersection(area)
 			x += tile.x
