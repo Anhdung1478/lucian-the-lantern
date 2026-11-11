@@ -4,18 +4,27 @@ extends SceneTree
 ## viewport screenshots. Needs a real window (not --headless).
 ## Usage: godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
 ## To keep the desktop free while it runs, give the project an untracked
-## override.cfg that puts the window off-screen and unfocusable, and mute it:
+## override.cfg that starts the window unfocusable and tiny, and run it muted
+## with SCREENSHOT_OFFSCREEN=1:
 ##   [display]
 ##   window/size/no_focus=true
+##   window/size/window_width_override=8
+##   window/size/window_height_override=8
 ##   window/size/initial_position_type=0
-##   window/size/initial_position=Vector2i(4000, 4000)
-##   godot --audio-driver Dummy --path . -s res://tests/tools/screenshot.gd -- ...
+##   window/size/initial_position=Vector2i(20000, 20000)
+##   SCREENSHOT_OFFSCREEN=1 godot --audio-driver Dummy --path . -s res://tests/tools/screenshot.gd -- ...
+## Windows keeps a third of a new window on a screen, so it starts as a
+## sliver in the corner; the tool then moves it to OFFSCREEN_AT and gives it
+## WINDOW_SIZE. Keep it bordered: a borderless window takes the keyboard focus.
 ## The tool never confines the mouse (Stage.confine_mouse), never moves or
 ## resizes its window (GameSettings.owns_window) and never moves the real
 ## cursor: mouse_move() places a pretend one (Pointer.pretend).
 ## SCREENSHOT_RUN=<name> gives a run its own settings and save files, so
 ## several scenarios can run at the same time.
 
+## SCREENSHOT_OFFSCREEN=1: where the window goes (beyond any monitor) and its size.
+const OFFSCREEN_AT := Vector2i(20000, 20000)
+const WINDOW_SIZE := Vector2i(1600, 900)
 const SETTINGS_PATH := "user://screenshot_settings.json"
 const SAVE_PREFIX := "user://screenshot_save_slot_"
 ## Scenarios that start from the game's root scene (the main screen).
@@ -69,6 +78,9 @@ func _initialize() -> void:
 	Stage.confine_mouse = false
 	GameSettings.owns_window = false
 	Pointer.pretend = Vector2(960, 540)
+	if OS.get_environment("SCREENSHOT_OFFSCREEN") != "":
+		DisplayServer.window_set_position(OFFSCREEN_AT)
+		DisplayServer.window_set_size(WINDOW_SIZE)
 	_window_home = DisplayServer.window_get_position()
 	print("window at ", _window_home, " size ", DisplayServer.window_get_size(),
 		" no_focus ", DisplayServer.window_get_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS))
