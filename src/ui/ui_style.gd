@@ -12,6 +12,17 @@ const DIM_COLOR := Color("9aa3b2")
 const GOLD_COLOR := Color("ffcf5a")
 const ERROR_COLOR := Color("ff6a5a")
 const DISABLED_FONT := Color(0.45, 0.48, 0.55)
+## The lantern's teal: the title's "THE LANTERN" and Senna's light.
+const LANTERN_COLOR := Color("8fe3b0")
+## A plate's gradient, top to bottom (Plate, MenuCard).
+const PLATE_TOP := Color("0b1220")
+const PLATE_BOTTOM := Color("0d2328")
+## A cell that holds an item, a skill or a spell: its well and its rim.
+const CELL_COLOR := Color(0.03, 0.04, 0.06)
+const CELL_BORDER := Color(0.36, 0.4, 0.48)
+## Good and bad numbers: a heal, a gain; damage, a loss.
+const GOOD_COLOR := Color("5ad07a")
+const BAD_COLOR := Color("e2504a")
 ## A styled button's soft click, quiet under the game's sounds.
 const CLICK_DB := -10.0
 ## Set on a button once its click is connected, so a restyle adds no second.
