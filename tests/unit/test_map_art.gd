@@ -99,13 +99,10 @@ func test_inward_points_into_the_polygon_either_winding() -> void:
 	assert_eq(MapArt.inward(wall, 4), Vector2(0, 1), "the top edge, wound the other way")
 
 
-func test_light_falls_on_the_top_left_of_a_wall() -> void:
-	var box := MapArt.polygon_of(Rect2(0, 0, 200, 200))
-	assert_true(MapArt.faces_light(box, Vector2(10, 100), 20.0), "near the left edge")
-	assert_true(MapArt.faces_light(box, Vector2(100, 10), 20.0), "near the top edge")
-	assert_false(MapArt.faces_light(box, Vector2(190, 190), 20.0), "near the bottom-right corner")
+func test_the_light_comes_from_the_top_left() -> void:
 	assert_gt(MapArt.SHADOW_DIR.x, 0.0)
 	assert_gt(MapArt.SHADOW_DIR.y, 0.0)
+	assert_almost_eq(MapArt.SHADOW_DIR.length(), 1.0, 0.001)
 
 
 func test_the_border_rings_the_bounds_without_covering_them() -> void:

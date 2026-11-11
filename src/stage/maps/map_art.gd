@@ -260,12 +260,6 @@ static func _distance_to_edges(point: Vector2, polygon: PackedVector2Array, edge
 	return sqrt(best)
 
 
-## True when `point`, inside a wall `polygon`, is within `reach` of an edge
-## that faces the light: there the wall is lit.
-static func faces_light(polygon: PackedVector2Array, point: Vector2, reach: float) -> bool:
-	return not Geometry2D.is_point_in_polygon(point - SHADOW_DIR * reach, polygon)
-
-
 ## The land round `bounds`, `reach` px out: the strips over it, under it, on
 ## its left and on its right.
 static func border(bounds: Rect2, reach: float) -> Array[Rect2]:
