@@ -966,6 +966,7 @@ func _flash_hurt() -> void:
 	if dead or in_stasis():
 		return
 	Sfx.play(&"hurt", -8.0)
+	visuals.motion.flinch()
 	visuals.modulate = HURT_FLASH
 	_stop_hurt_flash()
 	_hurt_tween = create_tween()
@@ -1313,10 +1314,11 @@ func fire_attack_projectile(gun: LucianVisuals.Gun, target: Enemy, info: DamageI
 	flash_muzzle(gun)
 
 
-## The skin's gunshot sound and, unless the quality is Low, its muzzle flash,
-## turned the way Lucian faces.
+## The skin's gunshot sound and, unless the quality is Low, his art's kick
+## back and the skin's muzzle flash, turned the way Lucian faces.
 func flash_muzzle(gun: LucianVisuals.Gun) -> void:
 	Sfx.play(fx().shot_sound, -6.0)
+	visuals.motion.recoil()
 	if GameSettings.instance().low_effects():
 		return
 	var flash := fx().muzzle_flash()

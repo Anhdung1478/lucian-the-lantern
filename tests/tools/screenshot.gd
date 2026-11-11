@@ -59,6 +59,7 @@ const ACT_SCENARIOS := {
 	"ending_cutscene": [6, 5],
 	"level_up": [2, 1],
 	"wave_banner": [3, 2], "wave_banner_boss": [1, 1],
+	"units_motion": [2, 1],
 }
 
 ## Where the window was when the run started; shot() stops the run if it moved.
@@ -373,6 +374,8 @@ func _run(scenario: String) -> void:
 			await scenario_wave_banner()
 		"wave_banner_boss":
 			await scenario_wave_banner_boss()
+		"units_motion":
+			await scenario_units_motion()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -4474,3 +4477,53 @@ func skin_fx_shots(prefix: String, dummy: TrainingDummy, start: Vector2) -> void
 	await shot(prefix + "_attack")
 	lucian.command_move(lucian.global_position)
 	await wait(0.8)
+
+
+## Units that feel alive, close up on stage 2-1 with wave 1 held: minions
+## fading and growing in as they appear; two frames of them walking (the
+## sway); a melee minion's lunge at Lucian; a minion squashed by a hit; and a
+## death, flattening with its burst, early and late.
+func scenario_units_motion() -> void:
+	var game := game_stage()
+	flush_tips()
+	var at := lucian.global_position
+	free_camera(at + Vector2(170, 0), 1.7)
+	var units: Array[EnemyUnit] = []
+	var ids: Array[StringName] = [WavePlan.MELEE, WavePlan.RANGED, WavePlan.SIEGE, WavePlan.SUPER, WavePlan.MELEE]
+	var spots: Array[Vector2] = [Vector2(330, -150), Vector2(420, -30), Vector2(470, 110), Vector2(330, 150), Vector2(240, 0)]
+	for i in ids.size():
+		units.append(game.spawn_enemy(ids[i], at + spots[i]))
+		units[i]._attack_left = 999.0
+	await wait(0.08)
+	print("appearing: alpha (expect between 0 and 1) ", snappedf(units[0].modulate.a, 0.01), "  art scale (expect under 1) ", units[0].sprite.scale)
+	await shot("units_motion_0_appear")
+	await wait(0.45)
+	print("walking: art turn ", snappedf(units[0].sprite.rotation, 0.001), "  scale ", units[0].sprite.scale)
+	await shot("units_motion_1_walk_a")
+	await wait(0.09)
+	print("walking: art turn ", snappedf(units[0].sprite.rotation, 0.001), "  scale ", units[0].sprite.scale)
+	await shot("units_motion_1_walk_b")
+	var melee := units[4]
+	while melee.distance_to_target() > melee.attack_range + Lucian.HIT_RADIUS:
+		await wait(0.02)
+	for unit in units:
+		unit.move_speed = 0.0
+	await wait(0.3)
+	melee._attack_left = 0.0
+	await wait(0.04)
+	print("lunge: art offset (expect forward, x > 0) ", melee.sprite.position, "  Lucian flinches: ", lucian.visuals.motion.is_moving())
+	await shot("units_motion_2_lunge")
+	melee._attack_left = 999.0
+	await wait(0.5)
+	units[1].take_damage(lucian.make_damage(60.0, DamageInfo.Type.PHYSICAL, &"test"))
+	await wait(0.02)
+	print("hit: art scale (expect squashed) ", units[1].sprite.scale)
+	await shot("units_motion_3_hit")
+	await wait(0.4)
+	units[3].take_damage(lucian.make_damage(99999.0, DamageInfo.Type.TRUE, &"test"))
+	units[0].take_damage(lucian.make_damage(99999.0, DamageInfo.Type.TRUE, &"test"))
+	await wait(0.06)
+	print("dying: art scale ", units[3].sprite.scale, "  alpha ", snappedf(units[3].modulate.a, 0.01))
+	await shot("units_motion_4_death_a")
+	await wait(0.12)
+	await shot("units_motion_4_death_b")

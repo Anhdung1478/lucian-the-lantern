@@ -98,6 +98,9 @@ var visuals := Node2D.new()
 ## Its art, under visuals: the tint and the veil color it, never the hit
 ## flash (that tweens visuals).
 var sprite: Sprite2D
+## Small motion of its art: steps, lunges, recoils and squashes (made in
+## _ready; see UnitMotion).
+var motion: UnitMotion
 var health_bar := EnemyHealthBar.new()
 ## Its way around walls (see walk_toward).
 var path_follower := PathFollower.new()
@@ -106,6 +109,8 @@ var _attack_left := 0.0
 var _stuck_left := 0.0
 var _sidestep := 1.0
 var _flash_tween: Tween
+## The fade-in as it appears, while it runs.
+var _appear_tween: Tween
 ## Seconds alive, for `escape_after`.
 var _alive_time := 0.0
 ## Seconds of fighting to the next summons.
@@ -160,6 +165,9 @@ func _ready() -> void:
 	sprite = Sprite2D.new()
 	sprite.texture = data.art
 	visuals.add_child(sprite)
+	motion = UnitMotion.new()
+	motion.setup(sprite, self, data.radius)
+	add_child(motion)
 	_paint()
 	if data.is_boss_kind():
 		health_bar.size = BOSS_BAR
@@ -178,6 +186,7 @@ func _ready() -> void:
 	_summon_left = data.summon_every
 	if data.drain > 0.0 and is_instance_valid(target):
 		target.damage_received.connect(_drain)
+	_appear()
 
 
 ## A leap or a charge runs first (no thinking meanwhile); else, while
@@ -283,6 +292,7 @@ func _die() -> void:
 	if has_escaped or dead:
 		return
 	super()
+	_show_death()
 	if summoned and is_instance_valid(summoner):
 		summoner.summon_killed(self)
 
@@ -325,6 +335,7 @@ func fire_bolt(hit: DamageInfo, speed: float, reach: float, toward := Vector2.ZE
 	if hit.source == &"basic":
 		bolt.hit_lucian.connect(apply_on_hit)
 	projectile_parent.add_child(bolt)
+	motion.recoil()
 	return bolt
 
 
@@ -392,8 +403,9 @@ func _think(delta: float) -> void:
 
 
 ## One attack: by default a hit on Lucian at once (melee), with the data's
-## on-hit effects when he takes it.
+## on-hit effects when he takes it. Its art lunges at him.
 func _attack() -> void:
+	motion.lunge()
 	if target.take_damage(make_hit()):
 		apply_on_hit()
 
@@ -445,6 +457,29 @@ func _show_hit() -> void:
 		_flash_tween.kill()
 	_flash_tween = create_tween()
 	_flash_tween.tween_property(visuals, "modulate", Color.WHITE, 0.15)
+	motion.flinch()
+
+
+## It fades and grows in over UnitMotion.SPAWN_TIME: its art, its bar and its
+## shadow. Only a look: it is there, and fights, from the first frame.
+func _appear() -> void:
+	if not Juice.on():
+		return
+	motion.appear()
+	modulate.a = 0.0
+	_appear_tween = create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
+	_appear_tween.tween_property(self, "modulate:a", 1.0, UnitMotion.SPAWN_TIME)
+
+
+## Its death, unless it goes free (that fade is its own): its art flattens
+## as it fades, and a small burst in its own color flies out.
+func _show_death() -> void:
+	if data.frees or not Juice.on():
+		return
+	motion.die(DEATH_FADE)
+	var burst := DeathBurst.new()
+	burst.setup(global_position, radius, DeathBurst.color_of(data.art) * data.tint)
+	get_parent().add_child(burst)
 
 
 ## A `frees` enemy's end (killed or vanished): it rises, brightens into
@@ -453,6 +488,8 @@ func _show_hit() -> void:
 ## fall starts the ending at once: the souls go free as it begins) and stops
 ## while the game is paused.
 func _fade_out() -> void:
+	if _appear_tween:
+		_appear_tween.kill()
 	if not data.frees:
 		super()
 		return

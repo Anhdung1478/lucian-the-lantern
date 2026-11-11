@@ -21,6 +21,8 @@ const SHADOW_RADIUS := 30.0
 var lucian: Lucian
 var projectile_parent: Node
 var visuals := Node2D.new()
+## Small motion of her art: steps and recoils (made in _ready).
+var motion: UnitMotion
 
 var _attack_left := 0.0
 
@@ -34,6 +36,9 @@ func _ready() -> void:
 	sprite.texture = ART
 	visuals.add_child(sprite)
 	add_child(visuals)
+	motion = UnitMotion.new()
+	motion.setup(sprite, self, SHADOW_RADIUS)
+	add_child(motion)
 	if projectile_parent == null:
 		projectile_parent = get_parent()
 
@@ -58,6 +63,7 @@ func _physics_process(delta: float) -> void:
 		shot.glow_color = SHOT_GLOW
 		shot.launch(global_position + Vector2.from_angle(visuals.rotation) * 50.0, target, DamageInfo.create(DAMAGE, DamageInfo.Type.PHYSICAL, &"senna", self))
 		projectile_parent.add_child(shot)
+		motion.recoil()
 		Sfx.play(&"shot", -10.0)
 
 

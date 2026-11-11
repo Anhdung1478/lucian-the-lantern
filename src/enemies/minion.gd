@@ -51,6 +51,7 @@ func _attack() -> void:
 			warning.strike(make_hit(), target)
 			warning.sound = &"shell"
 			warning_parent.add_child(warning)
+			motion.recoil()
 		_:
 			super()
 
