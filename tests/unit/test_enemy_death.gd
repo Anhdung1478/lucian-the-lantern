@@ -33,6 +33,17 @@ func test_died_fires_once_and_the_enemy_leaves_the_group() -> void:
 	assert_false(enemy.is_in_group(&"enemies"))
 
 
+## V1.5 (P13): the killing hit's source is kept, so a Smite kill can be told.
+func test_killed_by_is_the_source_of_the_hit_that_killed_it() -> void:
+	var enemy := _enemy(100.0)
+	enemy.take_damage(_true_hit(60.0, &"basic"))
+	assert_eq(enemy.killed_by, &"", "alive")
+	enemy.take_damage(_true_hit(60.0, &"smite"))
+	assert_eq(enemy.killed_by, &"smite")
+	enemy.take_damage(_true_hit(60.0, &"q"))
+	assert_eq(enemy.killed_by, &"smite", "a later hit on the dead changes nothing")
+
+
 func test_a_dead_enemy_takes_no_damage() -> void:
 	var enemy := _enemy(100.0)
 	enemy.take_damage(_true_hit(150.0))

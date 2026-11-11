@@ -42,6 +42,9 @@ var dead := false
 var untargetable := false
 ## Whoever hit this enemy last: the kill is theirs.
 var last_attacker: Node
+## The source of the hit that took it to 0 HP (DamageInfo.source, e.g.
+## &"smite"); &"" until then.
+var killed_by := &""
 ## Mark id -> seconds left.
 var _marks := {}
 ## Status id -> {stacks, left, duration, icon}.
@@ -88,6 +91,7 @@ func take_damage(info: DamageInfo) -> float:
 	if attacker and attacker.has_method(&"on_damage_dealt"):
 		attacker.on_damage_dealt(self, info, final_amount)
 	if hp <= 0.0:
+		killed_by = info.source
 		_die()
 	return final_amount
 

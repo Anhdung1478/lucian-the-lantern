@@ -293,6 +293,29 @@ func test_act_6_s_normals_drop_orange_twice_as_often() -> void:
 	assert_between(orange, 140, 260, "2%")
 
 
+## V1.5 (P13): an elite killed by Smite has 3× the orange chance, on top of
+## the act's growth and the difficulty's essence scale.
+func test_an_elite_killed_by_smite_has_three_times_the_orange_chance() -> void:
+	var run := StageSetup.new()
+	assert_almost_eq(KillRewards.orange_chance(&"elite", 1, run, true), 0.3, 0.00001)
+	assert_almost_eq(KillRewards.orange_chance(&"normal", 1, run, true), 0.01, 0.00001, "a normal: no bonus")
+	assert_almost_eq(KillRewards.orange_chance(&"elite", 1, run), 0.1, 0.00001, "not by default")
+	run.difficulty = Difficulty.EXTREME
+	assert_almost_eq(KillRewards.orange_chance(&"elite", 6, run, true), 0.1 * 2.0 * 3.0 * 1.5, 0.00001, "stacks")
+
+
+func test_roll_passes_a_smite_kill_to_the_orange_chance() -> void:
+	var run := StageSetup.new()
+	run.orange_mult = 3.4
+	var plain := 0
+	var smitten := 0
+	for i in 200:
+		plain += KillRewards.roll(SIEGE, 1, run, rng).orange
+		smitten += KillRewards.roll(SIEGE, 1, run, rng, false, 1.0, true).orange
+	assert_lt(plain, 200, "34%")
+	assert_eq(smitten, 200, "102%: always")
+
+
 func test_a_boss_s_sure_orange_does_not_grow_with_the_act() -> void:
 	var boss := _mini_boss()
 	boss.kind = &"boss"

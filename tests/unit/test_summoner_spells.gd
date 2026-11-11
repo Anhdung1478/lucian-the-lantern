@@ -141,14 +141,54 @@ func test_barrier_runs_out() -> void:
 	assert_eq(lucian.total_shield(), 0.0)
 
 
-func test_smite_deals_true_damage_and_heals() -> void:
+func test_smite_deals_true_damage_and_heals_nothing_without_a_kill() -> void:
 	dummy.position = Vector2(400, 0)
 	lucian.summoners.set_spell(0, &"smite")
 	lucian.hp = 100.0
 	assert_true(lucian.use_summoner(0, dummy.position))
 	assert_eq(sources, [&"smite"])
 	assert_almost_eq(finals[0], 450.0, 0.01)
-	assert_almost_eq(lucian.hp, 100.0 + lucian.stats.max_hp * 0.1, 0.01)
+	assert_almost_eq(lucian.hp, 100.0, 0.01, "the dummy lives: no heal")
+
+
+## V1.5 (P13): Smite heals 2.5% of max HP only when its hit kills.
+func test_a_smite_kill_heals_2_5_percent_of_max_hp() -> void:
+	var enemy := Enemy.new()
+	enemy.max_hp = 300.0
+	enemy.position = Vector2(400, 0)
+	add_child_autofree(enemy)
+	lucian.summoners.set_spell(0, &"smite")
+	lucian.hp = 100.0
+	assert_true(lucian.use_summoner(0, enemy.position))
+	assert_true(enemy.dead)
+	assert_eq(enemy.killed_by, &"smite")
+	assert_almost_eq(lucian.hp, 100.0 + lucian.stats.max_hp * 0.025, 0.01)
+
+
+func test_smite_s_card_names_the_kill_heal_and_the_elite_orange() -> void:
+	var text := TooltipText.plain(TooltipText.colorize(SummonerSpells.find(&"smite").description))
+	assert_eq(text, "Deal 450 true damage to the enemy nearest the cursor within 500 units. If it kills, restore 2.5% max health, "
+		+ "and an elite it kills is 3× as likely to drop orange essence.")
+
+
+func test_the_smite_upgrade_raises_its_damage_not_its_heal() -> void:
+	var setup := StageSetup.new()
+	setup.summoners.assign([&"smite", &"heal"])
+	setup.summoner_upgrades = {&"smite": 0.45}
+	lucian.apply_setup(setup)
+	dummy.position = Vector2(400, 0)
+	assert_true(lucian.use_summoner(0, dummy.position))
+	assert_almost_eq(finals[0], 450.0 * 1.45, 0.01)
+	assert_eq(lucian.summoners.upgrade_text(&"smite"), "Upgraded: 45% stronger")
+	var enemy := Enemy.new()
+	enemy.max_hp = 600.0
+	enemy.position = Vector2(-400, 0)
+	add_child_autofree(enemy)
+	lucian.summoners.clear_cooldowns()
+	lucian.hp = 100.0
+	assert_true(lucian.use_summoner(0, enemy.position))
+	assert_true(enemy.dead, "653 kills 600")
+	assert_almost_eq(lucian.hp, 100.0 + lucian.stats.max_hp * 0.025, 0.01, "the heal is not upgraded")
 
 
 func test_smite_needs_an_enemy_in_reach() -> void:

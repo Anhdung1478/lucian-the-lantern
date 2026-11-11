@@ -9,4 +9,4 @@ id = &"smite"
 display_name = "Smite"
 icon = ExtResource("1_icon")
 cooldown = 30.0
-description = "Deal [true]450 true damage[/true] to the enemy nearest the cursor within [kw]500[/kw] units and restore [hp]10% max health[/hp]."
+description = "Deal [true]450 true damage[/true] to the enemy nearest the cursor within [kw]500[/kw] units. If it kills, restore [hp]2.5% max health[/hp], and an elite it kills is [kw]3×[/kw] as likely to drop orange essence."

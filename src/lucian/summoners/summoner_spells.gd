@@ -33,8 +33,8 @@ const HEAL_SPEED_TIME := 1.0
 const CLARITY_MANA := 0.5
 const SMITE_RANGE := 500.0
 const SMITE_DAMAGE := 450.0
-## Share of max HP.
-const SMITE_HEAL := 0.1
+## Share of max HP, healed when Smite's hit kills.
+const SMITE_HEAL := 0.025
 
 var lucian: Lucian
 ## Spell id on D (0) and F (1).
@@ -201,13 +201,15 @@ func _flash(aim: Vector2) -> void:
 
 
 ## True damage to the enemy under the cursor, else the one nearest it, within
-## reach (Lucian.enemy_near_cursor), and a heal.
+## reach (Lucian.enemy_near_cursor). A kill heals SMITE_HEAL of max HP (and
+## raises an elite's orange chance: KillRewards).
 func _smite(aim: Vector2, effect: float) -> bool:
 	var target := lucian.enemy_near_cursor(aim, SMITE_RANGE)
 	if target == null:
 		return false
 	target.take_damage(lucian.make_damage(SMITE_DAMAGE * effect, DamageInfo.Type.TRUE, &"smite"))
-	lucian.heal(lucian.stats.max_hp * SMITE_HEAL)
+	if target.dead:
+		lucian.heal(lucian.stats.max_hp * SMITE_HEAL)
 	var bolt := ChainLightning.new()
 	bolt.setup(PackedVector2Array([lucian.global_position, target.global_position]), Color("ffb347"))
 	lucian.spawn(bolt)

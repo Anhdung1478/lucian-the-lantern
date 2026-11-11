@@ -272,6 +272,18 @@ func test_the_stage_counts_kills_and_gold() -> void:
 	assert_eq(stage.stats.gold_earned, stage.wallet.gold)
 
 
+## V1.5 (P13): the stage tells KillRewards when Smite's hit killed an elite.
+## At ×3.4 orange an elite's chance is 34%, and 102% (always) after Smite.
+func test_an_elite_killed_by_smite_pays_its_tripled_orange_chance() -> void:
+	var stage: Stage = await _stage(2, 1)
+	stage.run.orange_mult = 3.4
+	var at := stage.arena.spawn_points[0]
+	var orange: int = stage.collected[Essences.ORANGE]
+	for i in 10:
+		stage.spawn_enemy(WavePlan.SIEGE, at).take_damage(DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"smite"))
+	assert_eq(stage.collected[Essences.ORANGE] - orange, 10)
+
+
 func test_damage_dealt_is_lucians_hits_capped_at_the_hp_lost() -> void:
 	var stage: Stage = await _stage(2, 1)
 	var enemy := _melee(stage)
