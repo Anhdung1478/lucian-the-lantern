@@ -199,6 +199,21 @@ func test_the_boss_bar_shows_a_mini_boss_and_prefers_a_boss() -> void:
 	assert_eq(bar.boss.data.kind, &"mini_boss", "back to a mini boss")
 
 
+## The Lantern look: the bottom bar on an ornate plate, the smaller panels
+## on plain ones, all a little see-through.
+func test_the_hud_sits_on_plates() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	hud.setup(lucian, Wallet.new())
+	assert_true(hud.bottom_panel.ornate, "the bottom bar")
+	assert_eq(hud.bottom_panel.opacity, Hud.PLATE_OPACITY)
+	for plate: Plate in [hud.stats_panel, hud.extra_stats, hud.stage_info, hud._gold_label.get_parent().get_parent()]:
+		assert_false(plate.ornate)
+		assert_eq(plate.opacity, Hud.PLATE_OPACITY)
+
+
 func test_fps_sits_top_left() -> void:
 	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
 	add_child_autofree(hud)

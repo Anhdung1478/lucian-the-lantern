@@ -1,6 +1,7 @@
 class_name StatsPanel
-extends PanelContainer
-## Lucian's stats as icon + value cells, two per row, like LoL's stats panel.
+extends Plate
+## Lucian's stats as icon + value cells, two per row, like LoL's stats panel,
+## on a plain plate.
 ## A value with a bonus over Lucian's level alone shows in yellow, and its
 ## hover card breaks it down. The HUD has two: MAIN (Ctrl + the stats key
 ## toggles it) and EXTRA (shown while the stats key is held). Set `keys`
@@ -14,11 +15,18 @@ const EXTRA: Array[StringName] = [
 	&"magic_pen_flat", &"lifesteal", &"omnivamp", &"attack_range",
 	&"tenacity", &"slow_resist", &"summoner_haste",
 ]
+## The room between the plate's frame and the cells.
+const PAD := 12.0
 
 var lucian: Lucian
 var keys: Array[StringName] = MAIN
 
 var _cells: Array[StatCell] = []
+
+
+func _init() -> void:
+	super(PAD, false)
+	opacity = Hud.PLATE_OPACITY
 
 
 func _ready() -> void:

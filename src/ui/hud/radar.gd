@@ -1,11 +1,12 @@
 class_name Radar
 extends Control
-## Bottom right: the map as a dark panel with dots, no terrain. Lucian is a
+## Bottom right: the map as a plain plate with dots, no terrain. Lucian is a
 ## blue dot, an enemy red (an elite bigger), a boss a red skull (a mini boss
 ## a smaller one); Senna a small pale-blue dot and the merchant gold. Never
 ## takes clicks, so right-clicks under it still move Lucian.
 
 const WIDTH := 260.0
+const RADIUS := 6.0
 const SKULL := preload("res://assets/art/ui/skull.svg")
 const DOT := 4.0
 const ELITE_DOT := 7.0
@@ -58,7 +59,7 @@ func _process(_delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_style_box(UiStyle.panel(Color(0.04, 0.05, 0.07, 0.88), Color(0.36, 0.4, 0.48), 2, 0.0, 6), Rect2(Vector2.ZERO, size))
+	Plate.draw_on(self, Rect2(Vector2.ZERO, size), RADIUS, false, Hud.PLATE_OPACITY)
 	for merchant: Node2D in get_tree().get_nodes_in_group(&"merchants"):
 		draw_circle(to_radar(merchant.global_position), DOT, MERCHANT_COLOR)
 	for ally: Node2D in get_tree().get_nodes_in_group(&"allies"):

@@ -1,5 +1,5 @@
 class_name StageInfo
-extends PanelContainer
+extends Plate
 ## Top center of the stage: the stage's name, "Wave 2/3" (or "Boss wave")
 ## and the enemies left; before a wave, "Wave 2 in 0:17" and Skip. Endless
 ## has no last wave: "Wave 23", "Mini boss wave" or "Boss wave", and a dim
@@ -11,6 +11,8 @@ signal skip_pressed
 ## Space between the row and Endless's "Best" line.
 const LINE_GAP := 2
 const BEST_FONT_SIZE := 16
+## The room between the plate's frame and the lines.
+const PAD := 12.0
 
 var runner: WaveRunner
 var name_label := UiStyle.label("", 20, UiStyle.TITLE_COLOR)
@@ -20,6 +22,11 @@ var timer_label := UiStyle.label("", 20, UiStyle.GOLD_COLOR)
 var skip_button := Button.new()
 ## Endless only: the save's best run, in waves.
 var best_label := UiStyle.label("", BEST_FONT_SIZE, UiStyle.DIM_COLOR)
+
+
+func _init() -> void:
+	super(PAD, false)
+	opacity = Hud.PLATE_OPACITY
 
 
 func _ready() -> void:

@@ -19,6 +19,11 @@ const SKILL_ACTIONS: Array[StringName] = [&"skill_q", &"skill_w", &"skill_e", &"
 const GOLD_ICON := preload("res://assets/art/ui/gold.svg")
 const GOLD_COLOR := Color("ffcf5a")
 const MARGIN := 12.0
+## The HUD's plates let a little of the fight through.
+const PLATE_OPACITY := 0.92
+## The room inside the bottom bar's frame, and inside the gold box's.
+const BAR_PAD := 12.0
+const GOLD_PAD := 10.0
 ## The boss bar sits under the stage info.
 const BOSS_BAR_TOP := 72.0
 ## The tips sit under the boss bar.
@@ -60,7 +65,7 @@ var _skill_slots: Array[SkillSlot] = []
 var _modifier_shown := EndlessModifiers.NONE
 var _modifier_row := {}
 
-@onready var bottom_panel: PanelContainer = %BottomPanel
+@onready var bottom_panel: Plate = %BottomPanel
 @onready var portrait: TextureRect = %Portrait
 @onready var stats_panel: StatsPanel = %StatsPanel
 @onready var skill_row: HBoxContainer = %SkillRow
@@ -122,10 +127,11 @@ func setup(target: Lucian, stage_wallet: Wallet, stage_node: Stage = null) -> vo
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
+	bottom_panel.pad = BAR_PAD
+	bottom_panel.opacity = PLATE_OPACITY
 	bottom_panel.resized.connect(_place_stats_panel)
 	extra_stats.keys = StatsPanel.EXTRA
 	extra_stats.visible = false
-	extra_stats.add_theme_stylebox_override(&"panel", stats_panel.get_theme_stylebox(&"panel"))
 	extra_stats.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	extra_stats.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	extra_stats.grow_vertical = Control.GROW_DIRECTION_BEGIN
@@ -296,10 +302,10 @@ func _show_gold(gold: int) -> void:
 	_gold_label.text = str(gold)
 
 
-## Top right: a coin and the stage gold, in the HUD panel style.
+## Top right: a coin and the stage gold, on a plain plate.
 func _build_gold() -> void:
-	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override(&"panel", bottom_panel.get_theme_stylebox(&"panel"))
+	var panel := Plate.new(GOLD_PAD, false)
+	panel.opacity = PLATE_OPACITY
 	panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	panel.offset_right = -MARGIN
@@ -345,7 +351,6 @@ func _build_gold() -> void:
 ## Top center: the stage info with the boss bar and the tips under it; bottom
 ## right: the radar.
 func _build_stage_info() -> void:
-	stage_info.add_theme_stylebox_override(&"panel", bottom_panel.get_theme_stylebox(&"panel"))
 	$Root.add_child(stage_info)
 	stage_info.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	stage_info.grow_horizontal = Control.GROW_DIRECTION_BOTH
