@@ -15,6 +15,8 @@ const DAMAGE := 45.0
 const INTERVAL := 1.5
 const SHOT_COLOR := Color("b8fff0")
 const SHOT_GLOW := Color(0.5, 1.0, 0.9, 0.5)
+## Her shadow's size: she has no body, so no radius of her own.
+const SHADOW_RADIUS := 30.0
 
 var lucian: Lucian
 var projectile_parent: Node
@@ -25,6 +27,9 @@ var _attack_left := 0.0
 
 func _ready() -> void:
 	add_to_group(&"allies")
+	var shadow := UnitShadow.new()
+	shadow.radius = SHADOW_RADIUS
+	add_child(shadow)
 	var sprite := Sprite2D.new()
 	sprite.texture = ART
 	visuals.add_child(sprite)

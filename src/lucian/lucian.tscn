@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://src/lucian/skills/relentless_pursuit.gd" id="13_e"]
 [ext_resource type="Script" path="res://src/lucian/skills/ardent_blaze.gd" id="14_w"]
 [ext_resource type="Script" path="res://src/lucian/skills/the_culling.gd" id="15_r"]
+[ext_resource type="Script" path="res://src/combat/unit_shadow.gd" id="17_shadow"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 30.0
@@ -29,6 +30,9 @@ item_catalog = ExtResource("16_items")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_body")
+
+[node name="Shadow" type="Node2D" parent="."]
+script = ExtResource("17_shadow")
 
 [node name="Visuals" type="Node2D" parent="."]
 script = ExtResource("3_visuals")

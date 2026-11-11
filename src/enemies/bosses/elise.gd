@@ -85,8 +85,9 @@ func _web_hit() -> void:
 		target.add_cc(CrowdControl.Kind.STUN, COCOON_STUN)
 
 
-## Rises: untargetable, her art fading, a circle on Lucian that follows him
-## and locks (see _physics_process). Busy until she has dropped.
+## Rises: untargetable, her art and her shadow fading, a circle on Lucian
+## that follows him and locks (see _physics_process). Busy until she has
+## dropped.
 func rappel() -> float:
 	set_untargetable(true)
 	_rappel_time = 0.0
@@ -97,6 +98,7 @@ func rappel() -> float:
 	_fade = create_tween().set_parallel()
 	_fade.tween_property(visuals, "modulate:a", 0.0, RISE_FADE)
 	_fade.tween_property(health_bar, "modulate:a", 0.0, RISE_FADE)
+	_fade.tween_property(shadow, "modulate:a", 0.0, RISE_FADE)
 	_rappel_warning = GroundWarning.circle(_rappel_spot, RAPPEL_RADIUS, RAPPEL_TIME)
 	warning_parent.add_child(_rappel_warning)
 	return RAPPEL_TIME + RECOVER
@@ -147,5 +149,6 @@ func _drop() -> void:
 		_fade.kill()
 	visuals.modulate.a = 1.0
 	health_bar.modulate.a = 1.0
+	shadow.modulate.a = 1.0
 	if is_instance_valid(target) and GroundWarning.in_circle(_rappel_spot, RAPPEL_RADIUS, target.global_position, Lucian.HIT_RADIUS):
 		target.take_damage(skill_hit(RAPPEL_DAMAGE, DamageInfo.Type.MAGIC, &"rappel"))

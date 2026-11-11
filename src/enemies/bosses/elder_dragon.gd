@@ -83,8 +83,9 @@ func elder_breath() -> float:
 	return BREATH_WARN + RECOVER
 
 
-## Takes off: untargetable, its art fading out, its shadow following Lucian
-## (see _physics_process). Busy until it has landed.
+## Takes off: untargetable, its art and the shadow at its feet fading out,
+## its shadow from above following Lucian (see _physics_process). Busy until
+## it has landed.
 func sky_dive() -> float:
 	set_untargetable(true)
 	_dive = Dive.FOLLOW
@@ -97,6 +98,7 @@ func sky_dive() -> float:
 	_fade.tween_property(visuals, "modulate:a", 0.0, TAKE_OFF_FADE)
 	_fade.tween_property(visuals, "scale", Vector2.ONE * TAKE_OFF_SCALE, TAKE_OFF_FADE)
 	_fade.tween_property(health_bar, "modulate:a", 0.0, TAKE_OFF_FADE)
+	_fade.tween_property(shadow, "modulate:a", 0.0, TAKE_OFF_FADE)
 	queue_redraw()
 	return DIVE_FOLLOW + DIVE_WARN + RECOVER
 
@@ -170,6 +172,7 @@ func _land() -> void:
 	visuals.modulate.a = 1.0
 	visuals.scale = Vector2.ONE
 	health_bar.modulate.a = 1.0
+	shadow.modulate.a = 1.0
 	queue_redraw()
 	if not (is_instance_valid(target) and GroundWarning.in_circle(global_position, DIVE_RADIUS, target.global_position, Lucian.HIT_RADIUS)):
 		return

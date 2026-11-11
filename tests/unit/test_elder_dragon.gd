@@ -244,6 +244,7 @@ func test_sky_dive_takes_it_up_untargetable_and_unseen() -> void:
 	await wait_seconds(0.5)
 	assert_eq(dragon.visuals.modulate.a, 0.0, "its art has faded out")
 	assert_eq(dragon.health_bar.modulate.a, 0.0, "and its health bar")
+	assert_eq(dragon.shadow.modulate.a, 0.0, "and the shadow at its feet: only the one from above shows")
 
 
 func test_its_shadow_follows_lucian_at_300_over_walls() -> void:
@@ -300,6 +301,7 @@ func test_a_circle_warning_fills_where_the_shadow_stops_then_it_lands_with_a_hit
 	assert_eq(dragon.collision_layer, Layers.ENEMY_BODY)
 	assert_eq(dragon.visuals.modulate.a, 1.0, "seen again")
 	assert_eq(dragon.health_bar.modulate.a, 1.0)
+	assert_eq(dragon.shadow.modulate.a, 1.0)
 	await wait_seconds(0.35)
 	assert_almost_eq(lucian.global_position, spot + Vector2(300, 0), Vector2(6, 6), "pushed 200 away from the middle")
 	assert_eq(_hits(&"sky_dive").size(), 1, "it lands once")
@@ -351,6 +353,7 @@ func test_it_lands_on_its_own_timer_even_if_its_warning_is_gone() -> void:
 	assert_true(Lucian.is_target(dragon))
 	assert_eq(dragon.visuals.modulate.a, 1.0, "seen again")
 	assert_eq(dragon.health_bar.modulate.a, 1.0)
+	assert_eq(dragon.shadow.modulate.a, 1.0)
 	assert_eq(dragon.global_position, spot, "where it fell")
 	assert_eq(_hits(&"sky_dive").size(), 1, "the hit still lands on him in the circle")
 	await wait_seconds(0.3)

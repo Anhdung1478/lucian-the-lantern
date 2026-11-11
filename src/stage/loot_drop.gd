@@ -13,12 +13,20 @@ const FULL_NOTE_GAP := 3.0
 const ICON_SIZE := 44.0
 const GLOW := Color(0.6, 0.85, 1.0, 0.35)
 const LEGENDARY_GLOW := Color(1.0, 0.8, 0.3, 0.5)
+## The soft shadow on the ground under the bobbing icon.
+const SHADOW_RADIUS := 20.0
 
 var item: ItemData
 var lucian: Lucian
 
 var _note_left := 0.0
 var _time := 0.0
+
+
+func _ready() -> void:
+	var shadow := UnitShadow.new()
+	shadow.radius = SHADOW_RADIUS
+	add_child(shadow)
 
 
 func _physics_process(delta: float) -> void:

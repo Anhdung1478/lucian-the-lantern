@@ -30,6 +30,9 @@ func _ready() -> void:
 	var shape := CollisionShape2D.new()
 	shape.shape = circle
 	add_child(shape)
+	var shadow := UnitShadow.new()
+	shadow.radius = BODY_RADIUS
+	add_child(shadow)
 	var sprite := Sprite2D.new()
 	sprite.texture = ART
 	# The hover ring and name are drawn by this node, over the art.

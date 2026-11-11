@@ -92,6 +92,8 @@ var burn_scale := 1.0
 ## Where shots and ground warnings go; the parent when not set.
 var projectile_parent: Node
 var warning_parent: Node
+## The soft shadow under it, on the ground (made in _ready).
+var shadow: UnitShadow
 var visuals := Node2D.new()
 ## Its art, under visuals: the tint and the veil color it, never the hit
 ## flash (that tweens visuals).
@@ -151,6 +153,9 @@ func _ready() -> void:
 	hurtbox.monitoring = false
 	hurtbox.add_child(_circle(data.radius + 6.0))
 	add_child(hurtbox)
+	shadow = UnitShadow.new()
+	shadow.radius = data.radius
+	add_child(shadow)
 	add_child(visuals)
 	sprite = Sprite2D.new()
 	sprite.texture = data.art
@@ -500,16 +505,19 @@ func _summon_spot(i: int, count: int) -> Vector2:
 
 
 ## A leap's frame: along the straight line, growing to 1 + LEAP_RISE at the
-## middle and back; on the last one, down exactly on its point.
+## middle and back, its shadow shrinking under it; on the last one, down
+## exactly on its point.
 func _leap_step(delta: float) -> void:
 	_leap_left = maxf(_leap_left - delta, 0.0)
 	var t := 1.0 - _leap_left / _leap_time
 	global_position = _leap_from.lerp(_leap_to, t)
 	visuals.scale = Vector2.ONE * (1.0 + LEAP_RISE * sin(PI * t))
+	shadow.lift = sin(PI * t)
 	if _leap_left > 0.0:
 		return
 	global_position = _leap_to
 	visuals.scale = Vector2.ONE
+	shadow.lift = 0.0
 	set_untargetable(false)
 	landed.emit()
 

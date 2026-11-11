@@ -220,6 +220,8 @@ var _launch_left := 0.0
 var _level_shown := 1
 
 @onready var visuals: LucianVisuals = $Visuals
+## The soft shadow under him, on the ground.
+@onready var shadow: UnitShadow = $Shadow
 @onready var skills: Array[LucianSkill] = [$Skills/Q, $Skills/W, $Skills/E, $Skills/R]
 @onready var passive: Lightslinger = $Skills/Passive
 
@@ -1004,12 +1006,13 @@ func _fear_step() -> void:
 
 
 ## A throw's frame: along the straight line, growing to 1 + LAUNCH_RISE at
-## the middle and back. Nothing stops him.
+## the middle and back, his shadow shrinking under him. Nothing stops him.
 func _launch_step(delta: float) -> void:
 	_launch_left = maxf(_launch_left - delta, 0.0)
 	var t := 1.0 - _launch_left / _launch_time
 	global_position = _launch_from.lerp(_launch_to, t)
 	visuals.scale = Vector2.ONE * (1.0 + LAUNCH_RISE * sin(PI * t))
+	shadow.lift = sin(PI * t)
 	_last_position = global_position
 	if _launch_left <= 0.0:
 		_land()
@@ -1020,6 +1023,7 @@ func _launch_step(delta: float) -> void:
 func _land() -> void:
 	_launch_left = 0.0
 	visuals.scale = Vector2.ONE
+	shadow.lift = 0.0
 	_last_position = global_position
 	collision_mask = _body_mask()
 

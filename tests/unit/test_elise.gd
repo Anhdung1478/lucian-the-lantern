@@ -125,10 +125,12 @@ func test_rappel_is_untargetable_follows_then_locks_and_drops_there() -> void:
 	await wait_seconds(0.3)
 	assert_eq(warning.global_position, locked, "locked")
 	assert_true(boss.untargetable, "still up")
+	assert_eq(boss.shadow.modulate.a, 0.0, "no shadow where she isn't")
 	await wait_seconds(0.6)
 	assert_false(boss.untargetable)
 	assert_true(boss.is_in_group(&"enemies"))
 	assert_almost_eq(boss.global_position, locked, Vector2(1, 1), "she drops where it locked")
+	assert_eq(boss.shadow.modulate.a, 1.0, "her shadow lands with her")
 	assert_eq(_hits(&"rappel").size(), 0, "Lucian walked out")
 
 
