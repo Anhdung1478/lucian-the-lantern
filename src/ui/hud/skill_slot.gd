@@ -1,23 +1,31 @@
 class_name SkillSlot
 extends Control
-## One skill icon on the HUD: cooldown sweep, rank dots, mana cost, "+" button
-## and lock icon. A slot without a skill is the passive, drawn smaller.
-## Hovering shows the skill's card above it.
+## One skill on the HUD, in a dark cell: its icon, cooldown sweep and
+## seconds, mana cost, its key in the corner tab, rank diamonds under it, the
+## "+" button over it and a lock while it isn't bought. A slot without a
+## skill is the passive, drawn smaller. The cell's rim turns gold while the
+## mouse is on the slot; hovering shows the skill's card above it.
 
 const ICON_SIZE := 64.0
 ## 70% of a skill icon.
 const PASSIVE_SIZE := 45.0
-const PLUS_HEIGHT := 26.0
-const PLUS_RADIUS := 11.0
+const PLUS_HEIGHT := 24.0
+const PLUS_RADIUS := 10.0
 const PLUS_FILL := Color(0.07, 0.08, 0.11, 0.92)
 const PLUS_HOVER := Color("fff1c2")
 ## A "+" that can't be pressed yet.
 const PLUS_GREY := Color(0.45, 0.47, 0.52)
+## The soft light behind a "+" that can be pressed.
+const PLUS_GLOW := 0.35
 const DOTS_HEIGHT := 12.0
+## A rank diamond: its half-width and the step from one to the next.
+const DIAMOND := 4.0
+const DIAMOND_STEP := 11.0
 const SWEEP_COLOR := Color(0, 0, 0, 0.68)
-const FRAME_COLOR := Color(0.36, 0.4, 0.48)
 const DOT_ON := Color("ffcf5a")
 const DOT_OFF := Color(0.2, 0.22, 0.27)
+## The charged passive's ring.
+const CHARGED_WIDTH := 3
 const NO_MANA_TINT := Color(0.45, 0.55, 1.0)
 const UNLEARNED_TINT := Color(0.35, 0.35, 0.35)
 ## Greys out a skill another one holds back (Q and W during R, E during Q).
@@ -34,12 +42,13 @@ var _plus: Button
 var _cooldown_label: Label
 var _cost_label: Label
 var _lock: TextureRect
-var _key_label: Label
 var _key := ""
 var _icon_size := ICON_SIZE
 var _grey := ShaderMaterial.new()
 ## The next rank isn't bought yet: the grey "+" gets a lock.
 var _plus_locked := false
+## The mouse is on the slot: its rim is gold.
+var _hovered := false
 
 
 ## `icon_size` is smaller than ICON_SIZE for the passive, which then sits
@@ -50,7 +59,9 @@ func setup(target: Lucian, slot_skill: LucianSkill, icon: Texture2D, key: String
 	_key = key
 	_icon_size = icon_size
 	custom_minimum_size = Vector2(icon_size, PLUS_HEIGHT + ICON_SIZE + DOTS_HEIGHT)
-	var icon_rect := Rect2(0, PLUS_HEIGHT + (ICON_SIZE - icon_size) * 0.5, icon_size, icon_size)
+	var cell := _cell_rect()
+	mouse_entered.connect(func() -> void: _hovered = true)
+	mouse_exited.connect(func() -> void: _hovered = false)
 
 	# A flat, text-less button: _draw_plus paints the ringed circle and the "+".
 	_plus = Button.new()
@@ -71,35 +82,34 @@ func setup(target: Lucian, slot_skill: LucianSkill, icon: Texture2D, key: String
 	_icon.texture = icon
 	_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_icon.stretch_mode = TextureRect.STRETCH_SCALE
-	_place(_icon, icon_rect)
+	_place(_icon, cell.grow(-HudCell.INSET))
 
 	_overlay = Control.new()
 	_overlay.draw.connect(_draw_overlay)
-	_place(_overlay, icon_rect)
+	_place(_overlay, cell)
 
 	_lock = TextureRect.new()
 	_lock.texture = LOCK_TEXTURE
 	_lock.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_lock.visible = false
-	_place(_lock, Rect2(icon_rect.get_center() - Vector2(16, 16), Vector2(32, 32)))
+	_place(_lock, Rect2(cell.get_center() - Vector2(16, 16), Vector2(32, 32)))
 
-	_cooldown_label = _label(icon_rect, 24, HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
-	_cost_label = _label(icon_rect.grow(-3), 13, HORIZONTAL_ALIGNMENT_LEFT, VERTICAL_ALIGNMENT_TOP)
+	_cooldown_label = _label(cell, 24, HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
+	_cost_label = _label(cell.grow(-4), 13, HORIZONTAL_ALIGNMENT_LEFT, VERTICAL_ALIGNMENT_TOP)
 	_cost_label.add_theme_color_override(&"font_color", Color("8fb8ff"))
-	_key_label = _label(icon_rect.grow(-3), 13, HORIZONTAL_ALIGNMENT_RIGHT, VERTICAL_ALIGNMENT_BOTTOM)
-	_key_label.text = key
 
 
 ## Shows a new key after rebinding.
 func set_key(key: String) -> void:
 	_key = key
-	_key_label.text = key
+	_overlay.queue_redraw()
 
 
 func _process(_delta: float) -> void:
 	if lucian == null:
 		return
 	_overlay.queue_redraw()
+	queue_redraw()
 	if skill == null:
 		# The passive: locked and grey until the Evolution Tree teaches it.
 		var learned := lucian.passive.learned
@@ -120,12 +130,7 @@ func _process(_delta: float) -> void:
 	_plus_locked = not progress.next_rank_bought(skill.slot)
 	_plus.queue_redraw()
 	_cost_label.text = str(roundi(cost)) if cost > 0.0 else ""
-	if remaining <= 0.0:
-		_cooldown_label.text = ""
-	elif remaining < 1.0:
-		_cooldown_label.text = "%.1f" % remaining
-	else:
-		_cooldown_label.text = str(ceili(remaining))
+	_cooldown_label.text = HudCell.seconds_text(remaining) if remaining > 0.0 else ""
 	var blocked := skill.rank() > 0 and lucian.is_skill_blocked(skill.slot)
 	var material: Material = _grey if blocked else null
 	if _icon.material != material:
@@ -138,7 +143,6 @@ func _process(_delta: float) -> void:
 		_icon.modulate = NO_MANA_TINT
 	else:
 		_icon.modulate = Color.WHITE
-	queue_redraw()
 
 
 ## Shown around Lucian while hovered, once the skill is learned.
@@ -162,34 +166,40 @@ func tooltip_place() -> HoverTip.Place:
 	return HoverTip.Place.ABOVE
 
 
-## Rank dots under the icon.
+## The cell behind the icon, and a skill's rank diamonds under it: gold for
+## each rank learned.
 func _draw() -> void:
+	HudCell.draw_box(self, _cell_rect(), UiStyle.CELL_BORDER, _hovered)
 	if skill == null:
 		return
 	var count := skill.data.max_rank
-	var dot := Vector2(9, 5)
-	var gap := 3.0
-	var start_x := (ICON_SIZE - count * dot.x - (count - 1) * gap) * 0.5
+	var first := Vector2((ICON_SIZE - (count - 1) * DIAMOND_STEP) * 0.5, PLUS_HEIGHT + ICON_SIZE + DOTS_HEIGHT * 0.5 + 1.0)
 	for i in count:
-		var rect := Rect2(Vector2(start_x + i * (dot.x + gap), PLUS_HEIGHT + ICON_SIZE + 4.0), dot)
-		draw_rect(rect, DOT_ON if i < skill.rank() else DOT_OFF)
+		draw_colored_polygon(Plate.diamond(first + Vector2(i * DIAMOND_STEP, 0), DIAMOND), DOT_ON if i < skill.rank() else DOT_OFF)
 
 
+## Over the icon: the cooldown sweep (or the charged passive's gold ring) and
+## the key's tab.
 func _draw_overlay() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(_icon_size, _icon_size))
 	if skill:
 		var fraction := skill.cooldown.fraction_remaining()
 		if fraction > 0.005:
-			_overlay.draw_colored_polygon(sweep_polygon(fraction, _icon_size), SWEEP_COLOR)
+			_overlay.draw_set_transform(Vector2.ONE * HudCell.INSET)
+			_overlay.draw_colored_polygon(sweep_polygon(fraction, _icon_size - HudCell.INSET * 2.0), SWEEP_COLOR)
+			_overlay.draw_set_transform(Vector2.ZERO)
 	elif lucian.passive.learned and lucian.passive.charged:
-		_overlay.draw_rect(rect.grow(-2.0), DOT_ON, false, 4.0)
-		return
-	_overlay.draw_rect(rect, FRAME_COLOR, false, 2.0)
+		var ring := UiStyle.cell_style(DOT_ON)
+		ring.draw_center = false
+		ring.set_border_width_all(CHARGED_WIDTH)
+		_overlay.draw_style_box(ring, rect)
+	HudCell.draw_key(_overlay, rect, _key)
 
 
-## The rank-up button: a gold "+" in a gold ring. Brighter on hover; pressing
-## fills the circle gold. Grey when the skill can't rank up now, with a small
-## lock when its next rank isn't bought.
+## The rank-up button: a gold "+" in a gold ring over a soft light. Brighter
+## on hover; pressing fills the circle gold. Grey, with no light, when the
+## skill can't rank up now, and with a small lock when its next rank isn't
+## bought.
 func _draw_plus() -> void:
 	var center := _plus.size * 0.5
 	var mode := _plus.get_draw_mode()
@@ -198,6 +208,8 @@ func _draw_plus() -> void:
 	if _plus.disabled:
 		accent = PLUS_GREY
 		pressed = false
+	else:
+		_plus.draw_texture_rect(JourneyMap.glow(), Rect2(center - Vector2.ONE * PLUS_RADIUS * 2.0, Vector2.ONE * PLUS_RADIUS * 4.0), false, Color(DOT_ON, PLUS_GLOW))
 	_plus.draw_circle(center, PLUS_RADIUS, accent if pressed else PLUS_FILL)
 	_plus.draw_arc(center, PLUS_RADIUS, 0.0, TAU, 32, accent, 2.0, true)
 	var mark := PLUS_FILL if pressed else accent
@@ -223,6 +235,11 @@ static func sweep_polygon(fraction: float, square: float) -> PackedVector2Array:
 		var direction := Vector2(cos(angle), sin(angle))
 		points.append(center + direction / maxf(absf(direction.x), absf(direction.y)) * square * 0.5)
 	return points
+
+
+## The cell: under the "+", centered in the skill icons' band.
+func _cell_rect() -> Rect2:
+	return Rect2(0, PLUS_HEIGHT + (ICON_SIZE - _icon_size) * 0.5, _icon_size, _icon_size)
 
 
 func _place(control: Control, rect: Rect2) -> void:

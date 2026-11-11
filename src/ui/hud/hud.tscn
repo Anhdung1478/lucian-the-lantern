@@ -142,7 +142,7 @@ vertical_alignment = 1
 
 [node name="ManaBar" type="Control" parent="Root/BottomPanel/Row/MainColumn"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(420, 14)
+custom_minimum_size = Vector2(420, 16)
 layout_mode = 2
 script = ExtResource("5_bar")
 

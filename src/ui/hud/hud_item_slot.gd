@@ -1,20 +1,30 @@
 class_name HudItemSlot
 extends Control
-## One inventory cell on the HUD: an equip slot or a potion cell (the item's
-## icon, a potion stack's count, an active's cooldown and the cell's key; an
-## empty potion cell shows its potion faded) or the boots (no key, nothing
-## drawn while there are none). Locked slots are hidden. Hovering shows the
-## item's card above it.
+## One inventory cell on the HUD, a dark well with a rim by what it holds
+## (UiStyle.item_rim): an equip slot or a potion cell (the item's icon, a
+## potion stack's count, an active's cooldown and the cell's key in the
+## corner tab; an empty potion cell shows its potion faded) or the boots (no
+## key, nothing drawn while there are none). Locked slots are hidden. The rim
+## turns gold while the mouse is on the cell; hovering shows the item's card
+## above it.
 
 const SIZE := 40.0
-const FILL := Color(0.09, 0.105, 0.14)
-const FRAME_COLOR := Color(0.36, 0.4, 0.48)
 const PLACEHOLDER := Color(1, 1, 1, 0.3)
+const SWEEP_COLOR := Color(0, 0, 0, 0.65)
+## The room between the cell's edge and the item's icon.
+const ICON_INSET := 3.0
+const KEY_FONT := 12
 
 var inventory: Inventory
 var index := 0
 ## For item cooldowns; optional.
 var lucian: Lucian
+
+## The mouse is on the cell: its rim is gold.
+var _hovered := false:
+	set(value):
+		_hovered = value
+		queue_redraw()
 
 
 ## `cell` is the inventory index: an equip slot, a potion cell or the boots.
@@ -22,6 +32,8 @@ func _init(target_inventory: Inventory, cell: int) -> void:
 	inventory = target_inventory
 	index = cell
 	custom_minimum_size = Vector2(SIZE, SIZE)
+	mouse_entered.connect(func() -> void: _hovered = true)
+	mouse_exited.connect(func() -> void: _hovered = false)
 	inventory.changed.connect(_refresh)
 	_refresh()
 
@@ -63,12 +75,12 @@ func _draw_cooldown(rect: Rect2) -> void:
 	var cooldown: Cooldown = lucian.item_cooldowns[item.id]
 	if cooldown.is_ready():
 		return
-	draw_colored_polygon(SkillSlot.sweep_polygon(cooldown.fraction_remaining(), SIZE), Color(0, 0, 0, 0.65))
-	var text := "%.1f" % cooldown.remaining if cooldown.remaining < 1.0 else str(ceili(cooldown.remaining))
-	var font := ThemeDB.fallback_font
+	var inner := rect.grow(-HudCell.INSET)
+	draw_set_transform(inner.position)
+	draw_colored_polygon(SkillSlot.sweep_polygon(cooldown.fraction_remaining(), inner.size.x), SWEEP_COLOR)
+	draw_set_transform(Vector2.ZERO)
 	var at := Vector2(0, rect.get_center().y + 6.0)
-	draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 16, 4, Color.BLACK)
-	draw_string(font, at, text, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 16, Color.WHITE)
+	HudCell.draw_text(self, at, HudCell.seconds_text(cooldown.remaining), HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 16)
 
 
 func _refresh() -> void:
@@ -81,19 +93,13 @@ func _draw() -> void:
 	if index == Inventory.BOOTS_CELL and item == null:
 		return
 	var rect := Rect2(Vector2.ZERO, size)
-	draw_rect(rect, FILL)
+	HudCell.draw_box(self, rect, UiStyle.item_rim(item), _hovered)
 	if item:
-		ItemIcon.draw_item(self, item, rect.grow(-3.0))
+		ItemIcon.draw_item(self, item, rect.grow(-ICON_INSET))
 	else:
-		ItemIcon.draw_item(self, placeholder(), rect.grow(-3.0), PLACEHOLDER)
+		ItemIcon.draw_item(self, placeholder(), rect.grow(-ICON_INSET), PLACEHOLDER)
 	ItemIcon.draw_count(self, inventory.count_at(index), rect, true)
 	_draw_cooldown(rect)
-	draw_rect(rect, FRAME_COLOR, false, 2.0)
 	var action := Inventory.key_action(index)
-	if action == &"":
-		return
-	var key := GameSettings.instance().short_key_label(action)
-	var font := ThemeDB.fallback_font
-	var at := Vector2(0, size.y - 3.0)
-	draw_string_outline(font, at, key, HORIZONTAL_ALIGNMENT_RIGHT, size.x - 3.0, 12, 4, Color.BLACK)
-	draw_string(font, at, key, HORIZONTAL_ALIGNMENT_RIGHT, size.x - 3.0, 12, Color.WHITE)
+	if action != &"":
+		HudCell.draw_key(self, rect, GameSettings.instance().short_key_label(action), KEY_FONT)

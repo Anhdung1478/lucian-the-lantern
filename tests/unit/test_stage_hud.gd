@@ -60,7 +60,7 @@ func test_skill_and_summoner_slots_and_their_cards_show_the_short_key_name() -> 
 	add_child_autofree(hud)
 	hud.setup(lucian, Wallet.new())
 	await wait_process_frames(1)
-	var shown := hud._skill_slots[0]._key_label.text
+	var shown := hud._skill_slots[0]._key
 	var skill_card := hud._skill_slots[0].tooltip_content()
 	var summoner: SummonerSlot = null
 	for child in hud.skill_row.get_children():
@@ -229,6 +229,18 @@ func test_the_portrait_shows_the_level_and_the_xp() -> void:
 	assert_almost_eq(hud.xp_bar.value, 30.0 / progress.xp_for_next(), 0.001)
 	assert_true(hud.portrait.get_global_rect().encloses(hud.level_label.get_global_rect()), "the badge sits on the portrait")
 	assert_gte(hud.xp_bar.get_global_rect().position.y, hud.portrait.get_global_rect().end.y, "the XP bar is under it")
+
+
+## The bottom bar covers no more of the fight than it did before the
+## Lantern look (176 px).
+func test_the_bottom_bar_is_no_taller_than_before() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	hud.setup(lucian, Wallet.new())
+	await wait_process_frames(2)
+	assert_lte(hud.bottom_panel.size.y, 176.0)
 
 
 func test_fps_sits_top_left() -> void:
