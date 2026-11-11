@@ -3,7 +3,7 @@ extends Control
 ## Under the stage info while a boss or a mini boss lives, on an ornate
 ## plate: its name, and its Boss.phase_label() after it (Act 6's Thresh:
 ## "Phase 1", "Phase 2"), as a heading in spaced capitals over a wide red
-## health bar (a HudBar, with Lucian's gradient and ghost damage). It finds
+## health bar (a HudBar with Lucian's gradient and ghost damage, no ticks). It finds
 ## the unit itself (a boss before a mini boss).
 
 ## The health bar.
@@ -43,6 +43,7 @@ func _ready() -> void:
 	add_child(_heading)
 	_bar.fill_top = FILL_TOP
 	_bar.fill_bottom = FILL_BOTTOM
+	_bar.ticks = false
 	_bar.position = Vector2(PAD, PAD + HEADING_HEIGHT + HEADING_GAP)
 	_bar.size = SIZE
 	add_child(_bar)
