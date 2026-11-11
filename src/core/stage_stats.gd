@@ -9,6 +9,30 @@ var damage_dealt := 0.0
 ## After armor, before shields.
 var damage_taken := 0.0
 var gold_earned := 0
+## The damage taken (as damage_taken) per source: the attacking enemy's id,
+## else the hit's own source (&"burn" for ground fire).
+var damage_by_source := {}
+## Who struck the last blow (a key of damage_by_source) and with what
+## (DamageInfo.source, e.g. &"basic", &"burn" or a boss skill).
+var last_hit_by: StringName
+var last_hit_with: StringName
+
+
+## Counts a hit Lucian took: `amount` is what it did after armor.
+func record_hit(info: DamageInfo, amount: float) -> void:
+	var by := source_of(info)
+	damage_taken += amount
+	damage_by_source[by] = damage_by_source.get(by, 0.0) + amount
+	last_hit_by = by
+	last_hit_with = info.source
+
+
+## The key a hit counts under: its enemy's id, else its source.
+static func source_of(info: DamageInfo) -> StringName:
+	var attacker := info.attacker as EnemyUnit
+	if is_instance_valid(attacker) and attacker.data:
+		return attacker.data.id
+	return info.source
 
 
 ## "9,999" under 10,000; "41.2k" from there on.

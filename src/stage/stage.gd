@@ -157,7 +157,7 @@ func _ready() -> void:
 	result.chosen.connect(func(then: StringName) -> void: finished.emit(&"cleared" if result.cleared else &"failed", then))
 	lucian.died.connect(_on_lucian_died)
 	lucian.damage_received.connect(damage_numbers.spawn.bind(lucian, LUCIAN_NUMBER_SCALE))
-	lucian.damage_received.connect(func(_info: DamageInfo, amount: float) -> void: stats.damage_taken += amount)
+	lucian.damage_received.connect(stats.record_hit)
 	screens.backpack.setup(lucian.inventory)
 	screens.backpack_toggled.connect(debug_table.set_docked_right)
 	lucian.merchant_reached.connect(_open_shop)
