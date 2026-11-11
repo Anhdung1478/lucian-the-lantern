@@ -39,3 +39,18 @@ func test_a_diamond_has_four_points_around_its_center() -> void:
 	assert_eq(points.size(), 4)
 	assert_eq(points[0], Vector2(10, 6))
 	assert_eq(points[2], Vector2(10, 14))
+
+
+func test_a_cell_rim_follows_the_item_in_it() -> void:
+	var catalog: ItemCatalog = load("res://data/items/catalog.tres")
+	assert_eq(UiStyle.item_rim(null), UiStyle.CELL_BORDER)
+	assert_eq(UiStyle.item_rim(catalog.find(&"bf_sword")), UiStyle.RIM_FRAGMENT)
+	assert_eq(UiStyle.item_rim(catalog.find(&"infinity_edge")), UiStyle.RIM_LEGENDARY)
+	assert_eq(UiStyle.item_rim(catalog.find(&"hp_potion")), UiStyle.RIM_POTION)
+	assert_eq(UiStyle.item_rim(catalog.find(&"boots_of_speed")), UiStyle.RIM_BOOTS)
+
+
+func test_a_lit_cell_has_a_gold_rim() -> void:
+	assert_eq(UiStyle.cell_style().border_color, UiStyle.CELL_BORDER)
+	assert_eq(UiStyle.cell_style(UiStyle.RIM_LEGENDARY).border_color, UiStyle.RIM_LEGENDARY)
+	assert_eq(UiStyle.cell_style(UiStyle.RIM_LEGENDARY, true).border_color, UiStyle.GOLD_COLOR)

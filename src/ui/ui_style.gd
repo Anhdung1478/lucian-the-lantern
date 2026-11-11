@@ -23,6 +23,11 @@ const CELL_BORDER := Color(0.36, 0.4, 0.48)
 ## Good and bad numbers: a heal, a gain; damage, a loss.
 const GOOD_COLOR := Color("5ad07a")
 const BAD_COLOR := Color("e2504a")
+## The rim of a cell by the item in it: a fragment, a legendary, boots, a potion.
+const RIM_FRAGMENT := Color("8ea2b8")
+const RIM_LEGENDARY := Color("e0b04c")
+const RIM_BOOTS := Color("5fc7a8")
+const RIM_POTION := Color("c9706a")
 ## A styled button's soft click, quiet under the game's sounds.
 const CLICK_DB := -10.0
 ## Set on a button once its click is connected, so a restyle adds no second.
@@ -99,6 +104,29 @@ static func style_button(button: Button, font_size := 22, selected := false) -> 
 	button.add_theme_color_override(&"font_color", TITLE_COLOR if selected else TEXT_COLOR)
 	button.add_theme_color_override(&"font_hover_color", TITLE_COLOR)
 	button.add_theme_color_override(&"font_disabled_color", DISABLED_FONT)
+
+
+## A cell's box: a dark well with a thin rim (gold when `lit`).
+static func cell_style(rim := CELL_BORDER, lit := false, radius := 4) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = CELL_COLOR
+	style.border_color = GOLD_COLOR if lit else rim
+	style.set_border_width_all(2 if lit else 1)
+	style.set_corner_radius_all(radius)
+	return style
+
+
+## The rim colour for the item in a cell (CELL_BORDER for an empty one).
+static func item_rim(item: ItemData) -> Color:
+	if item == null:
+		return CELL_BORDER
+	if item.is_potion():
+		return RIM_POTION
+	if item.is_boots():
+		return RIM_BOOTS
+	if item.is_fragment():
+		return RIM_FRAGMENT
+	return RIM_LEGENDARY
 
 
 static func label(text: String, font_size := 18, color := TEXT_COLOR) -> Label:
