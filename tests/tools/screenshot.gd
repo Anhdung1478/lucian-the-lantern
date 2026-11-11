@@ -61,6 +61,7 @@ const ACT_SCENARIOS := {
 	"level_up": [2, 1],
 	"wave_banner": [3, 2], "wave_banner_boss": [1, 1],
 	"units_motion": [2, 1],
+	"wave_preview": [3, 2], "wave_preview_boss": [1, 1],
 }
 
 ## Where the window was when the run started; shot() stops the run if it moved.
@@ -257,6 +258,10 @@ func _run(scenario: String) -> void:
 			await scenario_act1_shell()
 		"act1_break":
 			await scenario_act1_break()
+		"wave_preview":
+			await scenario_wave_preview(false)
+		"wave_preview_boss":
+			await scenario_wave_preview(true)
 		"act1_lesson":
 			await scenario_act1_lesson()
 		"act1_thresh":
@@ -2427,6 +2432,22 @@ func scenario_act1_break() -> void:
 	print("merchant on the map (expect true): ", is_instance_valid(game.merchant),
 		"  gold: ", game.wallet.gold, "  blue collected: ", game.collected[Essences.BLUE])
 	await shot("act1_break_0")
+
+
+## A break with the next wave previewed: a normal wave, or (`boss`) the boss
+## wave with a tip showing under the preview.
+func scenario_wave_preview(boss: bool) -> void:
+	var game := game_stage()
+	flush_tips()
+	if boss:
+		game.runner._skip_to(game.runner.wave_count())
+		game.runner._countdown = WaveRunner.BREAK_TIME
+		game.hud.tips.show_tip(&"preview", "The boss comes next: buy what you need.")
+	await wait(1.5)
+	var preview := game.hud.wave_preview
+	print("preview (expect true): ", preview.visible, "  cells: ", preview.cells.size(), "  bottom ",
+		preview.get_global_rect().end.y, " (expect under the tip's top ", game.hud.tips.get_global_rect().position.y, ")")
+	await shot("wave_preview_boss_0" if boss else "wave_preview_0")
 
 
 ## Wave 1 cleared: Senna's lesson. Her first line, her dash with its trail,

@@ -28,7 +28,8 @@ const GOLD_PAD := 10.0
 const MANA_TOP := Color("5b9cf0")
 const MANA_BOTTOM := Color("2a5cb8")
 const MANA_GHOST := Color("c4d9ff")
-## The boss bar sits under the stage info.
+## The boss bar sits under the stage info; so does the next-wave preview, which
+## shows only in a break, when there is no boss bar.
 const BOSS_BAR_TOP := 92.0
 ## The tips sit under the boss bar.
 const TIPS_TOP := 180.0
@@ -57,6 +58,7 @@ var tips := TipBanner.new()
 var stage: Stage
 var stage_info := StageInfo.new()
 var boss_bar := BossBar.new()
+var wave_preview := WavePreview.new()
 ## Under the rest of the HUD: it never hides its text.
 var vignette := LowHealthVignette.new()
 var radar := Radar.new()
@@ -91,6 +93,7 @@ func setup(target: Lucian, stage_wallet: Wallet, stage_node: Stage = null) -> vo
 	stage_info.setup(stage.run.display_name if stage else "Training", stage.runner if stage else null)
 	if stage:
 		stage_info.skip_pressed.connect(stage.skip_break)
+		wave_preview.setup(stage.runner)
 	radar.setup(stage.arena.get_bounds() if stage else Rect2(0, 0, 4800, 2700), target)
 	_place_radar()
 	wallet = stage_wallet
@@ -171,6 +174,7 @@ func _process(_delta: float) -> void:
 		return
 	# Hovering a skill, item or summoner slot shows its range around Lucian.
 	lucian.indicator.hovered = hover_range_of(get_viewport().gui_get_hovered_control())
+	wave_preview.suppressed = stage != null and stage.result.visible
 	var progress := lucian.progress
 	level_label.text = str(progress.level)
 	var xp_needed := progress.xp_for_next()
@@ -351,6 +355,10 @@ func _build_stage_info() -> void:
 	stage_info.offset_left = 0.0
 	stage_info.offset_right = 0.0
 	stage_info.offset_top = MARGIN
+	$Root.add_child(wave_preview)
+	wave_preview.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	wave_preview.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	wave_preview.offset_top = BOSS_BAR_TOP
 	$Root.add_child(boss_bar)
 	boss_bar.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	boss_bar.grow_horizontal = Control.GROW_DIRECTION_BOTH
