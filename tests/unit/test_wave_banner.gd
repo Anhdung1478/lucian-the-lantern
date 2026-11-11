@@ -289,3 +289,14 @@ func test_training_has_no_banner() -> void:
 	add_child_autofree(stage)
 	await wait_process_frames(2)
 	assert_null(stage.wave_banner)
+
+
+## A tip under the boss bar (Act 1's "Thresh's hook…") and the boss's banner
+## show together: the banner starts under the tip, not over it.
+func test_the_banner_sits_under_the_huds_tips() -> void:
+	var tips := TipBanner.new()
+	add_child_autofree(tips)
+	tips.show_tip(&"t", "Thresh's hook flies along the red line. Move sideways!")
+	tips._process(0.0)
+	await wait_process_frames(2)
+	assert_gt(WaveBanner.TOP, Hud.TIPS_TOP + tips.size.y, "clear of a tip")

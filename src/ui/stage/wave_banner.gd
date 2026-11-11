@@ -12,8 +12,9 @@ extends PanelContainer
 const WAVE := "WAVE %d"
 const MINI_BOSS := "MINI BOSS"
 const BOSS := "BOSS"
-## From the top of the screen: under the stage info, the boss bar and a tip.
-const TOP := 210.0
+## From the top of the screen: under the stage info, the boss bar and a tip
+## (the HUD puts its tips at Hud.TIPS_TOP; one is about 52 tall).
+const TOP := Hud.TIPS_TOP + 70.0
 const WIDTH := 860.0
 const PAD := 14.0
 ## Seconds at full strength, and each fade.
