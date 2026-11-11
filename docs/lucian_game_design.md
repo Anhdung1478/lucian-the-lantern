@@ -204,7 +204,7 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 - **A skill's CC lands only when its hit lands:** Banshee's Veil blocks the damage and the CC with it.
 - **Fairness:** every root, stun or fear comes from a warning of 0.7 s or more, or from a bolt or wave he can see, and lasts 1.5 s at most (1.0, 1.25 and 1.25 s are the built values). It shows in the buff row ("Rooted", "Stunned", "Feared", with icons) and as a short red word under his health bar (the strongest: stun, then fear, then root).
 
-**Summons** (the Maiden's ghouls, the Broodmother's spiderlings, Thresh's Lantern Souls): the wave counts one the moment it is asked for and waits for it. Each summoner has a cap on its live summons. A summoner's death leaves them. A summon pays 25% (§9). *(V1.5.0: the Maiden heals 5% of her max HP each time she calls ghouls, and the final Thresh heals 3% when one of his souls is killed within 400 of him, 10 times a fight at most.)*
+**Summons** (the Maiden's ghouls, the Broodmother's spiderlings, Thresh's Lantern Souls): the wave counts one the moment it is asked for and waits for it. Each summoner has a cap on its live summons. A summoner's death leaves them. A summon pays 25% (§9). *(V1.5.0: the Maiden heals 5% of her max HP each time she calls ghouls, and the final Thresh heals 3% when one of his souls is killed within 400 of him, 10 times a fight at most.)* *(V2.0: a summoner also has a total (`EnemyData.summon_total`): the Maiden of the Mist calls 12 ghouls in all and the Broodmother 10 spiderlings, then no more. Before, only the cap on live summons limited them.)*
 
 **Vanishing:** a sapling that explodes and Thresh's souls at his fall leave with no rewards at all, no note and no kill. It is the Scuttler's escape without "Escaped!". **Freed:** a Lantern Soul that dies (or vanishes) rises and fades as teal-white light with a soft chime, and pays like any kill.
 
@@ -219,6 +219,22 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 **The ending:** the cutscene (skippable), STAGE CLEARED with "Senna is free" and "The story is complete", then, on the first clear only, `TheEndScreen` with the slot's story time. Replays skip it.
 
 **Debug:** the stage debug table gains "Boss HP 5%" and "Jump to the last wave" (every enemy goes, no rewards, and the last wave comes next). Since V1.4.2 the jump also removes untargetable bosses (one mid-dash, mid-Rappel or mid-Sky Dive). Since V1.4.3 a Dark Lucian removed mid-dash leaves no violet trail behind (it fades as at a dash's end), and a Thresh spawned from the debug list (not the stage's boss) leaves at 50% HP with his blue and orange, with no cutscene, and the fight goes on.
+
+### Built in V2.0
+**Resolve.** A story stage that beats Lucian gets a little easier each time, so every player gets through in the end.
+- Each **defeat** on a story stage **not yet cleared** adds one stack of Resolve for that stage, up to **5**. Leaving a stage is no defeat.
+- A stack gives **+10% damage dealt and -10% damage taken** on Easy and Normal, **5%** on Hard and **none** on Extreme (`Difficulty.RESOLVE_STEPS`, §17). Damage dealt covers attacks, skills, items and Lucian's burns, and is multiplied before the enemy's armor and magic resist. Damage taken is multiplied on top of the difficulty's scale, before armor and magic resist.
+- **Clearing the stage clears its stacks.** A cleared stage replayed, Training and Endless have none.
+- The save keeps the defeats per stage (`"defeats"`, §15). The stacks of a try are read when the stage starts.
+- The Gameplay setting **Resolve** (on by default) turns the effect off. The defeats are still counted, so the stacks come back when it is turned on.
+- It shows as a **buff icon** with the stacks, a green line on the DEFEATED screen ("Resolve 3 / 5: +30% damage, -30% damage taken on your next try"), a line in the Journey's side panel and a second line in each difficulty's hover text (`ui_design.md` §1, §5, §7; `main_screen.md`).
+- Code: `Resolve` (`src/core/resolve.gd`), `Lucian.set_resolve`.
+
+**The next-wave preview.** Before wave 1 and in every break, a plate under the stage info shows **NEXT** and each enemy of the next wave as an icon with its count; a boss or mini boss has a gold rim and its name. Endless only says "Mini boss wave" or "Boss wave". It is hidden in a wave, on the end screen, during the modifier pick and in Training (`ui_design.md` §1; `WaveRunner.next_ids()`).
+
+**The death recap.** On DEFEATED, GAME OVER and RUN OVER, a block **WHAT HIT YOU** names the enemy that struck the last blow, the three sources that did the most damage as shares, one tip for the top source and, when the save can buy a node, "You can afford an upgrade in the Evolution Tree." (`DeathRecap`, `StageStats.record_hit`; the tip table is in `ui_design.md` §1).
+
+**Summon totals.** The Maiden of the Mist calls 12 ghouls and the Broodmother 10 spiderlings in all (see "Summons" above).
 
 ---
 
@@ -794,6 +810,23 @@ No wall polygon has a hole: a hole would collide as solid wall. The jungle keeps
 
 The abyss is several polygons on its own physics layer (no polygon has a hole). Details and numbers are in `act5_shadow_isles.md` and `act6_the_lantern.md`.
 
+### Built in V2.0
+Every map is redrawn with `MapArt` (`src/stage/maps/map_art.gd`), the drawing kit of the maps' `_draw`, and gets slow ambient lights from `MapAmbience` (`map_ambience.gd`). **No wall, path, spawn point or size changed**: only what is drawn. The light comes from the top-left, walls cast soft shadows to the bottom-right, and nothing on the ground is strong enough to hide a unit or a red warning. A map is drawn once; its cost is about 0.2 to 1.2 ms of CPU and 0.1 to 0.3 ms of GPU with 40 enemies in view. The ambience (fireflies, glints, dust) is off on Low quality.
+
+| Act | Map | Look now |
+|---|---|---|
+| 1 | Mid lane | Cobbled lane, shaded rocks, jungle crowns with highlights, a river with banks and a current. |
+| 2 | Training ground | Flagstones, a brass ring with the Sentinels' star, a block wall with braziers, gates with towers, sandstone pillars. |
+| — | Training | Slate slabs lit by the lantern's teal light. |
+| 3 | Jungle | Worn paths, camp details, a dry riverbed; scorch marks round the lava in 3-2, clear water in 3-4, fireflies. |
+| 3 | Dragon's pit | Rings of stone, claw marks on the floor and an elder glow. |
+| 4 | Dark mid lane | Act 1's layout in black and violet, with wisps and a haze. |
+| 5 | Dead forest | Cold grey-teal earth, black leafless tree lines, gnarled trees, Maokai's ring, the spider nest, Elise's camp. Karthus's graveyard has flagstones and tombstones (`MapArt.limbs`). |
+| 6 | Thresh's domain | Slate flagstone plateaus with lit lips and cliff faces over a layered abyss with far chains and souls; stone bridges with lantern light; the altar and Hecarim's camp. |
+| 6 | Final platform | Slab courses, 32 glowing runes and a pale dais. |
+
+**Terrain pieces:** Black Mist banks are layered mist with a darker heart and wisps (the drift only with `Juice.on()`). Lava, every burning `HazardZone`, is a dark crust with glowing cracks, a hot core and a slow pulse. Shallow water has deeper steps, ripples and glints. The Blast Cone and the Honeyfruit are drawn in code (`MapArt.leaf`): their SVGs in `assets/art/stage/` are no longer used. Units have shadows and the battlefield has glows, sparks and numbers that pop: `ui_design.md` §1, "On the battlefield".
+
 ---
 
 ## 14. Endless Mode
@@ -962,10 +995,13 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 - The spells picked for D and F
 - Owned skins, equipped skin
 - Cleared stages, and which bosses / mini bosses already gave first-time purple
+- Resolve's defeats: how many times Lucian fell on each story stage not yet cleared (`"defeats"`, V2.0, §3)
 - Endless best wave (the most waves cleared in one run)
 - The Endless milestone waves already paid (V1.5.0, §14)
 - Play time: every second outside the title screen, pauses not counted
 - The difficulty (V1.3)
+
+The slot's JSON is still `VERSION` 1: V2.0 only adds the `"defeats"` key, a dictionary of stage id to count (`{"2-1": 3}`). A stage leaves it when it is cleared. A save from before V2.0 has none and loads with no defeats; an entry that is not a positive whole count, names no story stage or names a cleared stage is skipped on load.
 
 Nothing inside a stage is saved (items, gold, level, enemies), since stages always reset.
 
@@ -1006,6 +1042,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 | `loadout` | The spells on D and F: `["flash", "heal"]` (`""` for none) |
 | `cleared` | Cleared stage ids: `["1-1", "2-1"]` |
 | `bosses` | Bosses that already gave their first-time purple: `["thresh_1", "akshan"]` |
+| `defeats` | Resolve's defeats: stage id → how many times Lucian fell there, for story stages not yet cleared: `{"2-1": 3}` (V2.0). A stage's entry goes when it is cleared |
 | `endless_best` | Best Endless wave: the most waves cleared in one run (dying in wave 23 records 22) |
 | `endless_milestones` | The Endless milestone waves already paid, in the order won: `[10, 20]` (V1.5.0). Only 10, 20, 30 and 40 load, each once |
 | `play_time` | Whole seconds played in this slot: `3720` |
@@ -1016,7 +1053,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - Numbers are converted back with `int()` when loading (JSON numbers load as floats). Unknown keys, node ids, skins, spell ids and stage ids are dropped, so an old or edited file still loads.
 - IDs are saved, not display names.
 - A save is written to a temp file first. Then the old save becomes the backup (only if it still reads, so a broken file never replaces a good backup) and the temp file replaces it. If anything fails, the old file and backup stay as they were. The backup loads if the main file is broken. With both broken, it's a new game.
-- `"version"` stays 1: Phase 6 and V1.3 only added keys. A file without `"bosses"` or `"play_time"` loads with none; one without `"difficulty"` (or with an unknown word) plays on Normal. *(V1.5.0 only adds `"endless_milestones"` too: a file without it loads with none paid.)*
+- `"version"` stays 1: Phase 6 and V1.3 only added keys. A file without `"bosses"` or `"play_time"` loads with none; one without `"difficulty"` (or with an unknown word) plays on Normal. *(V1.5.0 only adds `"endless_milestones"` too: a file without it loads with none paid.)* *(V2.0 only adds `"defeats"`: a file without it loads with none.)*
 - `SaveGame.start_new(slot, difficulty)` makes that slot current, resets the progress, sets the difficulty and writes it at once. If the write fails, the old data and slot are put back and the title screen shows a red notice (V1.4.2). The difficulty is chosen only here: `set_difficulty` was removed in V1.4.2. `award_boss(id, first, repeat)` returns the purple due and records the boss; the stage adds the essence.
 - The main screen's debug table (F3 + Q) gives essences, sets the acts cleared, maxes or clears the tree, resets the progress, and forgets the bosses' first-time purple. *(V1.5.0: only in a debug build. `DebugPanel.allowed` is `OS.is_debug_build()`, so the released game never opens it or the stage's table; a test sets it false to check the release case.)*
 
@@ -1055,7 +1092,15 @@ A playtest bot (`tests/tools/autoplay.gd`) played the story headless at three sk
 
 Bosses and mini bosses don't scale and keep their numbers (except the Ocean Drake's mist). Endless keeps its own scaling (`EndlessPlan`).
 
-**Tools:** `tests/tools/autoplay.gd` plays the story at a tier (skilled, average, novice), retries a lost stage, farms the last cleared one after 3 losses, and prints each try (kills, damage taken by enemy, what killed him). `AUTOPLAY_DIFFICULTY=hard` plays it on a difficulty. `tests/tools/stage_budget.gd` prints every stage's HP per wave, XP, gold, blue and the level Lucian ends at. Both run headless only. *(V1.5.0: between stages the bot buys skins with purple, through the Skin Shop's own call: every one it can afford, in Skin Shop order. It wears the last one bought, or with `AUTOPLAY_SKIN=<id>` (`classic` for none) it saves up for that one first and wears it once owned. Each try's line names the skin worn. The bot also follows the new item rules: it buys onto a free equip slot when its backpack is full, equips to make room for loot, and keeps one penetration item. `stage_budget.gd` counts an Ancient Krug's splits in the XP, gold and blue too, applies each stage's gold share, and after the stages prints each boss's and mini boss's wall, its HP ÷ the gold earned in its stage before its wave, and each act's average gold per stage, the boss's own gold included.)*
+**Tools:** `tests/tools/autoplay.gd` plays the story at a tier (skilled, average, novice), retries a lost stage, farms the last cleared one after 3 losses, and prints each try (kills, damage taken by enemy, what killed him). `AUTOPLAY_DIFFICULTY=hard` plays it on a difficulty. `tests/tools/stage_budget.gd` prints every stage's HP per wave, XP, gold, blue and the level Lucian ends at. Both run headless only. *(V1.5.0: between stages the bot buys skins with purple, through the Skin Shop's own call: every one it can afford, in Skin Shop order. It wears the last one bought, or with `AUTOPLAY_SKIN=<id>` (`classic` for none) it saves up for that one first and wears it once owned. Each try's line names the skin worn. The bot also follows the new item rules: it buys onto a free equip slot when its backpack is full, equips to make room for loot, and keeps one penetration item. `stage_budget.gd` counts an Ancient Krug's splits in the XP, gold and blue too, applies each stage's gold share, and after the stages prints each boss's and mini boss's wall, its HP ÷ the gold earned in its stage before its wave, and each act's average gold per stage, the boss's own gold included.)* *(V2.0: the bot plays more like a player and measures how long the story takes. It walks to the merchant in each break, and waits its tier's `idle` seconds before pressing Skip. It goes for summoners first (`focus`, the share of the time it does), fumbles some actions (`fumble`) and backs away from a melee enemy when its health is below the tier's `panic` share. `AUTOPLAY_RUN=<name>` gives a run its own save and settings files, so runs can go side by side. `AUTOPLAY_TIER="panic=0.2,react=0.4"` plays a tier with some numbers changed. `AUTOPLAY_RESOLVE=off` plays with the Resolve setting off. Each try prints its Resolve. A run ends with a per-stage summary and an **estimate of the play time**: the stage time, plus `between` seconds for each stage or farm run and `retry` seconds for each failed try. The tiers' numbers are in the table below.)*
+
+| Tier | react | kite | panic | warn | bolt | focus | fumble | idle | between | retry |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Skilled | 0.15 | 90 | 0 | 1.0 | 0.5 | 1.0 | 0 | 1 | 45 | 10 |
+| Average | 0.25 | 40 | 0 | 0.8 | 0.2 | 0.5 | 0.08 | 3 | 75 | 15 |
+| Novice | 0.35 | never | 0.25 | 0.5 | 0 | 0 | 0.25 | 6 | 120 | 20 |
+
+`react` is the reaction time in seconds, `kite` the distance at which it steps back from a melee enemy, `warn` and `bolt` the share of ground warnings and enemy bolts it dodges, `idle` the seconds it waits in a break, `between` and `retry` the seconds the estimate adds per stage and per failed try. The measured play time is left to the V2.0 report (`docs/report/v2.0.0.md`).
 
 ### Difficulty (V1.3)
 
@@ -1078,3 +1123,18 @@ The pass above makes Normal fit a new player. The difficulty lets the player mak
 - **Blue essence:** every kill's blue × 1.2 on Hard and × 1.5 on Extreme (`KillRewards`), on top of the tree's Essence Drops and an Endless modifier, so replays pay for the tree.
 - **Orange essence (V1.5.0):** the same × 1.2 and × 1.5, on the orange drop chance of normal and elite kills and on the sure orange of bosses and mini bosses and the Rift Scuttler, rounded. A boss pays 6 orange on Hard and 8 on Extreme (5 on Normal), a mini boss 4 and 5 (3), the Scuttler 5 and 6 on top of its chance (4).
 - **What it doesn't:** gold, XP, ~~orange~~ and purple essence, enemy speed, timings, and the boss break bars (they are shares of the boss's HP, so they grow with it). It applies in the story and Endless; Training's dummies keep their HP. *(Orange since V1.5.0, above. Endless's milestones aren't raised.)*
+
+### Resolve (V2.0)
+
+A stage that has beaten Lucian gets easier (§3, "Built in V2.0"). What one stack is worth depends on the difficulty (`Difficulty.RESOLVE_STEPS`):
+
+| Difficulty | One stack | Five stacks (the most) |
+|---|---|---|
+| Easy | +10% damage dealt, -10% damage taken | +50% dealt, -50% taken |
+| **Normal** | +10% damage dealt, -10% damage taken | +50% dealt, -50% taken |
+| Hard | +5% damage dealt, -5% damage taken | +25% dealt, -25% taken |
+| Extreme | none | none |
+
+- The damage taken is multiplied by 1 - 0.1 × stacks (so five stacks halve it on Normal), on top of the difficulty's own scale.
+- Training, Endless and a cleared stage never have it.
+- The pass behind it: the novice bot could not leave 2-1 (25 tries, dead in about 25 s), so a player who dies a lot needs a way through that does not change the stage for everyone else (`docs/implementation/v2.0.0.md`).
