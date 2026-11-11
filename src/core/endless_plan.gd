@@ -34,7 +34,8 @@ const WAVE_GROWTH := 0.05
 ## Boss and mini boss HP, fixed by wave whoever comes: BOSS_HP (MINI_BOSS_HP)
 ## × (1 + TIER_HP(k−1)), k being the tier; a boss has at least
 ## BOSS_WAVE_SHARE of the HP the wave before it brings (wave_hp). Damage ×
-## (1 + TIER_POWER(k−1)), or √damage_scale(w) when that is more.
+## (1 + TIER_POWER(k−1)), or the square root of how much damage_scale has
+## grown since the kind's first wave when that is more (×1 at tier 1).
 const BOSS_HP := 15000.0
 const MINI_BOSS_HP := 9000.0
 const TIER_HP := 0.3
@@ -189,18 +190,19 @@ static func mini_boss_hp(w: int) -> float:
 
 
 ## Boss `id`'s damage multiplier in wave `w`: its basic attack and every
-## skill hit. Its tier's, or the square root of the wave's normal
-## damage_scale when that is more, so it keeps up with the waves; × its
-## late_share.
+## skill hit. Its tier's, or the square root of the normal damage_scale's
+## growth since the first boss wave (BOSS_EVERY) when that is more, so it
+## keeps up with the waves and the first boss is ×1; × its late_share.
 static func boss_power(w: int, id := &"") -> float:
 	var tier := _boss_tier(w)
-	return maxf(1.0 + TIER_POWER * (tier - 1), sqrt(damage_scale(w))) * late_share(id, tier)
+	return _power(tier, w, BOSS_EVERY) * late_share(id, tier)
 
 
-## Mini boss `id`'s damage multiplier in wave `w`, as a boss's.
+## Mini boss `id`'s damage multiplier in wave `w`, as a boss's, grown since
+## the first mini boss wave (MINI_BOSS_EVERY).
 static func mini_boss_power(w: int, id := &"") -> float:
 	var tier := _mini_boss_tier(w)
-	return maxf(1.0 + TIER_POWER * (tier - 1), sqrt(damage_scale(w))) * late_share(id, tier)
+	return _power(tier, w, MINI_BOSS_EVERY) * late_share(id, tier)
 
 
 ## The share of its power boss or mini boss `id` deals at tier `tier`:
@@ -259,6 +261,14 @@ static func _boss_tier(w: int) -> int:
 ## k: 1 for wave 5's mini boss, 2 for wave 15's... (1 when called up earlier).
 static func _mini_boss_tier(w: int) -> int:
 	return maxi((w + MINI_BOSS_EVERY) / BOSS_EVERY, 1)
+
+
+## A boss's or mini boss's power at tier `tier` in wave `w`, before its
+## late_share: its tier's, or √(damage_scale(w) / damage_scale(first)) when
+## that is more, `first` being its kind's first wave (so ×1 there, and
+## before it).
+static func _power(tier: int, w: int, first: int) -> float:
+	return maxf(1.0 + TIER_POWER * (tier - 1), sqrt(damage_scale(w) / damage_scale(first)))
 
 
 static func _pick(pool: Array[StringName], rng: RandomNumberGenerator, last: StringName) -> StringName:

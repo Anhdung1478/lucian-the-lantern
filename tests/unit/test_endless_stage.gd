@@ -236,9 +236,10 @@ func test_a_boss_comes_at_the_boss_point_with_its_waves_hp_and_scaled_skill_hits
 	assert_not_null(boss)
 	assert_eq(boss.global_position, stage.arena.boss_point)
 	# P9: 0.6 of the HP wave 19 brings (more than tier 2's 19500), and the
-	# square root of wave 20's damage scale (more than tier 2's ×1.15).
+	# square root of the damage scale's growth since wave 10 (more than tier
+	# 2's ×1.15).
 	var power := EndlessPlan.boss_power(20)
-	assert_almost_eq(power, 1.696, 0.001)
+	assert_almost_eq(power, 1.2725, 0.0001)
 	assert_almost_eq(boss.max_hp, 0.6 * EndlessPlan.wave_hp(19, Journey.ENDLESS_ACT), 0.01, "the waves of Acts 1–3")
 	assert_gt(boss.max_hp, 15000.0 * 1.3)
 	assert_almost_eq(boss.hp, boss.max_hp, 0.01)
@@ -297,20 +298,20 @@ func test_a_mini_boss_has_its_tiers_hp_and_power_and_keeps_its_spawn_point() -> 
 	assert_almost_eq(maokai.max_hp, 9000.0 * 1.3, 0.01)
 	# P10: an Act 5 mini boss deals ×0.9 of its power at tier 2.
 	var power := EndlessPlan.mini_boss_power(15) * 0.9
-	assert_almost_eq(EndlessPlan.mini_boss_power(15), 1.515, 0.001, "the square root of wave 15's damage scale, more than tier 2's ×1.15")
+	assert_almost_eq(EndlessPlan.mini_boss_power(15), 1.3186, 0.0001, "the square root of the damage scale's growth since wave 5, more than tier 2's ×1.15")
 	assert_almost_eq(maokai.damage, 90.0 * power, 0.01)
 	assert_almost_eq(maokai.skill_hit(100.0, DamageInfo.Type.MAGIC, &"test").amount, 100.0 * power, 0.01)
 
 
 ## Its burns follow its power (Fix B, B13): after P9, the square root of
-## wave 25's damage scale, ×1.876 (tier 3 alone gave ×1.3).
+## the damage scale's growth since wave 5, ×1.633 (tier 3 alone gave ×1.3).
 func test_a_tier_3_endless_infernal_drake_burns_with_its_power() -> void:
 	var stage: Stage = await _endless()
 	stage.runner.spawn_requested.emit(&"infernal_drake", 25)
 	var drake := _unit(&"infernal_drake") as InfernalDrake
 	assert_not_null(drake)
 	var power := EndlessPlan.mini_boss_power(25)
-	assert_almost_eq(power, 1.876, 0.001)
+	assert_almost_eq(power, 1.633, 0.001)
 	assert_almost_eq(drake.skill_scale, power, 0.0001)
 	drake._burn_cone(Vector2.ZERO, Vector2.RIGHT)
 	drake._burn_circle(Vector2(500, 0))

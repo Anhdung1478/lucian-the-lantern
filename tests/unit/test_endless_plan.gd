@@ -286,21 +286,27 @@ func test_boss_and_mini_boss_hp_follow_the_table() -> void:
 	assert_almost_eq(EndlessPlan.mini_boss_hp(25), 14400.0, 0.01)
 
 
-## P9: × (1 + 0.15(k−1)), or the square root of the wave's normal damage
-## scale when that is more, which it is at every boss and mini boss wave (it
-## was ×1, ×1.15 and ×1.45 at waves 10, 20 and 40, and at waves 5, 15 and 35).
+## P9: × (1 + 0.15(k−1)), or the square root of how much the normal damage
+## scale has grown since the kind's first wave (10 for a boss, 5 for a mini
+## boss) when that is more, which it is from tier 2 on. Tier 1 stays ×1 (it
+## was ×1, ×1.15, ×1.45, ×1.6 at waves 10, 20, 40, 50 and at 5, 15, 35, 45).
 func test_boss_and_mini_boss_damage_keeps_up_with_the_waves() -> void:
-	for w in [10, 20, 40]:
-		assert_almost_eq(EndlessPlan.boss_power(w), sqrt(EndlessPlan.damage_scale(w)), 0.0001, "boss %d" % w)
-	assert_almost_eq(EndlessPlan.boss_power(10), 1.3328, 0.0001)
-	assert_almost_eq(EndlessPlan.boss_power(20), 1.6960, 0.0001)
-	assert_almost_eq(EndlessPlan.boss_power(40), 2.4138, 0.0001)
-	for w in [5, 15, 35]:
-		assert_almost_eq(EndlessPlan.mini_boss_power(w), sqrt(EndlessPlan.damage_scale(w)), 0.0001, "mini boss %d" % w)
-	assert_almost_eq(EndlessPlan.mini_boss_power(5), 1.1489, 0.0001)
-	assert_almost_eq(EndlessPlan.mini_boss_power(15), 1.5149, 0.0001)
-	assert_almost_eq(EndlessPlan.mini_boss_power(35), 2.2349, 0.0001)
-	assert_eq(EndlessPlan.boss_power(1), 1.0, "never less than tier 1's")
+	assert_eq(EndlessPlan.boss_power(10), 1.0, "the first boss")
+	assert_eq(EndlessPlan.mini_boss_power(5), 1.0, "the first mini boss")
+	for w in [20, 30, 40, 50]:
+		var growth := sqrt(EndlessPlan.damage_scale(w) / EndlessPlan.damage_scale(10))
+		assert_almost_eq(EndlessPlan.boss_power(w), growth, 0.0001, "boss %d" % w)
+	assert_almost_eq(EndlessPlan.boss_power(20), 1.2725, 0.0001)
+	assert_almost_eq(EndlessPlan.boss_power(40), 1.8111, 0.0001)
+	assert_almost_eq(EndlessPlan.boss_power(50), 2.0788, 0.0001)
+	for w in [15, 25, 35, 45]:
+		var growth := sqrt(EndlessPlan.damage_scale(w) / EndlessPlan.damage_scale(5))
+		assert_almost_eq(EndlessPlan.mini_boss_power(w), growth, 0.0001, "mini boss %d" % w)
+	assert_almost_eq(EndlessPlan.mini_boss_power(15), 1.3186, 0.0001)
+	assert_almost_eq(EndlessPlan.mini_boss_power(35), 1.9453, 0.0001)
+	assert_almost_eq(EndlessPlan.mini_boss_power(45), 2.2563, 0.0001)
+	assert_eq(EndlessPlan.boss_power(1), 1.0, "called up early: never less than tier 1's")
+	assert_eq(EndlessPlan.mini_boss_power(1), 1.0)
 
 
 ## The planned HP of a normal wave: normal_count enemies at the normal pool's
