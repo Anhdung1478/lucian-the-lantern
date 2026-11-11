@@ -186,22 +186,60 @@ func test_normal_and_elite_strength_follow_the_table() -> void:
 	assert_almost_eq(EndlessPlan.damage_scale(35), 1.85 * 2.7, 0.001)
 
 
-## Fixed by wave: 15000 (a boss) or 9000 (a mini boss) × (1 + 0.3(k−1)), and
-## damage × (1 + 0.15(k−1)), with k = w / 10 for a boss, (w + 5) / 10 for a
-## mini boss.
-func test_boss_and_mini_boss_strength_follow_the_table() -> void:
-	assert_eq(EndlessPlan.boss_hp(10), 15000.0)
-	assert_almost_eq(EndlessPlan.boss_hp(20), 19500.0, 0.01)
-	assert_almost_eq(EndlessPlan.boss_hp(30), 24000.0, 0.01)
+## Fixed by wave: 15000 (a boss) or 9000 (a mini boss) × (1 + 0.3(k−1)),
+## with k = w / 10 for a boss, (w + 5) / 10 for a mini boss. P9: a boss has
+## at least 0.6 of the HP the wave before it brings, which wins from wave 20
+## (it was 19500, 24000 and 33000 at waves 20, 30 and 50).
+func test_boss_and_mini_boss_hp_follow_the_table() -> void:
+	assert_eq(EndlessPlan.boss_hp(10), 15000.0, "tier 1: more than 0.6 × wave 9's 12078")
+	assert_almost_eq(EndlessPlan.boss_hp(20), 0.6 * EndlessPlan.wave_hp(19), 0.01)
+	assert_almost_eq(EndlessPlan.boss_hp(20), 24118.9, 0.1)
+	assert_almost_eq(EndlessPlan.boss_hp(30), 41713.6, 0.1)
+	assert_almost_eq(EndlessPlan.boss_hp(50), 85554.3, 0.1)
 	assert_eq(EndlessPlan.mini_boss_hp(5), 9000.0)
 	assert_almost_eq(EndlessPlan.mini_boss_hp(15), 11700.0, 0.01)
 	assert_almost_eq(EndlessPlan.mini_boss_hp(25), 14400.0, 0.01)
-	assert_eq(EndlessPlan.boss_power(10), 1.0)
-	assert_almost_eq(EndlessPlan.boss_power(20), 1.15, 0.0001)
-	assert_almost_eq(EndlessPlan.boss_power(40), 1.45, 0.0001)
-	assert_eq(EndlessPlan.mini_boss_power(5), 1.0)
-	assert_almost_eq(EndlessPlan.mini_boss_power(15), 1.15, 0.0001)
-	assert_almost_eq(EndlessPlan.mini_boss_power(35), 1.45, 0.0001)
+
+
+## P9: × (1 + 0.15(k−1)), or the square root of the wave's normal damage
+## scale when that is more, which it is at every boss and mini boss wave (it
+## was ×1, ×1.15 and ×1.45 at waves 10, 20 and 40, and at waves 5, 15 and 35).
+func test_boss_and_mini_boss_damage_keeps_up_with_the_waves() -> void:
+	for w in [10, 20, 40]:
+		assert_almost_eq(EndlessPlan.boss_power(w), sqrt(EndlessPlan.damage_scale(w)), 0.0001, "boss %d" % w)
+	assert_almost_eq(EndlessPlan.boss_power(10), 1.3328, 0.0001)
+	assert_almost_eq(EndlessPlan.boss_power(20), 1.6960, 0.0001)
+	assert_almost_eq(EndlessPlan.boss_power(40), 2.4138, 0.0001)
+	for w in [5, 15, 35]:
+		assert_almost_eq(EndlessPlan.mini_boss_power(w), sqrt(EndlessPlan.damage_scale(w)), 0.0001, "mini boss %d" % w)
+	assert_almost_eq(EndlessPlan.mini_boss_power(5), 1.1489, 0.0001)
+	assert_almost_eq(EndlessPlan.mini_boss_power(15), 1.5149, 0.0001)
+	assert_almost_eq(EndlessPlan.mini_boss_power(35), 2.2349, 0.0001)
+	assert_eq(EndlessPlan.boss_power(1), 1.0, "never less than tier 1's")
+
+
+## The planned HP of a normal wave: normal_count enemies at the normal pool's
+## mean (a pack: its members' mean), elite_count at the elite pool's.
+func test_wave_hp_is_the_planned_total_of_a_normal_wave() -> void:
+	assert_eq(EndlessPlan.wave_hp(0), 0.0)
+	var normal := (240.0 + 160.0 + 240.0 + 160.0 + 620.0 / 5.0 + 675.0 / 3.0 + 870.0 / 3.0 + 500.0 + 110.0 + 130.0 + 220.0 + 150.0) / 12.0
+	var elite := 12200.0 / 11.0
+	assert_almost_eq(EndlessPlan.wave_hp(1), 9.0 * normal, 0.01, "9 normals, no elite, ×1")
+	assert_almost_eq(EndlessPlan.wave_hp(19), (27.0 * normal + 4.0 * elite) * EndlessPlan.hp_scale(19), 0.01)
+	assert_almost_eq(EndlessPlan.wave_hp(9), 12078.2, 0.1)
+
+
+## The planned HP is what the random waves bring on average.
+func test_wave_hp_is_the_mean_of_the_rolled_waves() -> void:
+	for w in [9, 19, 29]:
+		var total := 0.0
+		var rolls := 200
+		for s in rolls:
+			rng.seed = s
+			for id in EndlessPlan.wave(w, rng):
+				total += (load(Stage.ENEMY_PATH % id) as EnemyData).max_hp
+		var mean := total / rolls * EndlessPlan.hp_scale(w)
+		assert_almost_eq(mean, EndlessPlan.wave_hp(w), EndlessPlan.wave_hp(w) * 0.06, "wave %d" % w)
 
 
 func test_a_boss_called_up_early_is_never_weaker_than_its_first_tier() -> void:

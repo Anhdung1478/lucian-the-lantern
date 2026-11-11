@@ -31,11 +31,14 @@ const HP_GROWTH := 0.06
 const DAMAGE_GROWTH := 0.025
 const WAVE_GROWTH := 0.05
 ## Boss and mini boss HP, fixed by wave whoever comes: BOSS_HP (MINI_BOSS_HP)
-## × (1 + TIER_HP(k−1)), and damage × (1 + TIER_POWER(k−1)), k being the tier.
+## × (1 + TIER_HP(k−1)), k being the tier; a boss has at least
+## BOSS_WAVE_SHARE of the HP the wave before it brings (wave_hp). Damage ×
+## (1 + TIER_POWER(k−1)), or √damage_scale(w) when that is more.
 const BOSS_HP := 15000.0
 const MINI_BOSS_HP := 9000.0
 const TIER_HP := 0.3
 const TIER_POWER := 0.15
+const BOSS_WAVE_SHARE := 0.6
 ## Kills pay like act 1 + (w − 1) / REWARD_ACT_WAVES, at least like the
 ## acts the save has cleared, at most like the last act.
 const REWARD_ACT_WAVES := 10
@@ -125,28 +128,41 @@ static func damage_scale(w: int) -> float:
 	return (1.0 + DAMAGE_GROWTH * n) * (1.0 + WAVE_GROWTH * n)
 
 
-## A boss's max HP in wave `w` (each phase, for Thresh).
+## The HP normal wave `w` brings as planned, before the difficulty: its
+## normal_count normal enemies at the normal pool's mean HP, its elite_count
+## elites at the elite pool's, × hp_scale(w). The draw is random, so this is
+## its expected total: the same every run. 0 before wave 1.
+static func wave_hp(w: int) -> float:
+	if w < 1:
+		return 0.0
+	return (normal_count(w) * _mean_hp(NORMALS) + elite_count(w) * _mean_hp(ELITES)) * hp_scale(w)
+
+
+## A boss's max HP in wave `w` (each phase, for Thresh): its tier's, or
+## BOSS_WAVE_SHARE of the wave before's HP when that is more.
 static func boss_hp(w: int) -> float:
-	return BOSS_HP * (1.0 + TIER_HP * (_boss_tier(w) - 1))
+	return maxf(BOSS_HP * (1.0 + TIER_HP * (_boss_tier(w) - 1)), BOSS_WAVE_SHARE * wave_hp(w - 1))
 
 
 static func mini_boss_hp(w: int) -> float:
 	return MINI_BOSS_HP * (1.0 + TIER_HP * (_mini_boss_tier(w) - 1))
 
 
-## A boss's damage multiplier in wave `w`: its basic attack and every skill hit.
+## A boss's damage multiplier in wave `w`: its basic attack and every skill
+## hit. Its tier's, or the square root of the wave's normal damage_scale when
+## that is more, so it keeps up with the waves.
 static func boss_power(w: int) -> float:
-	return 1.0 + TIER_POWER * (_boss_tier(w) - 1)
+	return maxf(1.0 + TIER_POWER * (_boss_tier(w) - 1), sqrt(damage_scale(w)))
 
 
-## A mini boss's damage multiplier in wave `w`.
+## A mini boss's damage multiplier in wave `w`, as a boss's.
 static func mini_boss_power(w: int) -> float:
-	return 1.0 + TIER_POWER * (_mini_boss_tier(w) - 1)
+	return maxf(1.0 + TIER_POWER * (_mini_boss_tier(w) - 1), sqrt(damage_scale(w)))
 
 
 ## What a boss or mini boss in wave `w` pays more blue and orange essence
-## than in the story: the same factor as its HP, 1 at tier 1 and +0.3 a tier.
-## Anything else pays 1.0.
+## than in the story: its tier's HP factor (not a boss's wave_hp floor), 1
+## at tier 1 and +0.3 a tier. Anything else pays 1.0.
 static func reward_scale(kind: StringName, w: int) -> float:
 	match kind:
 		&"boss":
@@ -231,6 +247,19 @@ static func _normals(count: int, rng: RandomNumberGenerator) -> Array:
 		if units[i] > 0:
 			groups.append([kinds[i], units[i]])
 	return groups
+
+
+## One enemy's mean base HP in `pool`: each entry weighs the same, a pack
+## as its members' mean.
+static func _mean_hp(pool: Array[StringName]) -> float:
+	var total := 0.0
+	for id in pool:
+		var members: Array = WavePlan.PACKS.get(id, [id])
+		var hp := 0.0
+		for member: StringName in members:
+			hp += (load(Stage.ENEMY_PATH % member) as EnemyData).max_hp
+		total += hp / members.size()
+	return total / pool.size()
 
 
 ## Enemies a pool id brings: a pack's size, else 1.

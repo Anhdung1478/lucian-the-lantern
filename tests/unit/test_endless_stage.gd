@@ -235,12 +235,17 @@ func test_a_boss_comes_at_the_boss_point_with_its_waves_hp_and_scaled_skill_hits
 	var boss := _unit(&"akshan") as Boss
 	assert_not_null(boss)
 	assert_eq(boss.global_position, stage.arena.boss_point)
-	assert_almost_eq(boss.max_hp, 15000.0 * 1.3, 0.01)
+	# P9: 0.6 of the HP wave 19 brings (more than tier 2's 19500), and the
+	# square root of wave 20's damage scale (more than tier 2's ×1.15).
+	var power := EndlessPlan.boss_power(20)
+	assert_almost_eq(power, 1.696, 0.001)
+	assert_almost_eq(boss.max_hp, 0.6 * EndlessPlan.wave_hp(19), 0.01)
+	assert_gt(boss.max_hp, 15000.0 * 1.3)
 	assert_almost_eq(boss.hp, boss.max_hp, 0.01)
-	assert_almost_eq(boss.skill_scale, 1.15, 0.0001)
-	assert_almost_eq(boss.damage, 28.0 * 1.15, 0.01)
-	assert_almost_eq(boss.skill_hit(100.0, DamageInfo.Type.PHYSICAL, &"test").amount, 115.0, 0.01)
-	assert_almost_eq(boss.make_hit().amount, 28.0 * 1.15, 0.01)
+	assert_almost_eq(boss.skill_scale, power, 0.0001)
+	assert_almost_eq(boss.damage, 28.0 * power, 0.01)
+	assert_almost_eq(boss.skill_hit(100.0, DamageInfo.Type.PHYSICAL, &"test").amount, 100.0 * power, 0.01)
+	assert_almost_eq(boss.make_hit().amount, 28.0 * power, 0.01)
 	assert_null(stage.boss_unit, "never the stage's boss")
 
 
@@ -251,26 +256,32 @@ func test_a_mini_boss_has_its_tiers_hp_and_power_and_keeps_its_spawn_point() -> 
 	assert_not_null(maokai)
 	assert_ne(maokai.global_position, stage.arena.boss_point)
 	assert_almost_eq(maokai.max_hp, 9000.0 * 1.3, 0.01)
-	assert_almost_eq(maokai.damage, 90.0 * 1.15, 0.01)
-	assert_almost_eq(maokai.skill_hit(100.0, DamageInfo.Type.MAGIC, &"test").amount, 115.0, 0.01)
+	var power := EndlessPlan.mini_boss_power(15)
+	assert_almost_eq(power, 1.515, 0.001, "the square root of wave 15's damage scale, more than tier 2's ×1.15")
+	assert_almost_eq(maokai.damage, 90.0 * power, 0.01)
+	assert_almost_eq(maokai.skill_hit(100.0, DamageInfo.Type.MAGIC, &"test").amount, 100.0 * power, 0.01)
 
 
-func test_a_tier_3_endless_infernal_drake_burns_130_percent() -> void:
+## Its burns follow its power (Fix B, B13): after P9, the square root of
+## wave 25's damage scale, ×1.876 (tier 3 alone gave ×1.3).
+func test_a_tier_3_endless_infernal_drake_burns_with_its_power() -> void:
 	var stage: Stage = await _endless()
 	stage.runner.spawn_requested.emit(&"infernal_drake", 25)
 	var drake := _unit(&"infernal_drake") as InfernalDrake
 	assert_not_null(drake)
-	assert_almost_eq(drake.skill_scale, 1.3, 0.0001)
+	var power := EndlessPlan.mini_boss_power(25)
+	assert_almost_eq(power, 1.876, 0.001)
+	assert_almost_eq(drake.skill_scale, power, 0.0001)
 	drake._burn_cone(Vector2.ZERO, Vector2.RIGHT)
 	drake._burn_circle(Vector2(500, 0))
 	var dps: Array = []
 	for zone: Node in drake.warning_parent.get_children():
 		if zone is HazardZone:
 			dps.append(snappedf((zone as HazardZone).dps, 0.001))
-	assert_eq(dps, [snappedf(30.0 * 1.3, 0.001), snappedf(25.0 * 1.3, 0.001)], "breath and meteor burns")
+	assert_eq(dps, [snappedf(30.0 * power, 0.001), snappedf(25.0 * power, 0.001)], "breath and meteor burns")
 	drake.target = stage.lucian
 	drake.apply_on_hit()
-	assert_almost_eq(stage.lucian._burns.total_dps(), 10.0 * 1.3, 0.001, "the fireball's burn")
+	assert_almost_eq(stage.lucian._burns.total_dps(), 10.0 * power, 0.001, "the fireball's burn")
 	assert_almost_eq(drake.burn_scale, drake.skill_scale, 0.0001, "scaled once, by its power")
 
 

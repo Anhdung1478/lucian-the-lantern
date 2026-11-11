@@ -44,9 +44,10 @@ func start(owner_stage: Stage) -> EndlessRunner:
 ## A spawn's strength in place of the act and wave scaling (call before it
 ## joins the tree): a normal or elite enemy's HP and damage grow with its
 ## wave; a boss's or mini boss's HP is fixed by its wave, and its basic damage
-## and skill hits grow by tier. Its on-hit burn grows as its basic hit does
-## (for a boss or mini boss, that is its power: once, not twice). Then the
-## modifier's: every enemy's speed, and bosses' and mini bosses' HP.
+## and skill hits grow with it (EndlessPlan.boss_power). Its on-hit burn grows
+## as its basic hit does (for a boss or mini boss, that is its power: once,
+## not twice). Then the modifier's: every enemy's speed, and bosses' and mini
+## bosses' HP.
 func scale(unit: EnemyUnit) -> void:
 	var data := unit.data
 	match data.kind:

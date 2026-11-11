@@ -254,7 +254,7 @@ func test_modifier_5_raises_boss_and_mini_boss_hp_and_purple() -> void:
 	var stage: Stage = await _endless()
 	stage.endless.choose(5)
 	var akshan := stage.spawn_enemy(&"akshan", stage.arena.boss_point, 20)
-	assert_almost_eq(akshan.max_hp, 15000.0 * 1.3 * 1.25, 0.01)
+	assert_almost_eq(akshan.max_hp, EndlessPlan.boss_hp(20) * 1.25, 0.01, "after P9's floor")
 	assert_almost_eq(akshan.hp, akshan.max_hp, 0.01)
 	var maokai := stage.spawn_enemy(&"maokai", stage.arena.spawn_points[0], 15)
 	assert_almost_eq(maokai.max_hp, 9000.0 * 1.3 * 1.25, 0.01)
