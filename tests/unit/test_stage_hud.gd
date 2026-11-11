@@ -403,6 +403,9 @@ func test_the_vignette_follows_lucian_and_the_setting() -> void:
 	add_child_autofree(vignette)
 	lucian.hp = lucian.stats.max_hp * 0.2
 	vignette.show_health(lucian)
+	assert_false(vignette.visible, "nothing is drawn headless, so it stays off")
+	Juice.renders = true
+	vignette.show_health(lucian)
 	assert_true(vignette.visible)
 	lucian.hp = lucian.stats.max_hp * 0.5
 	vignette.show_health(lucian)
@@ -411,3 +414,4 @@ func test_the_vignette_follows_lucian_and_the_setting() -> void:
 	lucian.dead = true
 	vignette.show_health(lucian)
 	assert_false(vignette.visible)
+	Juice.renders = false

@@ -29,6 +29,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	Juice.renders = DisplayServer.get_name() != "headless"
 	GameSettings.instance().set_value(&"quality", "high")
 
 
@@ -161,6 +162,7 @@ func test_ambience_motes_stay_near_their_spots() -> void:
 
 
 func test_ambience_is_off_on_low_effects() -> void:
+	Juice.renders = true
 	var ambience := MapAmbience.new()
 	add_child_autofree(ambience)
 	assert_true(ambience.visible)
@@ -174,6 +176,7 @@ func test_ambience_is_off_on_low_effects() -> void:
 
 
 func test_a_map_adds_its_ambience_off_on_low_effects() -> void:
+	Juice.renders = true
 	var map := LitMap.new()
 	add_child_autofree(map)
 	assert_true(map.get_node("Ambience").visible)
@@ -222,3 +225,12 @@ func test_a_ripe_honeyfruit_and_blast_cone_draw() -> void:
 	add_child_autofree(fruit)
 	await wait_process_frames(2)
 	assert_true(fruit.is_ripe())
+
+
+## Headless (the tests, the bots) nothing is seen: the ambience stands still.
+func test_ambience_is_off_when_nothing_is_drawn() -> void:
+	Juice.renders = false
+	var ambience := MapAmbience.new()
+	add_child_autofree(ambience)
+	assert_false(ambience.visible)
+	assert_false(ambience.is_processing())

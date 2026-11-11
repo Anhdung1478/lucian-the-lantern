@@ -168,6 +168,10 @@ func _ready() -> void:
 	motion = UnitMotion.new()
 	motion.setup(sprite, self, data.radius)
 	add_child(motion)
+	# Its burst's color is read from its art once per kind: now, as it comes,
+	# not on the frame the first of its kind dies.
+	if Juice.on():
+		DeathBurst.color_of(data.art)
 	_paint()
 	if data.is_boss_kind():
 		health_bar.size = BOSS_BAR

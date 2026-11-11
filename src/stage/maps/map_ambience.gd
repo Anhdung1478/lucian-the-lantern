@@ -116,7 +116,8 @@ func _on_setting_changed(key: StringName) -> void:
 		_sync()
 
 
-## Shown and moving unless the Quality setting is low.
+## Shown and moving unless the Quality setting is low or nothing is drawn
+## (the tests, the bots).
 func _sync() -> void:
-	visible = not GameSettings.instance().low_effects()
+	visible = Juice.on()
 	set_process(visible)

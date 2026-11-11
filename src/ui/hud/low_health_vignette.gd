@@ -50,7 +50,7 @@ static func alpha_for(power: float, phase: float) -> float:
 
 ## Follows Lucian.
 func show_health(lucian: Lucian) -> void:
-	strength = strength_for(lucian.hp, lucian.stats.max_hp, lucian.dead, GameSettings.instance().low_effects())
+	strength = strength_for(lucian.hp, lucian.stats.max_hp, lucian.dead, not Juice.on())
 	visible = strength > 0.0
 
 
