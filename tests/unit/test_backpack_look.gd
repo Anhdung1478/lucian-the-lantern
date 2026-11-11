@@ -150,3 +150,23 @@ func test_an_empty_potion_cell_has_a_fainter_rim_of_its_potion() -> void:
 	assert_eq(empty, Color(UiStyle.RIM_POTION, ItemCell.EMPTY_RIM_ALPHA))
 	inventory.set_boots(Fixtures.boots(&"speed", 1))
 	assert_eq(cell(Inventory.BOOTS_CELL).rim(), UiStyle.RIM_BOOTS)
+
+
+func test_opening_fades_the_backpack_in_at_once_visible() -> void:
+	screen.close()
+	screen.open()
+	assert_true(screen.visible, "visible flips at once")
+	assert_eq(screen._backdrop.modulate.a, 0.0, "the fade starts clear")
+	await wait_seconds(BackpackScreen.FADE_TIME + 0.15)
+	assert_eq(screen._backdrop.modulate.a, 1.0, "and ends solid")
+
+
+func test_low_effects_open_without_a_fade() -> void:
+	var settings := GameSettings.instance()
+	var quality: Variant = settings.get_value(&"quality")
+	settings.set_value(&"quality", "low", false)
+	screen.close()
+	screen.open()
+	settings.set_value(&"quality", quality, false)
+	assert_true(screen.visible)
+	assert_eq(screen._backdrop.modulate.a, 1.0)

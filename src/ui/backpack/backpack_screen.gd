@@ -34,6 +34,8 @@ const CELL_GAP := 6
 ## The backpack is centered in the screen area above the HUD panel.
 const AREA_BOTTOM := 880.0
 const ROW_GAP := 18.0
+## The backpack and the shop fade in over this long (not on low effects).
+const FADE_TIME := 0.12
 const SHOP_GAP := 24.0
 ## The least room between the recipe table and the backpack.
 const TABLE_GAP := 20.0
@@ -64,6 +66,9 @@ var shop: Shop
 ## cells included); the sell slot comes last.
 var _cells: Array[ItemCell] = []
 var _column: VBoxContainer
+## The dim backdrop and everything on it; the fade-in is its modulate.
+var _backdrop: ColorRect
+var _fade: Tween
 var _recipes: RecipeTable
 var _shop_panel := ShopPanel.new()
 ## Cell index under the pressed button, the picked-up one, and the one the
@@ -121,6 +126,7 @@ func setup(target_inventory: Inventory) -> void:
 func open() -> void:
 	visible = true
 	redraw_cells()
+	_fade_in()
 
 
 ## Opens the backpack beside the merchant's shop.
@@ -488,8 +494,22 @@ func redraw_cells() -> void:
 		cell.queue_redraw()
 
 
+## Fades the backdrop in; visibility has already flipped. Skipped on low
+## effects, and by a tree-less screen.
+func _fade_in() -> void:
+	if _fade:
+		_fade.kill()
+	_backdrop.modulate.a = 1.0
+	if GameSettings.instance().low_effects() or not is_inside_tree():
+		return
+	_backdrop.modulate.a = 0.0
+	_fade = create_tween()
+	_fade.tween_property(_backdrop, "modulate:a", 1.0, FADE_TIME)
+
+
 func _build() -> void:
 	var backdrop := ColorRect.new()
+	_backdrop = backdrop
 	backdrop.color = Color(0, 0, 0, 0.45)
 	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(backdrop)
