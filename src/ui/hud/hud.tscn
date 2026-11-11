@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://src/ui/hud/stats_panel.gd" id="2_stats"]
 [ext_resource type="Script" path="res://src/ui/hud/hud_portrait.gd" id="3_portrait"]
 [ext_resource type="Script" path="res://src/ui/plate.gd" id="4_plate"]
+[ext_resource type="Script" path="res://src/ui/hud/hud_bar.gd" id="5_bar"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_badge"]
 content_margin_left = 6.0
@@ -21,20 +22,6 @@ corner_radius_bottom_left = 13
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_bar_bg"]
 bg_color = Color(0, 0, 0, 0.65)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_hp_fill"]
-bg_color = Color(0.25, 0.68, 0.29, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_mana_fill"]
-bg_color = Color(0.23, 0.48, 0.84, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -126,23 +113,18 @@ show_percentage = false
 [node name="MainColumn" type="VBoxContainer" parent="Root/BottomPanel/Row"]
 layout_mode = 2
 size_flags_vertical = 8
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
 [node name="SkillRow" type="HBoxContainer" parent="Root/BottomPanel/Row/MainColumn"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="HpBar" type="ProgressBar" parent="Root/BottomPanel/Row/MainColumn"]
+[node name="HpBar" type="Control" parent="Root/BottomPanel/Row/MainColumn"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(420, 22)
+custom_minimum_size = Vector2(420, 28)
 layout_mode = 2
-theme_override_styles/background = SubResource("StyleBox_bar_bg")
-theme_override_styles/fill = SubResource("StyleBox_hp_fill")
-max_value = 1.0
-step = 0.0
-value = 1.0
-show_percentage = false
+script = ExtResource("5_bar")
 
 [node name="HpLabel" type="Label" parent="Root/BottomPanel/Row/MainColumn/HpBar"]
 unique_name_in_owner = true
@@ -153,21 +135,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 15
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 17
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ManaBar" type="ProgressBar" parent="Root/BottomPanel/Row/MainColumn"]
+[node name="ManaBar" type="Control" parent="Root/BottomPanel/Row/MainColumn"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(420, 16)
+custom_minimum_size = Vector2(420, 14)
 layout_mode = 2
-theme_override_styles/background = SubResource("StyleBox_bar_bg")
-theme_override_styles/fill = SubResource("StyleBox_mana_fill")
-max_value = 1.0
-step = 0.0
-value = 1.0
-show_percentage = false
+script = ExtResource("5_bar")
 
 [node name="ManaLabel" type="Label" parent="Root/BottomPanel/Row/MainColumn/ManaBar"]
 unique_name_in_owner = true

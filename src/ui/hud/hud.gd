@@ -1,6 +1,6 @@
 class_name Hud
 extends CanvasLayer
-## Lucian's bottom panel (portrait, skills, bars, equipped items), the buff
+## Lucian's bottom bar (portrait, skills, bars, equipped items), the buff
 ## icons above it, the stats panels and the stage gold (top right). Ctrl + the
 ## stats key toggles the stats panel; holding the key alone shows the extra
 ## stats above it. Reads Lucian every frame, also while the game is paused, so
@@ -24,6 +24,10 @@ const PLATE_OPACITY := 0.92
 ## The room inside the bottom bar's frame, and inside the gold box's.
 const BAR_PAD := 12.0
 const GOLD_PAD := 10.0
+## The mana bar: its fill's top and bottom, and its ghost.
+const MANA_TOP := Color("5b9cf0")
+const MANA_BOTTOM := Color("2a5cb8")
+const MANA_GHOST := Color("c4d9ff")
 ## The boss bar sits under the stage info.
 const BOSS_BAR_TOP := 72.0
 ## The tips sit under the boss bar.
@@ -59,7 +63,6 @@ var _gold_label: Label
 var _essence_pairs := {}
 var _fps_label: Label
 var _buff_bar := BuffBar.new()
-var _shield_overlay := Control.new()
 var _skill_slots: Array[SkillSlot] = []
 ## The modifier row of the modifier shown, built once per modifier (it loads an icon).
 var _modifier_shown := EndlessModifiers.NONE
@@ -74,9 +77,9 @@ var _modifier_row := {}
 @onready var gear_column: VBoxContainer = %GearColumn
 @onready var level_label: Label = %LevelLabel
 @onready var xp_bar: ProgressBar = %XpBar
-@onready var hp_bar: ProgressBar = %HpBar
+@onready var hp_bar: HudBar = %HpBar
 @onready var hp_label: Label = %HpLabel
-@onready var mana_bar: ProgressBar = %ManaBar
+@onready var mana_bar: HudBar = %ManaBar
 @onready var mana_label: Label = %ManaLabel
 
 
@@ -141,11 +144,10 @@ func _ready() -> void:
 	_buff_bar.grow_horizontal = Control.GROW_DIRECTION_END
 	_buff_bar.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_place_stats_panel()
-	_shield_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_shield_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_shield_overlay.draw.connect(_draw_shield)
-	hp_bar.add_child(_shield_overlay)
-	hp_bar.move_child(_shield_overlay, 0)
+	mana_bar.fill_top = MANA_TOP
+	mana_bar.fill_bottom = MANA_BOTTOM
+	mana_bar.ghost_color = MANA_GHOST
+	mana_bar.ticks = false
 	hp_regen_label = _regen_label(hp_bar, 13)
 	mana_regen_label = _regen_label(mana_bar, 11)
 	_build_gold()
@@ -175,13 +177,12 @@ func _process(_delta: float) -> void:
 	var xp_needed := progress.xp_for_next()
 	xp_bar.value = float(progress.xp) / xp_needed if xp_needed > 0 else 1.0
 	var stats := lucian.stats
-	hp_bar.value = lucian.hp / stats.max_hp
+	hp_bar.show_amount(lucian.hp, stats.max_hp, lucian.total_shield())
 	hp_label.text = "%d / %d" % [roundi(lucian.hp), roundi(stats.max_hp)]
 	if lucian.total_shield() > 0.0:
 		hp_label.text += "  (+%d)" % roundi(lucian.total_shield())
-	_shield_overlay.queue_redraw()
 	_buff_bar.show_buffs(_buffs())
-	mana_bar.value = lucian.mana / stats.max_mana
+	mana_bar.show_amount(lucian.mana, stats.max_mana)
 	mana_label.text = "%d / %d" % [roundi(lucian.mana), roundi(stats.max_mana)]
 	hp_regen_label.text = "+%s/s" % TooltipText.number(snappedf(stats.hp_regen, 0.1))
 	mana_regen_label.text = "+%s/s" % TooltipText.number(snappedf(stats.mana_regen, 0.1))
@@ -273,7 +274,7 @@ func _place_stats_panel() -> void:
 	_buff_bar.offset_top = _buff_bar.offset_bottom
 
 
-func _regen_label(bar: ProgressBar, font_size: int) -> Label:
+func _regen_label(bar: HudBar, font_size: int) -> Label:
 	var label := Label.new()
 	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	label.offset_right = -8.0
@@ -285,17 +286,6 @@ func _regen_label(bar: ProgressBar, font_size: int) -> Label:
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bar.add_child(label)
 	return label
-
-
-## The shield, white, right after the HP on the HP bar (pushed back from the
-## end when HP and shield are more than max HP).
-func _draw_shield() -> void:
-	if lucian == null or lucian.total_shield() <= 0.0:
-		return
-	var width := _shield_overlay.size.x
-	var share := minf(lucian.total_shield() / lucian.stats.max_hp, 1.0)
-	var start := minf(lucian.hp / lucian.stats.max_hp, 1.0 - share)
-	_shield_overlay.draw_rect(Rect2(width * start, 0, width * share, _shield_overlay.size.y), Color(0.92, 0.94, 0.97, 0.85))
 
 
 func _show_gold(gold: int) -> void:
