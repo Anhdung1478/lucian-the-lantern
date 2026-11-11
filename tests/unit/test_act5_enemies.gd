@@ -232,9 +232,9 @@ func test_the_maiden_calls_2_ghouls_every_7_seconds_and_never_more_than_6() -> v
 	assert_eq(maiden.summons, 6)
 
 
-## P17: the Maiden heals half of what her hits deal to Lucian (after his
+## P17: the Maiden heals a quarter of what her hits deal to Lucian (after his
 ## armor); another's hit heals her nothing; Grievous Wounds cuts it.
-func test_the_maiden_heals_half_the_damage_her_hits_deal() -> void:
+func test_the_maiden_heals_a_quarter_of_the_damage_her_hits_deal() -> void:
 	var maiden := _monster("maiden_of_the_mist", Vector2(100, 0))
 	maiden.hp = 500.0
 	maiden._attack()
@@ -242,17 +242,17 @@ func test_the_maiden_heals_half_the_damage_her_hits_deal() -> void:
 	var dealt: float = received[0][1]
 	assert_gt(dealt, 0.0)
 	assert_lt(dealt, maiden.damage, "after his armor")
-	assert_almost_eq(maiden.hp, 500.0 + dealt * 0.5, 0.001)
+	assert_almost_eq(maiden.hp, 500.0 + dealt * 0.25, 0.001)
 	var ghoul := _monster("ghoul", Vector2(-100, 0))
 	lucian.take_damage(ghoul.make_hit())
-	assert_almost_eq(maiden.hp, 500.0 + dealt * 0.5, 0.001, "not her hit")
+	assert_almost_eq(maiden.hp, 500.0 + dealt * 0.25, 0.001, "not her hit")
 	maiden.hp = 500.0
 	maiden.add_status(Enemy.GRIEVOUS_WOUNDS, 3.0)
 	maiden._attack()
-	assert_almost_eq(maiden.hp, 500.0 + received[2][1] * 0.5 * Enemy.GRIEVOUS_HEALING, 0.001)
+	assert_almost_eq(maiden.hp, 500.0 + received[2][1] * 0.25 * Enemy.GRIEVOUS_HEALING, 0.001)
 
 
-## P17: each time she calls her ghouls she heals 5% of her max HP; at her
+## P17: each time she calls her ghouls she heals 2% of her max HP; at her
 ## cap she calls none and heals nothing.
 func test_the_maiden_heals_5_percent_each_time_she_calls_ghouls() -> void:
 	var maiden := _monster("maiden_of_the_mist", Vector2(1500, 0))
@@ -260,7 +260,7 @@ func test_the_maiden_heals_5_percent_each_time_she_calls_ghouls() -> void:
 	maiden._summon_left = 0.0
 	maiden._summon_step(0.01)
 	assert_eq(maiden.summons, 2)
-	assert_almost_eq(maiden.hp, 500.0 + maiden.max_hp * 0.05, 0.001)
+	assert_almost_eq(maiden.hp, 500.0 + maiden.max_hp * 0.02, 0.001)
 	maiden.summons = maiden.data.summon_cap
 	var before := maiden.hp
 	maiden._summon_left = 0.0

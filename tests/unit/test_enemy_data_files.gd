@@ -141,7 +141,7 @@ func test_the_act_5_specials() -> void:
 	assert_eq([brood.summon_id, brood.summon_every, brood.summon_count, brood.summon_cap], [&"spiderling", 3.5, 1, 5])
 	var maiden := _data("maiden_of_the_mist")
 	assert_eq([maiden.summon_id, maiden.summon_every, maiden.summon_count, maiden.summon_cap], [&"ghoul", 7.0, 2, 6])
-	assert_eq([maiden.drain, maiden.summon_heal], [0.5, 0.05], "P17: she heals")
+	assert_eq([maiden.drain, maiden.summon_heal], [0.25, 0.02], "P17: she heals")
 	for id in IDS:
 		if id != "maiden_of_the_mist":
 			assert_eq([_data(id).drain, _data(id).summon_heal], [0.0, 0.0], "%s heals nothing" % id)

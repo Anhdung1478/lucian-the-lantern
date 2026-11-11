@@ -4,15 +4,16 @@ extends Node2D
 ## units, breathing slowly. A normal or elite enemy inside a bank is veiled
 ## (a dark silhouette, no health bar, no radar dot) while Lucian is more than
 ## REVEAL_RANGE away; a veiled enemy can still be targeted and hit. While
-## hurt, it also regenerates REGEN of its max HP a second (Grievous Wounds
-## cuts it). Bosses and mini bosses are never veiled and never regenerate.
+## veiled and hurt, it also regenerates REGEN of its max HP a second
+## (Grievous Wounds cuts it); one Lucian is close enough to see doesn't.
+## Bosses and mini bosses are never veiled and never regenerate.
 ## The stage adds it to its world, so it freezes with it; give it the map's
 ## `banks` and `lucian`.
 
 ## Lucian this close to an enemy in the mist sees it.
 const REVEAL_RANGE := 350.0
-## A normal or elite enemy in the mist heals this share of its max HP a second.
-const REGEN := 0.02
+## A veiled normal or elite enemy heals this share of its max HP a second.
+const REGEN := 0.01
 ## Under the units (0) and the ground zones (HazardZone.Z), over the floor.
 const Z := HazardZone.Z - 1
 const MIST_COLOR := Color("9fb8a8")
@@ -52,7 +53,7 @@ func _physics_process(delta: float) -> void:
 			var misted := not unit.data.is_boss_kind() and in_mist(unit.global_position)
 			var reach := unit.global_position.distance_to(lucian.global_position) if watching else INF
 			unit.veiled = misted and reach > REVEAL_RANGE
-			if misted and unit.hp < unit.max_hp:
+			if unit.veiled and unit.hp < unit.max_hp:
 				unit.heal(unit.max_hp * REGEN * delta)
 
 
