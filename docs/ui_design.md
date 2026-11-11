@@ -20,6 +20,20 @@
 +--------------------------------------------------------------+
 ```
 
+*(V2.0: the sketch still holds. The stage info gains a row of wave pips, the next-wave preview takes the boss bar's place before a wave, and a wave banner shows under the tips. See "The Lantern look (V2.0)" and §1.)*
+
+## The Lantern look (V2.0)
+From V2.0 every stage screen follows one style, the title's and the Journey's: dark navy, gold trim, the lantern's teal glow. The old text below describes the layout and the behaviour; the V2.0 notes say how each part looks now.
+
+- **`Plate`** (`src/ui/plate.gd`) is the frame of every stage panel: a navy-to-teal gradient (`UiStyle.PLATE_TOP` to `PLATE_BOTTOM`), a 2 px gold line (`UiStyle.BORDER_COLOR`), and, when `ornate`, a fainter inner line with a gold diamond at each corner. `Plate.draw_on` paints the same frame on any `CanvasItem`. The HUD's bottom bar is an ornate plate about 0.92 opaque, so a little of the fight shows through. Pop-ups and questions keep `MenuCard`.
+- **`UiStyle`'s tokens:** `GOLD_COLOR` for what matters, `TITLE_COLOR` (pale gold) for headings, `TEXT_COLOR`, `DIM_COLOR` for notes, `LANTERN_COLOR` (teal) for light and for Senna, `GOOD_COLOR` and `BAD_COLOR` for gains and losses, `CELL_COLOR` and `CELL_BORDER` for cells, `RIM_FRAGMENT`, `RIM_LEGENDARY`, `RIM_BOOTS` and `RIM_POTION` for item rims. `UiStyle.cell_style()` and `item_rim()` build a cell and pick its rim. No beige and no brown panels are left.
+- **Headings** are spaced capitals in pale gold, with a short gold rule and a diamond where there is room.
+- **Cells** (items, skills, spells) are dark wells with a thin rim that follows the item's kind and turns gold on hover or when chosen.
+- **Buttons** use `UiStyle.style_button`.
+- **Motion** is short and soft: fades and slides of 0.1 to 0.25 s. Nothing blinks. Low quality (`GameSettings.low_effects()`) turns the extras off.
+- **The battlefield** is drawn in code, like the Journey's map: soft shapes, layered tints, a light from the top-left, shadows that ground every wall and unit, and small things that move. Hitboxes, walls and paths never changed. The kit is `MapArt` (`src/stage/maps/map_art.gd`, the drawing helpers every map's `_draw` uses) and `MapAmbience` (`map_ambience.gd`, the slow fireflies, glints and dust; off on Low quality). See the game design doc §12/§13.
+- **Readability first.** Enemies, red warnings and Lucian stay the clearest things on screen.
+
 ---
 
 ## 1. HUD
@@ -42,6 +56,12 @@
 - **Key labels** (skills, item slots and potion cells) follow the bindings in Settings.
 - **Built in Phase 9:** the Evolution Tree shows these same skill and summoner icons (`main_screen.md`). Learning a rank plays `rank_up`, and Q, W and E each have a cast sound (§8).
 
+**Built in V2.0 (the Lantern look; layout and behaviour as above):**
+- **The bottom bar** is an ornate plate. The **portrait** is round, in a gold ring, with the level in a gold badge on the ring and a slim gold XP bar.
+- **Health and mana bars** (`HudBar`) have a dark well with a thin rim and a gradient fill with a light line along its top. Health has a tick every 100 HP, a taller one every 1000 (ticks closer than 5 px are left out); mana has none. The white shield segment after the health stays. A **ghost** chunk (pale) shows the damage just taken and drains away in 0.4 s.
+- **Cells:** skill, summoner, item, potion and boots cells are dark wells with a rim by item kind (fragment, legendary, boots, potion). The key label sits in a small tab at the cell's corner. Rank dots are small gold diamonds.
+- **Low health:** below 30% health a soft red vignette pulses at the screen's edges (`LowHealthVignette`, one pulse every 2.4 s). It grows as health falls, is gone at 30% or more, when Lucian is dead and on Low quality, and never takes the mouse.
+
 ### Buff icons (above the skill bar)
 - **Very small icons** (36 px) in a row just above the HUD panel, starting over the portrait, like LoL.
 - Shows: Blue / Red buff (with timer), current Endless modifier, status effects (slow, stun, burn, etc.).
@@ -52,6 +72,7 @@
   - Spellblade ready, Spear of Shojin stacks, Jak'Sho stacks, Archangel's mana charge.
 - A dark sweep shows the time that has run out; a number shows stacks, charge or shield.
 - **Hover** the cursor over an icon to see its effect. *(V1.4.3: the card stays live while hovered. The time left, counts and values update, and when another buff moves into the hovered icon, the card shows that one.)*
+- *(V2.0)* **Look:** a buff icon is a rounded cell with a rim, in the cells' style. **Resolve** shows as one (a fist under a rising chevron) while the stage has stacks and the Gameplay setting is on: the number is the stacks, there is no sweep. Its card reads "+30% damage dealt, -30% damage taken. You fell here 3 times." (§5; game design doc §3).
 - **Built in Phase 8:** three crowd-control debuffs, in the style of `debuff_slow.svg` (64 × 64, a tinted dark backdrop, `#1a1d24` outlines): **Rooted** (a boot bound by green vines), **Stunned** (yellow stars circling a head) and **Feared** (a frightened purple ghost). Each has a sweep for its time and a one-line text on hover. They sit after "Slowed", the strongest first (stun, fear, root).
 - **Enemy statuses** (Carve stacks, Grievous Wounds, slow, Hatefog) show as tiny icons above the enemy's HP bar. *(V1.4.2: an enemy's bar redraws only when its health or a status changes, and about 10 times a second while a timed status is shown, so the time-spent shading still moves.)*
 - **Built in Phase 7:** the **Blue** and **Red** jungle buffs (a blue rune shield, a red flame shield) with their 60 s sweep; **Slowed** (the strongest slow on Lucian) and **Burning** while a burn ticks on him. Over an enemy's bar, slow and burn icons.
@@ -129,6 +150,13 @@ Godot names the key "Backspace" (not "BackSpace"), so that is the full name Sett
   - While the modifier pick is open, the countdown and Skip hide: the panel shows only the name and the Best line.
   - The boss bar sits under the Best line, so an Endless boss's or mini boss's bar never covers it.
 
+**Built in V2.0:**
+- **The plate:** the stage info is a plain `Plate`. The stage's name is a heading in small spaced capitals between two gold rules. The row under it has **wave pips**, then "Wave 2/3" (or "Boss wave") and "Enemies: N". Texts, the countdown and Skip are as above.
+- **Wave pips** (`WavePips`): one diamond per wave. **Gold** is a wave cleared, **bright with a soft glow** is the wave being fought, **dim** are those to come. The boss wave's pip is larger. Endless has none.
+- **The boss bar** is an ornate plate under the stage info (`Hud.BOSS_BAR_TOP` is 92). The name (and `Boss.phase_label()`) is a heading in spaced capitals over a wide red bar with the same gradient as Lucian's health bar, a ghost of the damage just done, and no ticks. Karthus's break bar sits under it.
+- **The next-wave preview** (`WavePreview`, R2): before wave 1 and in every break, a plain plate in the boss bar's place shows **NEXT** and each enemy type of the next wave as a 34 px icon in a dark cell with "×N" beside it, in spawn order. A boss or mini boss comes first, with a gold rim and its name. Hovering an icon names the enemy. It only takes hover, never a click. Endless rolls a wave's enemies when the wave starts, so it only says "Mini boss wave" or "Boss wave" (nothing before an ordinary one). It is hidden during a wave, on the end screen, while the modifier pick is open, and in Training. It reads `WaveRunner.next_ids()` and `next_kind()`; `WavePlan.preview_rows()` groups the ids.
+- **The wave banner** (`WaveBanner`): at each wave's start, "WAVE 3" in spaced capitals between gold rules on a dark band that fades out at its ends. A wave with a mini boss reads **MINI BOSS** over its name. The boss wave reads **BOSS** over the boss's name, larger and in red. It slides in and fades for 0.2 s, stays 1.6 s, and fades out. It sits at `Hud.TIPS_TOP + 70` (`TIPS_TOP` is 180, under the tips), runs only while the game does, hides with the HUD and never takes input.
+
 ### Top right – Loot
 - Stage gold: a coin and the amount, in the HUD panel style (Phase 3).
 - Essences collected in this stage (blue, orange, purple).
@@ -162,10 +190,13 @@ Godot names the key "Backspace" (not "BackSpace"), so that is the full name Sett
 
 An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves the radar until it is back *(Phase 7)*.
 
+*(V2.0: the radar is a plate with a gold diamond at each corner of its frame. The dots are as above.)*
+
 ### Act 1 tips
 - On Act 1's first play, tips show one at a time under the boss bar, in a gold-bordered panel, 7 s each. The list is in `act1_the_loss.md`.
 - The time only runs while the game does. A replay has no tips.
 - *(V1.5.0)* The same banner shows Endless's milestones, the first time a save wins wave 10, 20, 30 or 40: "Wave 10 won for the first time: +300 blue and +5 orange essence" (game design doc §14).
+- *(V2.0)* The tip banner is a plain plate with a gold diamond before the text. It sits at `Hud.TIPS_TOP` (180), under the boss bar and the next-wave preview.
 
 ### On the battlefield
 - **Lucian's HP bar** above his head: green, with his shields as a white segment after the HP.
@@ -218,6 +249,15 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
   - It lasts 1.2 s (the floating text's time) and moves with him.
   - On Low quality only the text shows.
 
+**Built in V2.0 (units and combat):**
+- **`Juice.on()`** (`src/combat/juice.gd`) gates the extras below. It is false on Low quality and when the game runs headless (the tests and the bots), true otherwise. Shadows and health bars are no extras: they always show.
+- **Shadows and motion.** Every unit has a soft shadow on the ground. With `Juice.on()`: a walk sway, a lunge on a melee hit, a recoil on a shot, a squash when hit, a spawn fade-in and a death burst.
+- **Health bars.** An enemy's bar has a dark frame and a gradient fill. A pale **ghost** of the lost health holds 0.3 s, then drains (with `Juice.on()`). An elite's bar has a gold rim and diamond. Lucian's bar is green with a tick every 100 HP. The damage-number rules above are unchanged.
+- **The target ring** (`TargetRing`): a thin red ring on the ground under the enemy Lucian is ordered to attack. It fades in on a new target and goes when the order goes.
+- **Shots** have a soft glow and trail (`ShotGlow`; not on skin shots). A hit makes a small **spark** (`HitSpark`). Damage numbers **pop** when they appear; a crit's is bigger.
+- **Warnings:** a ground warning keeps its red fill. It gains a dark underline and marching dashes along its edge (the dashes move only with `Juice.on()`).
+- **Terrain pieces:** the Black Mist banks are layered mist with a darker heart and wisps, drifting slowly (the drift only with `Juice.on()`). Lava (every burn `HazardZone`) is a dark crust with glowing cracks, a hot core and a slow pulse. Shallow water has deeper steps, ripples and glints. The Blast Cone and the Honeyfruit are drawn in code (`MapArt.leaf`), with a shadow, leaves and a bright head; `assets/art/stage/blast_cone.svg` and `honeyfruit.svg` are no longer used. The maps themselves: game design doc §12/§13.
+
 ### The End screen (`TheEndScreen`)
 Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the stage-end screen's button, then it goes where that button said.
 
@@ -237,6 +277,8 @@ Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the 
 - **Continue:** Main screen → the main screen on Act 6; Retry → 6-5 again. If the save failed, the main screen shows the "Could not save" toast. *(V1.5.0: the Journey opens on Training then, since every stage is cleared.)*
 - **ESC does nothing here** (it is consumed). The window's close button still asks to quit.
 - The first two credit lines ("Lucian: The Lantern", "Made with Godot 4") are placeholders.
+
+**Built in V2.0:** the sketch above is the old look. Now `TheEndScreen` shows **the title's scene** (Lucian and Senna, Thresh hidden) under a dawn tint, and an ornate card stands on the right (centred in the part right of 36% of the width, so it never covers Lucian's arm or Senna). The card holds THE END, "Senna is free.", the story time and the credits, with **Continue** under them. The texts, ESC and the continue targets are as above.
 
 ### Stage result: the end screen
 *(Phase 6 had a 560 px panel with one Continue button over the HUD. Phase 7 replaced it with this full-screen summary.)*
@@ -274,6 +316,28 @@ Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the 
 - **Retry** starts the stage again. **Next stage** starts the next one. **Main screen** opens the main screen on that act *(V1.5.0: on the latest open stage, or Training once every stage is cleared; `main_screen.md`)*. **Back to title** goes to the title screen. If the save fails, Retry and Next go to the main screen with a red "Could not save" toast.
 - **Built:** the panel is 1040 px wide in the HUD panel style. Title 56, stage name 26, section heads 20 (dim), rows 22 (label left, value right), reward lines 20. Buttons 260 × 60, text 24.
 - **Sounds (Phase 9):** `victory` with STAGE CLEARED, `defeat` with DEFEATED, GAME OVER and RUN OVER (§8).
+
+**Built in V2.0 (`StageResult`):** the layout above stays; the look and one block are new.
+- **The card:** the game stays blurred behind an **ornate plate**, 1040 px wide. The **lantern medallion** sits on its top edge: warm and lit for STAGE CLEARED, dim and red for DEFEATED, GAME OVER and RUN OVER. The title is large (60), in spaced capitals, with a soft glow in the outcome's colour (gold or red). The stage's name sits between two short gold rules. The screen's own radial glow is gold (clear) or dark red (defeat).
+- **STATS and REWARDS** are two columns with spaced-capital heads. A stats row is a faint dark well with an icon in its left margin (Time, Kills, Damage dealt, Damage taken, Gold earned; the other rows have a gold diamond). Each essence has its icon.
+- **Count-up:** the essence amounts count up from 0 over about 0.6 s, fast at first. On Low quality the final numbers show at once.
+- **Resolve line:** after a defeat that gives the next try Resolve stacks, a green line in REWARDS: "Resolve 3 / 5: +30% damage, -30% damage taken on your next try" (§5; game design doc §3). With the setting off, on a cleared stage and on Extreme there is none.
+- **WHAT HIT YOU** (`DeathRecap`, R3): after DEFEATED, GAME OVER and RUN OVER, a third block under the two columns, only when Lucian took damage in the stage (`StageStats.record_hit` keeps the sources). Its lines:
+  1. **"Killed by <name>"** in red. A burn names its source: "Killed by burning ground" for a ground zone, "Killed by Gromp's burn" for an enemy's burn.
+  2. **The top three damage sources** as shares of the damage taken, side by side ("Gromp 52%   Krug 30%   Burning ground 18%").
+  3. **One tip**, in the lantern's teal, chosen by the top source.
+  4. **"You can afford an upgrade in the Evolution Tree."** when the save's essences can buy some open node.
+
+  A clear never shows the block.
+
+| Top source | Tip |
+|---|---|
+| A boss or mini boss | "Watch the boss's red marks: each skill shows where it lands before it hits." |
+| A siege enemy (red marks) | "Red marks on the ground show where a hit will land. Step out before they fill." |
+| An elite | "Elites hit hard. Kill the small ones around them first, then keep your distance." |
+| A ranged enemy (ranged, spit) | "Ranged enemies: step sideways between their shots, or walk in and kill them first." |
+| Any other enemy (melee) | "Melee enemies: shoot, step back, shoot again. They can't hit what they can't reach." |
+| Burning ground | "Burning ground keeps hurting while you stand on it. Walk out at once." |
 
 **RUN OVER (Endless, built in Phase 9).** When Lucian dies in an Endless run, the same screen shows the run:
 
@@ -317,6 +381,8 @@ Built in Phase 9. After each Endless boss wave (10, 20, …) the break waits for
 - A card shows the modifier's icon (64 px; none for Nothing), its downside in red and its reward in green (20 px). A long downside wraps to 2 lines.
 - The game is paused, and the backpack and the menu are closed. ESC and P do nothing. A click picks (only the first click counts), plays `buff`, closes the panel and lets the full 20 s break count down.
 - The modifiers and what they do are in the game design doc §14.
+
+**Built in V2.0 (`ModifierPick`, `ModifierCard`):** the title reads **CHOOSE A MODIFIER** in spaced capitals between gold rules, over three ornate cards (320 × 250). Each card has the modifier's icon in a medallion on its top edge (Nothing has a diamond), the downside in red over a rule and the reward in green. A hovered card **lifts** 10 px and its rim turns gold with a soft light (on Low quality only the rim changes). The button keeps its place, so the mouse never falls off a lifted card. The layer, the backdrop, the pause and the pick are as above.
 
 ### Cutscenes
 - Black bars (120 px) at the top and bottom; the HUD hides.
@@ -442,6 +508,13 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **One penetration item.** Of Lord Dominik's Regards, Mortal Reminder and Void Staff, only one can be in the equip slots. A drop or swap that would equip a second one sends the item back, with the error sound and a one-button pop-up on the menus' card: "Only one penetration item can be equipped, and Lord Dominik's Regards already is." OK, Enter or ESC closes it. A move or swap inside the equip row is allowed. Shadowflame's flat penetration doesn't count, nor do boots (`items.md`).
 - The pop-up (`ConfirmPopup.tell`) closes without answering when the backpack closes under it.
 
+### Built in V2.0
+**A new look; the layout, the cells and the rules are as above.** The light tan and darker bottom row the Layout section describes are gone.
+- **The backpack** is an ornate plate headed BACKPACK. Its cells are dark wells whose rim follows the item (fragment, legendary, boots, potion). A locked cell is darker, with the chain.
+- **The equip row and the gear row** sit on plain plates, with the keys in corner tabs.
+- **The recipe table** is a plate headed RECIPES. Each line names its legendary after "[fragment] + [fragment] = [legendary]". A recipe whose two fragments Lucian holds is **lit gold** (a gold wash and a thin gold frame) and comes first, so what can be crafted shows without scrolling; a held fragment has a gold rim. A note under the heading reads "Lit gold: you hold both fragments." (`RecipeTable`, `RecipeRow`).
+- **Fade-in:** the backpack and the shop fade in over 0.12 s (not on Low quality).
+
 ---
 
 ## 3. Merchant's shop
@@ -517,6 +590,22 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Lower craft fees.** The fragments cost 650–1100, so the fees run 900–1600 (`items.md`). The Craft question, the fee line and the legendary cards' "Recipe: X + Y + N gold" follow.
 - An open notice closes, unanswered, when the merchant closes.
 
+### Built in V2.0
+**A new look; the tabs, prices and rules are as above.**
+- **The merchant** is an ornate plate headed MERCHANT, with the Items, Potions and Craft tabs and the stage gold beside them. The panel keeps one size on every tab, so the backpack beside it never moves. It fades in with the backpack (0.12 s, not on Low quality).
+- **Each item for sale is a row** (`ShopSlot`): its icon in a well whose rim follows the item, its name, a line with its main stats (a potion's effect), and its price with a coin on the right. A bought slot reads **SOLD**; a locked slot reads "Locked" with its chain and the Evolution Tree node that opens it. A potion row shows its key in the well's corner.
+- **The Craft tab** is a bench: the two inputs, "+", an arrow, the result, a note, the fee and the Craft button. The tab shows where it stands, and the note, the button and the fee follow it:
+
+| State | Note | Button |
+|---|---|---|
+| Empty | "Drag in two fragments, or your boots and a fragment." (dim) | Craft, off |
+| One item in | "Now drag in a fragment." (or "<Boots> are fully upgraded.") | Craft, off |
+| No recipe | "No legendary is made from X and Y." (red) | "No recipe", off |
+| Cannot afford | "X + Y → Z" | "Not enough gold", off; the fee is red |
+| Ready | "X + Y → Z" (pale gold) | Craft, lit gold |
+
+The result cell is gold once the craft can be paid for, shows a red cross when the two inputs make nothing, and a faint "?" until both are in (`CraftSlot`).
+
 ---
 
 ## 4. Menu (ESC)
@@ -558,7 +647,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 | Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. *(V1.4.3: a slider applies live while it is dragged and is saved once, when let go; a wheel or key step is saved at once.)* ~~No music yet.~~ *(V1.5.0: the Music slider sets the score, §8.)* |
 | Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A double-click doesn't bind the left button (the second press is ignored); a separate later click still does. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound *(V1.5.0: F3 + Q works only in a debug build; in the released game it does nothing)*; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. Each skill, summoner and item key also has a **cast mode** picker: Quick cast, Quick + indicator, Normal cast (Reset to defaults sets them back to Quick cast). |
 | Graphics | Window mode (windowed, borderless fullscreen, fullscreen), Resolution (1280×720, 1366×768, 1600×900, 1920×1080, 2560×1440, 3840×2160; sizes too big for a window on this screen, title bar included, are greyed out and marked "too big"; sets and centers the window, greyed out in borderless/fullscreen; *V1.3.1:* only at launch and when changed here, so starting a stage leaves a maximized or resized window alone), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails, muzzle flashes or summoner spell effects (Flash sparks, Ghost afterimages, Barrier bubble, Heal and Clarity bursts); Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
-| Gameplay | Cast queue (on by default; see the game design doc §2). It was called Skill queue before V1.4.2. |
+| Gameplay | Cast queue (on by default; see the game design doc §2). It was called Skill queue before V1.4.2. *(V2.0: and Resolve, on by default.)* |
 
 - **Not yet:** cast modes (normal / quick / quick with indicator) and camera options.
 
@@ -577,7 +666,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 | Audio | "Volumes change at once. Letting go of a slider plays a test sound." The three volumes, shown as whole numbers ("80"). "No music yet" is now the Music row's description. *(V1.5.0: it reads "Each act's score, which follows the fight.")* |
 | Controls | "Click a binding, then press a key or click it again with a mouse button." The list is grouped: MOVE AND ATTACK, SKILLS, SUMMONER SPELLS, ITEMS, INTERFACE. A 2-line hint sits under it. A binding waiting for a key is lit gold and reads "Press a key...". |
 | Graphics | "The window, the frame rate and how much the effects cost." The old notes are the Resolution and Quality rows' descriptions. |
-| Gameplay | "How Lucian takes your orders." Cast queue, with its note as the description: a skill, item active or summoner spell pressed during a cast time or a dash is cast when it ends. |
+| Gameplay | "How Lucian takes your orders." Cast queue, with its note as the description: a skill, item active or summoner spell pressed during a cast time or a dash is cast when it ends. *(V2.0: a second card, **Resolve**, a switch, on by default: "After each defeat on a stage, Lucian deals more damage and takes less there (up to 5 times)." Off turns every stack off at once, in a stage too; the defeats are still counted, so turning it on again brings the stacks back. Game design doc §3.)* |
 
 **No grey default widget is left.** A theme made in code (`UiStyle.theme()`) styles every control:
 - **sliders:** a dark rounded track, a gold fill, and a gold diamond handle that brightens on hover;
@@ -625,6 +714,8 @@ The game opens here (built in Phase 6).
 - **Built in V1.3:** after the slot (and its Overwrite question), **CHOOSE DIFFICULTY**: "Enemy HP and damage. It can't be changed later.", then four buttons, **Easy ×0.8**, **Normal ×1.0** (in gold), **Hard ×1.1** and **Extreme ×1.3**, and Back. Hovering one says what it does ("Enemies have 110% HP and deal 110% damage. Blue and orange essence ×1.2."; before V1.5.0, "Blue essence ×1.2."). A pick writes the new game and starts Act 1. Back or ESC returns to the slot list.
 - Loading a slot opens the main screen on Journey.
 - The slot buttons are 520 px wide, so the longest text keeps room around it. The gear menu's Save as copy uses the same list.
+- **Built in V2.0:** each difficulty's hover text has a second line about Resolve. Easy and Normal: "Resolve: each defeat on a stage gives +10% damage dealt and -10% damage taken there, up to 5 times." Hard: the same with 5%. Extreme: "No Resolve: a defeat makes no stage easier." (game design doc §17).
+- **Built in V2.0:** every change of screen **fades in from black** over 0.25 s (the title, the main screen, a stage and the end screen; `Game` switches them). `ScreenFade` is a black cover on layer 100, above every pop-up, that never takes input. Off on Low quality and when run headless.
 
 ### Built in Phase 10
 **The story on the title screen:** Lucian and Senna on the left face Thresh on the right, under the Shadow Isles moon. The figures are backlit silhouettes (the user's choice in planning): dark bodies with a moonlight rim on one edge, and colour accents. The centred column (lantern, title, buttons, slot list) is unchanged.
