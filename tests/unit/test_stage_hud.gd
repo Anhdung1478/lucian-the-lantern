@@ -195,6 +195,10 @@ func test_the_radar_maps_the_world_onto_itself() -> void:
 	assert_eq(radar.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 
 
+func test_the_radar_marks_its_four_frame_corners() -> void:
+	assert_eq(Radar.corners(Vector2(260, 160)), PackedVector2Array([Vector2(0, 0), Vector2(260, 0), Vector2(260, 160), Vector2(0, 160)]))
+
+
 func test_the_radar_sits_inside_the_bottom_right_corner() -> void:
 	SaveGame.instance().reset()
 	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
@@ -347,3 +351,4 @@ func test_fps_sits_top_left() -> void:
 	add_child_autofree(hud)
 	assert_eq(hud._fps_label.anchor_left, 0.0)
 	assert_eq(hud._fps_label.anchor_right, 0.0)
+

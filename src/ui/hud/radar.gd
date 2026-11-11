@@ -1,6 +1,7 @@
 class_name Radar
 extends Control
-## Bottom right: the map as a plain plate with dots, no terrain. Lucian is a
+## Bottom right: the map as a plate with a gold diamond at each corner of its
+## frame, and dots, no terrain. Lucian is a
 ## blue dot, an enemy red (an elite bigger), a boss a red skull (a mini boss
 ## a smaller one); Senna a small pale-blue dot and the merchant gold. Never
 ## takes clicks, so right-clicks under it still move Lucian.
@@ -9,6 +10,8 @@ const WIDTH := 260.0
 const RADIUS := 6.0
 const SKULL := preload("res://assets/art/ui/skull.svg")
 const DOT := 4.0
+## The gold diamonds on the frame's corners.
+const CORNER_DIAMOND := 3.5
 const ELITE_DOT := 7.0
 const SKULL_SIZE := 16.0
 const MINI_BOSS_SKULL_SIZE := 12.0
@@ -49,6 +52,11 @@ static func dot_size(kind: StringName) -> float:
 	return DOT
 
 
+## The four corners of a frame `frame_size` big, clockwise from the top left.
+static func corners(frame_size: Vector2) -> PackedVector2Array:
+	return PackedVector2Array([Vector2.ZERO, Vector2(frame_size.x, 0.0), frame_size, Vector2(0.0, frame_size.y)])
+
+
 ## An enemy gets a dot unless the Black Mist veils it.
 static func shows(enemy: Enemy) -> bool:
 	return not (enemy is EnemyUnit and (enemy as EnemyUnit).veiled)
@@ -60,6 +68,8 @@ func _process(_delta: float) -> void:
 
 func _draw() -> void:
 	Plate.draw_on(self, Rect2(Vector2.ZERO, size), RADIUS, false, Hud.PLATE_OPACITY)
+	for corner in corners(size):
+		draw_colored_polygon(Plate.diamond(corner, CORNER_DIAMOND), UiStyle.GOLD_COLOR)
 	for merchant: Node2D in get_tree().get_nodes_in_group(&"merchants"):
 		draw_circle(to_radar(merchant.global_position), DOT, MERCHANT_COLOR)
 	for ally: Node2D in get_tree().get_nodes_in_group(&"allies"):
