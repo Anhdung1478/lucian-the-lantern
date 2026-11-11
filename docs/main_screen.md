@@ -395,7 +395,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 - **Tabs** (150 × 48): the open one is lit. It opens on **Training**. A locked tab is disabled, with a small chain left of its name; hovering says "Clear Act 1 first" (Endless: "Clear Act 3 first"). *(Phase 6 changed which tab opens; Phase 9 removed the tabs. See below.)*
 - **Act page:**
   - The title ("ACT 3 · THE JUNGLE") and the act's story line.
-  - One card per stage (200 × 230): "Stage 2", its waves ("4 waves + mini boss wave", "5 waves + boss wave"), a skull (grey for a mini boss, red for the boss).
+  - One card per stage (200 × 230): "Stage 2", its waves ("4 waves + mini boss wave", "5 waves + boss wave"; V2.0: Act 2 reads "4 waves", "5 waves" and "5 waves + boss wave"), a skull (grey for a mini boss, red for the boss).
   - A locked card shows a chain; a cleared card gets a green check and a green frame.
   - **Start** is disabled ("Acts come in a later phase"). *(Acts 1–2 start since Phase 6, Acts 3–4 since Phase 7, Acts 5–6 since Phase 8.)*
 - **Training page:** what Training is ("Practice on training dummies with what you have bought in the Evolution Tree and your equipped skin. No essences are earned. Leave from the ESC menu to come back here.") and a gold **Start Training** button.
@@ -422,8 +422,8 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 
 ### Built in Phase 7
 **Acts 3 and 4 start**, like Acts 1 and 2: an act's Start works as soon as its first stage has waves.
-- **Act 3's cards:** "3 waves", "4 waves + mini boss" (grey skull), "4 waves", "5 waves + mini boss" (grey skull), "5 waves + boss wave" (red skull). The drake comes last in the last wave, not in a wave of its own, so its card no longer says "+ mini boss wave".
-- **Act 4's cards:** "4 waves", "5 waves", "5 waves + boss wave" (red skull).
+- **Act 3's cards:** "3 waves", "4 waves + mini boss" (grey skull), "4 waves", "5 waves + mini boss" (grey skull), "5 waves + boss wave" (red skull). The drake comes last in the last wave, not in a wave of its own, so its card no longer says "+ mini boss wave". *(V2.0: "5 waves", "6 waves + mini boss", "6 waves", "7 waves + mini boss", "7 waves + boss wave".)*
+- **Act 4's cards:** "4 waves", "5 waves", "5 waves + boss wave" (red skull). *(V2.0: "6 waves", "7 waves", "7 waves + boss wave".)*
 - **Acts 5–6** can be picked once open, but Start stays disabled ("Act 5 comes in a later phase"). *(They start since Phase 8.)*
 - **Endless** still opens once Act 3 is cleared, and its Start stays disabled ("Endless comes in a later phase"). *(Start works since Phase 9.)*
 - **The end screen's buttons start stages directly** (`ui_design.md`, "Stage result"):
@@ -435,8 +435,8 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 
 ### Built in Phase 8
 **Acts 5 and 6 start.** An act's Start works as soon as `WavePlan` has the act's first stage (5-1, 6-1) and the act is open: Act 5 once Act 4 is cleared, Act 6 once Act 5 is cleared. All 22 stages can now be played.
-- **Act 5's cards:** "5 waves", "5 waves + mini boss" (grey skull), "6 waves", "6 waves + mini boss" (grey skull), "6 waves + boss wave" (red skull).
-- **Act 6's cards:** "6 waves", "6 waves + mini boss", "7 waves", "7 waves + mini boss", "7 waves + boss wave".
+- **Act 5's cards:** "5 waves", "5 waves + mini boss" (grey skull), "6 waves", "6 waves + mini boss" (grey skull), "6 waves + boss wave" (red skull). *(V2.0: "6 waves", "6 waves + mini boss", "7 waves", "7 waves + mini boss", "7 waves + boss wave".)*
+- **Act 6's cards:** "6 waves", "6 waves + mini boss", "7 waves", "7 waves + mini boss", "7 waves + boss wave". *(V2.0: "8 waves", "8 waves + mini boss", "9 waves", "9 waves + mini boss", "9 waves + boss wave".)*
 - **The first clear of 6-5** shows `TheEndScreen` after the stage-end screen's button (`ui_design.md`), then the main screen on Act 6 (or 6-5 again after Retry). Next stage after 6-5 goes to the main screen as before. *(V1.5.0: the main screen opens on Training then, since every stage is cleared.)*
 - **Which tab opens** when every act is cleared: Training.
 - **Endless** still opens once Act 3 is cleared, and its Start stays disabled ("Endless comes in a later phase"). *(Start works since Phase 9.)*
@@ -485,7 +485,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 - The Endless portal is chained and dim, with a lock, until Act 3 is cleared.
 - *(V1.4.3)* The pulses, the portal's swirl and the token's bob run only while the Journey shows. On the Tree or the Skin Shop they stop, and a place that opens meanwhile starts when the Journey shows again.
 - **Hover texts:**
-  - A stage: its name and waves ("Stage 3-4 · The Jungle", "5 waves + mini boss"), plus "Clear 3-3 first" when it is locked in an open act.
+  - A stage: its name and waves ("Stage 3-4 · The Jungle", "5 waves + mini boss"; V2.0: "7 waves + mini boss"), plus "Clear 3-3 first" when it is locked in an open act.
   - A locked act, its region or its stages: "Clear Act 4 first".
   - Training: "Training". Endless: "Endless" and "Best wave: 22", or "Clear Act 3 first" while locked.
 - **Lucian's token:** the equipped skin's portrait (48 px, a gold ring and a pointer) bobs over the next stage, the first open one not yet cleared. Once every stage is cleared, it is gone. *(V1.4.3: it floats over the picked place instead, a stage, Training or the Endless portal, and moves when another is picked. The next stage has no mark of its own: the Journey opens on it (below), or on Training once every stage is cleared, so the token starts there.)*
