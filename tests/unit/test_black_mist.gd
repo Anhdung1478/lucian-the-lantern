@@ -162,3 +162,17 @@ func test_a_forest_stage_puts_the_mist_in_its_world() -> void:
 	assert_eq(found.size(), 1)
 	assert_eq(found[0].banks, stage.arena.mist)
 	assert_eq(found[0].lucian, stage.lucian)
+
+
+func test_the_banks_stand_still_without_juice() -> void:
+	await wait_physics_frames(3)
+	await wait_process_frames(3)
+	assert_eq(mist.drift_time(), 0.0)
+
+
+func test_the_banks_drift_with_juice() -> void:
+	Juice.renders = true
+	await wait_process_frames(3)
+	var drifted := mist.drift_time()
+	Juice.renders = DisplayServer.get_name() != "headless"
+	assert_gt(drifted, 0.0)
