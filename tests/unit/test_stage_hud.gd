@@ -234,6 +234,24 @@ func test_the_boss_bar_shows_only_while_a_boss_lives() -> void:
 	assert_false(bar.visible)
 
 
+func test_the_boss_bar_names_the_boss_in_capitals_over_a_health_bar() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var bar := BossBar.new()
+	add_child_autofree(bar)
+	var boss := _unit(&"boss", "Test Boss", lucian)
+	await wait_process_frames(2)
+	assert_eq(bar._heading.label.text, "Test Boss")
+	assert_true(bar._heading.label.uppercase, "shown in capitals")
+	assert_eq(bar._bar.amount, 1000.0)
+	assert_eq(bar._text.text, "1000 / 1000")
+	boss.take_damage(DamageInfo.create(400.0, DamageInfo.Type.TRUE, &"test"))
+	await wait_process_frames(2)
+	assert_eq(bar._bar.amount, 600.0)
+	assert_gt(bar._bar.ghost_amount(), 600.0, "the lost part lingers as a ghost")
+	assert_eq(bar._text.text, "600 / 1000")
+
+
 func test_a_mini_boss_is_a_12_px_skull() -> void:
 	assert_eq(Radar.dot_size(&"mini_boss"), 12.0)
 	assert_lt(Radar.dot_size(&"mini_boss"), Radar.dot_size(&"boss"))

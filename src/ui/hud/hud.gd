@@ -31,7 +31,7 @@ const MANA_GHOST := Color("c4d9ff")
 ## The boss bar sits under the stage info.
 const BOSS_BAR_TOP := 92.0
 ## The tips sit under the boss bar.
-const TIPS_TOP := 162.0
+const TIPS_TOP := 180.0
 const TIP_MARGIN := 14.0
 ## Space between the buff icons and the bottom panel.
 const BUFF_GAP := 8.0
