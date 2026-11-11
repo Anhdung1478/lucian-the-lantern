@@ -31,8 +31,9 @@ extends SceneTree
 ## In a break the bot walks to the merchant, shops, looks around for its
 ## tier's `idle` seconds and presses Skip.
 ## The run ends with a summary: the stage time and an estimate of the play
-## time (the slot's clock also runs on the main screen: `between` seconds
-## around each try), one line per stage ("summary 2-1: tries 4,
+## time (the slot's clock also runs on the end screen and the main screen:
+## `between` seconds before each stage, `retry` before each Retry), one line
+## per stage ("summary 2-1: tries 4,
 ## cleared in 3:10 with Resolve 3, spent 8:02"; its farm runs too) and the
 ## tree and essences it ended with.
 
@@ -214,12 +215,14 @@ func _finish(started: int) -> void:
 		_say("summary %s: tries %d, %s, spent %s%s" % [row.id, row.tries, outcome, StageResult.clock(row.spent), farm])
 	var in_stages := 0.0
 	var visits := 0
+	var retries := 0
 	for row in stage_rows:
 		in_stages += row.spent + row.farm_time
-		visits += row.tries + row.farms
-	var between: float = tier.between
-	_say("summary time: %s in stages; with %d visits to the main screen at %d s each, about %s of play time" % [
-		_hours(in_stages), visits, int(between), _hours(in_stages + visits * between)])
+		visits += 1 + row.farms
+		retries += row.tries - 1
+	var outside: float = visits * tier.between + retries * tier.retry
+	_say("summary time: %s in stages; with %d visits to the main screen at %d s and %d retries at %d s, about %s of play time" % [
+		_hours(in_stages), visits, int(tier.between), retries, int(tier.retry), _hours(in_stages + outside)])
 	_say("summary tree: %s; essences B%d O%d P%d" % [_tree_text(save), save.essences.amount(Essences.BLUE),
 		save.essences.amount(Essences.ORANGE), save.essences.amount(Essences.PURPLE)])
 	_say("real seconds: %d" % ((Time.get_ticks_msec() - started) / 1000))
@@ -340,17 +343,22 @@ class Bot extends Node:
 	## warn: share of red warnings stepped out of; bolt: share of enemy bolts
 	## sidestepped; e_dps: E used for damage, not only to escape; focus: share
 	## of summoners (a Maiden, a Broodmother) it goes for first, as a player
-	## who knows them does; idle: seconds it looks around after shopping before
-	## it presses Skip; between: seconds on the main screen and the end screen
-	## around each try (the summary's play time counts them; the stage clock
-	## doesn't).
+	## who knows them does; fumble: share of its decisions in a fight that are
+	## wasted on an aimless step (a new player's hands: no shot, no cast);
+	## idle: seconds it looks around after shopping before it presses Skip;
+	## between: seconds on the end screen and the main screen (the tree, the
+	## Journey) before each new stage or farm run; retry: seconds on the
+	## DEFEATED screen before a Retry. The summary's play time counts the last
+	## two; the stage clock doesn't.
 	const TIERS := {
-		"skilled": {"react": 0.15, "kite": 90.0, "panic": 0.0, "warn": 1.0, "bolt": 0.5, "e_dps": true, "focus": 1.0, "idle": 1.0, "between": 40.0},
-		"average": {"react": 0.25, "kite": 40.0, "panic": 0.0, "warn": 0.8, "bolt": 0.2, "e_dps": false, "focus": 0.5, "idle": 3.0, "between": 60.0},
-		"novice": {"react": 0.35, "kite": -INF, "panic": 0.5, "warn": 0.5, "bolt": 0.0, "e_dps": false, "focus": 0.0, "idle": 6.0, "between": 90.0},
+		"skilled": {"react": 0.15, "kite": 90.0, "panic": 0.0, "warn": 1.0, "bolt": 0.5, "e_dps": true, "focus": 1.0, "fumble": 0.0, "idle": 1.0, "between": 45.0, "retry": 10.0},
+		"average": {"react": 0.25, "kite": 40.0, "panic": 0.0, "warn": 0.8, "bolt": 0.2, "e_dps": false, "focus": 0.5, "fumble": 0.08, "idle": 3.0, "between": 75.0, "retry": 15.0},
+		"novice": {"react": 0.35, "kite": -INF, "panic": 0.25, "warn": 0.5, "bolt": 0.0, "e_dps": false, "focus": 0.0, "fumble": 0.25, "idle": 6.0, "between": 120.0, "retry": 20.0},
 	}
 	## A summoner this far past his reach is still worth walking to.
 	const FOCUS_WALK := 200.0
+	## A wasted decision is a step this long in any direction.
+	const FUMBLE_STEP := 90.0
 	## A walk to the merchant that takes longer than this (a blocked path)
 	## shops anyway, so a stuck bot doesn't skew the numbers.
 	const WALK_LIMIT := 10.0
@@ -456,6 +464,9 @@ class Bot extends Node:
 			return
 		if enemies.is_empty():
 			_between_waves(in_break)
+			return
+		if _rng.randf() < tier.fumble:
+			lucian.command_move(lucian.global_position + Vector2.from_angle(_rng.randf() * TAU) * FUMBLE_STEP)
 			return
 		var target := _pick_target(enemies)
 		_cast(target, enemies)
