@@ -491,6 +491,22 @@ static func rim(canvas: CanvasItem, polygon: PackedVector2Array, lit: Color, sha
 		canvas.draw_line(polygon[i], polygon[(i + 1) % polygon.size()], shaded.lerp(lit, smoothstep(-0.25, 0.25, facing)), width, true)
 
 
+## A stone wall round `bounds`, `thickness` px thick (a map's border rects),
+## `height` tall: its shadow on the floor, `block`-sized blocks of `color`
+## along it (turned on its sides), and a line along its inner edge, lit
+## where the wall faces the light. Draw it after the floor. Rects, then a
+## few polygons and lines.
+static func wall_ring(canvas: CanvasItem, dice: RandomNumberGenerator, bounds: Rect2, thickness: float, block: Vector2, color: Color, height: float) -> void:
+	for rect in border(bounds, thickness):
+		cast_shadow(canvas, polygon_of(rect), height)
+	for rect in border(bounds, thickness):
+		var turned := block if rect.size.x > rect.size.y else Vector2(block.y, block.x)
+		tiles(canvas, dice, rect, turned, color, color.darkened(0.45), 0.07, 3.0)
+	# The floor is a hole in the wall: where the floor's edge faces the light,
+	# the wall's faces away from it.
+	rim(canvas, polygon_of(bounds), Color(SHADOW, 0.5), color.lightened(0.3), 4.0)
+
+
 ## Tree crowns over a jungle wall `polygon`. `under` fills it: the dark
 ## under the trees. Bushes line its edge and crowns in `tints` fill the
 ## rest. The trees at the edge are the brightest, and catch `light` where

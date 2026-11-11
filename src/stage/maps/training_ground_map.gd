@@ -130,8 +130,8 @@ func _draw() -> void:
 	MapArt.outside(self, get_bounds(), BEYOND)
 	_draw_floor()
 	_draw_marks()
+	MapArt.wall_ring(self, MapArt.rng(17), get_bounds(), WALL_THICKNESS, BLOCK, WALL, WALL_HEIGHT)
 	_draw_shadows()
-	_draw_wall()
 	_draw_gates()
 	_draw_pillars()
 	MapArt.vignette(self, get_bounds(), VIGNETTE_DEPTH, VIGNETTE_ALPHA)
@@ -175,24 +175,11 @@ func _draw_marks() -> void:
 		MapArt.pebble(self, dice, at, dice.randf_range(3.0, 6.0), FLOOR.lightened(0.15))
 
 
-## The wall's shadow on the floor, and the pillars' and the dummies'.
+## The pillars' and the dummies' shadows on the floor.
 func _draw_shadows() -> void:
-	for rect in border_rects():
-		MapArt.cast_shadow(self, MapArt.polygon_of(rect), WALL_HEIGHT)
 	for circle in wall_circles:
 		var tall := PILLAR_HEIGHT if circle.z == PILLAR_RADIUS else DUMMY_HEIGHT
 		MapArt.round_shadow(self, Vector2(circle.x, circle.y), circle.z, tall)
-
-
-## The outer wall's blocks, with a lit edge where it faces the light.
-func _draw_wall() -> void:
-	var dice := MapArt.rng(17)
-	for rect in border_rects():
-		var block := BLOCK if rect.size.x > rect.size.y else Vector2(BLOCK.y, BLOCK.x)
-		MapArt.tiles(self, dice, rect, block, WALL, WALL.darkened(0.45), 0.07, 3.0)
-	# The floor is a hole in the wall: where the floor's edge faces the light,
-	# the wall's faces away from it.
-	MapArt.rim(self, MapArt.polygon_of(get_bounds()), Color(MapArt.SHADOW, 0.5), WALL.lightened(0.3), 4.0)
 
 
 ## Each gate: a passage out through the wall, lit where the waves come in
@@ -260,30 +247,19 @@ func _draw_braziers() -> void:
 		MapArt.glow(self, at, BRAZIER_RADIUS * 0.9, Color(FIRE.lightened(0.6), 0.95))
 
 
-## Where the braziers stand: along the middle of each side of the wall,
-## about BRAZIER_STEP apart, clear of the gates and the dummies.
+## Where the braziers stand: on the middle of the wall, BRAZIER_STEP apart,
+## clear of the gates and the dummies.
 func _braziers() -> PackedVector2Array:
-	var spots := PackedVector2Array()
-	var corners := MapArt.polygon_of(get_bounds())
-	for i in corners.size():
-		var from := corners[i]
-		var to := corners[(i + 1) % corners.size()]
-		var count := roundi(from.distance_to(to) / BRAZIER_STEP)
-		for k in count:
-			var on_line := from.lerp(to, (k + 0.5) / count)
-			if _clear_for_brazier(on_line):
-				spots.append(on_line - MapArt.inward(corners, i) * WALL_THICKNESS * 0.5)
-	return spots
+	return MapArt.along(MapArt.polygon_of(get_bounds()), BRAZIER_STEP, -WALL_THICKNESS * 0.5, _clear_for_brazier)
 
 
-## Far enough from every gate and dummy for a brazier at `on_line`, on the
-## wall's inner edge.
-func _clear_for_brazier(on_line: Vector2) -> bool:
+## Far enough from every gate and dummy for a brazier at `at`.
+func _clear_for_brazier(at: Vector2) -> bool:
 	for gate: Vector2 in GATES.values():
-		if on_line.distance_to(_wall_point(gate)) < GATE_CLEAR:
+		if at.distance_to(_wall_point(gate)) < GATE_CLEAR:
 			return false
 	for dummy in DUMMIES:
-		if on_line.distance_to(dummy) < DUMMY_CLEAR:
+		if at.distance_to(dummy) < DUMMY_CLEAR:
 			return false
 	return true
 
