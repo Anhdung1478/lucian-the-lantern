@@ -150,6 +150,7 @@ func _ready() -> void:
 	if dummy:
 		dummy.damage_taken.connect(damage_numbers.spawn.bind(dummy))
 	lucian.apply_setup(run)
+	_apply_resolve()
 	shop_slots = run.shop_slots
 	debug_table.setup(self)
 	add_child(result)
@@ -274,6 +275,8 @@ func show_result(is_cleared: bool) -> void:
 	])
 	if endless:
 		endless.add_result(rows, reward_lines)
+	if not is_cleared:
+		_count_defeat()
 	Sfx.play(&"victory" if is_cleared else &"defeat")
 	var next := Journey.next_stage(run.act, run.stage) if run.act > 0 and not endless else Vector2i.ZERO
 	var can_next := is_cleared and next != Vector2i.ZERO and WavePlan.has_stage(Journey.stage_id(next.x, next.y))
@@ -281,6 +284,22 @@ func show_result(is_cleared: bool) -> void:
 	result.show_result(is_cleared, run.display_name, rows, collected, reward_lines, not is_cleared and run.tutorial, can_next,
 			EndlessDirector.RUN_OVER if endless else "")
 	get_tree().paused = true
+
+
+## Lucian fell: the save counts it at once for a story stage not yet cleared
+## (the stage-done save writes it), and the result names the Resolve the
+## next try gets.
+func _count_defeat() -> void:
+	var save := SaveGame.instance()
+	save.record_defeat(run.stage_id)
+	var line := Resolve.defeat_line(Resolve.stacks_on(save, run.stage_id), save.difficulty)
+	if line != "":
+		reward_lines.append(line)
+
+
+## Resolve's stacks reach Lucian only while its setting is on.
+func _apply_resolve() -> void:
+	lucian.set_resolve(run.resolve if Resolve.enabled() else 0, run.defeats)
 
 
 ## Ends the stage as left: the essences collected so far are kept.
@@ -434,6 +453,8 @@ func set_shop_slots(count: int) -> void:
 func _on_setting_changed(key: StringName) -> void:
 	if key == &"queue_casts":
 		lucian.queue_casts = GameSettings.instance().get_value(&"queue_casts")
+	elif key == Resolve.SETTING:
+		_apply_resolve()
 
 
 func _open_shop(visited: Merchant) -> void:

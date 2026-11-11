@@ -784,3 +784,64 @@ func test_a_stage_alone_is_training_in_its_esc_menu() -> void:
 	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
 	add_child_autofree(stage)
 	assert_eq(stage.screens.menu.card.subtitle_label.text, "Training")
+
+
+## R1: each defeat gives the next try of the stage a Resolve stack, saved with
+## the stage-done save; the clear forgets them.
+func test_a_retry_after_a_defeat_has_a_resolve_stack_until_the_stage_is_cleared() -> void:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_process_frames(2)
+	var first := game.screen as Stage
+	assert_eq(first.lucian.resolve, 0)
+	first.show_result(false)
+	first.result.retry_button.pressed.emit()
+	await wait_process_frames(2)
+	var second := game.screen as Stage
+	assert_eq([second.run.resolve, second.lucian.resolve], [1, 1])
+	var loaded := SaveGame.new(_prefix)
+	loaded.load_slot(1)
+	assert_eq(loaded.defeats, {"2-1": 1}, "the defeat is saved")
+	second.show_result(false)
+	second.result.main_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, MainScreen)
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_process_frames(2)
+	var third := game.screen as Stage
+	assert_eq(third.lucian.resolve, 2, "from the main screen too")
+	third.show_result(true)
+	third.result.retry_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_eq((game.screen as Stage).lucian.resolve, 0, "a replay of the cleared stage has none")
+	assert_true(SaveGame.instance().defeats.is_empty())
+	loaded.load_slot(1)
+	assert_true(loaded.defeats.is_empty(), "the clear is saved without them")
+
+
+func test_leaving_a_stage_is_not_a_defeat() -> void:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_process_frames(2)
+	(game.screen as Stage).leave()
+	await wait_process_frames(2)
+	assert_is(game.screen, MainScreen)
+	assert_true(SaveGame.instance().defeats.is_empty())
+	assert_eq(StageSetup.for_stage(SaveGame.instance(), 2, 1).resolve, 0)
+
+
+func test_a_save_from_the_defeated_screen_counts_the_defeat_once() -> void:
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(1))
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	await wait_process_frames(2)
+	var stage := game.screen as Stage
+	stage.show_result(false)
+	game.ask_to_quit()
+	_prompt_button("Yes").pressed.emit()
+	assert_true(quit_called)
+	var loaded := SaveGame.new(_prefix)
+	loaded.load_slot(1)
+	assert_eq(loaded.defeats, {"2-1": 1})
+	stage.result.retry_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_eq(SaveGame.instance().defeats, {"2-1": 1}, "the button after the save adds none")

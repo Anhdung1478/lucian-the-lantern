@@ -24,6 +24,12 @@ static func stacks(defeats: int, difficulty: int) -> int:
 	return clampi(defeats, 0, MAX_STACKS) if Difficulty.resolve_step(difficulty) > 0.0 else 0
 
 
+## The stacks the next try on `stage_id` gets from `save`: none with the
+## setting off, on a cleared stage or outside the story.
+static func stacks_on(save: SaveGame, stage_id: String) -> int:
+	return stacks(save.defeats_on(stage_id), save.difficulty) if enabled() else 0
+
+
 ## Every hit Lucian deals with `count` stacks is multiplied by this.
 static func damage_dealt_scale(count: int, difficulty: int) -> float:
 	return 1.0 + Difficulty.resolve_step(difficulty) * count
@@ -38,3 +44,12 @@ static func damage_taken_scale(count: int, difficulty: int) -> float:
 ## What `count` stacks are worth, in percent: 30 for 3 stacks on Normal.
 static func percent(count: int, difficulty: int) -> int:
 	return roundi(Difficulty.resolve_step(difficulty) * count * 100.0)
+
+
+## The DEFEATED screen's line for a next try with `count` stacks: "Resolve
+## 3 / 5: +30% damage, -30% damage taken on your next try"; "" with none.
+static func defeat_line(count: int, difficulty: int) -> String:
+	if count <= 0:
+		return ""
+	var share := percent(count, difficulty)
+	return "Resolve %d / %d: +%d%% damage, -%d%% damage taken on your next try" % [count, MAX_STACKS, share, share]
