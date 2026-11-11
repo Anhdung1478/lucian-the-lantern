@@ -412,7 +412,7 @@ func test_a_picked_node_lists_each_level_with_its_value_and_cost() -> void:
 	assert_eq((ladder.get_child(4).get_node(^"Line/Value") as Label).get_theme_color(&"font_color"), UiStyle.DIM_COLOR, "later")
 	section.select(&"backpack_slots")
 	assert_eq(ladder.get_child_count(), 7)
-	assert_eq(_texts(ladder.get_child(6)), PackedStringArray(["Lv 7", "54 backpack slots", "1200", "25"]))
+	assert_eq(_texts(ladder.get_child(6)), PackedStringArray(["Lv 7", "54 backpack slots", "2000", "12"]))
 
 
 func test_r_shows_its_q_w_e_ranks() -> void:

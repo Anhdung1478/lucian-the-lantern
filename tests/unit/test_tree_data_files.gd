@@ -20,7 +20,7 @@ const COSTS := {
 	&"stat_attack_speed": [STAT_B, STAT_O], &"stat_mana": [STAT_B, STAT_O],
 	&"stat_hp_regen": [STAT_B, STAT_O], &"stat_mana_regen": [STAT_B, STAT_O],
 	&"equip_slots": [[150, 300, 600, 1000, 1500], [0, 0, 5, 15, 30]],
-	&"backpack_slots": [[50, 100, 200, 350, 500, 800, 1200], [0, 0, 0, 3, 8, 15, 25]],
+	&"backpack_slots": [[50, 100, 200, 350, 740, 1280, 2000], [0, 0, 0, 3, 4, 7, 12]],
 	&"stage_gold": [ECO_B, ECO_O], &"bonus_xp": [ECO_B, ECO_O], &"essence_drop": [ECO_B, ECO_O],
 	&"merchant_stock": [[300, 800], [0, 10]], &"refresh_cost": [[200, 500], [0, 5]],
 	&"flash": [[150], [0]], &"ghost": [[0], [0]], &"barrier": [[150], [0]],
