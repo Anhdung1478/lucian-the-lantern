@@ -267,3 +267,34 @@ func test_act_3_s_stages_pay_near_the_line_between_act_2_s_and_act_4_s() -> void
 	var line := (_act_gold(2) + _act_gold(4)) / 2.0
 	var act_3 := _act_gold(3)
 	assert_between(act_3, line * 0.9, _act_gold(4), "Act 2 %d, Act 3 %d, Act 4 %d" % [_act_gold(2), act_3, _act_gold(4)])
+
+
+## V1.5 (P6): a normal's and an elite's orange chance × (1 + 0.2 × (act − 1)).
+func test_the_orange_chance_grows_with_the_act() -> void:
+	var run := StageSetup.new()
+	for act in range(1, 7):
+		var growth := 1.0 + 0.2 * (act - 1)
+		assert_almost_eq(KillRewards.orange_chance(&"normal", act, run), 0.01 * growth, 0.00001, "a normal in act %d" % act)
+		assert_almost_eq(KillRewards.orange_chance(&"elite", act, run), 0.1 * growth, 0.00001, "an elite in act %d" % act)
+	assert_almost_eq(KillRewards.orange_chance(&"elite", 6, run), 0.2, 0.00001, "×2 in Act 6")
+
+
+func test_the_act_s_growth_stacks_with_the_tree_and_an_endless_modifier() -> void:
+	var run := StageSetup.new()
+	run.essence_bonus = 0.5
+	run.orange_mult = 1.5
+	assert_almost_eq(KillRewards.orange_chance(&"elite", 3, run), 0.1 * 1.4 * 1.5 * 1.5, 0.00001)
+
+
+func test_act_6_s_normals_drop_orange_twice_as_often() -> void:
+	var orange := 0
+	for i in 10000:
+		orange += KillRewards.roll(MELEE, 6, StageSetup.new(), rng).orange
+	assert_between(orange, 140, 260, "2%")
+
+
+func test_a_boss_s_sure_orange_does_not_grow_with_the_act() -> void:
+	var boss := _mini_boss()
+	boss.kind = &"boss"
+	assert_eq(KillRewards.roll(boss, 6, StageSetup.new(), rng).orange, KillRewards.BOSS_ORANGE)
+	assert_eq(KillRewards.roll(_mini_boss(), 6, StageSetup.new(), rng).orange, KillRewards.MINI_BOSS_ORANGE)

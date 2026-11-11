@@ -10,6 +10,9 @@ extends RefCounted
 ## from `rng`.
 
 const ORANGE_CHANCE := {&"normal": 0.01, &"elite": 0.1}
+## The orange chance grows by this share of itself per act after the first:
+## ×1.0 in Act 1 up to ×2.0 in Act 6.
+const ORANGE_ACT_GROWTH := 0.2
 const ELITE_BLUE := 5
 const BOSS_BLUE := 100
 const BOSS_ORANGE := 5
@@ -44,11 +47,18 @@ static func roll(data: EnemyData, act: int, run: StageSetup, rng: RandomNumberGe
 	else:
 		if data.kind == &"elite":
 			blue = act * ELITE_BLUE
-		if rng.randf() < ORANGE_CHANCE[data.kind] * (1.0 + run.essence_bonus) * run.orange_mult:
+		if rng.randf() < orange_chance(data.kind, act, run):
 			reward.orange = 1
 	reward.blue = roundi((blue + data.extra_blue) * (1.0 + run.essence_bonus) * run.blue_mult * Difficulty.blue_scale(run.difficulty))
 	reward.orange += data.extra_orange
 	return reward
+
+
+## A normal's or an elite's chance to drop an orange essence in `act`: its
+## kind's, grown by the act, then raised by the tree's Essence Drops and an
+## Endless modifier's orange multiplier.
+static func orange_chance(kind: StringName, act: int, run: StageSetup) -> float:
+	return ORANGE_CHANCE[kind] * (1.0 + ORANGE_ACT_GROWTH * (act - 1)) * (1.0 + run.essence_bonus) * run.orange_mult
 
 
 ## Endless: the purple a boss or mini boss pays on every kill, its repeat
