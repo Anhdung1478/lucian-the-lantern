@@ -3,7 +3,8 @@ extends Control
 ## The Journey's side panel, opaque beside the map: the picked place and its
 ## Start, with the D/F summoner spells at the bottom for every pick.
 ## - A stage: its act and id, the boss or mini boss with its purple, the
-##   waves, the act's story, whether it is cleared, and its enemies.
+##   waves, the act's story, whether it is cleared, its Resolve once it has
+##   beaten Lucian, and its enemies.
 ## - Training: what it is.
 ## - Endless: the best wave, the rules, and the map choice with a thumbnail.
 
@@ -22,6 +23,8 @@ const ENDLESS_ROW_GAP := 9
 const PORTRAIT_SIZE := 112.0
 const ICON_SIZE := 26.0
 const CHIP_HEIGHT := 34.0
+## The Resolve line: small enough for its longest text to fit on one line.
+const RESOLVE_FONT := 16
 ## The roster's round icons.
 const ROSTER_ICON := 44.0
 ## How far down the picked place's color glows from the top.
@@ -58,6 +61,9 @@ var purple_label: Label
 var waves_label: Label
 var story_label: Label
 var status_label: Label
+## The stage's Resolve, shown while it has stacks.
+var resolve_row: HBoxContainer
+var resolve_label: Label
 ## The stage's enemies, each once in wave order (its mini boss is in the
 ## portrait), and their icons.
 var enemy_ids: Array[StringName] = []
@@ -165,6 +171,10 @@ func _show_stage(node: JourneyNode, save: SaveGame) -> void:
 	status_label.add_theme_color_override(&"font_color", JourneyNode.CHECK_COLOR if node.cleared else UiStyle.DIM_COLOR)
 	_cleared_mark = node.cleared
 	_status_mark.queue_redraw()
+	var stacks := Resolve.stacks_on(save, node.stage_id)
+	resolve_row.visible = stacks > 0
+	resolve_label.text = Resolve.journey_line(stacks, save.difficulty)
+	resolve_row.set_meta(&"hover_text", Resolve.journey_note(save.defeats_on(node.stage_id)))
 	start_button.text = "Start" if Journey.stage_count(node.act) == 1 else "Start stage %d" % node.stage
 	_show_roster(node.stage_id)
 
@@ -276,6 +286,9 @@ func _build_stage() -> void:
 	_status_mark.custom_minimum_size = Vector2.ONE * ICON_SIZE
 	_status_mark.draw.connect(_draw_status_mark)
 	stage_box.add_child(_icon_row(_status_mark, status_label))
+	resolve_label = UiStyle.label("", RESOLVE_FONT, UiStyle.GOOD_COLOR)
+	resolve_row = _icon_row(_icon(Resolve.ICON), resolve_label)
+	stage_box.add_child(resolve_row)
 	stage_box.add_child(divider())
 	stage_box.add_child(UiStyle.label("ENEMIES", 16, CAPTION_COLOR))
 	roster.add_theme_constant_override(&"h_separation", 8)

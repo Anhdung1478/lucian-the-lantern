@@ -830,3 +830,59 @@ func test_picking_a_place_clicks_but_a_locked_one_stays_silent() -> void:
 	sfx._last_played.clear()
 	_node("2-1")._gui_input(_click())
 	assert_false(sfx._last_played.has(&"click"), "a locked place refuses silently")
+
+
+## R1: a stage that beat Lucian shows its Resolve under "Not cleared yet".
+func test_a_stage_with_defeats_shows_its_resolve_line() -> void:
+	_clear(1)
+	var panel := section.panel
+	section.pick(_node("2-1"))
+	assert_false(panel.resolve_row.visible, "no defeat, no line")
+	for i in 3:
+		_save().record_defeat("2-1")
+	assert_true(panel.resolve_row.visible, "the panel follows the save")
+	assert_eq(panel.resolve_label.text, "Resolve 3 / 5: +30% damage, -30% taken")
+	assert_eq(panel.resolve_row.get_meta(&"hover_text"),
+		"Lucian fell here 3 times.\nEach defeat makes this stage a little easier, up to 5 times, until it is cleared.")
+	assert_eq(panel.status_label.text, "Not cleared yet")
+	_clear(1, ["2-1"] as Array[String])
+	section.pick(_node("2-1"))
+	assert_false(panel.resolve_row.visible, "cleared: its Resolve is gone")
+	section.pick(_node("2-2"))
+	assert_false(panel.resolve_row.visible, "another stage has its own")
+
+
+func test_the_resolve_line_follows_the_difficulty_and_the_setting() -> void:
+	_clear(1)
+	for i in 7:
+		_save().record_defeat("2-1")
+	_save().difficulty = Difficulty.HARD
+	section.pick(_node("2-1"))
+	var panel := section.panel
+	assert_eq(panel.resolve_label.text, "Resolve 5 / 5: +25% damage, -25% taken")
+	assert_string_starts_with(panel.resolve_row.get_meta(&"hover_text"), "Lucian fell here 7 times.")
+	_save().difficulty = Difficulty.EXTREME
+	section.refresh()
+	assert_false(panel.resolve_row.visible, "Extreme has no Resolve")
+	_save().difficulty = Difficulty.NORMAL
+	_settings = GameSettings.instance()
+	GameSettings._instance = GameSettings.new(SETTINGS_PATH)
+	GameSettings.instance().set_value(Resolve.SETTING, false)
+	section.refresh()
+	assert_false(panel.resolve_row.visible, "the setting is off")
+	GameSettings.instance().set_value(Resolve.SETTING, true)
+	section.refresh()
+	assert_true(panel.resolve_row.visible)
+	assert_eq(panel.resolve_label.text, "Resolve 5 / 5: +50% damage, -50% taken")
+
+
+func test_the_resolve_line_fits_over_start_on_every_stage() -> void:
+	var limit := section.panel.start_button.position.y - JourneyPanel.GAP * 0.5
+	for id in Journey.all_stage_ids(Journey.ACTS.size()):
+		_save().record_defeat(id)
+		section.panel.show_node(_node(id), _save())
+		await wait_process_frames(2)
+		assert_true(section.panel.resolve_row.visible, id)
+		var box := section.panel.stage_box
+		assert_lte(box.position.y + box.get_combined_minimum_size().y, limit, "%s: the stage's rows end over Start" % id)
+		assert_lte(box.get_combined_minimum_size().x, JourneyPanel.CONTENT_WIDTH, "%s: no row is wider than the panel" % id)

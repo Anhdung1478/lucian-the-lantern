@@ -1125,11 +1125,14 @@ func enemy_near_cursor(aim: Vector2, reach: float) -> Enemy:
 	return best
 
 
-## HUD buff icons: potions, stat buffs (the jungle buffs), move speed,
-## shields, item passives, then the strongest slow, crowd control and the
-## burns. Each is {id, name, icon, text, count, left, duration, ready}.
+## HUD buff icons: Resolve (it lasts the whole try, so it never moves),
+## potions, stat buffs (the jungle buffs), move speed, shields, item
+## passives, then the strongest slow, crowd control and the burns. Each is
+## {id, name, icon, text, count, left, duration, ready}.
 func buffs() -> Array[Dictionary]:
 	var found: Array[Dictionary] = []
+	if resolve > 0:
+		found.append(Resolve.buff(resolve, defeats, difficulty))
 	if item_catalog:
 		for potion in item_catalog.potions():
 			var drinks := restores.count(potion.id)

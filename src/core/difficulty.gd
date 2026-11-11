@@ -51,13 +51,14 @@ static func scale_text(level: int) -> String:
 	return "×%s" % String.num(scale(level), 1)
 
 
-## "Enemies have 110% HP and deal 110% damage. Blue and orange essence ×1.2."
+## "Enemies have 110% HP and deal 110% damage. Blue and orange essence ×1.2.",
+## then what the level does to Resolve on a second line (Resolve.describe).
 static func describe(level: int) -> String:
 	var percent := roundi(scale(level) * 100.0)
 	var text := "Enemies have %d%% HP and deal %d%% damage." % [percent, percent]
 	if essence_scale(level) != 1.0:
 		text += " Blue and orange essence ×%s." % String.num(essence_scale(level), 1)
-	return text
+	return "%s\n%s" % [text, Resolve.describe(level)]
 
 
 ## The level a save file's word names; Normal for anything else.

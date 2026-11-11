@@ -45,9 +45,22 @@ func test_four_levels_with_their_numbers() -> void:
 	assert_eq(Difficulty.LEVELS.map(func(level: int) -> float: return Difficulty.scale(level)), [0.8, 1.0, 1.1, 1.3])
 	assert_eq(Difficulty.LEVELS.map(func(level: int) -> String: return Difficulty.scale_text(level)), ["×0.8", "×1.0", "×1.1", "×1.3"])
 	assert_eq(Difficulty.LEVELS.map(func(level: int) -> float: return Difficulty.essence_scale(level)), [1.0, 1.0, 1.2, 1.5])
-	assert_eq(Difficulty.describe(Difficulty.EASY), "Enemies have 80% HP and deal 80% damage.")
-	assert_eq(Difficulty.describe(Difficulty.HARD), "Enemies have 110% HP and deal 110% damage. Blue and orange essence ×1.2.")
-	assert_eq(Difficulty.describe(Difficulty.EXTREME), "Enemies have 130% HP and deal 130% damage. Blue and orange essence ×1.5.")
+	assert_eq(Difficulty.describe(Difficulty.EASY).get_slice("\n", 0), "Enemies have 80% HP and deal 80% damage.")
+	assert_eq(Difficulty.describe(Difficulty.HARD).get_slice("\n", 0), "Enemies have 110% HP and deal 110% damage. Blue and orange essence ×1.2.")
+	assert_eq(Difficulty.describe(Difficulty.EXTREME).get_slice("\n", 0), "Enemies have 130% HP and deal 130% damage. Blue and orange essence ×1.5.")
+
+
+## R1: each level's hover text ends with what it does to Resolve, on its own line.
+func test_each_level_says_what_it_does_to_resolve() -> void:
+	var tenth := "Resolve: each defeat on a stage gives +10% damage dealt and -10% damage taken there, up to 5 times."
+	assert_eq(Resolve.describe(Difficulty.EASY), tenth)
+	assert_eq(Resolve.describe(Difficulty.NORMAL), tenth)
+	assert_eq(Resolve.describe(Difficulty.HARD), "Resolve: each defeat on a stage gives +5% damage dealt and -5% damage taken there, up to 5 times.")
+	assert_eq(Resolve.describe(Difficulty.EXTREME), "No Resolve: a defeat makes no stage easier.")
+	assert_eq(Difficulty.describe(Difficulty.NORMAL), "Enemies have 100% HP and deal 100% damage.\n" + tenth)
+	for level in Difficulty.LEVELS:
+		assert_eq(Difficulty.describe(level).get_slice("\n", 1), Resolve.describe(level), Difficulty.name_of(level))
+		assert_eq(Difficulty.describe(level).get_slice_count("\n"), 2, "two lines")
 
 
 func test_an_unknown_level_or_key_is_normal() -> void:

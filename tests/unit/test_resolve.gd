@@ -290,3 +290,77 @@ func test_training_is_untouched() -> void:
 	stage.show_result(false)
 	assert_true(SaveGame.instance().defeats.is_empty())
 	_assert_no_line(stage, "Training")
+
+
+# --- The buff row --------------------------------------------------------------
+
+
+## Lucian's Resolve row in buffs(), or {} when he has none.
+func _buff_of(lucian: Lucian) -> Dictionary:
+	for row in lucian.buffs():
+		if row.id == Resolve.BUFF:
+			return row
+	return {}
+
+
+## The HUD's visible Resolve icon, or null.
+func _hud_icon(node: Node) -> BuffIcon:
+	var icon := node as BuffIcon
+	if icon and icon.is_visible_in_tree() and icon.buff.get("id") == Resolve.BUFF:
+		return icon
+	for child in node.get_children():
+		var found := _hud_icon(child)
+		if found:
+			return found
+	return null
+
+
+func test_the_buff_says_what_the_stacks_give_and_how_often_he_fell() -> void:
+	var row := Resolve.buff(3, 3, Difficulty.NORMAL)
+	assert_eq([row.id, row.name, row.count], [Resolve.BUFF, "Resolve", "3"])
+	assert_eq(TooltipText.plain(row.text), "+30% damage dealt, -30% damage taken. You fell here 3 times.")
+	assert_eq([row.left, row.duration, row.ready], [0.0, 0.0, false], "no timer: it lasts the whole try")
+	assert_eq(row.icon, Resolve.ICON)
+	assert_not_null(Resolve.ICON)
+	assert_eq(TooltipText.plain(Resolve.buff(5, 8, Difficulty.NORMAL).text), "+50% damage dealt, -50% damage taken. You fell here 8 times.")
+	assert_eq(TooltipText.plain(Resolve.buff(1, 1, Difficulty.EASY).text), "+10% damage dealt, -10% damage taken. You fell here once.")
+	assert_eq(TooltipText.plain(Resolve.buff(2, 2, Difficulty.HARD).text), "+10% damage dealt, -10% damage taken. You fell here 2 times.")
+
+
+func test_lucians_buffs_start_with_resolve_while_he_has_stacks() -> void:
+	var lucian := _lucian(3)
+	lucian.add_speed_buff(&"ghost", 0.0, 0.3, 5.0)
+	var rows := lucian.buffs()
+	assert_eq(rows[0], Resolve.buff(3, 3, Difficulty.NORMAL), "first, so it never moves")
+	assert_gt(rows.size(), 1)
+	lucian.set_resolve(0)
+	assert_true(_buff_of(lucian).is_empty(), "no stack, no icon")
+	assert_true(_buff_of(_lucian(0)).is_empty())
+
+
+func test_the_hud_shows_the_resolve_icon_with_its_stacks_and_its_card() -> void:
+	var stage: Stage = await _stage(2, 1, 3)
+	await wait_process_frames(2)
+	var icon := _hud_icon(stage.hud)
+	assert_not_null(icon, "in the buff row")
+	if icon == null:
+		return
+	assert_eq(icon.buff.count, "3")
+	var card := icon.tooltip_content()
+	var texts: PackedStringArray = []
+	for label: Label in card.find_children("*", "Label", true, false):
+		texts.append(label.text)
+	for rich: RichTextLabel in card.find_children("*", "RichTextLabel", true, false):
+		texts.append(rich.get_parsed_text())
+	card.free()
+	assert_has(texts, "Resolve")
+	assert_has(texts, "+30% damage dealt, -30% damage taken. You fell here 3 times.")
+	GameSettings.instance().set_value(Resolve.SETTING, false)
+	await wait_process_frames(2)
+	assert_null(_hud_icon(stage.hud), "the setting off takes the icon away")
+
+
+func test_no_icon_without_stacks() -> void:
+	var stage: Stage = await _stage(2, 1)
+	await wait_process_frames(2)
+	assert_null(_hud_icon(stage.hud))

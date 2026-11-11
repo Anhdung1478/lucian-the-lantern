@@ -205,7 +205,7 @@ func _build() -> void:
 
 
 ## CHOOSE DIFFICULTY: a button per level ("Hard  ×1.2", the full
-## effect on hover), Normal in gold, then Back to the slots.
+## effect on hover, Resolve's too), Normal in gold, then Back to the slots.
 func _build_difficulty_page() -> void:
 	_difficulty_page = VBoxContainer.new()
 	_difficulty_page.add_theme_constant_override(&"separation", 14)

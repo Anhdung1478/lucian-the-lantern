@@ -246,6 +246,7 @@ func test_the_difficulty_page_lists_the_four_levels() -> void:
 	assert_eq(texts, ["Easy   ×0.8", "Normal   ×1.0", "Hard   ×1.1", "Extreme   ×1.3"])
 	for level in Difficulty.LEVELS:
 		assert_eq(_title().difficulty_buttons[level].get_meta(&"hover_text"), Difficulty.describe(level))
+		assert_string_contains(_title().difficulty_buttons[level].get_meta(&"hover_text"), "Resolve", "R1: what the level does to Resolve")
 	assert_not_null(_title().find_button("Back"))
 
 

@@ -11,6 +11,10 @@ extends RefCounted
 const MAX_STACKS := 5
 ## The Gameplay setting's key (GameSettings), on by default.
 const SETTING := &"resolve"
+## The buff row's id, name and icon (a fist under a rising chevron).
+const BUFF := &"resolve"
+const NAME := "Resolve"
+const ICON := preload("res://assets/art/ui/status_empower.svg")
 
 
 ## The setting is on in the game's shared settings.
@@ -46,10 +50,51 @@ static func percent(count: int, difficulty: int) -> int:
 	return roundi(Difficulty.resolve_step(difficulty) * count * 100.0)
 
 
+## What `difficulty` does to Resolve, for the difficulty page's hover text.
+static func describe(difficulty: int) -> String:
+	var share := percent(1, difficulty)
+	if share <= 0:
+		return "No %s: a defeat makes no stage easier." % NAME
+	return "%s: each defeat on a stage gives +%d%% damage dealt and -%d%% damage taken there, up to %d times." % [
+		NAME, share, share, MAX_STACKS]
+
+
+## The buff row's entry for `count` stacks after `defeats` defeats on the
+## stage (see Lucian.buffs): the stack count on the icon, no timer, and a
+## card that reads "+30% damage dealt, -30% damage taken. You fell here 3
+## times."
+static func buff(count: int, defeats: int, difficulty: int) -> Dictionary:
+	var share := percent(count, difficulty)
+	var text := "[kw]+%d%% damage dealt[/kw], [kw]-%d%% damage taken[/kw]. You fell here %s." % [share, share, _times(defeats)]
+	return {"id": BUFF, "name": NAME, "icon": ICON, "text": TooltipText.colorize(text), "count": str(count),
+		"left": 0.0, "duration": 0.0, "ready": false}
+
+
 ## The DEFEATED screen's line for a next try with `count` stacks: "Resolve
 ## 3 / 5: +30% damage, -30% damage taken on your next try"; "" with none.
 static func defeat_line(count: int, difficulty: int) -> String:
 	if count <= 0:
 		return ""
 	var share := percent(count, difficulty)
-	return "Resolve %d / %d: +%d%% damage, -%d%% damage taken on your next try" % [count, MAX_STACKS, share, share]
+	return "%s %d / %d: +%d%% damage, -%d%% damage taken on your next try" % [NAME, count, MAX_STACKS, share, share]
+
+
+## The Journey's line for a stage with `count` stacks: "Resolve 3 / 5: +30%
+## damage, -30% taken"; "" with none.
+static func journey_line(count: int, difficulty: int) -> String:
+	if count <= 0:
+		return ""
+	var share := percent(count, difficulty)
+	return "%s %d / %d: +%d%% damage, -%d%% taken" % [NAME, count, MAX_STACKS, share, share]
+
+
+## The Journey line's hover text, after `defeats` defeats on the stage, on
+## two lines.
+static func journey_note(defeats: int) -> String:
+	return "Lucian fell here %s.\nEach defeat makes this stage a little easier, up to %d times, until it is cleared." % [
+		_times(defeats), MAX_STACKS]
+
+
+## "once", "3 times".
+static func _times(count: int) -> String:
+	return "once" if count == 1 else "%d times" % count
