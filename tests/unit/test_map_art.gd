@@ -6,7 +6,7 @@ const WALL := [Vector2(0, 0), Vector2(400, 0), Vector2(400, 100), Vector2(100, 1
 
 
 ## Stages ([act, stage]) whose maps have ambient life; [0, 0] is the Training arena.
-const AMBIENT_STAGES := [[1, 1], [2, 1], [2, 3], [4, 1], [0, 0]]
+const AMBIENT_STAGES := [[1, 1], [2, 1], [2, 3], [4, 1], [5, 1], [5, 2], [5, 4], [5, 5], [0, 0]]
 
 
 ## A small map with a firefly.
@@ -133,6 +133,14 @@ func test_a_rock_and_a_tuft_lie_where_they_are_put() -> void:
 	for point in facets.points:
 		assert_lte(point.distance_to(Vector2(50, 50)), 16.0 * 1.2)
 		assert_lte(point.y, 50.0 + 2.0, "it grows up")
+
+
+func test_a_bare_tree_keeps_its_limbs_inside_its_wall() -> void:
+	var facets := MapArt.Facets.new()
+	MapArt.limbs(facets, MapArt.rng(8), Vector2(300, 200), 70.0, 7, Color.GRAY, Color.WHITE)
+	assert_gt(facets.count(), 14, "limbs, forks and light")
+	for point in facets.points:
+		assert_lte(point.distance_to(Vector2(300, 200)), 70.01, "inside its round wall")
 
 
 func test_ambience_motes_stay_near_their_spots() -> void:

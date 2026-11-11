@@ -75,6 +75,12 @@ const ROCK_OUTLINE := Vector2(0.9, 1.0)
 const ROCK_TOP := Vector2(0.46, 0.62)
 const ROCK_LEAN := 0.14
 
+## A bare tree's limbs: the pieces of each (and how long each is, a share
+## of the radius), and how far it may turn.
+const LIMB_PIECES := 3
+const LIMB_LENGTH := 0.3
+const LIMB_TURN := 0.45
+
 ## Water: how many bands of depth it has, and its foam line's width.
 const WATER_BANDS := 3
 const FOAM_WIDTH := 5.0
@@ -605,6 +611,29 @@ static func pillar(canvas: CanvasItem, at: Vector2, radius: float, color: Color,
 	disc(canvas, at, radius * 0.4, trim)
 	disc(canvas, at, radius * 0.4 - 4.0, color.lightened(0.06))
 	disc(canvas, at - SHADOW_DIR * radius * 0.36, radius * 0.16, Color(1, 1, 1, 0.16))
+
+
+## The bare limbs of a dead tree seen from above, filling the round wall at
+## `at`: `count` forking limbs of `color`, thick at the trunk and thin at
+## the tips, from its middle to its edge, a thin line of `light` along the
+## ones that face the light. All of it stays inside `radius`. Facets.
+static func limbs(into: Facets, dice: RandomNumberGenerator, at: Vector2, radius: float, count: int, color: Color, light: Color) -> void:
+	var reach := radius * 0.96
+	for i in count:
+		var heading := TAU * (i + dice.randf_range(-0.3, 0.3)) / count
+		var from := at + Vector2.from_angle(heading) * radius * 0.1
+		var width := radius * 0.11
+		for piece in LIMB_PIECES:
+			heading += dice.randf_range(-LIMB_TURN, LIMB_TURN)
+			var to := at + (from + Vector2.from_angle(heading) * radius * LIMB_LENGTH - at).limit_length(reach)
+			into.line(from, to, width, color)
+			if Vector2.from_angle(heading).dot(-SHADOW_DIR) > 0.2:
+				into.line(from - SHADOW_DIR * width * 0.3, to - SHADOW_DIR * width * 0.3, maxf(width * 0.3, 1.0), Color(light, 0.45))
+			if piece == 1:
+				var branch := heading + (0.8 if dice.randf() < 0.5 else -0.8)
+				into.blade(to, at + (to + Vector2.from_angle(branch) * radius * LIMB_LENGTH - at).limit_length(reach), width * 0.8, color)
+			from = to
+			width *= 0.7
 
 
 # --- Water -------------------------------------------------------------------------

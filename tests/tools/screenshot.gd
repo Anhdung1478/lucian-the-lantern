@@ -52,7 +52,7 @@ const ACT_SCENARIOS := {
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
 	"infernal_meteor": [3, 2], "ocean_mist": [3, 4], "elder_sky_dive": [3, 5], "elder_mark": [3, 5],
 	"act4_lane": [4, 1], "dark_lucian_q": [4, 3], "dark_lucian_r": [4, 3],
-	"map_act1": [1, 1], "map_act2": [2, 1], "map_act2_ring": [2, 3], "map_act4": [4, 1],
+	"map_act1": [1, 1], "map_act2": [2, 1], "map_act2_ring": [2, 3], "map_act4": [4, 1], "map_act5": [5, 1], "map_act5_ring": [5, 2], "map_act5_camp": [5, 4], "map_act5_grave": [5, 5],
 	"act5_mist": [5, 1], "act5_sapling": [5, 1], "act5_brood": [5, 1], "maokai_grasp": [5, 2], "elise_rappel": [5, 4],
 	"karthus_wall": [5, 5], "karthus_requiem": [5, 5],
 	"act6_bridges": [6, 3], "act6_platform": [6, 5], "act6_rider": [6, 1], "karthus_defile": [6, 2],
@@ -331,6 +331,15 @@ func _run(scenario: String) -> void:
 		"map_act4":
 			await map_art("map_act4", [Vector2(0.5, 0.5), Vector2(0.14, 0.86), Vector2(0.86, 0.2), Vector2(0.36, 0.3)],
 				[WavePlan.SHADOW_MELEE, WavePlan.SHADOW_RANGED, WavePlan.SHADOW_SIEGE])
+		"map_act5":
+			await map_art("map_act5", [Vector2(0.5, 0.5), Vector2(0.14, 0.86), Vector2(0.62, 0.2), Vector2(0.3, 0.3)],
+				[WavePlan.SPIDERLING, WavePlan.SAPLING, WavePlan.SPIDERLING])
+		"map_act5_ring":
+			await map_art("map_act5_ring", [Vector2(0.72, 0.5), Vector2(0.1, 0.5)], [WavePlan.SPIDERLING, WavePlan.SAPLING])
+		"map_act5_camp":
+			await map_art("map_act5_camp", [Vector2(0.72, 0.4), Vector2(0.93, 0.74)], [WavePlan.SPIDERLING, WavePlan.SAPLING])
+		"map_act5_grave":
+			await map_art("map_act5_grave", [Vector2(0.78, 0.5), Vector2(0.72, 0.25), Vector2(0.4, 0.5)], [WavePlan.SPIDERLING, WavePlan.SAPLING])
 		"map_training":
 			await map_art("map_training", [Vector2(0.5, 0.5), Vector2(0.1, 0.12), Vector2(0.9, 0.9)], [WavePlan.MELEE, WavePlan.RANGED])
 		"dark_lucian_q":
