@@ -94,7 +94,7 @@ Each wave after the first also adds **+10% HP and damage**. Act 2's melee minion
 | 2-2 | 5 | 32,368 | 9,718 | — | 3,037 | 9 | 5,812 |
 | 2-3 | 5 | 42,103 | 11,774 | 7,500 | 3,612 | 10 | 6,862 |
 
-Health of each wave, in thousands: 2-1 3.0 · 3.7 · 5.5 · 6.0; 2-2 3.9 · 5.3 · 6.5 · 7.0 · 9.7; 2-3 5.1 · 6.3 · 8.8 · 10.1 · 11.8. Act 2 pays 5,700 gold in all, the boss's included. Lucian starts every Act 2 stage at **level 2**.
+Health of each wave, in thousands: 2-1 3.0 · 3.7 · 5.5 · 6.0; 2-2 3.9 · 5.3 · 6.5 · 7.0 · 9.7; 2-3 5.1 · 6.3 · 8.8 · 10.1 · 11.8. Act 2 pays 5,700 gold a stage on average, the boss's included. Lucian starts every Act 2 stage at **level 2**.
 
 ### Super minion
 | | Base (Act 1) | Act 2, wave 1 |

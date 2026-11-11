@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | **Stages** | 5 |
-| **Waves** | Stage 1: 3 · Stage 2: 4 · Stage 3: 4 · Stage 4: 5 · Stage 5: 5 + boss wave |
+| **Waves** | Stage 1: 3 · Stage 2: 4 · Stage 3: 4 · Stage 4: 5 · Stage 5: 5 + boss wave *(V2.0: 5 · 6 · 6 · 7 · 7 + boss wave)* |
 | **Mini bosses** | Infernal Drake (stage 2), Ocean Drake (stage 4), appearing in the last wave |
 | **Boss** | Elder Dragon (stage 5) |
 | **Teaches** | Fighting packs, using jungle buffs, chasing rewards |
@@ -110,12 +110,12 @@ Monsters scale like Act 1–2 minions (`EnemyData`); mini bosses and the boss do
 
 | | Per act after the first | Act 3 |
 |---|---|---|
-| HP | × (1 + 0.25 · (act − 1)) | × 1.5 |
+| HP | × (1 + 0.25 · (act − 1)) *(V2.0: 0.35)* | × 1.5 *(V2.0: × 1.7)* |
 | Damage | × (1 + 0.15 · (act − 1)) | × 1.3 |
 | Gold and XP | × (1 + 0.25 · (act − 1)) | × 1.5; gold × 2.55 since V1.5.0 (below) |
 | Blue per kill | = act number (elites 5×) | 3 (elites 15) |
 
-Each wave after the first also adds **+10% HP and damage**. A raptor at wave 1 has 128 HP and bites for 7.8. Lucian starts every Act 3 stage at **level 5**. In 3-1 the monsters have 20% less HP. *(V1.5.0: in 3-2 they have 10% less HP. Elites and the drake keep theirs.)*
+Each wave after the first also adds **+10% HP and damage**. A raptor at wave 1 has 128 HP *(V2.0: 145)* and bites for 7.8. Lucian starts every Act 3 stage at **level 5**. In 3-1 the monsters have 20% less HP. *(V1.5.0: in 3-2 they have 10% less HP. Elites and the drake keep theirs.)*
 
 *(V1.5.0: in 3-1 to 3-5 the monsters and elites pay **× 1.7 kill gold** on top of the act's × 1.5 (`WavePlan.GOLD_SHARES`), as their waves hold fewer, larger monsters than the other acts. An Act 3 stage now pays about 6.4k gold on average (3.9k before; Act 2 3.0k, Act 4 10.6k), and 3-1's first break about 675, enough for a Tear. XP, blue, the drakes, the dragon and Endless are unchanged. The Gold / XP columns below are the base numbers.)*
 
@@ -178,7 +178,7 @@ Each comes last in its stage's last wave, out of the pit. All skill hits count a
 
 | | Infernal Drake (3-2) | Ocean Drake (3-4) |
 |---|---|---|
-| HP | 6500 *(9000 before V1.5.0)* | 10000 |
+| HP | 6500 *(9000 before V1.5.0; V2.0: 8500)* | 10000 *(V2.0: 12500)* |
 | Armor / MR | 40 / 40 | 40 / 50 |
 | Basic attack | A fireball, 50 magic (700 px/s), that burns 10 magic a second for 2 s. Range 600, every 1.6 s. | A water shot, 55 magic (800 px/s). Range 600, every 1.5 s. |
 | Speed / radius | 260 / 70 | 260 / 70 |
@@ -194,7 +194,7 @@ It comes in the boss wave, after waves 1–5, in the middle of the pit.
 
 | | |
 |---|---|
-| HP | 11000 *(16000 before V1.5.0)* |
+| HP | 11000 *(16000 before V1.5.0; V2.0: 14500)* |
 | Armor / MR | 50 / 50 |
 | Basic attack | A violet shot, 70 magic (900 px/s), range 650, every 1.5 s. Walks at 280; radius 84. |
 | **Elder Breath** | When Lucian is within 730: a cone warning (90°, 700 long) for 1.0 s, then 160 magic. Cooldown 8 s, first after 2 s. |
@@ -218,6 +218,18 @@ Packs: **R** raptors, **W** wolves, **K** Krugs, **G** Gromp. Elites: **B** Blue
 | 3-5 | R W K G · R R W B · W K G D S · R W K G B · R R W K D S | 12 · 14 · 9 · 13 · 18 | 4.5k · 5.5k · 7.8k · 8.5k · 10.7k | Elder Dragon (boss wave) |
 
 The waves hold about **128k HP** (275k before V1.3, 129k before V1.5.0), plus **27.5k** for the two drakes and the dragon (35k before V1.5.0: the Infernal Drake 9000 and the Elder Dragon 16000). *(V1.5.0: 3-2's row is the new one: its monsters have 10% less HP, and the drake 6500.)* 3-1 is the act's gentle stage: one raptor pack in wave 2 (it had two) and 20% less HP for its monsters. A drake's wave brings fewer packs (V1.3: 3-2's last wave lost the Krugs and Gromp, 3-4's too), so its fight is about the drake. `tests/tools/stage_budget.gd` prints these numbers.
+
+**Waves in V2.0** (before V2.0: the table above). Same letters. HP is the wave's total after scaling (×1.7 for Act 3), with the split Krugs counted; a drake's HP is the second figure.
+
+| Stage | Waves | Enemies | HP per wave | Mini boss / boss |
+|---|---|---|---|---|
+| 3-1 | R W · R G B · W K G D S · R W K B · R R W G D | 8 · 7 · 9 · 12 · 15 | 1.8k · 4.3k · 7.9k · 7.5k · 7.9k | — |
+| 3-2 | R W G · R K W B · W K G D S · R R K G B · W W K G D · R W + drake | 9 · 12 · 9 · 15 · 11 · 9 | 2.7k · 6.8k · 8.4k · 8.9k · 9.8k · 3.0k + 8.5k | Infernal Drake, last in wave 6 |
+| 3-3 | R R W G · K W G B · R W K D S · R R W K G B · R R W W K D S · R R W W K G B D | 14 · 8 · 13 · 18 · 21 · 22 | 4.1k · 7.0k · 9.1k · 11.0k · 13.7k · 18.0k | — |
+| 3-4 | R W G K · R W K B · W K G D S · R R K G B · R R W K G D · R R W W K B S · R W D + drake | 12 · 12 · 9 · 15 · 18 · 21 · 10 | 5.1k · 7.2k · 8.9k · 9.5k · 11.9k · 14.7k · 7.3k + 12.5k | Ocean Drake, last in wave 7 |
+| 3-5 | R W K G · R R W B · W K G D S · R W K G B · R R W K D S · R R W W K G B D · R R R W W K G B D | 12 · 14 · 9 · 13 · 18 · 22 · 27 | 5.1k · 6.2k · 8.9k · 9.7k · 12.1k · 18.0k · 20.9k | Elder Dragon (boss wave) |
+
+The waves hold about **278k HP**, plus **35.5k** for the two drakes and the dragon (8,500, 12,500 and 14,500). Act 3 has 31 waves, and its stages end with Lucian at level 9, 10, 11, 11 and 12. The stages pay 6,617, 8,804, 12,176, 12,654 and 14,726 gold before their boss waves, an average of 11,055 a stage with the bosses' gold. The drakes' walls (the boss's health divided by the gold earned in its stage before its wave) are 1.09 (Infernal), 1.11 (Ocean) and 0.98 (Elder Dragon).
 
 ### The jungle (`JungleMap`, stages 3-1 to 3-4)
 | | |
