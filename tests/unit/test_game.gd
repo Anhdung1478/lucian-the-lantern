@@ -357,7 +357,32 @@ func test_a_cleared_act_stage_is_saved_as_cleared() -> void:
 	assert_true("2-1" in SaveGame.instance().cleared)
 	assert_is(game.screen, MainScreen)
 	var journey: JourneySection = game.screen.sections[MainScreen.SECTION_JOURNEY]
-	assert_eq(journey.picked, journey.map.node_for("2-2"), "act 2, its next stage")
+	assert_eq(journey.picked, journey.map.node_for("2-2"), "the next stage")
+
+
+## Fix 31: after the tutorial the Journey opens on the next stage, 2-1, not on
+## 1-1 again.
+func test_main_screen_after_the_tutorial_opens_the_journey_on_2_1() -> void:
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 1, 1))
+	await wait_process_frames(2)
+	var stage := game.screen as Stage
+	stage.show_result(true)
+	stage.result.main_button.pressed.emit()
+	await wait_process_frames(2)
+	assert_true("1-1" in SaveGame.instance().cleared)
+	assert_is(game.screen, MainScreen)
+	assert_eq(_journey().picked, _journey().map.node_for("2-1"))
+
+
+## Fix 31: after Training the Journey opens on the next stage.
+func test_main_screen_after_training_opens_the_journey_on_the_next_stage() -> void:
+	SaveGame.instance().set_cleared(["1-1", "2-1"] as Array[String])
+	var stage: Stage = await _stage_with_the_menu_open()
+	_leave_button(stage).pressed.emit()
+	_prompt_button("Leave").pressed.emit()
+	await wait_process_frames(2)
+	assert_is(game.screen, MainScreen)
+	assert_eq(_journey().picked, _journey().map.node_for("2-2"))
 
 
 func test_retry_starts_the_same_stage_again_saved() -> void:
@@ -503,13 +528,15 @@ func test_retry_after_random_keeps_random_so_it_rolls_again() -> void:
 	assert_between(run.act, 1, Journey.ACTS.size(), "a map was rolled")
 
 
-func test_main_screen_after_a_run_opens_the_journey_on_endless() -> void:
+## Fix 31: after an Endless run the Journey opens on the next stage too; the
+## map choice stays (below).
+func test_main_screen_after_a_run_opens_the_journey_on_the_next_stage() -> void:
 	var stage: Stage = await _endless_run()
 	stage.show_result(false)
 	stage.result.main_button.pressed.emit()
 	await wait_process_frames(2)
 	assert_is(game.screen, MainScreen)
-	assert_eq(_journey().picked, _journey().map.endless)
+	assert_eq(_journey().picked, _journey().map.node_for("4-1"))
 	assert_true(FileAccess.file_exists(SaveGame.instance().path(1)))
 
 
@@ -568,7 +595,7 @@ func test_leaving_an_endless_run_asks_its_own_question_and_saves_the_best() -> v
 	assert_eq(_on_disk().endless_best, 7)
 	assert_false("endless" in _on_disk().cleared)
 	assert_is(game.screen, MainScreen)
-	assert_eq(_journey().picked, _journey().map.endless)
+	assert_eq(_journey().picked, _journey().map.node_for("4-1"), "the next stage")
 
 
 func test_quitting_with_yes_in_an_endless_run_saves_the_best() -> void:

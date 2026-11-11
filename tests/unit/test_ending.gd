@@ -197,6 +197,9 @@ func test_the_stage_ending_moment_drops_no_loot() -> void:
 
 
 func test_the_first_clear_shows_the_end_screen_with_the_play_time() -> void:
+	var before := Journey.all_stage_ids(Journey.ACTS.size())
+	before.erase("6-5")
+	SaveGame.instance().set_cleared(before)
 	SaveGame.instance().play_time = 3725.0
 	var stage := await _fight()
 	await _win(stage)
@@ -210,7 +213,8 @@ func test_the_first_clear_shows_the_end_screen_with_the_play_time() -> void:
 	end.continue_button.pressed.emit()
 	await wait_process_frames(3)
 	assert_is(game.screen, MainScreen)
-	assert_eq((game.screen as MainScreen).focus_act, 6)
+	var journey := (game.screen as MainScreen).sections[MainScreen.SECTION_JOURNEY] as JourneySection
+	assert_eq(journey.picked, journey.map.training, "every stage is cleared")
 
 
 func test_continue_after_retry_plays_6_5_again() -> void:

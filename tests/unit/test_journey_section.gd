@@ -265,11 +265,11 @@ func test_lucians_token_starts_on_the_next_stage() -> void:
 	_assert_token_over(_node("1-1"), "a refresh keeps the pick, and the token with it")
 	_clear(2, ["3-1"] as Array[String])
 	assert_eq(map.next_node, _node("3-2"))
-	section.open_on()
+	section.open_on_next()
 	_assert_token_over(_node("3-2"))
 	_clear(6)
 	assert_null(map.next_node, "every stage is cleared")
-	section.open_on()
+	section.open_on_next()
 	_assert_token_over(map.training)
 
 
@@ -570,15 +570,17 @@ func test_main_screen_starts_endless_on_the_chosen_map() -> void:
 	assert_between(got[1].act, 1, Journey.ACTS.size(), "Random rolled a map")
 
 
-func test_the_main_screen_can_open_the_journey_on_endless() -> void:
+## Fix 31: with Endless open, the main screen still opens the Journey on the
+## next stage.
+func test_the_main_screen_opens_the_journey_on_the_next_stage() -> void:
 	_save().set_cleared(Journey.all_stage_ids(3))
 	var main := MainScreen.new()
-	main.focus_endless = true
 	add_child_autofree(main)
 	var journey := main.sections[MainScreen.SECTION_JOURNEY] as JourneySection
-	assert_eq(journey.picked, journey.map.endless)
-	assert_true(journey.panel.endless_box.visible)
-	assert_false(journey.panel.stage_box.visible)
+	assert_false(journey.map.endless.locked)
+	assert_eq(journey.picked, journey.map.node_for("4-1"))
+	assert_true(journey.panel.stage_box.visible)
+	assert_false(journey.panel.endless_box.visible)
 
 
 ## Item 32: the save keeps Endless's map, so the Journey opens on it.
@@ -604,18 +606,20 @@ func test_a_map_chip_stores_its_choice_in_the_save() -> void:
 	assert_eq(section.panel.map_choice(), 5, "a refresh keeps it")
 
 
-func test_focus_on_a_locked_endless_opens_as_usual() -> void:
+## Fix 31: after the tutorial (Act 1's one stage) the Journey opens on 2-1,
+## so a new player's first Start goes on instead of playing 1-1 again.
+func test_after_the_tutorial_it_opens_on_the_next_act() -> void:
+	_save().set_cleared(["1-1"] as Array[String])
 	var journey := JourneySection.new()
-	journey.focus_endless = true
 	add_child_autofree(journey)
-	assert_eq(journey.picked, journey.map.node_for("1-1"), "act 1, where the work is")
+	assert_eq(journey.picked, journey.map.node_for("2-1"))
 	assert_true(journey.panel.stage_box.visible)
 
 
 func test_a_locked_stage_cannot_be_chosen() -> void:
 	_clear(1)
 	assert_eq(section.picked, _node("1-1"), "a refresh keeps an open pick")
-	section.open_on()
+	section.open_on_next()
 	assert_eq(section.picked, _node("2-1"))
 	_node("2-2").chosen.emit()
 	_node("2-2")._gui_input(_click())
@@ -625,10 +629,11 @@ func test_a_locked_stage_cannot_be_chosen() -> void:
 
 func test_the_default_stage_is_the_first_open_uncleared_one() -> void:
 	_save().set_cleared(["1-1", "2-1"] as Array[String])
-	section.open_on(2)
+	section.open_on_next()
 	assert_eq(section.picked, _node("2-2"))
-	section.open_on()
-	assert_eq(section.picked, _node("2-2"))
+	var opened := JourneySection.new()
+	add_child_autofree(opened)
+	assert_eq(opened.picked, opened.map.node_for("2-2"), "a Journey opened now starts there")
 
 
 func test_a_pick_that_locks_falls_back_to_the_next_stage() -> void:
@@ -657,22 +662,23 @@ func test_clicking_a_place_picks_it() -> void:
 	assert_eq(section.picked, section.map.training)
 
 
+## Fix 31: the Journey always opens on the next stage, never on an act
+## already cleared, and on Training once the story is done.
 func test_it_opens_on_the_next_stage() -> void:
 	assert_eq(section.picked, _node("1-1"))
 	_save().set_cleared(["1-1"] as Array[String])
-	section.open_on()
+	section.open_on_next()
 	assert_eq(section.picked, _node("2-1"))
 	for act in range(2, 6):
 		_clear(act)
-		section.open_on()
+		section.open_on_next()
 		assert_eq(section.picked, _node(Journey.stage_id(act + 1, 1)), "act %d can be played" % (act + 1))
+	_clear(5, ["6-1", "6-2"] as Array[String])
+	section.open_on_next()
+	assert_eq(section.picked, _node("6-3"))
 	_clear(6)
-	section.open_on()
+	section.open_on_next()
 	assert_eq(section.picked, section.map.training, "the story is done")
-	section.open_on(1)
-	assert_eq(section.picked, _node("1-1"), "the act just played")
-	section.open_on(6)
-	assert_eq(section.picked, _node("6-5"), "an act all cleared: its last stage")
 
 
 func test_endless_shows_the_best_wave() -> void:

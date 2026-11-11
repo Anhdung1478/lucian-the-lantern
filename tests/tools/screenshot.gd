@@ -3699,7 +3699,7 @@ func scenario_journey_map() -> void:
 	spin.value = 3
 	save.bosses.append_array(["thresh_1", "akshan", "infernal_drake", "ocean_drake", "elder_dragon"])
 	save.record_endless(14)
-	section.open_on()
+	section.open_on_next()
 	await wait(0.3)
 	print("Acts cleared 3: locked (expect Act 5, Act 6): ", locked_place_names(section),
 		"  token on (expect 4-1): ", map.selected.stage_id, "  road lit to (expect 3-5): ", map.lit_stage,
@@ -3719,7 +3719,7 @@ func scenario_journey_map() -> void:
 	await shot("journey_map_3_hover_fogged")
 	await mouse_move(Vector2(960, 1000))
 	spin.value = Journey.ACTS.size()
-	section.open_on()
+	section.open_on_next()
 	await wait(0.3)
 	print("all cleared: locked (expect []): ", locked_place_names(section), "  token on (expect training): ", map.selected.kind,
 		"  picked (expect training): ", section.picked.kind, "  road lit to (expect 6-5): ", map.lit_stage)

@@ -3,8 +3,9 @@ extends Control
 ## The Journey page of the main screen: a painted world map (JourneyMap) of
 ## the six acts on one road, with Training and the Endless portal, and beside
 ## it a panel (JourneyPanel) with the picked place, Start and the D/F spells.
-## Lucian's token floats over the picked place. Places open along the Journey
-## chain; a locked one can't be picked. Nothing here saves.
+## Lucian's token floats over the picked place. It always opens on the next
+## stage, whatever was played before. Places open along the Journey chain; a
+## locked one can't be picked. Nothing here saves.
 
 signal start_training
 signal start_stage(act: int, stage: int)
@@ -22,10 +23,6 @@ var panel := JourneyPanel.new()
 var loadout: LoadoutPanel = panel.loadout
 ## The place the panel shows and Start plays.
 var picked: JourneyNode
-## The act just played, which the map opens on (0: none).
-var focus_act := 0
-## The map opens on Endless instead (after an Endless run), when it is open.
-var focus_endless := false
 
 ## What the map was last refreshed from: [cleared, endless_best, skin id].
 ## Empty until the first refresh.
@@ -42,24 +39,13 @@ func _ready() -> void:
 	panel.start_pressed.connect(_on_start)
 	add_child(panel)
 	SaveGame.instance().changed.connect(refresh)
+	# Nothing is picked yet, so the first refresh opens on the next stage.
 	refresh()
-	if focus_endless and not map.endless.locked:
-		pick(map.endless)
-	else:
-		open_on(focus_act)
 
 
-## Picks `act`'s first open stage not cleared yet (its last when all are)
-## when `act` (just played) is open; else the next stage; else Training.
-func open_on(act := 0) -> void:
-	var cleared := SaveGame.instance().cleared
-	if act > 0 and act <= Journey.ACTS.size() and Journey.is_act_open(act, cleared):
-		var stage := 1
-		while stage < Journey.stage_count(act) and Journey.stage_id(act, stage) in cleared \
-				and Journey.is_stage_open(act, stage + 1, cleared):
-			stage += 1
-		pick(map.node_for(Journey.stage_id(act, stage)))
-		return
+## Picks the next stage (the first open one not cleared yet), or Training
+## once every stage is cleared.
+func open_on_next() -> void:
 	pick(map.next_node if map.next_node else map.training)
 
 
@@ -80,8 +66,8 @@ func close_popup() -> bool:
 ## Locks, opens and marks the map from the save, only when the stages cleared,
 ## Endless's best or the equipped skin changed since the last time (a spell
 ## pick leaves the map alone), and refills the panel with Endless's best and
-## its map choice from the save; a pick that has locked falls back as
-## open_on() does.
+## its map choice from the save; with no pick yet, or one that has locked,
+## it opens on the next stage.
 func refresh() -> void:
 	var save := SaveGame.instance()
 	var inputs := [save.cleared, save.endless_best, save.skin]
@@ -92,7 +78,7 @@ func refresh() -> void:
 	if panel.map_choice() != save.endless_map:
 		panel.choose_map(save.endless_map)
 	if picked == null or picked.locked:
-		open_on()
+		open_on_next()
 	else:
 		pick(picked)
 

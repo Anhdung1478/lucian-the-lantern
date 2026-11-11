@@ -82,12 +82,10 @@ func _leave(save: bool) -> void:
 	show_title()
 
 
-## `focus_act`: the act the Journey opens on; `focus_endless`: it opens on
-## Endless instead (after a run). Endless's map choice comes from the save.
-func show_main_screen(focus_act := 0, focus_endless := false) -> void:
+## The Journey opens on the next stage, whatever was played; Endless's map
+## choice comes from the save.
+func show_main_screen() -> void:
 	var main := MainScreen.new()
-	main.focus_act = focus_act
-	main.focus_endless = focus_endless
 	main.start_requested.connect(start_stage)
 	main.exit_requested.connect(ask_to_quit)
 	main.leave_requested.connect(ask_to_leave)
@@ -203,7 +201,7 @@ func _on_stage_finished(result: StringName, then: StringName) -> void:
 		&"next":
 			start_stage.call_deferred(StageSetup.for_stage(SaveGame.instance(), next.x, next.y))
 		_:
-			show_main_screen.call_deferred(act)
+			show_main_screen.call_deferred()
 	if not saved:
 		_report_save_failed.call_deferred()
 
@@ -211,14 +209,13 @@ func _on_stage_finished(result: StringName, then: StringName) -> void:
 ## An Endless run is over (Lucian fell or the player left): the stage-done
 ## auto-save keeps the best, with no stage id, so `cleared` never gets
 ## "endless". Retry starts a new run on the same map choice (Random rolls
-## again); otherwise, and when the save failed, the main screen with the
-## Journey on Endless.
+## again); otherwise, and when the save failed, the main screen.
 func _end_run(result: StringName, then: StringName) -> void:
 	var saved := SaveGame.instance().finish_stage(result, "")
 	if saved and then == &"retry":
 		start_stage.call_deferred(StageSetup.for_endless(SaveGame.instance(), _run.map_choice, _rng))
 		return
-	show_main_screen.call_deferred(0, true)
+	show_main_screen.call_deferred()
 	if not saved:
 		_report_save_failed.call_deferred()
 
@@ -234,7 +231,7 @@ func _show_the_end(then: StringName, saved: bool) -> void:
 		if then == &"retry":
 			start_stage(StageSetup.for_stage(SaveGame.instance(), act, stage))
 		else:
-			show_main_screen(act)
+			show_main_screen()
 			if not saved:
 				_report_save_failed())
 	_swap(end)

@@ -26,10 +26,6 @@ const TOAST_TIME := 1.6
 
 ## The Evolution Tree, Skin Shop and Journey pages, in that order.
 var sections: Array[Control] = []
-## The act Journey opens on (the one just played), or 0.
-var focus_act := 0
-## Journey opens on Endless instead (after an Endless run).
-var focus_endless := false
 ## Drawn behind every section: the night grove, or the Skin Shop's gallery.
 var backdrop := MainBackdrop.new()
 var essence_bar := EssenceBar.new()
@@ -123,8 +119,6 @@ func _build() -> void:
 	_section_area.add_child(skin_shop)
 	sections.append(skin_shop)
 	var journey := JourneySection.new()
-	journey.focus_act = focus_act
-	journey.focus_endless = focus_endless
 	journey.start_training.connect(_start_training)
 	journey.start_stage.connect(_start_stage)
 	journey.start_endless.connect(_start_endless)
