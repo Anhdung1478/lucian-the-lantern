@@ -57,6 +57,7 @@ const ACT_SCENARIOS := {
 	"hecarim_onslaught": [6, 4], "thresh_box": [6, 5], "thresh_phase2": [6, 5], "thresh_lantern": [6, 5],
 	"ending_cutscene": [6, 5],
 	"level_up": [2, 1],
+	"wave_banner": [3, 2], "wave_banner_boss": [1, 1],
 }
 
 ## Where the window was when the run started; shot() stops the run if it moved.
@@ -356,6 +357,10 @@ func _run(scenario: String) -> void:
 			await scenario_tree_icons()
 		"level_up":
 			await scenario_level_up()
+		"wave_banner":
+			await scenario_wave_banner()
+		"wave_banner_boss":
+			await scenario_wave_banner_boss()
 		_:
 			push_error("Unknown scenario: " + scenario)
 	quit()
@@ -2207,6 +2212,52 @@ func shoot_for(enemy: Enemy, seconds: float) -> void:
 
 
 ## The end screen's stats column, as "Label value" pairs.
+## The wave banner on 3-2: wave 1's start, "WAVE 1" between gold rules in
+## the upper middle of the screen; the same banner fading out; then the last
+## wave, which brings the Infernal Drake: "MINI BOSS" over its name.
+func scenario_wave_banner() -> void:
+	var game := game_stage()
+	var banner := game.wave_banner
+	game.skip_break()
+	await wait(WaveBanner.FADE + 0.4)
+	print("banner (expect [\"WAVE 1\"], shown true, alpha 1, on the HUD true): ", banner.shown, " ", banner.visible, " ",
+		banner.modulate.a, " ", banner.get_parent() == game.hud)
+	print("top (expect under the stage info's bottom): ", banner.get_global_rect().position.y, " > ",
+		game.hud.stage_info.get_global_rect().end.y)
+	await shot("wave_banner_0_wave")
+	await wait(WaveBanner.TIME - 0.3)
+	print("fading out (expect an alpha between 0 and 1): ", banner.modulate.a)
+	await shot("wave_banner_1_fading")
+	await wait(WaveBanner.FADE)
+	print("gone (expect false): ", banner.visible)
+	game.jump_to_last_wave()
+	while banner.kind != &"mini_boss":
+		await wait(0.05)
+	await wait(WaveBanner.FADE + 0.4)
+	print("banner (expect [\"MINI BOSS\", \"Infernal Drake\"]): ", banner.shown, "  info: ", info_text())
+	await shot("wave_banner_2_mini_boss")
+
+
+## The wave banner at its most crowded, the tutorial's boss wave: "BOSS"
+## over "Thresh", larger and in red, under the stage info, the boss bar and
+## the hook's tip.
+func scenario_wave_banner_boss() -> void:
+	var game := game_stage()
+	var banner := game.wave_banner
+	flush_tips()
+	game.jump_to_boss_wave()
+	var boss := await wait_for_kind(&"boss")
+	face_boss(boss)
+	await wait(WaveBanner.FADE + 0.5)
+	var bar := game.hud.boss_bar.get_global_rect()
+	var tip := game.hud.tips.get_global_rect()
+	print("banner (expect [\"BOSS\", \"Thresh\"]): ", banner.shown, "  boss bar and tip shown (expect true true): ",
+		game.hud.boss_bar.visible, " ", game.hud.tips.visible)
+	print("top (expect under the boss bar's and the tip's bottoms): ", banner.get_global_rect().position.y, " > ",
+		bar.end.y, " and ", tip.end.y)
+	await shot("wave_banner_boss_0")
+
+
 ## The end screen's essences have counted up to their amounts.
 func wait_for_result_count() -> void:
 	await wait(StageResult.COUNT_TIME + 0.1)

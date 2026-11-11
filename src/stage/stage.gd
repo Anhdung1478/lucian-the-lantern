@@ -77,6 +77,8 @@ var runner: WaveRunner
 ## Endless mode's flow (its runner, spawn strength, the best); null in the
 ## story and Training.
 var endless: EndlessDirector
+## Each wave's start, announced on the HUD's layer; null in Training.
+var wave_banner: WaveBanner
 ## Lucian's invulnerable flag as a cutscene found it (debug God mode survives).
 var _invulnerable_before_freeze := false
 var result := StageResult.new()
@@ -450,6 +452,9 @@ func _start_waves() -> void:
 		runner = WaveRunner.new(WavePlan.waves(run.stage_id), run.boss)
 	runner.spawn_requested.connect(_spawn_wave_enemy)
 	runner.wave_started.connect(_on_wave_started)
+	wave_banner = WaveBanner.new()
+	wave_banner.setup(runner, run.stage_id)
+	hud.add_child(wave_banner)
 	## Deferred, both to keep their order: a shot's physics callback can end a wave, and the merchant's body can't be added mid-flush.
 	runner.break_started.connect(func(_seconds: float) -> void: add_merchant(), CONNECT_DEFERRED)
 	runner.break_ended.connect(remove_merchant, CONNECT_DEFERRED)
