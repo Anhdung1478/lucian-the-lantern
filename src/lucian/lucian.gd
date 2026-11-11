@@ -244,6 +244,7 @@ func _ready() -> void:
 	health_bar.name = "HealthBar"
 	health_bar.position = Vector2(0, -HEALTH_BAR_HEIGHT)
 	add_child(health_bar)
+	add_child(TargetRing.new())
 	stats = base_stats.at_level(progress.level, _stat_bonus())
 	passives.adjust_stats(stats)
 	_scale_by_skin(stats)
@@ -451,6 +452,11 @@ func on_kill(enemy: Enemy) -> void:
 		e.cooldown.reduce(RelentlessPursuit.KILL_CUT)
 	passives.on_kill(enemy)
 	enemy_killed.emit(enemy)
+
+
+## The enemy Lucian is ordered to attack, or null.
+func attack_target() -> Enemy:
+	return _target if _order == Order.ATTACK and is_instance_valid(_target) and _target.is_alive() else null
 
 
 ## An enemy still worth aiming at: there, not dead and not untargetable.
