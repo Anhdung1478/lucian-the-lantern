@@ -948,7 +948,8 @@ func scenario_gear() -> void:
 ## for its fee, the boots and a fragment upgraded, a pair that makes nothing,
 ## and boots refused by the sell slot. The recipe table stays beside the
 ## backpack. V1.4.3: the items in the inputs leave their cells, and Craft asks
-## first (Enter says Yes).
+## first (Enter says Yes). V2.0: one item in, and a craft the wallet can't
+## pay for.
 func scenario_craft_shop() -> void:
 	var game := stage as Stage
 	var inventory := lucian.inventory
@@ -964,6 +965,10 @@ func scenario_craft_shop() -> void:
 	print("recipe table shown in shop mode (expect true): ", backpack._recipes.visible)
 	await shot("craft_shop_0_empty")
 	await drag_cell(backpack, 0, control_center(panel.first_input()))
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.2)
+	print("one item in (expect ONE): ", ShopPanel.CraftState.keys()[panel.craft_state()])
+	await shot("craft_shop_0b_one_in")
 	await drag_cell(backpack, 1, control_center(panel.second_input()))
 	await mouse_move(Vector2(960, 1000))
 	await wait(0.2)
@@ -1006,6 +1011,15 @@ func scenario_craft_shop() -> void:
 	await shot("craft_shop_4_cant_sell")
 	await mouse_button(control_center(sell_cell), false)
 	print("boots kept (expect berserkers_greaves): ", inventory.boots().id)
+	# A craft the wallet can't pay for: the fee is red and the button says why.
+	give([&"bf_sword", &"bf_sword"])
+	game.wallet.spend(game.wallet.gold - 200)
+	await drag_cell(backpack, 1, control_center(panel.first_input()))
+	await drag_cell(backpack, 2, control_center(panel.second_input()))
+	await mouse_move(Vector2(960, 1000))
+	await wait(0.2)
+	print("can't afford (expect NO_GOLD, Infinity Edge): ", ShopPanel.CraftState.keys()[panel.craft_state()], " ", panel.craft_preview().display_name)
+	await shot("craft_shop_5_cant_afford")
 
 
 ## Drags inventory cell `from` to `to` (screen point) with the mouse held.

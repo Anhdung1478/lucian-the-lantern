@@ -34,7 +34,9 @@ const CELL_GAP := 6
 ## The backpack is centered in the screen area above the HUD panel.
 const AREA_BOTTOM := 880.0
 const ROW_GAP := 18.0
-const SHOP_GAP := 36.0
+const SHOP_GAP := 24.0
+## The least room between the recipe table and the backpack.
+const TABLE_GAP := 20.0
 ## Between the backpack's frame and its cells, and under its heading.
 const PACK_PAD := 22.0
 const HEADING_GAP := 14
@@ -164,6 +166,11 @@ func dragged_index() -> int:
 ## The Craft input being dragged from, or null.
 func dragged_input() -> CraftSlot:
 	return _drag_input
+
+
+## The item being dragged (from a cell, a Craft input or the shop), or null.
+func dragged_item() -> ItemData:
+	return _ghost.item if is_dragging() else null
 
 
 ## Whether the item in cell `index` sits in a Craft input: the cell draws
@@ -548,6 +555,8 @@ func _build() -> void:
 
 	_column.resized.connect(_place_column)
 	_shop_panel.resized.connect(_place_column)
+	# The shop is no taller than it needs once its wrapped note is laid out.
+	_shop_panel.minimum_size_changed.connect(_place_column)
 	_place_column.call_deferred()
 
 	_top.layer = 100
@@ -561,8 +570,9 @@ func _build() -> void:
 
 
 ## Centered above the HUD panel; with the shop open, the backpack and the
-## shop are centered side by side. Runs again when the column or the shop
-## resizes and when the viewport does.
+## shop are centered side by side. On a narrower screen they move right, clear
+## of the recipe table, as far as the screen's edge lets them. Runs again when
+## the column or the shop resizes and when the viewport does.
 func _place_column() -> void:
 	if _column == null:
 		return
@@ -571,7 +581,9 @@ func _place_column() -> void:
 	var shop_size := _shop_panel.get_combined_minimum_size() if _shop_panel.visible else Vector2.ZERO
 	var total := size.x + (SHOP_GAP + shop_size.x if _shop_panel.visible else 0.0)
 	var top := maxf((AREA_BOTTOM - size.y) * 0.5, MARGIN)
-	_column.position = Vector2((width - total) * 0.5, top)
+	var clear := _recipes.position.x + _recipes.get_combined_minimum_size().x + TABLE_GAP
+	var left := minf(maxf((width - total) * 0.5, clear), width - MARGIN - total)
+	_column.position = Vector2(maxf(left, MARGIN), top)
 	_shop_panel.position = Vector2(_column.position.x + size.x + SHOP_GAP, top)
 	_shop_panel.size = shop_size
 

@@ -1,25 +1,32 @@
 class_name CraftSlot
 extends Control
 ## One slot of the merchant's Craft tab: one of the two inputs (a fragment or
-## the boots) or the item they would make. An item dragged into an input
-## leaves the backpack view: the input keeps its inventory index, and while it
-## does the backpack screen draws that cell empty and keeps it out of drags,
-## drops, sales and purchases (BackpackScreen.in_craft). The item stays in its
-## cell in the Inventory, so a save or a crash loses nothing. It comes back
-## when it is dragged out of the input, on a right-click on the input, when
-## the merchant's tab changes and when the shop closes. A craft empties both
-## inputs, so what it made shows in its cell. An input's mouse input goes to
-## the backpack screen, which runs the drags.
+## the boots) or the item they would make. A dark well like the backpack's
+## cells: its rim follows the item, and an input turns gold under the mouse
+## and under a dragged item it takes. The result is gold once the craft can
+## be paid for, shows a red cross when the two inputs make nothing and a
+## faint "?" until both are in.
+##
+## An item dragged into an input leaves the backpack view: the input keeps
+## its inventory index, and while it does the backpack screen draws that cell
+## empty and keeps it out of drags, drops, sales and purchases
+## (BackpackScreen.in_craft). The item stays in its cell in the Inventory, so
+## a save or a crash loses nothing. It comes back when it is dragged out of
+## the input, on a right-click on the input, when the merchant's tab changes
+## and when the shop closes. A craft empties both inputs, so what it made
+## shows in its cell. An input's mouse input goes to the backpack screen,
+## which runs the drags.
 
 enum Kind { INPUT, RESULT }
 
 const SIZE := 64.0
 const ICON_INSET := 5.0
-const FILL := Color(0.09, 0.105, 0.14)
-const BORDER := Color(0.36, 0.4, 0.48)
-const TARGET_BORDER := Color("ffcf5a")
-const RESULT_BORDER := Color("c9a45c")
 const PLACEHOLDER := Color(1, 1, 1, 0.3)
+const PLACEHOLDER_FONT := 11
+## The result's "?" and the cross over two inputs that make nothing.
+const MARK_FONT := 26
+const CROSS_REACH := 10.0
+const CROSS_WIDTH := 3.0
 
 var screen: BackpackScreen
 var kind := Kind.INPUT
@@ -83,6 +90,31 @@ func recheck() -> void:
 		clear()
 
 
+## The rim's colour: the kind of the item shown; red for a result the two
+## inputs don't make; the frame's gold for the input still to fill once the
+## other one is.
+func rim() -> Color:
+	var shown := item()
+	if shown:
+		return UiStyle.item_rim(shown)
+	var state := screen.shop_panel().craft_state()
+	if kind == Kind.RESULT and state == ShopPanel.CraftState.NO_RECIPE:
+		return UiStyle.BAD_COLOR
+	if kind == Kind.INPUT and state == ShopPanel.CraftState.ONE:
+		return UiStyle.BORDER_COLOR
+	return UiStyle.CELL_BORDER
+
+
+## Whether the rim is gold: for an input, the mouse rests on its item or the
+## dragged item is over it and may go in; for the result, the craft is ready.
+func is_lit() -> bool:
+	if kind == Kind.RESULT:
+		return screen.shop_panel().craft_state() == ShopPanel.CraftState.READY
+	if screen.is_dragging():
+		return screen.target_index() == target() and takes(screen.dragged_item())
+	return item() != null and get_global_rect().has_point(Pointer.in_world(self))
+
+
 func tooltip_content() -> Control:
 	if screen.is_dragging():
 		return null
@@ -105,16 +137,23 @@ func _process(_delta: float) -> void:
 
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, size)
-	var over := kind != Kind.RESULT and screen.target_index() == target()
-	var box := StyleBoxFlat.new()
-	box.bg_color = FILL
-	box.border_color = TARGET_BORDER if over else (RESULT_BORDER if kind == Kind.RESULT else BORDER)
-	box.set_border_width_all(3 if over else 2)
-	box.set_corner_radius_all(6)
-	draw_style_box(box, rect)
+	var lit := is_lit()
+	draw_style_box(UiStyle.cell_style(rim(), lit, ItemCell.RADIUS), rect)
+	if lit and screen.is_dragging():
+		var wash := StyleBoxFlat.new()
+		wash.bg_color = ItemCell.DROP_WASH
+		wash.set_corner_radius_all(ItemCell.RADIUS)
+		draw_style_box(wash, rect)
 	var shown := item()
 	if shown and screen.dragged_input() != self:
 		ItemIcon.draw_item(self, shown, rect.grow(-ICON_INSET))
 		return
+	var font := ThemeDB.fallback_font
+	var middle := rect.get_center()
 	if kind == Kind.INPUT:
-		draw_string(ThemeDB.fallback_font, Vector2(0, rect.size.y * 0.5 + 4.0), "ITEM", HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 11, PLACEHOLDER)
+		draw_string(font, Vector2(0, middle.y + 4.0), "ITEM", HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, PLACEHOLDER_FONT, PLACEHOLDER)
+	elif screen.shop_panel().craft_state() == ShopPanel.CraftState.NO_RECIPE:
+		for side: float in [-1.0, 1.0]:
+			draw_line(middle + Vector2(-CROSS_REACH, -CROSS_REACH * side), middle + Vector2(CROSS_REACH, CROSS_REACH * side), UiStyle.BAD_COLOR, CROSS_WIDTH, true)
+	else:
+		draw_string(font, Vector2(0, middle.y + 9.0), "?", HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, MARK_FONT, PLACEHOLDER)

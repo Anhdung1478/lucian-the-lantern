@@ -1,21 +1,43 @@
 class_name ShopPanel
-extends PanelContainer
-## The merchant's shop, beside the backpack while it is open: a gold readout,
-## the Items, Potions and Craft tabs, a hint line, the Undo sale button (every
-## tab; it buys back the last sale) and the Refresh button (Items only) in
-## the bottom-right corner. Refused purchases flash a red message; a full
-## backpack and the one-penetration rule are told in a pop-up instead
-## (BackpackScreen._report).
+extends Plate
+## The merchant's shop, beside the backpack while it is open, on an ornate
+## plate headed MERCHANT: the Items, Potions and Craft tabs with the stage
+## gold beside them, the open tab's page, a hint line, a message line, and
+## the Undo sale button (every tab; it buys back the last sale) and the
+## Refresh button (Items only) in the bottom-right corner. The Items and
+## Potions tabs list what is for sale as rows that name it (ShopSlot).
+## Refused purchases flash a red message; a full backpack and the
+## one-penetration rule are told in a pop-up instead
+## (BackpackScreen._report). The panel keeps one size on every tab and
+## whatever its message says, so the backpack beside it never moves: a
+## shorter tab leaves the room under its hint empty.
 ##
-## The Craft tab: [input] + [input] -> [result], the fee and a Craft button.
-## Two fragments make their legendary, for the legendary's cost minus the
-## fragments'; the boots and a fragment make the upgraded boots, for their
-## upgrade_cost. Its two inputs are filled by dragging from the backpack: an
-## item in an input leaves the backpack view until it comes back (see
-## CraftSlot), and changing tabs gives both back. The Craft button asks first
-## (BackpackScreen.craft).
+## The Craft tab: [input] + [input] -> [result], a note line, the fee and a
+## Craft button. Two fragments make their legendary, for the legendary's cost
+## minus the fragments'; the boots and a fragment make the upgraded boots,
+## for their upgrade_cost. Its two inputs are filled by dragging from the
+## backpack: an item in an input leaves the backpack view until it comes back
+## (see CraftSlot), and changing tabs gives both back. The Craft button asks
+## first (BackpackScreen.craft). The tab shows where it stands (craft_state):
+## the note, the result, the arrow, the fee and the button follow it.
 
-const SLOT_GAP := 12
+## Where the Craft tab stands: nothing in its inputs; one item in; two that
+## make nothing (or boots that are fully upgraded); a craft the wallet can't
+## pay for; a craft ready to be pressed.
+enum CraftState { EMPTY, ONE, NO_RECIPE, NO_GOLD, READY }
+
+const PAD := 22.0
+const GAP := 12
+const ROW_GAP := 6
+const TAB_SIZE := Vector2(86, 38)
+const BUTTON_FONT := 17
+const HINT_FONT := 14
+## Room for the hint's two lines and the message's one, text or not.
+const HINT_HEIGHT := 44.0
+const MESSAGE_HEIGHT := 24.0
+## The open tab's page and its hint: as tall as the Items tab's (and as wide
+## as its rows) on every tab.
+const BODY_HEIGHT := MerchantStock.SLOTS * ShopSlot.HEIGHT + (MerchantStock.SLOTS - 1) * ROW_GAP + GAP + HINT_HEIGHT
 const MESSAGE_TIME := 1.6
 const TAB_NAMES: Array[String] = ["Items", "Potions", "Craft"]
 const ITEMS_TAB := 0
@@ -37,6 +59,26 @@ const MESSAGES := {
 	Shop.Result.NOTHING_TO_UNDO: "No sale to undo",
 	Shop.Result.SLOT_LOCKED: "That slot is locked",
 }
+## The Craft button's word and the note's colour in each state.
+const CRAFT_WORDS := {
+	CraftState.EMPTY: "Craft",
+	CraftState.ONE: "Craft",
+	CraftState.NO_RECIPE: "No recipe",
+	CraftState.NO_GOLD: "Not enough gold",
+	CraftState.READY: "Craft",
+}
+const NOTE_COLORS := {
+	CraftState.EMPTY: UiStyle.DIM_COLOR,
+	CraftState.ONE: UiStyle.TEXT_COLOR,
+	CraftState.NO_RECIPE: UiStyle.ERROR_COLOR,
+	CraftState.NO_GOLD: UiStyle.TEXT_COLOR,
+	CraftState.READY: UiStyle.TITLE_COLOR,
+}
+const CRAFT_BUTTON_SIZE := Vector2(176, 42)
+## The Craft tab's bench: the box around its three slots.
+const BENCH_PAD := 16.0
+const BENCH_GAP := 14
+const SIGN_FONT := 26
 
 var screen: BackpackScreen
 
@@ -52,31 +94,24 @@ var _message_left := 0.0
 var _first_input: CraftSlot
 var _second_input: CraftSlot
 var _result_slot: CraftSlot
+var _arrow: Label
 var _fee_label: Label
 var _craft_note: Label
 var _craft_button: Button
+## The state the Craft button is styled for; -1 before the first.
+var _styled_state := -1
+
+
+func _init() -> void:
+	super(PAD)
 
 
 func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	screen = owner_screen
-	add_theme_stylebox_override(&"panel", UiStyle.panel(UiStyle.PANEL_COLOR, UiStyle.BORDER_COLOR, 2, 20.0))
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override(&"separation", 14)
+	box.add_theme_constant_override(&"separation", GAP)
 	add_child(box)
-
-	var header := HBoxContainer.new()
-	box.add_child(header)
-	var title := UiStyle.label("MERCHANT", 26, UiStyle.TITLE_COLOR)
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(title)
-	var coin := TextureRect.new()
-	coin.texture = ShopSlot.COIN
-	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	coin.custom_minimum_size = Vector2(28, 28)
-	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	header.add_child(coin)
-	_gold_label = UiStyle.label("0", 24, UiStyle.GOLD_COLOR)
-	header.add_child(_gold_label)
+	box.add_child(BagHeading.new("MERCHANT"))
 
 	var tabs := HBoxContainer.new()
 	tabs.add_theme_constant_override(&"separation", 8)
@@ -84,37 +119,47 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	for i in TAB_NAMES.size():
 		var button := Button.new()
 		button.text = TAB_NAMES[i]
-		button.custom_minimum_size = Vector2(116, 40)
+		button.custom_minimum_size = TAB_SIZE
 		button.pressed.connect(show_tab.bind(i))
 		tabs.add_child(button)
 		_tab_buttons.append(button)
+	var gap := Control.new()
+	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tabs.add_child(gap)
+	tabs.add_child(_coin(24.0))
+	_gold_label = UiStyle.label("0", 22, UiStyle.GOLD_COLOR)
+	tabs.add_child(_gold_label)
 
-	var items := HBoxContainer.new()
-	items.add_theme_constant_override(&"separation", SLOT_GAP)
+	var body := _column(GAP)
+	body.custom_minimum_size = Vector2(ShopSlot.WIDTH, BODY_HEIGHT)
+	box.add_child(body)
+	var items := _column(ROW_GAP)
 	for slot in MerchantStock.SLOTS:
 		items.add_child(ShopSlot.new(screen, slot))
-	box.add_child(items)
-	var potion_row := HBoxContainer.new()
-	potion_row.add_theme_constant_override(&"separation", SLOT_GAP)
+	var potion_page := _column(ROW_GAP)
 	for potion in potions:
-		potion_row.add_child(ShopSlot.new(screen, -1, potion))
-	box.add_child(potion_row)
-	var craft_page := _build_craft_page()
-	box.add_child(craft_page)
-	_pages = [items, potion_row, craft_page]
-
-	_hint = UiStyle.label(HINTS[0], 14, UiStyle.DIM_COLOR)
-	box.add_child(_hint)
+		potion_page.add_child(ShopSlot.new(screen, -1, potion))
+	_pages = [items, potion_page, _build_craft_page()]
+	for page in _pages:
+		body.add_child(page)
+	_hint = UiStyle.label(HINTS[0], HINT_FONT, UiStyle.DIM_COLOR)
+	# Long key names are cut off instead of widening the shop.
+	_hint.clip_text = true
+	_hint.custom_minimum_size.y = HINT_HEIGHT
+	body.add_child(_hint)
 	GameSettings.instance().changed.connect(_on_setting_changed)
-	var bottom := HBoxContainer.new()
-	box.add_child(bottom)
 	_message = UiStyle.label("", 16, UiStyle.ERROR_COLOR)
-	_message.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bottom.add_child(_message)
+	_message.clip_text = true
+	_message.custom_minimum_size.y = MESSAGE_HEIGHT
+	box.add_child(_message)
+	var bottom := HBoxContainer.new()
+	bottom.alignment = BoxContainer.ALIGNMENT_END
+	bottom.add_theme_constant_override(&"separation", 8)
+	box.add_child(bottom)
 	_undo = Button.new()
 	_undo.text = "Undo sale"
 	_undo.custom_minimum_size = Vector2(130, 40)
-	UiStyle.style_button(_undo, 17)
+	UiStyle.style_button(_undo, BUTTON_FONT)
 	_undo.pressed.connect(func() -> void: screen.undo_sale())
 	bottom.add_child(_undo)
 	_refresh = Button.new()
@@ -124,7 +169,7 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	_refresh.add_theme_constant_override(&"icon_max_width", 22)
 	_refresh.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_refresh.custom_minimum_size = Vector2(160, 40)
-	UiStyle.style_button(_refresh, 17)
+	UiStyle.style_button(_refresh, BUTTON_FONT)
 	_refresh.pressed.connect(func() -> void: screen.refresh_shop())
 	bottom.add_child(_refresh)
 	screen.inventory.changed.connect(_recheck_inputs)
@@ -143,7 +188,7 @@ func show_tab(tab: int) -> void:
 	_tab = tab
 	for i in _pages.size():
 		_pages[i].visible = i == tab
-		UiStyle.style_button(_tab_buttons[i], 18, i == tab)
+		UiStyle.style_button(_tab_buttons[i], BUTTON_FONT, i == tab)
 	_refresh.visible = tab == ITEMS_TAB
 	_hint.text = hint(tab)
 
@@ -280,6 +325,20 @@ func craft_fee() -> int:
 	return screen.shop.craft_fee(_first_input.index, _second_input.index)
 
 
+## Where the Craft tab stands for what is in its inputs (see CraftState).
+func craft_state() -> CraftState:
+	var first := _first_input.item()
+	var second := _second_input.item()
+	if screen.shop == null or (first == null and second == null):
+		return CraftState.EMPTY
+	if first == null or second == null:
+		var one := first if first else second
+		return CraftState.NO_RECIPE if one.is_boots() and one.boots_tier >= 3 else CraftState.ONE
+	if craft_preview() == null:
+		return CraftState.NO_RECIPE
+	return CraftState.READY if screen.shop.wallet.can_afford(craft_fee()) else CraftState.NO_GOLD
+
+
 func _process(delta: float) -> void:
 	if screen == null or screen.shop == null:
 		return
@@ -321,15 +380,26 @@ func _show_undo() -> void:
 		_undo.set_meta(&"hover_text", "Buy back %s for %d gold" % [sale.item.display_name, sale.price])
 
 
-## The Craft tab's fee, note and Craft button for what is in the inputs.
+## The Craft tab's note, arrow, fee and Craft button for what is in the
+## inputs. The button is off until the inputs make something, says why, and
+## is lit gold once the craft can be paid for; the fee is red when it can't.
 func _show_craft() -> void:
+	var state := craft_state()
 	var result := craft_preview()
-	var fee := craft_fee()
-	_fee_label.text = str(fee) if result else "–"
-	var affordable := result != null and screen.shop.wallet.can_afford(fee)
-	_fee_label.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if affordable or result == null else UiStyle.ERROR_COLOR)
-	_craft_button.disabled = result == null
+	_fee_label.text = str(craft_fee()) if result else "–"
+	_fee_label.add_theme_color_override(&"font_color", UiStyle.ERROR_COLOR if state == CraftState.NO_GOLD else UiStyle.GOLD_COLOR)
 	_craft_note.text = craft_note()
+	_craft_note.add_theme_color_override(&"font_color", NOTE_COLORS[state])
+	_arrow.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if state == CraftState.READY else UiStyle.DIM_COLOR)
+	_craft_button.disabled = result == null
+	_craft_button.text = CRAFT_WORDS[state]
+	if state == _styled_state:
+		return
+	_styled_state = state
+	UiStyle.style_button(_craft_button, BUTTON_FONT, state == CraftState.READY)
+	if state == CraftState.NO_GOLD:
+		_craft_button.add_theme_color_override(&"font_color", UiStyle.ERROR_COLOR)
+		_craft_button.add_theme_color_override(&"font_hover_color", UiStyle.ERROR_COLOR)
 
 
 ## The Craft button's question: "Craft Muramana from Tear of the Goddess and
@@ -363,51 +433,73 @@ func craft_note() -> String:
 	return "No legendary is made from %s and %s." % [first.display_name, second.display_name]
 
 
+func _column(gap: int) -> VBoxContainer:
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override(&"separation", gap)
+	return column
+
+
 func _build_craft_page() -> VBoxContainer:
-	var page := VBoxContainer.new()
-	page.add_theme_constant_override(&"separation", 10)
+	var page := _column(GAP)
+	var bench := PanelContainer.new()
+	var inset := StyleBoxFlat.new()
+	inset.bg_color = ShopSlot.ROW_FILL
+	inset.border_color = ShopSlot.ROW_RIM
+	inset.set_border_width_all(1)
+	inset.set_corner_radius_all(ShopSlot.RADIUS)
+	inset.set_content_margin_all(BENCH_PAD)
+	bench.add_theme_stylebox_override(&"panel", inset)
+	page.add_child(bench)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 10)
-	page.add_child(row)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override(&"separation", BENCH_GAP)
+	bench.add_child(row)
 	_first_input = CraftSlot.new(screen, CraftSlot.Kind.INPUT, BackpackScreen.CRAFT_FIRST)
 	_second_input = CraftSlot.new(screen, CraftSlot.Kind.INPUT, BackpackScreen.CRAFT_SECOND)
 	_result_slot = CraftSlot.new(screen, CraftSlot.Kind.RESULT)
+	_arrow = _sign("→")
 	row.add_child(_first_input)
 	row.add_child(_sign("+"))
 	row.add_child(_second_input)
-	row.add_child(_sign("→"))
+	row.add_child(_arrow)
 	row.add_child(_result_slot)
+
+	_craft_note = UiStyle.label("", 15, UiStyle.TEXT_COLOR)
+	_craft_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# Long item names wrap instead of widening the shop.
+	_craft_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_craft_note.custom_minimum_size = Vector2(0, 44)
+	page.add_child(_craft_note)
 
 	var fee_row := HBoxContainer.new()
 	fee_row.add_theme_constant_override(&"separation", 6)
 	page.add_child(fee_row)
 	fee_row.add_child(UiStyle.label("Fee", 16, UiStyle.DIM_COLOR))
-	var coin := TextureRect.new()
-	coin.texture = ShopSlot.COIN
-	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	coin.custom_minimum_size = Vector2(20, 20)
-	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	fee_row.add_child(coin)
+	fee_row.add_child(_coin(20.0))
 	_fee_label = UiStyle.label("–", 18, UiStyle.GOLD_COLOR)
 	_fee_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	fee_row.add_child(_fee_label)
 	_craft_button = Button.new()
-	_craft_button.text = "Craft"
-	_craft_button.custom_minimum_size = Vector2(140, 38)
-	UiStyle.style_button(_craft_button, 17)
+	_craft_button.text = CRAFT_WORDS[CraftState.EMPTY]
+	_craft_button.custom_minimum_size = CRAFT_BUTTON_SIZE
+	UiStyle.style_button(_craft_button, BUTTON_FONT)
 	_craft_button.pressed.connect(func() -> void: screen.craft())
 	fee_row.add_child(_craft_button)
-
-	_craft_note = UiStyle.label("", 15, UiStyle.TEXT_COLOR)
-	# Long item names wrap instead of widening the shop.
-	_craft_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_craft_note.custom_minimum_size = Vector2(0, 40)
-	page.add_child(_craft_note)
 	return page
 
 
+## The gold coin, `side` wide.
+func _coin(side: float) -> TextureRect:
+	var coin := TextureRect.new()
+	coin.texture = ShopSlot.COIN
+	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	coin.custom_minimum_size = Vector2(side, side)
+	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	return coin
+
+
 func _sign(text: String) -> Label:
-	var sign := UiStyle.label(text, 26, UiStyle.DIM_COLOR)
+	var sign := UiStyle.label(text, SIGN_FONT, UiStyle.DIM_COLOR)
 	sign.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	return sign
 
