@@ -282,8 +282,14 @@ func show_result(is_cleared: bool) -> void:
 	var can_next := is_cleared and next != Vector2i.ZERO and WavePlan.has_stage(Journey.stage_id(next.x, next.y))
 	# Losing the tutorial (Act 1 before its first clear) is a game over.
 	result.show_result(is_cleared, run.display_name, rows, collected, reward_lines, not is_cleared and run.tutorial, can_next,
-			EndlessDirector.RUN_OVER if endless else "")
+			EndlessDirector.RUN_OVER if endless else "", _recap())
 	get_tree().paused = true
+
+
+## The recap of the damage Lucian took ({} with none); only a defeat shows it.
+func _recap() -> Dictionary:
+	var save := SaveGame.instance()
+	return DeathRecap.build(stats, save.tree, save.essences)
 
 
 ## Lucian fell: the save counts it at once for a story stage not yet cleared

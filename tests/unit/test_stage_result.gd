@@ -168,3 +168,12 @@ func test_stats_rows_show_label_and_value() -> void:
 	var texts := _texts()
 	for text in ["Time", "6:42", "Kills", "87", "Stage 2-1"]:
 		assert_true(text in texts, str(texts))
+
+
+func test_the_recap_shows_on_a_defeat_and_never_on_a_clear() -> void:
+	var recap := {"killed": "Killed by Gromp", "shares": ["Gromp 100%"], "tip": "A tip.", "tree": ""}
+	result.show_result(false, "Stage 2-1", [], _essences(), NONE, false, false, "", recap)
+	assert_true("Killed by Gromp" in _texts())
+	assert_true(result.find_children("*", "Label", true, false).any(func(label: Label) -> bool: return label.text == "WHAT HIT YOU" and label.is_visible_in_tree()))
+	result.show_result(true, "Stage 2-1", [], _essences(), NONE, false, false, "", recap)
+	assert_false(result.find_children("*", "Label", true, false).any(func(label: Label) -> bool: return label.text == "WHAT HIT YOU" and label.is_visible_in_tree()))

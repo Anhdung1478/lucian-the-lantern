@@ -46,7 +46,7 @@ const ACT_SCENARIOS := {
 	"act1_lesson": [1, 1], "act1_thresh": [1, 1], "act1_cutscene": [1, 1], "act1_result": [1, 1], "game_over": [1, 1],
 	"act2_pillars": [2, 3], "act2_super": [2, 1], "akshan_e": [2, 3], "akshan_r": [2, 3],
 	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
-	"resolve": [2, 1],
+	"resolve": [2, 1], "death_recap": [2, 1],
 	"attack_pick": [2, 1],
 	"act3_packs": [3, 1], "act3_elites": [3, 1], "act3_result": [3, 2],
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
@@ -110,11 +110,13 @@ func _initialize() -> void:
 				DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 	save.load_slot(1)
 	SaveGame._instance = save
-	if scenario == "resolve":
+	if scenario in ["resolve", "death_recap"]:
 		# R1: stage 2-1 has beaten Lucian twice before this try.
 		save.set_cleared(Journey.all_stage_ids(1))
 		for i in 2:
 			save.record_defeat("2-1")
+	if scenario == "death_recap":
+		save.essences.add(Essences.BLUE, 100000)
 	if scenario == "art_sheet":
 		# Art only: no stage, and no stretch, so a 32 px icon is 32 real pixels.
 		root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
@@ -284,6 +286,8 @@ func _run(scenario: String) -> void:
 			await scenario_defeat()
 		"resolve":
 			await scenario_resolve()
+		"death_recap":
+			await scenario_death_recap()
 		"main_resolve":
 			await scenario_main_resolve()
 		"loot":
@@ -3900,6 +3904,22 @@ func scenario_resolve() -> void:
 	print("result (expect DEFEATED): ", game.result.title.text)
 	print("rewards (expect Resolve 3 / 5: +30% damage, -30% damage taken on your next try): ", game.reward_lines)
 	await shot("resolve_1_defeated")
+	paused = false
+
+
+## R3: the longest recap: a Super Minion, a Ranged Minion, a Raptor and a
+## burn hit Lucian, the tree has something to buy and Resolve follows.
+func scenario_death_recap() -> void:
+	var game := game_stage()
+	await wait(0.3)
+	for hit: Array in [[&"super_minion", 120.0], [&"ranged_minion", 70.0], [&"raptor", 40.0]]:
+		var enemy := game.spawn_enemy(hit[0], lucian.global_position + Vector2(400, 0))
+		lucian.take_damage(enemy.make_hit(hit[1]))
+	lucian.hp = 20.0
+	lucian.take_damage(DamageInfo.create(30.0, DamageInfo.Type.TRUE, DamageOverTime.SOURCE))
+	await wait(Lucian.DEATH_FADE + 0.6)
+	print("result (expect DEFEATED): ", game.result.title.text)
+	await shot("death_recap_0_defeated")
 	paused = false
 
 

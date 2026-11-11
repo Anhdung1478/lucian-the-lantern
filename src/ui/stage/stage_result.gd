@@ -5,14 +5,18 @@ extends CanvasLayer
 ## its top edge, lit warm after a clear, dim and red after a defeat. On the
 ## plate: STAGE CLEARED or DEFEATED (GAME OVER when the tutorial is lost, or
 ## the caller's own title: Endless's RUN OVER), the stage between gold rules,
-## a stats column and a rewards column whose essences count up, then Retry,
-## Next stage and Main screen (a single Back to title after a game over).
+## a stats column and a rewards column whose essences count up, after a defeat
+## what hit Lucian (DeathRecap), then Retry, Next stage and Main screen (a single Back to title after a game over).
 
 ## The button pressed: &"retry", &"next", &"main" or &"title".
 signal chosen(then: StringName)
 
 const LAYER := 42
 const REWARD_COLOR := UiStyle.GOOD_COLOR
+## The recap's killed-by line, its tip (a calmer color) and its shares' gap.
+const KILLED_COLOR := UiStyle.ERROR_COLOR
+const TIP_COLOR := UiStyle.LANTERN_COLOR
+const SHARE_GAP := 36
 const PANEL_WIDTH := 1040.0
 const BUTTON_SIZE := Vector2(260, 60)
 const CLEARED_GLOW := Color(1.0, 0.78, 0.3, 0.22)
@@ -77,6 +81,9 @@ var main_button: Button
 var _stage_label: Label
 var _stats: VBoxContainer
 var _rewards: VBoxContainer
+## The recap's rows, and the section holding them (shown after a defeat).
+var _recap: VBoxContainer
+var _recap_section: Control
 var _gradient: Gradient
 ## Draws the medallion; the top of the plate's column.
 var _crest := Control.new()
@@ -111,7 +118,8 @@ static func clock(seconds: float) -> String:
 ## `stats` is a list of [label, value] pairs, in order. `can_next`: there is a
 ## next stage to play (it only shows after a clear). `title_text`, when set,
 ## replaces the outcome's title (its color, glow and lantern stay the outcome's).
-func show_result(is_cleared: bool, stage_name: String, stats: Array, collected: Dictionary, rewards: Array[String], is_game_over := false, can_next := false, title_text := "") -> void:
+## `recap` is DeathRecap.build's parts; a clear never shows it.
+func show_result(is_cleared: bool, stage_name: String, stats: Array, collected: Dictionary, rewards: Array[String], is_game_over := false, can_next := false, title_text := "", recap := {}) -> void:
 	cleared = is_cleared
 	game_over = is_game_over and not is_cleared
 	if title_text != "":
@@ -130,6 +138,7 @@ func show_result(is_cleared: bool, stage_name: String, stats: Array, collected: 
 	main_button.text = "Back to title" if game_over else "Main screen"
 	_fill_stats(stats)
 	_fill_rewards(collected, rewards)
+	_fill_recap({} if cleared else recap)
 	visible = true
 
 
@@ -215,16 +224,35 @@ func _show_essences(share: float) -> void:
 		(_essence_labels[kind] as Label).text = ESSENCE_LINE % [roundi(_amounts[kind] * share), kind]
 
 
-## A green line with a diamond before it; a long one wraps.
-func _reward_line(text: String) -> HBoxContainer:
+## What hit Lucian: who struck the last blow, the shares of the damage and
+## a tip, then the Evolution Tree line when something can be bought.
+func _fill_recap(recap: Dictionary) -> void:
+	_recap_section.visible = not recap.is_empty()
+	for child in _recap.get_children():
+		child.queue_free()
+	if recap.is_empty():
+		return
+	_recap.add_child(UiStyle.label(recap.killed, ROW_FONT, KILLED_COLOR))
+	var shares := HBoxContainer.new()
+	shares.add_theme_constant_override(&"separation", SHARE_GAP)
+	for share: String in recap.shares:
+		shares.add_child(UiStyle.label(share, LINE_FONT, UiStyle.TEXT_COLOR))
+	_recap.add_child(shares)
+	_recap.add_child(_reward_line(recap.tip, TIP_COLOR))
+	if recap.tree != "":
+		_recap.add_child(_reward_line(recap.tree))
+
+
+## A line with a diamond before it, green unless told otherwise; a long one wraps.
+func _reward_line(text: String, color := REWARD_COLOR) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 12)
 	var bullet := Control.new()
 	bullet.custom_minimum_size = Vector2(ESSENCE_ICON, LINE_FONT)
 	bullet.draw.connect(func() -> void:
-		bullet.draw_colored_polygon(Plate.diamond(Vector2(bullet.size.x * 0.5, LINE_FONT * 0.7), Ornament.DIAMOND), REWARD_COLOR))
+		bullet.draw_colored_polygon(Plate.diamond(Vector2(bullet.size.x * 0.5, LINE_FONT * 0.7), Ornament.DIAMOND), color))
 	row.add_child(bullet)
-	var reward := UiStyle.label(text, LINE_FONT, REWARD_COLOR)
+	var reward := UiStyle.label(text, LINE_FONT, color)
 	reward.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	reward.custom_minimum_size = Vector2(LINE_WIDTH, 0)
 	reward.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -280,6 +308,8 @@ func _build() -> void:
 	_stats = _section(columns, "STATS")
 	columns.add_child(Ornament.divider(true))
 	_rewards = _section(columns, "REWARDS")
+	_recap = _section(column, "WHAT HIT YOU")
+	_recap_section = _recap.get_parent()
 	column.add_child(Ornament.divider())
 	var buttons := HBoxContainer.new()
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER

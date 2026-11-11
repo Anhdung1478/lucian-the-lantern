@@ -5,7 +5,15 @@ var tree: EvolutionTree
 var essences: Essences
 
 
+const STAGE_SCENE := "res://src/stage/stage.tscn"
+const HEAD := "WHAT HIT YOU"
+## The card may be this tall (a 1080 screen less the medallion over its edge).
+const CARD_LIMIT := 1000.0
+
 func before_each() -> void:
+	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
+	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
+		SaveGame._instance = SaveGame.new("user://test_death_recap_save_slot_")
 	tree = EvolutionTree.new()
 	essences = Essences.new()
 
@@ -84,3 +92,84 @@ func test_the_tree_line_shows_only_when_something_can_be_bought() -> void:
 	essences.add(Essences.BLUE, 100000)
 	essences.add(Essences.ORANGE, 100000)
 	assert_eq(_build(stats).tree, DeathRecap.TREE_LINE)
+
+
+# --- On the end screen ---------------------------------------------------------
+
+
+func _texts(stage: Stage) -> Array[String]:
+	var texts: Array[String] = []
+	for label: Label in stage.result.find_children("*", "Label", true, false):
+		if label.is_visible_in_tree():
+			texts.append(label.text)
+	return texts
+
+
+func _run(setup: StageSetup) -> Stage:
+	var stage: Stage = load(STAGE_SCENE).instantiate()
+	stage.setup(setup)
+	add_child_autofree(stage)
+	await wait_process_frames(2)
+	return stage
+
+
+## A stage whose Lucian was hit once by a ranged minion, then ended as `cleared`.
+func _end(setup: StageSetup, cleared: bool) -> Stage:
+	var stage := await _run(setup)
+	var enemy := stage.spawn_enemy(&"ranged_minion", stage.lucian.global_position + Vector2(300, 0))
+	stage.lucian.take_damage(enemy.make_hit(50.0))
+	stage.show_result(cleared)
+	return stage
+
+
+func after_each() -> void:
+	get_tree().paused = false
+
+
+func test_a_story_defeat_shows_the_recap() -> void:
+	var stage := await _end(StageSetup.for_stage(SaveGame.instance(), 2, 1), false)
+	assert_eq(stage.result.title.text, "DEFEATED")
+	var texts := _texts(stage)
+	for line in [HEAD, "Killed by Ranged Minion", "Ranged Minion 100%", DeathRecap.TIP_RANGED]:
+		assert_true(line in texts, line)
+
+
+func test_a_clear_shows_no_recap() -> void:
+	var stage := await _end(StageSetup.for_stage(SaveGame.instance(), 2, 1), true)
+	assert_eq(stage.result.title.text, "STAGE CLEARED")
+	for text in _texts(stage):
+		assert_false(text.begins_with("Killed by") or text == HEAD, text)
+
+
+func test_the_lost_tutorial_shows_the_recap() -> void:
+	SaveGame.instance().reset()
+	var stage := await _end(StageSetup.for_stage(SaveGame.instance(), 1, 1), false)
+	assert_eq(stage.result.title.text, "GAME OVER")
+	assert_true(HEAD in _texts(stage))
+
+
+func test_a_lost_endless_run_shows_the_recap() -> void:
+	var stage := await _end(StageSetup.for_endless(SaveGame.instance(), 3, RandomNumberGenerator.new()), false)
+	assert_eq(stage.result.title.text, EndlessDirector.RUN_OVER)
+	assert_true(HEAD in _texts(stage))
+
+
+func test_a_defeat_with_no_damage_shows_no_recap() -> void:
+	var stage := await _run(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	stage.show_result(false)
+	assert_false(HEAD in _texts(stage))
+
+
+func test_the_longest_recap_fits_the_card_and_keeps_the_buttons_on_screen() -> void:
+	var stage := await _run(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	SaveGame.instance().essences.add(Essences.BLUE, 100000)
+	SaveGame.instance().essences.add(Essences.ORANGE, 100000)
+	for id: StringName in [&"super_minion", &"ranged_minion", &"raptor", &"burn"]:
+		var unit := stage.spawn_enemy(id, stage.lucian.global_position + Vector2(300, 0)) if id != &"burn" else null
+		stage.lucian.take_damage(DamageInfo.create(10.0, DamageInfo.Type.TRUE, id, unit))
+	SaveGame.instance().record_defeat("2-1")
+	stage.show_result(false)
+	await wait_process_frames(2)
+	assert_true(DeathRecap.TREE_LINE in _texts(stage))
+	var plate := stage.result.title.get_parent().get_parent() as Control
+	assert_lt(plate.size.y, CARD_LIMIT, "the card, medallion included, fits a 1080 screen")
