@@ -151,13 +151,18 @@ func _run(setup: StageSetup) -> Stage:
 
 ## The result panel has no Resolve line.
 func _assert_no_line(stage: Stage, why := "") -> void:
+	for text: String in _result_texts(stage):
+		assert_false(text.begins_with("Resolve"), "%s: %s" % [why, text])
+
+
+## The texts on the stage's result panel, plain or rich.
+func _result_texts(stage: Stage) -> Array[String]:
+	var texts: Array[String] = []
 	for label: Label in stage.result.find_children("*", "Label", true, false):
-		assert_false(label.text.begins_with("Resolve"), "%s: %s" % [why, label.text])
-
-
-## The texts on the stage's result panel.
-func _result_texts(stage: Stage) -> Array:
-	return stage.result.find_children("*", "Label", true, false).map(func(label: Label) -> String: return label.text)
+		texts.append(label.text)
+	for rich: RichTextLabel in stage.result.find_children("*", "RichTextLabel", true, false):
+		texts.append(rich.get_parsed_text())
+	return texts
 
 
 func test_a_stage_gives_lucian_its_stacks() -> void:
