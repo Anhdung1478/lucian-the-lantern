@@ -1,23 +1,31 @@
 class_name EnemyHealthBar
 extends Node2D
-## HP bar drawn above an enemy, with its item statuses (armor shred, Grievous
-## Wounds, ...) as small icons above it. Drawn by hand instead of using a
-## Control so it can never swallow clicks aimed at the enemy. It redraws only
-## when the health or the statuses change, and about every REFRESH_TIME while
-## a status shows, so the time-spent shading keeps moving.
+## HP bar drawn above an enemy (see UnitBar): a dark frame, a red fill and a
+## pale ghost of the health just lost that drains away, with its item
+## statuses (armor shred, Grievous Wounds, ...) as small icons above it. An
+## elite's has a gold rim and a gold diamond at its left end. Drawn by hand
+## instead of using a Control so it can never swallow clicks aimed at the
+## enemy. It redraws only when the health or the statuses change, and about
+## every REFRESH_TIME while a status shows or the ghost drains, so the
+## time-spent shading and the ghost keep moving.
 
 const STATUS_SIZE := 22.0
 const STATUS_GAP := 3.0
-## Seconds between redraws of the status shading.
+## Seconds between redraws of the status shading and the ghost.
 const REFRESH_TIME := 0.1
+const GHOST_COLOR := Color(1.0, 0.9, 0.74)
+## The elite's diamond: its half size, and the dark line round it.
+const BADGE_SIZE := 7.0
+const BADGE_LINE := Color(0.02, 0.03, 0.05)
 
 @export var size := Vector2(90, 10)
 @export var fill_color := Color("c8312b")
 
-## Elites: a small gold diamond at the bar's left end.
+## Elites: a gold rim, and a small gold diamond at the bar's left end.
 var badge := false
 
 var _ratio := 1.0
+var _ghost := BarGhost.new()
 ## The enemy's status_version at the last redraw, and the time since it.
 var _seen_version := 0
 var _since_draw := 0.0
@@ -27,30 +35,45 @@ func set_health(current: float, maximum: float) -> void:
 	var ratio := clampf(current / maximum, 0.0, 1.0)
 	if is_equal_approx(ratio, _ratio):
 		return
+	_ghost.follow(_ratio, ratio)
 	_ratio = ratio
 	queue_redraw()
 
 
+## The share of the bar where the ghost of lost health ends: the health's own
+## share when none shows.
+func ghost_share() -> float:
+	return maxf(_ghost.share, _ratio)
+
+
 func _process(delta: float) -> void:
-	var enemy := get_parent() as Enemy
-	if enemy == null:
-		return
 	_since_draw += delta
-	if enemy.status_version != _seen_version or (enemy.has_any_status() and _since_draw >= REFRESH_TIME):
+	_ghost.step(delta, _ratio)
+	var moving := _ghost.moved
+	var enemy := get_parent() as Enemy
+	if enemy:
+		if enemy.status_version != _seen_version:
+			queue_redraw()
+			return
+		moving = moving or enemy.has_any_status()
+	if moving and _since_draw >= REFRESH_TIME:
 		queue_redraw()
 
 
 func _draw() -> void:
 	_since_draw = 0.0
+	_ghost.moved = false
 	var rect := Rect2(-size * 0.5, size)
-	draw_rect(rect.grow(2.0), Color(0, 0, 0, 0.8))
-	draw_rect(Rect2(rect.position, Vector2(size.x * _ratio, size.y)), fill_color)
+	UnitBar.frame(self, rect, UiStyle.GOLD_COLOR if badge else Color.TRANSPARENT)
+	UnitBar.fill(self, rect, _ratio, ghost_share(), GHOST_COLOR)
+	UnitBar.fill(self, rect, 0.0, _ratio, fill_color)
 	if badge:
-		var left := Vector2(rect.position.x, 0.0)
-		var diamond := PackedVector2Array([left + Vector2(0, -6), left + Vector2(6, 0), left + Vector2(0, 6), left + Vector2(-6, 0)])
+		var left := Vector2(rect.position.x - UnitBar.FRAME_WIDTH, 0.0)
+		var diamond := PackedVector2Array([left + Vector2(0, -BADGE_SIZE), left + Vector2(BADGE_SIZE, 0),
+			left + Vector2(0, BADGE_SIZE), left + Vector2(-BADGE_SIZE, 0)])
 		draw_colored_polygon(diamond, UiStyle.GOLD_COLOR)
 		diamond.append(diamond[0])
-		draw_polyline(diamond, Color.BLACK, 2.0)
+		draw_polyline(diamond, BADGE_LINE, 2.0, true)
 	var enemy := get_parent() as Enemy
 	if enemy == null:
 		return
