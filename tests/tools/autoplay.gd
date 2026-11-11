@@ -26,7 +26,11 @@ extends SceneTree
 ## Each try also prints its items: the gold at each merchant, what was bought,
 ## picked up and crafted (after how many waves), and what was equipped at
 ## the end; and the Resolve stacks it was played with.
-## The run ends with a summary: one line per stage ("summary 2-1: tries 4,
+## In a break the bot walks to the merchant, shops, looks around for its
+## tier's `idle` seconds and presses Skip.
+## The run ends with a summary: the stage time and an estimate of the play
+## time (the slot's clock also runs on the main screen: `between` seconds
+## around each try), one line per stage ("summary 2-1: tries 4,
 ## cleared in 3:10 with Resolve 3, spent 8:02"; its farm runs too) and the
 ## tree and essences it ended with.
 
@@ -197,10 +201,24 @@ func _finish(started: int) -> void:
 		var outcome := "cleared in %s with Resolve %d" % [StageResult.clock(row.clear), row.resolve] if row.clear >= 0.0 else "not cleared"
 		var farm := ", farm %d runs %s" % [row.farms, StageResult.clock(row.farm_time)] if row.farms > 0 else ""
 		_say("summary %s: tries %d, %s, spent %s%s" % [row.id, row.tries, outcome, StageResult.clock(row.spent), farm])
+	var in_stages := 0.0
+	var visits := 0
+	for row in stage_rows:
+		in_stages += row.spent + row.farm_time
+		visits += row.tries + row.farms
+	var between: float = Bot.TIERS[skill].between
+	_say("summary time: %s in stages; with %d visits to the main screen at %d s each, about %s of play time" % [
+		_hours(in_stages), visits, int(between), _hours(in_stages + visits * between)])
 	_say("summary tree: %s; essences B%d O%d P%d" % [_tree_text(save), save.essences.amount(Essences.BLUE),
 		save.essences.amount(Essences.ORANGE), save.essences.amount(Essences.PURPLE)])
 	_say("real seconds: %d" % ((Time.get_ticks_msec() - started) / 1000))
 	quit()
+
+
+## "4 h 12" for seconds.
+func _hours(seconds: float) -> String:
+	var minutes := int(seconds / 60.0)
+	return "%d h %02d" % [minutes / 60, minutes % 60]
 
 
 func _tree_text(save: SaveGame) -> String:
@@ -309,12 +327,22 @@ class Bot extends Node:
 	## below this share of health it also steps back from a melee enemy whose
 	## swing is within PANIC_REACH (0 = never: the tiers that kite already do);
 	## warn: share of red warnings stepped out of; bolt: share of enemy bolts
-	## sidestepped; e_dps: E used for damage, not only to escape.
+	## sidestepped; e_dps: E used for damage, not only to escape; focus: share
+	## of summoners (a Maiden, a Broodmother) it goes for first, as a player
+	## who knows them does; idle: seconds it looks around after shopping before
+	## it presses Skip; between: seconds on the main screen and the end screen
+	## around each try (the summary's play time counts them; the stage clock
+	## doesn't).
 	const TIERS := {
-		"skilled": {"react": 0.15, "kite": 90.0, "panic": 0.0, "warn": 1.0, "bolt": 0.5, "e_dps": true},
-		"average": {"react": 0.25, "kite": 40.0, "panic": 0.0, "warn": 0.8, "bolt": 0.2, "e_dps": false},
-		"novice": {"react": 0.35, "kite": -INF, "panic": 0.5, "warn": 0.5, "bolt": 0.0, "e_dps": false},
+		"skilled": {"react": 0.15, "kite": 90.0, "panic": 0.0, "warn": 1.0, "bolt": 0.5, "e_dps": true, "focus": 1.0, "idle": 1.0, "between": 40.0},
+		"average": {"react": 0.25, "kite": 40.0, "panic": 0.0, "warn": 0.8, "bolt": 0.2, "e_dps": false, "focus": 0.5, "idle": 3.0, "between": 60.0},
+		"novice": {"react": 0.35, "kite": -INF, "panic": 0.5, "warn": 0.5, "bolt": 0.0, "e_dps": false, "focus": 0.0, "idle": 6.0, "between": 90.0},
 	}
+	## A summoner this far past his reach is still worth walking to.
+	const FOCUS_WALK := 200.0
+	## A walk to the merchant that takes longer than this (a blocked path)
+	## shops anyway, so a stuck bot doesn't skew the numbers.
+	const WALK_LIMIT := 10.0
 	const POTION_AT := 0.55
 	## A hurt player (below the tier's panic share) backs away from a melee
 	## enemy whose swing is less than this far away.
@@ -336,6 +364,10 @@ class Bot extends Node:
 	var _rng := RandomNumberGenerator.new()
 	var _shopped := false
 	var _was_break := false
+	## This break's seconds spent walking to the merchant, and looking around
+	## after shopping.
+	var _walked := 0.0
+	var _idled := 0.0
 
 	func _ready() -> void:
 		lucian = stage.lucian
@@ -405,6 +437,8 @@ class Bot extends Node:
 		var in_break := stage.runner and stage.runner.state == WaveRunner.State.BREAK
 		if in_break and not _was_break:
 			_shopped = false
+			_walked = 0.0
+			_idled = 0.0
 		_was_break = in_break
 		_survive(enemies)
 		if _dodge() or _dodge_bolts():
@@ -542,7 +576,8 @@ class Bot extends Node:
 				best = minf(best, at.distance_to(unit.global_position) - unit.data.attack_range - Lucian.HIT_RADIUS)
 		return best
 
-	## Between waves: loot, then the merchant, then Skip. A full backpack
+	## Between waves: loot, then a walk to the merchant, a moment to look
+	## around, then Skip. A full backpack
 	## leaves loot on the ground; with an equip slot free, the bot equips first
 	## to make room, as a player would.
 	func _between_waves(in_break: bool) -> void:
@@ -556,8 +591,16 @@ class Bot extends Node:
 		if not in_break:
 			return
 		if not _shopped and is_instance_valid(stage.merchant):
+			# He walks to the merchant first, as a player must.
+			if lucian.global_position.distance_to(stage.merchant.global_position) > Merchant.INTERACT_RANGE and _walked < WALK_LIMIT:
+				_walked += tier.react
+				lucian.command_move(stage.merchant.global_position)
+				return
 			_shopped = true
 			_shop()
+		if _idled < tier.idle:
+			_idled += tier.react
+			return
 		stage.skip_break()
 
 	## The merchant, as a player would use him (the shop pauses the game).
@@ -710,6 +753,10 @@ class Bot extends Node:
 				score = -1000.0 + unit.hp / maxf(unit.max_hp, 1.0) * 300.0
 				if unit.data.attack_range <= 200.0 and d < 230.0:
 					score -= 200.0
+			# A summoner within a short walk comes first for a player who knows
+			# it: its summons keep coming while it lives.
+			if unit.data.summon_id != &"" and d <= reach + FOCUS_WALK and not _skips(unit, tier.focus):
+				score = -2000.0 + d
 			if score < best_score:
 				best_score = score
 				best = unit
