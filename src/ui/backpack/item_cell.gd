@@ -1,26 +1,36 @@
 class_name ItemCell
 extends Control
-## One cell of the backpack screen: a tan backpack cell, a dark equip slot
-## (with its key number, or a chain when locked), a potion cell (its key; its
-## potion faded while empty), the boots cell (Boots of Speed faded while
-## empty) or the sell slot (red while the shop is open). Draws the item from
-## the inventory, or nothing while that item sits in a Craft input, and
+## One cell of the backpack screen: a dark well whose rim follows the item in
+## it (UiStyle.item_rim) and turns gold under the mouse, and under a dragged
+## item it would take. It is a backpack cell (a chain when locked), an equip
+## slot (with its key number, or a chain when locked), a potion cell (its
+## key; its potion faded while empty), the boots cell (Boots of Speed faded
+## while empty) or the sell slot (red while the shop is open). Draws the item
+## from the inventory, or nothing while that item sits in a Craft input, and
 ## passes mouse input to the screen.
 
 enum Style { BACKPACK, EQUIP, SELL, POTION, BOOTS }
 
 const SIZE := 64.0
 const ICON_INSET := 5.0
+const RADIUS := 5
 const FILLS := {
-	Style.BACKPACK: Color("d9c59b"), Style.EQUIP: Color("2a221a"), Style.SELL: Color("1e1a16"),
+	Style.EQUIP: Color("2a221a"), Style.SELL: Color("1e1a16"),
 	Style.POTION: Color("231d1d"), Style.BOOTS: Color("1d2023"),
 }
 const BORDERS := {
-	Style.BACKPACK: Color("8c6e45"), Style.EQUIP: Color("8c6e45"), Style.SELL: Color("5a4a38"),
+	Style.EQUIP: Color("8c6e45"), Style.SELL: Color("5a4a38"),
 	Style.POTION: Color("9a6a52"), Style.BOOTS: Color("7d8794"),
 }
 ## How strongly an empty potion or boots cell shows what goes in it.
 const PLACEHOLDER_ALPHA := 0.3
+## A locked cell: a fainter well and rim under a dim chain.
+const LOCKED_FILL := Color(0.02, 0.028, 0.045, 0.55)
+const LOCKED_RIM := Color(0.36, 0.4, 0.48, 0.3)
+const CHAIN_INSET := 14.0
+const CHAIN_ALPHA := 0.45
+## The gold wash over a cell that would take the dragged item.
+const DROP_WASH := Color(1.0, 0.81, 0.35, 0.14)
 const TARGET_BORDER := Color("ffcf5a")
 const SELL_FILL := Color("7a1f1a")
 const SELL_BORDER := Color("d04a3a")
@@ -32,6 +42,11 @@ const CHAIN := preload("res://assets/art/ui/chain.svg")
 var index := -1
 var style := Style.BACKPACK
 var screen: BackpackScreen
+## The mouse is over the cell.
+var hovered := false:
+	set(value):
+		hovered = value
+		queue_redraw()
 
 
 func _init(cell_index: int, cell_style: Style, owner_screen: BackpackScreen) -> void:
@@ -39,6 +54,8 @@ func _init(cell_index: int, cell_style: Style, owner_screen: BackpackScreen) -> 
 	style = cell_style
 	screen = owner_screen
 	custom_minimum_size = Vector2(SIZE, SIZE)
+	mouse_entered.connect(set.bind(&"hovered", true))
+	mouse_exited.connect(set.bind(&"hovered", false))
 
 
 ## The item the cell shows: null while it sits in a Craft input
@@ -51,6 +68,25 @@ func item() -> ItemData:
 
 func is_locked() -> bool:
 	return index >= 0 and screen.inventory.is_locked(index)
+
+
+## The rim's colour: the kind of the item it shows (UiStyle.item_rim).
+func rim() -> Color:
+	return UiStyle.item_rim(_shown())
+
+
+## Whether the rim is gold: the mouse rests on the cell's item, or the
+## dragged item is over the cell and would land in it
+## (BackpackScreen.takes_drop).
+func is_lit() -> bool:
+	if screen.is_dragging():
+		return index >= 0 and screen.target_index() == index and screen.takes_drop(index)
+	return hovered and item() != null
+
+
+## The item drawn in the cell: none while it is the one being dragged.
+func _shown() -> ItemData:
+	return null if index == screen.dragged_index() else item()
 
 
 func tooltip_content() -> Control:
@@ -96,6 +132,9 @@ func _draw() -> void:
 	if style == Style.SELL and screen.is_shopping():
 		_draw_sell(rect)
 		return
+	if style == Style.BACKPACK:
+		_draw_well(rect)
+		return
 	var fill := StyleBoxFlat.new()
 	fill.bg_color = FILLS[style]
 	fill.border_color = TARGET_BORDER if screen.target_index() == index and index >= 0 else BORDERS[style]
@@ -117,6 +156,30 @@ func _draw() -> void:
 		var key := GameSettings.instance().short_key_label(action)
 		draw_string_outline(font, Vector2(5, 15), key, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 4, Color.BLACK)
 		draw_string(font, Vector2(5, 15), key, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, KEY_COLOR)
+
+
+## The dark well: a locked one is fainter under its chain; an open one has
+## its item, with a stack's count in a corner tag.
+func _draw_well(rect: Rect2) -> void:
+	if is_locked():
+		var locked := UiStyle.cell_style(LOCKED_RIM, false, RADIUS)
+		locked.bg_color = LOCKED_FILL
+		draw_style_box(locked, rect)
+		draw_texture_rect(CHAIN, rect.grow(-CHAIN_INSET), false, Color(1, 1, 1, CHAIN_ALPHA))
+		return
+	var lit := is_lit()
+	draw_style_box(UiStyle.cell_style(rim(), lit, RADIUS), rect)
+	if lit and screen.is_dragging():
+		var wash := StyleBoxFlat.new()
+		wash.bg_color = DROP_WASH
+		wash.set_corner_radius_all(RADIUS)
+		draw_style_box(wash, rect)
+	var shown := _shown()
+	if shown == null:
+		return
+	ItemIcon.draw_item(self, shown, rect.grow(-ICON_INSET))
+	var count := screen.inventory.count_at(index)
+	ItemIcon.draw_tag(self, str(count) if count > 1 else "", rect.grow(-2.0), CORNER_BOTTOM_RIGHT, Color.WHITE, RADIUS - 2)
 
 
 ## The red sell slot: "SELL", or the gold the dragged item would bring.

@@ -1,9 +1,10 @@
 class_name BackpackScreen
 extends CanvasLayer
-## The backpack (P): 9x6 tan cells, and below them, outside the backpack, the
-## dark equip row (slots 1-6 and the sell slot) and the gear row (the boots
-## cell, then the Health and Mana potion cells on keys 7 and 8). The recipe
-## table sits top-left while it is open, shop or not.
+## The backpack (P), in the Lantern look: an ornate plate headed BACKPACK
+## with 9x6 dark cells, and below it, outside the backpack, the equip row
+## (slots 1-6 and the sell slot) and the gear row (the boots cell, then the
+## Health and Mana potion cells on keys 7 and 8). The recipe table sits
+## top-left while it is open, shop or not.
 ##
 ## Dragging: holding the left button on an item (or moving while holding)
 ## picks it up; releasing drops it, decided by Inventory.drop_outcome.
@@ -34,11 +35,11 @@ const CELL_GAP := 6
 const AREA_BOTTOM := 880.0
 const ROW_GAP := 18.0
 const SHOP_GAP := 36.0
-const PANEL_COLOR := Color("4a3524")
-const PANEL_BORDER := Color("2b1f15")
+## Between the backpack's frame and its cells, and under its heading.
+const PACK_PAD := 22.0
+const HEADING_GAP := 14
 const STRIP_COLOR := Color("1f1812")
 const STRIP_BORDER := Color("8c6e45")
-const TITLE_COLOR := Color("f3e2b8")
 const MARGIN := 16.0
 ## Between the equip strip and the gear strip under it.
 const GEAR_GAP := 10
@@ -132,12 +133,14 @@ func open_shop(new_shop: Shop) -> void:
 
 ## Closing mid-drag puts the item back. Also ends shop mode: the Craft tab's
 ## inputs give their items back and an open Craft question or notice is
-## dropped.
+## dropped. No cell stays lit by a mouse that was over it.
 func close() -> void:
 	_end_drag()
 	if _confirm.is_open():
 		_confirm.dismiss()
 	visible = false
+	for cell in _cells:
+		cell.hovered = false
 	shop = null
 	_shop_panel.clear_craft()
 	_shop_panel.visible = false
@@ -184,6 +187,23 @@ static func pen_limit_text(equipped: ItemData) -> String:
 ## The shop slot being dragged, or null.
 func dragged_shop_slot() -> ShopSlot:
 	return _drag_slot
+
+
+## Whether what is being dragged would land in cell `index` if dropped there:
+## an item from another cell moves, swaps or stacks, one from a Craft input
+## moves in, and a shop item is bought into the cell. The cell lights up gold
+## (ItemCell.is_lit). False for a locked cell, one that can't hold the item,
+## the cell it came from and one whose item sits in a Craft input.
+func takes_drop(index: int) -> bool:
+	if index < 0 or index >= Inventory.SIZE or in_craft(index):
+		return false
+	if _drag_index >= 0:
+		return inventory.drop_outcome(_drag_index, index) != Inventory.Drop.RETURN
+	if _drag_input:
+		return inventory.drop_outcome(_drag_input.index, index) == Inventory.Drop.MOVE
+	if _drag_slot:
+		return _drag_slot.item() != null and inventory.can_put(index, _drag_slot.item())
+	return false
 
 
 ## Index of the cell the dragged item is over, -1 for none, SELL for the
@@ -476,17 +496,12 @@ func _build() -> void:
 	_column.add_theme_constant_override(&"separation", int(ROW_GAP))
 	backdrop.add_child(_column)
 
-	var pack := _panel(PANEL_COLOR, PANEL_BORDER, 3, 20)
+	var pack := Plate.new(PACK_PAD)
 	_column.add_child(pack)
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override(&"separation", 12)
+	box.add_theme_constant_override(&"separation", HEADING_GAP)
 	pack.add_child(box)
-	var title := Label.new()
-	title.text = "BACKPACK"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override(&"font_size", 26)
-	title.add_theme_color_override(&"font_color", TITLE_COLOR)
-	box.add_child(title)
+	box.add_child(BagHeading.new("BACKPACK"))
 	var grid := GridContainer.new()
 	grid.columns = COLUMNS
 	grid.add_theme_constant_override(&"h_separation", CELL_GAP)

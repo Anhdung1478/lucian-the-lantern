@@ -11,6 +11,14 @@ const CODE_COLORS := {
 const LEGENDARY_COLOR := Color("8a6a2a")
 const BOOTS_COLOR := Color("5c4a36")
 const BORDER_COLOR := Color(0.07, 0.08, 0.1)
+## A corner tag (a stack count, a cell's key): its plate and thin rim, its
+## text size, the room beside the text, its height and its rounded corner.
+const TAG_COLOR := Color(0.02, 0.03, 0.05, 0.9)
+const TAG_RIM := Color(1, 1, 1, 0.16)
+const TAG_FONT := 13
+const TAG_PAD := 5.0
+const TAG_HEIGHT := 18.0
+const TAG_RADIUS := 5
 
 var item: ItemData:
 	set(value):
@@ -70,3 +78,33 @@ static func draw_count(canvas: CanvasItem, count: int, rect: Rect2, top_left := 
 	var width := rect.size.x - 3.0
 	canvas.draw_string_outline(font, at, str(count), align, width, font_size, 5, Color.BLACK)
 	canvas.draw_string(font, at, str(count), align, width, font_size, Color.WHITE)
+
+
+## A small dark tag with `text` in a corner of `rect` (a cell): its own
+## corner there follows the cell's (`radius`), the opposite one is rounded.
+## Nothing is drawn for "".
+static func draw_tag(canvas: CanvasItem, text: String, rect: Rect2, corner: Corner, color := Color.WHITE, radius := 4) -> void:
+	if text == "":
+		return
+	var font := ThemeDB.fallback_font
+	var tag := tag_rect(text, rect, corner)
+	var box := StyleBoxFlat.new()
+	box.bg_color = TAG_COLOR
+	box.border_color = TAG_RIM
+	box.set_border_width_all(1)
+	box.set_corner_radius(corner, radius)
+	var opposite := ((corner + 2) % 4) as Corner
+	box.set_corner_radius(opposite, TAG_RADIUS)
+	canvas.draw_style_box(box, tag)
+	canvas.draw_string(font, Vector2(tag.position.x, tag.end.y - 4.5), text, HORIZONTAL_ALIGNMENT_CENTER, tag.size.x, TAG_FONT, color)
+
+
+## Where draw_tag puts the tag for `text`: flush in `corner` of `rect`.
+static func tag_rect(text: String, rect: Rect2, corner: Corner) -> Rect2:
+	var width := ThemeDB.fallback_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, TAG_FONT).x + TAG_PAD * 2.0
+	var at := rect.position
+	if corner == CORNER_TOP_RIGHT or corner == CORNER_BOTTOM_RIGHT:
+		at.x = rect.end.x - width
+	if corner == CORNER_BOTTOM_LEFT or corner == CORNER_BOTTOM_RIGHT:
+		at.y = rect.end.y - TAG_HEIGHT
+	return Rect2(at, Vector2(width, TAG_HEIGHT))
