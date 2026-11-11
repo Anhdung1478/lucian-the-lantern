@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | **Stages** | 5 |
-| **Waves** | Stage 1: 6 · Stage 2: 6 · Stage 3: 7 · Stage 4: 7 · Stage 5: 7 + boss wave |
+| **Waves** | Stage 1: 6 · Stage 2: 6 · Stage 3: 7 · Stage 4: 7 · Stage 5: 7 + boss wave *(V2.0: 8 · 8 · 9 · 9 · 9 + boss wave)* |
 | **Map** | Deep Shadow Isles, Thresh's domain |
 | **Mini bosses** | Karthus – revived (stage 2), Hecarim (stage 4), appearing in the last wave |
 | **Boss** | Thresh (stage 5) |
@@ -111,7 +111,7 @@ All numbers are placeholders. A mini boss's or boss's skill hit counts as a skil
 ### Scaling
 | | Act 6 |
 |---|---|
-| HP | × 2.25 *(× 4.0 before V1.3)* |
+| HP | × 2.25 *(× 4.0 before V1.3; V2.0: × 2.75)* |
 | Damage | × 1.75 *(× 2.25 before V1.3)* |
 | Gold and XP | × 2.25 |
 | Blue per kill | 6 (elites 30) |
@@ -123,10 +123,10 @@ Base numbers (the data files). The last column shows wave 1 of Act 6, scaled.
 
 | Enemy | Kind | HP | Armor / MR | Attack | Range | Every | Speed | Radius | Gold / XP | Act 6, wave 1 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Mist Walker | normal | 220 | 10 / 10 | Fast ghoul melee, 14 physical | 100 | 0.9 s | 320 *(360 before V1.3)* | 26 | 55 / 28 | 495 HP, hits for 24.5 |
-| Lantern Soul | normal | 150 | 0 / 20 | A bolt at 500 px/s, 22 magic. Keeps 420–550 away. **Freed** on death | 550 | 1.6 s | 280 | 24 | 45 / 25 | 338 HP, bolt 38.5 |
-| Spectral Rider | elite | 1300 | 40 / 20 | **Charge** (below), 60 physical | 800 | 4.0 s | 280 | 42 | 140 / 80 | 2925 HP, charge 105 |
-| Chain Warden | elite | 1200 | 35 / 35 | **Chain** (below), 45 physical. Keeps 500–700 away | 700 | 3.5 s | 220 | 40 | 150 / 90 | 2700 HP, chain 79 |
+| Mist Walker | normal | 220 | 10 / 10 | Fast ghoul melee, 14 physical | 100 | 0.9 s | 320 *(360 before V1.3)* | 26 | 55 / 28 | 495 HP *(V2.0: 605)*, hits for 24.5 |
+| Lantern Soul | normal | 150 | 0 / 20 | A bolt at 500 px/s, 22 magic. Keeps 420–550 away. **Freed** on death | 550 | 1.6 s | 280 | 24 | 45 / 25 | 338 HP *(V2.0: 413)*, bolt 38.5 |
+| Spectral Rider | elite | 1300 | 40 / 20 | **Charge** (below), 60 physical | 800 | 4.0 s | 280 | 42 | 140 / 80 | 2925 HP *(V2.0: 3575)*, charge 105 |
+| Chain Warden | elite | 1200 | 35 / 35 | **Chain** (below), 45 physical. Keeps 500–700 away | 700 | 3.5 s | 220 | 40 | 150 / 90 | 2700 HP *(V2.0: 3300)*, chain 79 |
 
 - **Lantern Soul:** killed, it is **freed** and pays like any kill. It rises and brightens into teal-white light, then fades upward with a soft chime (0.9 s), in place of the grey fade. Its health bar goes at once.
 - **Spectral Rider:** it walks in until Lucian is within 800 (and keeps 250 away while the charge cools down). When the charge is ready it locks a red line (800 × 90) toward him and stands 0.8 s. Then it charges along the line at 1400 px/s. A hit is 60 physical (× 1.75) and a **push of 150** along the charge, at 1600 px/s. It hits at most once per charge. A wall or the abyss stops it. Step sideways to dodge. A perched rider never charges (it only faces him).
@@ -168,7 +168,7 @@ The abyss is several polygons (none has a hole) on the `CHASM` physics layer. It
 *(V2.0: Thresh's domain is redrawn with `MapArt`. The plateaus are slate flagstones with lit lips and cliff faces. The abyss is layered, with far chains and souls. The stone bridges carry lantern light. The altar and Hecarim's camp are drawn in. The final platform has slab courses, its 32 glowing runes and a pale dais. Walls, bridges, ledges, points and numbers are as above. Game design doc §13, "Built in V2.0".)*
 
 ### Karthus, revived (`karthus_revived`, mini boss, stage 6-2)
-Last in wave 6, at his altar. Ranged bolt, 85 magic (900 px/s), range 600, every 1.5 s. 16000 HP, armor 30, MR 60, speed 250, radius 46. The art is Karthus's with a pale teal tint. Pays as Maokai does (300 gold, 50 blue, 3 orange, 5 purple the first time, 1 after).
+Last in wave 6, at his altar. Ranged bolt, 85 magic (900 px/s), range 600, every 1.5 s. 16000 HP *(V2.0: 21000)*, armor 30, MR 60, speed 250, radius 46. The art is Karthus's with a pale teal tint. Pays as Maokai does (300 gold, 50 blue, 3 orange, 5 purple the first time, 1 after).
 
 | Skill | Numbers |
 |---|---|
@@ -178,7 +178,7 @@ Last in wave 6, at his altar. Ranged bolt, 85 magic (900 px/s), range 600, every
 He walks at Lucian (250 px/s) and keeps firing while he walks. He stops at 280, inside his own ring, so Lucian (range 500) has to kite him. No Wall of Pain, no Requiem.
 
 ### Hecarim (`hecarim`, mini boss, stage 6-4)
-Last in wave 7, from the east end. Melee, 100 physical, range 110, every 1.3 s. 18000 HP, armor 50, MR 40, speed 360, radius 56. Same rewards as Karthus, revived.
+Last in wave 7, from the east end. Melee, 100 physical, range 110, every 1.3 s. 18000 HP *(V2.0: 25000)*, armor 50, MR 40, speed 360, radius 56. Same rewards as Karthus, revived.
 
 | Skill | Numbers |
 |---|---|
@@ -186,7 +186,7 @@ Last in wave 7, from the east end. Melee, 100 physical, range 110, every 1.3 s. 
 | **Onslaught of Shadows** | At 80% HP or less. A red band (1100 × 300) for 1.0 s, then he rides along it at 1600 px/s with **four ghost riders** (the rider art at 55% alpha) beside him, 40 and 130 behind him. The pack is the hit area: Lucian inside the band, from Hecarim's radius ahead of him to **180 behind him** (the last riders' backs) along the ride, is hit once: 150 magic and a **fear of 1.0 s**. A step into the band behind the pack is safe. The fear runs from the nearest point on the ride's centre line, so he runs **sideways out of the band** (right on the line, to one side). A wall that stops the ride short means no hit. Cooldown 18 s, first use 2 s in; never during a Charge. |
 
 ### Thresh, final (`thresh_final`, boss, stage 6-5)
-Boss wave. Chain whip bolt, 85 physical (900 px/s), range 450, every 1.6 s. 16000 HP **per phase**, armor 45, MR 45, speed 320, radius 48. `thresh.svg`. He is Act 1's Thresh with his skill numbers as variables.
+Boss wave. Chain whip bolt, 85 physical (900 px/s), range 450, every 1.6 s. 16000 HP **per phase** *(V2.0: 22000)*, armor 45, MR 45, speed 320, radius 48. `thresh.svg`. He is Act 1's Thresh with his skill numbers as variables.
 
 **Phase 1 (Q, E, R).**
 
@@ -206,7 +206,7 @@ Boss wave. Chain whip bolt, 85 physical (900 px/s), range 450, every 1.6 s. 1600
 | **Dark Passage (W)** | Throws his lantern to a spot within 250 of Lucian (a circle warning r 100, 0.6 s; the spot has room for the circle). The lantern lies there 6 s and **3 Lantern Souls** come out at once, 60 px round it. Used within 1000. Cooldown 16 s. **Only while fewer than 6 of his souls are alive.** *(V1.5.0: he harvests them; see below.)* |
 | **The Box (R)** | As in Phase 1, but **220 magic**, cooldown 18 s. |
 
-**The harvest (V1.5.0).** When one of his own Lantern Souls (one from Dark Passage, not a wave's) is killed within **400** of him, he heals **3% of his max HP**, at most **10 times a fight** (30%), so the souls can't stall it. His souls keep their distance from Lucian, so the trigger is a soul dying near Thresh, not one reaching him. Nothing is harvested while he is down, rising or fallen. Grievous Wounds cuts the heal by 40%, and it shows as a green "+N" over him. Kill the souls away from him, or let them be.
+**The harvest (V1.5.0).** When one of his own Lantern Souls (one from Dark Passage, not a wave's) is killed within **400** of him, he heals **3% of his max HP** (660 at V2.0's 22000), at most **10 times a fight** (30%), so the souls can't stall it. His souls keep their distance from Lucian, so the trigger is a soul dying near Thresh, not one reaching him. Nothing is harvested while he is down, rising or fallen. Grievous Wounds cuts the heal by 40%, and it shows as a green "+N" over him. Kill the souls away from him, or let them be.
 
 **The fall.** At 0 HP in Phase 2 he never dies in the usual way: the fight clears every warning and shot, every summoned Lantern Soul **vanishes** (freed, no pay), and the ending cutscene plays. The freed souls rise, brighten and fade with the chime as the scene begins (their fade runs while the world is frozen), and are gone before its first line. His blue (100) and orange (5) are paid where he stood, with the line "Senna is free". Clearing 6-5 pays **20 purple the first time, 4 after**.
 
@@ -232,7 +232,28 @@ The letters are the ones above (w mist walker, l lantern soul, R rider, C warden
 | 6-4 | 7 | 10.6k · 11.4k · 17.1k · 19.7k · 20.6k · 23.9k · 30.2k | 133k |
 | 6-5 | 7 + Thresh | 10.6k · 12.5k · 17.9k · 21.0k · 22.0k · 24.9k · 37.2k | 146k |
 
-The waves hold about **531k HP**, plus 66k for the two mini bosses and Thresh (two phases). *(V1.5.0: the table is recomputed from the code. It still held Phase 8's numbers, from before the V1.3 balance pass: 1,094k in all. 6-2's Mist Walkers and Lantern Souls now have 10% less HP.)*
+The waves hold about **531k HP**, plus 66k for the two mini bosses and Thresh (two phases). *(V2.0: about 1,043k, plus 90k for Karthus, revived 21000, Hecarim 25000 and Thresh 22000 a phase; see below.)* *(V1.5.0: the table is recomputed from the code. It still held Phase 8's numbers, from before the V1.3 balance pass: 1,094k in all. 6-2's Mist Walkers and Lantern Souls now have 10% less HP.)*
+
+**Waves in V2.0** (before V2.0: the tables above). The same letters. HP is each wave's total after scaling (×2.75 for Act 6), summons and the mini bosses not counted; a mini boss's HP is the second figure of its wave.
+
+| Stage | Waves | Mini boss / boss |
+|---|---|---|
+| 6-1 | 8w 4l · 8w 6l · 8w 6l 1R · 10w 6l 1C · 10w 8l 1R · 10w 8l 1R 1C · 12w 8l 1R 1C · 12w 10l 2R | — |
+| 6-2 | 8w 6l · 10w 6l 1R · 10w 6l 1C · 10w 8l 1R · 12w 8l 1C · 12w 8l 1R 1C · 12w 10l 2R · 12w 8l 1R 1C | **Karthus, revived** last in wave 8 |
+| 6-3 | 10w 6l · 10w 8l 1R · 10w 8l 1C · 12w 8l 1R · 12w 8l 2C · 12w 10l 1R 1C · 14w 10l 2R 1C · 14w 10l 2R 2C · 14w 12l 2R 2C | — |
+| 6-4 | 10w 8l 1R · 10w 8l 1C · 12w 8l 1R 1C · 12w 10l 2R · 12w 10l 2C · 14w 10l 1R 1C · 14w 10l 2R 1C · 14w 12l 1R 2C · 14w 10l 2R 1C | **Hecarim** last in wave 9 |
+| 6-5 | 10w 8l 1R · 12w 8l 1C · 12w 10l 1R 1C · 14w 10l 2R · 14w 10l 2C · 14w 12l 1R 1C · 16w 12l 2R 2C · 16w 14l 2R 2C · 18w 14l 3R 2C | boss wave: **Thresh** alone |
+
+| Stage | Waves | HP per wave | Total |
+|---|---|---|---|
+| 6-1 | 8 | 5.2k · 6.4k · 11.3k · 13.2k · 15.5k · 21.5k · 24.5k · 27.6k | 125k |
+| 6-2 | 8 | 6.6k · 12.4k · 13.2k · 15.6k · 17.9k · 24.6k · 27.8k · 27.8k + 21.0k | 146k |
+| 6-3 | 9 | 8.5k · 14.2k · 15.2k · 18.4k · 24.0k · 27.4k · 36.9k · 44.8k · 48.9k | 238k |
+| 6-4 | 9 | 12.9k · 13.9k · 20.9k · 24.1k · 25.2k · 29.2k · 36.9k · 40.1k · 41.5k + 25.0k | 245k |
+| 6-5 | 9 + Thresh | 12.9k · 15.2k · 21.9k · 25.7k · 26.9k · 30.4k · 45.4k · 49.6k · 61.2k | 289k |
+
+The waves hold about **1,043k HP**, plus 90k for the two mini bosses and Thresh (Karthus, revived 21000, Hecarim 25000, Thresh 22000 in each of two phases). Act 6 has 43 waves. Lucian ends every stage at level 18 from 6-1 on, with 18,225, 20,257, 27,337, 29,055 and 33,007 gold before the boss waves (an average of 25,636 a stage with the bosses' gold). The walls (a boss's health divided by the gold earned in its stage before its wave) are 1.23 for Karthus, revived, 1.00 for Hecarim and 0.67 for Thresh.
+
 
 ### Art
 Hand-written SVGs: the Mist Walker (a lean grey ghoul trailing mist), the Lantern Soul (a teal-green wisp with a sad face), the Spectral Rider (a ghost knight on a spectral horse), the Chain Warden (a hooded jailer with a chain and a hook), and Hecarim (a spectral centaur with a lance and green-blue flame, 136 × 112). Karthus, revived reuses Karthus's art, tinted; Thresh reuses Act 1's.
