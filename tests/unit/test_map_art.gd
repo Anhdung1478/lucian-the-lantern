@@ -5,6 +5,10 @@ const AREA := Rect2(100, 50, 800, 600)
 const WALL := [Vector2(0, 0), Vector2(400, 0), Vector2(400, 100), Vector2(100, 100), Vector2(100, 300), Vector2(0, 300)]
 
 
+## Stages ([act, stage]) whose maps have ambient life.
+const AMBIENT_STAGES := [[1, 1], [4, 1]]
+
+
 ## A small map with a firefly.
 class LitMap:
 	extends StageMap
@@ -174,3 +178,18 @@ func test_a_map_adds_its_ambience_off_on_low_effects() -> void:
 	var ambience: MapAmbience = map.get_node("Ambience")
 	assert_false(ambience.visible)
 	assert_false(ambience.is_processing())
+
+
+func test_a_map_s_motes_stay_on_it() -> void:
+	for act_stage: Array in AMBIENT_STAGES:
+		var map := StageMaps.create(act_stage[0], act_stage[1])
+		var ambience := map.build_ambience()
+		assert_not_null(ambience, str(act_stage))
+		if ambience:
+			assert_gt(ambience.count(), 0, str(act_stage))
+			for i in ambience.count():
+				for time: float in [0.0, 7.0, 31.0]:
+					assert_true(map.get_bounds().grow(MapAmbience.FIREFLY_ROAM.length()).has_point(ambience.place_of(i, time)),
+						"%s: mote %d" % [act_stage, i])
+			ambience.free()
+		map.free()
