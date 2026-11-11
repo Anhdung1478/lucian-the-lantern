@@ -88,9 +88,25 @@ const STUB_SPAWN_BACK := 110.0
 # The art.
 const ABYSS_COLOR := Color("040706")
 const MIST_COLOR := Color(0.3, 0.85, 0.55)
-## Haze patches lying in the abyss, and their alpha.
+## The abyss's layers, far to near: patches of green haze and of dark mist
+## (how many, their radius range, the haze's alpha, the dark's), then a
+## nearer layer of the same, then chains hanging far below (how many, how far
+## apart their ends, how faint).
 const HAZE_PATCHES := 40
-const HAZE_ALPHA := 0.035
+const HAZE_RADIUS := Vector2(260, 560)
+const HAZE_ALPHA := 0.05
+const MURK_ALPHA := 0.5
+const NEAR_PATCHES := 26
+const NEAR_RADIUS := Vector2(140, 300)
+const FAR_CHAINS := 10
+const FAR_CHAIN_SPAN := Vector2(500, 1100)
+const FAR_CHAIN_FADE := 0.24
+## Souls drifting far below and motes over the ground: how many tries each
+## gets to find its place, and their colours.
+const SOUL_TRIES := 80
+const SOUL_COLOR := Color(0.55, 1.0, 0.8, 0.5)
+const MOTE_TRIES := 70
+const MOTE_COLOR := Color(0.55, 1.0, 0.8, 0.3)
 ## The mist swirls (x, y, radius), stages 1 to 4 and the platform: arms, the
 ## points along an arm, how far round an arm winds, its width (share of the
 ## radius), its alpha at the brightest.
@@ -112,32 +128,63 @@ const SWIRL_ALPHA := 0.07
 ## Radians a second the mist turns (each swirl a little faster or slower,
 ## every other one the other way).
 const SWIRL_SPEED := 0.05
-const SLATE := Color("2b3134")
-const SLATE_DARK := Color("1c2124")
-const SLATE_EDGE := Color("4f5a60")
-## Paving slabs on the plateaus: their size, and how far their shade varies.
-const SLAB := 120.0
-const SLAB_SHADE := 0.06
+## The plateaus' slate: slabs (a straight grid of this size, how far their
+## shade varies, the joint between them), the cliff below an edge (how deep,
+## its two shades), the lit lip, and what each edge casts into the abyss.
+const SLATE := Color("3a4247")
+const SLATE_JOINT := Color("20272a")
+const SLATE_EDGE := Color("6a7a82")
+const SLAB := Vector2(150, 150)
+const SLAB_SHADE := 0.05
+const SLAB_JOINT := 4.0
+const CLIFF_DEPTH := 40.0
+const CLIFF_LOW := Color("0d1113")
+const CLIFF_MID := Color("182024")
+const CLIFF_CRACK_STEP := 70.0
+const EDGE_SHADOW := 80.0
+## Wear on a plateau: soft patches (how many per px², their radius range),
+## cracks per px² (dark ones, and glowing green ones), pebbles per px², and
+## how far from an edge each stays.
+const PATCHES_PER_AREA := 1.0 / 90000.0
+const PATCH_RADIUS := Vector2(90, 160)
+const CRACKS_PER_AREA := 1.0 / 40000.0
+const GLOW_CRACKS_PER_AREA := 1.0 / 130000.0
+const PEBBLES_PER_AREA := 1.0 / 30000.0
+const CRACK_KEEP := 90.0
 const CRACK_GLOW := Color(0.35, 1.0, 0.6, 0.1)
 const CRACK_CORE := Color(0.55, 1.0, 0.75, 0.3)
-## Cracks per px² of a plateau's box.
-const CRACKS_PER_AREA := 1.0 / 90000.0
-const STONE := Color("47453f")
-const STONE_JOINT := Color("34322e")
-const STONE_EDGE := Color("29282a")
-const PAVING := 46.0
+const CRACK_DARK := Color(0.05, 0.07, 0.08, 0.5)
+## Mist curling over a cliff's lip onto the stone: a wisp this far apart.
+const LIP_MIST_STEP := 110.0
+const LIP_MIST_RADIUS := 80.0
+const LIP_MIST_ALPHA := 0.04
+## The bridges' stone and their curbs, the paving's slab size, and how
+## far they cast into the abyss.
+const STONE := Color("4b5253")
+const STONE_JOINT := Color("2c3334")
+const STONE_EDGE := Color("6f7c80")
+const PAVING := Vector2(92, 46)
+const CURB := 12.0
+const BRIDGE_SHADOW := 60.0
 const LANTERN_GAP := 150.0
 ## No lantern this close to a bridge's ends.
 const LANTERN_INSET := 40.0
 const LANTERN_POST := Color("121516")
+const LANTERN_POOL := 120.0
 const LANTERN_GLOW := Color(0.4, 1.0, 0.7, 0.16)
 const LANTERN_FLAME := Color("b9ffd9")
 const CHAIN_DARK := Color("15181a")
-const CHAIN_COLOR := Color("3a3f43")
-const CHAIN_SHINE := Color("666e73")
+const CHAIN_COLOR := Color("4a5156")
+const CHAIN_SHINE := Color("7b858b")
 const CHAIN_LINK := 18.0
 ## How far a chain sags, as a share of its length.
 const CHAIN_SAG := 0.12
+## A chain bolted to a plateau runs on over its stone this far, in a plate.
+const BOLTED_LENGTH := 170.0
+const BOLTED_SCALE := 0.75
+const PLATE_SIZE := 44.0
+## A chain's end counts as on a plateau this close to its edge.
+const ANCHOR_REACH := 60.0
 ## Stages 1 to 4: rocks rising from the abyss (x, y, radius), and the chains
 ## hung from them (from x, from y, to x, to y), to the plateaus' edges, off
 ## the map, and across the gaps between the bridges.
@@ -154,27 +201,74 @@ const CHAINS: Array[Vector4] = [
 	Vector4(5250, 2980, 5000, 2475),
 	Vector4(1675, 1520, 2325, 1880), Vector4(3275, 1880, 3925, 1520),
 ]
-const ROCK := Color("343b3f")
+## The rock spikes: their colour, how tall they stand (the shadow they cast),
+## and a spike rising from the abyss, darker.
+const ROCK := Color("3a4247")
 const ROCK_LIGHT := Color("59636a")
-const ROCK_DARK := Color("161a1c")
+const SPIKE_HEIGHT := 80.0
+const DEEP_ROCK_DARK := 0.4
+## A ledge: its cliff side below it, the worn middle of its top, and the
+## joints cut across it.
+const LEDGE_SIDES := 16
+const LEDGE_FACE := 36.0
+const LEDGE_WORN := 22.0
+const LEDGE_JOINTS := 3
+## The broken bridge's rubble, fallen into the dark under its gap.
+const RUBBLE_BLOCKS := 7
 ## The platform: its stone, the carved rings (radius) and the rune ring
 ## between two of them, its runes, and the chains rising at its rim (how far
 ## out they run to their rocks).
-const PLATFORM_STONE := Color("3a3f43")
-const CARVE_COLOR := Color("23282b")
+const PLATFORM_STONE := Color("454d52")
+const PLATFORM_JOINT := Color("1f2528")
+const CARVE_COLOR := Color("1b2124")
 const CARVED_RINGS: Array[float] = [250.0, 600.0, 1050.0, 1250.0]
+## The masonry: the courses between the rings (how many in each band, from
+## the dais out) and how long a slab is along its course.
+const COURSES: Array[int] = [3, 4, 1, 1]
+const COURSE_SLAB := 140.0
+const COURSE_SHADE := 0.05
+const COURSE_JOINT := 4.0
+## The rune band is a little darker, the rim's coping a little lighter.
+const RUNE_BAND_SHADE := 0.1
+const COPING_SHADE := 0.16
 const RUNE_RING := 1150.0
 const RUNES := 32
 const RUNE_COLOR := Color(0.45, 1.0, 0.7, 0.45)
 const RUNE_GLOW := Color(0.45, 1.0, 0.7, 0.1)
+const RUNE_POOL := 55.0
 const RIM_CHAINS := 16
 const RIM_CHAIN_REACH := 460.0
-## The pale stone heart where Thresh starts: his green-black art (darker
+const PLATFORM_CLIFF := 44.0
+const PLATFORM_SHADOW := 70.0
+## The pale stone dais where Thresh starts: his green-black art (darker
 ## still in Phase 2) vanished on a dark one.
 const HEART_COLOR := Color("5f686d")
+const DAIS_STAR_REACH := 190.0
+const DAIS_POOL := 380.0
 const ALTAR_COLOR := Color("5a6064")
 const ALTAR_SIZE := 200.0
+## The altar's plinth (a share of the slab) and how tall the slab stands.
+const ALTAR_PLINTH := 1.32
+const ALTAR_HEIGHT := 26.0
+const ALTAR_CRACKS := 3
 const HOOF_COLOR := Color(0.35, 1.0, 0.65, 0.22)
+## Hecarim's camp: the scorched ground round it (how many patches, how far
+## out), and the iron stakes ringing it (how many, how far out).
+const SCORCH := Color(0.0, 0.03, 0.02, 0.25)
+const SCORCH_PATCHES := 9
+const SCORCH_REACH := 190.0
+const STAKES := 6
+const STAKE_RING := 175.0
+
+## The pools of light round the camps, and the platform's wear: patches,
+## cracks and glowing cracks over the disc.
+const CAMP_POOL := 200.0
+const PLATFORM_PATCHES := 70
+const PLATFORM_CRACKS := 160
+const PLATFORM_GLOW_CRACKS := 45
+## The map's edges darken, a little less than the other maps'.
+const VIGNETTE_DEPTH := 380.0
+const VIGNETTE_ALPHA := 0.4
 
 var stage := 1
 ## The walkable ground: the plateaus and the bridges (stages 1 to 4), or the
@@ -345,47 +439,119 @@ static func _span(from_x: float, to_x: float, y: float, width: float) -> Rect2:
 	return Rect2(from_x, y - width * 0.5, to_x - from_x, width)
 
 
+
+
+## One bridge, or what is left of one (or a platform's stub): where it
+## leaves its ground, where it ends, how wide it is, and whether it breaks off
+## at `to`.
+class Span:
+	extends RefCounted
+
+	var from: Vector2
+	var to: Vector2
+	var width: float
+	var broken: bool
+
+
+	func _init(from_point: Vector2, to_point: Vector2, wide: float, breaks: bool) -> void:
+		from = from_point
+		to = to_point
+		width = wide
+		broken = breaks
+
+
+## The souls far below and a few motes over the ground, in teal.
+func build_ambience() -> MapAmbience:
+	var ambience := MapAmbience.new()
+	var dice := MapArt.rng(67)
+	ambience.add(MapAmbience.Kind.FIREFLY, MapArt.scatter(dice, get_bounds(), SOUL_TRIES, _over_abyss), SOUL_COLOR, dice)
+	ambience.add(MapAmbience.Kind.DUST, MapArt.scatter(dice, get_bounds().grow(-MapAmbience.DUST_REACH * 0.5), MOTE_TRIES), MOTE_COLOR, dice)
+	return ambience
+
+
+## The bridges as spans: whole ones, the stubs left of the broken one, or the
+## platform's four stubs.
+func _spans() -> Array[Span]:
+	var found: Array[Span] = []
+	if stage == FINAL_STAGE:
+		for i in STUB_DIRECTIONS.size():
+			found.append(Span.new(PLATFORM_CENTER + STUB_DIRECTIONS[i] * PLATFORM_RADIUS, stub_end(i), STUB_WIDTH, true))
+		return found
+	var width := bridge_width(stage)
+	for i in BRIDGES.size():
+		var west := Vector2(BRIDGES[i].x, BRIDGES[i].z)
+		var east := Vector2(BRIDGES[i].y, BRIDGES[i].z)
+		if is_broken(stage, i):
+			found.append(Span.new(west, west + Vector2(BROKEN_STUB, 0), width, true))
+			found.append(Span.new(east, east - Vector2(BROKEN_STUB, 0), width, true))
+		else:
+			found.append(Span.new(west, east, width, false))
+	return found
+
+
+## Whether `point` is over the abyss, not on any ground.
+func _over_abyss(point: Vector2) -> bool:
+	for piece in ground:
+		if Geometry2D.is_point_in_polygon(point, piece):
+			return false
+	return true
+
+
 func _draw() -> void:
 	if stage == FINAL_STAGE:
 		_draw_platform()
-		return
+	else:
+		_draw_plateaus()
+	MapArt.vignette(self, get_bounds(), VIGNETTE_DEPTH, VIGNETTE_ALPHA)
+	_draw_lights()
+
+
+## Stages 1 to 4, far to near: the rocks and ledges in the abyss, the
+## bridges, the plateaus, the chains, the camps and the spikes.
+func _draw_plateaus() -> void:
+	var deep := MapArt.Facets.new()
+	var dice := MapArt.rng(71)
 	for rock in ABYSS_ROCKS:
-		_draw_spike(Vector2(rock.x, rock.y), rock.z, true)
+		MapArt.rock(deep, dice, Vector2(rock.x, rock.y), rock.z, ROCK.darkened(DEEP_ROCK_DARK))
+	deep.draw(self)
 	for ledge in ledge_points:
 		_draw_ledge(ledge)
-	var width := bridge_width(stage)
-	for i in BRIDGES.size():
-		var bridge := BRIDGES[i]
-		var west := Vector2(bridge.x, bridge.z)
-		var east := Vector2(bridge.y, bridge.z)
-		if is_broken(stage, i):
-			_draw_causeway(west, west + Vector2(BROKEN_STUB, 0), width, true)
-			_draw_causeway(east, east - Vector2(BROKEN_STUB, 0), width, true)
-			_draw_rubble(west.lerp(east, 0.5), width)
-		else:
-			_draw_causeway(west, east, width, false)
+	for span in _spans():
+		_draw_causeway(span)
+	if is_broken(stage, BROKEN_BRIDGE):
+		var gap := BRIDGES[BROKEN_BRIDGE]
+		_draw_rubble(Vector2((gap.x + gap.y) * 0.5, gap.z), bridge_width(stage))
 	var plateau_list := plateaus()
 	for i in plateau_list.size():
 		_draw_plateau(plateau_list[i], 71 + i)
+	var chains := MapArt.Facets.new()
 	for chain in CHAINS:
-		_draw_chain(Vector2(chain.x, chain.y), Vector2(chain.z, chain.w))
+		var from := Vector2(chain.x, chain.y)
+		var to := Vector2(chain.z, chain.w)
+		_chain(chains, from, to)
+		_bolt_down(chains, from, to)
+		_bolt_down(chains, to, from)
+	chains.draw(self)
 	if camps.has(&"karthus_revived"):
 		_draw_altar(camps[&"karthus_revived"])
 	if camps.has(&"hecarim"):
-		_draw_hoofmarks(camps[&"hecarim"])
-	for spike in wall_circles:
-		_draw_spike(Vector2(spike.x, spike.y), spike.z, false)
+		_draw_camp(camps[&"hecarim"])
+	_draw_spikes()
 
 
-## Under the ground: the abyss's near black, past the map's edges too, with
-## faint patches of green haze.
+## Under the ground: the abyss's near black, past the map's edges too, then
+## its layers of mist, and chains hanging far below.
 func _draw_depths(depths: Node2D) -> void:
-	depths.draw_rect(get_bounds().grow(WALL_THICKNESS * 2.0), ABYSS_COLOR)
-	var haze := RandomNumberGenerator.new()
-	haze.seed = 61
-	for i in HAZE_PATCHES:
-		var at := Vector2(haze.randf_range(0.0, size.x), haze.randf_range(0.0, size.y))
-		depths.draw_circle(at, haze.randf_range(200.0, 500.0), Color(MIST_COLOR, HAZE_ALPHA))
+	depths.draw_rect(get_bounds().grow(MapArt.OUTSIDE_REACH), ABYSS_COLOR)
+	var area := get_bounds().grow(WALL_THICKNESS * 2.0)
+	MapArt.patches(depths, MapArt.rng(61), area, HAZE_PATCHES, HAZE_RADIUS, Color(MIST_COLOR, HAZE_ALPHA), Color(MapArt.SHADOW, MURK_ALPHA))
+	var far := MapArt.Facets.new()
+	var dice := MapArt.rng(62)
+	for i in FAR_CHAINS:
+		var from := area.position + Vector2(dice.randf(), dice.randf()) * area.size
+		_chain(far, from, from + Vector2.from_angle(dice.randf() * TAU) * dice.randf_range(FAR_CHAIN_SPAN.x, FAR_CHAIN_SPAN.y), 0.6, FAR_CHAIN_FADE)
+	far.draw(depths)
+	MapArt.patches(depths, MapArt.rng(63), area, NEAR_PATCHES, NEAR_RADIUS, Color(MIST_COLOR, HAZE_ALPHA * 0.8), Color(MapArt.SHADOW, MURK_ALPHA))
 
 
 ## A swirl of mist: a soft heart and arms winding out from it, fading at
@@ -402,230 +568,416 @@ func _draw_swirl(swirl: Node2D, radius: float) -> void:
 		swirl.draw_polyline_colors(points, colors, radius * SWIRL_WIDTH, true)
 
 
-## A slate plateau: paving slabs, faint green cracks, and its cliff edge.
+## A slate plateau: the shadow its edge casts into the abyss, its cliff, its
+## flagstones, patches, cracks and pebbles, and the lit lip.
 func _draw_plateau(polygon: PackedVector2Array, seed_number: int) -> void:
-	var dice := RandomNumberGenerator.new()
-	dice.seed = seed_number
-	var box := _bounds_of(polygon)
-	draw_colored_polygon(polygon, SLATE)
-	var y := box.position.y + SLAB * 0.5
-	while y < box.end.y:
-		var x := box.position.x + SLAB * 0.5
-		while x < box.end.x:
-			var at := Vector2(x, y)
-			var shade := dice.randf_range(-SLAB_SHADE, SLAB_SHADE)
-			if Geometry2D.is_point_in_polygon(at, polygon) and _distance_to_edge(at, polygon) > SLAB * 0.5:
-				var slab := SLATE.lightened(shade) if shade > 0.0 else SLATE.darkened(-shade)
-				draw_rect(Rect2(at - Vector2.ONE * SLAB * 0.46, Vector2.ONE * SLAB * 0.92), slab)
-			x += SLAB
-		y += SLAB
-	for i in ceili(box.get_area() * CRACKS_PER_AREA):
-		_draw_crack(polygon, box, dice)
-	for ring in Geometry2D.offset_polygon(polygon, -16.0):
-		_draw_outline(ring, SLATE_DARK, 6.0)
-	_draw_outline(polygon, SLATE_EDGE, 8.0)
+	var dice := MapArt.rng(seed_number)
+	var box := MapArt.bounds_of(polygon)
+	var low := _shifted(polygon, Vector2(0, CLIFF_DEPTH))
+	MapArt.cast_shadow(self, low, EDGE_SHADOW, 0.35)
+	draw_colored_polygon(low, CLIFF_LOW)
+	draw_colored_polygon(_shifted(polygon, Vector2(0, CLIFF_DEPTH * 0.55)), CLIFF_MID)
+	var strata := MapArt.Facets.new()
+	for i in polygon.size():
+		if MapArt.inward(polygon, i).y < -0.3:
+			for at in MapArt.along_edge(polygon, i, CLIFF_CRACK_STEP, 0.0):
+				strata.line(at, at + Vector2(dice.randf_range(-4.0, 4.0), CLIFF_DEPTH * dice.randf_range(0.5, 0.95)), 3.0, Color(CLIFF_LOW, 0.7))
+	strata.draw(self)
+	_draw_flagstones(box, dice)
+	var wear := MapArt.Facets.new()
+	var area := box.get_area()
+	var keep := is_walkable.bind(CRACK_KEEP)
+	for at in MapArt.scatter(dice, box, ceili(area * CRACKS_PER_AREA), keep):
+		MapArt.crack(wear, dice, at, dice.randf_range(30.0, 80.0), 2.0, CRACK_DARK)
+	for at in MapArt.scatter(dice, box, ceili(area * GLOW_CRACKS_PER_AREA), keep):
+		var shape := dice.randi()
+		var length := dice.randf_range(40.0, 90.0)
+		MapArt.crack(wear, MapArt.rng(shape), at, length, 8.0, CRACK_GLOW)
+		MapArt.crack(wear, MapArt.rng(shape), at, length, 2.0, CRACK_CORE)
+	for at in MapArt.scatter(dice, box, ceili(area * PATCHES_PER_AREA), is_walkable.bind(PATCH_RADIUS.y)):
+		var radius := dice.randf_range(PATCH_RADIUS.x, PATCH_RADIUS.y)
+		var tint := Color(SLATE.lightened(0.18), 0.3) if dice.randf() < 0.5 else Color(SLATE.darkened(0.4), 0.35)
+		MapArt.soft_oval(self, at, Vector2(radius * dice.randf_range(1.0, 1.4), radius), tint)
+	wear.draw(self)
+	for at in MapArt.scatter(dice, box, ceili(area * PEBBLES_PER_AREA), is_walkable.bind(40.0)):
+		MapArt.pebble(self, dice, at, dice.randf_range(3.0, 7.0), SLATE.lightened(0.12))
+	for ring in Geometry2D.offset_polygon(polygon, -14.0):
+		_draw_outline(ring, SLATE_JOINT, 4.0)
+	MapArt.rim(self, polygon, SLATE_EDGE, CLIFF_LOW, 6.0)
 
 
-## A crack glowing faintly green: a crooked line from a random spot well
-## inside `polygon`, stopping before its edge.
-func _draw_crack(polygon: PackedVector2Array, box: Rect2, dice: RandomNumberGenerator) -> void:
-	var at := Vector2(dice.randf_range(box.position.x, box.end.x), dice.randf_range(box.position.y, box.end.y))
-	var heading := dice.randf() * TAU
-	var points := PackedVector2Array([at])
-	for step in dice.randi_range(3, 6):
-		heading += dice.randf_range(-0.7, 0.7)
-		at += Vector2.from_angle(heading) * dice.randf_range(25.0, 60.0)
-		if not Geometry2D.is_point_in_polygon(at, polygon) or _distance_to_edge(at, polygon) < 30.0:
-			break
-		points.append(at)
-	if points.size() < 2 or not Geometry2D.is_point_in_polygon(points[0], polygon):
-		return
-	draw_polyline(points, CRACK_GLOW, 8.0, true)
-	draw_polyline(points, CRACK_CORE, 2.0, true)
+## A plateau's slabs: its box less the corners is two boxes crossed, each
+## paved on the same square grid so the joints run on across.
+func _draw_flagstones(box: Rect2, dice: RandomNumberGenerator) -> void:
+	var parts: Array[Rect2] = [
+		Rect2(box.position.x + CORNER_CUT, box.position.y, box.size.x - CORNER_CUT * 2.0, box.size.y),
+		Rect2(box.position.x, box.position.y + CORNER_CUT, CORNER_CUT, box.size.y - CORNER_CUT * 2.0),
+		Rect2(box.end.x - CORNER_CUT, box.position.y + CORNER_CUT, CORNER_CUT, box.size.y - CORNER_CUT * 2.0),
+	]
+	for part in parts:
+		MapArt.tiles(self, dice, part, SLAB, SLATE, SLATE_JOINT, SLAB_SHADE, SLAB_JOINT, 0.0)
 
 
-## A stone causeway from `from` (where it leaves its ground) to `to`, `width`
-## wide: paving joints, curbs and soul lanterns along both edges. Its base
-## runs on under the ground at `from` (and at `to` when whole); a broken one
-## ends in jagged stone at `to`.
-func _draw_causeway(from: Vector2, to: Vector2, width: float, broken: bool) -> void:
-	var along := from.direction_to(to)
-	var side := along.orthogonal() * width * 0.5
-	var start := from - along * BRIDGE_OVERLAP
-	var end := to if broken else to + along * BRIDGE_OVERLAP
-	draw_colored_polygon(PackedVector2Array([start + side, end + side, end - side, start - side]), STONE)
-	var length := from.distance_to(to)
-	var step := PAVING
-	while step < length:
-		var at := from + along * step
-		draw_line(at + side * 0.85, at - side * 0.85, STONE_JOINT, 2.0)
-		step += PAVING
-	draw_line(start + side, end + side, STONE_EDGE, 10.0)
-	draw_line(start - side, end - side, STONE_EDGE, 10.0)
-	if broken:
+## `polygon` moved by `by`.
+static func _shifted(polygon: PackedVector2Array, by: Vector2) -> PackedVector2Array:
+	var moved := PackedVector2Array()
+	for point in polygon:
+		moved.append(point + by)
+	return moved
+
+
+## A stone causeway: its shadow in the abyss, fitted paving, curbs along
+## both edges, its soul lanterns, and a jagged end where it is broken. Its
+## base runs on under the ground at `from` (and at its far end when whole).
+func _draw_causeway(span: Span) -> void:
+	var along := span.from.direction_to(span.to)
+	var side := along.orthogonal() * span.width * 0.5
+	var curb := side.normalized() * CURB
+	var start := span.from - along * BRIDGE_OVERLAP
+	var end := span.to if span.broken else span.to + along * BRIDGE_OVERLAP
+	var deck := PackedVector2Array([start + side, end + side, end - side, start - side])
+	var dice := MapArt.rng(hash(span.from))
+	MapArt.cast_shadow(self, deck, BRIDGE_SHADOW)
+	var tile := PAVING if absf(along.x) > 0.5 else Vector2(PAVING.y, PAVING.x)
+	MapArt.tiles(self, dice, MapArt.bounds_of(deck), tile, STONE, STONE_JOINT, 0.05, 3.0)
+	var marks := MapArt.Facets.new()
+	for way: float in [-1.0, 1.0]:
+		var edge := side * way
+		var inner := curb * way
+		marks.quad(start + edge, end + edge, end + edge - inner, start + edge - inner, STONE.lightened(0.1))
+		marks.line(start + edge - inner, end + edge - inner, 2.5, Color(MapArt.SHADOW, 0.45))
+	var length := span.from.distance_to(span.to)
+	for at in MapArt.scatter_band(dice, span.from, span.to, span.width * 0.5 - CURB - 6.0, ceili(length / 60.0)):
+		MapArt.crack(marks, dice, at, dice.randf_range(14.0, 30.0), 2.0, CRACK_DARK)
+	marks.draw(self)
+	MapArt.rim(self, deck, STONE_EDGE, CLIFF_LOW, 4.0)
+	if span.broken:
 		var teeth := PackedVector2Array([end + side])
 		for k in 5:
 			teeth.append(end + side - side * 2.0 * (k + 0.5) / 5.0 + along * (16.0 if k % 2 == 0 else 5.0))
 		teeth.append(end - side)
-		draw_colored_polygon(teeth, STONE)
-	step = LANTERN_INSET
+		draw_colored_polygon(teeth, STONE.darkened(0.1))
+		_draw_outline(teeth, CLIFF_LOW, 3.0)
+	for at in _lantern_spots(span):
+		_draw_lantern(at)
+
+
+## Where a causeway's soul lanterns stand: LANTERN_GAP apart along both
+## curbs, none near its ends.
+static func _lantern_spots(span: Span) -> PackedVector2Array:
+	var along := span.from.direction_to(span.to)
+	var side := along.orthogonal() * span.width * 0.5
+	var length := span.from.distance_to(span.to)
+	var spots := PackedVector2Array()
+	var step := LANTERN_INSET
 	while step <= length - LANTERN_INSET:
 		for way: float in [-1.0, 1.0]:
-			_draw_lantern(from + along * step + side * way * 0.8)
+			spots.append(span.from + along * step + side * way * 0.8)
 		step += LANTERN_GAP
+	return spots
 
 
-## A soul lantern on a post: a pale green flame and its glow.
+## A soul lantern's post: its shadow, an iron base and the flame's cage. Its
+## light is drawn last (_draw_lights).
 func _draw_lantern(at: Vector2) -> void:
-	draw_circle(at, 26.0, LANTERN_GLOW)
-	draw_circle(at, 9.0, LANTERN_POST)
-	draw_circle(at, 4.5, LANTERN_FLAME)
+	MapArt.disc(self, at + MapArt.SHADOW_DIR * 5.0, 9.0, Color(MapArt.SHADOW, 0.5))
+	MapArt.disc(self, at, 10.0, LANTERN_POST.lightened(0.25))
+	MapArt.disc(self, at + MapArt.SHADOW_DIR * 1.5, 8.0, LANTERN_POST)
+	MapArt.disc(self, at, 4.5, LANTERN_FLAME)
 
 
 ## Blocks of the broken bridge, fallen into the dark under its gap.
 func _draw_rubble(at: Vector2, width: float) -> void:
-	var dice := RandomNumberGenerator.new()
-	dice.seed = 29
-	for i in 7:
+	var dice := MapArt.rng(29)
+	var blocks := MapArt.Facets.new()
+	for i in RUBBLE_BLOCKS:
 		var middle := at + Vector2(dice.randf_range(-120.0, 120.0), dice.randf_range(-width, width) * 0.5)
 		var half := dice.randf_range(14.0, 26.0)
 		var turn := dice.randf() * TAU
 		var block := PackedVector2Array()
 		for corner in 4:
 			block.append(middle + Vector2.from_angle(turn + TAU * corner / 4.0) * half)
-		draw_colored_polygon(block, STONE.darkened(0.6))
+		blocks.fan(block, STONE.darkened(0.6))
+		blocks.line(block[0], block[1], 2.5, STONE.darkened(0.3))
+	blocks.draw(self)
 
 
-## A chain sagging from `from` to `to`, link by link, with an iron staple at
-## each end.
-func _draw_chain(from: Vector2, to: Vector2) -> void:
-	var bend := (from + to) * 0.5 + Vector2(0, from.distance_to(to) * CHAIN_SAG)
-	var links := maxi(ceili(from.distance_to(to) * 1.05 / CHAIN_LINK), 2)
+## A chain sagging from `from` to `to`, gathered into `into`: a dark line
+## under it, then its links (one lying along it, the next turned across it)
+## and an iron staple at each end. `scale` sizes the links, `fade` dims them
+## all and `sag` is how far it hangs, as a share of its length.
+static func _chain(into: MapArt.Facets, from: Vector2, to: Vector2, scale := 1.0, fade := 1.0, sag := CHAIN_SAG) -> void:
+	var dark := Color(CHAIN_DARK, fade)
+	var iron := Color(CHAIN_COLOR, fade)
+	var shine := Color(CHAIN_SHINE, fade)
+	var bend := (from + to) * 0.5 + Vector2(0, from.distance_to(to) * sag)
+	var links := maxi(ceili(from.distance_to(to) * 1.05 / (CHAIN_LINK * scale)), 2)
 	var points := PackedVector2Array()
 	for i in links + 1:
 		var t := float(i) / links
 		points.append(from.lerp(bend, t).lerp(bend.lerp(to, t), t))
-	draw_polyline(points, CHAIN_DARK, 8.0, true)
 	for i in links:
-		var middle := (points[i] + points[i + 1]) * 0.5
+		into.line(points[i], points[i + 1], 8.0 * scale, dark)
+	for i in links:
 		if i % 2 == 0:
-			draw_line(points[i], points[i + 1], CHAIN_COLOR, 4.0, true)
-		else:
-			draw_arc(middle, CHAIN_LINK * 0.45, 0.0, TAU, 10, CHAIN_SHINE, 2.5, true)
+			into.line(points[i], points[i + 1], 4.0 * scale, iron)
+			continue
+		var middle := (points[i] + points[i + 1]) * 0.5
+		var along := points[i].direction_to(points[i + 1])
+		for share: float in [1.0, 0.5]:
+			var ring := PackedVector2Array()
+			for corner in 6:
+				var turn := TAU * corner / 6.0
+				ring.append(middle + along * cos(turn) * CHAIN_LINK * 0.6 * scale * share + along.orthogonal() * sin(turn) * CHAIN_LINK * 0.4 * scale * share)
+			into.fan(ring, shine if share == 1.0 else dark)
 	for end: Vector2 in [from, to]:
-		draw_circle(end, 10.0, CHAIN_DARK)
-		draw_circle(end, 4.0, CHAIN_SHINE)
+		into.fan(_hexagon(end, 10.0 * scale), dark)
+		into.fan(_hexagon(end, 4.0 * scale), shine)
 
 
-## A rock spike seen from above: a jagged star with a lit side and a tip.
-## `deep` ones rise out of the abyss, darker.
-func _draw_spike(at: Vector2, radius: float, deep: bool) -> void:
-	var body := ROCK.darkened(0.35) if deep else ROCK
-	draw_circle(at + Vector2(8, 10), radius, Color(ROCK_DARK, 0.8))
-	draw_colored_polygon(_star(at, radius, 0.72), body)
-	draw_colored_polygon(_star(at - Vector2.ONE * radius * 0.12, radius * 0.55, 0.7), ROCK_LIGHT.darkened(0.35) if deep else ROCK_LIGHT)
-	draw_circle(at - Vector2.ONE * radius * 0.15, radius * 0.12, ROCK_LIGHT.lightened(0.3))
+static func _hexagon(at: Vector2, radius: float) -> PackedVector2Array:
+	var outline := PackedVector2Array()
+	for corner in 6:
+		outline.append(at + Vector2.from_angle(TAU * corner / 6.0) * radius)
+	return outline
 
 
-static func _star(at: Vector2, radius: float, inner: float) -> PackedVector2Array:
-	var points := PackedVector2Array()
-	for i in 12:
-		points.append(at + Vector2.from_angle(TAU * i / 12.0 + 0.2) * radius * (1.0 if i % 2 == 0 else inner))
-	return points
+## Where a chain meets a plateau (`end` is on its stone, at its edge, the
+## chain coming from `other`) it is bolted down: an iron plate, and the
+## chain runs on over the stone, as far as there is room.
+func _bolt_down(into: MapArt.Facets, end: Vector2, other: Vector2) -> void:
+	var anchored := false
+	for piece in ground.slice(0, PLATEAUS.size()):
+		anchored = anchored or (Geometry2D.is_point_in_polygon(end, piece) and MapArt.edge_distance(end, piece) < ANCHOR_REACH)
+	if not anchored:
+		return
+	var way := other.direction_to(end)
+	var length := BOLTED_LENGTH
+	while length > 0.0 and not is_walkable(end + way * length, 30.0):
+		length -= 30.0
+	if length > 0.0:
+		_chain(into, end, end + way * length, BOLTED_SCALE, 0.85, 0.0)
+	var half := way * PLATE_SIZE * 0.5
+	var side := way.orthogonal() * PLATE_SIZE * 0.5
+	into.quad(end - half - side, end + half - side, end + half + side, end - half + side, CHAIN_DARK)
+	into.quad(end - half * 0.8 - side * 0.8, end + half * 0.8 - side * 0.8, end + half * 0.8 + side * 0.8, end - half * 0.8 + side * 0.8, CHAIN_COLOR)
+	for corner: Vector2 in [Vector2(1, 1), Vector2(1, -1), Vector2(-1, 1), Vector2(-1, -1)]:
+		into.fan(_hexagon(end + half * corner.x * 0.55 + side * corner.y * 0.55, 3.0), CHAIN_SHINE)
 
 
-## A small rock island: its cliff side below it, a rough top and a crack.
+## The rock spikes on the plateaus, for cover: each one's shadow, then its
+## faces.
+func _draw_spikes() -> void:
+	var dice := MapArt.rng(73)
+	var rocks := MapArt.Facets.new()
+	for spike in wall_circles:
+		MapArt.round_shadow(self, Vector2(spike.x, spike.y), spike.z, SPIKE_HEIGHT)
+	for spike in wall_circles:
+		MapArt.rock(rocks, dice, Vector2(spike.x, spike.y), spike.z, ROCK)
+	rocks.draw(self)
+
+
+## A small rock island: its cliff side below it, a flat top of slate worn
+## lighter in the middle with joints and a crack, and a lit lip, so a Warden
+## plainly stands on stone.
 func _draw_ledge(at: Vector2) -> void:
-	var dice := RandomNumberGenerator.new()
-	dice.seed = hash(at)
+	var dice := MapArt.rng(hash(at))
 	var top := PackedVector2Array()
-	for i in 16:
-		top.append(at + Vector2.from_angle(TAU * i / 16.0) * LEDGE_RADIUS * dice.randf_range(0.88, 1.0))
-	var side := top.duplicate()
-	for i in side.size():
-		side[i] = side[i] + Vector2(0, 16)
-	draw_colored_polygon(side, ROCK_DARK)
-	draw_colored_polygon(top, ROCK)
-	_draw_outline(top, ROCK_LIGHT, 4.0)
-	_draw_crack(top, _bounds_of(top), dice)
+	for i in LEDGE_SIDES:
+		top.append(at + Vector2.from_angle(TAU * i / LEDGE_SIDES) * LEDGE_RADIUS * dice.randf_range(0.88, 1.0))
+	draw_colored_polygon(_shifted(top, Vector2(0, LEDGE_FACE)), CLIFF_LOW)
+	draw_colored_polygon(_shifted(top, Vector2(0, LEDGE_FACE * 0.55)), CLIFF_MID)
+	draw_colored_polygon(top, SLATE)
+	for ring in Geometry2D.offset_polygon(top, -LEDGE_WORN):
+		draw_colored_polygon(ring, SLATE.lightened(0.06))
+	var marks := MapArt.Facets.new()
+	for i in LEDGE_JOINTS:
+		var turn := Vector2.from_angle(dice.randf() * PI)
+		marks.line(at + turn * LEDGE_RADIUS * 0.8, at - turn * LEDGE_RADIUS * 0.8, 3.0, SLATE_JOINT)
+	MapArt.crack(marks, dice, at + Vector2(dice.randf_range(-30.0, 30.0), dice.randf_range(-30.0, 30.0)), 60.0, 2.0, CRACK_DARK)
+	marks.draw(self)
+	MapArt.rim(self, top, SLATE_EDGE, CLIFF_LOW, 5.0)
 
 
-## 6-2: the revived Karthus's broken altar, a cracked slab with a corner
-## knocked off, in a faint green glow.
+## 6-2: the revived Karthus's broken altar: a plinth, a cracked slab with a
+## corner knocked off (the chunk lying beside it), glowing green in its cracks.
 func _draw_altar(at: Vector2) -> void:
-	draw_circle(at, ALTAR_SIZE * 0.9, Color(MIST_COLOR, 0.08))
-	var half := ALTAR_SIZE * 0.5
+	var dice := MapArt.rng(83)
 	var turn := 0.2
 	var corners: Array[Vector2] = []
+	var plinth := PackedVector2Array()
 	for i in 4:
-		corners.append(at + Vector2(half if i in [1, 2] else -half, half if i >= 2 else -half).rotated(turn))
+		var corner := Vector2(1 if i in [1, 2] else -1, 1 if i >= 2 else -1) * ALTAR_SIZE * 0.5
+		corners.append(at + corner.rotated(turn))
+		plinth.append(at + corner.rotated(turn) * ALTAR_PLINTH)
 	var broken := corners[1]
 	var cut_a := broken.lerp(corners[0], 0.35)
 	var cut_b := broken.lerp(corners[2], 0.35)
 	var slab := PackedVector2Array([corners[0], cut_a, cut_b, corners[2], corners[3]])
+	MapArt.cast_shadow(self, plinth, ALTAR_HEIGHT * 0.5)
+	draw_colored_polygon(plinth, ALTAR_COLOR.darkened(0.45))
+	MapArt.rim(self, plinth, ALTAR_COLOR.lightened(0.1), CLIFF_LOW, 3.0)
+	MapArt.cast_shadow(self, slab, ALTAR_HEIGHT)
 	draw_colored_polygon(slab, ALTAR_COLOR)
-	_draw_outline(slab, ALTAR_COLOR.darkened(0.45), 4.0)
-	var away := at.direction_to(broken) * 26.0
-	draw_colored_polygon(PackedVector2Array([cut_a + away, broken + away, cut_b + away]), ALTAR_COLOR.darkened(0.2))
-	draw_polyline(PackedVector2Array([corners[3].lerp(at, 0.2), at + Vector2(-10, 12), at.lerp(cut_a, 0.5)]), ALTAR_COLOR.darkened(0.5), 3.0, true)
-	draw_polyline(PackedVector2Array([at + Vector2(-10, 12), at.lerp(corners[2], 0.7)]), ALTAR_COLOR.darkened(0.5), 3.0, true)
+	for ring in Geometry2D.offset_polygon(slab, -10.0):
+		draw_colored_polygon(ring, ALTAR_COLOR.lightened(0.07))
+	MapArt.rim(self, slab, ALTAR_COLOR.lightened(0.4), ALTAR_COLOR.darkened(0.5), 4.0)
+	var away := at.direction_to(broken) * 30.0
+	var chunk := PackedVector2Array([cut_a + away, broken + away, cut_b + away])
+	MapArt.cast_shadow(self, chunk, ALTAR_HEIGHT * 0.4)
+	draw_colored_polygon(chunk, ALTAR_COLOR.darkened(0.2))
+	MapArt.rim(self, chunk, ALTAR_COLOR.lightened(0.3), ALTAR_COLOR.darkened(0.5), 3.0)
+	var cracks := MapArt.Facets.new()
+	for i in ALTAR_CRACKS:
+		var shape := dice.randi()
+		var start := at + Vector2(dice.randf_range(-40.0, 40.0), dice.randf_range(-40.0, 40.0))
+		MapArt.crack(cracks, MapArt.rng(shape), start, 70.0, 7.0, CRACK_GLOW)
+		MapArt.crack(cracks, MapArt.rng(shape), start, 70.0, 2.0, CRACK_CORE)
+	cracks.draw(self)
 
 
-## 6-4: Hecarim rides in from the east end: green-scorched hoofprints from
-## the plateau's edge to his camp.
-func _draw_hoofmarks(at: Vector2) -> void:
-	draw_circle(at, 150.0, Color(MIST_COLOR, 0.07))
-	var x := PLATEAUS[2].end.x - 40.0
+## 6-4: Hecarim rides in from the east end: scorched ground, green-burnt
+## hoofprints from the plateau's edge to his camp, and iron stakes ringing it,
+## chained.
+func _draw_camp(at: Vector2) -> void:
+	var dice := MapArt.rng(79)
+	var from := Vector2(PLATEAUS[2].end.x - 40.0, at.y)
+	for spot in MapArt.scatter_band(dice, from, at, 40.0, SCORCH_PATCHES, is_walkable.bind(20.0)):
+		MapArt.soft_oval(self, spot, Vector2(dice.randf_range(60.0, 110.0), dice.randf_range(36.0, 70.0)), SCORCH)
+	for i in SCORCH_PATCHES:
+		var spot := at + Vector2.from_angle(dice.randf() * TAU) * dice.randf() * SCORCH_REACH
+		MapArt.soft_oval(self, spot, Vector2(dice.randf_range(60.0, 110.0), dice.randf_range(36.0, 70.0)), SCORCH)
+	var marks := MapArt.Facets.new()
+	var x := from.x
 	var row := 0
 	while x > at.x - 120.0:
 		var mark := Vector2(x, at.y + (22.0 if row % 2 == 0 else -22.0))
-		draw_arc(mark, 10.0, PI * 0.15 - PI * 0.5, PI * 1.85 - PI * 0.5, 10, HOOF_COLOR, 4.0, true)
+		marks.arc(mark, 10.0, PI * 0.15 - PI * 0.5, PI * 1.85 - PI * 0.5, 4.0, HOOF_COLOR, 8)
 		x -= 45.0
 		row += 1
+	var stakes: Array[Vector2] = []
+	for i in STAKES:
+		var stake := at + Vector2.from_angle(TAU * i / STAKES + 0.3) * STAKE_RING
+		if is_walkable(stake, 20.0):
+			stakes.append(stake)
+	for i in stakes.size() - 1:
+		_chain(marks, stakes[i], stakes[i + 1], 0.45, 0.9, 0.04)
+	marks.draw(self)
+	for stake in stakes:
+		MapArt.disc(self, stake + MapArt.SHADOW_DIR * 4.0, 7.0, Color(MapArt.SHADOW, 0.5))
+		MapArt.disc(self, stake, 7.0, LANTERN_POST.lightened(0.3))
+		MapArt.disc(self, stake, 3.0, CHAIN_SHINE)
 
 
-## 6-5: the stubs, then the carved disc over their ends: carved rings, the
-## rune ring, a pale heart where Thresh stands, and chains rising at the rim.
+## 6-5: the stubs, then the carved disc over their ends: its cliff, masonry
+## in rings, carved grooves, the rune ring, chains rising at the rim and the
+## pale dais where Thresh stands.
 func _draw_platform() -> void:
 	var middle := PLATFORM_CENTER
+	var disc := ground[0]
+	var dice := MapArt.rng(87)
+	var deep := MapArt.Facets.new()
 	for i in RIM_CHAINS:
 		var direction := Vector2.from_angle(TAU * (i + 0.5) / RIM_CHAINS)
-		_draw_spike(middle + direction * (PLATFORM_RADIUS + RIM_CHAIN_REACH), 50.0, true)
-	for i in STUB_DIRECTIONS.size():
-		_draw_causeway(middle + STUB_DIRECTIONS[i] * PLATFORM_RADIUS, stub_end(i), STUB_WIDTH, true)
-	draw_colored_polygon(ground[0], PLATFORM_STONE)
-	draw_arc(middle, PLATFORM_RADIUS - 18.0, 0.0, TAU, PLATFORM_SIDES, SLATE_EDGE, 36.0, true)
+		MapArt.rock(deep, dice, middle + direction * (PLATFORM_RADIUS + RIM_CHAIN_REACH), 50.0, ROCK.darkened(DEEP_ROCK_DARK))
+	deep.draw(self)
+	for span in _spans():
+		_draw_causeway(span)
+	MapArt.disc(self, middle + MapArt.SHADOW_DIR * PLATFORM_SHADOW, PLATFORM_RADIUS, Color(MapArt.SHADOW, 0.3))
+	draw_colored_polygon(_shifted(disc, Vector2(0, PLATFORM_CLIFF)), CLIFF_LOW)
+	draw_colored_polygon(_shifted(disc, Vector2(0, PLATFORM_CLIFF * 0.55)), CLIFF_MID)
+	draw_colored_polygon(disc, PLATFORM_JOINT)
+	MapArt.disc(self, middle, CARVED_RINGS[0], PLATFORM_STONE.darkened(0.15))
+	_draw_masonry(middle)
+	var wear := MapArt.Facets.new()
+	var near := func(point: Vector2) -> bool: return point.distance_to(middle) < PLATFORM_RADIUS - CRACK_KEEP
+	var box := Rect2(middle - Vector2.ONE * PLATFORM_RADIUS, Vector2.ONE * PLATFORM_RADIUS * 2.0)
+	for at in MapArt.scatter(dice, box, PLATFORM_PATCHES, near):
+		var radius := dice.randf_range(PATCH_RADIUS.x, PATCH_RADIUS.y)
+		var tint := Color(PLATFORM_STONE.lightened(0.18), 0.25) if dice.randf() < 0.5 else Color(PLATFORM_STONE.darkened(0.4), 0.3)
+		MapArt.soft_oval(self, at, Vector2(radius * dice.randf_range(1.0, 1.4), radius), tint)
+	for at in MapArt.scatter(dice, box, PLATFORM_CRACKS, near):
+		MapArt.crack(wear, dice, at, dice.randf_range(30.0, 80.0), 2.0, CRACK_DARK)
+	for at in MapArt.scatter(dice, box, PLATFORM_GLOW_CRACKS, near):
+		var shape := dice.randi()
+		var length := dice.randf_range(40.0, 90.0)
+		MapArt.crack(wear, MapArt.rng(shape), at, length, 8.0, CRACK_GLOW)
+		MapArt.crack(wear, MapArt.rng(shape), at, length, 2.0, CRACK_CORE)
 	for ring in CARVED_RINGS:
-		draw_arc(middle, ring, 0.0, TAU, 96, CARVE_COLOR, 6.0, true)
-	for i in 24:
-		var direction := Vector2.from_angle(TAU * (i + 0.5) / 24)
-		draw_line(middle + direction * CARVED_RINGS[1], middle + direction * CARVED_RINGS[2], CARVE_COLOR, 4.0, true)
-	_draw_runes(middle)
-	draw_circle(middle, CARVED_RINGS[0] - 30.0, HEART_COLOR)
-	draw_arc(middle, CARVED_RINGS[0] - 30.0, 0.0, TAU, 64, RUNE_COLOR, 3.0, true)
+		wear.arc(middle, ring, 0.0, TAU, 7.0, CARVE_COLOR, PLATFORM_SIDES)
+		wear.arc(middle, ring + 6.0, 0.0, TAU, 2.0, Color(1, 1, 1, 0.06), PLATFORM_SIDES)
+	_draw_runes(wear, dice)
+	wear.draw(self)
+	var lit_from := MapArt.SHADOW_DIR.angle() + PI
+	draw_arc(middle, PLATFORM_RADIUS - 3.0, lit_from - PI * 0.5, lit_from + PI * 0.5, PLATFORM_SIDES, SLATE_EDGE, 6.0, true)
+	draw_arc(middle, PLATFORM_RADIUS - 3.0, lit_from + PI * 0.5, lit_from + PI * 1.5, PLATFORM_SIDES, CLIFF_LOW, 6.0, true)
+	var chains := MapArt.Facets.new()
 	for i in RIM_CHAINS:
 		var direction := Vector2.from_angle(TAU * (i + 0.5) / RIM_CHAINS)
-		_draw_chain(middle + direction * (PLATFORM_RADIUS - 30.0), middle + direction * (PLATFORM_RADIUS + RIM_CHAIN_REACH))
+		_chain(chains, middle + direction * (PLATFORM_RADIUS - 30.0), middle + direction * (PLATFORM_RADIUS + RIM_CHAIN_REACH))
+	chains.draw(self)
+	_draw_dais(middle)
+
+
+## The stone of the disc in courses of slabs between the carved rings, each
+## course's joints set half a slab off the one before; the rune band darker,
+## the rim's coping lighter, all a little lighter toward the middle. One mesh.
+func _draw_masonry(middle: Vector2) -> void:
+	var dice := MapArt.rng(89)
+	var slabs := MapArt.Facets.new()
+	var edges: Array[float] = []
+	edges.assign(CARVED_RINGS)
+	edges.append(PLATFORM_RADIUS)
+	for band in COURSES.size():
+		var tint := 0.0
+		if band == COURSES.size() - 2:
+			tint = -RUNE_BAND_SHADE
+		elif band == COURSES.size() - 1:
+			tint = COPING_SHADE
+		for course in COURSES[band]:
+			var inner := lerpf(edges[band], edges[band + 1], float(course) / COURSES[band]) + COURSE_JOINT * 0.5
+			var outer := lerpf(edges[band], edges[band + 1], float(course + 1) / COURSES[band]) - COURSE_JOINT * 0.5
+			var count := maxi(roundi(TAU * (inner + outer) * 0.5 / COURSE_SLAB), 6)
+			var turn := dice.randf() * TAU
+			for k in count:
+				var from := turn + TAU * k / count + COURSE_JOINT * 0.5 / inner
+				var to := turn + TAU * (k + 1) / count - COURSE_JOINT * 0.5 / inner
+				var shade := tint + dice.randf_range(-COURSE_SHADE, COURSE_SHADE) + 0.08 * (1.0 - inner / PLATFORM_RADIUS)
+				slabs.quad(middle + Vector2.from_angle(from) * inner, middle + Vector2.from_angle(to) * inner,
+					middle + Vector2.from_angle(to) * outer, middle + Vector2.from_angle(from) * outer,
+					PLATFORM_STONE.lightened(shade) if shade > 0.0 else PLATFORM_STONE.darkened(-shade))
+	slabs.draw(self)
 
 
 ## Runes round the ring between the outer carved rings, each a few glowing
-## strokes, standing along the ring.
-func _draw_runes(middle: Vector2) -> void:
-	var dice := RandomNumberGenerator.new()
-	dice.seed = 53
+## strokes, standing along the ring (their light is drawn last).
+func _draw_runes(into: MapArt.Facets, dice: RandomNumberGenerator) -> void:
 	for i in RUNES:
-		var angle := TAU * i / RUNES
-		var at := middle + Vector2.from_angle(angle) * RUNE_RING
-		var out := Vector2.from_angle(angle)
+		var out := Vector2.from_angle(TAU * i / RUNES)
 		var along := out.orthogonal()
-		var top := at + out * 34.0
-		var bottom := at - out * 34.0
-		draw_line(top, bottom, RUNE_GLOW, 12.0, true)
-		draw_line(top, bottom, RUNE_COLOR, 4.0, true)
+		var at := PLATFORM_CENTER + out * RUNE_RING
+		into.line(at + out * 34.0, at - out * 34.0, 12.0, RUNE_GLOW)
+		into.line(at + out * 34.0, at - out * 34.0, 4.0, RUNE_COLOR)
 		for stroke in 2:
 			var from := at + out * dice.randf_range(-30.0, 30.0)
-			var to := from + along * dice.randf_range(-24.0, 24.0) + out * dice.randf_range(-16.0, 16.0)
-			draw_line(from, to, RUNE_COLOR, 4.0, true)
+			into.line(from, from + along * dice.randf_range(-24.0, 24.0) + out * dice.randf_range(-16.0, 16.0), 4.0, RUNE_COLOR)
+
+
+## The pale dais where Thresh stands: a lit step, the stone, an inlaid ring
+## of runes and a star.
+func _draw_dais(middle: Vector2) -> void:
+	var radius := CARVED_RINGS[0] - 30.0
+	MapArt.disc(self, middle + MapArt.SHADOW_DIR * 10.0, radius + 6.0, Color(MapArt.SHADOW, 0.4))
+	MapArt.disc(self, middle, radius + 6.0, HEART_COLOR.lightened(0.28))
+	MapArt.disc(self, middle + MapArt.SHADOW_DIR * 3.0, radius + 3.0, HEART_COLOR.darkened(0.35))
+	MapArt.disc(self, middle, radius - 2.0, HEART_COLOR)
+	MapArt.disc(self, middle - MapArt.SHADOW_DIR * radius * 0.08, radius * 0.8, HEART_COLOR.lightened(0.06))
+	var inlay := MapArt.Facets.new()
+	inlay.arc(middle, radius * 0.72, 0.0, TAU, 3.0, RUNE_COLOR, PLATFORM_SIDES)
+	for i in 8:
+		var way := Vector2.from_angle(TAU * i / 8.0)
+		inlay.blade(middle + way * radius * 0.1, middle + way * DAIS_STAR_REACH * (1.0 if i % 2 == 0 else 0.6), 22.0 if i % 2 == 0 else 14.0, Color(RUNE_COLOR, 0.16))
+	inlay.draw(self)
 
 
 ## A closed outline of `polygon`.
@@ -633,3 +985,27 @@ func _draw_outline(polygon: PackedVector2Array, color: Color, width: float) -> v
 	var loop := polygon.duplicate()
 	loop.append(polygon[0])
 	draw_polyline(loop, color, width, true)
+
+
+## Over everything else: the lanterns' pools of cold green light and their
+## flames; mist curling over the cliffs' lips; the camps' glow; on the
+## platform, the runes' faint teal and the dais's light.
+func _draw_lights() -> void:
+	if stage == FINAL_STAGE:
+		MapArt.glow(self, PLATFORM_CENTER, DAIS_POOL, Color(RUNE_COLOR, 0.07))
+		for i in RUNES:
+			MapArt.glow(self, PLATFORM_CENTER + Vector2.from_angle(TAU * i / RUNES) * RUNE_RING, RUNE_POOL, RUNE_GLOW)
+	else:
+		for piece in ground.slice(0, PLATEAUS.size()):
+			for at in MapArt.along(piece, LIP_MIST_STEP):
+				MapArt.soft_oval(self, at, Vector2(LIP_MIST_RADIUS, LIP_MIST_RADIUS * 0.6), Color(MIST_COLOR, LIP_MIST_ALPHA))
+		for camp: Vector2 in camps.values():
+			MapArt.glow(self, camp, CAMP_POOL, Color(MIST_COLOR, 0.08))
+	var lanterns := PackedVector2Array()
+	for span in _spans():
+		lanterns.append_array(_lantern_spots(span))
+	for at in lanterns:
+		MapArt.glow(self, at, LANTERN_POOL, LANTERN_GLOW)
+	for at in lanterns:
+		MapArt.glow(self, at, 26.0, Color(LANTERN_GLOW, 0.35))
+		MapArt.glow(self, at, 8.0, Color(LANTERN_FLAME, 0.9))
