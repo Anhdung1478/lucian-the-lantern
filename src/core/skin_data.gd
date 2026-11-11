@@ -27,6 +27,8 @@ extends Resource
 @export var scale: Dictionary[StringName, float] = {}
 ## Share of max HP healed on each kill.
 @export var kill_heal := 0.0
+## Share added to W's (Ardent Blaze's) damage: 0.3 = +30%.
+@export var w_damage := 0.0
 
 ## How its Q, W, E, R and shots look and sound. Null plays Classic's.
 @export var fx: SkinFx

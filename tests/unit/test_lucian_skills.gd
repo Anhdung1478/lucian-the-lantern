@@ -287,6 +287,15 @@ func test_w_bursts_on_first_enemy_and_marks_it() -> void:
 	assert_true(dummy.has_mark(ArdentBlaze.MARK))
 
 
+func test_pulsefire_w_deals_30_percent_more() -> void:
+	lucian.apply_skin(Skins.find(&"pulsefire"))
+	_rank(Slot.W, 1)
+	lucian.try_cast(Slot.W, dummy.position)
+	await wait_seconds(0.8)
+	assert_eq(_sources(), [&"w"])
+	assert_almost_eq(hits[0][1], 75.0 * 1.3 * DUMMY_MR_MULTIPLIER, 0.01)
+
+
 func test_w_bursts_at_max_range_and_cross_catches_enemies_beside_it() -> void:
 	# The missile flies along y = 0 and misses; its cross ends 944 px out.
 	dummy.position = Vector2(944, 150)

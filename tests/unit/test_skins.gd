@@ -7,7 +7,7 @@ const DOC := {
 	&"classic": [0, [], []],
 	&"high_noon": [25, ["+15% AD"], ["−15% Attack Speed"]],
 	&"project": [30, ["+20% Attack Speed", "+15% Move Speed"], ["−10% AD"]],
-	&"pulsefire": [20, ["+15% AP", "+15 Ability Haste"], ["−10% Attack Speed"]],
+	&"pulsefire": [20, ["+30% W Damage", "+10 Ability Haste"], ["−10% Attack Speed"]],
 	&"vampire": [25, ["+15% Lifesteal", "Kills heal 2% max HP"], ["−20% max HP"]],
 }
 
@@ -104,14 +104,22 @@ func test_project_moves_and_attacks_faster_for_less_ad() -> void:
 	assert_gt(lucian.stats.attack_speed, classic.attack_speed)
 
 
-func test_pulsefire_gives_haste_and_ap() -> void:
+func test_pulsefire_gives_haste_and_w_damage_not_ap() -> void:
 	var classic_attack_speed := lucian.stats.attack_speed
-	lucian.apply_skin(Skins.find(&"pulsefire"))
-	assert_almost_eq(lucian.stats.ability_haste, 15.0, 0.001)
+	var pulsefire := Skins.find(&"pulsefire")
+	lucian.apply_skin(pulsefire)
+	assert_almost_eq(lucian.stats.ability_haste, 10.0, 0.001)
 	assert_lt(lucian.stats.attack_speed, classic_attack_speed)
+	assert_almost_eq(pulsefire.w_damage, 0.3, 0.0001)
 	give_equipped(&"needlessly_large_rod")
 	var rod_ap: float = lucian.item_catalog.find(&"needlessly_large_rod").stats[&"ap"]
-	assert_almost_eq(lucian.stats.ap, rod_ap * 1.15, 0.001)
+	assert_almost_eq(lucian.stats.ap, rod_ap, 0.001)
+
+
+func test_only_pulsefire_raises_w_damage() -> void:
+	for skin in Skins.ALL:
+		if skin.id != &"pulsefire":
+			assert_eq(skin.w_damage, 0.0, str(skin.id))
 
 
 func test_vampire_trades_max_hp_for_lifesteal() -> void:

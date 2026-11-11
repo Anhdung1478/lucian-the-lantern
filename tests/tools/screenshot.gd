@@ -1960,7 +1960,7 @@ func scenario_skins_stage() -> void:
 		&"classic": "AD 60, AS 0.65, MS 345, HP 600",
 		&"high_noon": "AD 69, AS 0.5525",
 		&"project": "AD 54, AS 0.78, MS 396.75",
-		&"pulsefire": "AS 0.585, AH 15",
+		&"pulsefire": "AS 0.585, AH 10",
 		&"vampire": "HP 480, LS 0.15",
 	}
 	for i in Skins.ALL.size():

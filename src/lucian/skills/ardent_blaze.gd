@@ -3,6 +3,7 @@ extends LucianSkill
 ## W: a missile that bursts in a cross on the first enemy or at max range,
 ## dealing magic damage and marking every enemy hit. Lucian's other hits on a
 ## marked enemy give him a burst of move speed. Max rank makes the cross bigger.
+## The skin's w_damage (Pulsefire) raises the damage.
 
 const MARK := &"ardent_blaze"
 
@@ -82,7 +83,7 @@ func _explode(at: Vector2) -> void:
 	for enemy in lucian.query_enemies(bar, Transform2D(angle + PI / 2.0, at)):
 		if not enemies.has(enemy):
 			enemies.append(enemy)
-	var damage := data.damage_at(rank(), lucian.stats)
+	var damage := data.damage_at(rank(), lucian.stats) * (1.0 + lucian.skin.w_damage)
 	for enemy in enemies:
 		enemy.take_damage(lucian.make_damage(damage, data.damage_type, data.id))
 		enemy.add_mark(MARK, mark_duration)
