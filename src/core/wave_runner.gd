@@ -59,6 +59,22 @@ func is_waiting() -> bool:
 	return state == State.INTRO or state == State.BREAK
 
 
+## The enemy ids of the wave that comes next, while the runner waits (the boss
+## wave's is the boss); none during a wave or when no wave is left.
+func next_ids() -> Array:
+	if not is_waiting() or wave >= total_waves():
+		return []
+	return [boss] if wave >= _waves.size() else _waves[wave]
+
+
+## The kind of the wave that comes next: &"normal", &"mini_boss" or &"boss";
+## &"" during a wave or when none is left.
+func next_kind() -> StringName:
+	if not is_waiting() or wave >= total_waves():
+		return &""
+	return &"boss" if wave >= _waves.size() else &"normal"
+
+
 func countdown() -> float:
 	return maxf(_countdown, 0.0) if is_waiting() else 0.0
 

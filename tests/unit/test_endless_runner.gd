@@ -222,3 +222,15 @@ func test_jump_to_the_last_wave_does_nothing() -> void:
 	runner.skip_to_last_wave()
 	assert_eq(runner.wave, 1)
 	assert_eq(runner.state, WaveRunner.State.FIGHT)
+
+
+func test_endless_only_knows_the_kind_of_the_next_wave() -> void:
+	var runner := _runner()
+	assert_eq(runner.next_ids(), [], "its enemies are rolled when the wave starts")
+	assert_eq(runner.next_kind(), &"normal")
+	runner._skip_to(EndlessPlan.BOSS_EVERY - 1)
+	assert_eq(runner.next_kind(), &"boss")
+	runner._skip_to(EndlessPlan.MINI_BOSS_EVERY - 1)
+	assert_eq(runner.next_kind(), &"mini_boss")
+	runner.skip()
+	assert_eq(runner.next_kind(), &"", "none in a wave")

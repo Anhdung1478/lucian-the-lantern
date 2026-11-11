@@ -223,3 +223,41 @@ func test_act_4_waves_follow_the_table() -> void:
 		for wave: Array in WavePlan.waves(id):
 			for enemy: StringName in wave:
 				assert_true(ResourceLoader.exists(Stage.ENEMY_PATH % enemy), String(enemy))
+
+
+func test_the_rows_count_each_enemy_in_spawn_order_bosses_first() -> void:
+	var ids: Array[StringName] = [&"melee_minion", &"ranged_minion", &"melee_minion", &"siege_minion", &"akshan", &"melee_minion"]
+	var rows := WavePlan.preview_rows(ids)
+	assert_eq(rows.map(func(r: Dictionary) -> Variant: return r.id), [&"akshan", &"melee_minion", &"ranged_minion", &"siege_minion"])
+	assert_eq(rows.map(func(r: Dictionary) -> Variant: return r.count), [1, 3, 1, 1])
+	assert_eq(rows[0].name, "Akshan")
+	assert_true(rows[0].boss)
+	assert_false(rows[1].boss)
+
+
+func test_a_pack_is_counted_by_its_members() -> void:
+	var rows := WavePlan.preview_rows(WavePlan.expand([[[&"melee_minion", 2], [WavePlan.PACKS.keys()[0], 1]]])[0])
+	var total := 0
+	for row: Dictionary in rows:
+		total += row.count
+	assert_eq(total, 2 + WavePlan.PACKS.values()[0].size())
+
+
+func test_the_runner_tells_what_comes_next_while_it_waits() -> void:
+	var waves := WavePlan.waves("2-3")
+	var runner := WaveRunner.new(waves, &"akshan")
+	assert_eq(runner.next_ids(), waves[0], "before wave 1")
+	runner.skip()
+	assert_eq(runner.next_ids(), [], "no preview in a wave")
+	runner._skip_to(1)
+	assert_eq(runner.next_ids(), waves[1], "in a break")
+	runner._skip_to(waves.size())
+	assert_eq(runner.next_ids(), [&"akshan"], "the boss wave's boss")
+	assert_eq(runner.next_kind(), &"boss")
+
+
+func test_a_stage_without_a_boss_has_nothing_after_the_last_wave() -> void:
+	var runner := WaveRunner.new([[&"melee_minion"]])
+	assert_eq(runner.next_kind(), &"normal")
+	runner._skip_to(1)
+	assert_eq(runner.next_ids(), [])

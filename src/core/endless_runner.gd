@@ -55,6 +55,19 @@ func is_mini_boss_wave() -> bool:
 	return EndlessPlan.is_mini_boss_wave(wave)
 
 
+## None: Endless rolls a wave's enemies when it starts.
+func next_ids() -> Array:
+	return []
+
+
+func next_kind() -> StringName:
+	if not is_waiting():
+		return &""
+	if EndlessPlan.is_boss_wave(wave + 1):
+		return &"boss"
+	return &"mini_boss" if EndlessPlan.is_mini_boss_wave(wave + 1) else &"normal"
+
+
 ## The held break ends: its countdown runs from the start.
 func release() -> void:
 	held = false

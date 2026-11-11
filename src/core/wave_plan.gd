@@ -272,3 +272,18 @@ static func mini_boss(stage_id: String) -> StringName:
 		return &""
 	var last_wave: Array = STAGES[stage_id].back()
 	return last_wave.back()[0]
+
+
+## The enemies of a wave for the preview: one row {id, name, art, count, boss} per
+## distinct enemy, in spawn order, the bosses and mini bosses first.
+static func preview_rows(ids: Array) -> Array[Dictionary]:
+	var by_id := {}
+	var rows: Array[Dictionary] = []
+	for id: StringName in ids:
+		if not by_id.has(id):
+			var data: EnemyData = load(Stage.ENEMY_PATH % id)
+			by_id[id] = {"id": id, "name": data.display_name, "count": 0, "boss": data.is_boss_kind(), "art": data.art}
+			rows.append(by_id[id])
+		by_id[id].count += 1
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.boss and not b.boss)
+	return rows
