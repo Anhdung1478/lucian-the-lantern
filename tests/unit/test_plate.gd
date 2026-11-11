@@ -16,7 +16,9 @@ func test_a_plate_keeps_its_pad_around_what_it_holds() -> void:
 
 
 func test_a_plate_is_ornate_unless_told() -> void:
-	assert_true(Plate.new().ornate)
+	var ornate := Plate.new()
+	assert_true(ornate.ornate)
+	ornate.free()
 	var plain := Plate.new(8.0, false)
 	assert_false(plain.ornate)
 	plain.free()
