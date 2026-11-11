@@ -24,6 +24,8 @@ var quit_game := func() -> void: get_tree().quit()
 var _was_paused := false
 ## Rolls an Endless Retry's map when the choice is Random.
 var _rng := RandomNumberGenerator.new()
+## The score: it follows each screen swapped in.
+var music := Music.new()
 
 
 func _ready() -> void:
@@ -31,6 +33,7 @@ func _ready() -> void:
 	GameSettings.instance().apply()
 	get_tree().auto_accept_quit = false
 	add_child(Sfx.new())
+	add_child(music)
 	add_child(prompt)
 	show_title()
 
@@ -245,6 +248,7 @@ func _report_save_failed() -> void:
 
 
 ## The old screen goes at once; the prompt stays last so it gets input first.
+## The music follows the new screen.
 func _swap(next: Node) -> void:
 	if screen:
 		remove_child(screen)
@@ -253,3 +257,4 @@ func _swap(next: Node) -> void:
 	screen = next
 	add_child(next)
 	move_child(next, 0)
+	music.follow(next)

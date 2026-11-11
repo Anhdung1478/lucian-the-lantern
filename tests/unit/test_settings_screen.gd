@@ -163,6 +163,20 @@ func test_a_slider_drag_applies_every_step_and_saves_once() -> void:
 	assert_eq(settings.saves, 1, "a drag that changed nothing writes nothing")
 
 
+## N25: there is music now. Its slider moves the Music bus, and its row no
+## longer says there is none.
+func test_the_music_slider_moves_the_music_bus_and_its_row_names_the_score() -> void:
+	var slider := _control("Music volume", "HSlider") as HSlider
+	slider.value = 40
+	assert_almost_eq(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Music")), linear_to_db(0.4), 0.01)
+	var texts: Array[String] = []
+	for label: Label in screen.find_children("*", "Label", true, false):
+		texts.append(label.text)
+	assert_has(texts, "Each act's score, which follows the fight.")
+	for text in texts:
+		assert_false(text.containsn("no music"), text)
+
+
 func test_closing_the_screen_mid_drag_saves_it() -> void:
 	var slider := _control("Sound effects volume", "HSlider") as HSlider
 	slider.drag_started.emit()

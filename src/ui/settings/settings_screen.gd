@@ -64,7 +64,7 @@ const SCROLL_GAP := 14
 const BACK_SIZE := Vector2(200, 50)
 const VOLUMES := [
 	["Master volume", &"master_volume", "Every sound in the game."],
-	["Music volume", &"music_volume", "No music yet: this slider is ready for it."],
+	["Music volume", &"music_volume", "Each act's score, which follows the fight."],
 	["Sound effects volume", &"sfx_volume", "Shots, hits, coins and clicks."],
 ]
 const CAST_MODE_LABELS := ["Quick cast", "Quick + indicator", "Normal cast"]

@@ -96,6 +96,19 @@ func test_starts_on_the_title_screen() -> void:
 	assert_is(game.screen, TitleScreen)
 
 
+## N25: the music follows each screen swapped in, and plays on while paused.
+func test_the_music_follows_the_title_a_stage_and_the_main_screen() -> void:
+	assert_eq(game.music.get_parent(), game)
+	assert_eq(game.music.process_mode, Node.PROCESS_MODE_ALWAYS)
+	assert_eq(game.music.piece, Score.THEME, "the title")
+	game.start_stage(StageSetup.for_stage(SaveGame.instance(), 4, 1))
+	await wait_process_frames(2)
+	assert_eq(game.music.piece, 4)
+	game.show_main_screen()
+	await wait_process_frames(2)
+	assert_eq(game.music.piece, Score.THEME)
+
+
 func test_training_swaps_in_the_stage_with_its_setup() -> void:
 	var run := StageSetup.new()
 	run.equip_slots = 2
