@@ -5,9 +5,10 @@ extends Enemy
 ## sliding along walls, sidestepping when stuck), attacks when in range,
 ## and stands still while he is dead or can't be hit. With the data's
 ## `escape_after` it gets away after that long alive; with its `summon_id`
-## it calls summons. Subclasses say what an attack does (_attack), and may
-## think differently (_think); they can leap (leap_to) and charge (charge),
-## and nothing is thought while one runs.
+## it calls summons; with its `drain` and `summon_heal` it heals. Subclasses
+## say what an attack does (_attack), and may think differently (_think);
+## they can leap (leap_to) and charge (charge), and nothing is thought while
+## one runs.
 
 ## It got away (see escape): no death, no kill.
 signal escaped(unit: EnemyUnit)
@@ -16,8 +17,14 @@ signal escaped(unit: EnemyUnit)
 signal summon_requested(unit: EnemyUnit, id: StringName, at: Vector2)
 ## A leap (leap_to) or a charge (charge) has ended.
 signal landed
+## It healed `amount` HP (after Grievous Wounds), gathered over
+## HEAL_NUMBER_TIME so a steady heal shows one number at a time. The stage
+## shows it as a green number. Never while veiled.
+signal healed(amount: float)
 
 const HIT_FLASH := Color(1.8, 1.8, 1.8)
+## Heals within this many seconds of the first show as one number.
+const HEAL_NUMBER_TIME := 0.4
 ## Moving less than this share of its speed in a frame counts as stuck.
 const STUCK_SHARE := 0.25
 const STUCK_TIME := 0.4
@@ -111,6 +118,9 @@ var _charge_velocity := Vector2.ZERO
 var _charge_left := 0.0
 var _charge_hit := Callable()
 var _walk_mask := 0
+## HP healed and not shown yet, and the seconds left until it shows.
+var _healed := 0.0
+var _heal_number_left := 0.0
 
 
 ## Call before adding the unit to the tree.
@@ -159,6 +169,8 @@ func _ready() -> void:
 		warning_parent = get_parent()
 	_attack_left = randf_range(0.2, data.attack_interval)
 	_summon_left = data.summon_every
+	if data.drain > 0.0 and is_instance_valid(target):
+		target.damage_received.connect(_drain)
 
 
 ## A leap or a charge runs first (no thinking meanwhile); else, while
@@ -167,6 +179,7 @@ func _physics_process(delta: float) -> void:
 	super(delta)
 	if not is_alive():
 		return
+	_heal_number_step(delta)
 	if data.escape_after > 0.0:
 		_alive_time += delta
 		if _alive_time >= data.escape_after:
@@ -258,10 +271,19 @@ func is_charging() -> bool:
 	return _charging
 
 
+## Dies, unless it escaped. A summon tells its summoner it was killed.
 func _die() -> void:
-	if has_escaped:
+	if has_escaped or dead:
 		return
 	super()
+	if summoned and is_instance_valid(summoner):
+		summoner.summon_killed(self)
+
+
+## One of its summons was killed (not escaped or freed). Nothing here; the
+## final Thresh harvests his Lantern Souls.
+func summon_killed(_summon: EnemyUnit) -> void:
+	pass
 
 
 ## Lucian is there to fight: alive, not in stasis, not untouchable.
@@ -374,10 +396,40 @@ func _lose_hp(amount: float) -> void:
 	health_bar.set_health(hp, max_hp)
 
 
-## Heals, and the bar shows it.
+## Heals while alive, and the bar shows it; what it gained is gathered
+## for a green number (_heal_number_step).
 func heal(amount: float) -> void:
+	if not is_alive():
+		return
+	var before := hp
 	super(amount)
 	health_bar.set_health(hp, max_hp)
+	if hp <= before:
+		return
+	if _healed <= 0.0:
+		_heal_number_left = HEAL_NUMBER_TIME
+	_healed += hp - before
+
+
+## The heal gathered since the first one shows once HEAL_NUMBER_TIME has
+## passed (`healed`), unless it rounds to nothing. None while veiled: the
+## Black Mist hides its health too.
+func _heal_number_step(delta: float) -> void:
+	if _healed <= 0.0:
+		return
+	_heal_number_left -= delta
+	if _heal_number_left > 0.0:
+		return
+	if not veiled and roundi(_healed) > 0:
+		healed.emit(_healed)
+	_healed = 0.0
+
+
+## Lucian took a hit (`damage_received`): when it was its own basic attack
+## (no burn tick), it heals data.drain of the damage.
+func _drain(info: DamageInfo, amount: float) -> void:
+	if info.attacker == self and info.source == &"basic" and not info.over_time:
+		heal(amount * data.drain)
 
 
 func _show_hit() -> void:
@@ -416,7 +468,8 @@ func _paint() -> void:
 
 
 ## Every summon_every seconds: up to summon_count summons beside it, keeping
-## its own at or under summon_cap.
+## its own at or under summon_cap. Calling any heals it data.summon_heal of
+## its max HP.
 func _summon_step(delta: float) -> void:
 	if data.summon_id == &"" or data.summon_every <= 0.0:
 		return
@@ -425,6 +478,8 @@ func _summon_step(delta: float) -> void:
 		return
 	_summon_left = data.summon_every
 	var count := mini(data.summon_count, data.summon_cap - summons)
+	if count > 0 and data.summon_heal > 0.0:
+		heal(max_hp * data.summon_heal)
 	for i in count:
 		summons += 1
 		summon_requested.emit(self, data.summon_id, _summon_spot(i, count))

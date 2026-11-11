@@ -1,12 +1,15 @@
 class_name FloatingNumber
 extends Label
-## A damage number that rises, fades and frees itself.
+## A damage number (or an enemy's heal, "+N" in green) that rises, fades and
+## frees itself.
 
 const COLORS := {
 	DamageInfo.Type.PHYSICAL: Color("ff9a3c"),
 	DamageInfo.Type.MAGIC: Color("4fa8ff"),
 	DamageInfo.Type.TRUE: Color("ffffff"),
 }
+## Heal's green (HealBurst).
+const HEAL_COLOR := HealBurst.COLOR
 const NORMAL_SIZE := 28
 const CRIT_SIZE := 42
 const RISE := 70.0
@@ -19,9 +22,19 @@ var _is_crit := false
 func setup(amount: float, type: DamageInfo.Type, is_crit: bool, size_scale := 1.0) -> void:
 	_is_crit = is_crit
 	text = str(roundi(amount)) + ("!" if is_crit else "")
+	_style(COLORS[type], roundi((CRIT_SIZE if is_crit else NORMAL_SIZE) * size_scale))
+
+
+## A heal: "+N" in green, at the normal size.
+func setup_heal(amount: float) -> void:
+	text = "+%d" % roundi(amount)
+	_style(HEAL_COLOR, NORMAL_SIZE)
+
+
+func _style(color: Color, font_size: int) -> void:
 	var settings := LabelSettings.new()
-	settings.font_size = roundi((CRIT_SIZE if is_crit else NORMAL_SIZE) * size_scale)
-	settings.font_color = COLORS[type]
+	settings.font_size = font_size
+	settings.font_color = color
 	settings.outline_size = 6
 	settings.outline_color = Color(0, 0, 0, 0.85)
 	label_settings = settings

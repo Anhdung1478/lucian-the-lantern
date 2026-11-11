@@ -350,9 +350,9 @@ func set_dummy_count(count: int) -> void:
 		extra_dummies.append(extra)
 
 
-## Puts an enemy of type `id` on the map at `at`, wired for damage numbers,
-## the debug meter, rewards, escapes, summons and a Thresh's end (Act 1's at
-## half HP, the final one's fall).
+## Puts an enemy of type `id` on the map at `at`, wired for damage and heal
+## numbers, the debug meter, rewards, escapes, summons and a Thresh's end
+## (Act 1's at half HP, the final one's fall).
 func spawn_enemy(id: StringName, at: Vector2, wave := 1) -> EnemyUnit:
 	return spawn_unit(load(ENEMY_PATH % id), at, wave)
 
@@ -375,6 +375,7 @@ func spawn_unit(data: EnemyData, at: Vector2, wave := 1) -> EnemyUnit:
 	unit.position = at
 	$World.add_child(unit)
 	unit.damage_taken.connect(damage_numbers.spawn.bind(unit))
+	unit.healed.connect(damage_numbers.spawn_heal.bind(unit))
 	unit.damage_taken.connect(_count_damage_dealt.bind(unit))
 	unit.died.connect(_on_enemy_died)
 	unit.escaped.connect(_on_enemy_escaped)

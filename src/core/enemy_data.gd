@@ -93,6 +93,12 @@ const BOSS_KINDS: Array[StringName] = [&"mini_boss", &"boss"]
 ## fades upward with a soft chime, in place of the grey fade (Act 6's
 ## Lantern Souls). Its rewards are unchanged.
 @export var frees := false
+## It heals this share of the damage its basic attacks deal to Lucian (after
+## his armor or magic resist), and this share of its max HP each time it
+## calls summons (Act 5's Maiden of the Mist). Grievous Wounds cuts both.
+## 0 = none.
+@export var drain := 0.0
+@export var summon_heal := 0.0
 
 
 ## A boss or a mini boss.

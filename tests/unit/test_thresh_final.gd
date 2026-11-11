@@ -1000,6 +1000,94 @@ func test_no_payout_when_lucian_is_dead_as_he_falls() -> void:
 	assert_false("thresh_final" in SaveGame.instance().bosses)
 
 
+# --- P17: he harvests his souls ---------------------------------------------------------
+
+
+## A Lantern Soul of his, alone, `away` to the right of him.
+func _soul(boss: ThreshFinal, away: float) -> EnemyUnit:
+	var soul := Monster.new()
+	soul.setup(load("res://data/enemies/lantern_soul.tres") as EnemyData, 6, 8, lucian)
+	soul.position = boss.global_position + Vector2(away, 0)
+	soul.projectile_parent = effects
+	soul.summoned = true
+	soul.summoner = boss
+	add_child_autofree(soul)
+	return soul
+
+
+func test_a_soul_of_his_killed_near_him_heals_him_3_percent() -> void:
+	assert_eq([ThreshFinal.HARVEST_RANGE, ThreshFinal.HARVEST_HEAL, ThreshFinal.HARVEST_MAX], [400.0, 0.03, 10])
+	var stage: Stage = await _stage()
+	var boss := await _boss_wave(stage)
+	await _to_phase_2(boss)
+	var souls := await _souls(stage, boss)
+	assert_eq(souls.size(), 3)
+	boss.hp = 8000.0
+	var near: EnemyUnit = souls[0]
+	var far: EnemyUnit = souls[1]
+	near.global_position = boss.global_position + Vector2(ThreshFinal.HARVEST_RANGE - 50.0, 0)
+	far.global_position = boss.global_position + Vector2(ThreshFinal.HARVEST_RANGE + 50.0, 0)
+	far.take_damage(_lethal())
+	assert_eq(boss.hp, 8000.0, "too far from him")
+	near.take_damage(_lethal())
+	assert_almost_eq(boss.hp, 8000.0 + 16000.0 * 0.03, 0.001)
+	assert_eq(boss.harvested, 1)
+	boss._heal_number_step(EnemyUnit.HEAL_NUMBER_TIME)
+	var numbers := stage.damage_numbers.get_children().filter(func(node: Node) -> bool:
+		return node is FloatingNumber and (node as FloatingNumber).text == "+480")
+	assert_eq(numbers.size(), 1, "a green number over him")
+	assert_engine_error_count(0)
+
+
+func test_he_harvests_10_souls_a_fight_at_most() -> void:
+	var boss := _thresh(Vector2(800, 0))
+	await _to_phase_2(boss)
+	var soul := _soul(boss, 100.0)
+	boss.hp = 1000.0
+	for i in ThreshFinal.HARVEST_MAX + 2:
+		boss.summon_killed(soul)
+	assert_eq(boss.harvested, ThreshFinal.HARVEST_MAX)
+	assert_almost_eq(boss.hp, 1000.0 + 10 * 480.0, 0.001, "30% of his HP in all")
+
+
+func test_grievous_wounds_cuts_his_harvest() -> void:
+	var boss := _thresh(Vector2(800, 0))
+	await _to_phase_2(boss)
+	boss.hp = 1000.0
+	boss.add_status(Enemy.GRIEVOUS_WOUNDS, 3.0)
+	boss.summon_killed(_soul(boss, 100.0))
+	assert_almost_eq(boss.hp, 1000.0 + 480.0 * Enemy.GRIEVOUS_HEALING, 0.001)
+
+
+func test_no_harvest_while_he_is_down_or_rising_or_of_another_kind() -> void:
+	var boss := _thresh(Vector2(800, 0))
+	await _to_phase_2(boss)
+	boss.hp = 1000.0
+	boss.stopped = true
+	boss.summon_killed(_soul(boss, 100.0))
+	assert_eq(boss.hp, 1000.0, "stopped")
+	boss.stopped = false
+	var walker := Monster.new()
+	walker.setup(load("res://data/enemies/mist_walker.tres") as EnemyData, 6, 8, lucian)
+	walker.position = boss.global_position + Vector2(100, 0)
+	add_child_autofree(walker)
+	boss.summon_killed(walker)
+	assert_eq(boss.hp, 1000.0, "not a soul")
+	assert_eq(boss.harvested, 0)
+
+
+func test_a_soul_freed_at_his_side_is_no_harvest() -> void:
+	var boss := _thresh(Vector2(800, 0))
+	await _to_phase_2(boss)
+	boss.hp = 1000.0
+	var soul := _soul(boss, 100.0)
+	soul.vanish()
+	assert_eq(boss.hp, 1000.0)
+	soul = _soul(boss, 100.0)
+	soul.take_damage(_lethal())
+	assert_almost_eq(boss.hp, 1480.0, 0.001, "a kill is")
+
+
 # --- Act 1's Thresh, as he was ----------------------------------------------------------
 
 

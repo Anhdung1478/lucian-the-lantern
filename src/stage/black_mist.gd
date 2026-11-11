@@ -3,12 +3,16 @@ extends Node2D
 ## Act 5's Black Mist: pale green-grey banks lying on the ground, under the
 ## units, breathing slowly. A normal or elite enemy inside a bank is veiled
 ## (a dark silhouette, no health bar, no radar dot) while Lucian is more than
-## REVEAL_RANGE away; a veiled enemy can still be targeted and hit. Bosses and
-## mini bosses are never veiled. The stage adds it to its world, so it
-## freezes with it; give it the map's `banks` and `lucian`.
+## REVEAL_RANGE away; a veiled enemy can still be targeted and hit. While
+## hurt, it also regenerates REGEN of its max HP a second (Grievous Wounds
+## cuts it). Bosses and mini bosses are never veiled and never regenerate.
+## The stage adds it to its world, so it freezes with it; give it the map's
+## `banks` and `lucian`.
 
 ## Lucian this close to an enemy in the mist sees it.
 const REVEAL_RANGE := 350.0
+## A normal or elite enemy in the mist heals this share of its max HP a second.
+const REGEN := 0.02
 ## Under the units (0) and the ground zones (HazardZone.Z), over the floor.
 const Z := HazardZone.Z - 1
 const MIST_COLOR := Color("9fb8a8")
@@ -40,13 +44,16 @@ func in_mist(point: Vector2) -> bool:
 	return false
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	var watching := is_instance_valid(lucian)
 	for enemy in get_tree().get_nodes_in_group(&"enemies"):
 		if enemy is EnemyUnit:
 			var unit: EnemyUnit = enemy
+			var misted := not unit.data.is_boss_kind() and in_mist(unit.global_position)
 			var reach := unit.global_position.distance_to(lucian.global_position) if watching else INF
-			unit.veiled = not unit.data.is_boss_kind() and in_mist(unit.global_position) and reach > REVEAL_RANGE
+			unit.veiled = misted and reach > REVEAL_RANGE
+			if misted and unit.hp < unit.max_hp:
+				unit.heal(unit.max_hp * REGEN * delta)
 
 
 func _process(delta: float) -> void:

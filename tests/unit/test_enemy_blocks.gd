@@ -1,7 +1,7 @@
 extends GutTest
 ## Phase 8's enemy building blocks on lone units: summons and their cap,
-## vanish, the freed fade, leaps, charges, the veil and the tint, and an
-## enemy shot that misses. The stage side of summons and vanish is in
+## vanish, the freed fade, leaps, charges, the veil and the tint, heals and
+## their green number, and an enemy shot that misses. The stage side of summons and vanish is in
 ## test_stage_waves.gd.
 
 const MAP_SIZE := Vector2(3000, 2000)
@@ -374,6 +374,95 @@ func test_a_unit_veiled_before_it_is_ready_starts_dark() -> void:
 	add_child_autofree(unit)
 	assert_lt(unit.sprite.modulate.get_luminance(), 0.2)
 	assert_false(unit.health_bar.visible)
+
+
+# --- Heals (P17) ------------------------------------------------------------
+
+
+## [amount] per `healed` the unit sends.
+func _heals(unit: EnemyUnit) -> Array[float]:
+	var shown: Array[float] = []
+	unit.healed.connect(func(amount: float) -> void: shown.append(amount))
+	return shown
+
+
+func test_heals_gather_into_one_number_0_4_seconds_after_the_first() -> void:
+	var unit := _unit(_data())
+	unit.hp = 300.0
+	var shown := _heals(unit)
+	unit.heal(30.0)
+	unit.heal(20.0)
+	assert_eq(unit.hp, 350.0)
+	assert_eq(EnemyUnit.HEAL_NUMBER_TIME, 0.4)
+	unit._heal_number_step(0.2)
+	assert_eq(shown.size(), 0, "still gathering")
+	unit._heal_number_step(0.25)
+	assert_eq(shown, [50.0] as Array[float])
+	unit._heal_number_step(1.0)
+	assert_eq(shown.size(), 1, "nothing more to show")
+
+
+func test_a_heal_shows_only_what_it_gained() -> void:
+	var unit := _unit(_data())
+	var shown := _heals(unit)
+	unit.heal(50.0)
+	unit._heal_number_step(1.0)
+	assert_eq(unit.hp, 500.0)
+	assert_eq(shown.size(), 0, "full: nothing gained, no number")
+	unit.hp = 480.0
+	unit.heal(50.0)
+	unit._heal_number_step(1.0)
+	assert_eq(unit.hp, 500.0)
+	assert_eq(shown, [20.0] as Array[float])
+
+
+func test_grievous_wounds_cuts_an_enemy_heal_by_40_percent() -> void:
+	var unit := _unit(_data())
+	unit.hp = 100.0
+	unit.add_status(Enemy.GRIEVOUS_WOUNDS, 3.0)
+	unit.heal(100.0)
+	assert_almost_eq(unit.hp, 160.0, 0.001)
+
+
+func test_a_dead_enemy_heals_nothing() -> void:
+	var unit := _unit(_data())
+	unit.take_damage(_lethal())
+	unit.heal(100.0)
+	assert_lte(unit.hp, 0.0)
+
+
+func test_a_veiled_enemy_heals_without_a_number() -> void:
+	var unit := _unit(_data())
+	unit.hp = 300.0
+	var shown := _heals(unit)
+	unit.veiled = true
+	unit.heal(40.0)
+	unit._heal_number_step(1.0)
+	assert_eq(unit.hp, 340.0)
+	assert_eq(shown.size(), 0)
+
+
+func test_a_heal_number_is_a_green_plus() -> void:
+	var number := FloatingNumber.new()
+	number.setup_heal(49.6)
+	assert_eq(number.text, "+50")
+	assert_eq(number.label_settings.font_color, FloatingNumber.HEAL_COLOR)
+	assert_eq(number.label_settings.font_size, FloatingNumber.NORMAL_SIZE)
+	number.free()
+
+
+func test_the_stage_shows_an_enemy_heal_over_it() -> void:
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	add_child_autofree(stage)
+	await wait_physics_frames(2)
+	var unit := stage.spawn_enemy(WavePlan.MELEE, stage.lucian.global_position + Vector2(1500, 0))
+	unit.hp = unit.max_hp - 100.0
+	unit.heal(60.0)
+	unit._heal_number_step(EnemyUnit.HEAL_NUMBER_TIME)
+	var numbers := stage.damage_numbers.get_children().filter(func(node: Node) -> bool:
+		return node is FloatingNumber and (node as FloatingNumber).text == "+60")
+	assert_eq(numbers.size(), 1)
+	assert_lt(numbers[0].position.y, unit.global_position.y, "over it")
 
 
 # --- Enemy shots that miss -----------------------------------------------

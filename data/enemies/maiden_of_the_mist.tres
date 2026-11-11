@@ -25,3 +25,5 @@ summon_id = &"ghoul"
 summon_every = 7.0
 summon_count = 2
 summon_cap = 6
+drain = 0.5
+summon_heal = 0.05

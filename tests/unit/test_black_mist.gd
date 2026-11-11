@@ -1,5 +1,6 @@
 extends GutTest
-## Act 5's Black Mist: enemies inside a bank are veiled while Lucian is far.
+## Act 5's Black Mist: enemies inside a bank are veiled while Lucian is far,
+## and regenerate while hurt.
 
 const BANK := Vector3(1000, 1000, 400)
 var lucian: Lucian
@@ -96,6 +97,56 @@ func test_an_enemy_leaving_the_mist_is_unveiled() -> void:
 	unit.global_position = Vector2(2000, 2000)
 	await wait_physics_frames(2)
 	assert_false(unit.veiled)
+
+
+## P17: a hurt normal or elite enemy in a bank regenerates 2% of its max HP
+## a second; one out of the mist, a boss, a mini boss or one at full HP
+## doesn't.
+func test_a_hurt_enemy_in_a_bank_regenerates_2_percent_a_second() -> void:
+	assert_eq(BlackMist.REGEN, 0.02)
+	var inside := _unit(Vector2(1000, 1000))
+	var elite := _unit(Vector2(950, 1000), &"elite")
+	var outside := _unit(Vector2(2000, 2000))
+	var mini := _unit(Vector2(1000, 950), &"mini_boss")
+	var boss := _unit(Vector2(1050, 1000), &"boss")
+	var full := _unit(Vector2(1000, 1050))
+	for unit: EnemyUnit in [inside, elite, outside, mini, boss]:
+		unit.hp = 300.0
+	mist._physics_process(1.0)
+	assert_almost_eq(inside.hp, 310.0, 0.001)
+	assert_almost_eq(elite.hp, 310.0, 0.001)
+	assert_eq(outside.hp, 300.0, "out of the mist")
+	assert_eq(mini.hp, 300.0)
+	assert_eq(boss.hp, 300.0)
+	assert_eq(full.hp, 500.0)
+	inside.hp = 499.0
+	mist._physics_process(1.0)
+	assert_eq(inside.hp, 500.0, "never past full")
+
+
+func test_grievous_wounds_cuts_the_mist_regeneration() -> void:
+	var unit := _unit(Vector2(1000, 1000))
+	unit.hp = 300.0
+	unit.add_status(Enemy.GRIEVOUS_WOUNDS, 3.0)
+	mist._physics_process(1.0)
+	assert_almost_eq(unit.hp, 306.0, 0.001)
+
+
+func test_the_regeneration_shows_only_once_the_enemy_is_seen() -> void:
+	var unit := _unit(Vector2(1000, 1000))
+	unit.hp = 300.0
+	var shown: Array[float] = []
+	unit.healed.connect(func(amount: float) -> void: shown.append(amount))
+	mist._physics_process(1.0)
+	assert_true(unit.veiled)
+	unit._heal_number_step(EnemyUnit.HEAL_NUMBER_TIME)
+	assert_eq(shown.size(), 0, "the veil hides it")
+	lucian.global_position = Vector2(1000 + BlackMist.REVEAL_RANGE - 10.0, 1000)
+	mist._physics_process(1.0)
+	assert_false(unit.veiled)
+	unit._heal_number_step(EnemyUnit.HEAL_NUMBER_TIME)
+	assert_eq(shown.size(), 1)
+	assert_almost_eq(shown[0], 10.0, 0.001)
 
 
 func test_a_forest_stage_puts_the_mist_in_its_world() -> void:

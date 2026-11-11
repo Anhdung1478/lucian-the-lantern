@@ -11,8 +11,9 @@ extends Thresh
 ##
 ## Phase 2 (Q, W, R): a hook that misses comes again at once (once per cast),
 ## Dark Passage (his lantern thrown near Lucian; Lantern Souls come out of it
-## as his summons, PASSAGE_CAP of them at most), and a harder Box. At 0 HP he
-## falls: `fell`, once. The stage frees his souls and takes him away.
+## as his summons, PASSAGE_CAP of them at most), and a harder Box. A soul of
+## his killed near him is harvested: he heals. At 0 HP he falls: `fell`,
+## once. The stage frees his souls and takes him away.
 ##
 ## 0 HP is only noted in _die (a shot's physics callback can bring it); the
 ## rise and the fall come in _physics_process. `stopped` (Thresh's) holds
@@ -71,6 +72,15 @@ const PASSAGE_RANGE := 1000.0
 const PASSAGE_TRIES := 12
 ## A soul comes out this far from the lantern.
 const SOUL_GAP := 60.0
+## A soul of his killed within HARVEST_RANGE of him heals him HARVEST_HEAL of
+## his max HP (Grievous Wounds cuts it). His souls keep their distance from
+## Lucian and never walk to him, so dying near him is the trigger. Dark
+## Passage brings 3 souls every 16 s at most (about 11 a minute, 34% of his
+## HP a minute if every one died near him), so he harvests HARVEST_MAX at
+## most (30%), and the souls can't stall the fight.
+const HARVEST_RANGE := 400.0
+const HARVEST_HEAL := 0.03
+const HARVEST_MAX := 10
 ## Phase 2's first hook, this long after he is up.
 const PHASE_2_HOOK_FIRST := 1.0
 ## Seconds he takes no damage and does nothing after rising.
@@ -102,6 +112,8 @@ var _box_damage := BOX_DAMAGE
 var _box_gap_left := 0.0
 ## His warnings, walls, hooks and lanterns: cleared when he rises or falls.
 var _placed: Array[Node] = []
+## Souls harvested this fight (HARVEST_MAX at most).
+var harvested := 0
 
 
 func _init() -> void:
@@ -289,6 +301,18 @@ func _drop_lantern(spot: Vector2) -> void:
 		# A listener may have ended the fight.
 		if stopped:
 			return
+
+
+## A Lantern Soul of his killed within HARVEST_RANGE of him: he harvests it
+## and heals HARVEST_HEAL of his max HP, HARVEST_MAX times a fight at most.
+## Nothing while he is down, rising or fallen.
+func summon_killed(summon: EnemyUnit) -> void:
+	if stopped or harvested >= HARVEST_MAX or summon.data.id != WavePlan.LANTERN_SOUL:
+		return
+	if summon.global_position.distance_to(global_position) > HARVEST_RANGE:
+		return
+	harvested += 1
+	heal(max_hp * HARVEST_HEAL)
 
 
 ## Phase 2: full HP, his marks gone, Q/W/R (each waiting for the rise to
