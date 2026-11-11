@@ -67,7 +67,7 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
   - *(V1.4.2: while the gear menu is open, ESC goes to it first, before a pop-up that is hidden under it. So a tree purchase pop-up stays open when the menu closes.)*
 - **Arrow keys and Enter (V1.4.2):** with the gear menu open, Up and Down light a row (the list wraps) and Enter presses it. The slot page works the same, and skips the greyed current slot. Nothing is lit until the first arrow key. Space is untouched: it is still Center camera. Confirm pop-ups open with their first button lit, so Enter answers it; Left and Right move across the buttons (`ui_design.md`, "Menu keys").
 - **The skin preview stops while covered (V1.4.2):** an open Skin Shop preview is frozen while the gear menu, Settings or a confirm pop-up covers it, and resumes when it is closed. *(V1.4.3: Settings' backdrop is see-through, so while it is open the Tree, the Skin Shop and the Journey all stop moving and redrawing, and resume when it closes.)*
-- **Debug table (F3 + Q, hidden by default):** an **Essences** tab (blue +100 / +1000 / +10000, orange and purple +1 / +10 / +100, Reset for each) and a **Progress** tab (Acts cleared 0–6, Max tree (free), Clear tree (no refund), Reset progress: a new game in memory). Nothing there saves.
+- **Debug table (F3 + Q, hidden by default):** an **Essences** tab (blue +100 / +1000 / +10000, orange and purple +1 / +10 / +100, Reset for each) and a **Progress** tab (Acts cleared 0–6, Max tree (free), Clear tree (no refund), Reset progress: a new game in memory). Nothing there saves. *(V1.5.0: F3 + Q opens it, and the stage's debug table, only in a debug build. In the released game it does nothing.)*
 
 ### Built in Phase 6
 - **The game opens on the title screen** (`ui_design.md` §7): Start new game, Load game, Settings, Exit game. A new game goes straight into Act 1, then to the main screen. Loading a slot opens the main screen.
@@ -103,7 +103,7 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 | Hall of Relics | Skin Shop | A stone gallery with one lit arch per skin card (Section 2) |
 
 - Only the motes move; the rest is drawn once per scene. The backdrop never takes the mouse.
-- **FREE badge.** A small green-gold "FREE" pill, pulsing slowly, sits at the top right of the bottom bar's **Evolution Tree** button whenever the tree has a free upgrade to claim, such as Ghost after 1-1 (game design doc §11). It goes once the upgrade is claimed. The tree's tabs and nodes wear the same badge (Section 1).
+- **FREE badge.** A small green-gold "FREE" pill, pulsing slowly, sits at the top right of the bottom bar's **Evolution Tree** button whenever the tree has a free upgrade to claim, such as Ghost after 1-1 (game design doc §11). It goes once the upgrade is claimed. *(V1.5.0: R's rank 1 is one too, once Act 2 is cleared, the passive is bought and Q + W + E reach 5.)* The tree's tabs and nodes wear the same badge (Section 1).
 - **ESC** in the Evolution Tree clears the picked node; the info column goes back to the branch's summary.
 
 ---
@@ -182,9 +182,9 @@ A node with a level is never hidden (this only matters after the debug table's M
 - The name, "LVL 2 / 5", and "+8 AD → +12 AD". A maxed node shows only its value, in green.
 - The description.
 - A hidden node reads "???" and adds a red line built from its requirements, e.g. "Requires: Q – Piercing Light, W – Ardent Blaze or E – Relentless Pursuit", "Requires: any 2 of …", "Requires: Clear Act 1".
-- **Cost bar** (400 × 56, the buy button): for each essence the next level needs, its icon and "owned / cost" (red when short). A gold fill shows how close the player is (the smallest share over the kinds needed). It can only be clicked when the level can be bought; a click buys it with a coin sound. *(V1.3.1: a click asks first, so a double-click can't buy two levels; see "Built in V1.3.1".)* It reads **MAXED** (green), **LOCKED** (grey) or **Free** (E's first level after Act 1). *(Since Phase 10 also Ghost after 1-1, and LOCKED for a bought node whose next level is closed.)*
+- **Cost bar** (400 × 56, the buy button): for each essence the next level needs, its icon and "owned / cost" (red when short). A gold fill shows how close the player is (the smallest share over the kinds needed). It can only be clicked when the level can be bought; a click buys it with a coin sound. *(V1.3.1: a click asks first, so a double-click can't buy two levels; see "Built in V1.3.1".)* It reads **MAXED** (green), **LOCKED** (grey) or **Free** (E's first level after Act 1). *(Since Phase 10 also Ghost after 1-1, and LOCKED for a bought node whose next level is closed. Since V1.5.0 also R's rank 1 after Act 2.)*
 
-**Reset tree** (top-right): "Reset tree 5" with the purple icon. Disabled until something is bought and 5 purple are owned. It asks "Reset the Evolution Tree for 5 purple essence? Every blue and orange essence spent comes back." Buying and resetting never save by themselves. *(Since V1.4.1: disabled until some blue or orange essence is spent, since free levels alone (E after Act 1, Ghost) give nothing back; hovering it then says "Nothing to refund: no blue or orange essence spent", or "Needs 5 purple essence". The question names the refund: "… 700 blue and 3 orange essence come back.")*
+**Reset tree** (top-right): "Reset tree 5" with the purple icon. Disabled until something is bought and 5 purple are owned. It asks "Reset the Evolution Tree for 5 purple essence? Every blue and orange essence spent comes back." Buying and resetting never save by themselves. *(Since V1.4.1: disabled until some blue or orange essence is spent, since free levels alone (E after Act 1, Ghost, and since V1.5.0 R's rank 1 after Act 2) give nothing back; hovering it then says "Nothing to refund: no blue or orange essence spent", or "Needs 5 purple essence". The question names the refund: "… 700 blue and 3 orange essence come back.")*
 
 ### Built in Phase 9
 **The tree shows the stage's icons.** The skill nodes (Q, W, E, R, the passive) use the HUD's skill icons (`assets/art/ui/icon_*.svg`). The six spell nodes use the summoner art (`assets/art/summoners/*.svg`), as the HUD and the Journey's spells do. The 11 old `tree/` copies are gone. The six spell upgrades (`tree/*_upgrade.svg`) are redrawn from their spell's art with three outlined gold chevrons, so each still matches its spell. Every other node keeps its `tree/<id>.svg`.
@@ -218,7 +218,7 @@ A node with a level is never hidden (this only matters after the debug table's M
 
 **Nodes** are 96 px (72 before), with a larger level badge and the node's name on a dark plate under it ("???" while hidden). Two new marks:
 - a small **lock** at the bottom-right corner when the node is bought but its next level is closed (R at rank 1 below 9 Q + W + E; Equip Slots at level 1 before Act 2);
-- a **FREE** badge at the top-right corner when its next level is free (Ghost after 1-1).
+- a **FREE** badge at the top-right corner when its next level is free (Ghost after 1-1; since V1.5.0 R after Act 2).
 
 **The info column:**
 - **Nothing picked:** "EVOLUTION TREE", the branch's name and blurb, "Levels bought 3 / 45" with a gold bar, "Pick a node", then one row per node of the branch (icon, name, level), grouped under the page's captions. A click on a row picks that node.
@@ -301,9 +301,11 @@ A **full-screen** section showing every skin, including **Classic Lucian**.
 |---|---|---|---|
 | Classic | Free | — | — |
 | High Noon | 25 purple | +15% AD | −15% Attack Speed |
-| PROJECT | 30 purple | +20% Attack Speed, +15% Move Speed | −10% AD |
-| Pulsefire | 20 purple | +15% AP, +15 Ability Haste | −10% Attack Speed |
+| PROJECT | 30 purple | +20% Attack Speed, +8% Move Speed | −10% AD |
+| Pulsefire | 20 purple | +30% W Damage, +25 Ability Haste | −10% Attack Speed |
 | Vampire | 25 purple | +15% Lifesteal, kills heal 2% max HP | −20% max HP |
+
+*(V1.5.0: PROJECT's move speed was +15%; Pulsefire gave +15% AP and +15 ability haste. The cards and the purchase pop-up show the new lines.)*
 
 ### Built in Phase 5
 - Five cards (320 × 640) in a centered row: the portrait (288 px), the name, bonuses in green, weaknesses in red ("—" for Classic), the playstyle, and the button at the bottom.
@@ -409,12 +411,13 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 
 ### Built in Phase 6
 **Acts 1 and 2 start.**
-- **Picking a stage:** a click on an open card picks it; a gold outline marks it. A locked card can't be picked. The page opens on the first open stage not cleared yet, else the last open one.
+- **Picking a stage:** a click on an open card picks it; a gold outline marks it. A locked card can't be picked. The page opens on the first open stage not cleared yet, else the last open one. *(V1.5.0: the Journey opens on the first open stage not cleared in the whole game, else Training; see "Which place opens".)*
 - **Start** plays the picked stage: "Start" for a one-stage act, "Start stage 2" otherwise. The stage is built from the save like Training, plus its waves, map and boss. Act 1's first play is the tutorial (`act1_the_loss.md`).
 - **Acts 3–6:** the cards can be picked, but Start stays disabled ("Act 3 comes in a later phase"). Endless's Start is still disabled. *(Acts 3–4 start since Phase 7, Acts 5–6 since Phase 8, Endless since Phase 9.)*
 - **Which tab opens:**
   - after a stage (Continue on its result, or Leave this stage), the act just played;
   - otherwise (a loaded slot, after Training), the first act with an open stage not cleared yet, else Training.
+  - *(V1.5.0: always the second rule, after a stage too. See "Which place opens" at the end.)*
 - A cleared stage can be played again. Act 1's card always reads "2 waves + boss wave", though a replay has no boss.
 
 ### Built in Phase 7
@@ -426,7 +429,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 - **The end screen's buttons start stages directly** (`ui_design.md`, "Stage result"):
   - **Retry** starts the same stage again, built fresh from the save, without passing through the main screen.
   - **Next stage** starts the next one: 1-1 → 2-1, 2-3 → 3-1, 3-2 → 3-3. It shows only after a clear, when that stage can be played.
-  - **Main screen** opens the main screen on the act just played, as Continue did.
+  - **Main screen** opens the main screen on the act just played, as Continue did. *(V1.5.0: on the latest open stage instead, or Training once every stage is cleared.)*
   - Each saves first. If the save fails, Retry and Next land on the main screen instead, with the red "Could not save" toast.
 - After Retry or Next, the next end screen leads back here the same way, so the main screen only shows when the player asks for it.
 
@@ -434,7 +437,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 **Acts 5 and 6 start.** An act's Start works as soon as `WavePlan` has the act's first stage (5-1, 6-1) and the act is open: Act 5 once Act 4 is cleared, Act 6 once Act 5 is cleared. All 22 stages can now be played.
 - **Act 5's cards:** "5 waves", "5 waves + mini boss" (grey skull), "6 waves", "6 waves + mini boss" (grey skull), "6 waves + boss wave" (red skull).
 - **Act 6's cards:** "6 waves", "6 waves + mini boss", "7 waves", "7 waves + mini boss", "7 waves + boss wave".
-- **The first clear of 6-5** shows `TheEndScreen` after the stage-end screen's button (`ui_design.md`), then the main screen on Act 6 (or 6-5 again after Retry). Next stage after 6-5 goes to the main screen as before.
+- **The first clear of 6-5** shows `TheEndScreen` after the stage-end screen's button (`ui_design.md`), then the main screen on Act 6 (or 6-5 again after Retry). Next stage after 6-5 goes to the main screen as before. *(V1.5.0: the main screen opens on Training then, since every stage is cleared.)*
 - **Which tab opens** when every act is cleared: Training.
 - **Endless** still opens once Act 3 is cleared, and its Start stays disabled ("Endless comes in a later phase"). *(Start works since Phase 9.)*
 
@@ -509,9 +512,11 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 - **Start** (400 × 64) sits at a fixed place above the spells.
 
 **Which place opens:**
-1. After a story stage: the act just played, at its first open stage not cleared yet (its last when all are).
-2. After an Endless run (Main screen, Leave, or a failed save on Retry): Endless, with the run's map still chosen, if Endless is open.
+1. ~~After a story stage: the act just played, at its first open stage not cleared yet (its last when all are).~~
+2. ~~After an Endless run (Main screen, Leave, or a failed save on Retry): Endless, with the run's map still chosen, if Endless is open.~~
 3. Otherwise (a loaded slot, after Training): the next stage, the first open one not yet cleared. *(Since V1.4.3 the token floats over the pick, so it starts there.)*
 4. With every stage cleared: Training.
+
+*(V1.5.0: rules 1 and 2 are gone, so the Journey always opens on the latest open stage, the first open one not yet cleared (3), or on Training once every stage is cleared (4). That holds after a story stage, after Training, after Endless and on a loaded slot. After the tutorial it is 2-1, since Act 1 has one stage, so a new player's first Start goes on instead of playing 1-1 again. Switching between the Tree, the Skin Shop and the Journey keeps the player's pick. The Endless map choice is still saved, so picking the portal shows it.)*
 
 A pick that becomes locked (the debug table) falls back the same way. Nothing here saves.

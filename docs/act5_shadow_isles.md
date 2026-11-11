@@ -33,6 +33,7 @@ Lucian reaches the Shadow Isles and fights through its corrupted forest to find 
 ### Maiden of the Mist
 - Tanky melee ghost, **AD** damage.
 - **Trait:** summons 2 small ghouls every few seconds until she is killed.
+- **Trait (V1.5.0):** she drains: her hits heal her for a quarter of the damage they deal, and each call of ghouls heals her 2% of her max HP. Grievous Wounds cuts both.
 
 ### Broodmother
 - Giant spider.
@@ -106,7 +107,7 @@ All numbers are placeholders. A mini boss's or boss's skill hit counts as a skil
 | Gold and XP | × 2.0 |
 | Blue per kill | 5 (elites 25) |
 
-Each wave after the first also adds **+10% HP and damage**. Mini bosses and the boss don't scale. *(V1.3 balance pass: the numbers here are the new ones; see `lucian_game_design.md` §17.)* Lucian starts every Act 5 stage at **level 7**; in 5-1 the spiderlings and saplings have 20% less HP.
+Each wave after the first also adds **+10% HP and damage**. Mini bosses and the boss don't scale. *(V1.3 balance pass: the numbers here are the new ones; see `lucian_game_design.md` §17.)* Lucian starts every Act 5 stage at **level 7**; in 5-1 the spiderlings and saplings have 20% less HP. *(V1.5.0: in 5-2 they have 10% less HP. The Maiden, the Broodmother and Maokai keep theirs.)*
 
 ### Enemies
 Base numbers (the data files). The last column shows wave 1 of Act 5, scaled.
@@ -116,7 +117,7 @@ Base numbers (the data files). The last column shows wave 1 of Act 5, scaled.
 | Sapling | normal | 110 | 0 / 10 | **Bomber** (below), 30 magic | 80 | — | 320 *(340)* | 22 | 30 / 15 | 220 HP, blast 48 |
 | Spiderling | normal | 130 | 5 / 5 | Fast melee, 8 physical | 90 | 0.9 s | 330 *(380)* | 20 | 25 / 12 | 260 HP, hits for 12.8 |
 | Ghoul (a summon) | normal | 90 | 0 / 0 | Melee, 8 physical | 90 | 1.0 s | 320 | 20 | 20 / 10, paid at 25% | 180 HP, hits for 12.8 |
-| Maiden of the Mist | elite | 1500 | 35 / 35 | Tanky melee, 40 physical. **Summons 2 ghouls every 7 s, at most 6 alive** | 130 | 1.5 s | 220 | 42 | 140 / 80 | 3000 HP, hits for 64 |
+| Maiden of the Mist | elite | 1500 | 35 / 35 | Tanky melee, 40 physical. **Summons 2 ghouls every 7 s, at most 6 alive.** *(V1.5.0:)* **Drains:** heals 25% of the damage her basic attacks deal to Lucian (after his armor), and 2% of her max HP each time she calls ghouls | 130 | 1.5 s | 220 | 42 | 140 / 80 | 3000 HP, hits for 64 |
 | Broodmother | elite | 1100 | 20 / 40 | **Web spit:** a bolt at 600 px/s, 30 magic, slows Lucian 30% for 1.5 s. Keeps 450–600 away. **Summons 1 spiderling every 3.5 s, at most 5 alive** | 600 | 2.0 s | 200 | 48 | 150 / 90 | 2200 HP, bolt 48 |
 
 *(V1.3: the sapling and the spiderling run slower than Lucian's 345; the brackets hold the old speeds.)*
@@ -138,6 +139,7 @@ Base numbers (the data files). The last column shows wave 1 of Act 5, scaled.
   - its ground warnings always show.
 - It shows again when Lucian comes within 350, or when it leaves the bank, and veils again when either changes back.
 - **Bosses and mini bosses are never veiled.** The Maiden and the Broodmother are elites, so they are.
+- **Regeneration (V1.5.0):** a **veiled** normal or elite enemy inside a bank (Lucian more than 350 away) heals **1% of its max HP a second** while it is hurt; once Lucian is close enough to see it, it stops. Grievous Wounds cuts it by 40%. Bosses and mini bosses never regenerate. The veil hides the heal, so it shows no green number. *(First built as 2% a second, veiled or not, and the Maiden's drain as 50% and 5%; the bot runs showed early Act 5 walling, so V1.5.0 ships the softer numbers.)* Endless's Dead forest has the same banks and the same regeneration.
 - The hit flash and the veil don't fight: the flash tweens the unit's visuals, the veil lives on the sprite.
 - The banks are drawn under the units: three layered blobs of `#9fb8a8` at about 35% alpha, breathing slowly.
 
@@ -160,7 +162,7 @@ Base numbers (the data files). The last column shows wave 1 of Act 5, scaled.
 - **The graveyard (5-5 only, x > 3600):** flagstones, 8 tombstones (40 × 70, two columns of four, 250–300 apart) and two slabs of a broken crypt wall behind Karthus, with a gap between them. They are real walls: they stop bolts and walkers.
 
 ### Maokai (`maokai`, mini boss, stage 5-2)
-Last in wave 5, out of his camp. Melee, 90 physical, range 110, every 1.6 s. 12000 HP, armor 60, MR 40, speed 300, radius 54. Pays 300 gold, 50 blue, 3 orange and **5 purple the first time, 1 after**, on the kill.
+Last in wave 5, out of his camp. Melee, 90 physical, range 110, every 1.6 s. 8500 HP *(12000 before V1.5.0)*, armor 60, MR 40, speed 300, radius 54. Pays 300 gold, 50 blue, 3 orange and **5 purple the first time, 1 after**, on the kill.
 
 | Skill | Numbers |
 |---|---|
@@ -191,13 +193,13 @@ The letters are the ones above (p sapling, s spiderling, M Maiden, B Broodmother
 
 | Stage | Waves | HP per wave | Total |
 |---|---|---|---|
-| 5-1 | 5 | 5.0k · 6.6k · 14.1k · 15.1k · 20.0k | 61k |
-| 5-2 | 5 | 5.8k · 13.5k · 13.5k · 18.1k · 26.0k | 77k |
-| 5-3 | 6 | 6.7k · 13.5k · 14.5k · 19.4k · 19.3k · 30.0k | 103k |
-| 5-4 | 6 | 12.5k · 12.8k · 17.4k · 22.9k · 28.6k · 31.3k | 126k |
-| 5-5 | 6 + Karthus | 12.5k · 13.8k · 18.4k · 25.9k · 32.2k · 39.4k | 142k |
+| 5-1 | 5 | 2.4k · 3.0k · 6.9k · 6.9k · 9.1k | 28k |
+| 5-2 | 5 | 3.1k · 7.2k · 6.9k · 9.0k · 12.8k | 39k |
+| 5-3 | 6 | 3.9k · 7.6k · 7.9k · 10.2k · 9.9k · 15.1k | 55k |
+| 5-4 | 6 | 7.4k · 7.2k · 9.5k · 12.1k · 14.7k · 15.8k | 67k |
+| 5-5 | 6 + Karthus | 7.4k · 7.8k · 10.0k · 13.7k · 16.6k · 19.9k | 75k |
 
-The waves hold about **509k HP**, plus 45k for the three bosses.
+The waves hold about **264k HP**, plus 41.5k for the three bosses (Maokai 8500, Elise 13000, Karthus 20000). *(V1.5.0: the table is recomputed from the code. It still held Phase 8's numbers, from before the V1.3 balance pass: 509k in all. 5-2's spiderlings and saplings now have 10% less HP, and Maokai went from 12000 to 8500, so the bosses were 45k.)*
 
 ### Art
 Hand-written SVGs, as Phase 7's: the sapling (a walking dead tree with a glowing green core), the spiderling (a dark spider with bone-pale legs and a pale mark, so it shows on the forest floor), the ghoul, the Maiden (a veiled ghost woman in a teal shroud), the Broodmother (a huge spider with a bone-white carapace), Maokai (a treant, 116 px), Elise (a spider-queen in red and black, 96 px) and Karthus (a robed lich with a skull staff, 100 px).

@@ -112,10 +112,12 @@ Monsters scale like Act 1–2 minions (`EnemyData`); mini bosses and the boss do
 |---|---|---|
 | HP | × (1 + 0.25 · (act − 1)) | × 1.5 |
 | Damage | × (1 + 0.15 · (act − 1)) | × 1.3 |
-| Gold and XP | × (1 + 0.25 · (act − 1)) | × 1.5 |
+| Gold and XP | × (1 + 0.25 · (act − 1)) | × 1.5; gold × 2.55 since V1.5.0 (below) |
 | Blue per kill | = act number (elites 5×) | 3 (elites 15) |
 
-Each wave after the first also adds **+10% HP and damage**. A raptor at wave 1 has 128 HP and bites for 7.8. Lucian starts every Act 3 stage at **level 5**. In 3-1 the monsters have 20% less HP.
+Each wave after the first also adds **+10% HP and damage**. A raptor at wave 1 has 128 HP and bites for 7.8. Lucian starts every Act 3 stage at **level 5**. In 3-1 the monsters have 20% less HP. *(V1.5.0: in 3-2 they have 10% less HP. Elites and the drake keep theirs.)*
+
+*(V1.5.0: in 3-1 to 3-5 the monsters and elites pay **× 1.7 kill gold** on top of the act's × 1.5 (`WavePlan.GOLD_SHARES`), as their waves hold fewer, larger monsters than the other acts. An Act 3 stage now pays about 6.4k gold on average (3.9k before; Act 2 3.0k, Act 4 10.6k), and 3-1's first break about 675, enough for a Tear. XP, blue, the drakes, the dragon and Endless are unchanged. The Gold / XP columns below are the base numbers.)*
 
 ### Monsters (`data/enemies/*.tres`, base numbers)
 | Enemy | Behavior | HP | Armor / MR | Attack | Every | Speed | Gold / XP |
@@ -160,6 +162,8 @@ Blue's camp is low on the left, Red's low on the right, the Scuttler's on the ri
 *(V1.3: the brackets hold the numbers before the balance pass.)*
 | Rift Scuttler (flee) | 600 | 20 / 20 | None | — | 250 | 120 / 60 | +45 blue and +4 orange on top of an elite's |
 
+*(V1.5.0: in Act 3's stages the elites' gold is × 1.7 too, as the monsters'. The Scuttler's sure orange is × 1.2 on Hard and × 1.5 on Extreme, rounded: 5 and 6.)*
+
 **Jungle buffs** (`JungleBuffs`), given when the elite dies, for **60 s**. Each shows in the HUD's buff row with its timer. Death clears them.
 
 | Buff | Gives |
@@ -174,12 +178,12 @@ Each comes last in its stage's last wave, out of the pit. All skill hits count a
 
 | | Infernal Drake (3-2) | Ocean Drake (3-4) |
 |---|---|---|
-| HP | 9000 | 10000 |
+| HP | 6500 *(9000 before V1.5.0)* | 10000 |
 | Armor / MR | 40 / 40 | 40 / 50 |
 | Basic attack | A fireball, 50 magic (700 px/s), that burns 10 magic a second for 2 s. Range 600, every 1.6 s. | A water shot, 55 magic (800 px/s). Range 600, every 1.5 s. |
 | Speed / radius | 260 / 70 | 260 / 70 |
 | Skill 1 | **Fire Breath:** when Lucian is within 580, a cone warning (60°, 550 long) for 0.8 s, then 100 magic. The cone then burns for 3 s (30 magic a second; a stronger burn wins over a weaker one, and an Endless drake's burns scale with its tier, V1.4.2). Cooldown 9 s, first after 3 s. | **Tidal Wave:** a line warning (1100 × 180) for 0.8 s, then a wave front, 180 wide, rolls along it at 900 px/s. A hit: 90 magic, a push of 300 along the line (walls stop it), and a 30% slow for 2 s. *(V1.4.2: the wave itself stops on a wall by the width of its front, 180, not by a small circle at its middle. The first 90 units of flight are exempt, so a wave fired beside a wall doesn't vanish at the drake's feet. It still crosses the abyss. A wall-hugging Lucian can dodge a wave that comes in at a very shallow angle to the wall.)* Cooldown 10 s, first after 3 s. |
-| Skill 2 | **Meteor Fall:** within 900, 4 circle warnings (r 120): one on Lucian, 3 within 280 of him, all on walkable ground. 1.2 s later each lands for 80 magic and burns for 3 s (25 magic a second). Cooldown 13 s, first after 6 s. | **Soothing Mist:** at or below 70% HP, it stands still and heals 20% of its max HP over 4 s, a mist ring round it. 5% of its max HP in damage during that time **interrupts** it: "Interrupted!", and it stands dazed for 1.5 s (stars over its head). Cooldown 18 s, and at most 3 channels a fight (V1.3), so the fight always ends. |
+| Skill 2 | **Meteor Fall:** within 900, 4 circle warnings (r 120): one on Lucian, 3 within 280 of him, all on walkable ground. 1.2 s later each lands for 80 magic and burns for 3 s (25 magic a second). Cooldown 13 s, first after 6 s. | **Soothing Mist:** at or below 70% HP, it stands still and heals 20% of its max HP over 4 s, a mist ring round it. 5% of its max HP in damage during that time **interrupts** it: "Interrupted!", and it stands dazed for 1.5 s (stars over its head). Cooldown 18 s, and at most 3 channels a fight (V1.3), so the fight always ends. *(V1.5.0: the heal shows as green "+N" numbers over it, and Grievous Wounds cuts it by 40%, as every enemy heal.)* |
 
 **Rewards, paid on the kill:** 300 gold, 50 blue, 3 orange, and **5 purple the first time, 1 after**, with a line on the end screen ("+5 purple essence (Infernal Drake, first kill)"). Its loot: a fragment for sure, and 8% a legendary. The kill that ends the stage drops nothing.
 
@@ -190,7 +194,7 @@ It comes in the boss wave, after waves 1–5, in the middle of the pit.
 
 | | |
 |---|---|
-| HP | 16000 |
+| HP | 11000 *(16000 before V1.5.0)* |
 | Armor / MR | 50 / 50 |
 | Basic attack | A violet shot, 70 magic (900 px/s), range 650, every 1.5 s. Walks at 280; radius 84. |
 | **Elder Breath** | When Lucian is within 730: a cone warning (90°, 700 long) for 1.0 s, then 160 magic. Cooldown 8 s, first after 2 s. |
@@ -208,12 +212,12 @@ Packs: **R** raptors, **W** wolves, **K** Krugs, **G** Gromp. Elites: **B** Blue
 | Stage | Waves | Enemies | HP per wave | Mini boss / boss |
 |---|---|---|---|---|
 | 3-1 | R W · R G B · W K G D S | 8 · 7 · 9 | 1.6k · 3.8k · 7.0k | — |
-| 3-2 | R W G · R K W B · W K G D S · R W + drake | 9 · 12 · 9 · 9 | 2.7k · 6.4k · 7.8k · 2.5k + 9k | Infernal Drake, last in wave 4 |
+| 3-2 | R W G · R K W B · W K G D S · R W + drake | 9 · 12 · 9 · 9 | 2.4k · 6.0k · 7.4k · 2.3k + 6.5k | Infernal Drake, last in wave 4 |
 | 3-3 | R R W G · K W G B · R W K D S · R R W K G B | 14 · 8 · 13 · 18 | 3.6k · 6.2k · 8.1k · 9.7k | — |
 | 3-4 | R W G K · R W K B · W K G D S · R R K G B · R W D + drake | 12 · 12 · 9 · 15 · 10 | 4.5k · 6.4k · 7.8k · 8.4k · 5.7k + 10k | Ocean Drake, last in wave 5 |
 | 3-5 | R W K G · R R W B · W K G D S · R W K G B · R R W K D S | 12 · 14 · 9 · 13 · 18 | 4.5k · 5.5k · 7.8k · 8.5k · 10.7k | Elder Dragon (boss wave) |
 
-The waves hold about **129k HP** (275k before V1.3), plus 35k for the two drakes and the dragon. 3-1 is the act's gentle stage: one raptor pack in wave 2 (it had two) and 20% less HP for its monsters. A drake's wave brings fewer packs (V1.3: 3-2's last wave lost the Krugs and Gromp, 3-4's too), so its fight is about the drake. `tests/tools/stage_budget.gd` prints these numbers.
+The waves hold about **128k HP** (275k before V1.3, 129k before V1.5.0), plus **27.5k** for the two drakes and the dragon (35k before V1.5.0: the Infernal Drake 9000 and the Elder Dragon 16000). *(V1.5.0: 3-2's row is the new one: its monsters have 10% less HP, and the drake 6500.)* 3-1 is the act's gentle stage: one raptor pack in wave 2 (it had two) and 20% less HP for its monsters. A drake's wave brings fewer packs (V1.3: 3-2's last wave lost the Krugs and Gromp, 3-4's too), so its fight is about the drake. `tests/tools/stage_budget.gd` prints these numbers.
 
 ### The jungle (`JungleMap`, stages 3-1 to 3-4)
 | | |

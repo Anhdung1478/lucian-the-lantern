@@ -165,6 +165,7 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 ### Act 1 tips
 - On Act 1's first play, tips show one at a time under the boss bar, in a gold-bordered panel, 7 s each. The list is in `act1_the_loss.md`.
 - The time only runs while the game does. A replay has no tips.
+- *(V1.5.0)* The same banner shows Endless's milestones, the first time a save wins wave 10, 20, 30 or 40: "Wave 10 won for the first time: +300 blue and +5 orange essence" (game design doc §14).
 
 ### On the battlefield
 - **Lucian's HP bar** above his head: green, with his shields as a white segment after the HP.
@@ -177,7 +178,9 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 | Magic | Blue |
 | True | White |
 | Critical hit | Bigger text |
+| An enemy's heal *(V1.5.0)* | Green "+N", Heal's green, at the normal size |
 
+- *(V1.5.0)* **Enemy heals** show as a green "+N" over the enemy: the Ocean Drake's mist, the Maiden of the Mist's drain and summons, and Thresh's harvest. (The Black Mist heals only veiled enemies, so its regen never shows a number.) Heals within 0.4 s of the first are added into one number, so a steady regen shows one number at a time, and one that rounds to 0 shows nothing. A veiled enemy shows none. Grievous Wounds lowers the number with the heal.
 - **Skill warnings:** line and circle indicators for enemy attacks.
 
 **Built in Phase 6:**
@@ -202,7 +205,7 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 - **More ground warnings**, in the same red style: a **ring** band (The Box), a thin line (Wall of Pain, a rider's charge, a warden's chain, Maokai's vine line, Elise's Cocoon), the wide Onslaught band (300), circles (Lay Waste, Twisted Advance, Rappel, Dark Passage, the sapling's blast on its own spot) and the Defile ring, a purple ring that stays on Karthus.
 - **Spectral walls** (Wall of Pain, The Box): pale, glowing slabs that fade out at the end. A Box piece that Lucian breaks goes at once.
 - **The vine wave** is a wide green front, as the Tidal Wave is blue.
-- **The Black Mist:** pale green-grey banks under the units that breathe slowly. A veiled enemy is a black silhouette with no bar and no radar dot.
+- **The Black Mist:** pale green-grey banks under the units that breathe slowly. A veiled enemy is a black silhouette with no bar and no radar dot. *(V1.5.0: and no green heal number, though the mist heals it while it is veiled.)*
 - **Karthus's Requiem:** a pulsing purple ring on Lucian and a filling ring round Karthus, with the break bar on the boss bar. "Broken!" rises in gold over him.
 - **Freed souls** rise and brighten into teal-white and fade upward; the dissolve of Thresh's body at the ending also fades his aura and bar.
 - **The abyss** is near-black with slow green swirls; the Chain Warden ledges are rock islands with chains.
@@ -231,7 +234,7 @@ Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the 
 
 - A near-black background. **THE END** in gold at 84 px, "Senna is free." in green (`#8fe3b0`) at 34, "Story time" at 28 in the text color, the three credit lines small and dim. **Continue** is 420 × 64.
 - **Story time** is the slot's play time as H:MM:SS (the stage-end screen's clock is M:SS and rounds up, so it isn't reused).
-- **Continue:** Main screen → the main screen on Act 6; Retry → 6-5 again. If the save failed, the main screen shows the "Could not save" toast.
+- **Continue:** Main screen → the main screen on Act 6; Retry → 6-5 again. If the save failed, the main screen shows the "Could not save" toast. *(V1.5.0: the Journey opens on Training then, since every stage is cleared.)*
 - **ESC does nothing here** (it is consumed). The window's close button still asks to quit.
 - The first two credit lines ("Lucian: The Lantern", "Made with Godot 4") are placeholders.
 
@@ -268,7 +271,7 @@ Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the 
 | Defeated | Retry · Main screen |
 | Game over | Back to title |
 
-- **Retry** starts the stage again. **Next stage** starts the next one. **Main screen** opens the main screen on that act. **Back to title** goes to the title screen. If the save fails, Retry and Next go to the main screen with a red "Could not save" toast.
+- **Retry** starts the stage again. **Next stage** starts the next one. **Main screen** opens the main screen on that act *(V1.5.0: on the latest open stage, or Training once every stage is cleared; `main_screen.md`)*. **Back to title** goes to the title screen. If the save fails, Retry and Next go to the main screen with a red "Could not save" toast.
 - **Built:** the panel is 1040 px wide in the HUD panel style. Title 56, stage name 26, section heads 20 (dim), rows 22 (label left, value right), reward lines 20. Buttons 260 × 60, text 24.
 - **Sounds (Phase 9):** `victory` with STAGE CLEARED, `defeat` with DEFEATED, GAME OVER and RUN OVER (§8).
 
@@ -291,8 +294,8 @@ Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the 
 
 - The title is the optional `title_text` of `StageResult.show_result`; its red color and glow are the defeat's.
 - **Stats:** Waves cleared first, in place of "Waves N / M", then the usual rows, then **Modifier**: the current modifier's downside, or "None" (none picked yet, or Nothing).
-- **Rewards:** the essences, then a green **"New best: 22 waves!"** ("New best: 1 wave!" for one) when the run cleared more waves than the best it started with.
-- **Buttons:** **Retry** (a new run on the same map choice; Random rolls again) and **Main screen** (the Journey on Endless, with the run's map still chosen). There is no Next.
+- **Rewards:** the essences, then a green **"New best: 22 waves!"** ("New best: 1 wave!" for one) when the run cleared more waves than the best it started with. *(V1.5.0: and a green line for each milestone paid in the run, "Wave 10 won for the first time: +300 blue and +5 orange essence"; its essence is in the essence lines.)*
+- **Buttons:** **Retry** (a new run on the same map choice; Random rolls again) and **Main screen** (the Journey on Endless, with the run's map still chosen). There is no Next. *(V1.5.0: Main screen opens the Journey on the latest open stage, or Training once every stage is cleared. The map choice is still saved.)*
 - With the longest Modifier text ("Bosses and mini bosses +25% max HP") the panel grows to about 1074 px wide.
 
 ### Endless: the modifier pick (`ModifierPick`)
@@ -431,8 +434,13 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Only the open cells take items.** A new game opens 5: the first 5 cells. The others show a chain, like a locked equip slot, and hovering one says "Buy Backpack Slots in the Evolution Tree". The tree's Backpack Slots opens more, up to all 54 (game design doc §11).
 - Which cells are open is read from the tree when a stage starts, before the equip slots, so items leaving a locked equip slot land in an open cell. A stage run on its own opens all 54.
 - **Drag and drop:** a drop on a locked cell returns the item to its cell.
-- **When the open cells are full:** loot stays on the ground ("Backpack full" over Lucian), a right-click buy says "No room in the backpack", and a buy dragged onto a locked cell says "That cell is locked". *(V1.4.2: **empty, unlocked equip slots are used before this.** A fragment or legendary goes to an open equip slot once the backpack is full, and applies its stats at once. Loot and shop buys both do it. Potions never go to equip slots, and the backpack comes first. The messages above show only when the equip slots are full too.)*
+- **When the open cells are full:** loot stays on the ground ("Backpack full" over Lucian), a right-click buy says "No room in the backpack", and a buy dragged onto a locked cell says "That cell is locked". *(V1.4.2: **empty, unlocked equip slots are used before this.** A fragment or legendary goes to an open equip slot once the backpack is full, and applies its stats at once. Loot and shop buys both do it. Potions never go to equip slots, and the backpack comes first. The messages above show only when the equip slots are full too.)* *(V1.5.0: the equip slots are no longer used, so loot stays on the ground with "Backpack full" as soon as the open cells are full. A buy that would go into the backpack is declined with a pop-up, "Your backpack is full.", in place of the red "No room in the backpack". See "Built in V1.5.0" below and §3.)*
 - **Debug:** the stage debug table has a "Backpack slots" spinner (1–54).
+
+### Built in V1.5.0
+- **A full backpack takes nothing.** Buys and loot go only into the open backpack cells (and a potion into its potion cell first), never into an empty equip slot: V1.4.2's spill is gone. Loot stays on the ground with the red "Backpack full" (at most every 3 s). A buy with no open cell free is declined with a pop-up (§3).
+- **One penetration item.** Of Lord Dominik's Regards, Mortal Reminder and Void Staff, only one can be in the equip slots. A drop or swap that would equip a second one sends the item back, with the error sound and a one-button pop-up on the menus' card: "Only one penetration item can be equipped, and Lord Dominik's Regards already is." OK, Enter or ESC closes it. A move or swap inside the equip row is allowed. Shadowflame's flat penetration doesn't count, nor do boots (`items.md`).
+- The pop-up (`ConfirmPopup.tell`) closes without answering when the backpack closes under it.
 
 ---
 
@@ -464,8 +472,8 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **Opening:** right-click the merchant. Lucian walks over; the shop opens once he is within 250 units (right away if he already is). Hovering the merchant shows a gold ring.
 - **Header:** "MERCHANT" and the stage gold. ~~The recipe table is hidden;~~ *(it stays since V1.4.1)* the backpack and the shop are centered side by side.
 - **Slots:** 64 px, the price with a coin under each (red when it can't be afforded). A bought slot shows **SOLD** for the rest of the visit, even after a refresh.
-- **Buying:** right-click a shop item to buy it into the first cell it fits, or **hold-drag** it onto a backpack or equip cell. Dropping it on an occupied cell (other than a stack of the same potion with room) buys nothing. *(V1.4.2: a drop on a taken cell buys into a free cell instead, and says "No room in the backpack" only when none is free. A locked or wrong cell keeps its message.)*
-- **Refused purchase** (not enough gold, no room): a red message in the bottom row and the price flashes red, with an error sound.
+- **Buying:** right-click a shop item to buy it into the first cell it fits, or **hold-drag** it onto a backpack or equip cell. Dropping it on an occupied cell (other than a stack of the same potion with room) buys nothing. *(V1.4.2: a drop on a taken cell buys into a free cell instead, and says "No room in the backpack" only when none is free. A locked or wrong cell keeps its message.)* *(V1.5.0: a right-click, or a drop on a taken cell, buys into the backpack only. With no backpack cell free, a pop-up says "Your backpack is full." and nothing is bought. A drop on a free equip slot still buys there, unless it would equip a second penetration item.)*
+- **Refused purchase** (not enough gold, no room): a red message in the bottom row and the price flashes red, with an error sound. *(V1.5.0: no room, and the one-penetration rule, are told in a pop-up instead of the red message; see "Built in V1.5.0".)*
 - **Selling:** the 7th equip-row cell turns red and reads **SELL**. Dragging an item over it shows "+N" and "Sells for N gold"; releasing sells it (a whole potion stack at once).
 - **Closing:** ESC or P. The game stays paused while the shop is open.
 
@@ -479,7 +487,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 
 ### Built in V1.4.1
 - **The Boots tab becomes the Craft tab**, for both crafts: `[input] + [input] → [result]`, the fee, a **Craft** button and a note line. The backpack no longer crafts.
-  - **Two fragments** make their legendary. The fee is the legendary's cost minus the two fragments' costs, so crafting never makes gold when the legendary is sold. The legendary takes the first input's cell (an equip slot stays equipped); the second is emptied.
+  - **Two fragments** make their legendary. The fee is the legendary's cost minus the two fragments' costs, so crafting never makes gold when the legendary is sold. The legendary takes the first input's cell (an equip slot stays equipped); the second is emptied. *(V1.5.0: when the first input's cell is an equip slot the one-penetration rule closes to the legendary, it takes the second's instead; with both closed, Craft is refused with the rule's pop-up.)*
   - **The boots and a fragment** (either way round) make the upgraded boots, for their old fee.
   - Each input takes a fragment or the boots; anything else says "Only fragments and boots are crafted". The placeholder reads ITEM. A right-click empties an input; they are emptied when the shop closes. *(V1.4.3: also when the tab changes, and the item comes back to its cell; see below.)*
   - **Craft** is off until the two make something; the fee is red when it can't be paid ("Not enough gold"). Pressing it pays the fee, uses both items up and plays the craft sound. *(V1.4.3: it asks first, and a craft empties both inputs; see below.)*
@@ -491,17 +499,23 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 ### Built in V1.4.2
 - **Undo sale:** a button in the bottom row, on every tab (you can sell from any tab). It is greyed while nothing is sold. Its hover card names the last sale: "Buy back Muramana for 2030 gold".
   - Each press buys back the **last** thing you sold, and again for the one before it, until you leave the merchant. A new visit starts with nothing to undo.
-  - It costs the gold you got for it. Without enough gold it says "Not enough gold" and keeps the sale. The item returns to its old cell if that is still empty and fits; otherwise to any free cell, or "No room in the backpack".
+  - It costs the gold you got for it. Without enough gold it says "Not enough gold" and keeps the sale. The item returns to its old cell if that is still empty and fits; otherwise to any free cell, or "No room in the backpack". *(V1.5.0: an old equip cell takes it only if the one-penetration rule allows; otherwise, or when it is taken, it goes to a free backpack cell. With none, the "Your backpack is full." pop-up shows and the sale stays to undo.)*
   - **Limits:** the stacks and cooldowns of an equipped item that is sold and bought back are not restored.
 
 ### Built in V1.4.3
 - **A Craft input holds its item out of the backpack.** An item dragged into an input leaves the backpack view: its cell draws empty and can't be dragged, sold or dropped on, so one fragment can't fill both inputs. Hovering the cell says "In the Craft tab: drag it back here, or right-click its input". The boots cell shows its faded Boots placeholder. The item stays in its inventory cell, which still counts as taken.
   - **It comes back** when it is dragged out of the input (onto a free cell it moves there; anywhere else it returns), on a right-click on the input, when the merchant's tab changes, and when the merchant closes.
   - Dragging one input onto the other moves it there, or swaps the two when both are full.
-- **Craft asks first:** "Craft Muramana from Tear of the Goddess and Tear of the Goddess for 2100 gold?" Yes crafts; No (or ESC) changes nothing. Enter is Yes. A fee you can't pay is refused at once with "Not enough gold", without asking.
+- **Craft asks first:** "Craft Muramana from Tear of the Goddess and Tear of the Goddess for 1600 gold?" *(2100 before V1.5.0's fragment prices.)* Yes crafts; No (or ESC) changes nothing. Enter is Yes. A fee you can't pay is refused at once with "Not enough gold", without asking.
 - **A craft empties both inputs.** The legendary shows in the first input's cell, and upgraded boots in the boots cell.
 - **A locked slot:** right-clicking a chained Items slot says "That slot is locked" (it said "Already sold"). Hovering it says "Buy Merchant Stock in the Evolution Tree", the tree node that opens it.
 - **The Potions tab's hint** names the potion keys as bound now, in full ("Potions fill the 7 and 8 cells first, then the backpack."), and follows a rebind.
+
+### Built in V1.5.0
+- **A full backpack refuses a buy.** A buy goes into the backpack (a potion into its potion cell first). With no open backpack cell free, a one-button pop-up says **"Your backpack is full."** (OK, Enter or ESC closes it), the price flashes red with the error sound, and nothing is paid. It replaces the red "No room in the backpack". The one way past it: drag the item onto a free equip slot, which still buys it there.
+- **One penetration item.** A buy dropped on a free equip slot, a craft, or an Undo sale that would put a second of Lord Dominik's Regards, Mortal Reminder and Void Staff in the equip slots is refused or sent elsewhere (above), and the pop-up names the one equipped: "Only one penetration item can be equipped, and Mortal Reminder already is."
+- **Lower craft fees.** The fragments cost 650–1100, so the fees run 900–1600 (`items.md`). The Craft question, the fee line and the legendary cards' "Recipe: X + Y + N gold" follow.
+- An open notice closes, unanswered, when the merchant closes.
 
 ---
 
@@ -512,18 +526,18 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - Options:
   - **Resume**
   - **Settings** (cast mode, camera, volume, etc.)
-  - **Leave this stage** (keeps all essences collected; the game auto-saves). Works since Phase 5: the stage counts as left, the game saves to the current slot and goes back to the main screen. Since Phase 6, Journey opens on the act just played (after Training: the first act with a stage left to clear, else Training). When `stage.tscn` runs on its own, it stays disabled ("Not available yet").
+  - **Leave this stage** (keeps all essences collected; the game auto-saves). Works since Phase 5: the stage counts as left, the game saves to the current slot and goes back to the main screen. Since Phase 6, Journey opens on the act just played (after Training: the first act with a stage left to clear, else Training). *(V1.5.0: always on the latest open stage, or Training once every stage is cleared.)* When `stage.tscn` runs on its own, it stays disabled ("Not available yet").
   - **Exit the game** (asks **"Save before leaving?"** Yes / No; see the game design doc §15)
 - **Built in Phase 9: both exits ask, and both can be cancelled.**
   - **Leave this stage** asks **"Leave this stage? Essences collected so far are kept."** with **Leave / Cancel**. In Endless it asks **"Leave this run? Your best wave is kept."** Leave ends the stage as before. Cancel, or ESC, goes back to this menu, still paused. The menu only emits its request; `Game` asks.
   - **Exit the game** asks **"Save before leaving?"** with **Yes / No / Cancel**. Cancel, or ESC, goes back to this menu, still paused.
   - The question sits over the menu (`Game`'s prompt, layer 90) and reads ESC first, so the menu doesn't close under it.
-  - After a Leave, the Journey opens on the act just played, or on Endless after an Endless run (`main_screen.md`).
+  - After a Leave, the Journey opens on the act just played, or on Endless after an Endless run (`main_screen.md`). *(V1.5.0: on the latest open stage, or Training once every stage is cleared, whatever was left.)*
 - **Menu keys (V1.4.2): arrow keys and Enter work the menus.** (`MenuKeys`, `src/ui/menu/menu_keys.gd`.)
   - **Where:** the title menu and its slot and difficulty pages, this ESC menu, the main screen's gear menu and its slot page, and every confirm pop-up.
   - **Keys:** Up and Down (and Left and Right) move a lit row. Greyed and hidden rows are skipped, and the list wraps around. Enter or Keypad Enter presses the lit row. A held Enter is ignored (it doesn't repeat), so it can't answer the next pop-up.
   - **The lit look** is the row's own hover look (the gold row and bar, or the button's hover colours). Nothing is lit until the first arrow key, so mouse play looks as before. Once something is lit, the mouse moving onto a row lights that one, so the mouse and the keys agree.
-  - **Pop-ups** open with their first button lit (Yes, or the action), so Enter answers at once. Left and Right move across the side-by-side buttons. ESC still answers as before.
+  - **Pop-ups** open with their first button lit (Yes, or the action), so Enter answers at once. Left and Right move across the side-by-side buttons. ESC still answers as before. *(V1.5.0: a notice with OK alone, such as "Your backpack is full.", starts with OK lit, and ESC is OK too.)*
   - **Space** is untouched: it is still Center camera. Not covered: the skin and tree purchase pop-ups, the stage result panel, The End and Settings.
 - **Built in V1.2: an ornate card.**
   - The menu is a card (`MenuCard`) over the game, which is blurred, darkened and vignetted behind it (`MenuBackdrop`).
@@ -541,8 +555,8 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 
 | Tab | Contents |
 |---|---|
-| Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. *(V1.4.3: a slider applies live while it is dragged and is saved once, when let go; a wheel or key step is saved at once.)* No music yet. |
-| Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A double-click doesn't bind the left button (the second press is ignored); a separate later click still does. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. Each skill, summoner and item key also has a **cast mode** picker: Quick cast, Quick + indicator, Normal cast (Reset to defaults sets them back to Quick cast). |
+| Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. *(V1.4.3: a slider applies live while it is dragged and is saved once, when let go; a wheel or key step is saved at once.)* ~~No music yet.~~ *(V1.5.0: the Music slider sets the score, §8.)* |
+| Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A double-click doesn't bind the left button (the second press is ignored); a separate later click still does. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound *(V1.5.0: F3 + Q works only in a debug build; in the released game it does nothing)*; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. Each skill, summoner and item key also has a **cast mode** picker: Quick cast, Quick + indicator, Normal cast (Reset to defaults sets them back to Quick cast). |
 | Graphics | Window mode (windowed, borderless fullscreen, fullscreen), Resolution (1280×720, 1366×768, 1600×900, 1920×1080, 2560×1440, 3840×2160; sizes too big for a window on this screen, title bar included, are greyed out and marked "too big"; sets and centers the window, greyed out in borderless/fullscreen; *V1.3.1:* only at launch and when changed here, so starting a stage leaves a maximized or resized window alone), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails, muzzle flashes or summoner spell effects (Flash sparks, Ghost afterimages, Barrier bubble, Heal and Clarity bursts); Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
 | Gameplay | Cast queue (on by default; see the game design doc §2). It was called Skill queue before V1.4.2. |
 
@@ -560,7 +574,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 
 | Page | Subtitle and content |
 |---|---|
-| Audio | "Volumes change at once. Letting go of a slider plays a test sound." The three volumes, shown as whole numbers ("80"). "No music yet" is now the Music row's description. |
+| Audio | "Volumes change at once. Letting go of a slider plays a test sound." The three volumes, shown as whole numbers ("80"). "No music yet" is now the Music row's description. *(V1.5.0: it reads "Each act's score, which follows the fight.")* |
 | Controls | "Click a binding, then press a key or click it again with a mouse button." The list is grouped: MOVE AND ATTACK, SKILLS, SUMMONER SPELLS, ITEMS, INTERFACE. A 2-line hint sits under it. A binding waiting for a key is lit gold and reads "Press a key...". |
 | Graphics | "The window, the frame rate and how much the effects cost." The old notes are the Resolution and Quality rows' descriptions. |
 | Gameplay | "How Lucian takes your orders." Cast queue, with its note as the description: a skill, item active or summoner spell pressed during a cast time or a dash is cast when it ends. |
@@ -608,7 +622,7 @@ The game opens here (built in Phase 6).
 
 - **Built in V1.4.2:** if the new game can't be written to its slot, the game doesn't start. You stay on the difficulty page, and a red line on every page reads "Could not write slot N. The game can't start until it can save." with the error sound. The slot and the data in memory go back to what they were. Back, or going to the slot list, clears the line.
 - A new game on a used slot asks "Overwrite slot 2? Its progress will be lost." (Yes / No). Yes writes the new game at once and starts Act 1. An empty slot starts at once.
-- **Built in V1.3:** after the slot (and its Overwrite question), **CHOOSE DIFFICULTY**: "Enemy HP and damage. It can't be changed later.", then four buttons, **Easy ×0.8**, **Normal ×1.0** (in gold), **Hard ×1.1** and **Extreme ×1.3**, and Back. Hovering one says what it does ("Enemies have 110% HP and deal 110% damage. Blue essence ×1.2."). A pick writes the new game and starts Act 1. Back or ESC returns to the slot list.
+- **Built in V1.3:** after the slot (and its Overwrite question), **CHOOSE DIFFICULTY**: "Enemy HP and damage. It can't be changed later.", then four buttons, **Easy ×0.8**, **Normal ×1.0** (in gold), **Hard ×1.1** and **Extreme ×1.3**, and Back. Hovering one says what it does ("Enemies have 110% HP and deal 110% damage. Blue and orange essence ×1.2."; before V1.5.0, "Blue essence ×1.2."). A pick writes the new game and starts Act 1. Back or ESC returns to the slot list.
 - Loading a slot opens the main screen on Journey.
 - The slot buttons are 520 px wide, so the longest text keeps room around it. The gear menu's Save as copy uses the same list.
 
@@ -667,3 +681,34 @@ All 24 sounds are placeholders, generated in code by `Sfx` (`src/audio/sfx.gd`):
 | `essence` | Orange or purple essence gained in a stage (`Stage.add_essences`). Blue alone is quiet; it comes with every kill | 0 dB | A quick high sparkle |
 
 - On a boss stage's clear, `essence` (the purple) and `victory` play together. A mini boss kill pays orange and purple in the same frame; the 0.035 s gap keeps that to one `essence`.
+
+### Music (built in V1.5.0)
+The score is made in code too, by `Score` (`src/audio/score.gd`): there are no audio files. `Music` (`src/audio/music.gd`), a node the `Game` owns, plays it on the **Music** bus, so the Music slider (Settings → Audio) sets it. It follows each screen the Game shows.
+
+- **Pieces:** a theme, then one piece per act. Every piece plays the same leitmotif in its own mode, key and tempo, over its own drone and drums. A piece is a loop of 8 to 16 bars.
+
+| Piece | Plays on | Key and mode | Tempo | Bars |
+|---|---|---|---|---|
+| Theme | The title, the main screen, The End and Training | D major | 66 BPM | 8 |
+| Act 1, The Loss | Act 1 | A minor | 60 BPM | 8 |
+| Act 2, The Sentinels | Act 2 | E Mixolydian | 96 BPM | 12 |
+| Act 3, The Jungle | Act 3 | C Dorian | 104 BPM | 12 |
+| Act 4, The Darkness | Act 4 | B Phrygian | 76 BPM | 8 |
+| Act 5, Shadow Isles | Act 5 | F Locrian | 70 BPM | 8 |
+| Act 6, The Lantern | Act 6 | D harmonic minor | 126 BPM | 16 |
+
+- An Endless run plays the piece of its map's act.
+- **Layers:** each piece has five, looped in sync and faded in and out on their own.
+
+| Layer | What it is | When it plays |
+|---|---|---|
+| Drone | A low held chord on the tonic that breathes every two bars | Always |
+| Pulse | The piece's drums | In a wave. It follows the enemies left to beat (those still to spawn included): silent at none, full at 12 or more |
+| Lucian's voice | The leitmotif | Always, except after a defeat |
+| Senna's voice | Her answer to his call, then a third over his close | In Act 1's piece, and in the theme until Act 1 is cleared (in the tutorial, only while she is there). Then she is gone until 6-5 is cleared or the ending is seen, and from then on she sings in every piece. The title screen always has her |
+| Boss | Low drums and an ostinato | From when a boss or mini boss appears until its wave ends, and through a boss wave |
+
+- **Between waves** (the countdown, a break, a cutscene, and all of Training): no pulse and no boss layer; the drone plays at 70% and the voices at 80%. A cleared stage's result plays calm: the drone and the voices at full.
+- **A defeat** (Lucian dead, and his result) leaves the drone alone, at 60%.
+- **Timing:** a layer takes 2 s to fade in or out, and a new piece crossfades over the old one in 3 s. While the game is paused (the ESC menu, the backpack, the shop) the music plays on, 6 dB quieter; the result screen doesn't count as a pause.
+- **Rendering:** each piece is rendered once, when it is first needed, off the main thread (each layer on a thread of its own), at 22,050 Hz; the old piece plays on meanwhile. At most three are kept in memory, the theme always. Run headless (the tests, the bots), nothing renders or plays, but the volumes still follow the game.

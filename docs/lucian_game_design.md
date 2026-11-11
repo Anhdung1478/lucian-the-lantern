@@ -42,7 +42,7 @@ Minutes for a skilled player's first clear of each act, counting a few deaths, s
 
 **Measuring it:** each stage's end screen shows its time, and the slot lists (title screen, Save as copy) show each slot's total play time. Both clocks skip paused time, so shopping (the shop pauses the game) isn't in them, while the budget counts about 30 s of shopping per break. If Act 2 clears in under 25 minutes, or Act 3 in under 60, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards.
 
-**As built (Phase 7):** Act 3's waves hold about 275k HP, plus 35k for the two drakes and the dragon; Act 4's about 313k, plus 18k for Dark Lucian. The drakes come last in their stage's last wave, not in a wave of their own, so Act 3 has 21 waves plus the Elder Dragon's boss wave.
+**As built (Phase 7):** Act 3's waves hold about 275k HP, plus 35k for the two drakes and the dragon; Act 4's about 313k, plus 18k for Dark Lucian. The drakes come last in their stage's last wave, not in a wave of their own, so Act 3 has 21 waves plus the Elder Dragon's boss wave. *(V1.5.0: Act 3's waves hold about 128k and its drakes and dragon 27.5k; Act 4's waves about 164k. See the act files.)*
 
 ---
 
@@ -78,7 +78,7 @@ Casts with no aim (potions, Ghost, Barrier, Heal, Clarity) and casts that aren't
 
 **Targeted casts** (Gunblade, Smite) hit the enemy nearest the cursor within range. Aimed at an enemy out of range, Lucian walks over and casts once it is in range; any new order (move, attack) drops it, a dash or Flash doesn't. *(V1.3.1: the enemy under the cursor comes first, even with another one in range: out of range, he walks to it.)* *(V1.4.3: with Cast queue off, not when pressed during a cast time or a dash; see below.)*
 
-**Key bindings** can be changed in Settings → Controls (all but ESC and the debug F3 + Q).
+**Key bindings** can be changed in Settings → Controls (all but ESC and the debug F3 + Q). *(V1.5.0: F3 + Q opens the debug tables only in a debug build, the editor's or the tests'. In the released game it does nothing, and Q casts as usual.)*
 
 **Cast queue (setting, on by default; called Skill queue before V1.4.2):** a skill, an item active (Gunblade, Galeforce, Rocketbelt…) or a summoner spell pressed during a cast time or the E dash is cast as soon as it ends, aimed where the key was pressed. All three share **one slot** and only the latest press is kept. The only cast times are Q's 0.3 s and W's 0.2 s: R is a channel, not a lock, so nothing waits through it, and Q / W pressed during R are still refused. Potions stay instant. A rooted Flash or item dash is refused, not queued. A stun, a displacement or death drops the queued press. With the setting **off**, a summoner spell pressed during Q's or W's cast time is refused, as a skill is. *(V1.4.2.)* *(V1.4.3: with it off, a Gunblade or Smite pressed during a cast time or a dash at an enemy out of reach is refused too: he no longer walks into reach afterwards, and his attack order is kept.)*
 
@@ -143,7 +143,7 @@ Acts 1 and 2 play this way. Training keeps its dummies and has no waves.
 - **Enemies** attack only Lucian. They walk straight at him, sliding along walls; one that gets stuck sidesteps for a moment. They bump into each other and into Lucian. There is no navigation mesh. *(Phase 7: they path around walls; see below.)*
 - **Enemy bolts** are stopped by walls and pillars. Lucian's homing shots still fly over walls.
 - **Enemy hits** reach Lucian within his radius (30) of his center. Red ground warnings (circle, line, cone, lock line) fill up before an attack lands. *(V1.4.3: a cone counts his 30 px body at its sides too, as circles, lines and rings do, so a body reaching over a side edge is hit.)* *(V1.3.1: a warning dies with its caster. Once the enemy that cast it is dead, it goes at once with no hit: the Infernal Drake's meteors and Fire Breath, Karthus's Lay Waste, Elder Breath, a siege minion's shell.)*
-- **Scaling** (bosses don't scale): per act after the first, HP × (1 + 0.6 · (act − 1)), damage and rewards × (1 + 0.25 · (act − 1)). Each wave after the first adds +15% HP and damage. A stage can also lower some enemies' HP on its own: in Act 1 (1-1), melee and ranged minions have 20% less HP. *(V1.3: HP × (1 + 0.25 · (act − 1)), damage × (1 + 0.15 · (act − 1)), +10% a wave; the first stage of every act is gentler, and the tutorial's minions hit 25% softer. See §17.)*
+- **Scaling** (bosses don't scale): per act after the first, HP × (1 + 0.6 · (act − 1)), damage and rewards × (1 + 0.25 · (act − 1)). Each wave after the first adds +15% HP and damage. A stage can also lower some enemies' HP on its own: in Act 1 (1-1), melee and ranged minions have 20% less HP. *(V1.3: HP × (1 + 0.25 · (act − 1)), damage × (1 + 0.15 · (act − 1)), +10% a wave; the first stage of every act is gentler, and the tutorial's minions hit 25% softer. See §17.)* *(V1.5.0: the second stage of every act (2-2, 3-2, 4-2, 5-2, 6-2) is a little gentler too: its normal enemies have 10% less HP. Elites, mini bosses and bosses keep theirs. `WavePlan.HP_SHARES`.)*
 - **Death:** Lucian turns grey and fades for 1.5 s, then DEFEATED shows. Enemies stand still while he is dead or in stasis. Guardian Angel's stasis comes first. *(V1.4.3: in stasis his skill, summoner spell and item cooldowns and his attack timer keep counting down; only his buff timers and regen stop (`items.md`, Guardian Angel).)*
 - **Game over:** losing Act 1 before its first clear (the tutorial) shows **GAME OVER** instead, and **Back to title** returns to the title screen. It still auto-saves, so the essences collected are kept.
 - **Result panel** (pauses the game; ESC and P do nothing): **STAGE CLEARED**, **DEFEATED** or **GAME OVER**, the stage name, "Waves cleared: 2 / 3 · Time 4:32", the essences collected and any first-clear lines. **Continue** auto-saves and opens the main screen on that act (Back to title after a game over). *(Phase 7: the end screen replaces it; see below.)*
@@ -168,7 +168,7 @@ Acts 3 and 4 play this way too (`act3_the_jungle.md`, `act4_the_darkness.md`): p
 | Defeated | **Retry** · **Main screen** |
 | Game over (the tutorial) | **Back to title** |
 
-- **Retry** starts the same stage again, built fresh from the save. **Next stage** starts the next one (after 2-3, it is 3-1). **Main screen** opens the main screen on that act. If the save fails, Retry and Next go to the main screen instead, with its "Could not save" toast.
+- **Retry** starts the same stage again, built fresh from the save. **Next stage** starts the next one (after 2-3, it is 3-1). **Main screen** opens the main screen on that act. If the save fails, Retry and Next go to the main screen instead, with its "Could not save" toast. *(V1.5.0: the Journey opens on the latest open stage, the first open one not yet cleared, or on Training once every stage is cleared, whatever was played; after the tutorial that is 2-1. `main_screen.md`, "Which place opens".)*
 
 **Walking around walls:** enemies and Lucian walk straight while nothing blocks the line to their goal. When a wall does, they follow a path baked from the map's walls (agent radius 36), asked again every 0.4 s or when the goal moves 120. Lucian's moves, attack chases, merchant visits and cast walks use it; a click inside a wall walks to the closest reachable point. The enemies' sidestep stays as a fallback. Until the map's navigation is ready, and whenever a path comes back empty, everyone walks straight. Acts 1–2 benefit too.
 
@@ -204,11 +204,13 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 - **A skill's CC lands only when its hit lands:** Banshee's Veil blocks the damage and the CC with it.
 - **Fairness:** every root, stun or fear comes from a warning of 0.7 s or more, or from a bolt or wave he can see, and lasts 1.5 s at most (1.0, 1.25 and 1.25 s are the built values). It shows in the buff row ("Rooted", "Stunned", "Feared", with icons) and as a short red word under his health bar (the strongest: stun, then fear, then root).
 
-**Summons** (the Maiden's ghouls, the Broodmother's spiderlings, Thresh's Lantern Souls): the wave counts one the moment it is asked for and waits for it. Each summoner has a cap on its live summons. A summoner's death leaves them. A summon pays 25% (§9).
+**Summons** (the Maiden's ghouls, the Broodmother's spiderlings, Thresh's Lantern Souls): the wave counts one the moment it is asked for and waits for it. Each summoner has a cap on its live summons. A summoner's death leaves them. A summon pays 25% (§9). *(V1.5.0: the Maiden heals 5% of her max HP each time she calls ghouls, and the final Thresh heals 3% when one of his souls is killed within 400 of him, 10 times a fight at most.)*
 
 **Vanishing:** a sapling that explodes and Thresh's souls at his fall leave with no rewards at all, no note and no kill. It is the Scuttler's escape without "Escaped!". **Freed:** a Lantern Soul that dies (or vanishes) rises and fades as teal-white light with a soft chime, and pays like any kill.
 
-**The Black Mist** (Act 5): a normal or elite enemy in a mist bank, more than 350 from Lucian, is veiled: a dark silhouette with no health bar and no radar dot. It can still be targeted and hit, and its warnings show. Bosses and mini bosses are never veiled.
+**The Black Mist** (Act 5): a normal or elite enemy in a mist bank, more than 350 from Lucian, is veiled: a dark silhouette with no health bar and no radar dot. It can still be targeted and hit, and its warnings show. Bosses and mini bosses are never veiled. *(V1.5.0: a hurt normal or elite enemy in a bank also regenerates 1% of its max HP a second while it is veiled; once Lucian is close enough to see it, it stops. It is the same in Endless on the Dead forest. Bosses and mini bosses don't.)*
+
+**Enemy heals (V1.5.0).** Only the Ocean Drake healed before. Now the Black Mist heals (above), the Maiden of the Mist heals 25% of the damage her basic attacks deal and 2% of her max HP when she calls ghouls (`act5_shadow_isles.md`), and the final Thresh harvests his Lantern Souls (`act6_the_lantern.md`). Every enemy heal goes through `Enemy.heal`, so Grievous Wounds cuts it by 40%. A heal shows as a green "+N" over the enemy, gathered over 0.4 s, the Ocean Drake's too; none shows while the enemy is veiled.
 
 **The abyss** (Act 6) blocks walking, dashes, Flash, pulls and enemy bodies, but not bolts, chains or Lucian's shots. A pull stops at its edge. Chain Warden ledges are abyss for physics.
 
@@ -274,11 +276,12 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 ### Backpack & equipment
 - **Backpack:** 49 slots (7 × 7). *(Since Phase 10: 54 cells (9 × 6), and only 5 are open at the start. The Evolution Tree's Backpack Slots opens the rest (§11).)*
 - **Equip slots:** start with 1, unlock up to 6 in the Evolution Tree. *(Since Phase 10, slots 3–4 need Act 2 cleared and slots 5–6 need Act 4 (§11).)*
-- **Full backpack (V1.4.2):** a fragment or legendary that finds the backpack full goes to an **empty, unlocked equip slot** that takes it, and applies its stats at once. Shop buys and loot pickup both do this. The backpack comes first, and potions never go to equip slots.
+- **Full backpack (V1.4.2):** a fragment or legendary that finds the backpack full goes to an **empty, unlocked equip slot** that takes it, and applies its stats at once. Shop buys and loot pickup both do this. The backpack comes first, and potions never go to equip slots. *(Removed in V1.5.0: buys and pickups go only into the backpack, and a potion into its potion cell. With the backpack full, a buy is declined with "Your backpack is full.", unless the item is dragged onto a free equip slot, and loot stays on the ground with "Backpack full".)*
+- **One penetration item (V1.5.0):** only one of Lord Dominik's Regards, Mortal Reminder and Void Staff can be equipped at a time. A move, swap, buy or craft that would equip a second one is refused, with a pop-up naming the one equipped (`items.md`). Shadowflame now gives 15 flat magic penetration (was 10%), so it isn't one of them.
 - **Potion cells** *(since V1.4)*: one for Health potions on key 7 and one for Mana potions on key 8, never locked, 9 each. Bought potions fill them first; the player refills them by hand. Potions can't go in equip slots.
 - **Boots cell** *(since V1.4)*: the boots bought in the Evolution Tree, worn on every map. They give stats and passives, have no key and never leave the cell. The merchant's Boots tab (the Craft tab since V1.4.1) upgrades them with a fragment and a gold fee (`items.md`, Boots).
 - Items can be **sold** to the merchant for **70%** of their buy price (**Guardian Angel: 40%**). Legendary items **cannot be broken** back into fragments. **Undo sale** (V1.4.2): the merchant buys back your sales, last first, for the gold you got, until you leave him.
-- **Crafting:** ~~drag one fragment onto another that forms a recipe and hold for a short time~~. Since V1.4.1, only at the merchant's **Craft** tab: two fragments and a fee of the legendary's cost minus the fragments' costs, so crafting then selling never makes gold (see `ui_design.md` §3 and `items.md`). *(V1.4.3: an item in a Craft input leaves the backpack view until it comes back, Craft asks "Craft X from Y and Z for N gold?" first, and a craft empties both inputs.)*
+- **Crafting:** ~~drag one fragment onto another that forms a recipe and hold for a short time~~. Since V1.4.1, only at the merchant's **Craft** tab: two fragments and a fee of the legendary's cost minus the fragments' costs, so crafting then selling never makes gold (see `ui_design.md` §3 and `items.md`). *(V1.4.3: an item in a Craft input leaves the backpack view until it comes back, Craft asks "Craft X from Y and Z for N gold?" first, and a craft empties both inputs.)* *(V1.5.0: the fragments cost 650–1100 (were 400–1300), so the fees run 900–1600 (were 800–2100). The legendaries' prices are unchanged.)*
 - **Shared item cooldowns:** every copy of the same item shares **one cooldown** (e.g. all Galeforces, all Guardian Angels). Selling an item on cooldown and getting another copy does **not** reset it.
 - **Duplicates allowed.** Stats stack, but each **unique effect only counts once**.
 - **Energized attacks** work like LoL (moving and attacking build stacks; at 100 the next attack is energized).
@@ -378,7 +381,7 @@ Only these pairs combine. **Stats and unique passives/actives are based on LoL**
 | Ghost | Big move speed for a few seconds, pass through enemies |
 | Heal | Restore HP and gain a short burst of move speed |
 | Barrier | Shield that absorbs damage for a short time |
-| Smite | True damage to one enemy and heals Lucian. No bonus vs elites or bosses. Killing an elite with Smite raises its orange essence drop chance. |
+| Smite | True damage to one enemy, and heals Lucian if it kills. No bonus vs elites or bosses. Killing an elite with Smite raises its orange essence drop chance (×3, since V1.5.0). |
 | Clarity | Restore a large amount of mana |
 
 - Cooldowns: **30–90 seconds**. They do **not** reset between waves.
@@ -397,7 +400,7 @@ Placeholder numbers. Ability haste doesn't shorten them, and each spell keeps it
 | Barrier | 60 s | Shield of 95 + 18 × level for 2.5 s; heal and shield power makes it stronger. A golden bubble shows around Lucian while it lasts. |
 | Heal | 60 s | Heal 80 + 15 × level, +30% move speed fading over 1 s. A green ring spreads out and crosses rise around Lucian. |
 | Clarity | 45 s | Restore 50% of max mana. Blue motes spiral into Lucian. |
-| Smite | 30 s | 450 true damage to the enemy under the cursor (walking into reach), else the one nearest the cursor within 500, heal 10% of max HP. |
+| Smite | 30 s | 450 true damage to the enemy under the cursor (walking into reach), else the one nearest the cursor within 500. If it kills, heal 2.5% of max HP, and an elite it kills has 3× the orange chance (§9). *(Since V1.5.0. Before, it healed 10% of max HP on every cast.)* |
 
 ### Built in Phase 5
 - **Every spell is bought in the Evolution Tree** (its own node, 150B). A new game has none.
@@ -433,8 +436,8 @@ Placeholder numbers. Ability haste doesn't shorten them, and each spell keeps it
 
 | Source | Blue | Orange | Purple (first kill / repeat) |
 |---|---|---|---|
-| Normal enemy | = act number (Act 1 = 1 … Act 6 = 6) | 1% chance of 1 | — |
-| Elite | 5× normal | 10% chance of 1 | — |
+| Normal enemy | = act number (Act 1 = 1 … Act 6 = 6) | 1% chance of 1, × (1 + 0.2 · (act − 1)) | — |
+| Elite | 5× normal | 10% chance of 1, × (1 + 0.2 · (act − 1)); × 3 when Smite kills it | — |
 | Rift Scuttler (elite) | High | High (escapes if not killed quickly) | — |
 | Mini boss | 50 | 3 | 5 / 1 |
 | Act boss (Acts 1–5) | 100 | 5 | 10 / 2 |
@@ -442,11 +445,13 @@ Placeholder numbers. Ability haste doesn't shorten them, and each spell keeps it
 
 Act 1's Thresh appears only on the first clear, so he gives no repeat purple.
 
+*(V1.5.0: the orange chance of normal and elite kills grows with the act: ×1.0 in Act 1, ×1.2 in Act 2, up to ×2.0 in Act 6, so a normal kill in Act 6 has 2% and an elite 20%. Endless uses the act its kills pay as (§14). An elite killed by Smite has 3× its chance. Hard and Extreme raise both the chance and the sure orange (§17).)*
+
 **First-time purple total:** 100 (6 mini bosses × 5 + 5 act bosses × 10 + final Thresh × 20).
 
 ### Built in Phase 6
 Every kill pays out at once, Senna's kills too:
-- **Stage gold and XP:** the enemy's own amounts (in the act files), × (1 + 0.25 · (act − 1)).
+- **Stage gold and XP:** the enemy's own amounts (in the act files), × (1 + 0.25 · (act − 1)). *(V1.5.0: a stage can also raise some enemies' gold, `WavePlan.GOLD_SHARES`. In 3-1 to 3-5, Act 3's normal and elite monsters pay ×1.7 gold, so an Act 3 stage pays about 6.4k gold on average (was 3.9k; Act 2 3.0k, Act 4 10.6k), and 3-1's first break about 675. XP, Endless and the other acts are unchanged.)*
 - **Blue and orange:** as in the table above. A boss gives 100 blue and 5 orange.
 - **Purple:** only from bosses, through the save's list of bosses already beaten (`"bosses"`, §15): the first-time amount once, the repeat amount after.
 - **Essences go into the save as they drop.** Leaving the stage, dying, or a Yes to "Save before leaving?" keeps them; a No loses them. They rise over the kill as "+1" with their icon, and the HUD counts them next to the stage gold.
@@ -513,9 +518,11 @@ Skins can only be changed **outside stages**.
 |---|---|---|---|---|
 | Classic | Free | — | — | Balanced |
 | High Noon | 25 | +15% AD | −15% Attack Speed | Slow, heavy shots |
-| PROJECT | 30 | +20% Attack Speed, +15% Move Speed | −10% AD | Fast, always moving, faster energized stacks |
-| Pulsefire | 20 | +15% AP, +15 Ability Haste | −10% Attack Speed | Skill-focused, W and R as main damage |
+| PROJECT | 30 | +20% Attack Speed, +8% Move Speed | −10% AD | Fast, always moving, faster energized stacks |
+| Pulsefire | 20 | +30% W Damage, +25 Ability Haste | −10% Attack Speed | Skill-focused, W and R as main damage |
 | Vampire *(custom)* | 25 | +15% Lifesteal, kills heal 2% max HP | −20% max HP | Risky but sustainable |
+
+*(V1.5.0: PROJECT's move speed is +8% (was +15%). Pulsefire gives +30% W damage and +25 ability haste (was +15% AP and +15 ability haste); its −10% attack speed stays. The W bonus multiplies Ardent Blaze's cross damage.)*
 
 **Built in Phase 5:**
 - Bought and equipped in the Skin Shop (`main_screen.md`). Lucian's body sprite and the HUD portrait follow the equipped skin.
@@ -583,15 +590,17 @@ A node opens once **all of its requirements** are bought (or any 1 / any 2 of th
 | Q / W rank 1 | 100B each | Clear Act 1 |
 | E rank 1 | Free, given when Act 1 is cleared | Clear Act 1 |
 | Passive | 150B | Any 1 of Q, W, E rank 1 |
-| R rank 1 | 600B + 10O | Passive, and 5 levels in Q + W + E |
-| Q / W / E rank 2 | 200B | Previous rank |
-| Q / W / E rank 3 | 350B | Previous rank |
+| R rank 1 | Free, claimed in the tree | Clear Act 2, the passive, and 5 levels in Q + W + E |
+| Q / W / E rank 2 | 150B | Previous rank |
+| Q / W / E rank 3 | 250B | Previous rank |
 | Q / W / E rank 4 | 500B + 5O | Previous rank |
 | Q / W / E rank 5 | 800B + 10O | Previous rank |
 | R rank 2 | 1200B + 20O | R rank 1, and 9 levels in Q + W + E |
 | R rank 3 | 2000B + 30O | R rank 2, and 13 levels in Q + W + E |
 
 *(Since Phase 10. Before, R rank 1 needed Q, W and E each at rank 1 plus the passive, and ranks 2–3 only the rank before. Q + W + E is the sum of the three ranks bought, 15 at most: Q 4 + E 1 opens R once the passive is bought.)*
+
+*(V1.5.0: Q, W and E ranks 2 and 3 cost 150B and 250B (were 200B and 350B). R's rank 1 costs nothing (was 600B + 10O) and opens only once Act 2 is cleared, on top of its old rules, so it is a free claim like Ghost, with a FREE badge. It isn't given: the player clicks it. A save that already bought it keeps it, and a tree reset refunds at today's prices, so a rank 1 bought for 600B + 10O gives nothing back.)*
 
 ### Backpack
 *(Called Equipment before Phase 10.)*
@@ -622,9 +631,11 @@ A node opens once **all of its requirements** are bought (or any 1 / any 2 of th
 | 2 | 16 | +6 | 100B |
 | 3 | 22 | +6 | 200B |
 | 4 | 29 | +7 | 350B + 3O |
-| 5 | 37 | +8 | 500B + 8O |
-| 6 | 45 | +8 | 800B + 15O |
-| 7 | 54 | +9 | 1200B + 25O |
+| 5 | 37 | +8 | 740B + 4O |
+| 6 | 45 | +8 | 1280B + 7O |
+| 7 | 54 | +9 | 2000B + 12O |
+
+*(V1.5.0: levels 5–7 cost less orange and more blue, about 60 blue for each orange taken off. They were 500B + 8O, 800B + 15O and 1200B + 25O.)*
 
 ### Stats
 AD, AP, HP, Armor, MR, Attack Speed, Mana, Health Regen, Mana Regen — 5 levels each. *(The two regen nodes since Phase 10.)*
@@ -674,13 +685,13 @@ Stage gold, bonus XP and essence drops work since Phase 6: +10% gold, XP or blue
 
 | Case | Text |
 |---|---|
-| R on a new save | "Requires: Passive – Lightslinger and 5 levels in Q + W + E (now 0)" |
+| R on a new save | "Requires: Passive – Lightslinger and Clear Act 2 and 5 levels in Q + W + E (now 0)" *(V1.5.0; "Clear Act 2" is new)* |
 | R at rank 1 | "Requires: 9 levels in Q + W + E (now 7)" |
 | Equip Slots at level 1 | "Requires: Clear Act 2" |
 | Ghost before 1-1 | "Requires: Clear Act 1" |
 
-- **Free upgrades** are levels whose rules are met and that cost nothing. After 1-1 that is Ghost (E's first level is still put in the tree for free, as before). After a reset it is E and Ghost. A FREE badge marks them on the main screen (`main_screen.md`).
-- **Old saves keep their levels**, even above the new rules: an R at rank 2 with fewer than 13 Q + W + E levels, or equip slots past the acts cleared. Such a node shows as bought, with a small lock, and its next level reads LOCKED. A reset refunds from today's tables, so a Ghost bought for 150B gives back nothing.
+- **Free upgrades** are levels whose rules are met and that cost nothing. After 1-1 that is Ghost (E's first level is still put in the tree for free, as before). After a reset it is E and Ghost. A FREE badge marks them on the main screen (`main_screen.md`). *(V1.5.0: also R's rank 1, once Act 2 is cleared, the passive is bought and Q + W + E reach 5.)*
+- **Old saves keep their levels**, even above the new rules: an R at rank 2 with fewer than 13 Q + W + E levels, or equip slots past the acts cleared. Such a node shows as bought, with a small lock, and its next level reads LOCKED. A reset refunds from today's tables, so a Ghost bought for 150B gives back nothing. *(V1.5.0: nor does an R rank 1 bought for 600B + 10O, and Q, W and E ranks 2 and 3 give back 150B and 250B, whatever they cost.)*
 - **Backpack Slots** sets how many backpack cells are open in a stage: 5 on a new save, 16 after two levels. Items only go into open cells. With them full, loot stays on the ground ("Backpack full"). A locked cell shows a chain; hovering it says "Buy Backpack Slots in the Evolution Tree". A stage run on its own opens all 54, and the stage debug table has a "Backpack slots" spinner (`ui_design.md` §2).
 - **Health Regen and Mana Regen** add to Lucian's regen per second from the start of every stage.
 - **Boots** put Boots of Speed (level 1) or Slightly Magical Boots (level 2) in the boots cell at the start of every stage. The node sits on the Backpack page's trunk, between the Equip Slots and Backpack plaques, with a plaque of its own.
@@ -817,7 +828,7 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 
 **A run:**
 - **Start** from the Journey's Endless portal (`main_screen.md`). It opens once Act 3 is cleared. The side panel picks the map: **Random** or one of six. Random rolls a map at Start, and again on Retry.
-- The map changes only the ground. Every map has the same enemies and the same ramp.
+- The map changes only the ground. Every map has the same enemies and the same ramp. *(V1.5.0: the enemies come from the acts the save has cleared, whatever the map; see the pools below. The Dead forest's mist banks also heal hurt, veiled normal and elite enemies 1% a second, as in Act 5.)*
 
 | Map choice | Built from | Why |
 |---|---|---|
@@ -851,6 +862,8 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 | Mini boss (6) | Infernal Drake, Ocean Drake, Maokai, Elise, Karthus (revived), Hecarim |
 | Boss (5) | Akshan, Elder Dragon, Dark Lucian, Karthus, Thresh (final). Act 1's Thresh never comes: his fight needs Senna. |
 
+*(V1.5.0: every pool draws only from the acts the save had cleared when the run started, and at least Acts 1–3, since Endless opens after Act 3. Each id's act is the act whose story brings it first (`EndlessPlan.act_of`). With Acts 1–3 that leaves 6 normals (melee and ranged minions, Raptors, Murkwolves, Krugs and Gromp), 5 elites (siege and super minions, Blue, Red and the Scuttler), 2 mini bosses (the Infernal and Ocean Drakes) and 2 bosses (Akshan and the Elder Dragon), which take turns, since neither comes twice in a row. Clearing Act 4 adds the shadow minions and Dark Lucian, and so on.)*
+
 **Strength.** It replaces the act and wave scaling. n = w − 1; k is the boss's tier.
 
 | Who | Formula | Wave 1 | Wave 10 | Wave 20 | Wave 35 | Wave 50 |
@@ -860,22 +873,38 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 
 | Who | Formula | Values |
 |---|---|---|
-| Boss HP (each phase, for Thresh) | 15000 × (1 + 0.3(k − 1)), k = w / 10 | Wave 10: 15000 · 20: 19500 · 30: 24000 · 50: 33000 |
+| Boss HP (each phase, for Thresh) | max(15000 × (1 + 0.3(k − 1)), 0.6 × the planned HP of wave w − 1), k = w / 10 | All six acts cleared: wave 10: 15000 · 20: 24,119 · 30: 41,714 · 50: 85,554. Acts 1–3: wave 20: 26,381 |
 | Mini boss HP | 9000 × (1 + 0.3(k − 1)), k = (w + 5) / 10 | Wave 5: 9000 · 15: 11700 · 25: 14400 · 45: 19800 |
-| Boss and mini boss damage | basic damage and every skill hit × (1 + 0.15(k − 1)) | ×1, ×1.15, ×1.3, … |
+| Boss and mini boss damage | basic damage and every skill hit × max(1 + 0.15(k − 1), √(damage_scale(w) / damage_scale(f))), f = 10 for a boss, 5 for a mini boss; × 0.8 at tier 1 and × 0.9 at tier 2 for one from Acts 5–6 | Bosses, waves 10–50: ×1.0, ×1.27, ×1.54, ×1.81, ×2.08. Mini bosses, waves 5–45: ×1.0, ×1.32, ×1.63, ×1.95, ×2.26 (before the Acts 5–6 share) |
+
+*(V1.5.0: so the bosses keep up with the waves. Before: boss HP 15000 × (1 + 0.3(k − 1)) (wave 20: 19500, 30: 24000, 50: 33000), and damage × (1 + 0.15(k − 1)) (×1, ×1.15, ×1.3, …). The planned HP of a wave is `EndlessPlan.wave_hp`: its normal and elite counts at their pools' mean HP (the pools of the acts cleared), × the wave's HP scale, before the difficulty and modifier #5. It is the same every run. damage_scale is the normal and elite damage row above, so the first boss and the first mini boss hit ×1.0. The Act 5–6 share softens Karthus, Thresh, Maokai, Elise, Karthus revived and Hecarim at their first two tiers.)*
 
 - Wave 1 is as easy as Act 1. The HP passes Act 6's last story wave (×7.6) at wave 34.
-- A boss's HP is fixed by its wave, whoever comes, so the random pick doesn't swing the run.
-- *(V1.4.2)* An Endless boss's power also reaches the burns it makes: Karthus's Defile, the Infernal Drake's breath and meteor burns, and the on-hit burn of its basic shots are multiplied by the boss's `skill_scale` (×1.3 at tier 3). It is 1.0 for everything else, so the story doesn't change. Other ground hazards are not scaled.
+- A boss's HP is fixed by its wave, whoever comes, so the random pick doesn't swing the run. *(V1.5.0: by its wave and the acts cleared.)*
+- *(V1.4.2)* An Endless boss's power also reaches the burns it makes: Karthus's Defile, the Infernal Drake's breath and meteor burns, and the on-hit burn of its basic shots are multiplied by the boss's `skill_scale` (×1.3 at tier 3). It is 1.0 for everything else, so the story doesn't change. Other ground hazards are not scaled. *(V1.5.0: `skill_scale` is the power in the table above, Acts 5–6's share included, so ×1.54 at wave 30.)*
 - *(V1.4.3)* The on-hit burns of normal and elite enemies (Gromp, the Red Brambleback) grow with their hits too: `burn_scale` = the unit's damage / its `data.damage`, set by `EndlessDirector.scale`. For a boss or mini boss that ratio is its power, the same `skill_scale`, so its burn isn't scaled twice. Story burns are unchanged.
 - Bosses come at the boss point, mini bosses from their camp or the spawn points. An Endless boss is never the stage's boss, so its kill ends nothing. Final Thresh still rises into Phase 2 at full HP. His fall in Phase 2 has no cutscene: he leaves, and the run goes on.
 
 **Rewards:**
-- **Gold, XP and blue** use the story's rules with the act a = 1 + (w − 1) / 10 (whole numbers): waves 1–10 pay like Act 1, waves 11–20 like Act 2, and so on, with no cap. A normal kill gives a blue, an elite 5a. The orange chances are the story's (1% and 10%).
-- **Bosses and mini bosses** pay the story's essences (a boss 100 blue and 5 orange, a mini boss 50 and 3), **scaled with the tier** since V1.4.2: the same factor as their HP, 1 + 0.3(k − 1), applied to the base blue and the sure orange and rounded. A boss pays 100 blue and 5 orange at tier 1, **130 and 7** at tier 2, **160 and 8** at tier 3. Gold, XP, loot and the repeat purple stay as they are. They always pay their **repeat purple, on the kill**: 2 for Akshan, the Elder Dragon, Dark Lucian and Karthus, 4 for Thresh, 1 for a mini boss. The save's `"bosses"` list is never touched, and the end screen gets no purple line.
+- **Gold, XP and blue** use the story's rules with the act a = 1 + (w − 1) / 10 (whole numbers): waves 1–10 pay like Act 1, waves 11–20 like Act 2, and so on, with no cap. A normal kill gives a blue, an elite 5a. The orange chances are the story's (1% and 10%). *(V1.5.0: a = max(1 + (w − 1) / 10, the acts the save had cleared when the run started), capped at 6. A save with Act 5 cleared is paid like Act 5 from wave 1. The orange chances are the story's for that act, so they grow with it too (§9).)*
+- **Bosses and mini bosses** pay the story's essences (a boss 100 blue and 5 orange, a mini boss 50 and 3), **scaled with the tier** since V1.4.2: the same factor as their HP, 1 + 0.3(k − 1), applied to the base blue and the sure orange and rounded. A boss pays 100 blue and 5 orange at tier 1, **130 and 7** at tier 2, **160 and 8** at tier 3. Gold, XP, loot and the repeat purple stay as they are. They always pay their **repeat purple, on the kill**: 2 for Akshan, the Elder Dragon, Dark Lucian and Karthus, 4 for Thresh, 1 for a mini boss. The save's `"bosses"` list is never touched, and the end screen gets no purple line. *(V1.5.0: the factor is the tier's only, not the HP floor above. Hard and Extreme raise the sure orange too, ×1.2 and ×1.5 (§17).)*
 - **Final Thresh's fall counts as a kill:** 300 gold, XP, a loot roll and his 4 purple.
 - **Loot drops on every kill,** a boss's too (§9: a fragment for sure, plus 15% a legendary). There is no last kill in Endless.
 - The tree's economy nodes work as in the story. A modifier's reward multiplies on top of them.
+
+**Milestones (V1.5.0):** the first time a save wins wave 10, 20, 30 and 40, it is paid once:
+
+| Wave won | Blue | Orange |
+|---|---|---|
+| 10 | 300 | 5 |
+| 20 | 600 | 10 |
+| 30 | 900 | 15 |
+| 40 | 1,200 | 20 |
+
+- A milestone wave is "won" as the best wave counts it: its break starts. Waves skipped by a debug jump don't count.
+- The essence rises over Lucian as a kill's does. A banner under the stage info reads "Wave 10 won for the first time: +300 blue and +5 orange essence", and the same line is on the RUN OVER screen's rewards.
+- The amounts are fixed: the tree's Essence Drops, a modifier and the difficulty don't raise them.
+- The save keeps the waves already paid (`endless_milestones`, §15). They are written with the run's other essences when the run ends, even when Lucian falls.
 
 **Modifiers** (the table above):
 - After each boss wave (10, 20, …) the break **waits**. A **"Choose a modifier"** panel shows **3 cards**: 2 of #1–5 at random (never the current one), then Nothing. The game pauses, the backpack and the menu close, and ESC and P do nothing. A click picks, with the `buff` sound. Then the full 20 s break counts down.
@@ -906,9 +935,10 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 **The end of a run** (the end screen, on death):
 - **RUN OVER** in red, then "Endless · Jungle". The `defeat` sound plays.
 - **Stats:** Waves cleared, Time, Kills, Damage dealt, Damage taken, Gold earned, Level reached, Modifier (its downside, or "None").
-- **Rewards:** the essences, plus a green **"New best: 22 waves!"** ("1 wave" for one) when the run beat the best it started with.
+- **Rewards:** the essences, plus a green **"New best: 22 waves!"** ("1 wave" for one) when the run beat the best it started with. *(V1.5.0: and a green line for each milestone the run paid.)*
 - **Retry** starts a new run on the same map choice (Random rolls again). **Main screen** opens the Journey on Endless, with the run's map still chosen. There is no Next.
 - Leaving a run shows no end screen: it saves and opens the Journey on Endless the same way.
+- *(V1.5.0: the Journey now opens on the latest open stage, or on Training once every stage is cleared, after an Endless run too (`main_screen.md`, "Which place opens"). The run's map choice is still saved, so the Endless portal shows it when picked.)*
 
 **Debug:** "Jump to boss wave" jumps to the next tenth wave (from wave 3 to 10, from 10 to 20) and closes an open pick first. "Jump to the last wave" is hidden. The wave line reads "Wave 7 (Endless)".
 
@@ -933,6 +963,7 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 - Owned skins, equipped skin
 - Cleared stages, and which bosses / mini bosses already gave first-time purple
 - Endless best wave (the most waves cleared in one run)
+- The Endless milestone waves already paid (V1.5.0, §14)
 - Play time: every second outside the title screen, pauses not counted
 - The difficulty (V1.3)
 
@@ -940,7 +971,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 
 ### When to save
 - **Auto-save only when a stage is done:** cleared, left (ESC → Leave this stage) or failed (Lucian dies). Nothing is saved between waves.
-  - An Endless run is done when Lucian dies or the run is left. Its best wave is kept in memory each time a wave is won, so that save writes it (§14).
+  - An Endless run is done when Lucian dies or the run is left. Its best wave is kept in memory each time a wave is won, so that save writes it (§14). *(V1.5.0: a milestone paid in the run, with its essence, is written the same way.)*
 - **Little on the main screen auto-saves.** Evolution Tree purchases and resets, skin purchases and skin changes, and the Endless map choice are kept only by the next auto-save, the **Save** button in the gear menu, a **Yes** when leaving, or **pressing Start** (V1.4.2). A Start saves first; if the save fails, the stage doesn't start and a red toast says so. The difficulty can't change after a new game.
 - **Every exit can be cancelled** (since Phase 9). Cancel, or ESC, closes the question and nothing else happens.
 
@@ -976,16 +1007,18 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 | `cleared` | Cleared stage ids: `["1-1", "2-1"]` |
 | `bosses` | Bosses that already gave their first-time purple: `["thresh_1", "akshan"]` |
 | `endless_best` | Best Endless wave: the most waves cleared in one run (dying in wave 23 records 22) |
+| `endless_milestones` | The Endless milestone waves already paid, in the order won: `[10, 20]` (V1.5.0). Only 10, 20, 30 and 40 load, each once |
 | `play_time` | Whole seconds played in this slot: `3720` |
 | `endless_map` | The Endless map choice (V1.4.2): 0 is Random, 1–6 the maps in act order, 1 Mid lane to 6 Thresh's domain (`Journey.ENDLESS_MAPS`). Anything else loads as Random |
 | `difficulty` | `"easy"`, `"normal"`, `"hard"` or `"extreme"` (V1.3) |
+| `ending_seen` | `true` once The End has shown (V1.4.1). The score uses it too: Senna's voice comes back (`ui_design.md` §8) |
 
 - Numbers are converted back with `int()` when loading (JSON numbers load as floats). Unknown keys, node ids, skins, spell ids and stage ids are dropped, so an old or edited file still loads.
 - IDs are saved, not display names.
 - A save is written to a temp file first. Then the old save becomes the backup (only if it still reads, so a broken file never replaces a good backup) and the temp file replaces it. If anything fails, the old file and backup stay as they were. The backup loads if the main file is broken. With both broken, it's a new game.
-- `"version"` stays 1: Phase 6 and V1.3 only added keys. A file without `"bosses"` or `"play_time"` loads with none; one without `"difficulty"` (or with an unknown word) plays on Normal.
+- `"version"` stays 1: Phase 6 and V1.3 only added keys. A file without `"bosses"` or `"play_time"` loads with none; one without `"difficulty"` (or with an unknown word) plays on Normal. *(V1.5.0 only adds `"endless_milestones"` too: a file without it loads with none paid.)*
 - `SaveGame.start_new(slot, difficulty)` makes that slot current, resets the progress, sets the difficulty and writes it at once. If the write fails, the old data and slot are put back and the title screen shows a red notice (V1.4.2). The difficulty is chosen only here: `set_difficulty` was removed in V1.4.2. `award_boss(id, first, repeat)` returns the purple due and records the boss; the stage adds the essence.
-- The main screen's debug table (F3 + Q) gives essences, sets the acts cleared, maxes or clears the tree, resets the progress, and forgets the bosses' first-time purple.
+- The main screen's debug table (F3 + Q) gives essences, sets the acts cleared, maxes or clears the tree, resets the progress, and forgets the bosses' first-time purple. *(V1.5.0: only in a debug build. `DebugPanel.allowed` is `OS.is_debug_build()`, so the released game never opens it or the stage's table; a test sets it false to check the release case.)*
 
 ---
 
@@ -1000,7 +1033,7 @@ Nothing inside a stage is saved (items, gold, level, enemies), since stages alwa
 - [x] Item stats and effects (`items.md`)
 - [x] UI (see `ui_design.md` and `main_screen.md`): HUD (with the stage info, boss bar and radar), backpack, crafting, recipe table, ESC menu, merchant's shop, Settings, the main screen (Journey, Evolution Tree, Skin Shop), and the title screen with save slot selection
 - [x] Save system
-- [ ] Art style, sound (Phase 3 has generated placeholder sound effects and audio buses; Phase 9 adds 11 more, 24 in all, listed in `ui_design.md` §8; no music yet)
+- [ ] Art style, sound (Phase 3 has generated placeholder sound effects and audio buses; Phase 9 adds 11 more, 24 in all, listed in `ui_design.md` §8; no music yet) *(V1.5.0: a synthesized score, made in code like the sounds: a theme and one piece per act, in layers that follow the fight. `ui_design.md` §8, Music.)*
 
 ---
 
@@ -1022,23 +1055,26 @@ A playtest bot (`tests/tools/autoplay.gd`) played the story headless at three sk
 
 Bosses and mini bosses don't scale and keep their numbers (except the Ocean Drake's mist). Endless keeps its own scaling (`EndlessPlan`).
 
-**Tools:** `tests/tools/autoplay.gd` plays the story at a tier (skilled, average, novice), retries a lost stage, farms the last cleared one after 3 losses, and prints each try (kills, damage taken by enemy, what killed him). `AUTOPLAY_DIFFICULTY=hard` plays it on a difficulty. `tests/tools/stage_budget.gd` prints every stage's HP per wave, XP, gold, blue and the level Lucian ends at. Both run headless only.
+**Tools:** `tests/tools/autoplay.gd` plays the story at a tier (skilled, average, novice), retries a lost stage, farms the last cleared one after 3 losses, and prints each try (kills, damage taken by enemy, what killed him). `AUTOPLAY_DIFFICULTY=hard` plays it on a difficulty. `tests/tools/stage_budget.gd` prints every stage's HP per wave, XP, gold, blue and the level Lucian ends at. Both run headless only. *(V1.5.0: between stages the bot buys skins with purple, through the Skin Shop's own call: every one it can afford, in Skin Shop order. It wears the last one bought, or with `AUTOPLAY_SKIN=<id>` (`classic` for none) it saves up for that one first and wears it once owned. Each try's line names the skin worn. The bot also follows the new item rules: it buys onto a free equip slot when its backpack is full, equips to make room for loot, and keeps one penetration item. `stage_budget.gd` counts an Ancient Krug's splits in the XP, gold and blue too, applies each stage's gold share, and after the stages prints each boss's and mini boss's wall, its HP ÷ the gold earned in its stage before its wave, and each act's average gold per stage, the boss's own gold included.)*
 
 ### Difficulty (V1.3)
 
-The pass above makes Normal fit a new player. The difficulty lets the player make the game easier or harder, with one number (`Difficulty.SCALES`), and pays more blue essence on the harder levels (`Difficulty.BLUE_SCALES`):
+The pass above makes Normal fit a new player. The difficulty lets the player make the game easier or harder, with one number (`Difficulty.SCALES`), and pays more blue and orange essence on the harder levels (`Difficulty.ESSENCE_SCALES`; `BLUE_SCALES` before V1.5.0):
 
-| Difficulty | Enemy HP | Damage Lucian takes | Blue essence |
+| Difficulty | Enemy HP | Damage Lucian takes | Blue and orange essence |
 |---|---|---|---|
 | Easy | ×0.8 | ×0.8 | ×1.0 |
 | **Normal** | ×1.0 | ×1.0 | ×1.0 |
 | Hard | ×1.1 | ×1.1 | ×1.2 |
 | Extreme | ×1.3 | ×1.3 | ×1.5 |
 
+*(V1.5.0: the last column was blue only. It now scales orange too: see below.)*
+
 *The user first picked Hard ×1.2 and Extreme ×1.5 with no extra blue. On those numbers both bots were stuck at the start of Act 3 on Hard and Extreme, so the user chose four changes at once: the smaller steps above, more blue on Hard and Extreme, Act 3 starting at level 5, and the Blue Sentinel's slam 36 → 30.*
 
-- **Where it is picked:** after the slot in **Start new game** (a page titled CHOOSE DIFFICULTY, noted "Enemy HP and damage. It can't be changed later."; Normal is gold; hovering a level shows "Enemies have 110% HP and deal 110% damage. Blue essence ×1.2."). Back or ESC returns to the slots.
+- **Where it is picked:** after the slot in **Start new game** (a page titled CHOOSE DIFFICULTY, noted "Enemy HP and damage. It can't be changed later."; Normal is gold; hovering a level shows "Enemies have 110% HP and deal 110% damage. Blue and orange essence ×1.2."; "Blue essence ×1.2." before V1.5.0). Back or ESC returns to the slots.
 - **Fixed for the save (V1.4.2):** the level is chosen only here, at a new game, and nothing changes it afterwards. *(V1.3 let you change it from the gear menu; saves keep the level they have. V1.4.2 showed it there as a greyed row, "Difficulty · Normal"; since V1.4.3 the gear menu has no Difficulty row, and the game never shows the level after the new-game page.)*
 - **What it scales:** the HP of every enemy, bosses and mini bosses included (`Stage.spawn_unit`), and every hit Lucian takes before armor and magic resist (`Lucian.damage_taken_scale`), so boss skills, ground hazards and burns count too. The damage is on Lucian's side because boss skills have their own numbers.
 - **Blue essence:** every kill's blue × 1.2 on Hard and × 1.5 on Extreme (`KillRewards`), on top of the tree's Essence Drops and an Endless modifier, so replays pay for the tree.
-- **What it doesn't:** gold, XP, orange and purple essence, enemy speed, timings, and the boss break bars (they are shares of the boss's HP, so they grow with it). It applies in the story and Endless; Training's dummies keep their HP.
+- **Orange essence (V1.5.0):** the same × 1.2 and × 1.5, on the orange drop chance of normal and elite kills and on the sure orange of bosses and mini bosses and the Rift Scuttler, rounded. A boss pays 6 orange on Hard and 8 on Extreme (5 on Normal), a mini boss 4 and 5 (3), the Scuttler 5 and 6 on top of its chance (4).
+- **What it doesn't:** gold, XP, ~~orange~~ and purple essence, enemy speed, timings, and the boss break bars (they are shares of the boss's HP, so they grow with it). It applies in the story and Endless; Training's dummies keep their HP. *(Orange since V1.5.0, above. Endless's milestones aren't raised.)*

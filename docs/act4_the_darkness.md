@@ -63,7 +63,7 @@ A mirror of the player. He has **no Passive and no W**, and always uses his skil
 | Gold and XP | × (1 + 0.25 · (act − 1)) | × 1.75 |
 | Blue per kill | = act number (elites 5×) | 4 (elites 20) |
 
-Each wave after the first also adds **+10% HP and damage**. Dark Lucian doesn't scale. *(V1.3 balance pass: the numbers here are the new ones; see `lucian_game_design.md` §17.)* Lucian starts every Act 4 stage at **level 5**; in 4-1 the shadow melee and ranged minions have 20% less HP. The shadow super minion has the light one's new 1150 HP and 36 damage.
+Each wave after the first also adds **+10% HP and damage**. Dark Lucian doesn't scale. *(V1.3 balance pass: the numbers here are the new ones; see `lucian_game_design.md` §17.)* Lucian starts every Act 4 stage at **level 5**; in 4-1 the shadow melee and ranged minions have 20% less HP. The shadow super minion has the light one's new 1150 HP and 36 damage. *(V1.5.0: in 4-2 the shadow melee and ranged minions have 10% less HP. The siege and super minions keep theirs.)*
 
 ### Shadow minions
 Their own data files (`shadow_*_minion.tres`) with the Act 1–2 minions' numbers, behaviors and kinds; only the id, the name and the art change. Empower works on them as on the light ones.
@@ -80,11 +80,11 @@ Their own data files (`shadow_*_minion.tres`) with the Act 1–2 minions' number
 
 | Stage | Waves | Enemies | HP per wave | Boss |
 |---|---|---|---|---|
-| 4-1 | 8m 6r 1S · 8m 6r 2S · 8m 8r 1S 1U · 10m 8r 2S 1U | 15 · 16 · 18 · 21 | 10.0k · 13.8k · 19.3k · 26.3k | — |
-| 4-2 | 8m 6r 2S · 8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 10m 10r 3S 1U | 16 · 18 · 21 · 23 · 24 | 12.0k · 17.1k · 23.6k · 27.6k · 33.6k | — |
-| 4-3 | 8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 10m 10r 3S 1U · 12m 10r 2S 2U | 18 · 21 · 23 · 24 · 26 | 14.8k · 20.9k · 24.8k · 30.4k · 38.9k | Dark Lucian (boss wave) |
+| 4-1 | 8m 6r 1S · 8m 6r 2S · 8m 8r 1S 1U · 10m 8r 2S 1U | 15 · 16 · 18 · 21 | 5.3k · 7.1k · 9.3k · 12.5k | — |
+| 4-2 | 8m 6r 2S · 8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 10m 10r 3S 1U | 16 · 18 · 21 · 23 · 24 | 7.0k · 9.1k · 12.3k · 14.0k · 16.8k | — |
+| 4-3 | 8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 10m 10r 3S 1U · 12m 10r 2S 2U | 18 · 21 · 23 · 24 · 26 | 8.8k · 12.0k · 13.8k · 16.5k · 20.0k | Dark Lucian (boss wave) |
 
-The waves hold about **313k HP**, plus 18k for Dark Lucian.
+The waves hold about **164k HP**, plus 18k for Dark Lucian. *(V1.5.0: the HP column is recomputed from the code. It still held Phase 7's numbers, from before the V1.3 balance pass: 10.0k to 38.9k a wave, 313k in all. 4-2's minions now have 10% less HP too.)*
 
 ### Dark Lucian (`dark_lucian`, 4-3)
 He rises from the river in the boss wave. He uses one skill at a time; while busy with one he neither walks nor attacks, and he stands 0.3 s after a skill's warning ends. All skill hits count as skills.

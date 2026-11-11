@@ -116,7 +116,7 @@ All numbers are placeholders. A mini boss's or boss's skill hit counts as a skil
 | Gold and XP | × 2.25 |
 | Blue per kill | 6 (elites 30) |
 
-Each wave after the first also adds **+10% HP and damage**. Mini bosses and the boss don't scale. *(V1.3 balance pass: the numbers here are the new ones; see `lucian_game_design.md` §17.)* Lucian starts every Act 6 stage at **level 9**; in 6-1 the Mist Walkers and Lantern Souls have 20% less HP.
+Each wave after the first also adds **+10% HP and damage**. Mini bosses and the boss don't scale. *(V1.3 balance pass: the numbers here are the new ones; see `lucian_game_design.md` §17.)* Lucian starts every Act 6 stage at **level 9**; in 6-1 the Mist Walkers and Lantern Souls have 20% less HP. *(V1.5.0: in 6-2 they have 10% less HP. The riders, the wardens and Karthus, revived keep theirs.)*
 
 ### Enemies
 Base numbers (the data files). The last column shows wave 1 of Act 6, scaled.
@@ -201,8 +201,10 @@ Boss wave. Chain whip bolt, 85 physical (900 px/s), range 450, every 1.6 s. 1600
 | Skill | Numbers |
 |---|---|
 | **Death Sentence (Q)** | As above, but a hook that **misses** (reaches its range or a wall without touching Lucian) is thrown again at once, **once**, with a 0.45 s warning, aimed where Lucian is now. A hook that landed, or that Banshee's Veil blocked, is not a miss. |
-| **Dark Passage (W)** | Throws his lantern to a spot within 250 of Lucian (a circle warning r 100, 0.6 s; the spot has room for the circle). The lantern lies there 6 s and **3 Lantern Souls** come out at once, 60 px round it. Used within 1000. Cooldown 16 s. **Only while fewer than 6 of his souls are alive.** |
+| **Dark Passage (W)** | Throws his lantern to a spot within 250 of Lucian (a circle warning r 100, 0.6 s; the spot has room for the circle). The lantern lies there 6 s and **3 Lantern Souls** come out at once, 60 px round it. Used within 1000. Cooldown 16 s. **Only while fewer than 6 of his souls are alive.** *(V1.5.0: he harvests them; see below.)* |
 | **The Box (R)** | As in Phase 1, but **220 magic**, cooldown 18 s. |
+
+**The harvest (V1.5.0).** When one of his own Lantern Souls (one from Dark Passage, not a wave's) is killed within **400** of him, he heals **3% of his max HP**, at most **10 times a fight** (30%), so the souls can't stall it. His souls keep their distance from Lucian, so the trigger is a soul dying near Thresh, not one reaching him. Nothing is harvested while he is down, rising or fallen. Grievous Wounds cuts the heal by 40%, and it shows as a green "+N" over him. Kill the souls away from him, or let them be.
 
 **The fall.** At 0 HP in Phase 2 he never dies in the usual way: the fight clears every warning and shot, every summoned Lantern Soul **vanishes** (freed, no pay), and the ending cutscene plays. The freed souls rise, brighten and fade with the chime as the scene begins (their fade runs while the world is frozen), and are gone before its first line. His blue (100) and orange (5) are paid where he stood, with the line "Senna is free". Clearing 6-5 pays **20 purple the first time, 4 after**.
 
@@ -215,20 +217,20 @@ Boss wave. Chain whip bolt, 85 physical (900 px/s), range 450, every 1.6 s. 1600
 5. Senna: "Lucian… you came." Lucian: "Always."
 6. A fade to white (1.5 s), and the stage-end screen comes up as the white drops away.
 
-**After the cutscene:** STAGE CLEARED with the first-clear lines (+20 purple, "Senna is free", "The story is complete"). The stage-ending moment drops no loot. On the **first clear only**, the button chosen on the stage-end screen leads to **`TheEndScreen`** first (`ui_design.md`), then where the button said: Main screen opens the main screen on Act 6, Retry starts 6-5 again. A replay of 6-5 has the cutscene (skippable), +4 purple, and goes straight where the button said.
+**After the cutscene:** STAGE CLEARED with the first-clear lines (+20 purple, "Senna is free", "The story is complete"). The stage-ending moment drops no loot. On the **first clear only**, the button chosen on the stage-end screen leads to **`TheEndScreen`** first (`ui_design.md`), then where the button said: Main screen opens the main screen on Act 6 *(V1.5.0: on Training, as every stage is cleared)*, Retry starts 6-5 again. A replay of 6-5 has the cutscene (skippable), +4 purple, and goes straight where the button said.
 
 ### The waves
 The letters are the ones above (w mist walker, l lantern soul, R rider, C warden). HP is each wave's total after scaling, summons not counted.
 
 | Stage | Waves | HP per wave | Total |
 |---|---|---|---|
-| 6-1 | 6 | 9.4k · 12.2k · 20.6k · 24.9k · 30.1k · 41.3k | 139k |
-| 6-2 | 6 | 10.6k · 20.2k · 22.4k · 27.3k · 32.3k · 44.4k | 157k |
-| 6-3 | 7 | 12.4k · 21.6k · 23.9k · 29.8k · 39.9k · 46.5k · 63.7k | 238k |
-| 6-4 | 7 | 18.8k · 21.2k · 33.0k · 39.1k · 41.9k · 49.6k · 63.7k | 267k |
-| 6-5 | 7 + Thresh | 18.8k · 23.2k · 34.5k · 41.6k · 44.7k · 51.7k · 78.4k | 293k |
+| 6-1 | 6 | 4.2k · 5.3k · 9.3k · 10.8k · 12.7k · 17.6k | 60k |
+| 6-2 | 6 | 5.4k · 10.1k · 10.8k · 12.8k · 14.7k · 20.1k | 74k |
+| 6-3 | 7 | 7.0k · 11.6k · 12.4k · 15.0k · 19.7k · 22.4k · 30.2k | 118k |
+| 6-4 | 7 | 10.6k · 11.4k · 17.1k · 19.7k · 20.6k · 23.9k · 30.2k | 133k |
+| 6-5 | 7 + Thresh | 10.6k · 12.5k · 17.9k · 21.0k · 22.0k · 24.9k · 37.2k | 146k |
 
-The waves hold about **1,094k HP**, plus 66k for the two mini bosses and Thresh (two phases).
+The waves hold about **531k HP**, plus 66k for the two mini bosses and Thresh (two phases). *(V1.5.0: the table is recomputed from the code. It still held Phase 8's numbers, from before the V1.3 balance pass: 1,094k in all. 6-2's Mist Walkers and Lantern Souls now have 10% less HP.)*
 
 ### Art
 Hand-written SVGs: the Mist Walker (a lean grey ghoul trailing mist), the Lantern Soul (a teal-green wisp with a sad face), the Spectral Rider (a ghost knight on a spectral horse), the Chain Warden (a hooded jailer with a chain and a hook), and Hecarim (a spectral centaur with a lance and green-blue flame, 136 × 112). Karthus, revived reuses Karthus's art, tinted; Thresh reuses Act 1's.

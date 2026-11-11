@@ -18,41 +18,61 @@ never sold.
 
 **Crafting** *(since V1.4.1)* happens only at the merchant's **Craft** tab, never in the
 backpack. Two fragments make their legendary for a **fee: the legendary's cost minus the two
-fragments' costs** (Muramana: 2900 − 400 − 400 = 2100), so a crafted legendary costs what buying
+fragments' costs** (Muramana: 2900 − 650 − 650 = 1600), so a crafted legendary costs what buying
 it would. The legendary takes the first fragment's cell. A crafted legendary always sells for
 less than its two fragments sell for plus the craft fee paid (Muramana sells for 2030; two Tears
-sell for 560, plus the 2100 fee), so crafting and then selling never makes gold. The same tab
-upgrades the boots (see *Boots*).
+sell for 910, plus the 1600 fee), so crafting and then selling never makes gold. The same tab
+upgrades the boots (see *Boots*). *(V1.5.0: the fragments' new prices put the fees at 900–1600,
+from 800–2100; Muramana's was 2900 − 400 − 400 = 2100. The legendaries' prices didn't change.)*
 
 **Craft inputs** *(since V1.4.3)*: an item dragged into a Craft input leaves the backpack view
 until it comes back (dragged out, a right-click on the input, a tab change, or the merchant
 closing). **Craft** asks first ("Craft Muramana from Tear of the Goddess and Tear of the Goddess
-for 2100 gold?"), and a fee you can't pay is refused at once. A craft empties both inputs.
+for 1600 gold?"), and a fee you can't pay is refused at once. A craft empties both inputs.
 
 **Buyback** *(since V1.4.2)*: the merchant's **Undo sale** button buys back what you sold, last
 sale first, for the gold you got, until you leave the merchant. The item goes back to its old
 cell if that is empty, or to a free cell. Stacks and cooldowns of an equipped item that was sold
-and bought back are not restored.
+and bought back are not restored. *(V1.5.0: an old equip cell takes it back only if the
+one-penetration rule allows it. Otherwise, or when the old cell is taken, it goes to a free
+backpack cell; with none, "Your backpack is full." and the sale stays to undo.)*
 
 **Recipe hints** *(since V1.4.2)*: in the shop, a fragment's card lists what it builds into with
 the items you hold ("Builds into Muramana with Tear (you have it)"; at most 3 lines, then "+N
 more"), and "Upgrades your Boots into X" when it fits your boots.
 
-**Full backpack** *(since V1.4.2)*: a fragment or legendary with no backpack cell free goes to an
-empty, unlocked equip slot instead. Potions never do.
+**Full backpack** *(V1.4.2, removed in V1.5.0)*: ~~a fragment or legendary with no backpack cell
+free goes to an empty, unlocked equip slot instead. Potions never do.~~ Since V1.5.0 buys and
+pickups go only into the backpack (and a potion into its own potion cell). With the backpack
+full, the merchant declines a buy with a pop-up, "Your backpack is full.", but a shop item
+dragged onto a free equip slot is still bought there (if the one-penetration rule allows it).
+Loot stays on the ground, with the "Backpack full" note.
+
+**One penetration item** *(since V1.5.0)*: Lord Dominik's Regards, Mortal Reminder and Void Staff,
+the legendaries with percent armor or magic penetration, can't share the equip slots: only one
+of them can be equipped. A drag, swap or buy that would equip a second one is refused, and a
+pop-up names the one equipped ("Only one penetration item can be equipped, and Void Staff already
+is."). Moving one inside the equip row is allowed, and the backpack holds any number. A craft puts
+its legendary in the first input's cell, or the second's when the rule closes the first; with
+both closed it is refused. Boots (Sorcerer's and Spellslinger's Shoes) and Shadowflame's flat
+magic penetration don't count.
 
 ## Fragments
 
 | Code | Fragment | Stat | Cost |
 |---|---|---|---|
-| AD | B.F. Sword | +35 Attack Damage | 1300 |
-| AS | Recurve Bow | +25% Attack Speed | 1000 |
-| AP | Needlessly Large Rod | +60 Ability Power | 1200 |
-| AR | Chain Vest | +40 Armor | 800 |
-| CR | Cloak of Agility | +15% Critical Strike Chance | 600 |
+| AD | B.F. Sword | +30 Attack Damage | 1100 |
+| AS | Recurve Bow | +24% Attack Speed | 950 |
+| AP | Needlessly Large Rod | +52 Ability Power | 1050 |
+| AR | Chain Vest | +42 Armor | 850 |
+| CR | Cloak of Agility | +19% Critical Strike Chance | 750 |
 | HP | Giant's Belt | +350 Health | 900 |
-| MP | Tear of the Goddess | +300 Mana | 400 |
+| MP | Tear of the Goddess | +490 Mana | 650 |
 | MR | Negatron Cloak | +40 Magic Resist | 900 |
+
+*(V1.5.0: the fragments cost 650–1100, from 400–1300, and their stats follow the new cost. Before:
+B.F. Sword +35 AD for 1300, Recurve Bow +25% for 1000, Rod +60 AP for 1200, Chain Vest +40 for
+800, Cloak +15% for 600, Tear +300 mana for 400. Giant's Belt and Negatron Cloak are unchanged.)*
 
 ## Potions
 
@@ -142,6 +162,7 @@ spell haste** (shortens summoner cooldowns like ability haste does skills: 100 h
 - +20% Critical Strike Chance
 - +30% Armor Penetration
 - *Passive — Sepsis:* Dealing physical damage applies Grievous Wounds (40% less healing) for 3 s.
+- *(V1.5.0)* A penetration item: it can't be equipped beside Lord Dominik's Regards or Void Staff.
 
 ### Stormrazor
 
@@ -197,6 +218,7 @@ spell haste** (shortens summoner cooldowns like ability haste does skills: 100 h
 - +25% Attack Speed
 - +30% Armor Penetration
 - *Passive — Giant Slayer:* Deal up to 15% more damage to enemies with more max health than Lucian.
+- *(V1.5.0)* A penetration item: it can't be equipped beside Mortal Reminder or Void Staff.
 
 ### Runaan's Hurricane
 
@@ -233,6 +255,7 @@ spell haste** (shortens summoner cooldowns like ability haste does skills: 100 h
 - +20% Attack Speed
 - +35% Magic Penetration
 - *No passive.*
+- *(V1.5.0)* A penetration item: it can't be equipped beside Lord Dominik's Regards or Mortal Reminder.
 
 ### Rabadon's Deathcap
 
@@ -257,7 +280,7 @@ spell haste** (shortens summoner cooldowns like ability haste does skills: 100 h
 
 - +90 Ability Power
 - +15% Critical Strike Chance
-- +10% Magic Penetration
+- +15 Magic Penetration (flat, like Sorcerer's Shoes) *(V1.5.0; it was +10%, so it isn't a penetration item under the one-item rule)*
 - *Passive — Cinderbloom:* Magic damage against enemies below 40% health deals 20% more damage.
 
 ### Morellonomicon
@@ -302,7 +325,7 @@ spell haste** (shortens summoner cooldowns like ability haste does skills: 100 h
 - +45 Attack Damage
 - +20% Critical Strike Chance
 - +30 Armor
-- *Passive — Lifeline:* When damage would drop Lucian below 30% health, gain a shield of 300-650 (by level) for 3 s. 90 s cooldown.
+- *Passive — Lifeline:* When damage would drop Lucian below 30% health, gain a shield of 300-650 (by level) for 3 s. 90 s cooldown. *(Since V1.5.0 only the shields that would absorb the hit's damage type count toward that: a magic-only shield doesn't hold Lifeline back from a physical hit.)*
 
 ### Death's Dance
 
@@ -312,7 +335,7 @@ spell haste** (shortens summoner cooldowns like ability haste does skills: 100 h
 - +40 Armor
 - +250 Health
 - *Passive — Ignore Pain:* 30% of damage taken is delayed and taken over 3 s instead. *(Since V1.4.2 an **Ignore Pain** icon shows in the buff row while damage is still to come: the number is the damage left, and it goes when the bleed ends or Defy clears it. Since V1.4.3 the damage still to come, and its icon, stay when the item comes off (unequipped, or sold and bought back): only Defy and Guardian Angel clear it. A hit taken without the item isn't delayed.)*
-- *Passive — Defy:* Killing an enemy clears the delayed damage and restores 15% max health over 2 s.
+- *Passive — Defy:* Killing an enemy clears the delayed damage. Killing an elite, mini boss or boss also restores 15% max health over 2 s. *(Since V1.5.0; before, every kill healed.)*
 
 ### Fimbulwinter
 
@@ -416,7 +439,7 @@ enemies started hitting Lucian.
 |---|---|
 | Infinity Edge | Crit damage +40% (175% → 215%). |
 | Kraken Slayer | Every 3rd basic attack (the main shot) adds 140 physical, up to +50% as the target's health drops. The count never resets. Buff icon shows the count and glows before the 3rd. |
-| Mortal Reminder, Morellonomicon | Physical / magic damage applies Grievous Wounds (3 s) to the enemy: 40% less healing. |
+| Mortal Reminder, Morellonomicon | Physical / magic damage applies Grievous Wounds (3 s) to the enemy: 40% less healing. *(V1.5.0: more enemies heal, and it cuts every heal: the Ocean Drake's mist, the Black Mist's regen, the Maiden of the Mist's drain and Thresh's harvest. See `act5_shadow_isles.md` and `act6_the_lantern.md`.)* |
 | Stormrazor | Energized: +90 magic and +35% move speed for 1.5 s. |
 | Black Cleaver | Physical damage: Carve, −5% armor per stack for 6 s, up to 6. Any damage: Fervor, +20 move speed for 2 s. |
 | Spear of Shojin | The first skill hit of each cast adds a stack (6 s, up to 4); each makes Q/W/R hits deal 3% more. |
@@ -441,8 +464,8 @@ enemies started hitting Lucian.
 | Hextech Rocketbelt | Active: dash toward the cursor, as far as it but 275 at most (speed 800, slower than the bolts' 1500), an arc of 7 bolts forward that fly 900 from where Lucian started (each enemy hit once) for 100 (+10% AP) magic. Lucian can move again as soon as the dash lands. No move speed. The dash leaves a violet trail, like the bolts. |
 | Banshee's Veil | *Annul:* blocks the next enemy skill hit whole (Thresh's hook with its pull, Flay, Akshan's skills). It comes back 40 s after it breaks. Basic attacks and the siege shell aren't skills. |
 | Thornmail | *Thorns:* an enemy's basic attack on Lucian deals 20 (+10% bonus armor) magic damage back to it and applies Grievous Wounds for 3 s. |
-| Immortal Shieldbow | *Lifeline:* a hit that would leave Lucian under 30% HP first gives a shield of 300 (level 1) to 650 (level 18) for 3 s. 90 s cooldown. |
-| Death's Dance | *Ignore Pain:* 30% of each hit is taken over the next 3 s instead. *Defy:* a kill clears the damage still to come and heals 15% max HP over 2 s. Since V1.4.3 the damage still to come lands even after the item comes off; only Defy and Rebirth clear it. |
+| Immortal Shieldbow | *Lifeline:* a hit that would leave Lucian under 30% HP first gives a shield of 300 (level 1) to 650 (level 18) for 3 s. 90 s cooldown. *(V1.5.0: the shields already up count only if they would absorb the hit's type. Kaenic Rookern's Magebane and Chainlaced Crushers' Persistence take only magic, Armored Advance's Endurance only physical, so they no longer hold Lifeline back from the other type.)* |
+| Death's Dance | *Ignore Pain:* 30% of each hit is taken over the next 3 s instead. *Defy:* a kill clears the damage still to come and heals 15% max HP over 2 s. Since V1.4.3 the damage still to come lands even after the item comes off; only Defy and Rebirth clear it. *(V1.5.0: the heal comes only from an elite, mini boss or boss kill, Slay's kinds. Any kill still clears the damage to come.)* |
 | Guardian Angel | *Rebirth:* instead of dying, Lucian is held in gold stasis for 4 s (nothing can hurt him; enemies wait), then comes back with 50% base HP and 30% max mana. 300 s cooldown. Stasis ends his burns, slows and crowd control, and none land while it holds. *(V1.4.3: skill, summoner spell and item cooldowns and the attack timer keep counting down in stasis. Only buff timers stop: speed and stat buffs, shields (Barrier's time too), Ghost, potions and heals over time, and item buffs such as Spear of Shojin's Focused Will. Item waits that work like cooldowns keep running: Kaenic Rookern's Magebane wait, Malignance's Hatefog cooldown, Rapid Firecannon's ring wait and the combat timer behind Jak'Sho. HP and mana regen stay stopped, as before.)* |
 | Kaenic Rookern | *Magebane:* after 15 s without magic damage, a shield against magic damage only, 15% max HP. Any magic damage restarts the wait. |
 | Slightly Magical Boots | *Slightly Quicker:* +10 move speed, kept by every pair upgraded from them. A buff icon shows it. |

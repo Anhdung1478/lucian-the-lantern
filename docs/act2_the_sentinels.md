@@ -18,7 +18,7 @@ m = melee, r = ranged, S = siege, U = super minion.
 | Stage | Waves | Boss wave |
 |---|---|---|
 | 1 | 6m 4r 1S · 6m 6r 1S 1U (the act's gentle stage: minions and elites have 20% less HP, V1.3) | — |
-| 2 | 6m 6r 1S · 6m 6r 2S · 6m 6r 1S 1U | — |
+| 2 | 6m 6r 1S · 6m 6r 2S · 6m 6r 1S 1U (melee and ranged minions have 10% less HP, V1.5.0) | — |
 | 3 | 6m 6r 2S · 6m 6r 1S 1U · 8m 6r 2S 1U | Akshan, alone |
 
 ## Story
@@ -76,7 +76,7 @@ Minions use the Act 1 numbers (`act1_the_loss.md`), scaled. Bosses don't scale. 
 | Gold and XP | × (1 + 0.25 · (act − 1)) | × 1.25 |
 | Blue per kill | = act number (elites 5×) | 2 (elites 10) |
 
-Each wave after the first also adds **+10% HP and damage**. Act 2's melee minion at wave 1 has 300 HP and hits for 13.8 (in 2-1: 240 HP). Lucian starts every Act 2 stage at **level 2**.
+Each wave after the first also adds **+10% HP and damage**. Act 2's melee minion at wave 1 has 300 HP and hits for 13.8 (in 2-1: 240 HP; in 2-2: 270 HP since V1.5.0, whose melee and ranged minions have 10% less HP). Lucian starts every Act 2 stage at **level 2**.
 
 ### Super minion
 | | Base (Act 1) | Act 2, wave 1 |
