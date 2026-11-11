@@ -6,7 +6,7 @@ const WALL := [Vector2(0, 0), Vector2(400, 0), Vector2(400, 100), Vector2(100, 1
 
 
 ## Stages ([act, stage]) whose maps have ambient life; [0, 0] is the Training arena.
-const AMBIENT_STAGES := [[1, 1], [2, 1], [2, 3], [3, 1], [3, 2], [3, 4], [4, 1], [5, 1], [5, 2], [5, 4], [5, 5], [6, 1], [6, 3], [6, 5], [0, 0]]
+const AMBIENT_STAGES := [[1, 1], [2, 1], [2, 3], [3, 1], [3, 2], [3, 4], [3, 5], [4, 1], [5, 1], [5, 2], [5, 4], [5, 5], [6, 1], [6, 3], [6, 5], [0, 0]]
 
 
 ## A small map with a firefly.
