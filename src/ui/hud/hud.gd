@@ -57,6 +57,8 @@ var tips := TipBanner.new()
 var stage: Stage
 var stage_info := StageInfo.new()
 var boss_bar := BossBar.new()
+## Under the rest of the HUD: it never hides its text.
+var vignette := LowHealthVignette.new()
 var radar := Radar.new()
 
 var _gold_label: Label
@@ -178,6 +180,7 @@ func _process(_delta: float) -> void:
 	hp_label.text = "%d / %d" % [roundi(lucian.hp), roundi(stats.max_hp)]
 	if lucian.total_shield() > 0.0:
 		hp_label.text += "  (+%d)" % roundi(lucian.total_shield())
+	vignette.show_health(lucian)
 	_buff_bar.show_buffs(_buffs())
 	mana_bar.show_amount(lucian.mana, stats.max_mana)
 	mana_label.text = "%d / %d" % [roundi(lucian.mana), roundi(stats.max_mana)]
@@ -338,6 +341,8 @@ func _build_gold() -> void:
 ## Top center: the stage info with the boss bar and the tips under it; bottom
 ## right: the radar.
 func _build_stage_info() -> void:
+	$Root.add_child(vignette)
+	$Root.move_child(vignette, 0)
 	$Root.add_child(stage_info)
 	stage_info.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	stage_info.grow_horizontal = Control.GROW_DIRECTION_BOTH

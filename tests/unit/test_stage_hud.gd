@@ -362,3 +362,52 @@ func test_fps_sits_top_left() -> void:
 	assert_eq(hud._fps_label.anchor_left, 0.0)
 	assert_eq(hud._fps_label.anchor_right, 0.0)
 
+
+
+func test_the_vignette_shows_below_30_percent_health_and_grows_toward_zero() -> void:
+	assert_eq(LowHealthVignette.strength_for(300.0, 1000.0, false, false), 0.0, "gone at 30%")
+	assert_eq(LowHealthVignette.strength_for(900.0, 1000.0, false, false), 0.0)
+	assert_gt(LowHealthVignette.strength_for(299.0, 1000.0, false, false), 0.0)
+	assert_almost_eq(LowHealthVignette.strength_for(150.0, 1000.0, false, false), 0.5, 0.001)
+	assert_eq(LowHealthVignette.strength_for(0.0, 1000.0, false, false), 1.0)
+
+
+func test_the_vignette_is_gone_when_dead_on_low_effects_or_with_no_max() -> void:
+	assert_eq(LowHealthVignette.strength_for(100.0, 1000.0, true, false), 0.0)
+	assert_eq(LowHealthVignette.strength_for(100.0, 1000.0, false, true), 0.0)
+	assert_eq(LowHealthVignette.strength_for(0.0, 0.0, false, false), 0.0)
+
+
+func test_the_vignette_pulses_between_a_dim_and_a_full_alpha() -> void:
+	var full := LowHealthVignette.alpha_for(1.0, 0.0)
+	var dim := LowHealthVignette.alpha_for(1.0, 0.5)
+	assert_almost_eq(full, LowHealthVignette.ALPHA_AT_ZERO, 0.001)
+	assert_almost_eq(dim, full * (1.0 - LowHealthVignette.PULSE_DIP), 0.001)
+	assert_eq(LowHealthVignette.alpha_for(0.0, 0.0), 0.0)
+	assert_gt(LowHealthVignette.alpha_for(0.01, 0.0), 0.0)
+
+
+func test_the_hud_has_the_vignette_under_everything_and_it_never_takes_the_mouse() -> void:
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	assert_eq(hud.vignette.get_index(), 0, "first, so drawn under the rest")
+	assert_eq(hud.vignette.mouse_filter, Control.MOUSE_FILTER_IGNORE)
+	assert_eq(hud.vignette.get_parent(), hud.get_node("Root"))
+
+
+func test_the_vignette_follows_lucian_and_the_setting() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	await wait_physics_frames(1)
+	var vignette := LowHealthVignette.new()
+	add_child_autofree(vignette)
+	lucian.hp = lucian.stats.max_hp * 0.2
+	vignette.show_health(lucian)
+	assert_true(vignette.visible)
+	lucian.hp = lucian.stats.max_hp * 0.5
+	vignette.show_health(lucian)
+	assert_false(vignette.visible)
+	lucian.hp = lucian.stats.max_hp * 0.2
+	lucian.dead = true
+	vignette.show_health(lucian)
+	assert_false(vignette.visible)
