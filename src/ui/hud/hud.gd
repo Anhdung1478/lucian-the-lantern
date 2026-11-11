@@ -66,7 +66,7 @@ var _modifier_shown := EndlessModifiers.NONE
 var _modifier_row := {}
 
 @onready var bottom_panel: Plate = %BottomPanel
-@onready var portrait: TextureRect = %Portrait
+@onready var portrait: HudPortrait = %Portrait
 @onready var stats_panel: StatsPanel = %StatsPanel
 @onready var skill_row: HBoxContainer = %SkillRow
 @onready var item_grid: GridContainer = %ItemGrid

@@ -214,6 +214,23 @@ func test_the_hud_sits_on_plates() -> void:
 		assert_eq(plate.opacity, Hud.PLATE_OPACITY)
 
 
+## The round portrait carries the level badge on its ring, over the XP bar.
+func test_the_portrait_shows_the_level_and_the_xp() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	hud.setup(lucian, Wallet.new())
+	var progress := lucian.progress
+	progress.add_xp(progress.xp_for_next() + 30)
+	await wait_process_frames(2)
+	assert_eq(hud.portrait.texture, lucian.skin.portrait)
+	assert_eq(hud.level_label.text, "2")
+	assert_almost_eq(hud.xp_bar.value, 30.0 / progress.xp_for_next(), 0.001)
+	assert_true(hud.portrait.get_global_rect().encloses(hud.level_label.get_global_rect()), "the badge sits on the portrait")
+	assert_gte(hud.xp_bar.get_global_rect().position.y, hud.portrait.get_global_rect().end.y, "the XP bar is under it")
+
+
 func test_fps_sits_top_left() -> void:
 	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
 	add_child_autofree(hud)
