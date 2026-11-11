@@ -10,7 +10,7 @@ id = &"tear_of_the_goddess"
 display_name = "Tear of the Goddess"
 code = "MP"
 icon = ExtResource("2_efxu7")
-cost = 400
+cost = 650
 stats = Dictionary[StringName, float]({
-&"max_mana": 300.0
+&"max_mana": 490.0
 })

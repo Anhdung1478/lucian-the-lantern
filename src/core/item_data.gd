@@ -56,7 +56,8 @@ func is_penetration() -> bool:
 	return kind == Kind.LEGENDARY and (stats.has(&"armor_pen") or stats.has(&"magic_pen"))
 
 
-## Rounded down; the epsilon keeps 1300 x 0.7 at 910 despite float error.
+## Rounded down; the epsilon keeps 650 x 0.7 (Tear of the Goddess) at 455
+## despite float error.
 ## Boots can't be sold: 0.
 func sell_price() -> int:
 	if is_boots():

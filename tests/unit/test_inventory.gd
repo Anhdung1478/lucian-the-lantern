@@ -351,6 +351,9 @@ func test_sell_price_uses_the_ratio() -> void:
 	var sword := item(&"sword")
 	sword.cost = 1300
 	assert_eq(sword.sell_price(), 910)
+	sword.cost = 650
+	assert_eq(sword.sell_price(), 455, "Tear of the Goddess: 650 x 0.7 is just under 455 in floats")
+	sword.cost = 1300
 	sword.sell_ratio = 0.4
 	assert_eq(sword.sell_price(), 520)
 

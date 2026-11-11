@@ -79,7 +79,7 @@ func test_craft_makes_a_legendary_or_upgraded_boots_in_either_order() -> void:
 func test_a_legendarys_fee_is_its_cost_minus_its_fragments() -> void:
 	var real := load("res://data/items/catalog.tres") as ItemCatalog
 	var tear := real.find(&"tear_of_the_goddess")
-	assert_eq(real.craft_fee(tear, tear), 2900 - 400 - 400, "Muramana")
+	assert_eq(real.craft_fee(tear, tear), 2900 - 650 - 650, "Muramana")
 	for legendary in real.legendaries():
 		var a := real.find(legendary.components[0])
 		var b := real.find(legendary.components[1])

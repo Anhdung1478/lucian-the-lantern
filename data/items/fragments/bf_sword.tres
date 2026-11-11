@@ -10,7 +10,7 @@ id = &"bf_sword"
 display_name = "B.F. Sword"
 code = "AD"
 icon = ExtResource("2_2n2wv")
-cost = 1300
+cost = 1100
 stats = Dictionary[StringName, float]({
-&"ad": 35.0
+&"ad": 30.0
 })

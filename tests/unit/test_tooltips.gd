@@ -132,7 +132,7 @@ func test_crafting_cards_send_the_player_to_the_merchant() -> void:
 	assert_string_contains(card_text(card), "Craft it with another fragment at the merchant's Craft tab.")
 	card.free()
 	card = TooltipCard.item(catalog.find(&"muramana"), catalog)
-	assert_string_contains(card_text(card), "Recipe: Tear of the Goddess + Tear of the Goddess + 2100 gold at the merchant.")
+	assert_string_contains(card_text(card), "Recipe: Tear of the Goddess + Tear of the Goddess + 1600 gold at the merchant.")
 	card.free()
 
 

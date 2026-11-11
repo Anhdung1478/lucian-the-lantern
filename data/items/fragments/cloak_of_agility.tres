@@ -10,7 +10,7 @@ id = &"cloak_of_agility"
 display_name = "Cloak of Agility"
 code = "CR"
 icon = ExtResource("2_frauy")
-cost = 600
+cost = 750
 stats = Dictionary[StringName, float]({
-&"crit_chance": 0.15
+&"crit_chance": 0.19
 })

@@ -10,7 +10,7 @@ id = &"needlessly_large_rod"
 display_name = "Needlessly Large Rod"
 code = "AP"
 icon = ExtResource("2_bbmba")
-cost = 1200
+cost = 1050
 stats = Dictionary[StringName, float]({
-&"ap": 60.0
+&"ap": 52.0
 })

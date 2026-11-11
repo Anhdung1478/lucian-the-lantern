@@ -300,9 +300,9 @@ func test_crafting_two_fragments_pays_the_fee_and_puts_the_legendary_in_the_firs
 	bag.put(EQUIP, tear)
 	real_shop.wallet.add(2500)
 	assert_eq(real_shop.craft_result(EQUIP, 0), bag.catalog.find(&"muramana"))
-	assert_eq(real_shop.craft_fee(EQUIP, 0), 2100)
+	assert_eq(real_shop.craft_fee(EQUIP, 0), 1600, "2900 minus two 650-gold Tears")
 	assert_eq(real_shop.craft(EQUIP, 0), Result.OK)
-	assert_eq(real_shop.wallet.gold, 400)
+	assert_eq(real_shop.wallet.gold, 900)
 	assert_eq(bag.item_at(EQUIP), bag.catalog.find(&"muramana"), "it stays equipped where the first input was")
 	assert_null(bag.item_at(0), "the second fragment is used up")
 

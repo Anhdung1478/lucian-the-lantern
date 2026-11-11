@@ -87,7 +87,7 @@ func test_skin_scales_after_items_and_level_ups() -> void:
 	lucian.apply_skin(Skins.find(&"high_noon"))
 	give_equipped(&"bf_sword")
 	lucian.progress.set_level(5)
-	assert_almost_eq(lucian.stats.ad, (lucian.base_stats.at_level(5).ad + 35.0) * 1.15, 0.001)
+	assert_almost_eq(lucian.stats.ad, (lucian.base_stats.at_level(5).ad + 30.0) * 1.15, 0.001)
 
 
 func test_tree_bonus_adds_before_the_skin_scales() -> void:

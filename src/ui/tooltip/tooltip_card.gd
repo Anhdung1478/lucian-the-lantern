@@ -84,7 +84,7 @@ static func recipe_hints(shown: ItemData, catalog: ItemCatalog, inventory: Inven
 
 
 ## A legendary's recipe and the merchant's fee: "Recipe: Tear of the Goddess +
-## Tear of the Goddess + 2100 gold at the merchant."
+## Tear of the Goddess + 1600 gold at the merchant."
 static func recipe_footer(shown: ItemData, catalog: ItemCatalog) -> String:
 	var a := catalog.find(shown.components[0])
 	var b := catalog.find(shown.components[1])

@@ -10,7 +10,7 @@ id = &"recurve_bow"
 display_name = "Recurve Bow"
 code = "AS"
 icon = ExtResource("2_hw2ht")
-cost = 1000
+cost = 950
 stats = Dictionary[StringName, float]({
-&"attack_speed": 0.25
+&"attack_speed": 0.24
 })

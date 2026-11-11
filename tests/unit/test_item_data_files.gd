@@ -81,6 +81,33 @@ func test_ids_are_unique() -> void:
 		seen[item.id] = true
 
 
+func test_fragment_costs_and_stats() -> void:
+	var expect := {
+		&"bf_sword": [1100, &"ad", 30.0],
+		&"needlessly_large_rod": [1050, &"ap", 52.0],
+		&"recurve_bow": [950, &"attack_speed", 0.24],
+		&"giants_belt": [900, &"max_hp", 350.0],
+		&"negatron_cloak": [900, &"mr", 40.0],
+		&"chain_vest": [850, &"armor", 42.0],
+		&"cloak_of_agility": [750, &"crit_chance", 0.19],
+		&"tear_of_the_goddess": [650, &"max_mana", 490.0],
+	}
+	assert_eq(catalog.fragments().size(), expect.size())
+	for id: StringName in expect:
+		var fragment := catalog.find(id)
+		assert_eq(fragment.cost, expect[id][0], "%s cost" % id)
+		assert_eq(fragment.stats.keys(), [expect[id][1]], "%s gives one stat" % id)
+		assert_almost_eq(fragment.stats.get(expect[id][1], 0.0), expect[id][2], 0.0001, "%s stat" % id)
+
+
+func test_craft_fees_run_from_900_to_1600() -> void:
+	var fees: Array[int] = []
+	for legendary in catalog.legendaries():
+		fees.append(catalog.craft_fee(catalog.find(legendary.components[0]), catalog.find(legendary.components[1])))
+	assert_eq(fees.min(), 900)
+	assert_eq(fees.max(), 1600)
+
+
 func test_fragments_use_the_eight_codes() -> void:
 	var codes := catalog.fragments().map(func(item: ItemData) -> String: return item.code)
 	codes.sort()

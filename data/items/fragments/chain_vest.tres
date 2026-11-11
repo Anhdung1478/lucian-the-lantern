@@ -10,7 +10,7 @@ id = &"chain_vest"
 display_name = "Chain Vest"
 code = "AR"
 icon = ExtResource("2_kogcr")
-cost = 800
+cost = 850
 stats = Dictionary[StringName, float]({
-&"armor": 40.0
+&"armor": 42.0
 })

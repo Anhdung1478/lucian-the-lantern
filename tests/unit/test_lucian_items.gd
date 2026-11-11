@@ -44,7 +44,7 @@ func test_inventory_uses_the_item_catalog() -> void:
 func test_equipped_item_adds_its_stats() -> void:
 	var base_ad := lucian.stats.ad
 	give_equipped(&"bf_sword")
-	assert_almost_eq(lucian.stats.ad, base_ad + 35.0, 0.001)
+	assert_almost_eq(lucian.stats.ad, base_ad + 30.0, 0.001)
 
 
 func test_backpack_items_give_no_stats() -> void:
@@ -56,7 +56,7 @@ func test_backpack_items_give_no_stats() -> void:
 func test_item_bonus_survives_level_up() -> void:
 	give_equipped(&"bf_sword")
 	lucian.progress.set_level(5)
-	assert_almost_eq(lucian.stats.ad, lucian.base_stats.at_level(5).ad + 35.0, 0.001)
+	assert_almost_eq(lucian.stats.ad, lucian.base_stats.at_level(5).ad + 30.0, 0.001)
 
 
 func test_equipping_health_keeps_the_health_share() -> void:

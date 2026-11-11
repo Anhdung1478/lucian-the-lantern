@@ -901,7 +901,7 @@ func scenario_craft_shop() -> void:
 	await drag_cell(backpack, 1, control_center(panel.second_input()))
 	await mouse_move(Vector2(960, 1000))
 	await wait(0.2)
-	print("preview (expect Hextech Gunblade, fee 800): ", panel.craft_preview().display_name, " ", panel.craft_fee())
+	print("preview (expect Hextech Gunblade, fee 1150): ", panel.craft_preview().display_name, " ", panel.craft_fee())
 	await shot("craft_shop_1_legendary")
 	await click(panel.craft_button())
 	await wait(0.2)
@@ -910,7 +910,7 @@ func scenario_craft_shop() -> void:
 	await press_key(KEY_ENTER, true)
 	await press_key(KEY_ENTER, false)
 	await wait(0.2)
-	print("crafted (expect hextech_gunblade in 0, 1 empty, gold 2200): ", inventory.item_at(0).id, " ", inventory.item_at(1), " ", game.wallet.gold)
+	print("crafted (expect hextech_gunblade in 0, 1 empty, gold 1850): ", inventory.item_at(0).id, " ", inventory.item_at(1), " ", game.wallet.gold)
 	await drag_cell(backpack, Inventory.BOOTS_CELL, control_center(panel.first_input()))
 	await drag_cell(backpack, 3, control_center(panel.second_input()))
 	await mouse_move(Vector2(960, 1000))
@@ -927,7 +927,7 @@ func scenario_craft_shop() -> void:
 	await press_key(KEY_ENTER, true)
 	await press_key(KEY_ENTER, false)
 	await wait(0.2)
-	print("upgraded (expect berserkers_greaves, gold 1900, fragment gone): ", inventory.boots().id, " ",
+	print("upgraded (expect berserkers_greaves, gold 1550, fragment gone): ", inventory.boots().id, " ",
 		game.wallet.gold, " ", inventory.item_at(2))
 	print("inputs emptied (expect -1 -1): ", panel.first_input().index, " ", panel.second_input().index)
 	# Boots over the sell slot read NO.
