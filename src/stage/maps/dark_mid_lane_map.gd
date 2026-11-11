@@ -32,7 +32,7 @@ func _init() -> void:
 	jungle_color = Color("130f1a")
 	jungle_edge = Color("4a3670")
 	tree_color = Color("0a0810")
-	leaf_light = Color("6a55a0")
+	leaf_light = Color("54447f")
 	river_color = Color("2a2748")
 	river_edge = Color("6c62a8")
 	rock_color = Color("524e64")
