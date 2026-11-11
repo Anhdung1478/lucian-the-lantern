@@ -17,6 +17,8 @@ extends SceneTree
 ## (default normal); each tier and difficulty has its own save files.
 ## AUTOPLAY_RUN=<name> gives a run its own save and settings files too, so
 ## several runs of one tier and difficulty can play at the same time.
+## AUTOPLAY_TIER="panic=0.2,react=0.4" plays the tier with those numbers
+## changed (to find what a tier should be).
 ## AUTOPLAY_RESOLVE=off plays with the Resolve setting off (defeats are
 ## still counted, but give nothing).
 ## Skins: between stages it buys every skin its purple affords, in Skin Shop
@@ -66,6 +68,8 @@ var log_lines: PackedStringArray = []
 var wanted_skin := &""
 ## The last skin bought.
 var last_skin := &""
+## The tier played: Bot.TIERS[skill], with AUTOPLAY_TIER's changes.
+var tier := {}
 ## One row per stage tried, for the summary: {id, tries, clear (the winning
 ## try's seconds, -1 while not cleared), resolve (the winning try's stacks),
 ## spent (seconds over every try), farms, farm_time (the replays of an
@@ -87,6 +91,13 @@ func _initialize() -> void:
 	if FileAccess.file_exists(settings_path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(settings_path))
 	GameSettings._instance = GameSettings.new(settings_path)
+	tier = Bot.TIERS[skill].duplicate()
+	# AUTOPLAY_TIER="panic=0.2,react=0.4": the tier with those numbers changed.
+	for change in OS.get_environment("AUTOPLAY_TIER").split(",", false):
+		var pair := change.split("=")
+		if pair.size() == 2 and tier.has(pair[0].strip_edges()):
+			tier[pair[0].strip_edges()] = pair[1].strip_edges().to_float()
+			print("autoplay: %s = %s" % [pair[0].strip_edges(), pair[1].strip_edges()])
 	if OS.get_environment("AUTOPLAY_RESOLVE").to_lower() == "off":
 		GameSettings.instance().set_value(Resolve.SETTING, false)
 	difficulty = Difficulty.from_key(OS.get_environment("AUTOPLAY_DIFFICULTY").to_lower())
@@ -206,7 +217,7 @@ func _finish(started: int) -> void:
 	for row in stage_rows:
 		in_stages += row.spent + row.farm_time
 		visits += row.tries + row.farms
-	var between: float = Bot.TIERS[skill].between
+	var between: float = tier.between
 	_say("summary time: %s in stages; with %d visits to the main screen at %d s each, about %s of play time" % [
 		_hours(in_stages), visits, int(between), _hours(in_stages + visits * between)])
 	_say("summary tree: %s; essences B%d O%d P%d" % [_tree_text(save), save.essences.amount(Essences.BLUE),
@@ -293,7 +304,7 @@ func _play(act: int, number: int, first_try := false) -> Dictionary:
 	var blue_before := save.essences.amount(Essences.BLUE)
 	var bot := Bot.new()
 	bot.stage = stage
-	bot.tier = Bot.TIERS[skill]
+	bot.tier = tier
 	stage.add_child(bot)
 	var next_trace := 0.0
 	var tracing := first_try and trace_every > 0.0
