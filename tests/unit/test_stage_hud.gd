@@ -199,6 +199,16 @@ func test_the_radar_marks_its_four_frame_corners() -> void:
 	assert_eq(Radar.corners(Vector2(260, 160)), PackedVector2Array([Vector2(0, 0), Vector2(260, 0), Vector2(260, 160), Vector2(0, 160)]))
 
 
+func test_a_buff_icon_is_a_rounded_cell_that_draws_with_and_without_a_ready_pulse() -> void:
+	var icon := BuffIcon.new()
+	add_child_autofree(icon)
+	for ready in [false, true]:
+		icon.buff = {"id": &"test", "name": "Test", "icon": null, "text": "", "count": "3", "left": 2.0, "duration": 4.0, "ready": ready}
+		await wait_process_frames(2)
+		assert_eq(icon.custom_minimum_size, Vector2(BuffIcon.SIZE, BuffIcon.SIZE))
+	assert_eq(icon.mouse_filter, Control.MOUSE_FILTER_PASS, "still hoverable")
+
+
 func test_the_radar_sits_inside_the_bottom_right_corner() -> void:
 	SaveGame.instance().reset()
 	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()

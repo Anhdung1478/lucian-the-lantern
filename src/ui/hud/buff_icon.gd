@@ -6,8 +6,10 @@ extends Control
 ## Hovering shows what it does.
 
 const SIZE := 36.0
-const FRAME := Color(0.36, 0.4, 0.48)
-const READY := Color("ffcf5a")
+const FRAME := UiStyle.CELL_BORDER
+const WELL := UiStyle.CELL_COLOR
+const RADIUS := 5
+const READY := UiStyle.GOLD_COLOR
 const SWEEP := Color(0, 0, 0, 0.55)
 
 ## {id, name, icon, text, count, left, duration, ready}; see Lucian.buffs().
@@ -49,9 +51,9 @@ func _draw() -> void:
 	if buff.is_empty():
 		return
 	var rect := Rect2(Vector2.ZERO, Vector2(SIZE, SIZE))
-	draw_rect(rect, Color(0.05, 0.06, 0.08))
+	draw_style_box(_box(WELL, Color.TRANSPARENT, 0), rect)
 	if buff.icon:
-		draw_texture_rect(buff.icon, rect.grow(-2.0), false)
+		draw_texture_rect(buff.icon, rect.grow(-3.0), false)
 	var duration: float = buff.duration
 	if duration > 0.0:
 		var spent := 1.0 - clampf(buff.left / duration, 0.0, 1.0)
@@ -59,12 +61,23 @@ func _draw() -> void:
 			draw_colored_polygon(SkillSlot.sweep_polygon(spent, SIZE), SWEEP)
 	if buff.ready:
 		var pulse := 0.6 + 0.4 * sin(Time.get_ticks_msec() / 150.0)
-		draw_rect(rect.grow(-1.0), Color(READY, pulse), false, 3.0)
+		draw_style_box(_box(Color.TRANSPARENT, Color(READY, pulse), 3), rect)
 	else:
-		draw_rect(rect, FRAME, false, 1.5)
+		draw_style_box(_box(Color.TRANSPARENT, FRAME, 1), rect)
 	var count: String = buff.count
 	if count != "":
 		var font := ThemeDB.fallback_font
 		var at := Vector2(0, SIZE - 2.0)
 		draw_string_outline(font, at, count, HORIZONTAL_ALIGNMENT_RIGHT, SIZE - 2.0, 13, 4, Color.BLACK)
 		draw_string(font, at, count, HORIZONTAL_ALIGNMENT_RIGHT, SIZE - 2.0, 13, Color.WHITE)
+
+
+## A rounded cell: a `fill`, or a rim of `width` px in `rim`.
+func _box(fill: Color, rim: Color, width: int) -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = fill
+	box.draw_center = fill.a > 0.0
+	box.border_color = rim
+	box.set_border_width_all(width)
+	box.set_corner_radius_all(RADIUS)
+	return box
