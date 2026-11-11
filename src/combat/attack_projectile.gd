@@ -4,6 +4,7 @@ extends Node2D
 ## Always hits unless the target disappears first.
 
 const SPEED := 2800.0
+const GLOW_RADIUS := 16.0
 
 var speed := SPEED
 var color := Color("fffbe8")
@@ -13,6 +14,11 @@ var look: ShotLook
 
 var _target: Enemy
 var _info: DamageInfo
+
+
+func _ready() -> void:
+	if look == null:
+		ShotGlow.attach(self, GLOW_RADIUS)
 
 
 func launch(from: Vector2, target: Enemy, info: DamageInfo) -> void:

@@ -8,6 +8,8 @@ signal hit_enemy(enemy: Enemy, prior_hits: int)
 ## Emitted once, where the shot ended. Connect deferred to run physics queries.
 signal finished(at: Vector2)
 
+const GLOW_RADIUS := 18.0
+
 var color := Color("fffbe8")
 var glow_color := Color(1.0, 0.85, 0.45, 0.5)
 var streak_length := 26.0
@@ -39,6 +41,11 @@ func launch(from: Vector2, direction: Vector2, speed: float, max_range: float, r
 	shape.shape = circle
 	add_child(shape)
 	area_entered.connect(_on_area_entered)
+
+
+func _ready() -> void:
+	if look == null:
+		ShotGlow.attach(self, maxf(head_radius * 2.0, GLOW_RADIUS))
 
 
 ## Shows `new_look` instead of the plain streak; null keeps what it has.

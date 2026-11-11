@@ -22,6 +22,7 @@ const FRONT_DEPTH := 58.0
 const WAKE_DEPTH := 56.0
 const FRONT_POINTS := 18
 const FOAM := Color("eafcff")
+const GLOW_RADIUS := 22.0
 ## How thin the wall check across a wave's front is, along its travel.
 const WALL_CHECK_DEPTH := 12.0
 
@@ -69,6 +70,8 @@ func _ready() -> void:
 	shape.shape = circle
 	add_child(shape)
 	body_entered.connect(_on_wall)
+	if front_width <= 0.0:
+		ShotGlow.attach(self, GLOW_RADIUS)
 
 
 func _physics_process(delta: float) -> void:

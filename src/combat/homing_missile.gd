@@ -14,6 +14,7 @@ const TURN_GROWTH := 18.0
 ## Close enough to the target's center to count as a hit.
 const HIT_DISTANCE := 20.0
 const TRAIL_POINTS := 12
+const GLOW_RADIUS := 20.0
 
 var color := Color("dff4ff")
 var glow_color := Color(0.45, 0.75, 1.0, 0.55)
@@ -25,6 +26,10 @@ var _speed := START_SPEED
 var _turn := START_TURN
 ## Recent global positions, oldest first.
 var _trail := PackedVector2Array()
+
+
+func _ready() -> void:
+	ShotGlow.attach(self, GLOW_RADIUS, false)
 
 
 func launch(from: Vector2, direction: Vector2, target: Enemy, info: DamageInfo) -> void:

@@ -11,6 +11,7 @@ func spawn(info: DamageInfo, final_amount: float, unit: Node2D, size_scale := 1.
 	var number := FloatingNumber.new()
 	number.setup(final_amount, info.type, info.is_crit, size_scale)
 	_place(number, unit)
+	HitSpark.spawn(self, unit.global_position, FloatingNumber.COLORS[info.type].lightened(0.3), info.is_crit)
 
 
 ## A green "+N" over `unit` (EnemyUnit.healed).
