@@ -29,9 +29,9 @@ const MANA_TOP := Color("5b9cf0")
 const MANA_BOTTOM := Color("2a5cb8")
 const MANA_GHOST := Color("c4d9ff")
 ## The boss bar sits under the stage info.
-const BOSS_BAR_TOP := 72.0
+const BOSS_BAR_TOP := 92.0
 ## The tips sit under the boss bar.
-const TIPS_TOP := 130.0
+const TIPS_TOP := 162.0
 const TIP_MARGIN := 14.0
 ## Space between the buff icons and the bottom panel.
 const BUFF_GAP := 8.0
@@ -89,9 +89,6 @@ func setup(target: Lucian, stage_wallet: Wallet, stage_node: Stage = null) -> vo
 	stage_info.setup(stage.run.display_name if stage else "Training", stage.runner if stage else null)
 	if stage:
 		stage_info.skip_pressed.connect(stage.skip_break)
-		if stage.run.endless:
-			# The stage info's "Best" line: the boss bar moves down under it.
-			boss_bar.offset_top = BOSS_BAR_TOP + stage_info.best_height()
 	radar.setup(stage.arena.get_bounds() if stage else Rect2(0, 0, 4800, 2700), target)
 	_place_radar()
 	wallet = stage_wallet

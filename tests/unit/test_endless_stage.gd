@@ -573,6 +573,7 @@ func test_the_stage_info_reads_endless_waves_and_the_best() -> void:
 	info.setup("Endless · Jungle", runner)
 	assert_true(info.best_label.visible)
 	assert_eq(info.best_label.text, "Best 3")
+	assert_false(info.pips.visible, "no pips: its waves never end")
 	assert_eq(info.timer_label.text, "Wave 1 in 0:05")
 	runner.state = WaveRunner.State.FIGHT
 	runner.wave = 7

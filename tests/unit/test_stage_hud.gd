@@ -24,6 +24,75 @@ func test_the_wave_text_follows_the_runner() -> void:
 	assert_false(info.skip_button.visible)
 
 
+## One pip per wave, the boss wave's larger: cleared, current or ahead.
+func test_the_pips_follow_the_waves() -> void:
+	var runner := WaveRunner.new(WavePlan.waves("2-2"), &"test_boss")
+	var info := StageInfo.new()
+	add_child_autofree(info)
+	info.setup("Stage 2-2 Â· The Sentinels", runner)
+	var pips := info.pips
+	assert_true(pips.visible)
+	assert_eq(pips.total, 4, "3 waves and the boss wave")
+	assert_gt(pips.pip_size(4), pips.pip_size(3), "the boss wave's pip is larger")
+	assert_eq(_pip_states(pips), [WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD], "before wave 1")
+	runner.skip()
+	info.refresh()
+	assert_eq(_pip_states(pips), [WavePips.State.CURRENT, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD], "wave 1")
+	runner.state = WaveRunner.State.BREAK
+	runner.wave = 2
+	info.refresh()
+	assert_eq(_pip_states(pips), [WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.AHEAD, WavePips.State.AHEAD], "the break after wave 2")
+	runner.state = WaveRunner.State.FIGHT
+	runner.wave = 4
+	info.refresh()
+	assert_eq(_pip_states(pips), [WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CURRENT], "the boss wave")
+	runner.state = WaveRunner.State.DONE
+	info.refresh()
+	assert_eq(_pip_states(pips), [WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED], "the stage is won")
+
+
+## The state of every pip, in wave order.
+func _pip_states(pips: WavePips) -> Array:
+	var states := []
+	for i in range(1, pips.total + 1):
+		states.append(WavePips.state_of(i, pips.wave, pips.fighting))
+	return states
+
+
+func test_a_stage_with_no_boss_has_no_larger_pip() -> void:
+	var info := StageInfo.new()
+	add_child_autofree(info)
+	info.setup("Stage 2-2 Â· The Sentinels", WaveRunner.new(WavePlan.waves("2-2")))
+	assert_eq(info.pips.total, 3)
+	assert_eq(info.pips.pip_size(3), info.pips.pip_size(1))
+
+
+## The name is a heading in capitals; its text is the stage's name as given.
+func test_the_name_shows_in_capitals_over_the_row() -> void:
+	var info := StageInfo.new()
+	add_child_autofree(info)
+	info.setup("Stage 2-2 Â· The Sentinels", WaveRunner.new(WavePlan.waves("2-2")))
+	await wait_process_frames(2)
+	assert_eq(info.name_label.text, "Stage 2-2 Â· The Sentinels")
+	assert_true(info.name_label.uppercase)
+	assert_lt(info.name_label.get_global_rect().end.y, info.timer_label.get_global_rect().position.y + 1.0)
+
+
+## The break's Skip button and a wave's texts take the same room, so the
+## boss bar under the plate never jumps.
+func test_the_stage_info_is_as_tall_in_a_break_as_in_a_wave() -> void:
+	var runner := WaveRunner.new(WavePlan.waves("2-2"))
+	var info := StageInfo.new()
+	add_child_autofree(info)
+	info.setup("Stage 2-2 Â· The Sentinels", runner)
+	await wait_process_frames(2)
+	var in_break := info.size.y
+	runner.skip()
+	await wait_process_frames(2)
+	assert_false(info.skip_button.visible)
+	assert_eq(info.size.y, in_break)
+
+
 func test_training_shows_only_its_name() -> void:
 	var info := StageInfo.new()
 	add_child_autofree(info)
@@ -32,6 +101,7 @@ func test_training_shows_only_its_name() -> void:
 	assert_eq(info.name_label.text, "Training")
 	assert_false(info.wave_label.visible)
 	assert_false(info.skip_button.visible)
+	assert_false(info.pips.visible)
 
 
 func test_the_stage_info_fits_training() -> void:
@@ -103,6 +173,17 @@ func test_skip_on_the_hud_starts_the_wave() -> void:
 	await wait_physics_frames(2)
 	stage.hud.stage_info.skip_button.pressed.emit()
 	assert_eq(stage.runner.state, WaveRunner.State.FIGHT)
+
+
+func test_the_boss_bar_and_the_tips_sit_under_the_stage_info() -> void:
+	SaveGame.instance().reset()
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	stage.setup(StageSetup.for_stage(SaveGame.instance(), 2, 1))
+	add_child_autofree(stage)
+	await wait_process_frames(2)
+	var hud := stage.hud
+	assert_gte(hud.boss_bar.get_global_rect().position.y, hud.stage_info.get_global_rect().end.y)
+	assert_gte(hud.tips.offset_top, hud.boss_bar.offset_top + hud.boss_bar.custom_minimum_size.y)
 
 
 func test_the_radar_maps_the_world_onto_itself() -> void:
