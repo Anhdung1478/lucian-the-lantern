@@ -886,3 +886,8 @@ func test_with_no_ledges_a_perched_enemy_comes_from_a_stub_and_walks() -> void:
 		await wait_physics_frames(1)
 	stage.lucian.invulnerable = true
 	assert_gt(unit.global_position.distance_to(from), 10.0, "it walks")
+
+
+## Headless keeps no mouse mode, so only the switch itself can be checked.
+func test_stages_confine_the_mouse_by_default() -> void:
+	assert_true(Stage.confine_mouse, "only the screenshot tool turns it off")

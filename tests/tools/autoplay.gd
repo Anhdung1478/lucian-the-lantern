@@ -14,6 +14,8 @@ extends SceneTree
 ## prints a line of the fight that often, on each stage's first try.
 ## AUTOPLAY_DIFFICULTY=easy|normal|hard|extreme plays on that difficulty
 ## (default normal); each tier and difficulty has its own save files.
+## AUTOPLAY_RUN=<name> gives a run its own save and settings files too, so
+## several runs of one tier and difficulty can play at the same time.
 ## Skins: between stages it buys every skin its purple affords, in Skin Shop
 ## order, and wears the last one bought. AUTOPLAY_SKIN=<id> (e.g. pulsefire,
 ## or classic for none) saves up for that skin first and wears it once owned.
@@ -63,11 +65,15 @@ func _initialize() -> void:
 	last_stage = args[2] if args.size() > 2 else "6-5"
 	if args.size() > 3:
 		first_stage = args[3]
-	if FileAccess.file_exists(SETTINGS_PATH):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS_PATH))
-	GameSettings._instance = GameSettings.new(SETTINGS_PATH)
+	# AUTOPLAY_RUN=<name>: its own settings and save files, so several runs of
+	# one tier and difficulty can play side by side.
+	var run := OS.get_environment("AUTOPLAY_RUN")
+	var settings_path := SETTINGS_PATH if run == "" else "user://autoplay_settings_%s.json" % run
+	if FileAccess.file_exists(settings_path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(settings_path))
+	GameSettings._instance = GameSettings.new(settings_path)
 	difficulty = Difficulty.from_key(OS.get_environment("AUTOPLAY_DIFFICULTY").to_lower())
-	var save := SaveGame.new("%s%s_%s_" % [SAVE_PREFIX, skill, Difficulty.KEYS[difficulty]])
+	var save := SaveGame.new("%s%s_%s_%s" % [SAVE_PREFIX, skill, Difficulty.KEYS[difficulty], "" if run == "" else run + "_"])
 	SaveGame._instance = save
 	save.start_new(1, difficulty)
 	print("autoplay: %s on %s (%s)" % [skill, Difficulty.name_of(difficulty), Difficulty.scale_text(difficulty)])

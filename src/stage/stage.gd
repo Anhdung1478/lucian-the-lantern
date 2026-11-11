@@ -55,6 +55,10 @@ const ACT_1_REWARDS: Array[String] = [
 	"Ghost is free to claim in the Evolution Tree",
 ]
 
+## False keeps the mouse free: the screenshot tool's window sits off-screen,
+## and a mouse confined to it would be taken from the desktop.
+static var confine_mouse := true
+
 var wallet := Wallet.new()
 ## The merchant on the map, or null.
 var merchant: Merchant
@@ -137,7 +141,8 @@ func _ready() -> void:
 	screens.menu.set_leave_enabled(not _runs_alone())
 	screens.menu.exit_requested.connect(_exit)
 	screens.menu.set_subtitle(run.display_name)
-	Input.mouse_mode = Input.MOUSE_MODE_CONFINED
+	if confine_mouse:
+		Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	camera.setup(lucian, arena.get_bounds().grow(StageMap.WALL_THICKNESS))
 	lucian.projectile_parent = $Projectiles
 	if dummy:

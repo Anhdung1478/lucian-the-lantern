@@ -3,6 +3,14 @@ extends SceneTree
 ## the whole game), drives it by calling its commands directly, and saves
 ## viewport screenshots. Needs a real window (not --headless).
 ## Usage: godot --path . -s res://tests/tools/screenshot.gd -- <scenario> <output_dir>
+## To keep the desktop free while it runs, give the project an untracked
+## override.cfg that puts the window off-screen and unfocusable, and mute it:
+##   [display]
+##   window/size/no_focus=true
+##   window/size/initial_position_type=0
+##   window/size/initial_position=Vector2i(4000, 4000)
+##   godot --audio-driver Dummy --path . -s res://tests/tools/screenshot.gd -- ...
+## The tool never confines the mouse (Stage.confine_mouse).
 
 const SETTINGS_PATH := "user://screenshot_settings.json"
 const SAVE_PREFIX := "user://screenshot_save_slot_"
@@ -46,6 +54,9 @@ var out_dir := ""
 
 
 func _initialize() -> void:
+	# The window may sit off-screen and unfocused (see the usage above): a
+	# confined mouse would be taken from the desktop.
+	Stage.confine_mouse = false
 	var args := OS.get_cmdline_user_args()
 	var scenario: String = args[0] if args.size() > 0 else "move"
 	out_dir = args[1] if args.size() > 1 else OS.get_user_data_dir()
