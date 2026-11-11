@@ -18,6 +18,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	DebugPanel.allowed = OS.is_debug_build()
 	Input.parse_input_event(_key(KEY_F3, false))
 	Input.flush_buffered_events()
 
@@ -78,6 +79,19 @@ func test_f3_q_shows_and_hides_it() -> void:
 func test_q_alone_does_nothing() -> void:
 	table._input(_key(KEY_Q, true))
 	assert_false(table.visible)
+
+
+## Fix 19: the tests run in a debug build, where F3 + Q opens it; a release
+## build never does.
+func test_f3_q_opens_it_only_in_a_debug_build() -> void:
+	assert_true(OS.is_debug_build(), "the tests run in a debug build")
+	assert_true(DebugPanel.allowed)
+	DebugPanel.allowed = false
+	_toggle()
+	assert_false(table.visible, "a release build")
+	DebugPanel.allowed = true
+	_toggle()
+	assert_true(table.visible)
 
 
 func test_blue_plus_1000() -> void:

@@ -9,6 +9,9 @@ func before_each() -> void:
 
 func after_each() -> void:
 	get_tree().paused = false
+	DebugPanel.allowed = OS.is_debug_build()
+	Input.parse_input_event(_key(KEY_F3, false))
+	Input.flush_buffered_events()
 
 
 func _stage(act: int, stage_number: int) -> Stage:
@@ -38,6 +41,36 @@ func _collect(node: Node, text: String, into: Array[Button]) -> void:
 
 func _enemies() -> Array[Node]:
 	return get_tree().get_nodes_in_group(&"enemies")
+
+
+func _key(code: Key, pressed: bool) -> InputEventKey:
+	var event := InputEventKey.new()
+	event.physical_keycode = code
+	event.keycode = code
+	event.pressed = pressed
+	return event
+
+
+## F3 held, Q pressed on the table, F3 let go.
+func _f3_q(table: DebugTable) -> void:
+	Input.parse_input_event(_key(KEY_F3, true))
+	Input.flush_buffered_events()
+	table._input(_key(KEY_Q, true))
+	Input.parse_input_event(_key(KEY_F3, false))
+	Input.flush_buffered_events()
+
+
+## Fix 19: F3 + Q opens the stage's table in a debug build (the tests run in
+## one), never in a release build.
+func test_f3_q_opens_the_table_only_in_a_debug_build() -> void:
+	var stage: Stage = await _stage(2, 1)
+	assert_false(stage.debug_table.visible)
+	DebugPanel.allowed = false
+	_f3_q(stage.debug_table)
+	assert_false(stage.debug_table.visible, "a release build")
+	DebugPanel.allowed = true
+	_f3_q(stage.debug_table)
+	assert_true(stage.debug_table.visible)
 
 
 func test_kill_all_empties_the_group_and_pays() -> void:

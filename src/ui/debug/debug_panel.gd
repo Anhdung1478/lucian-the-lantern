@@ -6,6 +6,11 @@ extends CanvasLayer
 
 const PANEL_WIDTH := 400.0
 
+## F3 + Q opens the panels only in a debug build, so a released game never
+## hands out essences or resets progress. A test sets it false to play a
+## release build.
+static var allowed := OS.is_debug_build()
+
 var _panel: PanelContainer
 
 
@@ -16,7 +21,10 @@ func _ready() -> void:
 
 
 ## _input runs before the controller's _unhandled_input, so Q never casts here.
+## Outside a debug build F3 + Q does nothing, and Q casts as usual.
 func _input(event: InputEvent) -> void:
+	if not allowed:
+		return
 	var key := event as InputEventKey
 	if key and key.pressed and not key.echo and key.physical_keycode == KEY_Q 			and Input.is_physical_key_pressed(KEY_F3):
 		visible = not visible
