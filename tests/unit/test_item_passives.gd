@@ -187,8 +187,10 @@ func test_shadowflame_boosts_magic_on_low_health() -> void:
 	var low := dummy.take_damage(lucian.make_damage(100.0, DamageInfo.Type.MAGIC, &"w"))
 	var low_true := dummy.take_damage(lucian.make_damage(100.0, DamageInfo.Type.TRUE, &"w"))
 	assert_almost_eq(low_true, normal, 0.01, "true damage is not magic")
-	# Shadowflame also gives magic penetration.
-	assert_almost_eq(low, 100.0 * 1.2 * DamageCalc.resist_multiplier(dummy.mr * (1.0 - lucian.stats.magic_pen)), 0.01)
+	# Shadowflame also gives 15 flat magic penetration, and no percent.
+	assert_almost_eq(lucian.stats.magic_pen_flat, 15.0, 0.001)
+	assert_eq(lucian.stats.magic_pen, 0.0)
+	assert_almost_eq(low, 100.0 * 1.2 * DamageCalc.resist_multiplier(dummy.mr - 15.0), 0.01)
 
 
 func test_shojin_stacks_once_per_cast() -> void:

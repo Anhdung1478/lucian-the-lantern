@@ -1,10 +1,11 @@
 class_name ConfirmPopup
 extends CanvasLayer
 ## A question over everything else, on a MenuCard over the blurred screen: Yes / No (ask), Yes / No / Cancel
-## (ask_or_cancel) or an action / Cancel (confirm). Swallows all keys while
-## open. ESC is Cancel when the question has one; on a Yes / No question it
-## answers No when the question allows it. The arrow keys pick a button and
-## Enter presses it; Yes (or the action) starts lit, so Enter confirms at once.
+## (ask_or_cancel) or an action / Cancel (confirm); or a notice with OK alone
+## (tell). Swallows all keys while open. ESC is Cancel when the question has
+## one; on a Yes / No question it answers No when the question allows it; on a
+## notice it is OK. The arrow keys pick a button and Enter presses it; Yes
+## (or the action, or OK) starts lit, so Enter confirms at once.
 
 const BUTTON_SIZE := Vector2(200, 56)
 ## Above the menus. A pop-up that must stay on top of another one (Game's
@@ -96,6 +97,13 @@ func confirm(text: String, action_label: String, on_action: Callable, on_cancel 
 	_on_cancel = on_cancel
 
 
+## OK alone: "Your backpack is full." OK, Enter and ESC close it, then call
+## `on_ok`.
+func tell(text: String, on_ok := Callable()) -> void:
+	_open(text, "OK", false, false)
+	_on_yes = on_ok
+
+
 ## Shows the question with these buttons; the last question's answers are dropped.
 func _open(text: String, yes_label: String, with_no: bool, with_cancel: bool) -> void:
 	_message.text = text
@@ -136,6 +144,12 @@ func cancel() -> void:
 		_on_cancel.call()
 
 
+## Hides the pop-up without answering: what it asked about went away (the
+## backpack closed under it).
+func dismiss() -> void:
+	visible = false
+
+
 func _input(event: InputEvent) -> void:
 	if not visible:
 		return
@@ -145,6 +159,8 @@ func _input(event: InputEvent) -> void:
 				cancel()
 			elif _escape_means_no:
 				answer(false)
+			elif not _no.visible:
+				answer(true)
 		else:
 			_keys.handle(event)
 		get_viewport().set_input_as_handled()

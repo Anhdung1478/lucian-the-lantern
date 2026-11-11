@@ -48,6 +48,14 @@ func is_boots() -> bool:
 	return kind == Kind.BOOTS
 
 
+## A legendary with percent armor or magic penetration: Lord Dominik's
+## Regards, Mortal Reminder and Void Staff. Only one of them can be equipped
+## at a time (Inventory.pen_blocker). Boots never count, nor flat magic
+## penetration (Shadowflame).
+func is_penetration() -> bool:
+	return kind == Kind.LEGENDARY and (stats.has(&"armor_pen") or stats.has(&"magic_pen"))
+
+
 ## Rounded down; the epsilon keeps 1300 x 0.7 at 910 despite float error.
 ## Boots can't be sold: 0.
 func sell_price() -> int:

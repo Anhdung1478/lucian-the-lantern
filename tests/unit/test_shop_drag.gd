@@ -122,12 +122,98 @@ func test_dragging_onto_an_occupied_cell_buys_into_a_free_cell() -> void:
 
 func test_dragging_onto_an_occupied_cell_with_no_free_cell_buys_nothing() -> void:
 	inventory.unlocked_backpack = 1
-	inventory.unlocked_equip = 1
-	inventory.put(Inventory.EQUIP_START, inventory.catalog.find(&"belt"))
 	drag(slot(0, 1), cell(0))
 	assert_eq(wallet.gold, 5000)
 	assert_false(stock.is_sold(1))
-	assert_eq(screen.shop_panel()._message.text, "No room in the backpack")
+	assert_true(screen.craft_confirm().is_open())
+	assert_eq(screen.craft_confirm()._message.text, "Your backpack is full.")
+	assert_null(inventory.item_at(Inventory.EQUIP_START), "never spilled into an empty equip slot")
+
+
+func test_a_right_click_with_the_backpack_full_says_so_in_a_pop_up() -> void:
+	inventory.unlocked_backpack = 1
+	watch_signals(screen)
+	button(slot(0, 0), MOUSE_BUTTON_RIGHT, true, center(slot(0, 0)))
+	var popup := screen.craft_confirm()
+	assert_true(popup.is_open())
+	assert_eq(popup._message.text, BackpackScreen.BACKPACK_FULL)
+	assert_eq(_choices(popup), "OK", "a notice: OK alone")
+	assert_eq(screen.shop_panel()._message.text, "", "the pop-up says it, not the red line")
+	assert_signal_emitted_with_parameters(screen, "traded", [false])
+	assert_eq(wallet.gold, 5000)
+	assert_false(stock.is_sold(0))
+	popup.answer(true)
+	assert_false(popup.is_open())
+
+
+func test_a_shop_item_dragged_onto_a_free_equip_slot_is_bought_with_the_backpack_full() -> void:
+	inventory.unlocked_backpack = 1
+	var item := stock.item_at(1)
+	drag(slot(0, 1), cell(Inventory.EQUIP_START + 2))
+	assert_eq(inventory.item_at(Inventory.EQUIP_START + 2), item)
+	assert_eq(wallet.gold, 4000)
+	assert_false(screen.craft_confirm().is_open())
+
+
+## A penetration legendary for 1000 gold.
+func _pen(id: StringName, key := &"armor_pen") -> ItemData:
+	var made := Fixtures.legendary(id, &"sword", &"belt", {key: 0.3})
+	made.display_name = {&"ldr": "Lord Dominik's Regards", &"void": "Void Staff"}.get(id, String(id))
+	made.cost = 1000
+	return made
+
+
+func test_a_second_penetration_item_dragged_onto_an_equip_slot_is_refused_with_a_pop_up() -> void:
+	inventory.put(Inventory.EQUIP_START, _pen(&"void", &"magic_pen"))
+	stock.items[1] = _pen(&"ldr")
+	drag(slot(0, 1), cell(Inventory.EQUIP_START + 1))
+	var popup := screen.craft_confirm()
+	assert_true(popup.is_open())
+	assert_eq(popup._message.text, "Only one penetration item can be equipped,\nand Void Staff already is.")
+	assert_eq(wallet.gold, 5000)
+	assert_false(stock.is_sold(1))
+	assert_null(inventory.item_at(Inventory.EQUIP_START + 1))
+
+
+## The pop-up's buttons on screen, in order: "Yes / No".
+func _choices(popup: ConfirmPopup) -> String:
+	var labels := PackedStringArray()
+	for each: Button in popup.find_children("*", "Button", true, false):
+		if each.visible:
+			labels.append(each.text)
+	return " / ".join(labels)
+
+
+func _key(code: Key) -> InputEventKey:
+	var key := InputEventKey.new()
+	key.keycode = code
+	key.physical_keycode = code
+	key.pressed = true
+	return key
+
+
+func test_a_notice_closes_on_ok_enter_or_esc() -> void:
+	var popup := screen.craft_confirm()
+	var calls: Array[String] = []
+	popup.tell("Your backpack is full.", func() -> void: calls.append("ok"))
+	assert_eq(_choices(popup), "OK")
+	popup.answer(false)
+	popup.cancel()
+	assert_true(popup.is_open(), "no No or Cancel to answer")
+	popup._input(_key(KEY_ENTER))
+	assert_false(popup.is_open())
+	popup.tell("Your backpack is full.")
+	popup._input(_key(KEY_ESCAPE))
+	assert_false(popup.is_open(), "ESC is OK")
+	assert_eq(calls, ["ok"] as Array[String])
+
+
+func test_closing_the_shop_drops_an_open_notice() -> void:
+	inventory.unlocked_backpack = 1
+	button(slot(0, 0), MOUSE_BUTTON_RIGHT, true, center(slot(0, 0)))
+	assert_true(screen.craft_confirm().is_open())
+	screen.close()
+	assert_false(screen.craft_confirm().is_open())
 
 
 func test_dropping_a_shop_item_outside_buys_nothing() -> void:
@@ -482,6 +568,41 @@ func test_craft_asks_first_and_no_changes_nothing() -> void:
 	confirm.answer(true)
 	assert_eq(id_at(0), &"gunblade")
 	assert_eq(wallet.gold, 4400)
+
+
+func test_a_crafted_penetration_item_goes_to_the_second_cell_when_the_first_is_closed_to_it() -> void:
+	var gunblade := inventory.catalog.find(&"gunblade")
+	gunblade.stats[&"armor_pen"] = 0.3
+	gunblade.cost = 2600
+	inventory.put(Inventory.EQUIP_START, _pen(&"void", &"magic_pen"))
+	inventory.put(Inventory.EQUIP_START + 1, inventory.catalog.find(&"rod"))
+	var panel: ShopPanel = await craft_tab()
+	assert_true(panel.load_input(BackpackScreen.CRAFT_FIRST, Inventory.EQUIP_START + 1))
+	assert_true(panel.load_input(BackpackScreen.CRAFT_SECOND, 0))
+	panel.craft_button().pressed.emit()
+	assert_string_starts_with(screen.craft_confirm()._message.text, "Craft gunblade", "it asks as usual")
+	screen.craft_confirm().answer(true)
+	assert_eq(id_at(0), &"gunblade", "the backpack cell, not the equip slot")
+	assert_eq(id_at(Inventory.EQUIP_START + 1), &"")
+	assert_eq(wallet.gold, 4400)
+
+
+func test_a_craft_with_both_cells_closed_to_its_penetration_item_is_refused_with_a_pop_up() -> void:
+	inventory.catalog.find(&"gunblade").stats[&"armor_pen"] = 0.3
+	inventory.put(Inventory.EQUIP_START, _pen(&"void", &"magic_pen"))
+	inventory.put(Inventory.EQUIP_START + 1, inventory.catalog.find(&"rod"))
+	inventory.apply_drop(0, Inventory.EQUIP_START + 2)
+	var panel: ShopPanel = await craft_tab()
+	assert_true(panel.load_input(BackpackScreen.CRAFT_FIRST, Inventory.EQUIP_START + 1))
+	assert_true(panel.load_input(BackpackScreen.CRAFT_SECOND, Inventory.EQUIP_START + 2))
+	watch_signals(screen)
+	panel.craft_button().pressed.emit()
+	var popup := screen.craft_confirm()
+	assert_eq(popup._message.text, "Only one penetration item can be equipped,\nand Void Staff already is.")
+	assert_eq(_choices(popup), "OK", "refused at once, not asked")
+	assert_signal_emitted_with_parameters(screen, "traded", [false])
+	assert_eq([id_at(Inventory.EQUIP_START + 1), id_at(Inventory.EQUIP_START + 2)], [&"rod", &"sword"])
+	assert_eq(wallet.gold, 5000)
 
 
 func test_craft_without_the_gold_is_refused_without_asking() -> void:

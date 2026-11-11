@@ -109,6 +109,15 @@ func test_free_pairs_stay_free() -> void:
 		assert_null(catalog.combine(a, b), "%s + %s" % pair)
 
 
+func test_the_penetration_items_are_lord_dominiks_mortal_reminder_and_void_staff() -> void:
+	var ids := catalog.items.filter(func(item: ItemData) -> bool: return item.is_penetration()).map(
+		func(item: ItemData) -> String: return String(item.id))
+	ids.sort()
+	assert_eq(ids, ["lord_dominiks_regards", "mortal_reminder", "void_staff"])
+	assert_eq(catalog.find(&"shadowflame").stats.get(&"magic_pen_flat", 0.0), 15.0, "15 flat, like Sorcerer's Shoes")
+	assert_false(catalog.find(&"shadowflame").stats.has(&"magic_pen"))
+
+
 func test_every_item_has_a_name_cost_and_known_stats() -> void:
 	for item in catalog.items:
 		assert_ne(item.display_name, "", str(item.id))

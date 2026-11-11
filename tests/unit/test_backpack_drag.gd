@@ -104,6 +104,38 @@ func test_drop_into_equip_slot_equips() -> void:
 	assert_almost_eq(inventory.equipped_bonus()[&"ad"], 35.0, 0.001)
 
 
+## A penetration legendary, named as in the game.
+func _pen(name: String, key := &"armor_pen") -> ItemData:
+	var made := Fixtures.legendary(StringName(name.to_snake_case()), &"sword", &"belt", {key: 0.3})
+	made.display_name = name
+	return made
+
+
+func test_a_second_penetration_item_dragged_into_the_equip_row_is_refused_with_a_pop_up() -> void:
+	inventory.put(Inventory.EQUIP_START, _pen("Mortal Reminder"))
+	var void_staff := _pen("Void Staff", &"magic_pen")
+	inventory.put(10, void_staff)
+	drag(10, Inventory.EQUIP_START + 1, 0.1)
+	assert_eq(inventory.item_at(10), void_staff, "it goes back")
+	assert_null(inventory.item_at(Inventory.EQUIP_START + 1))
+	var popup := screen.craft_confirm()
+	assert_true(popup.is_open())
+	assert_eq(popup._message.text, "Only one penetration item can be equipped,\nand Mortal Reminder already is.")
+	popup.answer(true)
+	drag(10, Inventory.EQUIP_START, 0.1)
+	assert_eq(inventory.item_at(Inventory.EQUIP_START), void_staff, "it swaps with the one equipped")
+	assert_false(popup.is_open())
+
+
+func test_closing_the_backpack_drops_an_open_notice() -> void:
+	inventory.put(Inventory.EQUIP_START, _pen("Mortal Reminder"))
+	inventory.put(10, _pen("Void Staff", &"magic_pen"))
+	drag(10, Inventory.EQUIP_START + 1, 0.1)
+	assert_true(screen.craft_confirm().is_open())
+	screen.close()
+	assert_false(screen.craft_confirm().is_open())
+
+
 func test_drop_on_locked_slot_returns() -> void:
 	inventory.unlocked_equip = 2
 	drag(0, Inventory.EQUIP_START + 3, 0.1)

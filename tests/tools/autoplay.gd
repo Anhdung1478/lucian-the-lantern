@@ -493,10 +493,14 @@ class Bot extends Node:
 				best = minf(best, at.distance_to(unit.global_position) - unit.data.attack_range - Lucian.HIT_RADIUS)
 		return best
 
-	## Between waves: loot, then the merchant, then Skip.
+	## Between waves: loot, then the merchant, then Skip. A full backpack
+	## leaves loot on the ground; with an equip slot free, the bot equips first
+	## to make room, as a player would.
 	func _between_waves(in_break: bool) -> void:
 		for node in stage.get_node("World").get_children():
 			var drop := node as LootDrop
+			if drop and lucian.inventory.space_for(drop.item) == 0 and _free_equip_slot(drop.item) >= 0:
+				_equip()
 			if drop and lucian.inventory.space_for(drop.item) > 0:
 				lucian.command_move(drop.global_position)
 				return
@@ -516,18 +520,24 @@ class Bot extends Node:
 		_note("gold %d" % stage.wallet.gold)
 		# Crafts first, at the merchant's fee, then items.
 		_craft(shop)
-		# Items: the best fragment or legendary affordable, keeping 100 for potions.
+		# Items: the best fragment or legendary affordable that has somewhere to
+		# go, keeping 100 for potions.
 		for pass_count in 3:
 			var best := -1
 			for slot in MerchantStock.SLOTS:
 				var item := shop.stock.item_at(slot)
-				if item and stage.wallet.gold >= item.cost + 100:
-					if best < 0 or item.cost > shop.stock.item_at(best).cost:
-						best = slot
+				if item == null or stage.wallet.gold < item.cost + 100:
+					continue
+				if lucian.inventory.space_for(item) == 0 and _free_equip_slot(item) < 0:
+					continue
+				if best < 0 or item.cost > shop.stock.item_at(best).cost:
+					best = slot
 			if best < 0:
 				break
 			var bought := shop.stock.item_at(best)
-			if shop.buy_slot(best) == Shop.Result.OK:
+			# A full backpack takes nothing: it is dragged onto a free equip slot.
+			var cell := -1 if lucian.inventory.space_for(bought) > 0 else _free_equip_slot(bought)
+			if shop.buy_slot(best, cell) == Shop.Result.OK:
 				_note("buy %s (%d)" % [bought.display_name, bought.cost])
 		_craft(shop)
 		# Potions: up to 4.
@@ -538,6 +548,15 @@ class Bot extends Node:
 		while have < 4 and shop.buy_potion(potion) == Shop.Result.OK:
 			have += 1
 		_equip()
+
+	## The first empty open equip slot that takes `item` (the one-penetration
+	## rule allowing), or -1.
+	func _free_equip_slot(item: ItemData) -> int:
+		var inv := lucian.inventory
+		for i in range(Inventory.EQUIP_START, Inventory.EQUIP_END):
+			if inv.item_at(i) == null and inv.can_put(i, item):
+				return i
+		return -1
 
 	## Crafts any two fragments into their legendary at the merchant's Craft
 	## tab, while the fee leaves 100 gold for potions.
@@ -561,31 +580,54 @@ class Bot extends Node:
 				if again:
 					break
 
-	## The priciest items go into the open equip slots; Health potions in the
-	## backpack top up their cell (key 7), and the boots stay in theirs.
+	## The priciest items go into the open equip slots, with at most one
+	## penetration item (the priciest); Health potions in the backpack top up
+	## their cell (key 7), and the boots stay in theirs. Each open slot is
+	## filled in turn with the priciest item not yet placed; a penetration item
+	## takes the slot of the one equipped, if any, so the rule never refuses it.
 	func _equip() -> void:
 		var inv := lucian.inventory
 		for i in Inventory.BACKPACK_SIZE:
 			var held := inv.item_at(i)
 			if held and held.id == &"hp_potion" and not inv.is_locked(i):
 				inv.apply_drop(i, Inventory.HP_POTION_CELL)
-		var gear: Array[int] = []
-		for i in Inventory.SIZE:
-			var item := inv.item_at(i)
-			if not inv.is_locked(i) and item and not item.is_potion() and not item.is_boots():
-				gear.append(i)
-		gear.sort_custom(func(x: int, y: int) -> bool: return inv.item_at(x).cost > inv.item_at(y).cost)
-		var slot := 0
-		for i in gear:
-			while slot < Inventory.EQUIP_SIZE and inv.is_locked(Inventory.EQUIP_START + slot):
-				slot += 1
-			if slot >= Inventory.EQUIP_SIZE:
+		var placed: Array[int] = []
+		var has_pen := false
+		while placed.size() < inv.unlocked_equip:
+			var best := -1
+			for i in Inventory.SIZE:
+				var item := inv.item_at(i)
+				if inv.is_locked(i) or item == null or item.is_potion() or item.is_boots() or placed.has(i):
+					continue
+				if (item.is_penetration() and has_pen) or (best >= 0 and item.cost <= inv.item_at(best).cost):
+					continue
+				best = i
+			if best < 0:
 				break
-			var cell := Inventory.EQUIP_START + slot
-			if i != cell:
-				inv.apply_drop(i, cell)
-			slot += 1
+			var cell := _equip_cell(best, placed)
+			if best != cell:
+				inv.apply_drop(best, cell)
+			placed.append(cell)
+			var worn := inv.item_at(cell)
+			has_pen = has_pen or (worn != null and worn.is_penetration())
 		lucian.refresh_stats()
+
+	## The open equip slot not in `placed` that the item in cell `index` goes
+	## to: its own when it is equipped, the slot of the penetration item
+	## equipped when it is one too, else the first.
+	func _equip_cell(index: int, placed: Array[int]) -> int:
+		var inv := lucian.inventory
+		var free: Array[int] = []
+		for i in range(Inventory.EQUIP_START, Inventory.EQUIP_START + inv.unlocked_equip):
+			if not placed.has(i):
+				free.append(i)
+		if free.has(index):
+			return index
+		if inv.item_at(index).is_penetration():
+			for i in free:
+				if inv.item_at(i) and inv.item_at(i).is_penetration():
+					return i
+		return free[0]
 
 	func _pick_target(enemies: Array[EnemyUnit]) -> EnemyUnit:
 		var pos := lucian.global_position

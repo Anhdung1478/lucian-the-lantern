@@ -20,7 +20,7 @@ cost = 3200
 stats = Dictionary[StringName, float]({
 &"ap": 90.0,
 &"crit_chance": 0.15,
-&"magic_pen": 0.1
+&"magic_pen_flat": 15.0
 })
 components = Array[StringName]([&"needlessly_large_rod", &"cloak_of_agility"])
 effects = Array[ExtResource("1_5ew07")]([SubResource("Resource_mfrvh")])

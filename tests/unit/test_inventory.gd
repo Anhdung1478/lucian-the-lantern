@@ -20,6 +20,11 @@ func item(id: StringName) -> ItemData:
 	return catalog.find(id)
 
 
+## A penetration legendary: percent armor or magic penetration.
+func pen(id: StringName, key := &"armor_pen") -> ItemData:
+	return Fixtures.legendary(id, &"sword", &"belt", {key: 0.3})
+
+
 func test_starts_empty_with_all_equip_slots_unlocked() -> void:
 	assert_eq(inventory.items.size(), 63)
 	assert_eq(Inventory.BACKPACK_SIZE, 54)
@@ -42,13 +47,13 @@ func test_add_fills_first_empty_backpack_cell() -> void:
 	assert_eq(inventory.item_at(0), item(&"belt"))
 
 
-func test_a_full_backpack_fills_an_empty_equip_slot() -> void:
+func test_a_full_backpack_takes_nothing_with_the_equip_slots_empty() -> void:
 	for i in Inventory.BACKPACK_SIZE:
 		inventory.add(item(&"sword"))
-	assert_true(inventory.add(item(&"rod")), "the backpack is full, an equip slot is free")
-	assert_eq(inventory.item_at(EQUIP), item(&"rod"))
-	assert_true(inventory.add(item(&"belt")))
-	assert_eq(inventory.item_at(EQUIP + 1), item(&"belt"), "the first empty slot each time")
+	assert_eq(inventory.space_for(item(&"rod")), 0, "empty equip slots are no room")
+	assert_false(inventory.add(item(&"rod")))
+	for i in range(EQUIP, Inventory.EQUIP_END):
+		assert_null(inventory.item_at(i))
 
 
 func test_the_backpack_is_used_before_the_equip_slots() -> void:
@@ -57,16 +62,14 @@ func test_the_backpack_is_used_before_the_equip_slots() -> void:
 	assert_null(inventory.item_at(EQUIP))
 
 
-func test_add_skips_locked_and_taken_equip_slots() -> void:
+func test_a_full_backpack_still_lets_an_item_be_put_in_a_chosen_equip_slot() -> void:
 	for i in Inventory.BACKPACK_SIZE:
 		inventory.add(item(&"sword"))
 	inventory.unlocked_equip = 2
 	inventory.put(EQUIP, item(&"belt"))
-	assert_eq(inventory.space_for(item(&"rod")), 1)
-	assert_true(inventory.add(item(&"rod")))
-	assert_eq(inventory.item_at(EQUIP + 1), item(&"rod"))
-	assert_false(inventory.add(item(&"rod")), "every open cell is taken")
-	assert_null(inventory.item_at(EQUIP + 2), "the locked slot stays empty")
+	assert_true(inventory.can_put(EQUIP + 1, item(&"rod")))
+	assert_true(inventory.put(EQUIP + 1, item(&"rod")), "putting it there is a choice, not a spill")
+	assert_false(inventory.can_put(EQUIP + 2, item(&"rod")), "a locked slot")
 
 
 func test_potions_never_go_to_equip_slots() -> void:
@@ -81,12 +84,12 @@ func test_potions_never_go_to_equip_slots() -> void:
 		assert_null(inventory.item_at(i))
 
 
-func test_changed_fires_when_add_fills_an_equip_slot() -> void:
+func test_an_add_with_no_room_changes_nothing() -> void:
 	for i in Inventory.BACKPACK_SIZE:
 		inventory.add(item(&"sword"))
 	watch_signals(inventory)
 	inventory.add(item(&"rod"))
-	assert_signal_emitted(inventory, "changed")
+	assert_signal_not_emitted(inventory, "changed")
 
 
 func test_drop_on_empty_cell_moves() -> void:
@@ -243,7 +246,7 @@ func test_space_for_counts_room_in_stacks_and_empty_cells() -> void:
 	inventory.add(item(&"red"), 9 + 5)
 	assert_eq(inventory.space_for(item(&"red")), 4)
 	assert_eq(inventory.space_for(item(&"blue")), 9, "only its own potion cell is left")
-	assert_eq(inventory.space_for(item(&"sword")), Inventory.EQUIP_SIZE, "then the empty equip slots")
+	assert_eq(inventory.space_for(item(&"sword")), 0, "the empty equip slots don't count")
 
 
 func test_add_is_all_or_nothing() -> void:
@@ -374,8 +377,6 @@ func test_unlocked_backpack_stays_between_1_and_54() -> void:
 
 func test_add_and_space_for_use_only_open_cells() -> void:
 	inventory.unlocked_backpack = 5
-	inventory.unlocked_equip = 1
-	inventory.put(EQUIP, item(&"belt"))
 	assert_eq(inventory.space_for(item(&"sword")), 5)
 	for i in 5:
 		assert_true(inventory.add(item(&"sword")))
@@ -429,3 +430,87 @@ func test_lowering_the_equip_slots_skips_locked_backpack_cells() -> void:
 	inventory.unlocked_equip = 5
 	assert_eq(inventory.item_at(1), item(&"sword"), "the first empty open cell")
 	assert_null(inventory.item_at(EQUIP + 5))
+
+
+# --- One penetration item --------------------------------------------------------
+
+
+func test_penetration_items_have_percent_armor_or_magic_penetration() -> void:
+	assert_true(pen(&"ldr").is_penetration())
+	assert_true(pen(&"void", &"magic_pen").is_penetration())
+	var flat := Fixtures.legendary(&"flame", &"rod", &"belt", {&"magic_pen_flat": 15.0})
+	assert_false(flat.is_penetration(), "flat magic penetration doesn't count")
+	var shoes := Fixtures.boots(&"shoes", 3)
+	shoes.stats[&"magic_pen"] = 0.08
+	assert_false(shoes.is_penetration(), "boots never count")
+	assert_false(item(&"sword").is_penetration())
+
+
+func test_only_one_penetration_item_can_be_put_in_the_equip_slots() -> void:
+	var ldr := pen(&"ldr")
+	var void_staff := pen(&"void", &"magic_pen")
+	assert_true(inventory.put(EQUIP, ldr))
+	assert_eq(inventory.pen_blocker(EQUIP + 1, void_staff), ldr)
+	assert_false(inventory.can_put(EQUIP + 1, void_staff))
+	assert_false(inventory.put(EQUIP + 1, void_staff))
+	assert_null(inventory.item_at(EQUIP + 1))
+	assert_null(inventory.pen_blocker(EQUIP, void_staff), "the slot of the one equipped would swap it out")
+	assert_null(inventory.pen_blocker(0, void_staff), "the backpack takes any number")
+	assert_true(inventory.put(0, void_staff))
+	assert_true(inventory.put(EQUIP + 1, item(&"rod")), "other items are not limited")
+
+
+func test_a_drop_that_would_equip_a_second_penetration_item_returns() -> void:
+	var ldr := pen(&"ldr")
+	var void_staff := pen(&"void", &"magic_pen")
+	inventory.put(EQUIP, ldr)
+	inventory.put(0, void_staff)
+	assert_eq(inventory.drop_pen_blocker(0, EQUIP + 1), ldr)
+	assert_eq(inventory.drop_outcome(0, EQUIP + 1), Drop.RETURN)
+	watch_signals(inventory)
+	assert_eq(inventory.apply_drop(0, EQUIP + 1), Drop.RETURN)
+	assert_signal_not_emitted(inventory, "changed")
+	assert_eq(inventory.item_at(0), void_staff)
+	assert_null(inventory.item_at(EQUIP + 1))
+
+
+func test_a_penetration_item_swaps_with_the_one_equipped() -> void:
+	var ldr := pen(&"ldr")
+	var void_staff := pen(&"void", &"magic_pen")
+	inventory.put(EQUIP, ldr)
+	inventory.put(0, void_staff)
+	assert_null(inventory.drop_pen_blocker(0, EQUIP))
+	assert_eq(inventory.apply_drop(0, EQUIP), Drop.SWAP)
+	assert_eq(inventory.item_at(EQUIP), void_staff)
+	assert_eq(inventory.item_at(0), ldr)
+	assert_eq(inventory.apply_drop(EQUIP, 0), Drop.SWAP, "and back, dragged from the equip row")
+	assert_eq(inventory.item_at(EQUIP), ldr)
+
+
+func test_a_swap_out_of_the_equip_row_cannot_bring_in_a_second_one() -> void:
+	var ldr := pen(&"ldr")
+	var void_staff := pen(&"void", &"magic_pen")
+	inventory.put(EQUIP, ldr)
+	inventory.put(EQUIP + 1, item(&"rod"))
+	inventory.put(0, void_staff)
+	assert_eq(inventory.drop_pen_blocker(EQUIP + 1, 0), ldr, "the rod out, the Void Staff in")
+	assert_eq(inventory.apply_drop(EQUIP + 1, 0), Drop.RETURN)
+	assert_eq([inventory.item_at(EQUIP + 1), inventory.item_at(0)], [item(&"rod"), void_staff])
+
+
+func test_moves_within_the_equip_row_are_never_refused() -> void:
+	var ldr := pen(&"ldr")
+	inventory.put(EQUIP, ldr)
+	inventory.put(EQUIP + 1, item(&"rod"))
+	assert_eq(inventory.apply_drop(EQUIP, EQUIP + 3), Drop.MOVE)
+	assert_eq(inventory.apply_drop(EQUIP + 3, EQUIP + 1), Drop.SWAP)
+	assert_eq(inventory.item_at(EQUIP + 1), ldr)
+
+
+func test_a_drop_refused_for_another_reason_names_no_blocker() -> void:
+	inventory.put(EQUIP, pen(&"ldr"))
+	inventory.put(0, pen(&"void", &"magic_pen"))
+	inventory.unlocked_equip = 3
+	assert_null(inventory.drop_pen_blocker(0, EQUIP + 4), "a locked slot sends it back anyway")
+	assert_null(inventory.drop_pen_blocker(0, -1))
+	assert_null(inventory.drop_pen_blocker(0, Inventory.HP_POTION_CELL))

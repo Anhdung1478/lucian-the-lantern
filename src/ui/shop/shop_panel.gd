@@ -3,7 +3,9 @@ extends PanelContainer
 ## The merchant's shop, beside the backpack while it is open: a gold readout,
 ## the Items, Potions and Craft tabs, a hint line, the Undo sale button (every
 ## tab; it buys back the last sale) and the Refresh button (Items only) in
-## the bottom-right corner. Refused purchases flash a red message.
+## the bottom-right corner. Refused purchases flash a red message; a full
+## backpack and the one-penetration rule are told in a pop-up instead
+## (BackpackScreen._report).
 ##
 ## The Craft tab: [input] + [input] -> [result], the fee and a Craft button.
 ## Two fragments make their legendary, for the legendary's cost minus the
@@ -27,7 +29,6 @@ const HINTS: Array[String] = [
 ]
 const MESSAGES := {
 	Shop.Result.NO_GOLD: "Not enough gold",
-	Shop.Result.NO_ROOM: "No room in the backpack",
 	Shop.Result.CELL_LOCKED: "That cell is locked",
 	Shop.Result.SOLD_OUT: "Already sold",
 	Shop.Result.NOTHING_TO_REFRESH: "Nothing left to refresh",

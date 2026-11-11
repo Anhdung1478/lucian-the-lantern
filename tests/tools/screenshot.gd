@@ -1646,16 +1646,16 @@ func scenario_tree_rules() -> void:
 
 
 ## A new save in Training: the 9 x 6 backpack with 5 cells open and the rest
-## chained, and a chained cell's hover. Items go into the open equip slots
-## first, so six equip items and five backpack items fill everything; walking
-## onto one more on the ground says "Backpack full". Then two levels of Backpack
-## Slots on the main screen: 16 cells open in the next stage.
+## chained, and a chained cell's hover. Five items fill it (a full backpack
+## never spills into the empty equip slots); walking onto one more on the
+## ground says "Backpack full". Then two levels of Backpack Slots on the main
+## screen: 16 cells open in the next stage.
 func scenario_backpack_slots() -> void:
 	await start_training()
 	var inventory := lucian.inventory
 	print("new save: open cells (expect 5 of 54): ", inventory.unlocked_backpack, " of ", Inventory.BACKPACK_SIZE)
 	var legendaries := lucian.item_catalog.legendaries()
-	for i in Inventory.EQUIP_SIZE + inventory.unlocked_backpack:
+	for i in inventory.unlocked_backpack:
 		inventory.add(legendaries[i % legendaries.size()])
 	print("one more item fits (expect false): ", inventory.add(lucian.item_catalog.find(&"negatron_cloak")))
 	await press_key(KEY_P, true)
@@ -3635,13 +3635,13 @@ func scenario_defeat() -> void:
 	paused = false
 
 
-## A fragment and a legendary on the ground; with the backpack and the equip
-## slots full, walking onto one says "Backpack full".
+## A fragment and a legendary on the ground; with the backpack full, walking
+## onto one says "Backpack full".
 func scenario_loot() -> void:
 	var game := game_stage()
 	var catalog := lucian.item_catalog
 	var legendaries := catalog.legendaries()
-	for i in Inventory.BACKPACK_SIZE + Inventory.EQUIP_SIZE:
+	for i in Inventory.BACKPACK_SIZE:
 		lucian.inventory.add(legendaries[i % legendaries.size()])
 	var fragment := catalog.find(&"bf_sword")
 	game.drop_loot(fragment, lucian.global_position + Vector2(300, -60))

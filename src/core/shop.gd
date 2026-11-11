@@ -6,11 +6,14 @@ extends RefCounted
 ## a fee), selling, and refreshing, all for stage gold. Nothing is paid when a
 ## purchase does not fit. Boots are never sold. A sale can be undone, last
 ## first, until this shop is dropped (the player leaves the merchant).
+## A purchase goes into the backpack, so a full backpack refuses it (NO_ROOM),
+## unless it is dropped on a free equip slot. Nothing may equip a second
+## penetration item (PEN_LIMIT; see Inventory.pen_blocker).
 
 enum Result {
 	OK, NO_GOLD, NO_ROOM, CELL_LOCKED, SOLD_OUT, NOTHING_TO_REFRESH,
 	NO_RECIPE, WRONG_CELL, NOTHING_TO_UNDO,
-	SLOT_LOCKED,
+	SLOT_LOCKED, PEN_LIMIT,
 }
 
 var stock: MerchantStock
@@ -28,10 +31,11 @@ func _init(merchant_stock: MerchantStock, target_inventory: Inventory, stage_wal
 	wallet = stage_wallet
 
 
-## Buys what stock slot `slot` sells, into `cell` or (-1) the first cell
-## it fits. When `cell` is already taken the item goes to the first free
-## cell instead; a locked cell or one that can't hold it is refused. A
-## locked (chained) slot is SLOT_LOCKED, a bought one SOLD_OUT.
+## Buys what stock slot `slot` sells, into `cell` or (-1) the backpack's
+## first cell it fits. When `cell` is already taken the item goes into the
+## backpack instead; a locked cell or one that can't hold it is refused, as is
+## a free equip slot that would equip a second penetration item (PEN_LIMIT).
+## A locked (chained) slot is SLOT_LOCKED, a bought one SOLD_OUT.
 func buy_slot(slot: int, cell := -1) -> Result:
 	if stock.is_locked(slot):
 		return Result.SLOT_LOCKED
@@ -78,8 +82,9 @@ func last_sale() -> Dictionary:
 
 
 ## Buys back the last sale for what it paid: the whole stack returns to its
-## old cell when that is still empty, otherwise to the first place it fits.
-## NO_GOLD and NO_ROOM change nothing and keep the sale to undo.
+## old cell when that is still empty (and, for an equip slot, the
+## one-penetration rule allows it), otherwise to the backpack's first place it
+## fits. NO_GOLD and NO_ROOM change nothing and keep the sale to undo.
 func undo_sale() -> Result:
 	if _sales.is_empty():
 		return Result.NOTHING_TO_UNDO
@@ -116,21 +121,40 @@ func craft_fee(first: int, second: int) -> int:
 	return inventory.catalog.craft_fee(inventory.item_at(first), inventory.item_at(second))
 
 
-## The Craft tab's button: pays the fee, then uses up both items. Upgraded
-## boots go in the boots cell; a legendary goes in `first`'s cell and
-## `second`'s is emptied. NO_GOLD changes nothing.
+## The Craft tab's button: pays the fee, then uses up both items. What it
+## makes goes in craft_cell and the other input's cell is emptied. PEN_LIMIT
+## and NO_GOLD change nothing.
 func craft(first: int, second: int) -> Result:
 	var made := craft_result(first, second)
 	if made == null:
 		return Result.NO_RECIPE
+	var keep := craft_cell(first, second)
+	if keep < 0:
+		return Result.PEN_LIMIT
 	if not wallet.spend(craft_fee(first, second)):
 		return Result.NO_GOLD
 	if made.is_boots():
 		var fragment := second if inventory.item_at(first).is_boots() else first
-		inventory.craft_into(Inventory.BOOTS_CELL, fragment, made)
+		inventory.craft_into(keep, fragment, made)
 	else:
-		inventory.craft_into(first, second, made)
+		inventory.craft_into(keep, second if keep == first else first, made)
 	return Result.OK
+
+
+## Where crafting cells `first` and `second` puts what it makes: the boots
+## cell for upgraded boots; for a legendary, `first`'s cell, or `second`'s
+## when `first` is an equip slot the one-penetration rule closes to it. -1
+## when it makes nothing or the rule closes both cells.
+func craft_cell(first: int, second: int) -> int:
+	var made := craft_result(first, second)
+	if made == null:
+		return -1
+	if made.is_boots():
+		return Inventory.BOOTS_CELL
+	for cell in [first, second]:
+		if inventory.pen_blocker(cell, made) == null:
+			return cell
+	return -1
 
 
 ## A refresh would change something: an open slot is still unsold.
@@ -156,6 +180,8 @@ func _buy(item: ItemData, cell: int) -> Result:
 		return Result.CELL_LOCKED
 	if cell >= 0 and not Inventory.accepts(cell, item):
 		return Result.WRONG_CELL
+	if cell >= 0 and inventory.item_at(cell) == null and inventory.pen_blocker(cell, item) != null:
+		return Result.PEN_LIMIT
 	if cell >= 0 and not inventory.can_put(cell, item):
 		cell = -1
 	if cell < 0 and inventory.space_for(item) <= 0:

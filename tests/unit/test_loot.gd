@@ -80,26 +80,36 @@ func test_walking_over_a_drop_picks_it_up() -> void:
 	assert_false(is_instance_valid(drop))
 
 
-func test_a_full_backpack_puts_the_pickup_in_an_equip_slot() -> void:
+## The "Backpack full" notes in the world.
+func _full_notes() -> Array[Node]:
+	return stage.get_node("World").get_children().filter(func(node: Node) -> bool:
+		return node is FloatingText and node.text == "Backpack full")
+
+
+func test_a_full_backpack_leaves_the_drop_and_says_so_now_and_then() -> void:
 	_stage()
 	var sword := stage.lucian.item_catalog.find(&"bf_sword")
 	for i in Inventory.BACKPACK_SIZE:
-		stage.lucian.inventory.add(sword)
-	var drop := _drop_on_lucian(sword)
-	await wait_physics_frames(2)
-	assert_false(is_instance_valid(drop))
-	assert_eq(stage.lucian.inventory.item_at(Inventory.EQUIP_START), sword)
-
-
-func test_a_full_backpack_and_equip_row_leaves_the_drop() -> void:
-	_stage()
-	var sword := stage.lucian.item_catalog.find(&"bf_sword")
-	for i in Inventory.BACKPACK_SIZE + Inventory.EQUIP_SIZE:
 		stage.lucian.inventory.add(sword)
 	assert_eq(stage.lucian.inventory.space_for(sword), 0)
 	var drop := _drop_on_lucian(sword)
 	await wait_physics_frames(2)
 	assert_true(is_instance_valid(drop))
+	assert_null(stage.lucian.inventory.item_at(Inventory.EQUIP_START), "the empty equip slots take nothing")
+	assert_eq(_full_notes().size(), 1)
+	await wait_physics_frames(10)
+	assert_eq(_full_notes().size(), 1, "at most one note every %d s" % LootDrop.FULL_NOTE_GAP)
+
+
+func test_a_full_equip_row_doesnt_stop_a_pickup() -> void:
+	_stage()
+	var sword := stage.lucian.item_catalog.find(&"bf_sword")
+	for i in Inventory.EQUIP_SIZE:
+		stage.lucian.inventory.put(Inventory.EQUIP_START + i, sword)
+	var drop := _drop_on_lucian(sword)
+	await wait_physics_frames(2)
+	assert_false(is_instance_valid(drop))
+	assert_eq(stage.lucian.inventory.item_at(0), sword)
 
 
 func _drops() -> Array[Node]:
@@ -186,11 +196,11 @@ func test_a_drop_stays_when_the_open_cells_are_full() -> void:
 	_stage()
 	var sword := stage.lucian.item_catalog.find(&"bf_sword")
 	stage.lucian.inventory.unlocked_backpack = 3
-	stage.lucian.inventory.unlocked_equip = 1
-	for i in 4:
+	for i in 3:
 		stage.lucian.inventory.add(sword)
 	assert_eq(stage.lucian.inventory.space_for(sword), 0)
 	var drop := _drop_on_lucian(sword)
 	await wait_physics_frames(2)
 	assert_true(is_instance_valid(drop))
 	assert_null(stage.lucian.inventory.item_at(3))
+	assert_null(stage.lucian.inventory.item_at(Inventory.EQUIP_START))

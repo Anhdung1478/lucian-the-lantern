@@ -8,6 +8,10 @@ extends RefCounted
 ## Potions stack up to their max_stack in one cell; everything else is 1.
 ## Potions go only in the backpack and their potion cell, never in an equip
 ## slot. Boots live only in the boots cell: they never move by drag.
+## Only one penetration item (ItemData.is_penetration) can be in the equip
+## slots at a time: a put or drop that would equip a second one is refused
+## (pen_blocker). Picked-up and bought items go only into the backpack (and a
+## potion's own cell), never into an empty equip slot.
 
 signal changed
 
@@ -126,8 +130,8 @@ func count_at(index: int) -> int:
 
 
 ## How many more of `item` fit: room in a potion's own potion cell, then in
-## the backpack's stacks and empty cells, then in empty equip slots that take
-## it (unlocked cells only; potions never go to equip slots). Boots never fit.
+## the backpack's stacks and empty cells (unlocked cells only). Empty equip
+## slots don't count: a full backpack takes nothing. Boots never fit.
 func space_for(item: ItemData) -> int:
 	if item.is_boots():
 		return 0
@@ -137,15 +141,12 @@ func space_for(item: ItemData) -> int:
 		room += _room_in(cell, item)
 	for i in unlocked_backpack:
 		room += _room_in(i, item)
-	for i in _equip_cells_for(item):
-		room += _room_in(i, item)
 	return room
 
 
 ## Puts `amount` of `item` away: a potion fills its potion cell first; then
-## the backpack's stacks with room, then its first empty cells; then, when the
-## backpack is full, empty equip slots that take it (it applies at once). All
-## or nothing: false when it doesn't fit.
+## the backpack's stacks with room, then its first empty cells. Never an
+## equip slot. All or nothing: false when it doesn't fit.
 func add(item: ItemData, amount := 1) -> bool:
 	if space_for(item) < amount:
 		return false
@@ -158,18 +159,33 @@ func add(item: ItemData, amount := 1) -> bool:
 				break
 			if (items[i] == null) == pass_empty:
 				amount = _fill(i, item, amount)
-	for i in _equip_cells_for(item):
-		amount = _fill(i, item, amount)
 	changed.emit()
 	return true
 
 
 ## True when one `item` fits in cell `index`: an empty unlocked cell that
-## accepts it, or a stack of the same item with room.
+## accepts it, or a stack of the same item with room. An equip slot also
+## needs the one-penetration rule to allow it (pen_blocker).
 func can_put(index: int, item: ItemData) -> bool:
 	if index < 0 or index >= SIZE or is_locked(index) or not accepts(index, item):
 		return false
-	return items[index] == null or (items[index] == item and counts[index] < item.max_stack)
+	if items[index] != null and (items[index] != item or counts[index] >= item.max_stack):
+		return false
+	return pen_blocker(index, item) == null
+
+
+## The equipped penetration item that keeps `item` out of equip slot `index`:
+## only one penetration item can be equipped (ItemData.is_penetration). Null
+## when `index` isn't an equip slot, `item` isn't a penetration item, or the
+## only one equipped is in `index` itself (it would be swapped out). Only the
+## unlocked slots count, as only they give stats.
+func pen_blocker(index: int, item: ItemData) -> ItemData:
+	if not is_equip(index) or item == null or not item.is_penetration():
+		return null
+	for i in range(EQUIP_START, EQUIP_START + unlocked_equip):
+		if i != index and items[i] and items[i].is_penetration():
+			return items[i]
+	return null
 
 
 ## Puts one `item` into cell `index` when it fits there (see can_put).
@@ -249,9 +265,29 @@ func craft_into(keep: int, use_up: int, made: ItemData) -> void:
 
 ## What dropping the item from `from` onto `to` does. `to` is -1 outside any
 ## cell. Boots never move, and a cell that doesn't accept the item moving in
-## (or, on a swap, the item coming back) sends it back. Crafting happens only
-## at the merchant (Shop.craft), never by dropping.
+## (or, on a swap, the item coming back) sends it back, as does a drop that
+## would equip a second penetration item (drop_pen_blocker). Crafting happens
+## only at the merchant (Shop.craft), never by dropping.
 func drop_outcome(from: int, to: int) -> Drop:
+	if drop_pen_blocker(from, to) != null:
+		return Drop.RETURN
+	return _drop_outcome_without_pen_rule(from, to)
+
+
+## The equipped penetration item that sends back the drop of `from` onto
+## `to`, which would otherwise go through: the item it brings into the equip
+## row (into `to`, or on a swap into `from`) is a penetration item while
+## another one stays equipped. Null when the rule allows it; a move or swap
+## within the equip row always is allowed.
+func drop_pen_blocker(from: int, to: int) -> ItemData:
+	if _drop_outcome_without_pen_rule(from, to) == Drop.RETURN or is_equip(from) == is_equip(to):
+		return null
+	if is_equip(to):
+		return pen_blocker(to, items[from])
+	return pen_blocker(from, items[to])
+
+
+func _drop_outcome_without_pen_rule(from: int, to: int) -> Drop:
 	if to < 0 or to >= SIZE or to == from or items[from] == null or is_locked(to) or is_locked(from):
 		return Drop.RETURN
 	if from == BOOTS_CELL or to == BOOTS_CELL or not accepts(to, items[from]):
@@ -325,15 +361,6 @@ func _fill(index: int, item: ItemData, amount: int) -> int:
 	if moved > 0:
 		_set_cell(index, item, counts[index] + moved)
 	return amount - moved
-
-
-## The unlocked equip slots `item` may go in (none for potions and boots).
-func _equip_cells_for(item: ItemData) -> Array[int]:
-	var cells: Array[int] = []
-	for i in range(EQUIP_START, EQUIP_START + unlocked_equip):
-		if accepts(i, item):
-			cells.append(i)
-	return cells
 
 
 func _first_empty_backpack_cell() -> int:

@@ -8,6 +8,8 @@ extends CanvasLayer
 ## Dragging: holding the left button on an item (or moving while holding)
 ## picks it up; releasing drops it, decided by Inventory.drop_outcome.
 ## Nothing is crafted in the backpack: that is the merchant's Craft tab.
+## A drop, purchase or craft that would equip a second penetration item is
+## refused with a pop-up naming the equipped one (pen_limit_text).
 ##
 ## Potions are drunk only with keys 7 and 8, from their potion cells (which
 ## check that Lucian can act); the backpack has no Use button.
@@ -15,6 +17,9 @@ extends CanvasLayer
 ## Shop mode (open_shop): the merchant's shop sits right of the backpack.
 ## Shop items are bought by dragging them onto a cell or by right-clicking
 ## them, and items dropped on the red sell slot are sold (boots never are).
+## A purchase goes into the backpack; with every open cell full it is refused
+## with a pop-up (BACKPACK_FULL), unless the item is dragged onto a free equip
+## slot.
 ## On the Craft tab, two fragments (or the boots and a fragment) are dragged
 ## onto its two inputs. An item in an input leaves the backpack view (in_craft)
 ## until it is dragged back out, the tab changes or the shop closes; Craft
@@ -45,6 +50,8 @@ const SELL := -2
 ## Drop targets of the Craft tab's two inputs.
 const CRAFT_FIRST := -3
 const CRAFT_SECOND := -4
+## The pop-up for a purchase (or an undone sale) with no room in the backpack.
+const BACKPACK_FULL := "Your backpack is full."
 
 var inventory: Inventory
 ## The open shop, or null outside shop mode.
@@ -75,7 +82,8 @@ var _mouse := Vector2.ZERO
 ## The dragged icon sits above the debug table.
 var _top := CanvasLayer.new()
 var _ghost := ItemIcon.new()
-## The Craft button's question.
+## The Craft button's question, and the full-backpack and one-penetration
+## notices.
 var _confirm := ConfirmPopup.new()
 ## The viewport whose size_changed places the column, while in the tree.
 var _viewport: Viewport
@@ -123,11 +131,12 @@ func open_shop(new_shop: Shop) -> void:
 
 
 ## Closing mid-drag puts the item back. Also ends shop mode: the Craft tab's
-## inputs give their items back and an open Craft question is dropped.
+## inputs give their items back and an open Craft question or notice is
+## dropped.
 func close() -> void:
 	_end_drag()
 	if _confirm.is_open():
-		_confirm.answer(false)
+		_confirm.dismiss()
 	visible = false
 	shop = null
 	_shop_panel.clear_craft()
@@ -161,9 +170,15 @@ func in_craft(index: int) -> bool:
 	return shop != null and _shop_panel.holds(index)
 
 
-## The Craft button's Yes / No question.
+## The pop-up: the Craft button's Yes / No question, and the notices for a
+## full backpack and the one-penetration rule.
 func craft_confirm() -> ConfirmPopup:
 	return _confirm
+
+
+## The one-penetration rule's notice, naming the penetration item equipped.
+static func pen_limit_text(equipped: ItemData) -> String:
+	return "Only one penetration item can be equipped,\nand %s already is." % equipped.display_name
 
 
 ## The shop slot being dragged, or null.
@@ -207,16 +222,20 @@ func undo_sale() -> void:
 
 ## The Craft tab's Craft button: asks "Craft Muramana from ... for 2100
 ## gold?" and Yes crafts what is in its two inputs; No changes nothing. Inputs
-## that make nothing, or a fee the wallet can't pay, are refused at once.
+## that make nothing, a legendary the one-penetration rule keeps out of both
+## inputs' cells, or a fee the wallet can't pay, are refused at once.
 ## A craft uses up both inputs' items, so both inputs empty and what it made
-## shows in its cell (upgraded boots in the boots cell).
+## shows in its cell (Shop.craft_cell; upgraded boots in the boots cell).
 func craft() -> void:
 	if shop == null:
 		return
 	var first := _shop_panel.first_input().index
 	var second := _shop_panel.second_input().index
-	if shop.craft_result(first, second) == null:
+	var made := shop.craft_result(first, second)
+	if made == null:
 		_report(Shop.Result.NO_RECIPE)
+	elif shop.craft_cell(first, second) < 0:
+		_report(Shop.Result.PEN_LIMIT, null, inventory.pen_blocker(first, made))
 	elif not shop.wallet.can_afford(shop.craft_fee(first, second)):
 		_report(Shop.Result.NO_GOLD)
 	else:
@@ -352,8 +371,19 @@ func _release() -> void:
 			if not _shop_panel.load_input(_target, _drag_index):
 				traded.emit(false)
 		elif not in_craft(_target):
-			inventory.apply_drop(_drag_index, _target)
+			_drop(_drag_index, _target)
 	_end_drag()
+
+
+## Drops the item in cell `from` on cell `to` (Inventory.apply_drop). One the
+## one-penetration rule sends back says why in the pop-up.
+func _drop(from: int, to: int) -> void:
+	var blocker := inventory.drop_pen_blocker(from, to)
+	if blocker:
+		_confirm.tell(pen_limit_text(blocker))
+		Sfx.play(&"error")
+	else:
+		inventory.apply_drop(from, to)
 
 
 ## An item dragged out of a Craft input: dropped on the other input it moves
@@ -385,15 +415,23 @@ func _end_drag() -> void:
 
 
 func _buy(slot: ShopSlot, cell: int) -> void:
+	var item := slot.item()
 	var result: Shop.Result
 	if slot.potion:
 		result = shop.buy_potion(slot.potion, cell)
 	else:
 		result = shop.buy_slot(slot.stock_slot, cell)
-	_report(result, slot)
+	_report(result, slot, inventory.pen_blocker(cell, item) if cell >= 0 else null)
 
 
-func _report(result: Shop.Result, slot: ShopSlot = null) -> void:
+## A refused trade flashes the slot's price and says why: no room in the
+## backpack and the one-penetration rule (naming `blocker`, the equipped
+## penetration item) in the pop-up, the rest in the shop's red message.
+func _report(result: Shop.Result, slot: ShopSlot = null, blocker: ItemData = null) -> void:
+	if result == Shop.Result.NO_ROOM:
+		_confirm.tell(BACKPACK_FULL)
+	elif result == Shop.Result.PEN_LIMIT and blocker:
+		_confirm.tell(pen_limit_text(blocker))
 	if result != Shop.Result.OK:
 		_shop_panel.refuse(result, slot)
 	traded.emit(result == Shop.Result.OK)

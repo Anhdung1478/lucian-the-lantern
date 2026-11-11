@@ -47,21 +47,48 @@ func test_a_sold_or_locked_slot_cannot_be_bought() -> void:
 	assert_eq(wallet.gold, 4000)
 
 
-func test_a_full_backpack_buys_into_an_empty_equip_slot() -> void:
+func test_a_full_backpack_is_refused_without_paying_though_equip_slots_are_free() -> void:
 	wallet.add(5000)
 	for i in Inventory.BACKPACK_SIZE:
 		inventory.add(catalog.find(&"sword"))
-	assert_eq(shop.buy_slot(0), Result.OK)
-	assert_eq(inventory.item_at(EQUIP), stock.items[0])
+	assert_eq(shop.buy_slot(0), Result.NO_ROOM)
+	assert_eq(wallet.gold, 5000)
+	assert_false(stock.is_sold(0))
+	for i in range(EQUIP, Inventory.EQUIP_END):
+		assert_null(inventory.item_at(i))
+
+
+func test_a_full_backpack_still_buys_onto_a_chosen_free_equip_slot() -> void:
+	wallet.add(5000)
+	for i in Inventory.BACKPACK_SIZE:
+		inventory.add(catalog.find(&"sword"))
+	assert_eq(shop.buy_slot(0, EQUIP + 2), Result.OK)
+	assert_eq(inventory.item_at(EQUIP + 2), stock.items[0])
+	assert_eq(wallet.gold, 4000)
+	inventory.put(EQUIP + 3, catalog.find(&"belt"))
+	assert_eq(shop.buy_slot(1, EQUIP + 3), Result.NO_ROOM, "a taken slot: the backpack, which is full")
 	assert_eq(wallet.gold, 4000)
 
 
-func test_full_backpack_and_equip_row_is_refused_without_paying() -> void:
+func test_a_purchase_dropped_on_a_taken_equip_slot_goes_to_the_backpack() -> void:
 	wallet.add(5000)
-	for i in Inventory.BACKPACK_SIZE + Inventory.EQUIP_SIZE:
+	inventory.put(EQUIP, catalog.find(&"belt"))
+	assert_eq(shop.buy_slot(0, EQUIP), Result.OK)
+	assert_eq(inventory.item_at(EQUIP), catalog.find(&"belt"))
+	assert_eq(inventory.item_at(0), stock.items[0])
+	assert_null(inventory.item_at(EQUIP + 1), "never another equip slot")
+
+
+func test_potions_keep_their_own_cell_with_the_backpack_full() -> void:
+	wallet.add(5000)
+	for i in Inventory.BACKPACK_SIZE:
 		inventory.add(catalog.find(&"sword"))
-	assert_eq(shop.buy_slot(0), Result.NO_ROOM)
-	assert_eq(wallet.gold, 5000)
+	var red := catalog.find(&"red")
+	for i in 9:
+		assert_eq(shop.buy_potion(red), Result.OK)
+	assert_eq(inventory.count_at(Inventory.HP_POTION_CELL), 9)
+	assert_eq(shop.buy_potion(red), Result.NO_ROOM)
+	assert_eq(wallet.gold, 5000 - 9 * 50)
 
 
 func test_buying_into_a_chosen_cell() -> void:
@@ -143,11 +170,10 @@ func test_undo_with_no_room_is_refused_and_kept() -> void:
 	inventory.add(catalog.find(&"sword"))
 	shop.sell(0)
 	inventory.unlocked_backpack = 1
-	inventory.unlocked_equip = 1
 	inventory.add(catalog.find(&"rod"))
-	inventory.add(catalog.find(&"rod"))
-	assert_eq(shop.undo_sale(), Result.NO_ROOM)
+	assert_eq(shop.undo_sale(), Result.NO_ROOM, "the empty equip slots are no room")
 	assert_eq(wallet.gold, 700)
+	assert_null(inventory.item_at(EQUIP))
 	inventory.remove(0)
 	assert_eq(shop.undo_sale(), Result.OK)
 
@@ -215,11 +241,47 @@ func test_a_locked_cell_is_refused_without_paying() -> void:
 func test_no_room_counts_only_the_open_cells() -> void:
 	wallet.add(5000)
 	inventory.unlocked_backpack = 2
-	inventory.unlocked_equip = 1
-	for i in 3:
-		inventory.add(catalog.find(&"sword"), 1)
+	inventory.add(catalog.find(&"sword"), 1)
+	inventory.add(catalog.find(&"belt"), 1)
 	assert_eq(shop.buy_slot(0), Result.NO_ROOM)
 	assert_eq(wallet.gold, 5000)
+
+
+# --- One penetration item --------------------------------------------------------
+
+
+## A penetration legendary for 1000 gold.
+func _pen(id: StringName, key := &"armor_pen") -> ItemData:
+	var made := Fixtures.legendary(id, &"sword", &"belt", {key: 0.3})
+	made.cost = 1000
+	return made
+
+
+func test_a_second_penetration_item_cannot_be_bought_onto_an_equip_slot() -> void:
+	wallet.add(5000)
+	var ldr := _pen(&"ldr")
+	inventory.put(EQUIP, ldr)
+	stock.items[0] = _pen(&"void", &"magic_pen")
+	assert_eq(shop.buy_slot(0, EQUIP + 1), Result.PEN_LIMIT)
+	assert_eq(wallet.gold, 5000)
+	assert_false(stock.is_sold(0))
+	assert_null(inventory.item_at(EQUIP + 1))
+	assert_eq(shop.buy_slot(0, EQUIP), Result.OK, "onto the one equipped: taken, so into the backpack")
+	assert_eq(inventory.item_at(0).id, &"void")
+	assert_eq(inventory.item_at(EQUIP), ldr)
+
+
+func test_undo_puts_an_equipped_item_back_in_its_slot_when_the_rule_allows() -> void:
+	var void_staff := _pen(&"void", &"magic_pen")
+	inventory.put(EQUIP + 1, void_staff)
+	shop.sell(EQUIP + 1)
+	assert_eq(shop.undo_sale(), Result.OK)
+	assert_eq(inventory.item_at(EQUIP + 1), void_staff, "back in its equip slot")
+	shop.sell(EQUIP + 1)
+	inventory.put(EQUIP, _pen(&"ldr"))
+	assert_eq(shop.undo_sale(), Result.OK)
+	assert_null(inventory.item_at(EQUIP + 1), "another one is equipped now")
+	assert_eq(inventory.item_at(0), void_staff, "so it comes back to the backpack")
 
 
 # --- The Craft tab ---------------------------------------------------------------
@@ -257,6 +319,38 @@ func test_a_craft_without_the_fee_changes_nothing() -> void:
 	assert_eq(real_shop.wallet.gold, fee - 1)
 	assert_eq(bag.item_at(0), bag.catalog.find(&"bf_sword"))
 	assert_eq(bag.item_at(1), bag.catalog.find(&"cloak_of_agility"))
+
+
+func test_a_crafted_penetration_item_goes_to_the_second_cell_when_the_first_is_closed_to_it() -> void:
+	var real_shop := _real_shop()
+	var bag := real_shop.inventory
+	var ldr := bag.catalog.find(&"lord_dominiks_regards")
+	bag.put(EQUIP, ldr)
+	bag.put(EQUIP + 1, bag.catalog.find(&"recurve_bow"))
+	bag.put(0, bag.catalog.find(&"tear_of_the_goddess"))
+	real_shop.wallet.add(5000)
+	var fee := real_shop.craft_fee(EQUIP + 1, 0)
+	assert_eq(real_shop.craft_cell(EQUIP + 1, 0), 0, "Void Staff can't join Lord Dominik's in the equip row")
+	assert_eq(real_shop.craft(EQUIP + 1, 0), Result.OK)
+	assert_eq(bag.item_at(0), bag.catalog.find(&"void_staff"))
+	assert_null(bag.item_at(EQUIP + 1), "the first input's fragment is used up")
+	assert_eq(bag.item_at(EQUIP), ldr)
+	assert_eq(real_shop.wallet.gold, 5000 - fee)
+
+
+func test_a_craft_with_both_cells_closed_to_its_penetration_item_is_refused() -> void:
+	var real_shop := _real_shop()
+	var bag := real_shop.inventory
+	bag.put(EQUIP, bag.catalog.find(&"void_staff"))
+	bag.put(EQUIP + 1, bag.catalog.find(&"bf_sword"))
+	bag.put(EQUIP + 2, bag.catalog.find(&"chain_vest"))
+	real_shop.wallet.add(5000)
+	assert_eq(real_shop.craft_result(EQUIP + 1, EQUIP + 2), bag.catalog.find(&"mortal_reminder"))
+	assert_eq(real_shop.craft_cell(EQUIP + 1, EQUIP + 2), -1)
+	assert_eq(real_shop.craft(EQUIP + 1, EQUIP + 2), Result.PEN_LIMIT)
+	assert_eq(real_shop.wallet.gold, 5000)
+	assert_eq(bag.item_at(EQUIP + 1).id, &"bf_sword")
+	assert_eq(bag.item_at(EQUIP + 2).id, &"chain_vest")
 
 
 func test_a_craft_needs_two_different_open_cells_that_make_something() -> void:
