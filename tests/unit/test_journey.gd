@@ -16,7 +16,7 @@ func test_stage_ids() -> void:
 
 
 func test_waves() -> void:
-	assert_eq(Journey.waves(3, 4), 5)
+	assert_eq(Journey.waves(3, 4), 7)
 	assert_eq(Journey.waves(1, 1), 2)
 
 

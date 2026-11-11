@@ -149,8 +149,8 @@ func test_locked_places_say_what_to_clear() -> void:
 
 func test_hover_says_the_stage_and_its_waves() -> void:
 	_clear(2)
-	assert_eq(_node("3-1").get_meta(&"hover_text"), "Stage 3-1 · The Jungle\n3 waves")
-	assert_eq(_node("3-2").get_meta(&"hover_text"), "Stage 3-2 · The Jungle\n4 waves + mini boss\nClear 3-1 first",
+	assert_eq(_node("3-1").get_meta(&"hover_text"), "Stage 3-1 · The Jungle\n5 waves")
+	assert_eq(_node("3-2").get_meta(&"hover_text"), "Stage 3-2 · The Jungle\n6 waves + mini boss\nClear 3-1 first",
 		"a locked stage in an open act")
 	assert_eq(_node("1-1").get_meta(&"hover_text"), "Act 1 · The Loss\n2 waves", "a cleared 1-1 has no boss wave")
 
@@ -207,15 +207,15 @@ func test_mini_boss_and_boss_places_show_their_art() -> void:
 
 
 func test_places_say_their_waves() -> void:
-	assert_eq(_node("2-1").waves_text, "2 waves")
-	assert_eq(_node("2-3").waves_text, "3 waves + boss wave")
+	assert_eq(_node("2-1").waves_text, "4 waves")
+	assert_eq(_node("2-3").waves_text, "5 waves + boss wave")
 
 
 ## A drake comes last in its stage's last wave, not in a wave of its own.
 func test_a_mini_boss_place_puts_it_in_the_last_wave() -> void:
-	assert_eq(_node("3-2").waves_text, "4 waves + mini boss")
-	assert_eq(_node("3-4").waves_text, "5 waves + mini boss")
-	assert_eq(_node("3-5").waves_text, "5 waves + boss wave")
+	assert_eq(_node("3-2").waves_text, "6 waves + mini boss")
+	assert_eq(_node("3-4").waves_text, "7 waves + mini boss")
+	assert_eq(_node("3-5").waves_text, "7 waves + boss wave")
 
 
 # --- Cleared marks, the road and the token ---------------------------------------
@@ -408,7 +408,7 @@ func test_act_one_says_its_boss_wave_until_it_is_cleared() -> void:
 	section.pick(_node("1-1"))
 	assert_eq(section.panel.waves_label.text, "2 waves + boss wave")
 	assert_eq(_node("1-1").get_meta(&"hover_text"), "Act 1 · The Loss\n2 waves + boss wave")
-	assert_eq(_node("2-3").waves_text, "3 waves + boss wave", "other boss stages keep it on replays too")
+	assert_eq(_node("2-3").waves_text, "5 waves + boss wave", "other boss stages keep it on replays too")
 
 
 func test_picking_a_mini_boss_stage_fills_the_panel() -> void:
@@ -422,7 +422,7 @@ func test_picking_a_mini_boss_stage_fills_the_panel() -> void:
 	assert_eq(panel.portrait_texture(), _node("3-4").enemy.art)
 	assert_eq(panel.boss_name_label.text, "Ocean Drake")
 	assert_eq(panel.tag_label.text, "Mini boss")
-	assert_eq(panel.waves_label.text, "5 waves + mini boss")
+	assert_eq(panel.waves_label.text, "7 waves + mini boss")
 	assert_eq(panel.story_label.text, Journey.ACTS[2]["story"])
 	assert_eq(panel.status_label.text, "Not cleared yet")
 	assert_eq(panel.purple_label.text, "First kill: +5")
@@ -443,7 +443,7 @@ func test_picking_a_boss_stage_shows_the_boss() -> void:
 	var panel := section.panel
 	assert_eq(panel.boss_name_label.text, "Akshan")
 	assert_eq(panel.tag_label.text, "Boss")
-	assert_eq(panel.waves_label.text, "3 waves + boss wave")
+	assert_eq(panel.waves_label.text, "5 waves + boss wave")
 	assert_eq(panel.purple_label.text, "First kill: +10")
 	assert_eq(panel.start_button.text, "Start stage 3")
 
@@ -453,7 +453,7 @@ func test_a_normal_stage_has_no_boss_row() -> void:
 	section.pick(_node("2-1"))
 	assert_false(section.panel.boss_row.visible)
 	assert_false(section.panel.purple_row.visible)
-	assert_eq(section.panel.waves_label.text, "2 waves")
+	assert_eq(section.panel.waves_label.text, "4 waves")
 	assert_eq(section.panel.start_button.text, "Start stage 1")
 
 

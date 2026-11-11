@@ -7,11 +7,11 @@ extends RefCounted
 ## mini boss. The last stage of every act is its boss.
 const ACTS := [
 	{"name": "The Loss", "story": "Lucian and Senna fight together, until Thresh takes her soul.", "waves": [2], "mini_bosses": []},
-	{"name": "The Sentinels", "story": "Lucian trains with Akshan to prove he's ready to hunt Thresh.", "waves": [2, 3, 3], "mini_bosses": []},
-	{"name": "The Jungle", "story": "Lucian crosses the jungle, facing the drakes and the Elder Dragon.", "waves": [3, 4, 4, 5, 5], "mini_bosses": [2, 4]},
-	{"name": "The Darkness", "story": "Lucian faces his own fear and grief as Dark Lucian.", "waves": [4, 5, 5], "mini_bosses": []},
-	{"name": "Shadow Isles", "story": "Lucian fights through Maokai, Elise and Karthus.", "waves": [5, 5, 6, 6, 6], "mini_bosses": [2, 4]},
-	{"name": "The Lantern", "story": "Lucian defeats Thresh and frees Senna.", "waves": [6, 6, 7, 7, 7], "mini_bosses": [2, 4]},
+	{"name": "The Sentinels", "story": "Lucian trains with Akshan to prove he's ready to hunt Thresh.", "waves": [4, 5, 5], "mini_bosses": []},
+	{"name": "The Jungle", "story": "Lucian crosses the jungle, facing the drakes and the Elder Dragon.", "waves": [5, 6, 6, 7, 7], "mini_bosses": [2, 4]},
+	{"name": "The Darkness", "story": "Lucian faces his own fear and grief as Dark Lucian.", "waves": [6, 7, 7], "mini_bosses": []},
+	{"name": "Shadow Isles", "story": "Lucian fights through Maokai, Elise and Karthus.", "waves": [6, 6, 7, 7, 7], "mini_bosses": [2, 4]},
+	{"name": "The Lantern", "story": "Lucian defeats Thresh and frees Senna.", "waves": [8, 8, 9, 9, 9], "mini_bosses": [2, 4]},
 ]
 ## Endless Mode opens once this many acts are cleared.
 const ENDLESS_ACT := 3
