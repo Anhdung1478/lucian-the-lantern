@@ -11,6 +11,8 @@ extends SceneTree
 ##   window/size/initial_position=Vector2i(4000, 4000)
 ##   godot --audio-driver Dummy --path . -s res://tests/tools/screenshot.gd -- ...
 ## The tool never confines the mouse (Stage.confine_mouse).
+## SCREENSHOT_RUN=<name> gives a run its own settings and save files, so
+## several scenarios can run at the same time.
 
 const SETTINGS_PATH := "user://screenshot_settings.json"
 const SAVE_PREFIX := "user://screenshot_save_slot_"
@@ -46,6 +48,9 @@ const ACT_SCENARIOS := {
 	"level_up": [2, 1],
 }
 
+## This run's settings file and save slots (SCREENSHOT_RUN gives it its own).
+var settings_path := SETTINGS_PATH
+var save_prefix := SAVE_PREFIX
 var stage: Node
 var lucian: Lucian
 ## The Game root, for the main screen scenarios and the Training they start.
@@ -61,11 +66,17 @@ func _initialize() -> void:
 	var scenario: String = args[0] if args.size() > 0 else "move"
 	out_dir = args[1] if args.size() > 1 else OS.get_user_data_dir()
 	# A scratch settings file, so runs never touch the player's settings.
-	if FileAccess.file_exists(SETTINGS_PATH):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS_PATH))
-	GameSettings._instance = GameSettings.new(SETTINGS_PATH)
+	# SCREENSHOT_RUN=<name>: its own settings and save files, so several
+	# scenarios can run at the same time.
+	var run := OS.get_environment("SCREENSHOT_RUN")
+	if run != "":
+		settings_path = "user://screenshot_settings_%s.json" % run
+		save_prefix = "user://screenshot_%s_save_slot_" % run
+	if FileAccess.file_exists(settings_path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(settings_path))
+	GameSettings._instance = GameSettings.new(settings_path)
 	# Scratch save slots too, so every run starts from a new game.
-	var save := SaveGame.new(SAVE_PREFIX)
+	var save := SaveGame.new(save_prefix)
 	for n in range(1, SaveGame.SLOTS + 1):
 		for file in [save.path(n), save.backup_path(n)]:
 			if FileAccess.file_exists(file):
@@ -1034,7 +1045,7 @@ func scenario_settings() -> void:
 	await press_key(KEY_ESCAPE, false)
 	await wait(0.2)
 	await shot("settings_5_hud_keys")
-	var saved := GameSettings.new(SETTINGS_PATH)
+	var saved := GameSettings.new(settings_path)
 	print("saved binding reloads (expect W): ", saved.key_label(&"skill_q"))
 
 
