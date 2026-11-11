@@ -52,6 +52,7 @@ const ACT_SCENARIOS := {
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
 	"infernal_meteor": [3, 2], "ocean_mist": [3, 4], "elder_sky_dive": [3, 5], "elder_mark": [3, 5],
 	"act4_lane": [4, 1], "dark_lucian_q": [4, 3], "dark_lucian_r": [4, 3],
+	"map_act1": [1, 1], "map_act2": [2, 1], "map_act2_ring": [2, 3], "map_act4": [4, 1],
 	"act5_mist": [5, 1], "act5_sapling": [5, 1], "act5_brood": [5, 1], "maokai_grasp": [5, 2], "elise_rappel": [5, 4],
 	"karthus_wall": [5, 5], "karthus_requiem": [5, 5],
 	"act6_bridges": [6, 3], "act6_platform": [6, 5], "act6_rider": [6, 1], "karthus_defile": [6, 2],
@@ -310,6 +311,19 @@ func _run(scenario: String) -> void:
 			await scenario_elder_mark()
 		"act4_lane":
 			await scenario_act4_lane()
+		"map_act1":
+			await map_art("map_act1", [Vector2(0.5, 0.5), Vector2(0.14, 0.86), Vector2(0.86, 0.2), Vector2(0.36, 0.3)],
+				[WavePlan.MELEE, WavePlan.RANGED, WavePlan.SIEGE])
+		"map_act2":
+			await map_art("map_act2", [Vector2(0.5, 0.5), Vector2(0.5, 0.1), Vector2(0.9, 0.5), Vector2(0.14, 0.9)],
+				[WavePlan.MELEE, WavePlan.RANGED, WavePlan.SUPER])
+		"map_act2_ring":
+			await map_art("map_act2_ring", [Vector2(0.5, 0.5), Vector2(0.1, 0.5)], [WavePlan.MELEE, WavePlan.RANGED, WavePlan.SUPER])
+		"map_act4":
+			await map_art("map_act4", [Vector2(0.5, 0.5), Vector2(0.14, 0.86), Vector2(0.86, 0.2), Vector2(0.36, 0.3)],
+				[WavePlan.SHADOW_MELEE, WavePlan.SHADOW_RANGED, WavePlan.SHADOW_SIEGE])
+		"map_training":
+			await map_art("map_training", [Vector2(0.5, 0.5), Vector2(0.1, 0.12), Vector2(0.9, 0.9)], [WavePlan.MELEE, WavePlan.RANGED])
 		"dark_lucian_q":
 			await scenario_dark_lucian_q()
 		"dark_lucian_r":
@@ -2974,6 +2988,66 @@ func scenario_act4_lane() -> void:
 	await wait(1.2)
 	print("stage info (expect Stage 4-1 · The Darkness  Wave 1/4  Enemies: N): ", info_text())
 	await shot("act4_lane_1_wave")
+
+
+## A map's art, for review. The whole map; then at each of `spots` (shares
+## of the map's size, moved to open ground) at play zoom: Lucian, enemies of
+## `ids` standing round him, and a red circle and a red line on the ground;
+## then what the map costs to draw with 40 enemies in view.
+func map_art(prefix: String, spots: Array[Vector2], ids: Array[StringName]) -> void:
+	var game := game_stage()
+	flush_tips()
+	if game.runner:
+		game.runner._countdown = 999.0
+	await whole_map(prefix + "_0_whole")
+	var warnings := stage.get_node("Warnings")
+	for i in spots.size():
+		var at := open_ground(spots[i] * game.arena.size, 60.0)
+		blink(at)
+		free_camera(at)
+		var placed: Array[Node] = []
+		for k in 6:
+			var spot := open_ground(at + Vector2.from_angle(TAU * k / 6.0 + 0.4) * (240.0 + 60.0 * (k % 2)), 50.0)
+			placed.append(stand(ids[k % ids.size()], spot, 0.5 + 0.1 * k))
+		for mark: GroundWarning in [GroundWarning.circle(at + Vector2(-330, 170), 150.0, 600.0),
+				GroundWarning.line(at + Vector2(140, -330), Vector2(1, 0.25), 520.0, 70.0, 600.0)]:
+			mark._elapsed = 360.0
+			warnings.add_child(mark)
+			placed.append(mark)
+		await wait(0.6)
+		await shot("%s_%d_spot" % [prefix, i + 1])
+		for node in placed:
+			node.queue_free()
+		await wait(0.1)
+	var middle := open_ground(game.arena.size * 0.5, 60.0)
+	blink(middle)
+	free_camera(middle)
+	for k in 40:
+		stand(ids[k % ids.size()], open_ground(middle + Vector2((k % 8) - 3.5, floorf(k / 8.0) - 2.0) * Vector2(190, 160), 50.0))
+	var with_map := await draw_cost()
+	game.arena.visible = false
+	var without := await draw_cost()
+	game.arena.visible = true
+	print("%s draw cost with 40 enemies in view (ms, medians): CPU %.2f, GPU %.2f; the map's share: CPU %.2f, GPU %.2f" % [
+		prefix, with_map.x, with_map.y, with_map.x - without.x, with_map.y - without.y])
+	await shot(prefix + "_9_crowd")
+
+
+## The median CPU and GPU time (x and y, in ms) the game's viewport takes to
+## draw, over 90 frames.
+func draw_cost() -> Vector2:
+	var viewport := root.get_viewport_rid()
+	RenderingServer.viewport_set_measure_render_time(viewport, true)
+	await wait(0.4)
+	var cpu: Array[float] = []
+	var gpu: Array[float] = []
+	for i in 90:
+		await process_frame
+		cpu.append(RenderingServer.viewport_get_measured_render_time_cpu(viewport))
+		gpu.append(RenderingServer.viewport_get_measured_render_time_gpu(viewport))
+	cpu.sort()
+	gpu.sort()
+	return Vector2(cpu[45], gpu[45])
 
 
 ## Dark Lucian at the river on 4-3's dark lane, Lucian down the lane from

@@ -3,11 +3,12 @@ extends Node2D
 ## A stage's ground: its size, its walls on Layers.WORLD (the border, plus
 ## polygons and circles inside), its abyss on Layers.CHASM (Act 6), the
 ## navigation baked around both for PathFollower, and the points the stage
-## uses. Subclasses fill the lists in _init and draw the ground in _draw.
-## The playable area starts at (0, 0); the border walls sit just outside
-## it. A map may also have terrain (lava, water, plants): build_terrain
-## makes it, and the stage adds it to its world. The map is drawn at
-## FLOOR_Z, under everything else on the stage.
+## uses. Subclasses fill the lists in _init and draw the ground in _draw,
+## with the MapArt kit. The playable area starts at (0, 0); the border walls
+## sit just outside it. A map may also have terrain (lava, water, plants):
+## build_terrain makes it, and the stage adds it to its world. The map is
+## drawn once at FLOOR_Z, under everything else on the stage; what moves on
+## it (fireflies, a shimmer) is its MapAmbience, a node of its own.
 
 const WALL_THICKNESS := 64.0
 ## Under ground zones (HazardZone.Z) and the units.
@@ -50,6 +51,8 @@ var navigation: NavigationRegion2D
 
 func _ready() -> void:
 	z_index = FLOOR_Z
+	# MapArt's stamps are drawn at many sizes: mipmaps keep the small ones smooth.
+	texture_filter = TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	var walls := StaticBody2D.new()
 	walls.name = "Walls"
 	walls.collision_layer = Layers.WORLD
@@ -84,6 +87,10 @@ func _ready() -> void:
 			chasm.add_child(drop)
 		add_child(chasm)
 	_bake_navigation()
+	var ambience := build_ambience()
+	if ambience:
+		ambience.name = "Ambience"
+		add_child(ambience)
 
 
 func get_bounds() -> Rect2:
@@ -95,6 +102,12 @@ func get_bounds() -> Rect2:
 ## add to its world. None by default.
 func build_terrain(_lucian: Lucian) -> Array[Node2D]:
 	return []
+
+
+## The map's ambient life (fireflies, a shimmer on water, drifting dust), or
+## null: its motes, each where the map wants it. None by default.
+func build_ambience() -> MapAmbience:
+	return null
 
 
 ## Inside the area and at least `margin` away from every wall and the abyss.
