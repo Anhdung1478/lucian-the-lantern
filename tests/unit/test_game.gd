@@ -845,3 +845,15 @@ func test_a_save_from_the_defeated_screen_counts_the_defeat_once() -> void:
 	stage.result.retry_button.pressed.emit()
 	await wait_process_frames(2)
 	assert_eq(SaveGame.instance().defeats, {"2-1": 1}, "the button after the save adds none")
+
+
+func test_a_change_of_screen_fades_in_and_stays_synchronous() -> void:
+	var renders := Juice.renders
+	Juice.renders = true
+	game.show_main_screen()
+	assert_is(game.screen, MainScreen)
+	assert_eq(game.fade.cover.modulate.a, 1.0)
+	assert_eq(game.fade.cover.mouse_filter, Control.MOUSE_FILTER_IGNORE)
+	await wait_seconds(ScreenFade.FADE_IN + 0.15)
+	assert_eq(game.fade.cover.modulate.a, 0.0)
+	Juice.renders = renders

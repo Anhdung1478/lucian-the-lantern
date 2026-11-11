@@ -17,6 +17,8 @@ var screen: Node
 ## The stage being played, for its id when it ends.
 var _run := StageSetup.new()
 var prompt := ConfirmPopup.new(PROMPT_LAYER)
+## The black cover that fades each new screen in.
+var fade := ScreenFade.new()
 ## Replaced in tests, which must not close the test run.
 var quit_game := func() -> void: get_tree().quit()
 
@@ -34,6 +36,7 @@ func _ready() -> void:
 	get_tree().auto_accept_quit = false
 	add_child(Sfx.new())
 	add_child(music)
+	add_child(fade)
 	add_child(prompt)
 	show_title()
 
@@ -248,7 +251,7 @@ func _report_save_failed() -> void:
 
 
 ## The old screen goes at once; the prompt stays last so it gets input first.
-## The music follows the new screen.
+## The music follows the new screen, and the fade covers the change.
 func _swap(next: Node) -> void:
 	if screen:
 		remove_child(screen)
@@ -258,3 +261,4 @@ func _swap(next: Node) -> void:
 	add_child(next)
 	move_child(next, 0)
 	music.follow(next)
+	fade.play()
