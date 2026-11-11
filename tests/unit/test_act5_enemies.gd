@@ -302,3 +302,33 @@ func test_the_broodmother_calls_a_spiderling_every_3_5_seconds_up_to_5() -> void
 		await wait_physics_frames(3)
 	assert_eq(_units(&"spiderling").size(), 5, "the cap")
 	assert_eq(brood.summons, 5)
+
+
+## Her spiderlings die as they come, so the live cap never stops her: the
+## total does. Without it a fight with her never ends, and pays for ever.
+func test_a_summoner_tires_after_its_total() -> void:
+	var stage: Stage = await _stage(2, 1)
+	var brood := _alone_in_wave(stage, &"broodmother")
+	brood.move_speed = 0.0
+	stage.lucian.global_position = brood.global_position + Vector2(1500, 0)
+	assert_eq(brood.data.summon_total, 10)
+	assert_eq(_data("maiden_of_the_mist").summon_total, 12)
+	for round in 14:
+		brood._summon_left = 0.0
+		await wait_physics_frames(3)
+		for spiderling: EnemyUnit in _units(&"spiderling"):
+			spiderling.take_damage(_lethal())
+		await wait_physics_frames(2)
+	assert_eq(brood.summons_called, 10, "no more after the total")
+	assert_eq(_units(&"spiderling").size(), 0)
+
+
+func test_a_summoner_with_no_total_never_tires() -> void:
+	var unit := _monster("broodmother", Vector2(600, 600))
+	unit.data = unit.data.duplicate()
+	unit.data.summon_total = 0
+	for round in 30:
+		unit.summons = 0
+		unit._summon_left = 0.0
+		unit._summon_step(0.01)
+	assert_eq(unit.summons_called, 30)

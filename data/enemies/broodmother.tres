@@ -30,3 +30,4 @@ summon_id = &"spiderling"
 summon_every = 3.5
 summon_count = 1
 summon_cap = 5
+summon_total = 10

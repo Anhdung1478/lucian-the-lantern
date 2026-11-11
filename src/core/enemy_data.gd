@@ -89,6 +89,9 @@ const BOSS_KINDS: Array[StringName] = [&"mini_boss", &"boss"]
 @export var summon_every := 0.0
 @export var summon_count := 0
 @export var summon_cap := 0
+## The most summons it ever calls in its life; after them it tires and calls
+## no more, so its fight ends and can't be farmed. 0 = no limit.
+@export var summon_total := 0
 ## Its end is "freed": it rises and brightens into teal-white light and
 ## fades upward with a soft chime, in place of the grey fade (Act 6's
 ## Lantern Souls). Its rewards are unchanged.

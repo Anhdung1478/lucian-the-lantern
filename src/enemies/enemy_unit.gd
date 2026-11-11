@@ -68,6 +68,8 @@ var summoned := false
 var summoner: EnemyUnit
 ## Its own summons alive or on their way (called, not spawned yet).
 var summons := 0
+## Every summon it has called so far (the data's summon_total ends them).
+var summons_called := 0
 ## On a ledge in the abyss (the stage sets it): it never walks, leaps or
 ## charges, since a move would push its body out of the abyss's shape (or
 ## off its ledge). It still turns toward Lucian and attacks.
@@ -468,8 +470,8 @@ func _paint() -> void:
 
 
 ## Every summon_every seconds: up to summon_count summons beside it, keeping
-## its own at or under summon_cap. Calling any heals it data.summon_heal of
-## its max HP.
+## its own at or under summon_cap and never calling more than summon_total
+## in its life. Calling any heals it data.summon_heal of its max HP.
 func _summon_step(delta: float) -> void:
 	if data.summon_id == &"" or data.summon_every <= 0.0:
 		return
@@ -478,10 +480,13 @@ func _summon_step(delta: float) -> void:
 		return
 	_summon_left = data.summon_every
 	var count := mini(data.summon_count, data.summon_cap - summons)
+	if data.summon_total > 0:
+		count = mini(count, data.summon_total - summons_called)
 	if count > 0 and data.summon_heal > 0.0:
 		heal(max_hp * data.summon_heal)
 	for i in count:
 		summons += 1
+		summons_called += 1
 		summon_requested.emit(self, data.summon_id, _summon_spot(i, count))
 		# A listener may have ended it (a shot on the same frame).
 		if not is_alive():
