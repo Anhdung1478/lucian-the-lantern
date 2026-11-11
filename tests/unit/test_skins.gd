@@ -7,7 +7,7 @@ const DOC := {
 	&"classic": [0, [], []],
 	&"high_noon": [25, ["+15% AD"], ["−15% Attack Speed"]],
 	&"project": [30, ["+20% Attack Speed", "+8% Move Speed"], ["−10% AD"]],
-	&"pulsefire": [20, ["+30% W Damage", "+10 Ability Haste"], ["−10% Attack Speed"]],
+	&"pulsefire": [20, ["+30% W Damage", "+25 Ability Haste"], ["−10% Attack Speed"]],
 	&"vampire": [25, ["+15% Lifesteal", "Kills heal 2% max HP"], ["−20% max HP"]],
 }
 
@@ -108,7 +108,7 @@ func test_pulsefire_gives_haste_and_w_damage_not_ap() -> void:
 	var classic_attack_speed := lucian.stats.attack_speed
 	var pulsefire := Skins.find(&"pulsefire")
 	lucian.apply_skin(pulsefire)
-	assert_almost_eq(lucian.stats.ability_haste, 10.0, 0.001)
+	assert_almost_eq(lucian.stats.ability_haste, 25.0, 0.001)
 	assert_lt(lucian.stats.attack_speed, classic_attack_speed)
 	assert_almost_eq(pulsefire.w_damage, 0.3, 0.0001)
 	give_equipped(&"needlessly_large_rod")

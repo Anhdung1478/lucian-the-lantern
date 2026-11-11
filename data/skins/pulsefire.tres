@@ -16,11 +16,11 @@ display_name = "Pulsefire"
 cost = 20
 portrait = ExtResource("2_portrait")
 body = ExtResource("3_body")
-bonuses = PackedStringArray("+30% W Damage", "+10 Ability Haste")
+bonuses = PackedStringArray("+30% W Damage", "+25 Ability Haste")
 weaknesses = PackedStringArray("−10% Attack Speed")
 playstyle = "Skill-focused, W and R as main damage"
 flat = Dictionary[StringName, float]({
-&"ability_haste": 10.0,
+&"ability_haste": 25.0,
 &"attack_speed": -0.1
 })
 w_damage = 0.3
