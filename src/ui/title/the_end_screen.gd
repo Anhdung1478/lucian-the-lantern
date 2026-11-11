@@ -10,6 +10,8 @@ signal continue_pressed
 
 ## The warm light laid over the title's night scene: dawn, not the night's teal.
 const DAWN_TINT := Color(1.0, 0.72, 0.38, 0.22)
+## The card is centred in the screen's part right of this share of its width.
+const CARD_FROM := 0.36
 const FREE_COLOR := Color("8fe3b0")
 const TITLE_FONT := 72
 const SUBTITLE_FONT := 32
@@ -51,8 +53,11 @@ func _build() -> void:
 	dawn.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dawn.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(dawn)
+	# The card stands in the right part of the scene, where Thresh stood, so
+	# Lucian and Senna on the left are not covered.
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.anchor_left = CARD_FROM
 	add_child(center)
 	var card := MenuCard.new("THE END", "Senna is free.")
 	card.title_label.add_theme_font_size_override(&"font_size", TITLE_FONT)

@@ -308,3 +308,17 @@ func test_play_time_text() -> void:
 	assert_eq(TheEndScreen.story_time(0.0), "0:00:00")
 	assert_eq(TheEndScreen.story_time(3725.9), "1:02:05")
 	assert_eq(TheEndScreen.story_time(36000.0), "10:00:00")
+
+
+## Lucian and Senna stand in the left third of the title's scene: the card
+## stays right of them.
+func test_the_end_card_stands_clear_of_lucian_and_senna() -> void:
+	var frame := Control.new()
+	frame.size = Vector2(1920, 1080)
+	add_child_autofree(frame)
+	var end := TheEndScreen.new()
+	frame.add_child(end)
+	await wait_process_frames(3)
+	var card: MenuCard = end.find_children("*", "MenuCard", true, false)[0]
+	assert_gt(card.get_global_rect().position.x, 1920.0 * 0.34, "right of Lucian's reaching arm")
+	assert_lt(card.get_global_rect().end.x, 1920.0, "inside the screen")
