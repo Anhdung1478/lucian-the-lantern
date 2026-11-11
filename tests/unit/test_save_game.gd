@@ -529,3 +529,79 @@ func test_a_failed_start_new_puts_the_slot_and_progress_back() -> void:
 	after.erase("saved_at")
 	assert_eq(after, before)
 	assert_push_warning_count(1)
+
+
+## R1: the save counts the defeats on each story stage not yet cleared
+## (Resolve), in memory until the next save.
+func test_a_defeat_is_counted_for_a_story_stage_not_yet_cleared() -> void:
+	assert_true(save_game.defeats.is_empty(), "a new game")
+	assert_eq(save_game.defeats_on("2-1"), 0)
+	watch_signals(save_game)
+	save_game.record_defeat("2-1")
+	assert_signal_emitted(save_game, "changed")
+	for i in 6:
+		save_game.record_defeat("2-1")
+	save_game.record_defeat("1-1")
+	assert_eq(save_game.defeats_on("2-1"), 7, "every defeat is counted; Resolve caps its stacks")
+	assert_eq(save_game.defeats, {"2-1": 7, "1-1": 1})
+	assert_false(save_game.slot_exists(1), "nothing is written by itself")
+	save_game.reset()
+	assert_true(save_game.defeats.is_empty(), "a new game again")
+
+
+func test_only_story_stages_not_yet_cleared_count_defeats() -> void:
+	save_game.set_cleared(["1-1"] as Array[String])
+	for id in ["1-1", "", EndlessPlan.STAGE_ID, "9-9"]:
+		save_game.record_defeat(id)
+		assert_eq(save_game.defeats_on(id), 0, "'%s'" % id)
+	assert_true(save_game.defeats.is_empty())
+
+
+func test_clearing_a_stage_forgets_its_defeats() -> void:
+	save_game.record_defeat("1-1")
+	save_game.record_defeat("2-1")
+	save_game.record_defeat("2-1")
+	save_game.finish_stage(&"failed", "2-1")
+	save_game.finish_stage(&"left", "2-1")
+	assert_eq(save_game.defeats_on("2-1"), 2, "failing and leaving keep them")
+	save_game.finish_stage(&"cleared", "2-1")
+	assert_eq(save_game.defeats, {"1-1": 1}, "only the cleared stage's go")
+	save_game.record_defeat("2-2")
+	save_game.set_cleared(["1-1", "2-1", "2-2"] as Array[String])
+	assert_true(save_game.defeats.is_empty(), "the debug table's clears too")
+
+
+func test_defeats_round_trip_and_an_old_save_has_none() -> void:
+	save_game.set_cleared(["1-1"] as Array[String])
+	save_game.record_defeat("2-1")
+	save_game.record_defeat("2-1")
+	save_game.record_defeat("2-2")
+	assert_true(save_game.finish_stage(&"failed", "2-1"))
+	var loaded := SaveGame.new(PREFIX)
+	loaded.load_slot(1)
+	assert_eq(loaded.defeats, {"2-1": 2, "2-2": 1})
+	assert_typeof(loaded.defeats["2-1"], TYPE_INT)
+	assert_eq(int(JSON.parse_string(FileAccess.get_file_as_string(save_game.path(1))).version), 1, "the version stays 1")
+	_write_text(save_game.path(1), JSON.stringify({"cleared": ["1-1"]}))
+	loaded.load_slot(1)
+	assert_true(loaded.defeats.is_empty(), "a save from before Resolve")
+	assert_eq(loaded.cleared, ["1-1"] as Array[String])
+
+
+func test_bad_defeats_are_dropped() -> void:
+	_write_text(save_game.path(1), JSON.stringify({"cleared": ["1-1"], "defeats": {
+		"2-1": 3.0, "2-2": 1.5, "2-3": "4", "3-1": 0, "3-2": -2, "3-3": null, "9-9": 2, "endless": 2, "1-1": 2, "3-4": 12}}))
+	save_game.load_slot(1)
+	assert_eq(save_game.defeats, {"2-1": 3, "3-4": 12}, "whole counts of story stages not yet cleared")
+	for bad: Variant in [3, "2-1", ["2-1"], null]:
+		_write_text(save_game.path(1), JSON.stringify({"defeats": bad}))
+		save_game.load_slot(1)
+		assert_true(save_game.defeats.is_empty(), "%s" % [bad])
+
+
+func test_a_failed_start_new_puts_the_defeats_back() -> void:
+	save_game.record_defeat("1-1")
+	save_game.prefix = "user://no_such_dir/test_save_slot_"
+	assert_false(save_game.start_new(2))
+	assert_eq(save_game.defeats, {"1-1": 1})
+	assert_push_warning_count(1)

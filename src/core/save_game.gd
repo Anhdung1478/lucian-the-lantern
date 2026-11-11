@@ -32,6 +32,9 @@ var loadout: Array[StringName] = [&"", &""]
 var endless_map := EndlessPlan.RANDOM
 ## Stage ids ("1-1" ... "6-5") cleared at least once.
 var cleared: Array[String] = []
+## Resolve: stage id -> how many times Lucian fell there, for story stages
+## not yet cleared. A stage leaves it when it is cleared.
+var defeats := {}
 var endless_best := 0
 ## Endless's milestone waves (EndlessPlan.MILESTONES) already paid, in the
 ## order they were won.
@@ -114,6 +117,7 @@ func copy_to(of_slot: int) -> bool:
 func finish_stage(result: StringName, stage_id := "") -> bool:
 	if result == &"cleared" and stage_id != "" and not stage_id in cleared:
 		cleared.append(stage_id)
+		defeats.erase(stage_id)
 		_update_acts_cleared()
 		changed.emit()
 	return save()
@@ -137,6 +141,7 @@ func reset() -> void:
 	loadout = [&"", &""]
 	endless_map = EndlessPlan.RANDOM
 	cleared = []
+	defeats = {}
 	endless_best = 0
 	endless_milestones = []
 	bosses = []
@@ -183,6 +188,21 @@ func award_boss(id: String, first: int, repeat: int) -> int:
 	bosses.append(id)
 	changed.emit()
 	return first
+
+
+## Lucian fell on `stage_id`: counted for a story stage not yet cleared
+## (Resolve), in memory (the stage-done save writes it).
+func record_defeat(stage_id: String) -> void:
+	if not Journey.is_stage_id(stage_id) or stage_id in cleared:
+		return
+	defeats[stage_id] = defeats_on(stage_id) + 1
+	changed.emit()
+
+
+## How many times Lucian fell on `stage_id` before clearing it; 0 once it is
+## cleared.
+func defeats_on(stage_id: String) -> int:
+	return defeats.get(stage_id, 0)
 
 
 ## An Endless run has cleared `waves`: kept when it beats the best, in memory
@@ -233,12 +253,14 @@ static func play_time_text(seconds: int) -> String:
 	return "%dh %02dm" % [minutes / 60, minutes % 60] if minutes >= 60 else "%dm" % minutes
 
 
-## Debug: replaces the cleared stages (unknown ids are dropped).
+## Debug: replaces the cleared stages (unknown ids are dropped). A cleared
+## stage's defeats go.
 func set_cleared(ids: Array[String]) -> void:
 	cleared = []
 	for id in ids:
 		if Journey.is_stage_id(id) and not id in cleared:
 			cleared.append(id)
+			defeats.erase(id)
 	_update_acts_cleared()
 	changed.emit()
 
@@ -298,6 +320,7 @@ func to_dict() -> Dictionary:
 		"loadout": loadout.map(func(id: StringName) -> String: return String(id)),
 		"endless_map": endless_map,
 		"cleared": cleared.duplicate(),
+		"defeats": defeats.duplicate(),
 		"endless_best": endless_best,
 		"endless_milestones": endless_milestones.duplicate(),
 		"bosses": bosses.duplicate(),
@@ -387,6 +410,16 @@ func _apply(data: Dictionary) -> void:
 		for id: Variant in saved_cleared:
 			if id is String and Journey.is_stage_id(id) and not id in cleared:
 				cleared.append(id)
+	# A whole count, 1 or more, for each story stage not yet cleared; a save
+	# from before Resolve has none.
+	defeats = {}
+	var saved_defeats: Variant = data.get("defeats", {})
+	if saved_defeats is Dictionary:
+		for id: Variant in saved_defeats:
+			var count: Variant = saved_defeats[id]
+			var counted := (count is int or count is float) and float(count) == float(int(count)) and int(count) > 0
+			if id is String and Journey.is_stage_id(id) and not id in cleared and counted:
+				defeats[id] = int(count)
 	var best: Variant = data.get("endless_best", 0)
 	endless_best = maxi(int(best), 0) if (best is int or best is float) else 0
 	# Each milestone wave once, as a whole number; a save from before the
