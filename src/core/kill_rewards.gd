@@ -1,8 +1,9 @@
 class_name KillRewards
 extends RefCounted
-## What a kill gives (design doc §9): stage gold and XP for the run, blue
-## and orange essence for good, plus the data's extra essence. Boss and mini
-## boss purple comes from SaveGame.award_boss. The tree's Stage Gold, Bonus
+## What a kill gives (design doc §9): stage gold (× its stage's
+## WavePlan.gold_share) and XP for the run, blue and orange essence for
+## good, plus the data's extra essence. Boss and mini boss purple comes
+## from SaveGame.award_boss. The tree's Stage Gold, Bonus
 ## XP and Essence Drops raise them, then an Endless modifier's multipliers
 ## (StageSetup.gold_mult, blue_mult, orange_mult; XP has none), and the
 ## difficulty's blue (Difficulty.blue_scale). Pure: the randomness comes
@@ -26,7 +27,7 @@ const SUMMON_SHARE := 0.25
 static func roll(data: EnemyData, act: int, run: StageSetup, rng: RandomNumberGenerator, summoned := false, boss_scale := 1.0) -> Dictionary:
 	var scale := data.reward_scale(act) * (SUMMON_SHARE if summoned else 1.0)
 	var reward := {
-		"gold": roundi(data.gold * scale * (1.0 + run.gold_bonus) * run.gold_mult),
+		"gold": roundi(data.gold * scale * WavePlan.gold_share(run.stage_id, data.id) * (1.0 + run.gold_bonus) * run.gold_mult),
 		"xp": roundi(data.xp * scale * (1.0 + run.xp_bonus)),
 		"blue": 0,
 		"orange": 0,

@@ -206,3 +206,64 @@ func test_repeat_purple_is_raised_by_the_purple_multiplier() -> void:
 	assert_eq(KillRewards.repeat_purple(boss, run), 5, "roundi(4.5)")
 	boss.purple_repeat = 10
 	assert_eq(KillRewards.repeat_purple(boss, run), 15)
+
+
+## V1.5 (P3): Act 3's monsters pay their stage's gold share; XP and essence
+## don't change.
+func test_act_3_s_monsters_pay_70_percent_more_gold_in_its_stages() -> void:
+	var raptor: EnemyData = load("res://data/enemies/raptor.tres")
+	var sentinel: EnemyData = load("res://data/enemies/blue_sentinel.tres")
+	var plain := KillRewards.roll(raptor, 3, StageSetup.new(), rng)
+	for number in range(1, 6):
+		var run := StageSetup.new()
+		run.stage_id = Journey.stage_id(3, number)
+		var reward := KillRewards.roll(raptor, 3, run, rng)
+		assert_eq(reward.gold, roundi(20 * 1.5 * 1.7), run.stage_id)
+		assert_eq([reward.xp, reward.blue], [plain.xp, plain.blue], run.stage_id)
+		assert_eq(KillRewards.roll(sentinel, 3, run, rng).gold, roundi(160 * 1.5 * 1.7), "%s: elites too" % run.stage_id)
+
+
+func test_the_gold_share_leaves_other_stages_bosses_and_endless_alone() -> void:
+	assert_eq(WavePlan.gold_share("2-3", WavePlan.MELEE), 1.0)
+	assert_eq(WavePlan.gold_share("4-1", WavePlan.SHADOW_MELEE), 1.0)
+	assert_eq(WavePlan.gold_share("5-2", WavePlan.SPIDERLING), 1.0)
+	assert_eq(WavePlan.gold_share("3-2", WavePlan.INFERNAL_DRAKE), 1.0, "a mini boss")
+	assert_eq(WavePlan.gold_share("3-5", &"elder_dragon"), 1.0, "a boss")
+	assert_eq(WavePlan.gold_share(EndlessPlan.STAGE_ID, &"raptor"), 1.0, "Endless pays its own way")
+	assert_eq(WavePlan.gold_share("", &"raptor"), 1.0, "the sandbox")
+
+
+## The gold every kill in a story stage's first `waves` waves pays (all of
+## them for -1), an Ancient Krug's splits included, with no tree bonus.
+func _stage_gold(act: int, number: int, waves := -1) -> int:
+	var run := StageSetup.new()
+	run.act = act
+	run.stage_id = Journey.stage_id(act, number)
+	var plan := WavePlan.waves(run.stage_id)
+	var gold := 0
+	for wave: Array in plan.slice(0, plan.size() if waves < 0 else waves):
+		for id: StringName in wave:
+			var data: EnemyData = load("res://data/enemies/%s.tres" % id)
+			gold += KillRewards.roll(data, act, run, rng).gold
+			if data.split_into != &"":
+				var split: EnemyData = load("res://data/enemies/%s.tres" % data.split_into)
+				gold += data.split_count * KillRewards.roll(split, act, run, rng).gold
+	return gold
+
+
+func _act_gold(act: int) -> float:
+	var total := 0
+	for number in range(1, Journey.stage_count(act) + 1):
+		total += _stage_gold(act, number)
+	return float(total) / Journey.stage_count(act)
+
+
+## The cheapest fragment (Tear of the Goddess, 650 from V1.5) at 3-1's first break.
+func test_3_1_s_first_break_pays_for_the_cheapest_fragment() -> void:
+	assert_gte(_stage_gold(3, 1, 1), 650)
+
+
+func test_act_3_s_stages_pay_near_the_line_between_act_2_s_and_act_4_s() -> void:
+	var line := (_act_gold(2) + _act_gold(4)) / 2.0
+	var act_3 := _act_gold(3)
+	assert_between(act_3, line * 0.9, _act_gold(4), "Act 2 %d, Act 3 %d, Act 4 %d" % [_act_gold(2), act_3, _act_gold(4)])

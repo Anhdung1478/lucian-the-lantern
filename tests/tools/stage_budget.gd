@@ -1,7 +1,7 @@
 extends SceneTree
 ## Prints, for every story stage: the HP its waves hold (after act, wave and
-## stage scaling), the XP, gold and blue they pay (an Ancient Krug's splits
-## included, summons not), the level Lucian reaches by the end (from the
+## stage scaling), the XP, gold (after the stage's gold share) and blue they
+## pay (an Ancient Krug's splits included, summons not), the level Lucian reaches by the end (from the
 ## act's start level), and the strongest wave's raw damage per second. Then
 ## each boss's and mini boss's wall: its HP ÷ the gold earned in its stage
 ## before its wave, and each act's average gold per stage (the boss's own
@@ -44,12 +44,12 @@ func _initialize() -> void:
 						var split: EnemyData = load("res://data/enemies/%s.tres" % data.split_into)
 						wave_hp += data.split_count * split.max_hp * split.hp_scale(act, w + 1) * WavePlan.hp_share(id, data.split_into)
 						xp += data.split_count * split.xp * split.reward_scale(act)
-						gold += data.split_count * split.gold * split.reward_scale(act)
+						gold += data.split_count * split.gold * split.reward_scale(act) * WavePlan.gold_share(id, data.split_into)
 						blue += data.split_count * act
 					if data.attack_interval > 0.0:
 						dps += data.damage * data.damage_scale(act, w + 1) / data.attack_interval
 					xp += data.xp * data.reward_scale(act)
-					gold += data.gold * data.reward_scale(act)
+					gold += data.gold * data.reward_scale(act) * WavePlan.gold_share(id, enemy_id)
 					blue += act * (5 if data.kind == &"elite" else 1) if not data.is_boss_kind() else (50 if data.kind == &"mini_boss" else 100)
 					count += 1
 				hp += wave_hp

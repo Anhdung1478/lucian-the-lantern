@@ -203,6 +203,16 @@ const HP_SHARES := {
 ## Stage id -> enemy id -> its share of damage in that stage only. The
 ## tutorial's minions hit 25% softer.
 const DAMAGE_SHARES := {"1-1": {MELEE: 0.75, RANGED: 0.75, SIEGE: 0.75}}
+## Act 3's monsters, normal and elite, pay 70% more gold: its waves hold
+## fewer, larger monsters, so its stages would pay far below the line
+## between Act 2's and Act 4's.
+const JUNGLE_GOLD := {
+	&"raptor": 1.7, &"raptor_big": 1.7, &"murkwolf": 1.7, &"murkwolf_big": 1.7, &"krug": 1.7, &"krug_big": 1.7, &"gromp": 1.7,
+	BLUE_SENTINEL: 1.7, RED_BRAMBLEBACK: 1.7, SCUTTLER: 1.7,
+}
+## Stage id -> enemy id -> its share of kill gold in that stage only. Endless
+## is not a stage here, so it pays its own way.
+const GOLD_SHARES := {"3-1": JUNGLE_GOLD, "3-2": JUNGLE_GOLD, "3-3": JUNGLE_GOLD, "3-4": JUNGLE_GOLD, "3-5": JUNGLE_GOLD}
 
 
 static func has_stage(stage_id: String) -> bool:
@@ -212,6 +222,11 @@ static func has_stage(stage_id: String) -> bool:
 ## Enemy `id`'s share of HP in stage `stage_id` (1.0 unless listed).
 static func hp_share(stage_id: String, id: StringName) -> float:
 	return HP_SHARES.get(stage_id, {}).get(id, 1.0)
+
+
+## Enemy `id`'s share of kill gold in stage `stage_id` (1.0 unless listed).
+static func gold_share(stage_id: String, id: StringName) -> float:
+	return GOLD_SHARES.get(stage_id, {}).get(id, 1.0)
 
 
 ## Enemy `id`'s share of damage in stage `stage_id` (1.0 unless listed).
