@@ -14,6 +14,19 @@ enum Shape { CIRCLE, LINE, CONE, LOCK, RING }
 
 const EDGE := Color(1.0, 0.25, 0.2, 0.9)
 const FILL := Color(1.0, 0.2, 0.15, 0.3)
+## The edge's widths (a lock line's is thinner).
+const EDGE_WIDTH := 3.0
+const LOCK_EDGE_WIDTH := 2.0
+## With Juice: a dark line under the edge (this much wider each side), so the
+## shape reads on any ground, and pale dashes of this length and gap, this
+## wide, marching along it at MARCH_SPEED pixels a second.
+const UNDERLINE := Color(0.1, 0.0, 0.02, 0.55)
+const UNDERLINE_GROW := 1.5
+const DASH_COLOR := Color(1.0, 0.86, 0.8, 0.85)
+const DASH := 12.0
+const GAP := 18.0
+const DASH_WIDTH := 1.5
+const MARCH_SPEED := 40.0
 ## Points round a ring's arcs.
 const RING_POINTS := 96
 
@@ -173,22 +186,67 @@ func _draw() -> void:
 	match shape:
 		Shape.CIRCLE:
 			draw_circle(Vector2.ZERO, reach * progress(), fill)
-			draw_arc(Vector2.ZERO, reach, 0.0, TAU, 64, EDGE, 3.0, true)
+			_edge_arc(reach, 0.0, TAU, 64)
 		Shape.LINE, Shape.LOCK:
 			draw_set_transform(Vector2.ZERO, direction.angle())
 			draw_rect(Rect2(0.0, -width * 0.5, reach * progress(), width), fill)
-			draw_rect(Rect2(0.0, -width * 0.5, reach, width), EDGE, false, 3.0 if shape == Shape.LINE else 2.0)
+			var half := width * 0.5
+			var line_width := EDGE_WIDTH if shape == Shape.LINE else LOCK_EDGE_WIDTH
+			var corners := [Vector2(0.0, -half), Vector2(reach, -half), Vector2(reach, half), Vector2(0.0, half)]
+			for i in 4:
+				_edge_line(corners[i], corners[(i + 1) % 4], line_width)
 			draw_set_transform(Vector2.ZERO, 0.0)
 		Shape.CONE:
 			var points := PackedVector2Array([Vector2.ZERO])
 			for i in 17:
 				points.append(Vector2.from_angle(direction.angle() - spread * 0.5 + spread * i / 16.0) * reach)
 			draw_colored_polygon(points, fill)
-			points.append(Vector2.ZERO)
-			draw_polyline(points, EDGE, 3.0, true)
+			var first := direction.angle() - spread * 0.5
+			var last := direction.angle() + spread * 0.5
+			_edge_line(Vector2.ZERO, Vector2.from_angle(first) * reach)
+			_edge_arc(reach, first, last, 16)
+			_edge_line(Vector2.from_angle(last) * reach, Vector2.ZERO)
 		Shape.RING:
 			# The band fills out from its middle line, between its two edges.
 			if progress() > 0.0:
 				draw_arc(Vector2.ZERO, reach, 0.0, TAU, RING_POINTS, fill, width * progress())
 			for edge: float in [reach - width * 0.5, reach + width * 0.5]:
-				draw_arc(Vector2.ZERO, maxf(edge, 0.0), 0.0, TAU, RING_POINTS, EDGE, 3.0, true)
+				_edge_arc(maxf(edge, 0.0), 0.0, TAU, RING_POINTS)
+
+
+## One straight edge from `a` to `b`: the red line and, with Juice on, a dark
+## line under it and pale dashes marching along it.
+func _edge_line(a: Vector2, b: Vector2, line_width := EDGE_WIDTH) -> void:
+	if not Juice.on():
+		draw_line(a, b, EDGE, line_width, true)
+		return
+	draw_line(a, b, UNDERLINE, line_width + 2.0 * UNDERLINE_GROW, true)
+	draw_line(a, b, EDGE, line_width, true)
+	var length := a.distance_to(b)
+	var way := (b - a) / maxf(length, 0.001)
+	var at := fposmod(_elapsed * MARCH_SPEED, DASH + GAP) - DASH - GAP
+	while at < length:
+		var from := maxf(at, 0.0)
+		var to := minf(at + DASH, length)
+		if to > from:
+			draw_line(a + way * from, a + way * to, DASH_COLOR, DASH_WIDTH, true)
+		at += DASH + GAP
+
+
+## One arc of `radius` from angle `from` to `to`, like _edge_line.
+func _edge_arc(radius: float, from: float, to: float, points: int) -> void:
+	if not Juice.on():
+		draw_arc(Vector2.ZERO, radius, from, to, points, EDGE, EDGE_WIDTH, true)
+		return
+	draw_arc(Vector2.ZERO, radius, from, to, points, UNDERLINE, EDGE_WIDTH + 2.0 * UNDERLINE_GROW, true)
+	draw_arc(Vector2.ZERO, radius, from, to, points, EDGE, EDGE_WIDTH, true)
+	if radius < 1.0:
+		return
+	var step := (DASH + GAP) / radius
+	var at := from - step + fposmod(_elapsed * MARCH_SPEED / radius, step)
+	while at < to:
+		var start := maxf(at, from)
+		var end := minf(at + DASH / radius, to)
+		if end > start:
+			draw_arc(Vector2.ZERO, radius, start, end, 4, DASH_COLOR, DASH_WIDTH, true)
+		at += step

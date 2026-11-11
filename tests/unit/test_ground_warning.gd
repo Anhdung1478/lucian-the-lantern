@@ -138,3 +138,21 @@ func test_a_living_caster_s_warning_still_strikes() -> void:
 	var hp := lucian.hp
 	await wait_physics_frames(12)
 	assert_almost_eq(lucian.hp, hp - 100.0, 1.0)
+
+
+func test_every_shape_draws_its_moving_edge_without_changing_what_it_covers() -> void:
+	Juice.renders = true
+	var warnings: Array[GroundWarning] = [
+		GroundWarning.circle(Vector2.ZERO, 120.0, 1.0),
+		GroundWarning.line(Vector2.ZERO, Vector2.RIGHT, 300.0, 60.0, 1.0),
+		GroundWarning.cone(Vector2.ZERO, Vector2.RIGHT, 300.0, deg_to_rad(60.0), 1.0),
+	]
+	for warning in warnings:
+		add_child_autofree(warning)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	Juice.renders = false
+	assert_true(warnings[0].covers(Vector2(100, 0)))
+	assert_false(warnings[0].covers(Vector2(130, 0)))
+	assert_true(warnings[1].covers(Vector2(290, 20)))
+	assert_false(warnings[2].covers(Vector2(100, 200)))
