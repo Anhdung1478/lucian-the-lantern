@@ -51,18 +51,39 @@ const PACKS := {
 ## Stage id -> waves; each wave lists [enemy or pack id, count] in spawn order.
 const STAGES := {
 	"1-1": [[[MELEE, 4], [RANGED, 2]], [[MELEE, 6], [RANGED, 4], [SIEGE, 1]]],
-	"2-1": [[[MELEE, 6], [RANGED, 4], [SIEGE, 1]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]]],
-	"2-2": [[[MELEE, 6], [RANGED, 6], [SIEGE, 1]], [[MELEE, 6], [RANGED, 6], [SIEGE, 2]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]]],
-	"2-3": [[[MELEE, 6], [RANGED, 6], [SIEGE, 2]], [[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]], [[MELEE, 8], [RANGED, 6], [SIEGE, 2], [SUPER, 1]]],
+	"2-1": [
+		[[MELEE, 6], [RANGED, 4], [SIEGE, 1]],
+		[[MELEE, 6], [RANGED, 6], [SIEGE, 1]],
+		[[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]],
+		[[MELEE, 8], [RANGED, 6], [SIEGE, 2]],
+	],
+	"2-2": [
+		[[MELEE, 6], [RANGED, 6], [SIEGE, 1]],
+		[[MELEE, 6], [RANGED, 6], [SIEGE, 2]],
+		[[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]],
+		[[MELEE, 8], [RANGED, 6], [SIEGE, 2]],
+		[[MELEE, 8], [RANGED, 6], [SIEGE, 2], [SUPER, 1]],
+	],
+	"2-3": [
+		[[MELEE, 6], [RANGED, 6], [SIEGE, 2]],
+		[[MELEE, 6], [RANGED, 6], [SIEGE, 1], [SUPER, 1]],
+		[[MELEE, 8], [RANGED, 6], [SIEGE, 2], [SUPER, 1]],
+		[[MELEE, 8], [RANGED, 8], [SIEGE, 2], [SUPER, 1]],
+		[[MELEE, 10], [RANGED, 8], [SIEGE, 2], [SUPER, 1]],
+	],
 	"3-1": [
 		[[&"raptors", 1], [&"wolves", 1]],
 		[[&"raptors", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
 		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [BLUE_SENTINEL, 1]],
+		[[&"raptors", 2], [&"wolves", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1]],
 	],
 	"3-2": [
 		[[&"raptors", 1], [&"wolves", 1], [&"gromp", 1]],
 		[[&"raptors", 1], [&"krugs", 1], [&"wolves", 1], [BLUE_SENTINEL, 1]],
 		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+		[[&"raptors", 2], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
+		[[&"wolves", 2], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1]],
 		[[&"raptors", 1], [&"wolves", 1], [INFERNAL_DRAKE, 1]],
 	],
 	"3-3": [
@@ -70,12 +91,16 @@ const STAGES := {
 		[[&"krugs", 1], [&"wolves", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
 		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
 		[[&"raptors", 2], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
+		[[&"raptors", 2], [&"wolves", 2], [&"krugs", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+		[[&"raptors", 2], [&"wolves", 2], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1], [RED_BRAMBLEBACK, 1]],
 	],
 	"3-4": [
 		[[&"raptors", 1], [&"wolves", 1], [&"gromp", 1], [&"krugs", 1]],
 		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [BLUE_SENTINEL, 1]],
 		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
 		[[&"raptors", 2], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
+		[[&"raptors", 2], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1]],
+		[[&"raptors", 2], [&"wolves", 2], [&"krugs", 1], [BLUE_SENTINEL, 1], [SCUTTLER, 1]],
 		[[&"raptors", 1], [&"wolves", 1], [RED_BRAMBLEBACK, 1], [OCEAN_DRAKE, 1]],
 	],
 	"3-5": [
@@ -84,12 +109,16 @@ const STAGES := {
 		[[&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
 		[[&"raptors", 1], [&"wolves", 1], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1]],
 		[[&"raptors", 2], [&"wolves", 1], [&"krugs", 1], [RED_BRAMBLEBACK, 1], [SCUTTLER, 1]],
+		[[&"raptors", 2], [&"wolves", 2], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1], [RED_BRAMBLEBACK, 1]],
+		[[&"raptors", 3], [&"wolves", 2], [&"krugs", 1], [&"gromp", 1], [BLUE_SENTINEL, 1], [RED_BRAMBLEBACK, 1]],
 	],
 	"4-1": [
 		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 6], [SHADOW_SIEGE, 1]],
 		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 6], [SHADOW_SIEGE, 2]],
 		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 8], [SHADOW_SIEGE, 1], [SHADOW_SUPER, 1]],
 		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 8], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 12], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
 	],
 	"4-2": [
 		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 6], [SHADOW_SIEGE, 2]],
@@ -97,6 +126,8 @@ const STAGES := {
 		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 8], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
 		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
 		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 3], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 12], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 2]],
+		[[SHADOW_MELEE, 12], [SHADOW_RANGED, 12], [SHADOW_SIEGE, 3], [SHADOW_SUPER, 1]],
 	],
 	"4-3": [
 		[[SHADOW_MELEE, 8], [SHADOW_RANGED, 8], [SHADOW_SIEGE, 1], [SHADOW_SUPER, 1]],
@@ -104,6 +135,8 @@ const STAGES := {
 		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 1]],
 		[[SHADOW_MELEE, 10], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 3], [SHADOW_SUPER, 1]],
 		[[SHADOW_MELEE, 12], [SHADOW_RANGED, 10], [SHADOW_SIEGE, 2], [SHADOW_SUPER, 2]],
+		[[SHADOW_MELEE, 12], [SHADOW_RANGED, 12], [SHADOW_SIEGE, 3], [SHADOW_SUPER, 1]],
+		[[SHADOW_MELEE, 12], [SHADOW_RANGED, 12], [SHADOW_SIEGE, 3], [SHADOW_SUPER, 2]],
 	],
 	"5-1": [
 		[[SPIDERLING, 8], [SAPLING, 4]],
@@ -111,12 +144,14 @@ const STAGES := {
 		[[SPIDERLING, 8], [SAPLING, 6], [MAIDEN, 1]],
 		[[SPIDERLING, 10], [SAPLING, 6], [BROODMOTHER, 1]],
 		[[SPIDERLING, 10], [SAPLING, 8], [MAIDEN, 1]],
+		[[SPIDERLING, 10], [SAPLING, 8], [BROODMOTHER, 1]],
 	],
 	"5-2": [
 		[[SPIDERLING, 8], [SAPLING, 6]],
 		[[SPIDERLING, 10], [SAPLING, 6], [MAIDEN, 1]],
 		[[SPIDERLING, 10], [SAPLING, 6], [BROODMOTHER, 1]],
 		[[SPIDERLING, 10], [SAPLING, 8], [MAIDEN, 1]],
+		[[SPIDERLING, 10], [SAPLING, 8], [BROODMOTHER, 1]],
 		[[SPIDERLING, 10], [SAPLING, 8], [MAIDEN, 1], [BROODMOTHER, 1], [MAOKAI, 1]],
 	],
 	"5-3": [
@@ -126,6 +161,7 @@ const STAGES := {
 		[[SPIDERLING, 12], [SAPLING, 8], [MAIDEN, 1]],
 		[[SPIDERLING, 12], [SAPLING, 8], [BROODMOTHER, 1]],
 		[[SPIDERLING, 12], [SAPLING, 8], [MAIDEN, 1], [BROODMOTHER, 1]],
+		[[SPIDERLING, 12], [SAPLING, 10], [MAIDEN, 1], [BROODMOTHER, 1]],
 	],
 	"5-4": [
 		[[SPIDERLING, 10], [SAPLING, 8], [MAIDEN, 1]],
@@ -133,6 +169,7 @@ const STAGES := {
 		[[SPIDERLING, 12], [SAPLING, 8], [MAIDEN, 1]],
 		[[SPIDERLING, 12], [SAPLING, 8], [BROODMOTHER, 2]],
 		[[SPIDERLING, 12], [SAPLING, 10], [MAIDEN, 1], [BROODMOTHER, 1]],
+		[[SPIDERLING, 12], [SAPLING, 10], [MAIDEN, 2]],
 		[[SPIDERLING, 12], [SAPLING, 10], [MAIDEN, 1], [BROODMOTHER, 1], [ELISE, 1]],
 	],
 	"5-5": [
@@ -142,6 +179,7 @@ const STAGES := {
 		[[SPIDERLING, 12], [SAPLING, 10], [MAIDEN, 1], [BROODMOTHER, 1]],
 		[[SPIDERLING, 14], [SAPLING, 10], [MAIDEN, 2]],
 		[[SPIDERLING, 14], [SAPLING, 10], [MAIDEN, 1], [BROODMOTHER, 2]],
+		[[SPIDERLING, 14], [SAPLING, 12], [MAIDEN, 2], [BROODMOTHER, 1]],
 	],
 	"6-1": [
 		[[MIST_WALKER, 8], [LANTERN_SOUL, 4]],
@@ -150,6 +188,8 @@ const STAGES := {
 		[[MIST_WALKER, 10], [LANTERN_SOUL, 6], [CHAIN_WARDEN, 1]],
 		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1]],
 		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2]],
 	],
 	"6-2": [
 		[[MIST_WALKER, 8], [LANTERN_SOUL, 6]],
@@ -157,6 +197,8 @@ const STAGES := {
 		[[MIST_WALKER, 10], [LANTERN_SOUL, 6], [CHAIN_WARDEN, 1]],
 		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1]],
 		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 12], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2]],
 		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1], [KARTHUS_REVIVED, 1]],
 	],
 	"6-3": [
@@ -167,6 +209,8 @@ const STAGES := {
 		[[MIST_WALKER, 12], [LANTERN_SOUL, 8], [CHAIN_WARDEN, 2]],
 		[[MIST_WALKER, 12], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
 		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2], [CHAIN_WARDEN, 2]],
+		[[MIST_WALKER, 14], [LANTERN_SOUL, 12], [SPECTRAL_RIDER, 2], [CHAIN_WARDEN, 2]],
 	],
 	"6-4": [
 		[[MIST_WALKER, 10], [LANTERN_SOUL, 8], [SPECTRAL_RIDER, 1]],
@@ -175,6 +219,8 @@ const STAGES := {
 		[[MIST_WALKER, 12], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2]],
 		[[MIST_WALKER, 12], [LANTERN_SOUL, 10], [CHAIN_WARDEN, 2]],
 		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2], [CHAIN_WARDEN, 1]],
+		[[MIST_WALKER, 14], [LANTERN_SOUL, 12], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 2]],
 		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [SPECTRAL_RIDER, 2], [CHAIN_WARDEN, 1], [HECARIM, 1]],
 	],
 	"6-5": [
@@ -185,6 +231,8 @@ const STAGES := {
 		[[MIST_WALKER, 14], [LANTERN_SOUL, 10], [CHAIN_WARDEN, 2]],
 		[[MIST_WALKER, 14], [LANTERN_SOUL, 12], [SPECTRAL_RIDER, 1], [CHAIN_WARDEN, 1]],
 		[[MIST_WALKER, 16], [LANTERN_SOUL, 12], [SPECTRAL_RIDER, 2], [CHAIN_WARDEN, 2]],
+		[[MIST_WALKER, 16], [LANTERN_SOUL, 14], [SPECTRAL_RIDER, 2], [CHAIN_WARDEN, 2]],
+		[[MIST_WALKER, 18], [LANTERN_SOUL, 14], [SPECTRAL_RIDER, 3], [CHAIN_WARDEN, 2]],
 	],
 }
 ## Stage id -> the boss wave's enemy id.

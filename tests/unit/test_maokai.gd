@@ -67,7 +67,7 @@ func _wall(at: Vector2) -> void:
 func test_maokai_matches_the_table() -> void:
 	var data := load("res://data/enemies/maokai.tres") as EnemyData
 	assert_eq([data.id, data.kind, data.behavior, data.camp], [&"maokai", &"mini_boss", &"maokai", &"maokai"])
-	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [8500.0, 60.0, 40.0, 90.0, DamageInfo.Type.PHYSICAL])
+	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [10500.0, 60.0, 40.0, 90.0, DamageInfo.Type.PHYSICAL])
 	assert_eq([data.attack_interval, data.move_speed, data.radius, data.projectile_speed], [1.6, 300.0, 54.0, 0.0])
 	assert_eq([data.purple_first, data.purple_repeat, data.gold], [5, 1, 300])
 	assert_not_null(data.art)
@@ -82,7 +82,7 @@ func test_the_stage_builds_maokai_unscaled() -> void:
 	await wait_process_frames(2)
 	var boss := stage.spawn_enemy(&"maokai", Vector2(1000, 1000), 4)
 	assert_is(boss, Maokai)
-	assert_eq(boss.max_hp, 8500.0, "no scaling")
+	assert_eq(boss.max_hp, 10500.0, "no scaling")
 
 
 func test_twisted_advance_warns_leaps_and_roots_inside_the_circle() -> void:

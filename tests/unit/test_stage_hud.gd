@@ -19,7 +19,7 @@ func test_the_wave_text_follows_the_runner() -> void:
 	for i in 10:
 		runner.tick(WaveRunner.GROUP_GAP)
 	info.refresh()
-	assert_eq(info.wave_label.text, "Wave 1/3")
+	assert_eq(info.wave_label.text, "Wave 1/5")
 	assert_eq(info.enemies_label.text, "Enemies: 13")
 	assert_false(info.skip_button.visible)
 
@@ -32,23 +32,23 @@ func test_the_pips_follow_the_waves() -> void:
 	info.setup("Stage 2-2 Â· The Sentinels", runner)
 	var pips := info.pips
 	assert_true(pips.visible)
-	assert_eq(pips.total, 4, "3 waves and the boss wave")
-	assert_gt(pips.pip_size(4), pips.pip_size(3), "the boss wave's pip is larger")
-	assert_eq(_pip_states(pips), [WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD], "before wave 1")
+	assert_eq(pips.total, 6, "5 waves and the boss wave")
+	assert_gt(pips.pip_size(6), pips.pip_size(5), "the boss wave's pip is larger")
+	assert_eq(_pip_states(pips), [WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD], "before wave 1")
 	runner.skip()
 	info.refresh()
-	assert_eq(_pip_states(pips), [WavePips.State.CURRENT, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD], "wave 1")
+	assert_eq(_pip_states(pips), [WavePips.State.CURRENT, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD], "wave 1")
 	runner.state = WaveRunner.State.BREAK
 	runner.wave = 2
 	info.refresh()
-	assert_eq(_pip_states(pips), [WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.AHEAD, WavePips.State.AHEAD], "the break after wave 2")
+	assert_eq(_pip_states(pips), [WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD, WavePips.State.AHEAD], "the break after wave 2")
 	runner.state = WaveRunner.State.FIGHT
-	runner.wave = 4
+	runner.wave = 6
 	info.refresh()
-	assert_eq(_pip_states(pips), [WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CURRENT], "the boss wave")
+	assert_eq(_pip_states(pips), [WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CURRENT], "the boss wave")
 	runner.state = WaveRunner.State.DONE
 	info.refresh()
-	assert_eq(_pip_states(pips), [WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED], "the stage is won")
+	assert_eq(_pip_states(pips), [WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED, WavePips.State.CLEARED], "the stage is won")
 
 
 ## The state of every pip, in wave order.
@@ -63,8 +63,8 @@ func test_a_stage_with_no_boss_has_no_larger_pip() -> void:
 	var info := StageInfo.new()
 	add_child_autofree(info)
 	info.setup("Stage 2-2 Â· The Sentinels", WaveRunner.new(WavePlan.waves("2-2")))
-	assert_eq(info.pips.total, 3)
-	assert_eq(info.pips.pip_size(3), info.pips.pip_size(1))
+	assert_eq(info.pips.total, 5)
+	assert_eq(info.pips.pip_size(5), info.pips.pip_size(1))
 
 
 ## The name is a heading in capitals; its text is the stage's name as given.

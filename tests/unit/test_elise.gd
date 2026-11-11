@@ -52,7 +52,7 @@ func _hits(source: StringName) -> Array:
 func test_elise_matches_the_table() -> void:
 	var data := load("res://data/enemies/elise.tres") as EnemyData
 	assert_eq([data.id, data.kind, data.behavior, data.camp], [&"elise", &"mini_boss", &"elise", &"elise"])
-	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [13000.0, 30.0, 50.0, 70.0, DamageInfo.Type.MAGIC])
+	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [15000.0, 30.0, 50.0, 70.0, DamageInfo.Type.MAGIC])
 	assert_eq([data.attack_range, data.attack_interval, data.move_speed, data.radius, data.projectile_speed], [550.0, 1.4, 330.0, 44.0, 900.0])
 	assert_eq([data.purple_first, data.purple_repeat, data.gold], [5, 1, 300])
 	assert_not_null(data.art)
@@ -67,7 +67,7 @@ func test_the_stage_builds_elise_unscaled() -> void:
 	await wait_process_frames(2)
 	var boss := stage.spawn_enemy(&"elise", Vector2(1000, 1000), 4)
 	assert_is(boss, Elise)
-	assert_eq(boss.max_hp, 13000.0, "no scaling")
+	assert_eq(boss.max_hp, 15000.0, "no scaling")
 
 
 func test_cocoon_warns_then_a_web_bolt_stuns() -> void:

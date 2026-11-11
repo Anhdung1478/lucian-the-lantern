@@ -77,7 +77,7 @@ func test_his_data_file_matches_the_plan() -> void:
 		return
 	var fields := ["id", "kind", "behavior", "max_hp", "armor", "mr", "damage", "damage_type", "projectile_speed",
 		"attack_range", "attack_interval", "move_speed", "radius", "purple_first", "purple_repeat", "gold"]
-	var table := [&"karthus", &"boss", &"karthus", 20000.0, 30.0, 60.0, 80.0, DamageInfo.Type.MAGIC, 900.0,
+	var table := [&"karthus", &"boss", &"karthus", 23000.0, 30.0, 60.0, 80.0, DamageInfo.Type.MAGIC, 900.0,
 		600.0, 1.5, 280.0, 46.0, 10, 2, 300]
 	for i in fields.size():
 		assert_eq(data.get(fields[i]), table[i], fields[i])
@@ -87,7 +87,7 @@ func test_his_data_file_matches_the_plan() -> void:
 
 
 func test_act_5s_stages_follow_the_plan() -> void:
-	var counts := {"5-1": 5, "5-2": 5, "5-3": 6, "5-4": 6, "5-5": 6}
+	var counts := {"5-1": 6, "5-2": 6, "5-3": 7, "5-4": 7, "5-5": 7}
 	for id: String in counts:
 		assert_true(WavePlan.has_stage(id), id)
 		assert_eq(WavePlan.waves(id).size(), counts[id], id)
@@ -392,7 +392,7 @@ func test_channel_reports_the_damage_so_far_and_what_breaks_it() -> void:
 	boss.hp = boss.max_hp * 0.7
 	boss.requiem()
 	var info := boss.channel()
-	assert_eq(info.need, 20000.0 * 0.08)
+	assert_eq(info.need, 23000.0 * 0.08)
 	assert_eq(info.done, 0.0)
 	boss.take_damage(_true_hit(500.0))
 	assert_eq(boss.channel().done, 500.0)
@@ -416,7 +416,7 @@ func test_the_boss_bar_shows_the_break_bar_while_he_channels() -> void:
 	boss.take_damage(_true_hit(800.0))
 	bar._process(0.0)
 	assert_eq(bar.channel.done, 800.0)
-	assert_eq(bar.channel.need, 1600.0)
+	assert_eq(bar.channel.need, 1840.0)
 	assert_gte(bar.custom_minimum_size.y, BossBar.SIZE.y + 30.0 + BossBar.BREAK_HEIGHT)
 
 
@@ -475,7 +475,7 @@ func _kill_karthus(stage: Stage) -> Karthus:
 	if boss == null:
 		return null
 	assert_eq(boss.global_position, stage.arena.boss_point)
-	assert_eq(boss.max_hp, 20000.0, "no scaling")
+	assert_eq(boss.max_hp, 23000.0, "no scaling")
 	assert_eq(boss.arena, stage.arena)
 	_quiet(boss)
 	await wait_physics_frames(1)
@@ -525,7 +525,7 @@ func test_the_revived_data_file_matches_the_plan() -> void:
 	if data == null:
 		return
 	assert_eq([data.id, data.kind, data.behavior, data.camp], [&"karthus_revived", &"mini_boss", &"karthus_revived", &"karthus_revived"])
-	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [16000.0, 30.0, 60.0, 85.0, DamageInfo.Type.MAGIC])
+	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [21000.0, 30.0, 60.0, 85.0, DamageInfo.Type.MAGIC])
 	assert_eq([data.attack_range, data.attack_interval, data.move_speed, data.projectile_speed], [600.0, 1.5, 250.0, 900.0])
 	assert_eq([data.purple_first, data.purple_repeat, data.gold], [5, 1, 300])
 	assert_ne(data.tint, Color.WHITE, "a pale teal tint")
@@ -542,7 +542,7 @@ func test_the_stage_builds_a_revived_karthus_unscaled() -> void:
 	var boss := stage.spawn_enemy(&"karthus_revived", Vector2(1000, 1000), 4)
 	assert_is(boss, Karthus)
 	assert_true((boss as Karthus).revived)
-	assert_eq(boss.max_hp, 16000.0, "no scaling")
+	assert_eq(boss.max_hp, 21000.0, "no scaling")
 	assert_false((stage.spawn_enemy(&"karthus", Vector2(1200, 1000), 4) as Karthus).revived)
 
 

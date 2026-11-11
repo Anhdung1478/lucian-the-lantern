@@ -116,7 +116,7 @@ func test_dark_lucian_matches_the_table() -> void:
 		return
 	var fields := ["id", "kind", "behavior", "max_hp", "armor", "mr", "damage", "damage_type", "projectile_speed",
 		"attack_range", "attack_interval", "move_speed", "radius", "purple_first", "purple_repeat", "gold", "xp"]
-	var table := [&"dark_lucian", &"boss", &"dark_lucian", 18000.0, 45.0, 45.0, 40.0, DamageInfo.Type.PHYSICAL, 1400.0,
+	var table := [&"dark_lucian", &"boss", &"dark_lucian", 25000.0, 45.0, 45.0, 40.0, DamageInfo.Type.PHYSICAL, 1400.0,
 		550.0, 1.3, 330.0, 40.0, 10, 2, 300, 0]
 	for i in fields.size():
 		assert_eq(data.get(fields[i]), table[i], fields[i])
@@ -276,9 +276,9 @@ func test_he_dodges_sideways_after_taking_6_percent_of_max_hp_within_1_5_s() -> 
 	await wait_physics_frames(1)
 	boss.take_damage(_true(1000.0))
 	await wait_physics_frames(3)
-	assert_false(boss.is_dashing(), "5.6% is not enough")
-	boss.take_damage(_true(100.0))
-	assert_almost_eq(boss.recent_damage(), 1100.0, 0.01, "recorded as it is taken")
+	assert_false(boss.is_dashing(), "4% is not enough")
+	boss.take_damage(_true(500.0))
+	assert_almost_eq(boss.recent_damage(), 1500.0, 0.01, "recorded as it is taken")
 	assert_false(boss.is_dashing(), "never inside the damage path")
 	assert_false(boss.untargetable)
 	await wait_physics_frames(1)
@@ -321,7 +321,7 @@ func test_a_real_shot_that_brings_him_to_6_percent_dodges_on_his_next_think() ->
 	# Damage inside area_entered, as an R bullet or a Rocketbelt bolt deals it.
 	var shot := LinearProjectile.new()
 	shot.launch(Vector2(-300, 0), Vector2.RIGHT, 2000.0, 600.0, 20.0)
-	shot.hit_enemy.connect(func(hit: Enemy, _prior: int) -> void: hit.take_damage(_true(1100.0)))
+	shot.hit_enemy.connect(func(hit: Enemy, _prior: int) -> void: hit.take_damage(_true(1500.0)))
 	effects.add_child(shot)
 	var dashed: bool = await wait_until(func() -> bool: return boss.is_dashing(), 1.0)
 	assert_true(dashed)
@@ -339,7 +339,7 @@ func test_a_homing_shot_in_flight_fizzles_when_he_dodges() -> void:
 	var shot := AttackProjectile.new()
 	shot.launch(Vector2(-2000, 0), boss, _true(300.0))
 	effects.add_child(shot)
-	boss.take_damage(_true(1100.0))
+	boss.take_damage(_true(1500.0))
 	var hp := boss.hp
 	await wait_physics_frames(2)
 	assert_true(boss.is_dashing())
@@ -358,7 +358,7 @@ func test_lucians_attack_order_on_him_survives_the_dash() -> void:
 		return
 	var shot: AttackProjectile = _effects(AttackProjectile)[0]
 	boss._cooldowns[E] = 0.0
-	boss.take_damage(_true(1100.0))
+	boss.take_damage(_true(1500.0))
 	var hp := boss.hp
 	await wait_physics_frames(2)
 	assert_true(boss.is_dashing(), "he dodges")
@@ -431,7 +431,7 @@ func test_a_dodge_near_the_edge_goes_the_open_way() -> void:
 	boss.arena = map
 	boss._cooldowns[E] = 0.0
 	await wait_physics_frames(1)
-	boss.take_damage(_true(1100.0))
+	boss.take_damage(_true(1500.0))
 	var done: bool = await wait_until(func() -> bool: return boss._cooldowns[E] > 0.0 and not boss.is_dashing(), 1.0)
 	assert_true(done)
 	assert_almost_eq(boss.global_position, Vector2(1000, 500), Vector2(2, 2))
@@ -656,7 +656,7 @@ func test_the_boss_wave_brings_him_to_the_river_and_a_kill_pays_10_purple() -> v
 	if boss == null:
 		return
 	assert_eq(boss.global_position, stage.arena.boss_point)
-	assert_eq(boss.max_hp, 18000.0, "no scaling")
+	assert_eq(boss.max_hp, 25000.0, "no scaling")
 	assert_eq(boss.arena, stage.arena)
 	assert_eq(boss.health_bar.size, EnemyUnit.BOSS_BAR)
 	_quiet(boss)
@@ -682,7 +682,7 @@ func test_a_real_shot_dodge_on_the_dark_lane_lands_on_open_ground() -> void:
 	stage.lucian.invulnerable = false
 	stage.lucian.global_position = map.boss_point - map.along() * 500.0
 	await wait_physics_frames(2)
-	_shoot(stage, boss, 1100.0)
+	_shoot(stage, boss, 1500.0)
 	var dashed: bool = await wait_until(func() -> bool: return boss.is_dashing(), 1.0)
 	assert_true(dashed)
 	var done: bool = await wait_until(func() -> bool: return not boss.is_dashing(), 0.5)

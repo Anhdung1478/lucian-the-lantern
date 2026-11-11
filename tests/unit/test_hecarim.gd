@@ -58,7 +58,7 @@ func test_hecarim_matches_the_table() -> void:
 	if data == null:
 		return
 	assert_eq([data.id, data.kind, data.behavior, data.camp], [&"hecarim", &"mini_boss", &"hecarim", &"hecarim"])
-	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [18000.0, 50.0, 40.0, 100.0, DamageInfo.Type.PHYSICAL])
+	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [25000.0, 50.0, 40.0, 100.0, DamageInfo.Type.PHYSICAL])
 	assert_eq([data.attack_interval, data.move_speed, data.radius, data.projectile_speed], [1.3, 360.0, 56.0, 0.0])
 	assert_eq([data.purple_first, data.purple_repeat, data.gold], [5, 1, 300])
 	assert_not_null(data.art)
@@ -73,7 +73,7 @@ func test_the_stage_builds_hecarim_unscaled() -> void:
 	await wait_process_frames(2)
 	var boss := stage.spawn_enemy(&"hecarim", Vector2(1000, 1000), 4)
 	assert_is(boss, Hecarim)
-	assert_eq(boss.max_hp, 18000.0, "no scaling")
+	assert_eq(boss.max_hp, 25000.0, "no scaling")
 
 
 func test_the_skill_table() -> void:

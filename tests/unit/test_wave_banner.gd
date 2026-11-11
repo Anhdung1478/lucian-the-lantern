@@ -234,7 +234,7 @@ func test_a_wave_start_shows_the_banner_on_the_huds_layer() -> void:
 	stage.jump_to_last_wave()
 	stage.runner.tick(0.1)
 	assert_true(banner.visible, "again for the next")
-	assert_eq(banner.shown, PackedStringArray(["WAVE 2"]))
+	assert_eq(banner.shown, PackedStringArray(["WAVE 4"]))
 
 
 func test_the_boss_wave_names_the_boss() -> void:

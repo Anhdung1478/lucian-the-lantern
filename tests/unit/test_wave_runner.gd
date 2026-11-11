@@ -57,7 +57,7 @@ func test_skip_returns_the_time_left() -> void:
 func test_the_boss_wave_comes_last_only_with_a_boss() -> void:
 	var runner := _runner(WavePlan.waves("2-3"), &"akshan")
 	watch_signals(runner)
-	for wave in 3:
+	for wave in WavePlan.waves("2-3").size():
 		runner.skip()
 		_spawn_all(runner)
 		_kill_all(runner)
@@ -68,13 +68,13 @@ func test_the_boss_wave_comes_last_only_with_a_boss() -> void:
 	assert_eq(spawned, [&"akshan"] as Array[StringName])
 	_kill_all(runner)
 	assert_signal_emit_count(runner, "cleared", 1)
-	assert_eq(runner.waves_done(), 4)
+	assert_eq(runner.waves_done(), WavePlan.waves("2-3").size() + 1)
 
 
 func test_without_a_boss_the_last_wave_clears_it() -> void:
 	var runner := _runner(WavePlan.waves("2-1"))
 	watch_signals(runner)
-	for wave in 2:
+	for wave in WavePlan.waves("2-1").size():
 		runner.skip()
 		_spawn_all(runner)
 		_kill_all(runner)
@@ -91,7 +91,7 @@ func test_finish_ends_it_once() -> void:
 
 
 func test_the_last_enemy_is_the_last_of_the_last_wave() -> void:
-	var runner := _runner(WavePlan.waves("2-1"))
+	var runner := _runner(WavePlan.waves("1-1"))
 	runner.skip()
 	_spawn_all(runner)
 	for i in spawned.size() - 1:
@@ -164,11 +164,11 @@ func test_act_3_waves_follow_the_table() -> void:
 	var letters := {&"raptors": "R", &"wolves": "W", &"krugs": "K", &"gromp": "G",
 		WavePlan.BLUE_SENTINEL: "B", WavePlan.RED_BRAMBLEBACK: "D", WavePlan.SCUTTLER: "S"}
 	var table := {
-		"3-1": "R W · R G B · W K G D S",
-		"3-2": "R W G · R K W B · W K G D S · R W",
-		"3-3": "R R W G · K W G B · R W K D S · R R W K G B",
-		"3-4": "R W G K · R W K B · W K G D S · R R K G B · R W D",
-		"3-5": "R W K G · R R W B · W K G D S · R W K G B · R R W K D S",
+		"3-1": "R W · R G B · W K G D S · R W K B · R R W G D",
+		"3-2": "R W G · R K W B · W K G D S · R R K G B · W W K G D · R W",
+		"3-3": "R R W G · K W G B · R W K D S · R R W K G B · R R W W K D S · R R W W K G B D",
+		"3-4": "R W G K · R W K B · W K G D S · R R K G B · R R W K G D · R R W W K B S · R W D",
+		"3-5": "R W K G · R R W B · W K G D S · R W K G B · R R W K D S · R R W W K G B D · R R R W W K G B D",
 	}
 	var mini_bosses := {"3-2": WavePlan.INFERNAL_DRAKE, "3-4": WavePlan.OCEAN_DRAKE}
 	for id: String in table:
@@ -202,9 +202,9 @@ func test_every_act_3_enemy_has_its_data() -> void:
 func test_act_4_waves_follow_the_table() -> void:
 	var letters := {WavePlan.SHADOW_MELEE: "m", WavePlan.SHADOW_RANGED: "r", WavePlan.SHADOW_SIEGE: "S", WavePlan.SHADOW_SUPER: "U"}
 	var table := {
-		"4-1": "8m 6r 1S · 8m 6r 2S · 8m 8r 1S 1U · 10m 8r 2S 1U",
-		"4-2": "8m 6r 2S · 8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 10m 10r 3S 1U",
-		"4-3": "8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 10m 10r 3S 1U · 12m 10r 2S 2U",
+		"4-1": "8m 6r 1S · 8m 6r 2S · 8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 12m 10r 2S 1U",
+		"4-2": "8m 6r 2S · 8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 10m 10r 3S 1U · 12m 10r 2S 2U · 12m 12r 3S 1U",
+		"4-3": "8m 8r 1S 1U · 10m 8r 2S 1U · 10m 10r 2S 1U · 10m 10r 3S 1U · 12m 10r 2S 2U · 12m 12r 3S 1U · 12m 12r 3S 2U",
 	}
 	for id: String in table:
 		assert_true(WavePlan.has_stage(id), id)

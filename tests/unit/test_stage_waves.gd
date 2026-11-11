@@ -88,7 +88,7 @@ func _shoot(stage: Stage, enemy: Enemy, amount: float) -> void:
 
 func test_a_shot_that_ends_the_stage_shows_the_result_safely() -> void:
 	var stage: Stage = await _stage(2, 1)
-	for wave in 2:
+	for wave in WavePlan.waves("2-1").size():
 		stage.skip_break()
 		for i in 20:
 			stage.runner.tick(WaveRunner.GROUP_GAP)
@@ -124,7 +124,7 @@ func test_skip_gives_the_regen_of_the_time_skipped() -> void:
 
 func test_clearing_every_wave_shows_stage_cleared() -> void:
 	var stage: Stage = await _stage(2, 1)
-	for wave in 2:
+	for wave in WavePlan.waves("2-1").size():
 		stage.skip_break()
 		await _kill_wave(stage)
 		await wait_process_frames(1)
@@ -325,13 +325,13 @@ func test_the_result_lists_the_stats() -> void:
 	stage.stats.damage_dealt = 41234.0
 	stage.show_result(true)
 	var texts := stage.result.find_children("*", "Label", true, false).map(func(label: Label) -> String: return label.text)
-	for text in ["Kills", "87", "Damage dealt", "41.2k", "Gold earned", "Level reached", "Waves", "0 / 2"]:
+	for text in ["Kills", "87", "Damage dealt", "41.2k", "Gold earned", "Level reached", "Waves", "0 / 4"]:
 		assert_true(text in texts, "%s in %s" % [text, texts])
 
 
 func test_stage_is_open_shows_on_a_first_clear_only() -> void:
 	var stage: Stage = await _stage(2, 1)
-	for wave in 2:
+	for wave in WavePlan.waves("2-1").size():
 		stage.skip_break()
 		await _kill_wave(stage)
 		await wait_process_frames(1)
@@ -342,7 +342,7 @@ func test_stage_is_open_shows_on_a_first_clear_only() -> void:
 	add_child_autofree(again)
 	await wait_process_frames(2)
 	again.lucian.invulnerable = true
-	for wave in 2:
+	for wave in WavePlan.waves("2-1").size():
 		again.skip_break()
 		await _kill_wave(again)
 		await wait_process_frames(1)
@@ -376,7 +376,7 @@ func test_next_stage_shows_only_when_it_can_be_played() -> void:
 func test_6_1_runs_its_waves() -> void:
 	var first: Stage = await _stage(6, 1)
 	assert_eq(first.runner.wave_count(), Journey.waves(6, 1))
-	assert_eq(first.runner.total_waves(), 6, "no boss wave")
+	assert_eq(first.runner.total_waves(), 8, "no boss wave")
 	first.skip_break()
 	for i in 20:
 		first.runner.tick(WaveRunner.GROUP_GAP)
@@ -452,8 +452,9 @@ func test_a_split_brings_2_units_where_it_died_and_the_wave_waits_for_them() -> 
 
 func test_a_split_on_the_last_wave_never_ends_the_stage() -> void:
 	var stage: Stage = await _stage(2, 1)
-	stage.skip_break()
-	await _kill_wave(stage)
+	for wave in WavePlan.waves("2-1").size() - 1:
+		stage.skip_break()
+		await _kill_wave(stage)
 	stage.skip_break()
 	# A boss's kind, so its loot is sure.
 	var krug := _alone_in_wave(stage, _krug(&"boss"))

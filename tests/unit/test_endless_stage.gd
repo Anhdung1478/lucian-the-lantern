@@ -362,7 +362,7 @@ func test_a_story_gromp_keeps_its_listed_burn() -> void:
 func test_a_story_boss_keeps_its_hp_and_skill_hits() -> void:
 	var stage: Stage = await _story(2, 1)
 	var akshan := stage.spawn_enemy(&"akshan", stage.arena.boss_point) as Boss
-	assert_almost_eq(akshan.max_hp, 5000.0, 0.01)
+	assert_almost_eq(akshan.max_hp, 7500.0, 0.01)
 	assert_almost_eq(akshan.skill_hit(100.0, DamageInfo.Type.PHYSICAL, &"test").amount, 100.0, 0.01)
 
 
@@ -524,7 +524,7 @@ func test_the_modifier_row_reads_its_downside_and_none_after_nothing() -> void:
 func test_the_story_result_keeps_its_waves_row() -> void:
 	var stage: Stage = await _story(2, 1)
 	stage.show_result(false)
-	assert_eq(_result_rows(stage)[1], ["Waves", "0 / 2"])
+	assert_eq(_result_rows(stage)[1], ["Waves", "0 / 4"])
 	assert_false("Modifier" in _row_names(stage))
 	assert_eq(stage.result.title.text, "DEFEATED")
 

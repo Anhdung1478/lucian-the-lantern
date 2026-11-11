@@ -114,7 +114,7 @@ func test_his_data_file_matches_the_plan() -> void:
 	if data == null:
 		return
 	assert_eq([data.id, data.kind, data.behavior, data.display_name], [&"thresh_final", &"boss", &"thresh_final", "Thresh"])
-	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [16000.0, 45.0, 45.0, 85.0, DamageInfo.Type.PHYSICAL])
+	assert_eq([data.max_hp, data.armor, data.mr, data.damage, data.damage_type], [22000.0, 45.0, 45.0, 85.0, DamageInfo.Type.PHYSICAL])
 	assert_eq([data.attack_range, data.attack_interval, data.move_speed, data.radius, data.projectile_speed], [450.0, 1.6, 320.0, 48.0, 900.0])
 	assert_eq([data.purple_first, data.purple_repeat, data.gold], [20, 4, 300])
 	assert_eq(data.summon_id, &"", "no periodic summons: Dark Passage brings his souls")
@@ -126,7 +126,7 @@ func test_the_stage_builds_a_final_thresh_unscaled() -> void:
 	var stage: Stage = await _stage()
 	var boss := stage.spawn_enemy(&"thresh_final", Vector2(2800, 1500), 4)
 	assert_is(boss, ThreshFinal)
-	assert_eq(boss.max_hp, 16000.0, "no scaling")
+	assert_eq(boss.max_hp, 22000.0, "no scaling")
 	assert_eq((boss as ThreshFinal).stop_share, 0.0, "never stops at half")
 	assert_false(stage.spawn_enemy(&"thresh_1", Vector2(2800, 1900)) is ThreshFinal, "Act 1's stays a plain Thresh")
 
@@ -137,11 +137,11 @@ func test_the_stage_builds_a_final_thresh_unscaled() -> void:
 func test_act_6s_stages_follow_the_table() -> void:
 	var letters := {"w": WavePlan.MIST_WALKER, "l": WavePlan.LANTERN_SOUL, "R": WavePlan.SPECTRAL_RIDER, "C": WavePlan.CHAIN_WARDEN}
 	var table := {
-		"6-1": "8w 4l · 8w 6l · 8w 6l 1R · 10w 6l 1C · 10w 8l 1R · 10w 8l 1R 1C",
-		"6-2": "8w 6l · 10w 6l 1R · 10w 6l 1C · 10w 8l 1R · 12w 8l 1C · 12w 8l 1R 1C",
-		"6-3": "10w 6l · 10w 8l 1R · 10w 8l 1C · 12w 8l 1R · 12w 8l 2C · 12w 10l 1R 1C · 14w 10l 2R 1C",
-		"6-4": "10w 8l 1R · 10w 8l 1C · 12w 8l 1R 1C · 12w 10l 2R · 12w 10l 2C · 14w 10l 1R 1C · 14w 10l 2R 1C",
-		"6-5": "10w 8l 1R · 12w 8l 1C · 12w 10l 1R 1C · 14w 10l 2R · 14w 10l 2C · 14w 12l 1R 1C · 16w 12l 2R 2C",
+		"6-1": "8w 4l · 8w 6l · 8w 6l 1R · 10w 6l 1C · 10w 8l 1R · 10w 8l 1R 1C · 12w 8l 1R 1C · 12w 10l 2R",
+		"6-2": "8w 6l · 10w 6l 1R · 10w 6l 1C · 10w 8l 1R · 12w 8l 1C · 12w 8l 1R 1C · 12w 10l 2R · 12w 8l 1R 1C",
+		"6-3": "10w 6l · 10w 8l 1R · 10w 8l 1C · 12w 8l 1R · 12w 8l 2C · 12w 10l 1R 1C · 14w 10l 2R 1C · 14w 10l 2R 2C · 14w 12l 2R 2C",
+		"6-4": "10w 8l 1R · 10w 8l 1C · 12w 8l 1R 1C · 12w 10l 2R · 12w 10l 2C · 14w 10l 1R 1C · 14w 10l 2R 1C · 14w 12l 1R 2C · 14w 10l 2R 1C",
+		"6-5": "10w 8l 1R · 12w 8l 1C · 12w 10l 1R 1C · 14w 10l 2R · 14w 10l 2C · 14w 12l 1R 1C · 16w 12l 2R 2C · 16w 14l 2R 2C · 18w 14l 3R 2C",
 	}
 	var mini_bosses := {"6-2": WavePlan.KARTHUS_REVIVED, "6-4": WavePlan.HECARIM}
 	for id: String in table:
@@ -805,17 +805,17 @@ func test_dark_passage_brings_3_summoned_souls_counted_in_the_wave() -> void:
 func test_in_6_5_he_comes_in_the_boss_wave_and_his_souls_get_its_scaling() -> void:
 	var stage: Stage = await _stage()
 	var boss := await _boss_wave(stage)
-	assert_eq(boss.wave, 8, "6-5's 7 waves, then the boss wave")
-	assert_eq(boss.max_hp, 16000.0, "a boss's own stats ignore the wave")
+	assert_eq(boss.wave, 10, "6-5's 9 waves, then the boss wave")
+	assert_eq(boss.max_hp, 22000.0, "a boss's own stats ignore the wave")
 	await _to_phase_2(boss)
 	var souls := await _souls(stage, boss)
 	assert_eq(souls.size(), 3)
-	# Act 6, wave 8: HP x 2.25 x 1.7 and damage x 1.75 x 1.7 (Normal), as for
+	# Act 6, wave 10: HP x 2.25 x 1.9 and damage x 1.75 x 1.9 (Normal), as for
 	# the boss wave's other enemies, not wave 1's x 2.25 / x 1.75.
 	for soul: EnemyUnit in souls:
-		assert_eq(soul.wave, 8)
-		assert_almost_eq(soul.max_hp, 150.0 * 2.25 * 1.7, 0.01)
-		assert_almost_eq(soul.damage, 22.0 * 1.75 * 1.7, 0.01)
+		assert_eq(soul.wave, 10)
+		assert_almost_eq(soul.max_hp, 150.0 * 2.25 * 1.9, 0.01)
+		assert_almost_eq(soul.damage, 22.0 * 1.75 * 1.9, 0.01)
 	assert_engine_error_count(0)
 
 
@@ -1030,11 +1030,11 @@ func test_a_soul_of_his_killed_near_him_heals_him_3_percent() -> void:
 	far.take_damage(_lethal())
 	assert_eq(boss.hp, 8000.0, "too far from him")
 	near.take_damage(_lethal())
-	assert_almost_eq(boss.hp, 8000.0 + 16000.0 * 0.03, 0.001)
+	assert_almost_eq(boss.hp, 8000.0 + 22000.0 * 0.03, 0.001)
 	assert_eq(boss.harvested, 1)
 	boss._heal_number_step(EnemyUnit.HEAL_NUMBER_TIME)
 	var numbers := stage.damage_numbers.get_children().filter(func(node: Node) -> bool:
-		return node is FloatingNumber and (node as FloatingNumber).text == "+480")
+		return node is FloatingNumber and (node as FloatingNumber).text == "+660")
 	assert_eq(numbers.size(), 1, "a green number over him")
 	assert_engine_error_count(0)
 
@@ -1047,7 +1047,7 @@ func test_he_harvests_10_souls_a_fight_at_most() -> void:
 	for i in ThreshFinal.HARVEST_MAX + 2:
 		boss.summon_killed(soul)
 	assert_eq(boss.harvested, ThreshFinal.HARVEST_MAX)
-	assert_almost_eq(boss.hp, 1000.0 + 10 * 480.0, 0.001, "30% of his HP in all")
+	assert_almost_eq(boss.hp, 1000.0 + 10 * 660.0, 0.001, "30% of his HP in all")
 
 
 func test_grievous_wounds_cuts_his_harvest() -> void:
@@ -1056,7 +1056,7 @@ func test_grievous_wounds_cuts_his_harvest() -> void:
 	boss.hp = 1000.0
 	boss.add_status(Enemy.GRIEVOUS_WOUNDS, 3.0)
 	boss.summon_killed(_soul(boss, 100.0))
-	assert_almost_eq(boss.hp, 1000.0 + 480.0 * Enemy.GRIEVOUS_HEALING, 0.001)
+	assert_almost_eq(boss.hp, 1000.0 + 660.0 * Enemy.GRIEVOUS_HEALING, 0.001)
 
 
 func test_no_harvest_while_he_is_down_or_rising_or_of_another_kind() -> void:
@@ -1085,7 +1085,7 @@ func test_a_soul_freed_at_his_side_is_no_harvest() -> void:
 	assert_eq(boss.hp, 1000.0)
 	soul = _soul(boss, 100.0)
 	soul.take_damage(_lethal())
-	assert_almost_eq(boss.hp, 1480.0, 0.001, "a kill is")
+	assert_almost_eq(boss.hp, 1660.0, 0.001, "a kill is")
 
 
 # --- Act 1's Thresh, as he was ----------------------------------------------------------

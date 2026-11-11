@@ -82,9 +82,9 @@ func test_the_drakes_match_the_table() -> void:
 	var fields := ["kind", "behavior", "camp", "max_hp", "armor", "mr", "damage", "damage_type", "projectile_speed",
 		"attack_range", "attack_interval", "move_speed", "radius", "purple_first", "purple_repeat"]
 	var table := {
-		"infernal_drake": [&"mini_boss", &"infernal_drake", &"drake", 6500.0, 40.0, 40.0, 50.0, DamageInfo.Type.MAGIC, 700.0,
+		"infernal_drake": [&"mini_boss", &"infernal_drake", &"drake", 8500.0, 40.0, 40.0, 50.0, DamageInfo.Type.MAGIC, 700.0,
 			600.0, 1.6, 260.0, 70.0, 5, 1],
-		"ocean_drake": [&"mini_boss", &"ocean_drake", &"drake", 10000.0, 40.0, 50.0, 55.0, DamageInfo.Type.MAGIC, 800.0,
+		"ocean_drake": [&"mini_boss", &"ocean_drake", &"drake", 12500.0, 40.0, 50.0, 55.0, DamageInfo.Type.MAGIC, 800.0,
 			600.0, 1.5, 260.0, 70.0, 5, 1],
 	}
 	for id: String in table:
@@ -105,11 +105,11 @@ func test_the_drakes_match_the_table() -> void:
 
 func test_each_drake_comes_last_in_the_last_wave_of_its_stage_and_nowhere_else() -> void:
 	var waves := WavePlan.waves("3-2")
-	assert_eq(waves.size(), 4)
-	assert_eq(waves[3].back(), &"infernal_drake")
+	assert_eq(waves.size(), 6)
+	assert_eq(waves[5].back(), &"infernal_drake")
 	waves = WavePlan.waves("3-4")
-	assert_eq(waves.size(), 5)
-	assert_eq(waves[4].back(), &"ocean_drake")
+	assert_eq(waves.size(), 7)
+	assert_eq(waves[6].back(), &"ocean_drake")
 	var seen := {}
 	for stage_id: String in WavePlan.STAGES:
 		for wave: Array in WavePlan.waves(stage_id):
@@ -136,13 +136,13 @@ func test_the_stage_builds_each_drake_unscaled_in_the_pit() -> void:
 	assert_lt(stage._spawn_point(_data("infernal_drake")).distance_to(pit), 200.0, "it comes out of the pit")
 	var infernal := stage.spawn_enemy(&"infernal_drake", pit, 4)
 	assert_is(infernal, InfernalDrake)
-	assert_eq(infernal.max_hp, 6500.0, "no scaling")
+	assert_eq(infernal.max_hp, 8500.0, "no scaling")
 	assert_eq(infernal.damage, 50.0)
 	assert_eq((infernal as Boss).arena, stage.arena, "it knows the map, for walkable ground")
 	assert_eq(infernal.warning_parent, stage.get_node("Warnings"))
 	var ocean := stage.spawn_enemy(&"ocean_drake", pit + Vector2(200, 0), 5)
 	assert_is(ocean, OceanDrake)
-	assert_eq(ocean.max_hp, 10000.0, "no scaling")
+	assert_eq(ocean.max_hp, 12500.0, "no scaling")
 	assert_eq(ocean.health_bar.size, EnemyUnit.BOSS_BAR)
 
 
