@@ -2207,6 +2207,11 @@ func shoot_for(enemy: Enemy, seconds: float) -> void:
 
 
 ## The end screen's stats column, as "Label value" pairs.
+## The end screen's essences have counted up to their amounts.
+func wait_for_result_count() -> void:
+	await wait(StageResult.COUNT_TIME + 0.1)
+
+
 func result_rows() -> String:
 	var rows := []
 	for row in game_stage().result._stats.get_children():
@@ -2421,6 +2426,7 @@ func scenario_act1_result() -> void:
 		" ", SaveGame.instance().bosses, "  waves (expect 3 / 3): ", game.runner.waves_done(), " / ", game.runner.total_waves())
 	print("buttons (expect retry, next to 2-1 and main lit): ", game.result.retry_button.visible, " ", game.result.next_button.visible, " ", game.result.main_button.text,
 		"  HUD hidden (expect true): ", not game.hud.visible)
+	await wait_for_result_count()
 	await shot("act1_result_0")
 	paused = false
 
@@ -2439,6 +2445,7 @@ func scenario_game_over() -> void:
 	print("result (expect GAME OVER): ", game.result.title.text, "  retry shown (expect false): ", game.result.retry_button.visible,
 		"  main button (expect Back to title): ", game.result.main_button.text)
 	print("stats (expect Damage dealt > 0): ", result_rows())
+	await wait_for_result_count()
 	await shot("game_over_0")
 	paused = false
 
@@ -2628,6 +2635,7 @@ func scenario_act3_result() -> void:
 	print("reward lines (expect +5 purple … first kill, Stage 3-3 is open): ", game.reward_lines)
 	print("stats (expect Damage dealt > 0): ", result_rows())
 	print("buttons (expect retry, next and main): ", game.result.retry_button.visible, " ", game.result.next_button.visible, " ", game.result.main_button.text)
+	await wait_for_result_count()
 	await shot("act3_result_0")
 	paused = false
 
@@ -3554,6 +3562,7 @@ func scenario_ending_cutscene() -> void:
 	await wait(0.4)
 	print("result (expect STAGE CLEARED): ", game.result.title.text, "  reward lines: ", game.reward_lines)
 	print("purple (expect 20): ", SaveGame.instance().essences.amount(Essences.PURPLE), "  stats (expect Damage dealt > 0): ", result_rows())
+	await wait_for_result_count()
 	await shot("ending_cutscene_5_result")
 	paused = false
 
@@ -3680,6 +3689,7 @@ func scenario_defeat() -> void:
 	print("blue kept in the save (expect %d): %d" % [blue, SaveGame.instance().essences.amount(Essences.BLUE)])
 	print("buttons (expect Retry shown, Next hidden): ", game.result.retry_button.visible, " ", game.result.next_button.visible)
 	print("stats (expect Damage dealt > 0): ", result_rows())
+	await wait_for_result_count()
 	await shot("defeat_1_result")
 	paused = false
 
@@ -4061,6 +4071,7 @@ func scenario_endless_run_over() -> void:
 	print("reward lines (expect New best: 22 waves!): ", game.reward_lines)
 	print("buttons (expect Retry shown, Next hidden, Main screen): ", game.result.retry_button.visible, " ",
 		game.result.next_button.visible, " ", game.result.main_button.text)
+	await wait_for_result_count()
 	await shot("endless_run_over_0_result")
 	game.result.main_button.pressed.emit()
 	await wait(0.6)
