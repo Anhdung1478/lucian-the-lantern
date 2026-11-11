@@ -61,7 +61,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _edge_direction() -> Vector2:
-	var mouse := get_viewport().get_mouse_position()
+	var mouse := Pointer.on_screen(self)
 	var view := get_viewport().get_visible_rect().size
 	var direction := Vector2.ZERO
 	if mouse.x <= edge_margin:

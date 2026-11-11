@@ -190,7 +190,7 @@ func _kill_all() -> void:
 
 ## A minion near the cursor; it counts toward the wave.
 func _spawn(id: StringName) -> void:
-	stage.spawn_enemy(id, lucian.get_global_mouse_position())
+	stage.spawn_enemy(id, Pointer.in_world(lucian))
 	if stage.runner:
 		stage.runner.enemy_spawned()
 

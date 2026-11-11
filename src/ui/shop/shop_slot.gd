@@ -71,7 +71,7 @@ func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(SIZE, SIZE))
 	var box := StyleBoxFlat.new()
 	box.bg_color = FILL
-	var hovered := get_global_rect().has_point(get_global_mouse_position()) and item() != null
+	var hovered := get_global_rect().has_point(Pointer.in_world(self)) and item() != null
 	box.border_color = HOVER_BORDER if hovered else BORDER
 	box.set_border_width_all(2)
 	box.set_corner_radius_all(6)

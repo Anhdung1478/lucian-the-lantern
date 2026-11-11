@@ -10,7 +10,9 @@ extends SceneTree
 ##   window/size/initial_position_type=0
 ##   window/size/initial_position=Vector2i(4000, 4000)
 ##   godot --audio-driver Dummy --path . -s res://tests/tools/screenshot.gd -- ...
-## The tool never confines the mouse (Stage.confine_mouse).
+## The tool never confines the mouse (Stage.confine_mouse), never moves or
+## resizes its window (GameSettings.owns_window) and never moves the real
+## cursor: mouse_move() places a pretend one (Pointer.pretend).
 ## SCREENSHOT_RUN=<name> gives a run its own settings and save files, so
 ## several scenarios can run at the same time.
 
@@ -48,6 +50,8 @@ const ACT_SCENARIOS := {
 	"level_up": [2, 1],
 }
 
+## Where the window was when the run started; shot() stops the run if it moved.
+var _window_home := Vector2i.ZERO
 ## This run's settings file and save slots (SCREENSHOT_RUN gives it its own).
 var settings_path := SETTINGS_PATH
 var save_prefix := SAVE_PREFIX
@@ -59,9 +63,15 @@ var out_dir := ""
 
 
 func _initialize() -> void:
-	# The window may sit off-screen and unfocused (see the usage above): a
-	# confined mouse would be taken from the desktop.
+	# The window may sit off-screen and unfocused (see the usage above). It
+	# must never come back on screen, confine the mouse or move the real
+	# cursor: the game leaves the window alone, and reads a pretend mouse.
 	Stage.confine_mouse = false
+	GameSettings.owns_window = false
+	Pointer.pretend = Vector2(960, 540)
+	_window_home = DisplayServer.window_get_position()
+	print("window at ", _window_home, " size ", DisplayServer.window_get_size(),
+		" no_focus ", DisplayServer.window_get_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS))
 	var args := OS.get_cmdline_user_args()
 	var scenario: String = args[0] if args.size() > 0 else "move"
 	out_dir = args[1] if args.size() > 1 else OS.get_user_data_dir()
@@ -340,6 +350,11 @@ func _run(scenario: String) -> void:
 
 
 func shot(file_name: String) -> void:
+	# A window that moved is on its way onto the desktop: stop at once.
+	if DisplayServer.window_get_position() != _window_home:
+		push_error("The window moved from %s to %s; stopping." % [_window_home, DisplayServer.window_get_position()])
+		quit(1)
+		return
 	# Let every node process once more so the HUD shows the latest values.
 	await process_frame
 	await RenderingServer.frame_post_draw
@@ -559,11 +574,11 @@ func scenario_menu() -> void:
 
 
 ## Moves the mouse to `canvas_pos` (1920x1080 canvas units), as if the player
-## did it. `held` keeps the left button down during the motion. The OS cursor
-## is warped there too, so its own motion events agree with ours.
+## did it. `held` keeps the left button down during the motion. The real
+## cursor is never touched: the game reads the pretend one (Pointer).
 func mouse_move(canvas_pos: Vector2, held := false) -> void:
 	var window_pos := root.get_final_transform() * canvas_pos
-	Input.warp_mouse(window_pos)
+	Pointer.pretend = canvas_pos
 	var event := InputEventMouseMotion.new()
 	event.position = window_pos
 	event.global_position = window_pos
@@ -574,7 +589,7 @@ func mouse_move(canvas_pos: Vector2, held := false) -> void:
 
 func mouse_button(canvas_pos: Vector2, pressed: bool) -> void:
 	var window_pos := root.get_final_transform() * canvas_pos
-	Input.warp_mouse(window_pos)
+	Pointer.pretend = canvas_pos
 	var event := InputEventMouseButton.new()
 	event.button_index = MOUSE_BUTTON_LEFT
 	event.pressed = pressed
@@ -745,7 +760,7 @@ func scenario_gold() -> void:
 
 func mouse_right_click(canvas_pos: Vector2) -> void:
 	var window_pos := root.get_final_transform() * canvas_pos
-	Input.warp_mouse(window_pos)
+	Pointer.pretend = canvas_pos
 	for pressed in [true, false]:
 		var event := InputEventMouseButton.new()
 		event.button_index = MOUSE_BUTTON_RIGHT

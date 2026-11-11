@@ -160,7 +160,7 @@ func _input(event: InputEvent) -> void:
 				and not WHEEL_BUTTONS.has(mouse.button_index) \
 				and Engine.get_process_frames() != _listen_frame:
 			var button: Button = _bind_buttons[_listening]
-			if button.get_global_rect().has_point(button.get_global_mouse_position()):
+			if button.get_global_rect().has_point(Pointer.in_world(button)):
 				_bind(mouse)
 				get_viewport().set_input_as_handled()
 			else:

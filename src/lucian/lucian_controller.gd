@@ -238,4 +238,4 @@ func _merchant_under_cursor() -> Merchant:
 
 
 func _cursor() -> Vector2:
-	return lucian.get_global_mouse_position()
+	return Pointer.in_world(lucian)

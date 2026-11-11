@@ -42,7 +42,7 @@ func is_under(point: Vector2) -> bool:
 
 
 func _process(_delta: float) -> void:
-	var hovered := is_under(get_global_mouse_position())
+	var hovered := is_under(Pointer.in_world(self))
 	if hovered != _hovered:
 		_hovered = hovered
 		queue_redraw()

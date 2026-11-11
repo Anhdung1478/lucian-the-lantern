@@ -89,6 +89,9 @@ const SHORT_LABEL_MAX := 5
 const MSAA := {"low": Viewport.MSAA_DISABLED, "medium": Viewport.MSAA_2X, "high": Viewport.MSAA_4X}
 
 static var _instance: GameSettings
+## False forbids every change to the OS window: its mode, size and place.
+## The screenshot tool's window sits off-screen and must stay there.
+static var owns_window := true
 
 var path := DEFAULT_PATH
 
@@ -258,15 +261,16 @@ func apply_input() -> void:
 func apply_display() -> void:
 	if DisplayServer.get_name() == "headless":
 		return
-	match _values[&"window_mode"]:
-		"fullscreen":
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
-		"borderless":
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-		_:
-			# A maximized window counts as windowed and stays as it is.
-			if DisplayServer.window_get_mode() not in [DisplayServer.WINDOW_MODE_WINDOWED, DisplayServer.WINDOW_MODE_MAXIMIZED]:
-				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	if owns_window:
+		match _values[&"window_mode"]:
+			"fullscreen":
+				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+			"borderless":
+				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+			_:
+				# A maximized window counts as windowed and stays as it is.
+				if DisplayServer.window_get_mode() not in [DisplayServer.WINDOW_MODE_WINDOWED, DisplayServer.WINDOW_MODE_MAXIMIZED]:
+					DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 	DisplayServer.window_set_vsync_mode(
 		DisplayServer.VSYNC_ENABLED if _values[&"vsync"] else DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = int(_values[&"max_fps"])
@@ -279,7 +283,7 @@ func apply_display() -> void:
 ## restored first). A size too big for the screen shrinks to fit, title bar
 ## included. Fullscreen modes keep the screen's own size.
 func apply_resolution() -> void:
-	if DisplayServer.get_name() == "headless" or _values[&"window_mode"] != "windowed":
+	if not owns_window or DisplayServer.get_name() == "headless" or _values[&"window_mode"] != "windowed":
 		return
 	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)

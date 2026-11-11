@@ -127,7 +127,7 @@ func _position_card() -> void:
 			if at.x + size.x > screen.end.x:
 				at.x = anchor.position.x - GAP - size.x
 		Place.CURSOR:
-			at = get_viewport().get_mouse_position() + CURSOR_OFFSET
+			at = Pointer.on_screen(self) + CURSOR_OFFSET
 	_card.position = at.clamp(screen.position, screen.end - size)
 	_card.modulate.a = 1.0
 	if _old_card:
