@@ -55,6 +55,34 @@ func test_shieldbow_shields_before_dropping_under_30_percent() -> void:
 	assert_false(lucian.item_cooldown(&"immortal_shieldbow").is_ready())
 
 
+func test_shieldbow_ignores_a_magic_only_shield_on_a_physical_hit() -> void:
+	_equip(&"immortal_shieldbow")
+	lucian.shields.add(&"magebane", 10000.0, 0.0, true)
+	lucian.hp = lucian.stats.max_hp * 0.35
+	lucian.lose_hp(lucian.stats.max_hp * 0.1, DamageInfo.Type.PHYSICAL)
+	assert_true(lucian.shields.has(&"lifeline"))
+	assert_false(lucian.item_cooldown(&"immortal_shieldbow").is_ready())
+	assert_almost_eq(lucian.shields.amount(&"magebane"), 10000.0, 0.01)
+
+
+func test_shieldbow_ignores_a_physical_only_shield_on_a_magic_hit() -> void:
+	_equip(&"immortal_shieldbow")
+	lucian.shields.add(&"endurance", 10000.0, 0.0, false, true)
+	lucian.hp = lucian.stats.max_hp * 0.35
+	lucian.lose_hp(lucian.stats.max_hp * 0.1, DamageInfo.Type.MAGIC)
+	assert_true(lucian.shields.has(&"lifeline"))
+	assert_false(lucian.item_cooldown(&"immortal_shieldbow").is_ready())
+
+
+func test_shieldbow_waits_while_a_shield_would_take_the_hit() -> void:
+	_equip(&"immortal_shieldbow")
+	lucian.shields.add(&"magebane", 10000.0, 0.0, true)
+	lucian.hp = lucian.stats.max_hp * 0.35
+	lucian.lose_hp(lucian.stats.max_hp * 0.1, DamageInfo.Type.MAGIC)
+	assert_false(lucian.shields.has(&"lifeline"))
+	assert_true(lucian.item_cooldown(&"immortal_shieldbow").is_ready())
+
+
 func test_deaths_dance_delays_30_percent() -> void:
 	_equip(&"deaths_dance")
 	var before := lucian.hp

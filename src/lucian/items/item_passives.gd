@@ -346,12 +346,14 @@ func delay_damage(amount: float) -> float:
 	return amount - delayed
 
 
-## Immortal Shieldbow: a hit that would leave Lucian under 30% HP first
-## gives him Lifeline (300 at level 1 to 650 at 18).
-func before_hp_loss(amount: float) -> void:
+## Immortal Shieldbow: a hit of `type` that would leave Lucian under 30% HP
+## first gives him Lifeline (300 at level 1 to 650 at 18). Only the shields
+## that would take this hit count (a magic-only shield can't stop a physical
+## hit).
+func before_hp_loss(amount: float, type: DamageInfo.Type) -> void:
 	if not has(&"immortal_shieldbow") or not lucian.item_cooldown(&"immortal_shieldbow").is_ready():
 		return
-	if lucian.hp + lucian.shields.total() - amount >= lucian.stats.max_hp * LIFELINE_HP:
+	if lucian.hp + lucian.shields.total_for(type) - amount >= lucian.stats.max_hp * LIFELINE_HP:
 		return
 	var share := (lucian.progress.level - 1) / float(ChampionProgress.MAX_LEVEL - 1)
 	lucian.add_shield(&"lifeline", lerpf(LIFELINE_MIN, LIFELINE_MAX, share), LIFELINE_TIME)

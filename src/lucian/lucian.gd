@@ -788,7 +788,7 @@ func add_jungle_buff(id: StringName) -> bool:
 func lose_hp(amount: float, type: DamageInfo.Type) -> void:
 	if dead or in_stasis():
 		return
-	passives.before_hp_loss(amount)
+	passives.before_hp_loss(amount, type)
 	hp -= shields.absorb(amount, type)
 	if hp <= 0.0:
 		hp = 0.0

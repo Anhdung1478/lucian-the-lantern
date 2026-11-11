@@ -28,6 +28,16 @@ func test_a_magic_only_shield_ignores_physical_damage() -> void:
 	assert_almost_eq(shields.amount(&"magebane"), 60.0, 0.001)
 
 
+func test_total_for_counts_only_the_shields_that_take_the_type() -> void:
+	shields.add(&"magebane", 100.0, 0.0, true)
+	shields.add(&"endurance", 40.0, 0.0, false, true)
+	shields.add(&"barrier", 10.0, 2.0)
+	assert_almost_eq(shields.total_for(DamageInfo.Type.PHYSICAL), 50.0, 0.001)
+	assert_almost_eq(shields.total_for(DamageInfo.Type.MAGIC), 110.0, 0.001)
+	assert_almost_eq(shields.total_for(DamageInfo.Type.TRUE), 10.0, 0.001)
+	assert_almost_eq(shields.total(), 150.0, 0.001)
+
+
 func test_a_timed_shield_runs_out_and_a_lasting_one_stays() -> void:
 	shields.add(&"barrier", 50.0, 1.0)
 	shields.add(&"ichorshield", 20.0)

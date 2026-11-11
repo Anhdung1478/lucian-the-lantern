@@ -65,6 +65,15 @@ func total() -> float:
 	return sum
 
 
+## What the shields that take damage of `type` hold between them.
+func total_for(type: DamageInfo.Type) -> float:
+	var sum := 0.0
+	for shield: Dictionary in _shields.values():
+		if _takes(shield, type):
+			sum += shield.amount
+	return sum
+
+
 ## Takes `damage` of `type` out of the shields; returns what gets through.
 func absorb(damage: float, type: DamageInfo.Type) -> float:
 	for id in ORDER:
@@ -73,9 +82,7 @@ func absorb(damage: float, type: DamageInfo.Type) -> float:
 		if not _shields.has(id):
 			continue
 		var shield: Dictionary = _shields[id]
-		if shield.magic_only and type != DamageInfo.Type.MAGIC:
-			continue
-		if shield.physical_only and type != DamageInfo.Type.PHYSICAL:
+		if not _takes(shield, type):
 			continue
 		var taken := minf(shield.amount, damage)
 		shield.amount -= taken
@@ -92,3 +99,13 @@ func tick(delta: float) -> void:
 			shield.left -= delta
 			if shield.left <= 0.0:
 				_shields.erase(id)
+
+
+## A magic-only shield takes only magic damage, a physical-only one only
+## physical damage; the rest take any.
+func _takes(shield: Dictionary, type: DamageInfo.Type) -> bool:
+	if shield.magic_only:
+		return type == DamageInfo.Type.MAGIC
+	if shield.physical_only:
+		return type == DamageInfo.Type.PHYSICAL
+	return true
