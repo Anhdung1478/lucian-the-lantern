@@ -1,7 +1,9 @@
 class_name ItemIcon
 extends Control
 ## Draws an item's icon. Items without an icon yet get a colored tile with
-## their code. Hovering shows the item card when `tooltips` is on.
+## their code. Hovering shows the item card when `tooltips` is on. When
+## `framed`, the icon sits in a dark well whose rim follows the item
+## (UiStyle.item_rim) and is gold while `lit`.
 
 ## Tile colors by fragment code; legendaries use LEGENDARY_COLOR.
 const CODE_COLORS := {
@@ -19,6 +21,10 @@ const TAG_FONT := 13
 const TAG_PAD := 5.0
 const TAG_HEIGHT := 18.0
 const TAG_RADIUS := 5
+## A framed icon: the room between the well's rim and the icon, and the
+## well's corner.
+const FRAME_INSET := 3.0
+const FRAME_RADIUS := 4
 
 var item: ItemData:
 	set(value):
@@ -27,6 +33,14 @@ var item: ItemData:
 ## Used by the card to name a legendary's recipe.
 var catalog: ItemCatalog
 var tooltips := true
+var framed := false:
+	set(value):
+		framed = value
+		queue_redraw()
+var lit := false:
+	set(value):
+		lit = value
+		queue_redraw()
 
 
 func _init(icon_item: ItemData = null, item_catalog: ItemCatalog = null) -> void:
@@ -40,7 +54,11 @@ func tooltip_content() -> Control:
 
 
 func _draw() -> void:
-	draw_item(self, item, Rect2(Vector2.ZERO, size))
+	var rect := Rect2(Vector2.ZERO, size)
+	if framed:
+		draw_style_box(UiStyle.cell_style(UiStyle.item_rim(item), lit, FRAME_RADIUS), rect)
+		rect = rect.grow(-FRAME_INSET)
+	draw_item(self, item, rect)
 
 
 ## Shared with cells that draw an item inside their own frame. `tint` fades

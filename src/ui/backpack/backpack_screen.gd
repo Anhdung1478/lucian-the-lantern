@@ -488,7 +488,7 @@ func _build() -> void:
 	add_child(backdrop)
 
 	_recipes = RecipeTable.new()
-	_recipes.setup(inventory.catalog)
+	_recipes.setup(inventory.catalog, inventory)
 	_recipes.position = Vector2(MARGIN, MARGIN)
 	backdrop.add_child(_recipes)
 
