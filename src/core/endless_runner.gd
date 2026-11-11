@@ -14,6 +14,9 @@ const NO_END := -1
 
 ## Elites per wave × this (modifier #2 sets 2).
 var elite_mult := 1
+## The waves draw from the first `acts` acts (EndlessPlan.cleared_pool): the
+## acts the save has cleared, which EndlessDirector sets. Every act until then.
+var acts := Journey.ACTS.size()
 ## The break after a boss wave waits while this is true.
 var held := false
 ## The run's last mini boss (and the inherited `boss`, its last boss): neither
@@ -82,7 +85,7 @@ func skip_to_last_wave() -> void:
 
 
 func _wave_ids() -> Array:
-	var ids := EndlessPlan.wave(wave, _rng, elite_mult, boss, mini_boss)
+	var ids := EndlessPlan.wave(wave, _rng, elite_mult, boss, mini_boss, acts)
 	if is_boss_wave():
 		boss = ids[0]
 	elif is_mini_boss_wave():

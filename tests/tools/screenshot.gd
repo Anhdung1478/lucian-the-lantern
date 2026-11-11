@@ -3753,11 +3753,12 @@ func scenario_journey_endless() -> void:
 		await shot("journey_endless_%d_%s" % [i, shown[i][1]])
 
 
-## A player who has cleared Act 3 (Endless is open): the tree maxed, Flash
-## and Heal on D and F, and a best run of `best` waves.
-func endless_save(best: int) -> void:
+## A player who has cleared Act 3 (Endless is open), or the first `acts`
+## acts: the tree maxed, Flash and Heal on D and F, and a best run of `best`
+## waves. The waves draw only from the acts cleared.
+func endless_save(best: int, acts := Journey.ENDLESS_ACT) -> void:
 	var save := SaveGame.instance()
-	save.set_cleared(Journey.all_stage_ids(Journey.ENDLESS_ACT))
+	save.set_cleared(Journey.all_stage_ids(acts))
 	save.tree.max_all()
 	save.set_loadout(0, &"flash")
 	save.set_loadout(1, &"heal")
@@ -3802,7 +3803,7 @@ func seed_boss(id: StringName) -> void:
 	for value in 500:
 		var probe := RandomNumberGenerator.new()
 		probe.seed = value
-		if EndlessPlan.pick_boss(probe, runner.boss) == id:
+		if EndlessPlan.pick_boss(probe, runner.boss, runner.acts) == id:
 			runner._rng.seed = value
 			return
 	push_error("no seed brings " + id)
@@ -3887,9 +3888,10 @@ func scenario_endless_wave() -> void:
 ## An Endless boss wave on Thresh's domain: the debug jump to wave 10, the
 ## Elder Dragon alone at the boss point, its bar under the Best line; its
 ## kill pays the repeat purple; then wave 20 (Nothing picked): a final Thresh,
-## who leaves without a cutscene and pays too.
+## who leaves without a cutscene and pays too. The story is cleared, so he
+## can come.
 func scenario_endless_boss() -> void:
-	endless_save(14)
+	endless_save(14, Journey.ACTS.size())
 	await start_endless(THRESH_DOMAIN)
 	var game := game_stage()
 	flush_tips()
@@ -3923,7 +3925,7 @@ func scenario_endless_boss() -> void:
 	await wait(2.5)
 	frame(thresh)
 	await wait(0.1)
-	print("wave 20 (expect Boss wave): ", info_text(), "  boss: ", thresh.data.id, "  HP (expect 19500): ", roundi(thresh.max_hp),
+	print("wave 20 (expect Boss wave): ", info_text(), "  boss: ", thresh.data.id, "  HP (expect %d): " % roundi(EndlessPlan.boss_hp(20)), roundi(thresh.max_hp),
 		"  boss_unit (expect null): ", game.boss_unit)
 	await shot("endless_boss_2_thresh")
 	purple = game.collected[Essences.PURPLE]

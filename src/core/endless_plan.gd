@@ -4,6 +4,7 @@ extends RefCounted
 ## 10th wave is one boss alone; every other 5th wave is a normal wave with a
 ## mini boss last; any other wave is normal: enemies of 2 kinds from NORMALS
 ## plus a few elites. Neither a boss nor a mini boss comes twice in a row.
+## The waves draw only from the acts the save has cleared (cleared_pool).
 ## Pure: the randomness comes from the run's `rng`.
 
 ## The ids waves draw from. A pack (WavePlan.PACKS) brings its members.
@@ -39,6 +40,10 @@ const MINI_BOSS_HP := 9000.0
 const TIER_HP := 0.3
 const TIER_POWER := 0.15
 const BOSS_WAVE_SHARE := 0.6
+## A boss or mini boss from Act LATE_ACT on deals LATE_POWER[k − 1] of its
+## power at tier k (1 and 2), then all of it.
+const LATE_ACT := 5
+const LATE_POWER: Array[float] = [0.8, 0.9]
 ## Kills pay like act 1 + (w − 1) / REWARD_ACT_WAVES, at least like the
 ## acts the save has cleared, at most like the last act.
 const REWARD_ACT_WAVES := 10
@@ -68,6 +73,9 @@ const MAPS := {
 	6: Vector2i(6, 1),
 }
 
+## Pool id -> its act, filled on act_of's first call.
+static var _acts := {}
+
 
 static func is_boss_wave(w: int) -> bool:
 	return w > 0 and w % BOSS_EVERY == 0
@@ -88,31 +96,62 @@ static func elite_count(w: int, elite_mult := 1) -> int:
 
 
 ## Wave `w`'s enemy ids in spawn order (WavePlan.expand): the normal enemies,
-## the elites, then the mini boss; or the boss alone. `last_boss` and
-## `last_mini_boss` are the run's previous picks, never picked again here.
-static func wave(w: int, rng: RandomNumberGenerator, elite_mult := 1, last_boss := &"", last_mini_boss := &"") -> Array[StringName]:
+## the elites, then the mini boss; or the boss alone, all from the first
+## `acts` acts (cleared_pool). `last_boss` and `last_mini_boss` are the run's
+## previous picks, never picked again here.
+static func wave(w: int, rng: RandomNumberGenerator, elite_mult := 1, last_boss := &"", last_mini_boss := &"", acts := Journey.ACTS.size()) -> Array[StringName]:
 	var groups := []
 	if is_boss_wave(w):
-		groups.append([pick_boss(rng, last_boss), 1])
+		groups.append([pick_boss(rng, last_boss, acts), 1])
 	else:
-		groups.append_array(_normals(normal_count(w), rng))
+		groups.append_array(_normals(normal_count(w), rng, acts))
+		var elites := cleared_pool(ELITES, acts)
 		for i in elite_count(w, elite_mult):
-			groups.append([ELITES[rng.randi_range(0, ELITES.size() - 1)], 1])
+			groups.append([elites[rng.randi_range(0, elites.size() - 1)], 1])
 		if is_mini_boss_wave(w):
-			groups.append([pick_mini_boss(rng, last_mini_boss), 1])
+			groups.append([pick_mini_boss(rng, last_mini_boss, acts), 1])
 	var ids: Array[StringName] = []
 	ids.assign(WavePlan.expand([groups])[0])
 	return ids
 
 
-## A random boss, never `last`.
-static func pick_boss(rng: RandomNumberGenerator, last := &"") -> StringName:
-	return _pick(BOSSES, rng, last)
+## A random boss of the first `acts` acts, never `last`.
+static func pick_boss(rng: RandomNumberGenerator, last := &"", acts := Journey.ACTS.size()) -> StringName:
+	return _pick(cleared_pool(BOSSES, acts), rng, last)
 
 
-## A random mini boss, never `last`.
-static func pick_mini_boss(rng: RandomNumberGenerator, last := &"") -> StringName:
-	return _pick(MINI_BOSSES, rng, last)
+## A random mini boss of the first `acts` acts, never `last`.
+static func pick_mini_boss(rng: RandomNumberGenerator, last := &"", acts := Journey.ACTS.size()) -> StringName:
+	return _pick(cleared_pool(MINI_BOSSES, acts), rng, last)
+
+
+## The ids of `pool` whose act (act_of) is one of the first `acts`, at least
+## the Journey.ENDLESS_ACT acts Endless opens after: never too few to pick
+## from (Acts 1–3 give 6 normals, 5 elites, 2 mini bosses and 2 bosses).
+static func cleared_pool(pool: Array[StringName], acts: int) -> Array[StringName]:
+	var last := maxi(acts, Journey.ENDLESS_ACT)
+	var found: Array[StringName] = []
+	for id in pool:
+		if act_of(id) <= last:
+			found.append(id)
+	return found
+
+
+## The act whose story brings pool id `id` (an enemy, a pack or a boss)
+## first, in WavePlan's stages; 0 when none does.
+static func act_of(id: StringName) -> int:
+	if _acts.is_empty():
+		for act in range(1, Journey.ACTS.size() + 1):
+			for stage in range(1, Journey.stage_count(act) + 1):
+				var stage_id := Journey.stage_id(act, stage)
+				var ids: Array = [WavePlan.boss(stage_id)]
+				for wave_groups: Array in WavePlan.STAGES.get(stage_id, []):
+					for group: Array in wave_groups:
+						ids.append(group[0])
+				for found: StringName in ids:
+					if found != &"" and not _acts.has(found):
+						_acts[found] = act
+	return _acts.get(id, 0)
 
 
 ## A normal or elite enemy's HP multiplier in wave `w` (in place of
@@ -130,34 +169,46 @@ static func damage_scale(w: int) -> float:
 
 ## The HP normal wave `w` brings as planned, before the difficulty: its
 ## normal_count normal enemies at the normal pool's mean HP, its elite_count
-## elites at the elite pool's, × hp_scale(w). The draw is random, so this is
-## its expected total: the same every run. 0 before wave 1.
-static func wave_hp(w: int) -> float:
+## elites at the elite pool's (both of the first `acts` acts), × hp_scale(w).
+## The draw is random, so this is its expected total: the same every run. 0
+## before wave 1.
+static func wave_hp(w: int, acts := Journey.ACTS.size()) -> float:
 	if w < 1:
 		return 0.0
-	return (normal_count(w) * _mean_hp(NORMALS) + elite_count(w) * _mean_hp(ELITES)) * hp_scale(w)
+	return (normal_count(w) * _mean_hp(cleared_pool(NORMALS, acts)) + elite_count(w) * _mean_hp(cleared_pool(ELITES, acts))) * hp_scale(w)
 
 
 ## A boss's max HP in wave `w` (each phase, for Thresh): its tier's, or
 ## BOSS_WAVE_SHARE of the wave before's HP when that is more.
-static func boss_hp(w: int) -> float:
-	return maxf(BOSS_HP * (1.0 + TIER_HP * (_boss_tier(w) - 1)), BOSS_WAVE_SHARE * wave_hp(w - 1))
+static func boss_hp(w: int, acts := Journey.ACTS.size()) -> float:
+	return maxf(BOSS_HP * (1.0 + TIER_HP * (_boss_tier(w) - 1)), BOSS_WAVE_SHARE * wave_hp(w - 1, acts))
 
 
 static func mini_boss_hp(w: int) -> float:
 	return MINI_BOSS_HP * (1.0 + TIER_HP * (_mini_boss_tier(w) - 1))
 
 
-## A boss's damage multiplier in wave `w`: its basic attack and every skill
-## hit. Its tier's, or the square root of the wave's normal damage_scale when
-## that is more, so it keeps up with the waves.
-static func boss_power(w: int) -> float:
-	return maxf(1.0 + TIER_POWER * (_boss_tier(w) - 1), sqrt(damage_scale(w)))
+## Boss `id`'s damage multiplier in wave `w`: its basic attack and every
+## skill hit. Its tier's, or the square root of the wave's normal
+## damage_scale when that is more, so it keeps up with the waves; × its
+## late_share.
+static func boss_power(w: int, id := &"") -> float:
+	var tier := _boss_tier(w)
+	return maxf(1.0 + TIER_POWER * (tier - 1), sqrt(damage_scale(w))) * late_share(id, tier)
 
 
-## A mini boss's damage multiplier in wave `w`, as a boss's.
-static func mini_boss_power(w: int) -> float:
-	return maxf(1.0 + TIER_POWER * (_mini_boss_tier(w) - 1), sqrt(damage_scale(w)))
+## Mini boss `id`'s damage multiplier in wave `w`, as a boss's.
+static func mini_boss_power(w: int, id := &"") -> float:
+	var tier := _mini_boss_tier(w)
+	return maxf(1.0 + TIER_POWER * (tier - 1), sqrt(damage_scale(w))) * late_share(id, tier)
+
+
+## The share of its power boss or mini boss `id` deals at tier `tier`:
+## LATE_POWER's at tiers 1 and 2 for one from Act LATE_ACT on, else all.
+static func late_share(id: StringName, tier: int) -> float:
+	if act_of(id) < LATE_ACT or tier > LATE_POWER.size():
+		return 1.0
+	return LATE_POWER[tier - 1]
 
 
 ## What a boss or mini boss in wave `w` pays more blue and orange essence
@@ -218,12 +269,12 @@ static func _pick(pool: Array[StringName], rng: RandomNumberGenerator, last: Str
 	return choices[rng.randi_range(0, choices.size() - 1)]
 
 
-## `count` normal enemies of NORMAL_KINDS kinds drawn from NORMALS, as
-## [id, n] groups. A pack comes whole: each step adds one more of the kind
-## with the fewest enemies so far that still fits, so 2 packs can leave the
-## wave up to 2 short.
-static func _normals(count: int, rng: RandomNumberGenerator) -> Array:
-	var pool := NORMALS.duplicate()
+## `count` normal enemies of NORMAL_KINDS kinds drawn from the NORMALS of
+## the first `acts` acts, as [id, n] groups. A pack comes whole: each step
+## adds one more of the kind with the fewest enemies so far that still fits,
+## so 2 packs can leave the wave up to 2 short.
+static func _normals(count: int, rng: RandomNumberGenerator, acts: int) -> Array:
+	var pool := cleared_pool(NORMALS, acts)
 	var kinds: Array[StringName] = []
 	var units: Array[int] = []
 	var enemies: Array[int] = []

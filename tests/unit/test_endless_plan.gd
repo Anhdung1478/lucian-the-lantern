@@ -39,6 +39,91 @@ func test_the_pools_follow_the_design() -> void:
 	assert_eq(EndlessPlan.BOSSES, [&"akshan", &"elder_dragon", &"dark_lucian", &"karthus", &"thresh_final"] as Array[StringName])
 
 
+## P10: each pool id's act, the first whose story brings it.
+func test_every_pool_id_has_the_act_of_its_story() -> void:
+	var acts := {
+		&"melee_minion": 1, &"ranged_minion": 1, &"siege_minion": 1, &"super_minion": 2, &"akshan": 2,
+		&"raptors": 3, &"wolves": 3, &"krugs": 3, &"gromp": 3, &"blue_sentinel": 3, &"red_brambleback": 3, &"rift_scuttler": 3,
+		&"infernal_drake": 3, &"ocean_drake": 3, &"elder_dragon": 3,
+		&"shadow_melee_minion": 4, &"shadow_ranged_minion": 4, &"shadow_siege_minion": 4, &"shadow_super_minion": 4, &"dark_lucian": 4,
+		&"sapling": 5, &"spiderling": 5, &"maiden_of_the_mist": 5, &"broodmother": 5, &"maokai": 5, &"elise": 5, &"karthus": 5,
+		&"mist_walker": 6, &"lantern_soul": 6, &"spectral_rider": 6, &"chain_warden": 6, &"karthus_revived": 6, &"hecarim": 6, &"thresh_final": 6,
+	}
+	var pools: Array[StringName] = EndlessPlan.NORMALS + EndlessPlan.ELITES + EndlessPlan.MINI_BOSSES + EndlessPlan.BOSSES
+	assert_eq(pools.size(), acts.size(), "every pool id is listed here")
+	for id in pools:
+		assert_eq(EndlessPlan.act_of(id), acts.get(id, -1), String(id))
+	assert_eq(EndlessPlan.act_of(&"thresh_1"), 1)
+	assert_eq(EndlessPlan.act_of(&"teemo"), 0, "in no story stage")
+
+
+## P10: Endless opens after Act 3, so Acts 1–3 are the least it draws from,
+## and they leave enough of each to pick from.
+func test_the_pools_of_acts_1_to_3() -> void:
+	for acts in [0, 1, 3]:
+		assert_eq(EndlessPlan.cleared_pool(EndlessPlan.NORMALS, acts), [&"melee_minion", &"ranged_minion", &"raptors", &"wolves", &"krugs", &"gromp"] as Array[StringName], "%d acts" % acts)
+		assert_eq(EndlessPlan.cleared_pool(EndlessPlan.ELITES, acts), [&"siege_minion", &"super_minion", &"blue_sentinel", &"red_brambleback", &"rift_scuttler"] as Array[StringName])
+		assert_eq(EndlessPlan.cleared_pool(EndlessPlan.MINI_BOSSES, acts), [&"infernal_drake", &"ocean_drake"] as Array[StringName])
+		assert_eq(EndlessPlan.cleared_pool(EndlessPlan.BOSSES, acts), [&"akshan", &"elder_dragon"] as Array[StringName])
+	assert_eq(EndlessPlan.cleared_pool(EndlessPlan.BOSSES, 4), [&"akshan", &"elder_dragon", &"dark_lucian"] as Array[StringName])
+	assert_eq(EndlessPlan.cleared_pool(EndlessPlan.NORMALS, 6), EndlessPlan.NORMALS)
+	assert_eq(EndlessPlan.cleared_pool(EndlessPlan.BOSSES, 6), EndlessPlan.BOSSES)
+
+
+func test_waves_draw_only_from_the_acts_cleared() -> void:
+	var entries := _pool_entries(EndlessPlan.NORMALS + EndlessPlan.ELITES + EndlessPlan.MINI_BOSSES + EndlessPlan.BOSSES)
+	for acts in [3, 4, 5]:
+		var seen := {}
+		for s in 10:
+			rng.seed = s
+			var last_boss := &""
+			var last_mini_boss := &""
+			for w in range(1, 61):
+				var ids := EndlessPlan.wave(w, rng, 1, last_boss, last_mini_boss, acts)
+				if EndlessPlan.is_boss_wave(w):
+					last_boss = ids[0]
+				elif EndlessPlan.is_mini_boss_wave(w):
+					last_mini_boss = ids.back()
+				for id in ids:
+					var act := EndlessPlan.act_of(entries[id])
+					seen[act] = true
+					assert_between(act, 1, acts, "%d acts, wave %d: %s" % [acts, w, id])
+		assert_eq(seen.size(), acts, "%d acts: each of them comes" % acts)
+
+
+## P10: with Acts 1–3 only, the bosses take turns: Akshan, the Elder Dragon.
+func test_two_bosses_or_mini_bosses_still_never_repeat() -> void:
+	var last := &""
+	var seen := {}
+	for i in 50:
+		var id := EndlessPlan.pick_boss(rng, last, 3)
+		assert_ne(id, last)
+		assert_has([&"akshan", &"elder_dragon"], id)
+		seen[id] = true
+		last = id
+	assert_eq(seen.size(), 2)
+	last = &""
+	for w in range(5, 205, 10):
+		var id: StringName = EndlessPlan.wave(w, rng, 1, &"", last, 3).back()
+		assert_ne(id, last, "wave %d" % w)
+		assert_has([&"infernal_drake", &"ocean_drake"], id)
+		last = id
+
+
+## P10: Acts 5–6's bosses and mini bosses deal ×0.8 at tier 1, ×0.9 at
+## tier 2, then all their power; the others always all of it.
+func test_late_bosses_and_mini_bosses_deal_less_at_tiers_1_and_2() -> void:
+	assert_almost_eq(EndlessPlan.boss_power(10, &"karthus"), EndlessPlan.boss_power(10) * 0.8, 0.0001)
+	assert_almost_eq(EndlessPlan.boss_power(20, &"thresh_final"), EndlessPlan.boss_power(20) * 0.9, 0.0001)
+	assert_almost_eq(EndlessPlan.boss_power(30, &"karthus"), EndlessPlan.boss_power(30), 0.0001)
+	assert_almost_eq(EndlessPlan.mini_boss_power(5, &"maokai"), EndlessPlan.mini_boss_power(5) * 0.8, 0.0001)
+	assert_almost_eq(EndlessPlan.mini_boss_power(15, &"hecarim"), EndlessPlan.mini_boss_power(15) * 0.9, 0.0001)
+	assert_almost_eq(EndlessPlan.mini_boss_power(25, &"elise"), EndlessPlan.mini_boss_power(25), 0.0001)
+	for id in [&"akshan", &"elder_dragon", &"dark_lucian"]:
+		assert_almost_eq(EndlessPlan.boss_power(10, id), EndlessPlan.boss_power(10), 0.0001, String(id))
+	assert_almost_eq(EndlessPlan.mini_boss_power(5, &"infernal_drake"), EndlessPlan.mini_boss_power(5), 0.0001)
+
+
 func test_which_waves_have_a_boss_or_a_mini_boss() -> void:
 	for w in [10, 20, 30, 100]:
 		assert_true(EndlessPlan.is_boss_wave(w), "boss %d" % w)
@@ -229,17 +314,30 @@ func test_wave_hp_is_the_planned_total_of_a_normal_wave() -> void:
 	assert_almost_eq(EndlessPlan.wave_hp(9), 12078.2, 0.1)
 
 
+## P10: from the pools of the acts the waves draw from. Acts 1–3's normal
+## enemies are tougher on average (256.5 a head, not 212.4).
+func test_wave_hp_follows_the_acts_cleared() -> void:
+	var normal := (240.0 + 160.0 + 620.0 / 5.0 + 675.0 / 3.0 + 870.0 / 3.0 + 500.0) / 6.0
+	var elite := (700.0 + 1150.0 + 1400.0 + 1400.0 + 600.0) / 5.0
+	assert_almost_eq(EndlessPlan.wave_hp(19, 3), (27.0 * normal + 4.0 * elite) * EndlessPlan.hp_scale(19), 0.01)
+	assert_almost_eq(EndlessPlan.wave_hp(19, 0), EndlessPlan.wave_hp(19, 3), 0.01, "at least Acts 1–3")
+	assert_almost_eq(EndlessPlan.boss_hp(20, 3), 26380.8, 0.1)
+	assert_almost_eq(EndlessPlan.boss_hp(10, 3), 15000.0, 0.01)
+
+
 ## The planned HP is what the random waves bring on average.
 func test_wave_hp_is_the_mean_of_the_rolled_waves() -> void:
-	for w in [9, 19, 29]:
-		var total := 0.0
-		var rolls := 200
-		for s in rolls:
-			rng.seed = s
-			for id in EndlessPlan.wave(w, rng):
-				total += (load(Stage.ENEMY_PATH % id) as EnemyData).max_hp
-		var mean := total / rolls * EndlessPlan.hp_scale(w)
-		assert_almost_eq(mean, EndlessPlan.wave_hp(w), EndlessPlan.wave_hp(w) * 0.06, "wave %d" % w)
+	for acts in [3, 6]:
+		for w in [9, 19, 29]:
+			var total := 0.0
+			var rolls := 200
+			for s in rolls:
+				rng.seed = s
+				for id in EndlessPlan.wave(w, rng, 1, &"", &"", acts):
+					total += (load(Stage.ENEMY_PATH % id) as EnemyData).max_hp
+			var mean := total / rolls * EndlessPlan.hp_scale(w)
+			var planned := EndlessPlan.wave_hp(w, acts)
+			assert_almost_eq(mean, planned, planned * 0.06, "%d acts, wave %d" % [acts, w])
 
 
 func test_a_boss_called_up_early_is_never_weaker_than_its_first_tier() -> void:

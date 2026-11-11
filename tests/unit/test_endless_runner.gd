@@ -72,6 +72,23 @@ func test_each_wave_comes_from_the_plan_with_its_own_seeded_rng() -> void:
 		assert_eq(waves[w], Array(EndlessPlan.wave(w, rng)), "wave %d" % w)
 
 
+## P10: the waves come from the acts the runner is given.
+func test_it_draws_from_its_acts() -> void:
+	var runner := _runner(11)
+	runner.acts = 3
+	_play(runner, 10)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 11
+	var boss := &""
+	var mini_boss := &""
+	for w in range(1, 11):
+		var expected := EndlessPlan.wave(w, rng, 1, boss, mini_boss, 3)
+		assert_eq(waves[w], Array(expected), "wave %d" % w)
+		if w == 5:
+			mini_boss = expected.back()
+	assert_has([&"akshan", &"elder_dragon"], waves[10][0])
+
+
 func test_the_same_seed_plays_the_same_run() -> void:
 	_play(_runner(5), 12)
 	var first := waves.duplicate(true)

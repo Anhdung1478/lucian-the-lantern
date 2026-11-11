@@ -36,6 +36,7 @@ func start(owner_stage: Stage) -> EndlessRunner:
 	stage = owner_stage
 	start_best = SaveGame.instance().endless_best
 	runner = EndlessRunner.new()
+	runner.acts = stage.run.acts_cleared
 	runner.break_started.connect(_on_wave_won)
 	runner.boss_cleared.connect(_on_boss_cleared)
 	return runner
@@ -43,20 +44,21 @@ func start(owner_stage: Stage) -> EndlessRunner:
 
 ## A spawn's strength in place of the act and wave scaling (call before it
 ## joins the tree): a normal or elite enemy's HP and damage grow with its
-## wave; a boss's or mini boss's HP is fixed by its wave, and its basic damage
-## and skill hits grow with it (EndlessPlan.boss_power). Its on-hit burn grows
-## as its basic hit does (for a boss or mini boss, that is its power: once,
-## not twice). Then the modifier's: every enemy's speed, and bosses' and mini
-## bosses' HP.
+## wave; a boss's or mini boss's HP is fixed by its wave (and the acts the
+## waves draw from), and its basic damage and skill hits grow with it
+## (EndlessPlan.boss_power, softer at first for Acts 5–6's). Its on-hit burn
+## grows as its basic hit does (for a boss or mini boss, that is its power:
+## once, not twice). Then the modifier's: every enemy's speed, and bosses'
+## and mini bosses' HP.
 func scale(unit: EnemyUnit) -> void:
 	var data := unit.data
 	match data.kind:
 		&"boss":
-			unit.max_hp = EndlessPlan.boss_hp(unit.wave) * EndlessModifiers.boss_hp(modifier)
-			_power(unit, EndlessPlan.boss_power(unit.wave))
+			unit.max_hp = EndlessPlan.boss_hp(unit.wave, runner.acts) * EndlessModifiers.boss_hp(modifier)
+			_power(unit, EndlessPlan.boss_power(unit.wave, data.id))
 		&"mini_boss":
 			unit.max_hp = EndlessPlan.mini_boss_hp(unit.wave) * EndlessModifiers.boss_hp(modifier)
-			_power(unit, EndlessPlan.mini_boss_power(unit.wave))
+			_power(unit, EndlessPlan.mini_boss_power(unit.wave, data.id))
 		_:
 			unit.max_hp = data.max_hp * EndlessPlan.hp_scale(unit.wave)
 			unit.damage = data.damage * EndlessPlan.damage_scale(unit.wave)

@@ -239,7 +239,7 @@ func test_a_boss_comes_at_the_boss_point_with_its_waves_hp_and_scaled_skill_hits
 	# square root of wave 20's damage scale (more than tier 2's ×1.15).
 	var power := EndlessPlan.boss_power(20)
 	assert_almost_eq(power, 1.696, 0.001)
-	assert_almost_eq(boss.max_hp, 0.6 * EndlessPlan.wave_hp(19), 0.01)
+	assert_almost_eq(boss.max_hp, 0.6 * EndlessPlan.wave_hp(19, Journey.ENDLESS_ACT), 0.01, "the waves of Acts 1–3")
 	assert_gt(boss.max_hp, 15000.0 * 1.3)
 	assert_almost_eq(boss.hp, boss.max_hp, 0.01)
 	assert_almost_eq(boss.skill_scale, power, 0.0001)
@@ -249,6 +249,45 @@ func test_a_boss_comes_at_the_boss_point_with_its_waves_hp_and_scaled_skill_hits
 	assert_null(stage.boss_unit, "never the stage's boss")
 
 
+## P10: a save that has cleared Acts 1–3 meets only their enemies, and its
+## bosses' HP follows their waves.
+func test_a_run_draws_from_the_acts_the_save_has_cleared() -> void:
+	var stage: Stage = await _endless(JUNGLE, 0, 3)
+	var runner := stage.runner as EndlessRunner
+	assert_eq(runner.acts, 3)
+	stage.skip_break()
+	assert_eq(runner.wave, 1)
+	# Acts 1–3's normal enemies, a pack's members included.
+	var normals := {}
+	for entry in EndlessPlan.cleared_pool(EndlessPlan.NORMALS, 3):
+		for member: StringName in WavePlan.PACKS.get(entry, [entry]):
+			normals[member] = true
+	assert_false(runner._to_spawn.is_empty())
+	for id: StringName in runner._to_spawn:
+		assert_true(normals.has(id), String(id))
+	stage.runner.spawn_requested.emit(&"akshan", 20)
+	assert_almost_eq(_unit(&"akshan").max_hp, EndlessPlan.boss_hp(20, 3), 0.01)
+	stage.jump_to_boss_wave()
+	runner.tick(0.1)
+	assert_eq(runner.wave, 10)
+	assert_has([&"akshan", &"elder_dragon"], runner._to_spawn[0])
+
+
+## P10: an Act 5–6 boss hits ×0.8 at tier 1, ×0.9 at tier 2; its burns too.
+func test_a_late_boss_deals_less_at_its_first_tiers() -> void:
+	var stage: Stage = await _endless(JUNGLE, 0, 6)
+	stage.runner.spawn_requested.emit(&"karthus", 10)
+	var karthus := _unit(&"karthus") as Boss
+	var power := EndlessPlan.boss_power(10) * 0.8
+	assert_almost_eq(karthus.skill_scale, power, 0.0001)
+	assert_almost_eq(karthus.damage, 80.0 * power, 0.01)
+	assert_almost_eq(karthus.burn_scale, power, 0.0001)
+	stage.runner.spawn_requested.emit(&"maokai", 15)
+	assert_almost_eq(_unit(&"maokai").skill_scale, EndlessPlan.mini_boss_power(15) * 0.9, 0.0001)
+	stage.runner.spawn_requested.emit(&"elise", 25)
+	assert_almost_eq(_unit(&"elise").skill_scale, EndlessPlan.mini_boss_power(25), 0.0001, "all of it at tier 3")
+
+
 func test_a_mini_boss_has_its_tiers_hp_and_power_and_keeps_its_spawn_point() -> void:
 	var stage: Stage = await _endless()
 	stage.runner.spawn_requested.emit(&"maokai", 15)
@@ -256,8 +295,9 @@ func test_a_mini_boss_has_its_tiers_hp_and_power_and_keeps_its_spawn_point() -> 
 	assert_not_null(maokai)
 	assert_ne(maokai.global_position, stage.arena.boss_point)
 	assert_almost_eq(maokai.max_hp, 9000.0 * 1.3, 0.01)
-	var power := EndlessPlan.mini_boss_power(15)
-	assert_almost_eq(power, 1.515, 0.001, "the square root of wave 15's damage scale, more than tier 2's ×1.15")
+	# P10: an Act 5 mini boss deals ×0.9 of its power at tier 2.
+	var power := EndlessPlan.mini_boss_power(15) * 0.9
+	assert_almost_eq(EndlessPlan.mini_boss_power(15), 1.515, 0.001, "the square root of wave 15's damage scale, more than tier 2's ×1.15")
 	assert_almost_eq(maokai.damage, 90.0 * power, 0.01)
 	assert_almost_eq(maokai.skill_hit(100.0, DamageInfo.Type.MAGIC, &"test").amount, 100.0 * power, 0.01)
 
