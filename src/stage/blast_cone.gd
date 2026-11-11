@@ -21,8 +21,6 @@ extends Enemy
 ## Set `lucian` and `arena` (the map, for walkable ground) before adding it,
 ## and `ground_parent` for its ground marks.
 
-## Drawn 108 px wide (its leaves reach about 46 from the middle).
-const ART := preload("res://assets/art/stage/blast_cone.svg")
 const GROUP := &"plants"
 ## For clicks and attack range: a click on a leaf tip (RADIUS +
 ## Lucian.CLICK_SLACK) still picks it.
@@ -41,6 +39,16 @@ const REGROW_TIME := 20.0
 const STALK := Color("4f8a2e")
 const BUD := Color("8fa628")
 const OUTLINE := Color("1a1d24")
+## Its look: leaves reach LEAF_REACH from the middle, round the bright head.
+const LEAF := Color("4a9230")
+const LEAF_LIT := Color("7cc443")
+const HEAD := Color("b8d63c")
+const HEAD_LIT := Color("e6f78c")
+const HEAD_SHADE := Color("6f9420")
+const LEAF_REACH := 46.0
+const LEAF_COUNT := 6
+const HEAD_RADIUS := 17.0
+const SHADOW_HEIGHT := 14.0
 ## Ripe, a soft yellow glow under it, breathing GLOW_PULSE times a second.
 const GLOW := Color("f2f56a")
 const GLOW_RADIUS := 66.0
@@ -68,7 +76,6 @@ var _regrow_left := 0.0
 var _ripe_time := 0.0
 ## Built in _ready (a cone freed unadded leaves nothing behind).
 var _hurtbox: Hurtbox
-var _bulb: Sprite2D
 ## Draws its reach and landing marks (_draw_guide): on `ground_parent`, or
 ## its own child.
 var _guide: Node2D
@@ -117,9 +124,6 @@ func _ready() -> void:
 	_hurtbox.monitoring = false
 	_hurtbox.add_child(shape)
 	add_child(_hurtbox)
-	_bulb = Sprite2D.new()
-	_bulb.texture = ART
-	add_child(_bulb)
 	_make_guide()
 
 
@@ -189,7 +193,9 @@ func _physics_process(delta: float) -> void:
 			_regrow()
 	else:
 		_ripe_time += delta
-		queue_redraw()
+		# The glow breathes: a redraw ten times a second is enough.
+		if int(_ripe_time * 10.0) != int((_ripe_time - delta) * 10.0):
+			queue_redraw()
 		_update_guide()
 
 
@@ -210,7 +216,6 @@ func _pop() -> void:
 	_regrow_left = REGROW_TIME
 	remove_from_group(GROUP)
 	_hurtbox.collision_layer = 0
-	_bulb.visible = false
 	_lucian_in_reach = false
 	_throws = false
 	_show_guide(false)
@@ -237,7 +242,6 @@ func _regrow() -> void:
 	_regrow_left = 0.0
 	add_to_group(GROUP)
 	_hurtbox.collision_layer = Layers.ENEMY_HURTBOX
-	_bulb.visible = true
 	_show_guide(true)
 	queue_redraw()
 
@@ -245,10 +249,7 @@ func _regrow() -> void:
 func _draw() -> void:
 	super()
 	if not dead:
-		# Rings fading out from the bulb, under the art.
-		var breath := 0.8 + 0.2 * sin(_ripe_time * TAU * GLOW_PULSE)
-		for i in 5:
-			draw_circle(Vector2.ZERO, GLOW_RADIUS * breath * (1.0 - i * 0.16), Color(GLOW, 0.09))
+		_draw_ripe()
 		return
 	# Regrowing: a stem with a bud swelling back.
 	var grown := 1.0 - _regrow_left / REGROW_TIME
@@ -257,6 +258,21 @@ func _draw() -> void:
 		draw_line(Vector2(0, 8), Vector2(12 * side, 2), STALK, 3.0, true)
 	draw_circle(Vector2(0, -6), 4.0 + 6.0 * grown, BUD)
 	draw_arc(Vector2(0, -6), 4.0 + 6.0 * grown, 0.0, TAU, 20, OUTLINE, 2.0, true)
+
+
+## Rings fading out from the bulb, then the plant: its shadow, leaves round a
+## bright head with a highlight.
+func _draw_ripe() -> void:
+	var breath := 0.8 + 0.2 * sin(_ripe_time * TAU * GLOW_PULSE)
+	for i in 5:
+		draw_circle(Vector2.ZERO, GLOW_RADIUS * breath * (1.0 - i * 0.16), Color(GLOW, 0.09))
+	MapArt.round_shadow(self, Vector2.ZERO, HEAD_RADIUS + 8.0, SHADOW_HEIGHT)
+	for i in LEAF_COUNT:
+		MapArt.leaf(self, Vector2.ZERO, TAU * (i + 0.5) / LEAF_COUNT, LEAF_REACH, LEAF, LEAF_LIT)
+	MapArt.disc(self, Vector2.ZERO, HEAD_RADIUS + 2.0, OUTLINE)
+	MapArt.disc(self, Vector2.ZERO, HEAD_RADIUS, HEAD_SHADE)
+	MapArt.disc(self, -MapArt.SHADOW_DIR * 2.5, HEAD_RADIUS * 0.82, HEAD)
+	MapArt.disc(self, -MapArt.SHADOW_DIR * 6.0, HEAD_RADIUS * 0.38, HEAD_LIT)
 
 
 ## On _guide, in its space (it sits on the plant): the reach ring, then the

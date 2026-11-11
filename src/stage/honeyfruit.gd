@@ -7,7 +7,6 @@ extends Node2D
 ## it is an empty stalk for REGROW_TIME and grows back. Set `lucian` before
 ## adding it.
 
-const ART := preload("res://assets/art/stage/honeyfruit.svg")
 const PICKUP_RANGE := 50.0
 const HEAL := 100.0
 const HEAL_SHARE := 0.06
@@ -19,6 +18,15 @@ const Z := -1
 const STALK := Color("5a3b1e")
 const LEAF := Color("4f8a2e")
 const OUTLINE := Color("1a1d24")
+const LEAF_LIT := Color("7cc443")
+const FRUIT := Color("f2b630")
+const FRUIT_LIT := Color("ffe58a")
+const FRUIT_SHADE := Color("c0781c")
+const FRUIT_GLOW := Color("ffd36a")
+## The fruit's size, the leaves' length, and its shadow's height.
+const FRUIT_RADIUS := 13.0
+const LEAF_LENGTH := 36.0
+const SHADOW_HEIGHT := 9.0
 
 var lucian: Lucian
 
@@ -63,8 +71,9 @@ func _eat() -> void:
 
 
 func _draw() -> void:
+	MapArt.round_shadow(self, Vector2.ZERO, FRUIT_RADIUS + 5.0, SHADOW_HEIGHT)
 	if is_ripe():
-		draw_texture(ART, -ART.get_size() * 0.5)
+		_draw_ripe()
 		return
 	# The empty stalk: two leaves and a bare stem.
 	for side in [-1.0, 1.0]:
@@ -73,3 +82,14 @@ func _draw() -> void:
 		leaf.append(leaf[0])
 		draw_polyline(leaf, OUTLINE, 2.0, true)
 	draw_line(Vector2(0, 4), Vector2(2, -10), STALK, 3.0, true)
+
+
+## Leaves round a warm gold fruit with a highlight and a faint glow.
+func _draw_ripe() -> void:
+	for angle in [0.5, 1.9, 3.3, 4.7]:
+		MapArt.leaf(self, Vector2.ZERO, angle, LEAF_LENGTH, LEAF, LEAF_LIT)
+	MapArt.glow(self, Vector2.ZERO, FRUIT_RADIUS * 3.0, Color(FRUIT_GLOW, 0.22))
+	MapArt.disc(self, Vector2.ZERO, FRUIT_RADIUS + 2.0, OUTLINE)
+	MapArt.disc(self, Vector2.ZERO, FRUIT_RADIUS, FRUIT_SHADE)
+	MapArt.disc(self, -MapArt.SHADOW_DIR * 1.5, FRUIT_RADIUS * 0.85, FRUIT)
+	MapArt.disc(self, -MapArt.SHADOW_DIR * 5.0, FRUIT_RADIUS * 0.35, FRUIT_LIT)

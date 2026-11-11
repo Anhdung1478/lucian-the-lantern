@@ -88,6 +88,10 @@ const FOAM_WIDTH := 5.0
 const RIPPLE_ARC := Vector2(PI * 1.12, PI * 1.88)
 const RIPPLE_PIECES := 7
 const RIPPLE_WIDTH := 2.5
+## A leaf's widest point (share of its length from the base) and its width (share of its length).
+const LEAF_BULGE := 0.4
+const LEAF_WIDTH := 0.5
+const LEAF_RIB_ALPHA := 0.5
 
 static var _disc: ImageTexture
 static var _soft: ImageTexture
@@ -656,3 +660,17 @@ static func water(canvas: CanvasItem, polygon: PackedVector2Array, deep: Color, 
 ## A ripple at `at`: a thin arc, open at the bottom. Facets.
 static func ripple(into: Facets, at: Vector2, radius: float, color: Color) -> void:
 	into.arc(at, radius, RIPPLE_ARC.x, RIPPLE_ARC.y, RIPPLE_WIDTH, color, RIPPLE_PIECES)
+
+
+## A leaf from `at` along `angle`, `length` long: `color`, its half toward the
+## light in `light`, and a darker rib down the middle. A few polygons and a line.
+static func leaf(canvas: CanvasItem, at: Vector2, angle: float, length: float, color: Color, light: Color) -> void:
+	var along := Vector2.from_angle(angle)
+	var side := along.orthogonal() * length * LEAF_WIDTH * 0.5
+	if side.dot(SHADOW_DIR) > 0.0:
+		side = -side
+	var bulge := at + along * length * LEAF_BULGE
+	var tip := at + along * length
+	canvas.draw_colored_polygon(PackedVector2Array([at, bulge + side, tip, bulge - side]), color)
+	canvas.draw_colored_polygon(PackedVector2Array([at, bulge - side, tip]), light)
+	canvas.draw_line(at, tip, Color(color.darkened(0.45), LEAF_RIB_ALPHA), 1.5, true)

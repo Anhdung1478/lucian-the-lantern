@@ -391,11 +391,11 @@ func test_without_a_ground_parent_its_marks_are_under_the_units() -> void:
 	assert_lt(cone._guide.z_index, lucian.z_index)
 
 
-## Its art is 108 px wide: a click on a leaf tip, 46 from its middle, picks
+## Its leaves reach 46 px: a click on a leaf tip, 46 from its middle, picks
 ## it; one just past the leaves doesn't.
 func test_a_click_on_a_leaf_tip_picks_it() -> void:
 	var cone := _cone(_map())
-	assert_eq(BlastCone.ART.get_width(), 108)
+	assert_eq(BlastCone.LEAF_REACH, 46.0)
 	assert_eq(lucian.enemy_at(cone.global_position + Vector2(46, 0)), cone)
 	assert_eq(lucian.enemy_at(cone.global_position + Vector2(0, -46)), cone)
 	assert_null(lucian.enemy_at(cone.global_position + Vector2(60, 0)))

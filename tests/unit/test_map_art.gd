@@ -198,3 +198,27 @@ func test_a_map_s_motes_stay_on_it() -> void:
 						"%s: mote %d" % [act_stage, i])
 			ambience.free()
 		map.free()
+
+
+## Draws one leaf, and says it did.
+class LeafCanvas:
+	extends Node2D
+	var drawn := false
+
+	func _draw() -> void:
+		MapArt.leaf(self, Vector2.ZERO, 0.7, 40.0, Color.GREEN, Color.LIME)
+		drawn = true
+
+
+func test_a_leaf_draws() -> void:
+	var canvas := LeafCanvas.new()
+	add_child_autofree(canvas)
+	await wait_process_frames(2)
+	assert_true(canvas.drawn)
+
+
+func test_a_ripe_honeyfruit_and_blast_cone_draw() -> void:
+	var fruit := Honeyfruit.new()
+	add_child_autofree(fruit)
+	await wait_process_frames(2)
+	assert_true(fruit.is_ripe())
