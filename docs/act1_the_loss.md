@@ -174,3 +174,5 @@ After the first clear: the full kit, no Senna, no Thresh and no tips. The stage 
 | Minions | Come from two points at the top-right end, taking turns |
 | Thresh | Rises in the river, 300 from its center on the top-left side |
 | Merchant | On the lane, 700 before the river's center, during breaks |
+
+*(V2.0: the lane is cobbles, the rocks are shaded, the jungle walls have crowns with highlights, and the river has banks and a current. The layout is as above. Game design doc §13, "Built in V2.0".)*

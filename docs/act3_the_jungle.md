@@ -243,6 +243,8 @@ The paths make two loops. Each loop's inner jungle is a wall of its own, so no w
 - **Blast Cone:** shoot it (a basic attack or a skill; a burn tick doesn't count). It pops, and if Lucian is within **350**, he is thrown **800** straight away from it in **0.6 s**, over walls. He lands on the farthest spot at least 250 away and 40 from any wall; with no such spot there is no throw. He can't act in flight, and lava doesn't burn him in the air. The plant regrows after **20 s**. It is never an enemy (waves, the radar and A + Left-click's fallbacks ignore it), but a click on it attacks it. It draws 108 px wide, with a soft yellow glow while ripe. *(V1.4.3: a ripe cone shows its reach, a faint yellow ring at 350, brighter while Lucian stands inside. While a shot would throw him, it also shows where he would land: a ring his body's size, with a faint dashed line from him to it, moving at once as he moves. The marks lie over the lava and under the units. Nothing shows while it regrows or when no throw would happen. Being thrown into lava is intended.)*
 - **Honeyfruit:** walking over it (within 50 of his edge) heals **100 + 6% of his max HP** and restores **60 + 6% of his max mana** *(mana since V1.4.2)*. It is eaten only when HP or mana is missing: at full HP and full mana it stays ripe and waits for him. Once eaten, it is an empty stalk for **30 s**, then grows back.
 
+*(V2.0: the "drawn like Act 1's" jungle has worn paths and camp details, and the dry riverbed is drawn as a riverbed. 3-2's lava is a dark crust with glowing cracks, a hot core and a slow pulse, with scorch marks round it. 3-4's shallow water is clear water with deeper steps, ripples and glints. Fireflies drift over the jungle (off on Low quality). The Blast Cone and the Honeyfruit are drawn in code, with a shadow, leaves and a bright head. Walls, paths and terrain numbers are as above.)*
+
 ### The Elder Dragon's pit (`DragonPitMap`, 3-5)
 | | |
 |---|---|
@@ -254,8 +256,10 @@ The paths make two loops. Each loop's inner jungle is a wall of its own, so no w
 | Merchant | 450 south of the middle |
 | Dragon | The middle |
 
+*(V2.0: the pit's floor has rings of stone, claw marks and an elder glow. The numbers above are as they were.)*
+
 ### Walking around walls
 Enemies and Lucian walk straight while nothing blocks the line to their goal. When a wall does, they follow a path baked from the map's walls (agent radius 36), asked again every 0.4 s or when the goal moves 120. Lucian's moves, chases, merchant visits and cast walks use it too, on every map. A click inside a wall walks to the closest reachable point.
 
 ### Art
-Hand-written SVGs, top-down, facing right: the 10 monsters (red-crested raptors, grey-blue wolves with teal eyes, mossy rock Krugs, a green-purple toad, a blue stone golem, a red thorned beast, a purple shelled crab), the two drakes (150 px), the Elder Dragon (180 px), the Blast Cone (108 px) and Honeyfruit (56 px), the Blue and Red buff icons, the slow and burn icons, and Elder's Mark.
+Hand-written SVGs, top-down, facing right: the 10 monsters (red-crested raptors, grey-blue wolves with teal eyes, mossy rock Krugs, a green-purple toad, a blue stone golem, a red thorned beast, a purple shelled crab), the two drakes (150 px), the Elder Dragon (180 px), the Blast Cone (108 px) and Honeyfruit (56 px), the Blue and Red buff icons, the slow and burn icons, and Elder's Mark. *(V2.0: the Blast Cone's and the Honeyfruit's SVGs, `blast_cone.svg` and `honeyfruit.svg`, are no longer used: both are drawn in code with `MapArt.leaf`.)*

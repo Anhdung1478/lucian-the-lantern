@@ -32,13 +32,13 @@ Lucian reaches the Shadow Isles and fights through its corrupted forest to find 
 
 ### Maiden of the Mist
 - Tanky melee ghost, **AD** damage.
-- **Trait:** summons 2 small ghouls every few seconds until she is killed.
+- **Trait:** summons 2 small ghouls every few seconds until she is killed. *(V2.0: until she has called 12 ghouls in all, `summon_total`.)*
 - **Trait (V1.5.0):** she drains: her hits heal her for a quarter of the damage they deal, and each call of ghouls heals her 2% of her max HP. Grievous Wounds cuts both.
 
 ### Broodmother
 - Giant spider.
 - **Special normal attack:** ranged web spit, **AP** damage, slows Lucian.
-- **Trait:** keeps spawning spiderlings until she is killed.
+- **Trait:** keeps spawning spiderlings until she is killed. *(V2.0: until she has called 10 spiderlings in all.)*
 
 ---
 
@@ -130,6 +130,7 @@ Base numbers (the data files). The last column shows wave 1 of Act 5, scaled.
   - It appears beside its summoner, spread round it. If that spot is in a wall, the abyss or off the map, it appears on the summoner instead.
   - A summoner's cap counts its summons that are alive or still coming.
   - **Maiden:** the first two ghouls come 7 s into her fight. **Broodmother:** the first spiderling comes after 3.5 s.
+  - **Total (V2.0):** a summoner calls only so many in all (`EnemyData.summon_total`): the **Maiden 12 ghouls**, the **Broodmother 10 spiderlings**. A call is cut to what is left, then she calls no more. The cap on live summons still holds.
 - **Web:** the slow shows in Lucian's buff row ("Slowed", 30%) and follows Phase 7's slow rule.
 
 ### The Black Mist
@@ -142,6 +143,7 @@ Base numbers (the data files). The last column shows wave 1 of Act 5, scaled.
 - **Regeneration (V1.5.0):** a **veiled** normal or elite enemy inside a bank (Lucian more than 350 away) heals **1% of its max HP a second** while it is hurt; once Lucian is close enough to see it, it stops. Grievous Wounds cuts it by 40%. Bosses and mini bosses never regenerate. The veil hides the heal, so it shows no green number. *(First built as 2% a second, veiled or not, and the Maiden's drain as 50% and 5%; the bot runs showed early Act 5 walling, so V1.5.0 ships the softer numbers.)* Endless's Dead forest has the same banks and the same regeneration.
 - The hit flash and the veil don't fight: the flash tweens the unit's visuals, the veil lives on the sprite.
 - The banks are drawn under the units: three layered blobs of `#9fb8a8` at about 35% alpha, breathing slowly.
+- *(V2.0: a bank is layered soft mist with a darker heart and wisps, and it drifts slowly, but only with `Juice.on()` (off on Low quality). The veil's rules are as above.)*
 
 ### Map: the dead forest (`DeadForestMap`, 5400 × 3400, all five stages)
 - **Ground:** `#2a3330` with dead-grass flecks. A ragged wall of black trees (2 × 18 convex pieces, about 250 deep, ± 40) runs along the top and bottom.
@@ -160,6 +162,8 @@ Base numbers (the data files). The last column shows wave 1 of Act 5, scaled.
 - **Maokai's trunks (5-2):** a ring of 6 trunks (r 85, ring radius 260) with a gap on the west side, where Lucian comes from.
 - **Nest:** a white web disc with a dark hole.
 - **The graveyard (5-5 only, x > 3600):** flagstones, 8 tombstones (40 × 70, two columns of four, 250–300 apart) and two slabs of a broken crypt wall behind Karthus, with a gap between them. They are real walls: they stop bolts and walkers.
+
+*(V2.0: the forest is redrawn with `MapArt`: cold grey-teal earth, black leafless tree lines, gnarled trees, Maokai's ring, the spider nest and Elise's camp. Karthus's graveyard has flagstones and tombstones (`MapArt.limbs`). Layout, counts and positions are as above. Game design doc §13, "Built in V2.0".)*
 
 ### Maokai (`maokai`, mini boss, stage 5-2)
 Last in wave 5, out of his camp. Melee, 90 physical, range 110, every 1.6 s. 8500 HP *(12000 before V1.5.0)*, armor 60, MR 40, speed 300, radius 54. Pays 300 gold, 50 blue, 3 orange and **5 purple the first time, 1 after**, on the kill.

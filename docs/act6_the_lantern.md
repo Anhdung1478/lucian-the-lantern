@@ -165,6 +165,8 @@ The abyss is several polygons (none has a hole) on the `CHASM` physics layer. It
 - Four bridge stubs (280 wide, broken ends) at north, east, south and west. Lucian starts at the west rim (1650, 1700). Enemies spawn from the **north, east and south stubs only** (2800, 150), (4590, 1700), (2800, 3250); the west stub is behind Lucian's start.
 - The merchant stands at (2800, 1950) in the breaks.
 
+*(V2.0: Thresh's domain is redrawn with `MapArt`. The plateaus are slate flagstones with lit lips and cliff faces. The abyss is layered, with far chains and souls. The stone bridges carry lantern light. The altar and Hecarim's camp are drawn in. The final platform has slab courses, its 32 glowing runes and a pale dais. Walls, bridges, ledges, points and numbers are as above. Game design doc §13, "Built in V2.0".)*
+
 ### Karthus, revived (`karthus_revived`, mini boss, stage 6-2)
 Last in wave 6, at his altar. Ranged bolt, 85 magic (900 px/s), range 600, every 1.5 s. 16000 HP, armor 30, MR 60, speed 250, radius 46. The art is Karthus's with a pale teal tint. Pays as Maokai does (300 gold, 50 blue, 3 orange, 5 purple the first time, 1 after).
 

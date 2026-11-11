@@ -123,3 +123,5 @@ He enters from the top gate in stage 3's boss wave, alone.
 | 2-3 | 10 in a ring (r 650) around the center | Left, top, right |
 
 Minions take turns over the open gates, in groups of 3.
+
+*(V2.0: the "stone tiles" are flagstones. A brass ring with the Sentinels' star lies on the floor, the walls are blocks with braziers, the gates have towers and the pillars are sandstone. The Training arena (Phase 3) is slate slabs under the lantern's teal light. Positions and counts are as above. Game design doc §13, "Built in V2.0".)*

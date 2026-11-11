@@ -114,5 +114,7 @@ Act 1's map (5200 × 3200) with the same layout and points: the diagonal lane, t
 
 The plan's palette (lane `#2a2633`, edge `#3b2a52`, river `#1d1630`, ripples `#7a4fb0`, rocks `#3a3742`) was a step lighter in the visual pass: the shadow minions and Dark Lucian were hard to see on it. It stays dark and purple; each color is still darker than Act 1's lane.
 
+*(V2.0: the map is redrawn with `MapArt` in black and violet, with wisps and a haze. It keeps Act 1's layout; the colours in the table are the base of the new drawing. Game design doc §13, "Built in V2.0".)*
+
 ### Art
 Hand-written SVGs: the four shadow minions (the minions in black-purple with violet glows) and Dark Lucian (Lucian's silhouette in black and violet, red eyes, two dark guns).
