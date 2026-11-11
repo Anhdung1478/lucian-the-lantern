@@ -15,7 +15,7 @@
 | **Platform** | PC (mouse + keyboard) |
 | **Graphics** | Top-down view like LoL, simpler and less detailed |
 | **Character** | Lucian (more champions could be added later) |
-| **Target length** | A skilled player needs at least 5–7 hours to beat the story |
+| **Target length** | A skilled player needs at least 5–7 hours to beat the story *(V2.0: a skilled player wins the story in about 4–5 hours, a novice in about 7–10. Measured with the bots on Normal: skilled 3 h 56 and 4 h 22 of stage time, about 4 h 13 and 4 h 40 of play; average 4 h 56, about 5 h 32; novice: see the report.)* |
 
 **Design rule:** this is not LoL. Everything taken from LoL (stats, items, skills, UI, enemies) should stay only about **70–80% similar**, adapted to fit this game.
 
@@ -34,15 +34,27 @@ Minutes for a skilled player's first clear of each act, counting a few deaths, s
 | 6 | 5 | 33 + 3 | 90–120 |
 | **All** | 22 | 106 + 12 | **323–420 (5.4–7 h)** |
 
+**Pacing in V2.0** (before V2.0: the table above). Waves are `WavePlan.STAGES` (143 + 12 boss and mini boss waves). Minutes are the skilled bots' stage time on Normal, the range of two runs; Act 1 was not timed apart.
+
+| Act | Stages | Waves (+ boss / mini boss waves) | Minutes (stage time, skilled bots) |
+|---|---|---|---|
+| 1 | 1 | 2 + 1 | not measured apart |
+| 2 | 3 | 14 + 1 | 23–25 |
+| 3 | 5 | 31 + 3 | 39–60 |
+| 4 | 3 | 20 + 1 | 32–34 |
+| 5 | 5 | 33 + 3 | 73–82 |
+| 6 | 5 | 43 + 3 | 62–66 |
+| **All** | 22 | 143 + 12 | **236–262 (3 h 56 to 4 h 22) of stage time; about 4 h 13 to 4 h 40 of play** |
+
 **Rules of thumb:**
 - A wave should take a skilled player **about 2 minutes** of fighting.
 - A boss should take **2–3 minutes**.
 - A break is used, on average, for about 30 s of shopping.
 - About a third of each act's time is deaths and replays: farming essence for the tree (see the balance goal in §11).
 
-**Measuring it:** each stage's end screen shows its time, and the slot lists (title screen, Save as copy) show each slot's total play time. Both clocks skip paused time, so shopping (the shop pauses the game) isn't in them, while the budget counts about 30 s of shopping per break. If Act 2 clears in under 25 minutes, or Act 3 in under 60, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards.
+**Measuring it:** each stage's end screen shows its time, and the slot lists (title screen, Save as copy) show each slot's total play time. Both clocks skip paused time, so shopping (the shop pauses the game) isn't in them, while the budget counts about 30 s of shopping per break. If Act 2 clears in under 25 minutes, or Act 3 in under 60, raise `EnemyData.ACT_HP` and the bosses' HP before changing rewards. *(V2.0: those two limits belong to the 5–7 hour target. The 4–5 hour target is measured with the bots, in the V2.0 table above.)*
 
-**As built (Phase 7):** Act 3's waves hold about 275k HP, plus 35k for the two drakes and the dragon; Act 4's about 313k, plus 18k for Dark Lucian. The drakes come last in their stage's last wave, not in a wave of their own, so Act 3 has 21 waves plus the Elder Dragon's boss wave. *(V1.5.0: Act 3's waves hold about 128k and its drakes and dragon 27.5k; Act 4's waves about 164k. See the act files.)*
+**As built (Phase 7):** Act 3's waves hold about 275k HP, plus 35k for the two drakes and the dragon; Act 4's about 313k, plus 18k for Dark Lucian. The drakes come last in their stage's last wave, not in a wave of their own, so Act 3 has 21 waves plus the Elder Dragon's boss wave. *(V1.5.0: Act 3's waves hold about 128k and its drakes and dragon 27.5k; Act 4's waves about 164k. See the act files.)* *(V2.0: Act 3's waves hold about 278k and its drakes and dragon 35.5k; Act 4's waves about 332k and Dark Lucian 25k. Act 3 has 31 waves plus the Elder Dragon's boss wave. See the act files.)*
 
 ---
 
@@ -108,6 +120,17 @@ It is one target: after that kill Lucian stops and idles. A dead or untargetable
 | 5 | 5 · 5 · 6 · 6 · 6 |
 | 6 | 6 · 6 · 7 · 7 · 7 |
 
+*(V2.0: the waves per stage, 143 in all (was 106). Bosses and mini bosses are as before.)*
+
+| Act | Waves per stage, V2.0 |
+|---|---|
+| 1 | 2 |
+| 2 | 4 · 5 · 5 |
+| 3 | 5 · 6 · 6 · 7 · 7 |
+| 4 | 6 · 7 · 7 |
+| 5 | 6 · 6 · 7 · 7 · 7 |
+| 6 | 8 · 8 · 9 · 9 · 9 |
+
 - Mini bosses appear in the last wave of their stage.
 
 ### Break between waves
@@ -143,7 +166,7 @@ Acts 1 and 2 play this way. Training keeps its dummies and has no waves.
 - **Enemies** attack only Lucian. They walk straight at him, sliding along walls; one that gets stuck sidesteps for a moment. They bump into each other and into Lucian. There is no navigation mesh. *(Phase 7: they path around walls; see below.)*
 - **Enemy bolts** are stopped by walls and pillars. Lucian's homing shots still fly over walls.
 - **Enemy hits** reach Lucian within his radius (30) of his center. Red ground warnings (circle, line, cone, lock line) fill up before an attack lands. *(V1.4.3: a cone counts his 30 px body at its sides too, as circles, lines and rings do, so a body reaching over a side edge is hit.)* *(V1.3.1: a warning dies with its caster. Once the enemy that cast it is dead, it goes at once with no hit: the Infernal Drake's meteors and Fire Breath, Karthus's Lay Waste, Elder Breath, a siege minion's shell.)*
-- **Scaling** (bosses don't scale): per act after the first, HP × (1 + 0.6 · (act − 1)), damage and rewards × (1 + 0.25 · (act − 1)). Each wave after the first adds +15% HP and damage. A stage can also lower some enemies' HP on its own: in Act 1 (1-1), melee and ranged minions have 20% less HP. *(V1.3: HP × (1 + 0.25 · (act − 1)), damage × (1 + 0.15 · (act − 1)), +10% a wave; the first stage of every act is gentler, and the tutorial's minions hit 25% softer. See §17.)* *(V1.5.0: the second stage of every act (2-2, 3-2, 4-2, 5-2, 6-2) is a little gentler too: its normal enemies have 10% less HP. Elites, mini bosses and bosses keep theirs. `WavePlan.HP_SHARES`.)*
+- **Scaling** (bosses don't scale): per act after the first, HP × (1 + 0.6 · (act − 1)), damage and rewards × (1 + 0.25 · (act − 1)). Each wave after the first adds +15% HP and damage. A stage can also lower some enemies' HP on its own: in Act 1 (1-1), melee and ranged minions have 20% less HP. *(V1.3: HP × (1 + 0.25 · (act − 1)), damage × (1 + 0.15 · (act − 1)), +10% a wave; the first stage of every act is gentler, and the tutorial's minions hit 25% softer. See §17.)* *(V2.0: HP × (1 + 0.35 · (act − 1)), so ×1.35 in Act 2, ×1.70 in Act 3, ×2.05 in Act 4, ×2.40 in Act 5 and ×2.75 in Act 6 (`EnemyData.ACT_HP`). Damage per act, the 10% a wave and the shares below are as in V1.3 and V1.5.0.)* *(V1.5.0: the second stage of every act (2-2, 3-2, 4-2, 5-2, 6-2) is a little gentler too: its normal enemies have 10% less HP. Elites, mini bosses and bosses keep theirs. `WavePlan.HP_SHARES`.)*
 - **Death:** Lucian turns grey and fades for 1.5 s, then DEFEATED shows. Enemies stand still while he is dead or in stasis. Guardian Angel's stasis comes first. *(V1.4.3: in stasis his skill, summoner spell and item cooldowns and his attack timer keep counting down; only his buff timers and regen stop (`items.md`, Guardian Angel).)*
 - **Game over:** losing Act 1 before its first clear (the tutorial) shows **GAME OVER** instead, and **Back to title** returns to the title screen. It still auto-saves, so the essences collected are kept.
 - **Result panel** (pauses the game; ESC and P do nothing): **STAGE CLEARED**, **DEFEATED** or **GAME OVER**, the stage name, "Waves cleared: 2 / 3 · Time 4:32", the essences collected and any first-clear lines. **Continue** auto-saves and opens the main screen on that act (Back to title after a game over). *(Phase 7: the end screen replaces it; see below.)*
@@ -693,7 +716,7 @@ They count as **bonus** stats (yellow in the stats panel) from the start of ever
 
 Stage gold, bonus XP and essence drops work since Phase 6: +10% gold, XP or blue per kill for each level, and the essence node also raises the chance of orange (§9).
 
-**Balance goal:** in 5–7 hours a skilled player can afford all skills, R, 4–5 equip slots and some stats, but not the full tree. The rest is a goal for Endless mode.
+**Balance goal:** in 5–7 hours a skilled player can afford all skills, R, 4–5 equip slots and some stats, but not the full tree. The rest is a goal for Endless mode. *(V2.0: the story takes a skilled player about 4–5 hours (§1).)*
 
 ### Built in Phase 10
 - **Rules per level.** A level opens when enough acts are cleared, the node's requirements have level 1, and the node's level sum is high enough. The act needed is the larger of the node's act and the level's own act. R's level sum is Q + W + E (5, 9, 13).
@@ -912,7 +935,7 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 
 *(V1.5.0: so the bosses keep up with the waves. Before: boss HP 15000 × (1 + 0.3(k − 1)) (wave 20: 19500, 30: 24000, 50: 33000), and damage × (1 + 0.15(k − 1)) (×1, ×1.15, ×1.3, …). The planned HP of a wave is `EndlessPlan.wave_hp`: its normal and elite counts at their pools' mean HP (the pools of the acts cleared), × the wave's HP scale, before the difficulty and modifier #5. It is the same every run. damage_scale is the normal and elite damage row above, so the first boss and the first mini boss hit ×1.0. The Act 5–6 share softens Karthus, Thresh, Maokai, Elise, Karthus revived and Hecarim at their first two tiers.)*
 
-- Wave 1 is as easy as Act 1. The HP passes Act 6's last story wave (×7.6) at wave 34.
+- Wave 1 is as easy as Act 1. The HP passes Act 6's last story wave (×7.6) at wave 34. *(V2.0: Act 6's last story wave is wave 9, so its scale is ×2.75 × 1.8 = ×4.95. The Endless HP passes it at wave 24: ×4.87 at wave 23, ×5.12 at wave 24. The ×7.6 was already out of date after V1.3.)*
 - A boss's HP is fixed by its wave, whoever comes, so the random pick doesn't swing the run. *(V1.5.0: by its wave and the acts cleared.)*
 - *(V1.4.2)* An Endless boss's power also reaches the burns it makes: Karthus's Defile, the Infernal Drake's breath and meteor burns, and the on-hit burn of its basic shots are multiplied by the boss's `skill_scale` (×1.3 at tier 3). It is 1.0 for everything else, so the story doesn't change. Other ground hazards are not scaled. *(V1.5.0: `skill_scale` is the power in the table above, Acts 5–6's share included, so ×1.54 at wave 30.)*
 - *(V1.4.3)* The on-hit burns of normal and elite enemies (Gromp, the Red Brambleback) grow with their hits too: `burn_scale` = the unit's damage / its `data.damage`, set by `EndlessDirector.scale`. For a boss or mini boss that ratio is its power, the same `skill_scale`, so its burn isn't scaled twice. Story burns are unchanged.
@@ -1081,7 +1104,7 @@ A playtest bot (`tests/tools/autoplay.gd`) played the story headless at three sk
 | Cause | Change |
 |---|---|
 | Lucian restarted every stage at level 1 while enemies grew per act, so each act's first wave was the hardest moment of the game. Skill ranks bought in the tree could not be used: rank 3 needs level 5, R needs level 6, and Act 2 ended at level 3–5. | A story stage starts Lucian at its act's level: 1, 2, 5, 5, 7, 9 (`StageSetup.ACT_START_LEVELS`: the user's numbers, with Act 3 raised from 4 to 5 after Hard's playtest), with that many skill points. The XP to the next level is 100 + 60 × level (was 180 + 100 × level). Act 1, Training and Endless start at level 1. |
-| Enemy HP grew ×1.6 to ×4.0 by act while Lucian's damage grew far less. | `EnemyData`: HP per act 0.6 → **0.25**, damage per act 0.25 → **0.15**, growth per wave 15% → **10%**. Rewards per act are unchanged. |
+| Enemy HP grew ×1.6 to ×4.0 by act while Lucian's damage grew far less. | `EnemyData`: HP per act 0.6 → **0.25**, damage per act 0.25 → **0.15**, growth per wave 15% → **10%**. Rewards per act are unchanged. *(V2.0: HP per act 0.25 → **0.35**, with more waves and stronger bosses; §1, §3 and the act files.)* |
 | 1-1 → 2-1 was a cliff: 2.7× the tutorial's HP and no Senna. | The first stage of every act (2-1, 3-1, 4-1, 5-1, 6-1) gives its normal enemies 20% less HP (in 2-1 the elites too); 3-1's wave 2 brings one raptor pack (was two). |
 | The tutorial killed a player who doesn't kite in 26 s. | 1-1's wave 1 is 4 melee and 2 ranged (was 6 and 4), wave 2 has 4 ranged (was 6), and its minions hit 25% softer (`WavePlan.DAMAGE_SHARES`). |
 | Swarm enemies outran Lucian (345), so kiting, his whole kit, did nothing. | Raptors 300 / 295, wolves 310 / 300, spiderlings 330, saplings 320, Mist Walkers 320. |
