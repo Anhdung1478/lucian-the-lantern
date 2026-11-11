@@ -13,8 +13,10 @@ const TIP_MARKS := "Red marks on the ground show where a hit will land. Step out
 const TIP_ELITE := "Elites hit hard. Kill the small ones around them first, then keep your distance."
 const TIP_BOSS := "Watch the boss's red marks: each skill shows where it lands before it hits."
 const TIP_BURN := "Burning ground keeps hurting while you stand on it. Walk out at once."
-## The names of the sources that are no enemy.
-const SOURCE_NAMES := {&"burn": "A burn"}
+## The names of the sources that are no enemy, and how the killed-by line
+## says them ("Killed by burning ground").
+const SOURCE_NAMES := {&"burn": "Burning ground"}
+const KILLED_NAMES := {&"burn": "burning ground"}
 ## Enemies whose behavior makes them ranged, and those that are red marks.
 const RANGED := [&"ranged", &"spit"]
 const MARKED := [&"siege"]
@@ -48,7 +50,7 @@ static func _killed(stats: StageStats) -> String:
 	var who := _name(stats.last_hit_by)
 	if stats.last_hit_with == DamageOverTime.SOURCE and _enemy(stats.last_hit_by):
 		return KILLED_BY_BURN % who
-	return KILLED % who
+	return KILLED % KILLED_NAMES.get(stats.last_hit_by, who)
 
 
 static func _shares(stats: StageStats, top: Array[StringName]) -> Array[String]:

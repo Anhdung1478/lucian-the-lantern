@@ -41,7 +41,7 @@ func test_the_killer_is_named_by_its_display_name() -> void:
 
 
 func test_a_burn_or_hazard_with_no_enemy_has_a_plain_name() -> void:
-	assert_eq(_build(_stats({&"burn": 10.0}, &"burn", &"burn")).killed, "Killed by A burn")
+	assert_eq(_build(_stats({&"burn": 10.0}, &"burn", &"burn")).killed, "Killed by burning ground")
 	assert_eq(_build(_stats({&"mystery_pit": 10.0}, &"mystery_pit")).killed, "Killed by Mystery Pit")
 
 
@@ -52,7 +52,7 @@ func test_a_burn_an_enemy_left_names_the_enemy() -> void:
 
 func test_the_top_three_sources_share_all_the_damage() -> void:
 	var recap := _build(_stats({&"raptor": 10.0, &"gromp": 50.0, &"melee_minion": 25.0, &"burn": 15.0}, &"gromp"))
-	assert_eq(recap.shares, ["Gromp 50%", "Melee Minion 25%", "A burn 15%"] as Array[String])
+	assert_eq(recap.shares, ["Gromp 50%", "Melee Minion 25%", "Burning ground 15%"] as Array[String])
 
 
 func test_fewer_sources_make_fewer_shares() -> void:
