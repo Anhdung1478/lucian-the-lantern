@@ -779,9 +779,9 @@ func _drop_loot_of(unit: EnemyUnit) -> void:
 
 
 ## The act whose gold, XP and blue a kill pays: the stage's (the sandbox
-## pays like act 1); in Endless, the unit's wave's.
+## pays like act 1); in Endless, the unit's wave's, at least the acts cleared.
 func _reward_act(unit: EnemyUnit) -> int:
-	return EndlessPlan.reward_act(unit.wave) if endless else maxi(run.act, 1)
+	return EndlessPlan.reward_act(unit.wave, run.acts_cleared) if endless else maxi(run.act, 1)
 
 
 ## `count` enemies of `id` around where their parent died, in its wave

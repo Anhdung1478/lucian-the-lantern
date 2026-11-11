@@ -43,7 +43,7 @@ var extra_stats := StatsPanel.new()
 var hp_regen_label: Label
 var mana_regen_label: Label
 
-## Act 1's tips, under the boss bar.
+## Act 1's tips and Endless's milestones, under the boss bar.
 var tips := TipBanner.new()
 var stage: Stage
 var stage_info := StageInfo.new()

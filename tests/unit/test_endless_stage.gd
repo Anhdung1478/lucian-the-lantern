@@ -21,11 +21,12 @@ func after_each() -> void:
 	get_tree().paused = false
 
 
-## An Endless run on map `choice`, from a fresh save whose best is `best`;
-## Lucian takes no damage.
-func _endless(choice := JUNGLE, best := 0) -> Stage:
+## An Endless run on map `choice`, from a fresh save whose best is `best`
+## and that has cleared the first `acts` acts; Lucian takes no damage.
+func _endless(choice := JUNGLE, best := 0, acts := 0) -> Stage:
 	SaveGame.instance().reset()
 	SaveGame.instance().record_endless(best)
+	SaveGame.instance().set_cleared(Journey.all_stage_ids(acts))
 	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
 	stage.setup(StageSetup.for_endless(SaveGame.instance(), choice, RandomNumberGenerator.new()))
 	add_child_autofree(stage)
@@ -145,6 +146,75 @@ func test_kills_pay_like_the_act_of_their_wave() -> void:
 	stage.spawn_enemy(WavePlan.MELEE, at, 21).take_damage(_lethal())
 	assert_eq(stage.collected[Essences.BLUE], 1 + 3 + 2 * data.extra_blue, "wave 21 pays like act 3")
 	assert_eq(stage.wallet.gold, gold + roundi(data.gold * data.reward_scale(3)))
+
+
+## P11: never less than the acts the save has cleared.
+func test_kills_pay_at_least_like_the_acts_cleared() -> void:
+	var stage: Stage = await _endless(TRAINING_GROUND, 0, 3)
+	assert_eq(stage.run.acts_cleared, 3)
+	var data: EnemyData = load(Stage.ENEMY_PATH % WavePlan.MELEE)
+	var at := stage.arena.spawn_points[0]
+	stage.spawn_enemy(WavePlan.MELEE, at, 1).take_damage(_lethal())
+	assert_eq(stage.collected[Essences.BLUE], 3 + data.extra_blue, "wave 1 pays like act 3")
+	var gold := roundi(data.gold * data.reward_scale(3))
+	assert_eq(stage.wallet.gold, gold)
+	stage.spawn_enemy(WavePlan.MELEE, at, 31).take_damage(_lethal())
+	assert_eq(stage.collected[Essences.BLUE], 3 + 4 + 2 * data.extra_blue, "wave 31 pays like act 4")
+	assert_eq(stage.wallet.gold, gold + roundi(data.gold * data.reward_scale(4)))
+
+
+## The break after winning wave `waves` of the run (its count, as the best
+## counts it).
+func _win_wave(stage: Stage, waves: int) -> void:
+	stage.runner._done = waves
+	stage.runner.break_started.emit(WaveRunner.BREAK_TIME)
+
+
+## P11: the first time the save wins wave 10, its 300 blue and 5 orange rise
+## over Lucian, with a banner and a result line; never again.
+func test_winning_wave_10_the_first_time_pays_its_milestone_once() -> void:
+	var stage: Stage = await _endless()
+	var save := SaveGame.instance()
+	_win_wave(stage, 9)
+	assert_eq(stage.collected[Essences.BLUE], 0, "no milestone at 9")
+	_win_wave(stage, 10)
+	assert_eq(save.endless_milestones, [10] as Array[int])
+	assert_eq(save.endless_best, 10)
+	assert_eq(stage.collected[Essences.BLUE], 300)
+	assert_eq(stage.collected[Essences.ORANGE], 5)
+	assert_eq(save.essences.amount(Essences.BLUE), 300, "in the save at once, as a kill's essence")
+	assert_eq(save.essences.amount(Essences.ORANGE), 5)
+	var line := "Wave 10 won for the first time: +300 blue and +5 orange essence"
+	assert_eq(stage.reward_lines, [line] as Array[String])
+	assert_eq(stage.hud.tips._queue, [line] as Array[String], "a banner")
+	_win_wave(stage, 10)
+	assert_eq(stage.collected[Essences.BLUE], 300, "paid once")
+	_win_wave(stage, 20)
+	assert_eq(stage.collected[Essences.BLUE], 900)
+	assert_eq(stage.collected[Essences.ORANGE], 15)
+	assert_eq(save.endless_milestones, [10, 20] as Array[int])
+	stage.show_result(false)
+	assert_eq(stage.reward_lines[-1], "New best: 20 waves!")
+	assert_eq(stage.reward_lines.size(), 3, "both milestones on the result")
+
+
+## A debug jump's skipped waves don't count: wave 10 reached by a jump is 1
+## wave won.
+func test_a_jump_to_wave_10_pays_no_milestone() -> void:
+	var stage: Stage = await _endless()
+	stage.jump_to_boss_wave()
+	stage.runner.tick(0.1)
+	stage.runner.tick(0.1)
+	assert_eq(stage.runner.wave, 10)
+	# The boss goes without a kill (no rewards), and the wave is won.
+	for enemy: Node in get_tree().get_nodes_in_group(&"enemies"):
+		enemy.remove_from_group(&"enemies")
+		enemy.queue_free()
+		stage.runner.enemy_died()
+	assert_eq(stage.runner.state, WaveRunner.State.BREAK)
+	assert_eq(stage.runner.waves_cleared, 1)
+	assert_true(SaveGame.instance().endless_milestones.is_empty())
+	assert_eq(stage.collected[Essences.BLUE], 0)
 
 
 func test_a_tier_2_boss_kill_pays_130_blue_and_a_tier_1_boss_100() -> void:

@@ -36,8 +36,17 @@ const BOSS_HP := 15000.0
 const MINI_BOSS_HP := 9000.0
 const TIER_HP := 0.3
 const TIER_POWER := 0.15
-## Kills pay like act 1 + (w − 1) / REWARD_ACT_WAVES.
+## Kills pay like act 1 + (w − 1) / REWARD_ACT_WAVES, at least like the
+## acts the save has cleared, at most like the last act.
 const REWARD_ACT_WAVES := 10
+## Wave -> Vector2i(blue, orange) paid the first time a save wins that wave
+## (SaveGame.endless_milestones), as is: no bonus or multiplier raises it.
+const MILESTONES := {
+	10: Vector2i(300, 5),
+	20: Vector2i(600, 10),
+	30: Vector2i(900, 15),
+	40: Vector2i(1200, 20),
+}
 
 ## The run's StageSetup.stage_id.
 const STAGE_ID := "endless"
@@ -147,9 +156,17 @@ static func reward_scale(kind: StringName, w: int) -> float:
 	return 1.0
 
 
-## The act whose gold, XP and blue a kill in wave `w` pays.
-static func reward_act(w: int) -> int:
-	return 1 + maxi(w - 1, 0) / REWARD_ACT_WAVES
+## The act whose gold, XP and blue a kill in wave `w` pays: one more every
+## REWARD_ACT_WAVES waves, at least `acts_cleared` (the save's) and at most
+## the last act.
+static func reward_act(w: int, acts_cleared := 0) -> int:
+	return mini(maxi(1 + maxi(w - 1, 0) / REWARD_ACT_WAVES, acts_cleared), Journey.ACTS.size())
+
+
+## What winning wave `w` pays the first time, as Vector2i(blue, orange);
+## ZERO for a wave with no milestone.
+static func milestone(w: int) -> Vector2i:
+	return MILESTONES.get(w, Vector2i.ZERO)
 
 
 ## Map choice `choice` (1–6) as Vector2i(act, stage variant); ZERO for none.

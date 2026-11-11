@@ -216,6 +216,27 @@ func test_rewards_pay_like_an_act_every_10_waves() -> void:
 	assert_eq(EndlessPlan.reward_act(10), 1)
 	assert_eq(EndlessPlan.reward_act(11), 2)
 	assert_eq(EndlessPlan.reward_act(35), 4)
+	assert_eq(EndlessPlan.reward_act(51), 6)
+
+
+## P11: never less than the acts the save has cleared, never past Act 6.
+func test_rewards_pay_at_least_like_the_acts_cleared_and_at_most_like_act_6() -> void:
+	assert_eq(EndlessPlan.reward_act(1, 3), 3, "Endless opens after Act 3")
+	assert_eq(EndlessPlan.reward_act(30, 3), 3)
+	assert_eq(EndlessPlan.reward_act(31, 3), 4, "the wave's act once it is higher")
+	assert_eq(EndlessPlan.reward_act(1, 6), 6)
+	assert_eq(EndlessPlan.reward_act(61), 6, "was act 7")
+	assert_eq(EndlessPlan.reward_act(200, 6), 6)
+
+
+## P11: paid the first time a save wins waves 10, 20, 30 and 40.
+func test_the_milestones_pay_300_blue_and_5_orange_a_tenth_wave_up_to_40() -> void:
+	assert_eq(EndlessPlan.milestone(10), Vector2i(300, 5))
+	assert_eq(EndlessPlan.milestone(20), Vector2i(600, 10))
+	assert_eq(EndlessPlan.milestone(30), Vector2i(900, 15))
+	assert_eq(EndlessPlan.milestone(40), Vector2i(1200, 20))
+	for w in [0, 1, 9, 11, 15, 50, 100]:
+		assert_eq(EndlessPlan.milestone(w), Vector2i.ZERO, "wave %d" % w)
 
 
 func test_the_map_table() -> void:

@@ -33,6 +33,9 @@ var endless_map := EndlessPlan.RANDOM
 ## Stage ids ("1-1" ... "6-5") cleared at least once.
 var cleared: Array[String] = []
 var endless_best := 0
+## Endless's milestone waves (EndlessPlan.MILESTONES) already paid, in the
+## order they were won.
+var endless_milestones: Array[int] = []
 ## Bosses and mini bosses with a first-time purple reward, by id (some
 ## before their data files exist).
 const BOSS_IDS: Array[String] = ["thresh_1", "akshan", "infernal_drake", "ocean_drake", "elder_dragon", "dark_lucian", "maokai", "elise", "karthus", "karthus_revived", "hecarim", "thresh_final"]
@@ -135,6 +138,7 @@ func reset() -> void:
 	endless_map = EndlessPlan.RANDOM
 	cleared = []
 	endless_best = 0
+	endless_milestones = []
 	bosses = []
 	play_time = 0.0
 	difficulty = Difficulty.NORMAL
@@ -187,6 +191,17 @@ func record_endless(waves: int) -> bool:
 	if waves <= endless_best:
 		return false
 	endless_best = waves
+	changed.emit()
+	return true
+
+
+## An Endless run has won wave `w`: true the first time the save wins a
+## milestone wave (EndlessPlan.MILESTONES), which is then marked as paid in
+## memory (the next save writes it). The caller adds the essence.
+func claim_endless_milestone(w: int) -> bool:
+	if not EndlessPlan.MILESTONES.has(w) or w in endless_milestones:
+		return false
+	endless_milestones.append(w)
 	changed.emit()
 	return true
 
@@ -284,6 +299,7 @@ func to_dict() -> Dictionary:
 		"endless_map": endless_map,
 		"cleared": cleared.duplicate(),
 		"endless_best": endless_best,
+		"endless_milestones": endless_milestones.duplicate(),
 		"bosses": bosses.duplicate(),
 		"play_time": int(play_time),
 		"difficulty": Difficulty.KEYS[difficulty],
@@ -373,6 +389,14 @@ func _apply(data: Dictionary) -> void:
 				cleared.append(id)
 	var best: Variant = data.get("endless_best", 0)
 	endless_best = maxi(int(best), 0) if (best is int or best is float) else 0
+	# Each milestone wave once, as a whole number; a save from before the
+	# milestones has none paid.
+	endless_milestones = []
+	var saved_milestones: Variant = data.get("endless_milestones", [])
+	if saved_milestones is Array:
+		for w: Variant in saved_milestones:
+			if (w is int or w is float) and float(w) == float(int(w)) and EndlessPlan.MILESTONES.has(int(w)) and not int(w) in endless_milestones:
+				endless_milestones.append(int(w))
 	bosses = []
 	var saved_bosses: Variant = data.get("bosses", [])
 	if saved_bosses is Array:

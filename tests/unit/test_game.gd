@@ -611,6 +611,24 @@ func test_leaving_an_endless_run_asks_its_own_question_and_saves_the_best() -> v
 	assert_eq(_journey().picked, _journey().map.node_for("4-1"), "the next stage")
 
 
+## P11: a run that dies after winning wave 20 keeps its milestones and
+## their essence, as it keeps every essence of the run.
+func test_a_failed_run_keeps_its_milestones_and_their_essence() -> void:
+	var stage: Stage = await _endless_run()
+	var essences := SaveGame.instance().essences.to_dict()
+	for waves in [10, 20]:
+		stage.endless.runner._done = waves
+		stage.endless.runner.break_started.emit(WaveRunner.BREAK_TIME)
+	stage.show_result(false)
+	stage.result.main_button.pressed.emit()
+	await wait_process_frames(2)
+	var saved := _on_disk()
+	assert_eq(saved.endless_milestones, [10, 20] as Array[int])
+	assert_eq(saved.endless_best, 20)
+	assert_eq(saved.essences.amount(Essences.BLUE), essences.blue + 900)
+	assert_eq(saved.essences.amount(Essences.ORANGE), essences.orange + 15)
+
+
 func test_quitting_with_yes_in_an_endless_run_saves_the_best() -> void:
 	var stage: Stage = await _endless_run()
 	SaveGame.instance().record_endless(9)

@@ -3,7 +3,8 @@ extends Node
 ## Endless mode inside a stage (design: Endless mode). The Stage adds one only
 ## when run.endless and calls its hooks: start (the runner), scale (each
 ## spawn's strength) and skip_to_boss (debug). It records the best as each
-## wave is won. After a boss wave it holds the break for the ModifierPick over
+## wave is won, and pays a milestone the first time the save wins its wave.
+## After a boss wave it holds the break for the ModifierPick over
 ## a paused game, applies the pick and lets the break go. At the end it adds
 ## the run's rows and "New best" to the result (add_result). The rest of the
 ## run is the story's stage: the merchant in breaks, rewards, loot.
@@ -14,6 +15,8 @@ const RUN_OVER := "RUN OVER"
 const NEW_BEST := "New best: %d %s!"
 ## The Modifier row with none in effect (none picked yet, or Nothing).
 const NO_MODIFIER := "None"
+## A milestone's banner and result line: the wave, its blue and orange.
+const MILESTONE := "Wave %d won for the first time: +%d blue and +%d orange essence"
 
 var stage: Stage
 var runner: EndlessRunner
@@ -95,10 +98,25 @@ func _power(unit: EnemyUnit, power: float) -> void:
 	unit.skill_scale = power
 
 
-## A wave was won (its break starts): the best, in memory only. The stage's
-## end saves it.
+## A wave was won (its break starts): the best and a first milestone, in
+## memory only (its essence too). The stage's end saves them, as it saves
+## every essence of the run, even when Lucian falls.
 func _on_wave_won(_seconds: float) -> void:
 	SaveGame.instance().record_endless(runner.waves_cleared)
+	_pay_milestone(runner.waves_cleared)
+
+
+## The first time the save wins milestone wave `waves` (counted as the best
+## is: a debug jump's skipped waves don't count): its blue and orange rise
+## over Lucian as a kill's do, with a banner and a line on the result.
+func _pay_milestone(waves: int) -> void:
+	var pay := EndlessPlan.milestone(waves)
+	if pay == Vector2i.ZERO or not SaveGame.instance().claim_endless_milestone(waves):
+		return
+	var text := MILESTONE % [waves, pay.x, pay.y]
+	stage.add_essences(pay.x, pay.y, 0, stage.lucian.global_position)
+	stage.reward_lines.append(text)
+	stage.hud.tips.show_tip(StringName(text), text)
 
 
 ## Deferred: the boss's death can come in a shot's physics callback.

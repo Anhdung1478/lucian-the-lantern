@@ -473,6 +473,48 @@ func test_the_endless_best_survives_save_and_load() -> void:
 	assert_eq(loaded.endless_best, 12)
 
 
+## P11: each milestone is paid once a save, and a save keeps the claims.
+func test_claim_endless_milestone_pays_each_milestone_once() -> void:
+	assert_true(save_game.endless_milestones.is_empty(), "a new game")
+	watch_signals(save_game)
+	assert_true(save_game.claim_endless_milestone(20))
+	assert_signal_emitted(save_game, "changed")
+	assert_false(save_game.claim_endless_milestone(20), "paid already")
+	assert_true(save_game.claim_endless_milestone(10))
+	for w in [0, 9, 11, 50]:
+		assert_false(save_game.claim_endless_milestone(w), "no milestone at %d" % w)
+	assert_eq(save_game.endless_milestones, [20, 10] as Array[int])
+	assert_false(save_game.slot_exists(1), "nothing is written by itself")
+	save_game.reset()
+	assert_true(save_game.endless_milestones.is_empty(), "a new game again")
+
+
+func test_endless_milestones_round_trip_and_an_old_save_has_none() -> void:
+	save_game.claim_endless_milestone(10)
+	save_game.claim_endless_milestone(30)
+	assert_true(save_game.save())
+	var loaded := SaveGame.new(PREFIX)
+	loaded.load_slot(1)
+	assert_eq(loaded.endless_milestones, [10, 30] as Array[int])
+	assert_false(loaded.claim_endless_milestone(30))
+	_write_text(save_game.path(1), JSON.stringify({"endless_best": 25}))
+	loaded.load_slot(1)
+	assert_true(loaded.endless_milestones.is_empty(), "a save from before the milestones")
+	assert_eq(loaded.endless_best, 25)
+	assert_true(loaded.claim_endless_milestone(10), "so a best of 25 still pays wave 10 once")
+
+
+func test_bad_endless_milestones_are_dropped() -> void:
+	_write_text(save_game.path(1), JSON.stringify({"endless_milestones": [10, 10.0, 20.5, "30", 15, 50, null, 40.0]}))
+	save_game.load_slot(1)
+	assert_eq(save_game.endless_milestones, [10, 40] as Array[int])
+	assert_typeof(save_game.endless_milestones[1], TYPE_INT)
+	for bad: Variant in [10, "10", {"10": true}, null]:
+		_write_text(save_game.path(1), JSON.stringify({"endless_milestones": bad}))
+		save_game.load_slot(1)
+		assert_true(save_game.endless_milestones.is_empty(), "%s" % [bad])
+
+
 func test_a_failed_start_new_puts_the_slot_and_progress_back() -> void:
 	save_game.slot = 3
 	save_game.essences.add(Essences.BLUE, 9)

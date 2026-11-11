@@ -1,8 +1,8 @@
 class_name TipBanner
 extends PanelContainer
-## Act 1's tips under the stage info: one at a time, each shown once for
-## TIME seconds; later ones wait their turn. The time only runs while the
-## game does.
+## Act 1's tips (and Endless's milestones) under the stage info: one at a
+## time, each shown once for TIME seconds; later ones wait their turn. The
+## time only runs while the game does.
 
 const TIME := 7.0
 

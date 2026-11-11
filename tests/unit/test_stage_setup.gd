@@ -147,6 +147,16 @@ func test_endless_on_a_chosen_map() -> void:
 	assert_eq(setup.bought, StageSetup.from_save(save).bought, "built on the save's setup")
 
 
+## P11: an Endless run pays at least like the acts the save has cleared.
+func test_endless_keeps_the_acts_the_save_has_cleared() -> void:
+	var rng := RandomNumberGenerator.new()
+	var save := SaveGame.new("user://test_setup_")
+	assert_eq(StageSetup.new().acts_cleared, 0)
+	assert_eq(StageSetup.for_endless(save, 3, rng).acts_cleared, 0)
+	save.set_cleared(Journey.all_stage_ids(4))
+	assert_eq(StageSetup.for_endless(save, 3, rng).acts_cleared, 4)
+
+
 func test_endless_on_each_map() -> void:
 	var rng := RandomNumberGenerator.new()
 	var save := SaveGame.new("user://test_setup_")

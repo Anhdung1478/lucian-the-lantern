@@ -55,6 +55,8 @@ var tutorial := false
 ## Random, rolled again on Retry). `act` and `stage` then only pick the map.
 var endless := false
 var map_choice := 0
+## Endless: the acts the save had cleared when the run started (Journey.acts_cleared).
+var acts_cleared := 0
 ## The Endless modifier's reward multipliers (EndlessModifiers.apply_rewards):
 ## gold, blue, the orange drop chance and repeat purple. 1 = none.
 var gold_mult := 1.0
@@ -130,4 +132,5 @@ static func for_endless(save: SaveGame, choice: int, rng: RandomNumberGenerator)
 	setup.stage_id = EndlessPlan.STAGE_ID
 	setup.display_name = "Endless · %s" % EndlessPlan.map_name(map)
 	setup.boss = &""
+	setup.acts_cleared = Journey.acts_cleared(save.cleared)
 	return setup
