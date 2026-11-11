@@ -3995,7 +3995,8 @@ func scenario_endless_boss() -> void:
 
 
 ## After an Endless boss wave (wave 10 on the Training ground): the pick's
-## three cards over the paused game; a click on the first: the break counts
+## three cards over the paused game; the second hovered (lifted, a gold
+## rim); a click on the first: the break counts
 ## down and the modifier's row leads the buff bar (hovered: both lines); then
 ## a ModifierPick of the three modifiers not offered (not a real pick), so
 ## every card is seen.
@@ -4018,6 +4019,10 @@ func scenario_endless_pick() -> void:
 		return "%s / %s" % [EndlessModifiers.downside(id), EndlessModifiers.reward(id)]))
 	print("stage info (expect no countdown, no Skip): ", info_text())
 	await shot("endless_pick_0_cards")
+	await mouse_move(control_center(pick.cards[1]))
+	await wait(ModifierCard.LIFT_TIME + 0.1)
+	print("hovered card lit (expect true): ", (pick.cards[1] as ModifierCard).lit)
+	await shot("endless_pick_0_hovered")
 	pick.cards[0].pressed.emit()
 	await wait(0.3)
 	print("picked: modifier (expect %d) %d, paused (expect false) %s, info (expect Wave 11 in 0:2x  [Skip]): %s" % [
