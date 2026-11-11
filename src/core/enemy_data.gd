@@ -5,7 +5,7 @@ extends Resource
 
 ## HP, damage and reward growth per act after the first; HP and damage
 ## growth per wave after the first.
-const ACT_HP := 0.25
+const ACT_HP := 0.35
 const ACT_DAMAGE := 0.15
 const ACT_REWARD := 0.25
 const WAVE_GROWTH := 0.1

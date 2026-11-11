@@ -810,11 +810,11 @@ func test_in_6_5_he_comes_in_the_boss_wave_and_his_souls_get_its_scaling() -> vo
 	await _to_phase_2(boss)
 	var souls := await _souls(stage, boss)
 	assert_eq(souls.size(), 3)
-	# Act 6, wave 10: HP x 2.25 x 1.9 and damage x 1.75 x 1.9 (Normal), as for
-	# the boss wave's other enemies, not wave 1's x 2.25 / x 1.75.
+	# Act 6, wave 10: HP x 2.75 x 1.9 and damage x 1.75 x 1.9 (Normal), as for
+	# the boss wave's other enemies, not wave 1's x 2.75 / x 1.75.
 	for soul: EnemyUnit in souls:
 		assert_eq(soul.wave, 10)
-		assert_almost_eq(soul.max_hp, 150.0 * 2.25 * 1.9, 0.01)
+		assert_almost_eq(soul.max_hp, 150.0 * 2.75 * 1.9, 0.01)
 		assert_almost_eq(soul.damage, 22.0 * 1.75 * 1.9, 0.01)
 	assert_engine_error_count(0)
 
