@@ -176,6 +176,11 @@ func _tree_text(save: SaveGame) -> String:
 ## Returns what it bought.
 func _spend(save: SaveGame) -> String:
 	var bought: PackedStringArray = []
+	# A free claim (E's and R's rank 1) is taken as soon as it opens, as a
+	# player would, not when the order reaches it.
+	for id in save.tree.free_ids():
+		if save.tree.buy(id, save.essences):
+			bought.append("%s%d" % [id, save.tree.level(id)])
 	for want: Array in BUY_ORDER:
 		var id: StringName = want[0]
 		if save.tree.node(id) == null or save.tree.level(id) >= want[1]:
@@ -530,6 +535,9 @@ class Bot extends Node:
 					continue
 				if lucian.inventory.space_for(item) == 0 and _free_equip_slot(item) < 0:
 					continue
+				# A second penetration item could never be worn.
+				if item.is_penetration() and _holds_penetration():
+					continue
 				if best < 0 or item.cost > shop.stock.item_at(best).cost:
 					best = slot
 			if best < 0:
@@ -558,8 +566,18 @@ class Bot extends Node:
 				return i
 		return -1
 
+	## A penetration item is held anywhere: equipped or in the backpack.
+	func _holds_penetration() -> bool:
+		var inv := lucian.inventory
+		for i in Inventory.SIZE:
+			var item := inv.item_at(i)
+			if item and not inv.is_locked(i) and item.is_penetration():
+				return true
+		return false
+
 	## Crafts any two fragments into their legendary at the merchant's Craft
-	## tab, while the fee leaves 100 gold for potions.
+	## tab, while the fee leaves 100 gold for potions; never a second
+	## penetration item, which could not be worn.
 	func _craft(shop: Shop) -> void:
 		var inv := lucian.inventory
 		var again := true
@@ -573,6 +591,8 @@ class Bot extends Node:
 						continue
 					var made := shop.craft_result(a, b)
 					var fee := shop.craft_fee(a, b)
+					if made and made.is_penetration() and _holds_penetration():
+						continue
 					if made and stage.wallet.gold >= fee + 100 and shop.craft(a, b) == Shop.Result.OK:
 						_note("craft %s (fee %d)" % [made.display_name, fee])
 						again = true
@@ -599,7 +619,11 @@ class Bot extends Node:
 				var item := inv.item_at(i)
 				if inv.is_locked(i) or item == null or item.is_potion() or item.is_boots() or placed.has(i):
 					continue
-				if (item.is_penetration() and has_pen) or (best >= 0 and item.cost <= inv.item_at(best).cost):
+				if item.is_penetration() and has_pen:
+					continue
+				# On a tie the item already equipped wins, so two items of one
+				# price never swap back and forth.
+				if best >= 0 and (item.cost < inv.item_at(best).cost or (item.cost == inv.item_at(best).cost and i < Inventory.EQUIP_START)):
 					continue
 				best = i
 			if best < 0:
