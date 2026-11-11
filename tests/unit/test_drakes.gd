@@ -82,7 +82,7 @@ func test_the_drakes_match_the_table() -> void:
 	var fields := ["kind", "behavior", "camp", "max_hp", "armor", "mr", "damage", "damage_type", "projectile_speed",
 		"attack_range", "attack_interval", "move_speed", "radius", "purple_first", "purple_repeat"]
 	var table := {
-		"infernal_drake": [&"mini_boss", &"infernal_drake", &"drake", 9000.0, 40.0, 40.0, 50.0, DamageInfo.Type.MAGIC, 700.0,
+		"infernal_drake": [&"mini_boss", &"infernal_drake", &"drake", 6500.0, 40.0, 40.0, 50.0, DamageInfo.Type.MAGIC, 700.0,
 			600.0, 1.6, 260.0, 70.0, 5, 1],
 		"ocean_drake": [&"mini_boss", &"ocean_drake", &"drake", 10000.0, 40.0, 50.0, 55.0, DamageInfo.Type.MAGIC, 800.0,
 			600.0, 1.5, 260.0, 70.0, 5, 1],
@@ -136,7 +136,7 @@ func test_the_stage_builds_each_drake_unscaled_in_the_pit() -> void:
 	assert_lt(stage._spawn_point(_data("infernal_drake")).distance_to(pit), 200.0, "it comes out of the pit")
 	var infernal := stage.spawn_enemy(&"infernal_drake", pit, 4)
 	assert_is(infernal, InfernalDrake)
-	assert_eq(infernal.max_hp, 9000.0, "no scaling")
+	assert_eq(infernal.max_hp, 6500.0, "no scaling")
 	assert_eq(infernal.damage, 50.0)
 	assert_eq((infernal as Boss).arena, stage.arena, "it knows the map, for walkable ground")
 	assert_eq(infernal.warning_parent, stage.get_node("Warnings"))

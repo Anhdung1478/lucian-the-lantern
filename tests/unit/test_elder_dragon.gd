@@ -103,7 +103,7 @@ func test_the_elder_dragon_matches_the_table() -> void:
 		return
 	var fields := ["id", "kind", "behavior", "max_hp", "armor", "mr", "damage", "damage_type", "projectile_speed",
 		"attack_range", "attack_interval", "move_speed", "radius", "purple_first", "purple_repeat", "gold"]
-	var table := [&"elder_dragon", &"boss", &"elder_dragon", 16000.0, 50.0, 50.0, 70.0, DamageInfo.Type.MAGIC, 900.0,
+	var table := [&"elder_dragon", &"boss", &"elder_dragon", 11000.0, 50.0, 50.0, 70.0, DamageInfo.Type.MAGIC, 900.0,
 		650.0, 1.5, 280.0, 84.0, 10, 2, 300]
 	for i in fields.size():
 		assert_eq(data.get(fields[i]), table[i], fields[i])
@@ -617,7 +617,7 @@ func test_the_boss_wave_lands_it_in_the_middle_of_the_pit_and_a_kill_pays_10_pur
 	if dragon == null:
 		return
 	assert_eq(dragon.global_position, stage.arena.boss_point)
-	assert_eq(dragon.max_hp, 16000.0, "no scaling")
+	assert_eq(dragon.max_hp, 11000.0, "no scaling")
 	assert_eq(dragon.arena, stage.arena)
 	assert_eq(dragon.health_bar.size, EnemyUnit.BOSS_BAR)
 	_quiet(dragon)
