@@ -103,6 +103,35 @@ func test_deaths_dance_kill_clears_the_bleed() -> void:
 	assert_gte(lucian.hp, after_kill)
 
 
+## A unit of `kind` (&"normal", &"elite", &"mini_boss" or &"boss") to kill.
+func _unit(kind: StringName) -> EnemyUnit:
+	var unit: EnemyUnit = autofree(EnemyUnit.new())
+	autofree(unit.visuals)
+	autofree(unit.health_bar)
+	unit.data = EnemyData.new()
+	unit.data.kind = kind
+	return unit
+
+
+func test_defy_cleanses_but_does_not_heal_on_a_normal_kill() -> void:
+	_equip(&"deaths_dance")
+	lucian.take_damage(_hit(100.0))
+	lucian.passives.on_kill(_unit(&"normal"))
+	assert_true(lucian.passives._bleeds.is_empty())
+	assert_eq(lucian.restores.count(&"deaths_dance"), 0)
+
+
+func test_defy_heals_on_elite_mini_boss_and_boss_kills() -> void:
+	_equip(&"deaths_dance")
+	for kind: StringName in [&"elite", &"mini_boss", &"boss"]:
+		lucian.take_damage(_hit(100.0))
+		lucian.passives.on_kill(_unit(kind))
+		assert_true(lucian.passives._bleeds.is_empty(), str(kind))
+		assert_eq(lucian.restores.count(&"deaths_dance"), 1, str(kind))
+		var healed := lucian.restores.tick(ItemPassives.DEFY_TIME + 0.1).x
+		assert_almost_eq(healed, lucian.stats.max_hp * ItemPassives.DEFY_HEAL, 0.01, str(kind))
+
+
 func test_thornmail_ignores_a_freed_attacker() -> void:
 	_equip(&"thornmail")
 	var info := _hit(10.0)

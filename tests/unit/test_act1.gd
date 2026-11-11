@@ -96,11 +96,12 @@ func test_sennas_last_hit_is_lucians_kill() -> void:
 	var e := lucian.skills[ChampionProgress.Slot.E]
 	e.cooldown.start(10.0)
 	lucian.inventory.put(Inventory.EQUIP_START, lucian.item_catalog.find(&"deaths_dance"))
+	lucian.take_damage(DamageInfo.create(100.0, DamageInfo.Type.TRUE, &"basic"))
 	watch_signals(lucian)
 	_senna_kills(senna, 10.0)
 	assert_signal_emitted(lucian, "enemy_killed")
 	assert_almost_eq(e.cooldown.remaining, 10.0 - RelentlessPursuit.KILL_CUT, 0.001, "max-rank E's kill cut")
-	assert_eq(lucian.restores.count(&"deaths_dance"), 1, "Death's Dance heals on her kill")
+	assert_true(lucian.passives._bleeds.is_empty(), "Death's Dance's Defy clears the bleed on her kill")
 
 
 func test_a_kill_after_lucian_died_is_nobodys() -> void:

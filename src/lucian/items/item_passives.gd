@@ -97,6 +97,7 @@ const MAGEBANE_WAIT := 15.0
 const MAGEBANE_SHIELD := 0.15
 # Boots (docs/items.md, Boots).
 const SLAY_BOOTS: Array[StringName] = [&"gluttonous_greaves", &"immortal_path"]
+## The kills Slay stacks on and Defy heals on.
 const SLAY_KINDS: Array[StringName] = [&"elite", &"mini_boss", &"boss"]
 const SLAY_OMNIVAMP := 0.006
 const SLAY_MAX := 10
@@ -391,16 +392,25 @@ func on_lethal() -> bool:
 	return true
 
 
-## Death's Dance (Defy): a kill clears the delayed damage and heals 15%
-## max HP over 2 s. Slay: an elite, mini boss or boss kill adds a stack.
+## Death's Dance (Defy): any kill clears the delayed damage; an elite, mini
+## boss or boss kill also heals 15% max HP over 2 s. Slay: an elite, mini
+## boss or boss kill adds a stack.
 func on_kill(enemy: Enemy = null) -> void:
+	var big := _is_elite_or_boss(enemy)
 	if has(&"deaths_dance"):
 		_bleeds.clear()
-		lucian.restores.start_amount(&"deaths_dance", lucian.stats.max_hp * DEFY_HEAL, 0.0, DEFY_TIME)
-	var unit := enemy as EnemyUnit
-	if has_slay() and slay_stacks < SLAY_MAX and unit and unit.data and unit.data.kind in SLAY_KINDS:
+		if big:
+			lucian.restores.start_amount(&"deaths_dance", lucian.stats.max_hp * DEFY_HEAL, 0.0, DEFY_TIME)
+	if has_slay() and slay_stacks < SLAY_MAX and big:
 		slay_stacks += 1
 		lucian.refresh_stats()
+
+
+## An elite, mini boss or boss (SLAY_KINDS): what Slay stacks on and Defy
+## heals on.
+static func _is_elite_or_boss(enemy: Enemy) -> bool:
+	var unit := enemy as EnemyUnit
+	return unit != null and unit.data != null and unit.data.kind in SLAY_KINDS
 
 
 ## Fimbulwinter (Everlasting): slowing an enemy shields Lucian.
