@@ -90,6 +90,8 @@ var attack_interval := 0.0
 var drain := 0.0
 ## Its elite trait (EliteTrait); &"" for none.
 var elite_trait := &""
+## The trait's ring on the ground; null with no trait or on low effects.
+var trait_ring: EliteRing
 ## Its Boss.skill_hit damage times this (Endless's boss and mini boss power).
 var skill_scale := 1.0
 ## Its basic attack's on-hit burn times this: in Endless, its damage over
@@ -525,17 +527,20 @@ func _fade_out() -> void:
 func _add_trait_ring() -> void:
 	if not Juice.on():
 		return
-	var ring := EliteRing.new()
-	ring.color = EliteTrait.color(elite_trait)
-	ring.radius = data.radius
-	add_child(ring)
-	move_child(ring, shadow.get_index() + 1)
+	trait_ring = EliteRing.new()
+	trait_ring.color = EliteTrait.color(elite_trait)
+	trait_ring.radius = data.radius
+	trait_ring.visible = not veiled
+	add_child(trait_ring)
+	move_child(trait_ring, shadow.get_index() + 1)
 
 
 ## The sprite's color: the data's tint, darkened to a silhouette when veiled.
-## The health bar hides under the veil.
+## The health bar and the trait's ring hide under the veil.
 func _paint() -> void:
 	health_bar.visible = not veiled
+	if trait_ring:
+		trait_ring.visible = not veiled
 	if sprite:
 		sprite.modulate = data.tint * VEIL_SHADE if veiled else data.tint
 

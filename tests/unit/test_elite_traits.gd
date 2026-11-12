@@ -247,3 +247,18 @@ func test_endless_gives_a_trait_from_wave_11() -> void:
 	stage.runner._countdown = 999.0
 	assert_eq(stage.spawn_enemy(&"siege_minion", Vector2(3000, 3000), 10).elite_trait, &"")
 	assert_true(stage.spawn_enemy(&"siege_minion", Vector2(3000, 3100), 11).elite_trait in EliteTrait.IDS)
+
+
+## The Black Mist hides who an elite is: its trait's ring goes with its bar.
+func test_the_trait_ring_hides_under_the_veil() -> void:
+	var renders := Juice.renders
+	Juice.renders = true
+	var elite := _elite(EliteTrait.VOLATILE, Vector2(300, 0))
+	var rings := elite.get_children().filter(func(node: Node) -> bool: return node is EliteRing)
+	assert_eq(rings.size(), 1)
+	elite.veiled = true
+	assert_false(elite.health_bar.visible, "the bar hides")
+	assert_false((rings[0] as EliteRing).visible, "the ring hides with it")
+	elite.veiled = false
+	assert_true((rings[0] as EliteRing).visible, "and comes back when Lucian is close")
+	Juice.renders = renders
