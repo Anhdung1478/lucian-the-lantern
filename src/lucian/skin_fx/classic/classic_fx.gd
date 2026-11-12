@@ -15,3 +15,9 @@ func w_blast(at: Vector2, direction: Vector2, bar: Vector2) -> Node2D:
 	var blast := ClassicBlast.new()
 	blast.setup(at, direction, bar)
 	return blast
+
+
+func e_trail(body: Texture2D) -> DashTrail:
+	var trail := ClassicTrail.new()
+	trail.body = body
+	return trail

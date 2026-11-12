@@ -135,7 +135,7 @@ func test_classic_pieces_are_the_effects_of_1_0() -> void:
 	var flash := fx.muzzle_flash()
 	assert_eq(beam.get_script(), ClassicBeam)
 	assert_eq(blast.get_script(), ClassicBlast)
-	assert_eq(trail.get_script(), DashTrail)
+	assert_eq(trail.get_script(), ClassicTrail)
 	assert_eq(trail.color, DashTrail.LIGHT)
 	assert_eq(flash.get_script(), MuzzleFlash)
 	for node: Node in [beam, blast, trail, flash]:
@@ -217,6 +217,15 @@ func test_classic_ring_stays_inside_the_cross() -> void:
 		assert_gte(radius, BAR.y * 0.5 - 0.001, "t %d/10" % step)
 	assert_almost_eq(blast.ring_radius(1.0), BAR.y * 1.5, 0.001)
 	blast.free()
+
+
+func test_classic_trail_has_two_or_three_echoes_inside_the_dash() -> void:
+	assert_between(ClassicTrail.ECHOES.size(), 2, 3)
+	for share: float in ClassicTrail.ECHOES:
+		assert_between(share, 0.0, 1.0)
+	var sorted := ClassicTrail.ECHOES.duplicate()
+	sorted.sort()
+	assert_eq(ClassicTrail.ECHOES, sorted, "oldest first")
 
 
 func test_pulsefire_shockwave_stays_inside_the_cross() -> void:
