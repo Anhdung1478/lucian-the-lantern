@@ -110,6 +110,9 @@ Added in V1.4. Stats and passives follow LoL (patch 26.x); the live values are i
   two slots, press Craft and confirm (it asks since V1.4.3), and pay the fee. The fragment is used
   up, and the new boots show in the boots cell. Tier 2 comes from either tier-1 pair plus
   its line's fragment; tier 3 from that tier 2 plus the same fragment. Giant's Belt has no line.
+  *(V2.0: the recipe table beside the backpack lists these 14 recipes under BOOTS, after the
+  legendaries. The two tier-1 pairs share the first cell of a tier-2 line, since they make the
+  same boots. A line is lit gold while Lucian wears its boots and holds its fragment.)*
 - *Slightly Quicker:* Slightly Magical Boots give +10 move speed over Boots of Speed, and every
   pair upgraded from them keeps it (it comes from the tree level, so a save needs nothing new).
 

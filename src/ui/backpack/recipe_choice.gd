@@ -6,7 +6,7 @@ extends Control
 ## own card. The rim is the first item's kind, gold while `lit`.
 
 ## Each item's side, as a share of the room inside the well.
-const SHARE := 0.66
+const SHARE := 0.6
 
 var icons: Array[ItemIcon] = []
 var lit := false:

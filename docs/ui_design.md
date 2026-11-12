@@ -484,6 +484,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - ~~**Hidden** while the merchant's shop is open.~~ *(Since V1.4.1 it stays while the shop is open, since crafting happens there; it sits clear of the backpack.)*
 - Each line shows only: **item + item = item** (e.g. `[B.F. Sword] + [B.F. Sword] = [Infinity Edge]`).
 - Scrollable, since there are 33 recipes.
+- *(V2.0)* **The boots' recipes** follow the legendaries under a small **BOOTS** heading: one line per upgraded pair, `[boots] + [fragment] = [boots] name`, each second tier with its third tier under it (14 lines). Either starting pair makes the same second tier (Slightly Magical Boots only add their passive), so **the two starting boots share the first cell** of a second-tier line: both icons in one well, stepping down its diagonal, each with its own card (`RecipeChoice`). A third-tier line takes its second tier and the same fragment again.
 
 ```
 +------------------------+
@@ -519,7 +520,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 **A new look; the layout, the cells and the rules are as above.** The light tan and darker bottom row the Layout section describes are gone.
 - **The backpack** is an ornate plate headed BACKPACK. Its cells are dark wells whose rim follows the item (fragment, legendary, boots, potion). A locked cell is darker, with the chain.
 - **The equip row and the gear row** sit on plain plates, with the keys in corner tabs.
-- **The recipe table** is a plate headed RECIPES. Each line names its legendary after "[fragment] + [fragment] = [legendary]". A recipe whose two fragments Lucian holds is **lit gold** (a gold wash and a thin gold frame) and comes first, so what can be crafted shows without scrolling; a held fragment has a gold rim. A note under the heading reads "Lit gold: you hold both fragments." (`RecipeTable`, `RecipeRow`).
+- **The recipe table** is a plate headed RECIPES. Each line names its legendary after "[fragment] + [fragment] = [legendary]". A recipe whose two fragments Lucian holds is **lit gold** (a gold wash and a thin gold frame) and comes first, so what can be crafted shows without scrolling; a held fragment has a gold rim. A boots line is lit while Lucian wears the boots it takes and holds its fragment; the boots he wears count as held. A note under the list reads "Lit gold: you hold both parts." (`RecipeTable`, `RecipeRow`, `RecipeChoice`).
 - **Fade-in:** the backpack and the shop fade in over 0.12 s (not on Low quality).
 
 ---
