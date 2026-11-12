@@ -1,8 +1,8 @@
 extends GutTest
 ## V1.1 skin effects: each skin's SkinFx builds every piece at the size it is
 ## given; the pieces are gone within 0.6 s and drop their details on Low
-## effects; Classic's are 1.0's effects; every sound has its own recipe, as
-## loud as the Classic one it replaces.
+## effects; every sound has its own recipe, as loud as the Classic one it
+## replaces.
 
 const LENGTH := 700.0
 const WIDTH := 60.0
@@ -29,9 +29,10 @@ func _blast(fx: SkinFx) -> Node2D:
 	return fx.w_blast(Vector2(300, 0), Vector2.DOWN, BAR)
 
 
-## Themed skin -> its classes: [SkinFx, beam, blast, trail, shot look, flash].
+## Skin -> its classes: [SkinFx, beam, blast, trail, shot look, flash].
 func _themed() -> Dictionary:
 	return {
+		&"classic": [ClassicFx, ClassicBeam, ClassicBlast, ClassicTrail, ClassicShot, ClassicFlash],
 		&"high_noon": [HighNoonFx, HighNoonBeam, HighNoonBlast, HighNoonTrail, HighNoonShot, HighNoonFlash],
 		&"project": [ProjectFx, ProjectBeam, ProjectBlast, ProjectTrail, ProjectShot, ProjectFlash],
 		&"pulsefire": [PulsefireFx, PulsefireBeam, PulsefireBlast, PulsefireTrail, PulsefireShot, PulsefireFlash],
@@ -117,9 +118,6 @@ func test_themed_pieces_show_details_on_high_and_none_on_low() -> void:
 		for skin in Skins.ALL:
 			for piece: Node2D in [_beam(skin.fx), _blast(skin.fx), skin.fx.muzzle_flash()]:
 				add_child_autofree(piece)
-				if not piece is FxPiece:
-					assert_eq(skin.fx.get_script(), ClassicFx, "%s: only Classic's pieces are not FxPieces" % skin.id)
-					continue
 				var label := "%s %s on %s" % [skin.id, piece.get_script().get_global_name(), quality]
 				if quality == "low":
 					assert_eq((piece as FxPiece).details(), 0, label)
@@ -127,35 +125,14 @@ func test_themed_pieces_show_details_on_high_and_none_on_low() -> void:
 					assert_gt((piece as FxPiece).details(), 0, label)
 
 
-func test_classic_pieces_are_the_effects_of_1_0() -> void:
+func test_classic_shots_are_light_with_a_teal_tip() -> void:
 	var fx := Skins.find(&"classic").fx
-	var beam := _beam(fx)
-	var blast := _blast(fx)
-	var trail := fx.e_trail(null)
-	var flash := fx.muzzle_flash()
-	assert_eq(beam.get_script(), ClassicBeam)
-	assert_eq(blast.get_script(), ClassicBlast)
-	assert_eq(trail.get_script(), ClassicTrail)
-	assert_eq(trail.color, DashTrail.LIGHT)
-	assert_eq(flash.get_script(), MuzzleFlash)
-	for node: Node in [beam, blast, trail, flash]:
-		node.free()
-
-
-func test_classic_shots_draw_like_the_plain_projectiles_of_1_0() -> void:
-	var fx := Skins.find(&"classic").fx
-	var missile := fx.w_missile_look() as PlainShotLook
-	assert_eq([missile.color, missile.glow_color], [Color("ffd27a"), Color(1.0, 0.45, 0.1, 0.6)])
-	assert_eq([missile.streak_length, missile.streak_width, missile.head_radius], [40.0, 8.0, 11.0])
-	var plain := LinearProjectile.new()
-	var bullet := fx.r_bullet_look() as PlainShotLook
-	assert_eq([bullet.color, bullet.glow_color], [plain.color, plain.glow_color])
-	assert_eq([bullet.streak_length, bullet.streak_width, bullet.head_radius], [36.0, 5.0, 0.0])
-	var attack := AttackProjectile.new()
-	var bolt := fx.attack_shot_look() as PlainShotLook
-	assert_eq([bolt.color, bolt.glow_color], [attack.color, attack.glow_color])
-	for node: Node in [missile, plain, bullet, attack, bolt]:
-		node.free()
+	var kinds := {}
+	for look: ShotLook in [fx.w_missile_look(), fx.r_bullet_look(), fx.attack_shot_look()]:
+		assert_true(look is ClassicShot)
+		kinds[look.kind] = true
+		look.free()
+	assert_eq(kinds.size(), 3)
 
 
 func test_every_skin_sound_has_its_own_recipe() -> void:
@@ -178,11 +155,9 @@ func test_as_loud_as_scales_a_sound_to_the_classic_peak() -> void:
 	assert_almost_eq(Sfx._peak(scaled), _peak(&"shot"), 0.01)
 
 
-func test_every_skin_but_classic_has_a_set_of_its_own() -> void:
+func test_every_skin_has_a_set_of_its_own() -> void:
 	var themed := _themed()
 	for skin in Skins.ALL:
-		if skin.id == &"classic":
-			continue
 		assert_true(themed.has(skin.id), str(skin.id))
 		assert_ne(skin.fx.get_script(), SkinFx, str(skin.id))
 

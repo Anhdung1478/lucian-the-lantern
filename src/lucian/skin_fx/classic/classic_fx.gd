@@ -21,3 +21,11 @@ func e_trail(body: Texture2D) -> DashTrail:
 	var trail := ClassicTrail.new()
 	trail.body = body
 	return trail
+
+
+func shot_look(kind: ShotLook.Kind) -> ShotLook:
+	return ClassicShot.new(kind)
+
+
+func muzzle_flash() -> Node2D:
+	return ClassicFlash.new()
