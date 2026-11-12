@@ -1,7 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- Move Speed: a boot with speed lines -->
-  <path d="M 5 24 L 17 24 M 3 34 L 15 34 M 7 44 L 17 44" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 5 24 L 17 24 M 3 34 L 15 34 M 7 44 L 17 44" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 25 10 L 40 10 L 40 33 L 55 39 C 60 41 60 51 55 51 L 25 51 Z" fill="#ffffff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 26 45 L 58 45" stroke="#1a1d24" stroke-width="2"/>
+  <!-- Move Speed: a winged boot, toe to the right -->
+  <path d="M 23.5 15 C 17 14 10 11 5.5 6.5 C 5 12 6 16 8.5 19 C 7 21 7.5 24 9.5 26 C 9 29 11 32 14 33 C 17 34.5 21 34.5 23.5 33 Z" fill="#ffffff"/>
+  <path d="M 9.5 26 C 9 29 11 32 14 33 C 17 34.5 21 34.5 23.5 33 L 23.5 28.5 C 18 29 13 28.2 9.5 26 Z" fill="#b4bdcc"/>
+  <path d="M 22 21.5 L 11 18.5 M 22 27 L 12 25.5" fill="none" stroke="#b4bdcc" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 23.5 15 C 17 14 10 11 5.5 6.5 C 5 12 6 16 8.5 19 C 7 21 7.5 24 9.5 26 C 9 29 11 32 14 33 C 17 34.5 21 34.5 23.5 33 Z" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M 22 10 L 39 10 L 39 31 C 46 32.5 54 35.5 56.5 40 C 57.5 42 58 44.5 58 47 L 21 47 Z" fill="#ffffff"/>
+  <path d="M 34 14 L 39 14 L 39 31 C 46 32.5 54 35.5 56.5 40 C 57.5 42 58 44.5 58 47 L 30 47 L 30 42 L 49 42 C 46 38 40 36.5 34 35.5 Z" fill="#b4bdcc"/>
+  <path d="M 22 10 L 39 10 L 39 31 C 46 32.5 54 35.5 56.5 40 C 57.5 42 58 44.5 58 47 L 21 47 Z" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+  <rect x="19.5" y="7" width="22" height="7" rx="2.5" fill="#ffffff"/>
+  <path d="M 19.5 10.5 L 41.5 10.5 L 41.5 11.5 A 2.5 2.5 0 0 1 39 14 L 22 14 A 2.5 2.5 0 0 1 19.5 11.5 Z" fill="#b4bdcc"/>
+  <rect x="19.5" y="7" width="22" height="7" rx="2.5" fill="none" stroke="#1a1d24" stroke-width="3"/>
+  <path d="M 19.5 47 L 58.5 47 L 58.5 50.5 C 58.5 53 56.5 54.5 54 54.5 L 19.5 54.5 Z" fill="#b4bdcc" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
 </svg>

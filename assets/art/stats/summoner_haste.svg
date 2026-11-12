@@ -1,8 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- Summoner Haste: a summoner rune star inside a clockwise cooldown arrow -->
-  <path d="M 39.9 10.4 A 23 23 0 1 1 19.9 12.4" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round"/>
-  <path d="M 39.9 10.4 A 23 23 0 1 1 19.9 12.4" fill="none" stroke="#c4ef5a" stroke-width="4" stroke-linecap="round"/>
-  <path d="M 26.4 8.4 L 15.9 7.9 L 21.9 17.9 Z" fill="#c4ef5a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 32 15 L 36 28 L 49 32 L 36 36 L 32 49 L 28 36 L 15 32 L 28 28 Z" fill="#c4ef5a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 32 26 L 34 32 L 32 38 L 30 32 Z" fill="#f2ffd8"/>
+  <!-- Summoner Haste: a round cooldown arrow around a spell spark -->
+  <g transform="rotate(50 32 34)">
+    <path d="M 46.55 21.79 A 19 19 0 1 1 25.5 16.15" fill="none" stroke="#1a1d24" stroke-width="14" stroke-linecap="round"/>
+    <path d="M 46.55 21.79 A 19 19 0 1 1 25.5 16.15" fill="none" stroke="#c4ef5a" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <path d="M 52.68 37.65 A 21 21 0 0 1 17.15 48.85" fill="none" stroke="#86ac23" stroke-width="4"/>
+  <path d="M 13.3 37 A 18.5 18.5 0 0 1 16.2 24.5" fill="none" stroke="#efffc4" stroke-width="2.5" stroke-linecap="round"/>
+  <g transform="rotate(50 32 34)">
+    <path d="M 35.84 12.39 L 27.04 26.23 L 20.2 7.43 Z" fill="#c4ef5a"/>
+    <path d="M 35.84 12.39 L 27.04 26.23 L 23.62 16.83 Z" fill="#86ac23"/>
+    <path d="M 35.84 12.39 L 27.04 26.23 L 20.2 7.43 Z" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+  <path d="M 32 22.5 L 34.83 31.17 L 43.5 34 L 34.83 36.83 L 32 45.5 L 29.17 36.83 L 20.5 34 L 29.17 31.17 Z" fill="#efffc4"/>
+  <path d="M 43.5 34 L 34.83 36.83 L 32 45.5 L 29.17 36.83 Z" fill="#c4ef5a"/>
+  <path d="M 32 22.5 L 34.83 31.17 L 43.5 34 L 34.83 36.83 L 32 45.5 L 29.17 36.83 L 20.5 34 L 29.17 31.17 Z" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
 </svg>
