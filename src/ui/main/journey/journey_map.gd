@@ -209,7 +209,14 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	GameSettings.instance().changed.connect(_on_setting_changed)
 	_sync_process()
+
+
+## Low effects chosen while the map shows: the lights and wisps stop at once.
+func _on_setting_changed(key: StringName) -> void:
+	if key == &"quality":
+		_sync_process()
 
 
 func _notification(what: int) -> void:

@@ -936,3 +936,22 @@ func test_the_resolve_line_fits_over_start_on_every_stage() -> void:
 		var box := section.panel.stage_box
 		assert_lte(box.position.y + box.get_combined_minimum_size().y, limit, "%s: the stage's rows end over Start" % id)
 		assert_lte(box.get_combined_minimum_size().x, JourneyPanel.CONTENT_WIDTH, "%s: no row is wider than the panel" % id)
+
+
+## Low effects chosen in the settings while the Journey shows: the lights,
+## the wisps and the pulses stop at once, and start again on High.
+func test_low_effects_set_while_the_journey_shows_stops_the_motion() -> void:
+	_settings = GameSettings._instance
+	GameSettings._instance = GameSettings.new(SETTINGS_PATH)
+	var fresh := JourneySection.new()
+	add_child_autofree(fresh)
+	await wait_process_frames(2)
+	var open_stage := fresh.map.node_for("1-1")
+	assert_true(fresh.map.is_drifting(), "high: the wisps drift")
+	assert_true(open_stage.is_processing(), "high: the open stage pulses")
+	GameSettings.instance().set_value(&"quality", "low", false)
+	assert_false(fresh.map.is_drifting(), "low: the map stands still")
+	assert_false(open_stage.is_processing(), "low: no pulse")
+	GameSettings.instance().set_value(&"quality", "high", false)
+	assert_true(fresh.map.is_drifting(), "high again: the wisps drift")
+	assert_true(open_stage.is_processing(), "high again: the pulse runs")

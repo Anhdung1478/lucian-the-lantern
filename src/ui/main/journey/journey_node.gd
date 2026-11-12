@@ -138,7 +138,15 @@ static func waves_line(act_number: int, stage_number: int, with_boss := true) ->
 func _ready() -> void:
 	mouse_entered.connect(_set_hovered.bind(true))
 	mouse_exited.connect(_set_hovered.bind(false))
+	GameSettings.instance().changed.connect(_on_setting_changed)
 	_sync_process()
+
+
+## Low effects chosen while the place shows: its pulse stops at once.
+func _on_setting_changed(key: StringName) -> void:
+	if key == &"quality":
+		_sync_process()
+		queue_redraw()
 
 
 func _notification(what: int) -> void:
