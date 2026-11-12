@@ -114,6 +114,14 @@ static func overlap(outline: PackedVector2Array, other: PackedVector2Array) -> A
 	return _solid(Geometry2D.intersect_polygons(outline, other))
 
 
+## The rect round `outline`.
+static func bounds(outline: PackedVector2Array) -> Rect2:
+	var out := Rect2(outline[0], Vector2.ZERO)
+	for point in outline:
+		out = out.expand(point)
+	return out
+
+
 ## Fills every outline of `path`.
 func fill(path: String, color: Variant) -> void:
 	for piece in outlines(path):

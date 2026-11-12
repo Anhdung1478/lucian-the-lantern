@@ -3,10 +3,11 @@ extends TitleFigure
 ## Thresh on the title, looming at the right and facing left, towards
 ## Lucian and Senna. A tall hood over a dark face with burning green eyes,
 ## spiked pauldrons, a ribbed chest with the green of the souls showing
-## between the ribs, a long tattered robe and chains across him and down to
-## the ground. His near hand holds the lantern out on a short chain, small
-## souls caged in its light, which lights him green from below; his far hand
-## lets the sickle hang on its chain. The moon is far to his upper left.
+## between the ribs, a long tattered robe with a cape behind it, and chains
+## across him and down to the ground. His near hand holds the lantern out
+## on a short chain, small souls caged in its light, which lights him green
+## from below; his far hand lets the sickle hang on its chain. The moon is
+## far to his upper left.
 
 ## The art's frame, in units.
 const BOX := Rect2(-12, -8, 176, 286)
@@ -27,12 +28,13 @@ const CHAIN_EDGE := Color(0.01, 0.02, 0.015, 0.95)
 const EYE := Color("eafff2")
 const SOUL := Color("8fe3b0")
 ## A fold in his robe: its shadow, the light on its ridge and its width.
-const FOLD_DARK := Color(0.0, 0.0, 0.0, 0.5)
-const FOLD_LIGHT := Color(0.7, 0.85, 0.95, 0.12)
-const FOLD_WIDTH := 3.4
+const FOLD_DARK := Color(0.0, 0.0, 0.0, 0.6)
+const FOLD_LIGHT := Color(0.7, 0.85, 0.95, 0.2)
+const FOLD_WIDTH := 4.2
 
 ## His parts, back to front.
-const FAR_ARM := "M 123 71 L 137 70 C 141 96 145 120 148.4 146 L 139 148 C 135 124 130 98 123 71 Z"
+const CAPE := "M 110 60 C 128 56 141 63 147 74 C 155 100 160 140 162 180 C 163.4 210 162.6 240 160.6 268 L 154.6 258 L 151.6 273 L 145.4 259 L 140 271 L 136 252 C 134 220 130 180 126 140 C 122 110 116 86 110 60 Z"
+const FAR_ARM := "M 119 68 L 139 66 C 143 92 147 116 150 140 L 152 150 L 147.6 146 L 145 154 L 141.6 146 L 138.6 152 L 137.6 140 C 133 116 127 92 119 68 Z"
 const FAR_HAND := "M 138 144 L 148.6 142.6 L 150.6 150 L 148 156 L 144.6 152 L 142.6 157 L 140 152 Z"
 const SICKLE := "M 140 186 C 162 181 178 198 173 232 C 167 213 157 202 138.6 198 Z"
 const SICKLE_HAFT := "M 141.6 177 L 146.4 177 L 145.6 196 L 140.6 196 Z"
@@ -59,13 +61,18 @@ const RIBS: Array[String] = [
 	"M 104 104 Q 89 103.4 77.4 114",
 ]
 const RIB_WIDTH := Vector2(2.2, 5.0)
-## The robe's folds, and the hood's.
+## The tabard hanging from his waist down the front of his robe, its
+## tattered end, and its colour.
+const TABARD := "M 86 128 L 112 126 C 113 160 112 196 110 226 L 105 236 L 101 226 L 97 240 L 93 228 L 89 236 C 87.6 200 87 160 86 128 Z"
+const TABARD_COLOR := Color("101b17")
+## The robe's folds, the cape's and the hood's.
 const ROBE_FOLDS: Array[String] = [
 	"M 92 132 C 90 172 84 212 76 256",
 	"M 106 130 C 110 172 116 214 121 258",
 	"M 84 140 C 78 180 66 220 52 258",
 	"M 116 132 C 124 170 134 214 142 262",
 ]
+const CAPE_FOLDS: Array[String] = ["M 140 76 C 150 120 155 180 155 254", "M 128 92 C 136 140 142 200 144 258"]
 const HOOD_FOLDS: Array[String] = ["M 98 16 C 102 30 101 44 96 56", "M 88 14 C 94 26 95 42 92 58"]
 ## The chains: across his chest, round his waist, from his lantern arm
 ## and down his robe to the ground, where the backdrop takes it on to
@@ -123,7 +130,11 @@ func eyes() -> PackedVector2Array:
 
 func _paint(paint: TitlePaint) -> void:
 	paint.glow(LANTERN_MIDDLE, Vector2(46, 46), Color(SOUL, 0.18))
+	_part(paint, TitlePaint.outline(CAPE), ROBE.darkened(0.25))
+	for fold in CAPE_FOLDS:
+		_fold(paint, fold, FOLD_WIDTH)
 	_part(paint, TitlePaint.outline(FAR_ARM), ROBE)
+	_fold(paint, "M 128 80 Q 136 110 142 140", FOLD_WIDTH * 0.7)
 	paint.chain(TitlePaint.outline(CHAINS[4]), LINK, 1.2, CHAIN, CHAIN_EDGE)
 	paint.ring(SICKLE_RING, Vector2(2.6, 2.6), 1.4, IRON.lightened(0.15))
 	_part(paint, TitlePaint.outline(SICKLE_HAFT), IRON)
@@ -148,14 +159,17 @@ func _paint(paint: TitlePaint) -> void:
 	_paint_lantern(paint)
 
 
-## The long robe: shaded and rimmed, its folds, the lantern's green on its
-## lower front, and dark towards its tattered hem.
+## The long robe: shaded, its folds, the lantern's green on its lower
+## front, the tabard down its middle, and dark towards its tattered hem.
 func _paint_robe(paint: TitlePaint) -> void:
 	var robe := TitlePaint.outline(ROBE_SHAPE)
 	_part(paint, robe, ROBE)
 	for fold in ROBE_FOLDS:
 		_fold(paint, fold, FOLD_WIDTH)
 	paint.glow_in(robe, LANTERN_MIDDLE, 95.0, Color(SOUL, 0.26))
+	var tabard := TitlePaint.outline(TABARD)
+	_part(paint, tabard, TABARD_COLOR)
+	_fold(paint, "M 99 132 C 99.6 170 99 200 98 232", FOLD_WIDTH * 0.6)
 	paint.shape(robe, TitlePaint.linear(Vector2(0, 200), Vector2(0, 278), Color(0, 0, 0, 0.0), Color(0, 0, 0, 0.5)))
 
 
@@ -230,7 +244,8 @@ func _paint_lantern(paint: TitlePaint) -> void:
 
 
 ## A spike of his armour, from its outline (two corners at its root, then
-## its tip): a cone, lit along its moon side and dark on the other, rimmed.
+## its tip): a cone, lit along its moon side and dark on the other. It
+## counts towards his outline.
 func _spike(paint: TitlePaint, outline: PackedVector2Array) -> void:
 	var root := (outline[0] + outline[2]) * 0.5
 	var tip := outline[1]
@@ -238,4 +253,4 @@ func _spike(paint: TitlePaint, outline: PackedVector2Array) -> void:
 	var dark := outline[2] if lit == outline[0] else outline[0]
 	paint.shape(PackedVector2Array([lit, tip, root]), IRON.lerp(lit_tint, 0.18))
 	paint.shape(PackedVector2Array([root, tip, dark]), IRON.darkened(0.6))
-	_rims(paint, outline)
+	_parts.append(outline)

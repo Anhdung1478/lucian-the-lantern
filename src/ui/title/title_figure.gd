@@ -4,8 +4,10 @@ extends Control
 ## its own units: `box`, the art's frame, is scaled to the node's height.
 ## The backdrop gives the node its size and keeps it to the bottom and to
 ## one side. Every part is lit the same way: shaded across from the moon's
-## side, with a cool rim of moonlight on that side and, while the lantern
-## lights the figure, a green rim on the side facing it.
+## side, with the lantern's soft green on the side facing it. Then the
+## figure's outline, all its parts as one, gets a cool rim of moonlight on
+## the moon's side and, while the lantern lights it, a green rim on the
+## side facing that; the edges inside the outline are lit only faintly.
 
 ## The moonlight's rim, at the top of the figure and at its feet.
 const MOON_RIM_TOP := Color(0.86, 0.92, 1.0, 0.95)
@@ -24,6 +26,8 @@ const DARK_SIDE := 0.6
 const FILL_ALPHA := 0.5
 ## How strong the lantern's crisp rim is, over its soft fill.
 const LANTERN_RIM := 0.6
+## How strongly the edges inside the outline are lit, over the outline's.
+const INNER_RIM := 0.22
 ## How far a fold's light lies from its shadow (a share of its width), and
 ## how wide it is.
 const FOLD_LIGHT_OFFSET := 0.55
@@ -50,6 +54,8 @@ var rim_width := 0.9
 var lantern_at := Vector2.ZERO
 var lantern_reach := 1.0
 var lantern_width := 1.1
+## The parts painted so far, for the outline's rims.
+var _parts: Array[PackedVector2Array] = []
 ## False once the lantern is gone (Thresh is hidden): no green on this
 ## figure. Setting it paints the figure again.
 var lantern_lit := true:
@@ -79,7 +85,9 @@ func _draw() -> void:
 	var scale_by := size.y / box.size.y
 	draw_set_transform(-box.position * scale_by, 0.0, Vector2.ONE * scale_by)
 	var paint := TitlePaint.new()
+	_parts.clear()
 	_paint(paint)
+	_paint_outline(paint)
 	paint.draw(self)
 
 
@@ -89,8 +97,8 @@ func _paint(_paint_with: TitlePaint) -> void:
 
 
 ## Paints `outline` as one part: `base` shaded across it, lighter on the
-## moon's side, the lantern's soft green on the side facing it, then its
-## rims of light.
+## moon's side, the lantern's soft green on the side facing it, and its
+## edges lit faintly. It counts towards the figure's outline.
 func _part(paint: TitlePaint, outline: PackedVector2Array, base: Color) -> void:
 	var middle := _middle(outline)
 	var across := Vector2(signf(moon_way.x), 0.0)
@@ -102,20 +110,47 @@ func _part(paint: TitlePaint, outline: PackedVector2Array, base: Color) -> void:
 		var green: Color = _lantern_tint().call(middle)
 		paint.shape(outline, TitlePaint.linear(middle, middle + way * _reach(outline, middle, way),
 			Color(green, 0.0), Color(green, green.a * FILL_ALPHA)))
-	_rims(paint, outline)
+	paint.rim(outline, moon_way * rim_width, _moon_tint(INNER_RIM))
+	if lantern_lit:
+		paint.rim(outline, _lantern_way(outline) * lantern_width, _lantern_tint(LANTERN_RIM * INNER_RIM))
+	_parts.append(outline)
 
 
-## The rims of light on `outline`: moonlight, then the lantern's green.
-func _rims(paint: TitlePaint, outline: PackedVector2Array, strength := 1.0) -> void:
-	var moon := _moon_tint(strength)
-	paint.rim(outline, moon_way * rim_width * SOFT_REACH, _faded(moon, SOFT_ALPHA))
-	paint.rim(outline, moon_way * rim_width, moon)
-	if not lantern_lit:
-		return
-	var way := (lantern_at - _middle(outline)).normalized()
-	var green := _lantern_tint(strength * LANTERN_RIM)
-	paint.rim(outline, way * lantern_width * SOFT_REACH, _faded(green, SOFT_ALPHA))
-	paint.rim(outline, way * lantern_width, green)
+## The rims of light along the figure's outline, over everything painted:
+## moonlight, then the lantern's green. A part's rim is what is left of its
+## lit band once every part moved back from the light is taken away, so
+## only the edges with nothing beyond them shine.
+func _paint_outline(paint: TitlePaint) -> void:
+	var moon := _moon_tint()
+	var green := _lantern_tint(LANTERN_RIM)
+	for outline in _parts:
+		for band in [moon_way * rim_width * SOFT_REACH, moon_way * rim_width]:
+			paint.shapes(_outline_band(outline, band), _faded(moon, SOFT_ALPHA) if band.length() > rim_width else moon)
+		if lantern_lit:
+			var way := _lantern_way(outline)
+			paint.shapes(_outline_band(outline, way * lantern_width * SOFT_REACH), _faded(green, SOFT_ALPHA))
+			paint.shapes(_outline_band(outline, way * lantern_width), green)
+
+
+## The band of `outline` facing `toward` (as TitlePaint.rim) with nothing
+## beyond it: every part, moved back by `toward`, taken away.
+func _outline_band(outline: PackedVector2Array, toward: Vector2) -> Array[PackedVector2Array]:
+	var bands := TitlePaint.cut(outline, [TitlePaint.moved(outline, -toward)])
+	var cutters: Array[PackedVector2Array] = []
+	for band in bands:
+		var reach := TitlePaint.bounds(band)
+		for part in _parts:
+			if part != outline and TitlePaint.bounds(part).grow(toward.length()).intersects(reach):
+				cutters.append(TitlePaint.moved(part, -toward))
+	var out: Array[PackedVector2Array] = []
+	for band in bands:
+		out.append_array(TitlePaint.cut(band, cutters))
+	return out
+
+
+## Towards the lantern from `outline`'s middle.
+func _lantern_way(outline: PackedVector2Array) -> Vector2:
+	return (lantern_at - _middle(outline)).normalized()
 
 
 ## A fold along `path`: a shadow that swells to `width` in its middle, and
