@@ -1,5 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
   <!-- Health: a heart -->
-  <path d="M 32 54 C 10 40 6 28 10 20 C 14 10 26 8 32 18 C 38 8 50 10 54 20 C 58 28 54 40 32 54 Z" fill="#6fd36f" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 16 22 C 18 16 24 15 27 19" fill="none" stroke="#c8f5c8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 32 58 C 19 49.5 5.5 39 5.5 23 C 5.5 13 12.5 6.5 21 6.5 C 26.5 6.5 30 9.5 32 13 C 34 9.5 37.5 6.5 43 6.5 C 51.5 6.5 58.5 13 58.5 23 C 58.5 39 45 49.5 32 58 Z" fill="#6fd36f"/>
+  <path d="M 53.94 11 C 56.75 13.88 58.5 18 58.5 23 C 58.5 39 45 49.5 32 58 C 43 48.5 52.5 38.5 52.8 24 C 52.9 18.5 53.5 14.5 53.94 11 Z" fill="#3a983f"/>
+  <path d="M 11 23 C 11 17 14.5 12.8 19.5 12.2" fill="none" stroke="#d4f7cc" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 32 58 C 19 49.5 5.5 39 5.5 23 C 5.5 13 12.5 6.5 21 6.5 C 26.5 6.5 30 9.5 32 13 C 34 9.5 37.5 6.5 43 6.5 C 51.5 6.5 58.5 13 58.5 23 C 58.5 39 45 49.5 32 58 Z" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
 </svg>
