@@ -167,6 +167,10 @@ func test_every_view_stays_inside_its_page_at_1920x1080() -> void:
 		var page_rect := page.get_global_rect()
 		assert_true(Rect2(Vector2.ZERO, screen.size).encloses(page_rect), str(page_rect))
 		assert_true(page_rect.encloses(reset), "Reset tree is on the page")
+		var forge := tree_section.forge_bar.get_global_rect()
+		assert_true(page_rect.encloses(forge), "the forge is on every page")
+		assert_false(forge.intersects(reset), "the forge is beside Reset tree")
+		assert_false(forge.intersects(Rect2(page_rect.position + TreePage.HEADER_RECT.position, TreePage.HEADER_RECT.size)), "clear of the header")
 		assert_false(page_rect.intersects(tree_section.info.get_global_rect()), "beside the info column")
 		assert_false(page_rect.intersects(tree_section.tabs.get_global_rect()), "above the tabs")
 		var header := Rect2(page_rect.position + TreePage.HEADER_RECT.position, TreePage.HEADER_RECT.size)
@@ -880,3 +884,78 @@ func test_the_free_badge_pulses_only_while_it_shows() -> void:
 	hidden.visible = false
 	add_child_autofree(hidden)
 	assert_false(hidden.is_processing(), "hidden when it enters the tree")
+
+
+func test_forge_buttons_forge_one_and_ten_and_the_amounts_update() -> void:
+	_save().essences.add(Essences.BLUE, 1500)
+	var one: Button = section.forge_bar.buttons[1]
+	var ten: Button = section.forge_bar.buttons[10]
+	assert_false(one.disabled)
+	assert_false(ten.disabled)
+	one.pressed.emit()
+	assert_eq(_save().essences.amount(Essences.BLUE), 1380)
+	assert_eq(_save().essences.amount(Essences.ORANGE), 1)
+	ten.pressed.emit()
+	assert_eq(_save().essences.amount(Essences.BLUE), 180)
+	assert_eq(_save().essences.amount(Essences.ORANGE), 11)
+	assert_true(ten.disabled, "180 blue is short of 1200")
+	assert_false(one.disabled)
+
+
+func test_forge_is_disabled_and_says_what_it_needs_when_blue_is_short() -> void:
+	var one: Button = section.forge_bar.buttons[1]
+	var ten: Button = section.forge_bar.buttons[10]
+	assert_true(one.disabled)
+	assert_eq(one.get_meta(&"hover_text", ""), "Needs 120 blue essence")
+	assert_eq(ten.get_meta(&"hover_text", ""), "Needs 1200 blue essence")
+	_save().essences.add(Essences.BLUE, 119)
+	assert_true(one.disabled)
+	_save().essences.add(Essences.BLUE, 1)
+	assert_false(one.disabled)
+	assert_true(ten.disabled)
+	assert_string_contains(one.get_meta(&"hover_text", ""), "cannot be undone")
+	one.pressed.emit()
+	assert_true(one.disabled)
+	assert_eq(one.get_meta(&"hover_text", ""), "Needs 120 blue essence")
+
+
+func test_forge_shows_its_rate_with_both_icons() -> void:
+	for count: int in ForgeBar.COUNTS:
+		var texts: PackedStringArray = []
+		var icons := 0
+		for child in section.forge_bar.buttons[count].get_child(0).get_children():
+			if child is Label:
+				texts.append(child.text)
+			elif child is TextureRect:
+				icons += 1
+		assert_eq(texts, PackedStringArray([str(count * Essences.FORGE_BLUE), "→", str(count)]))
+		assert_eq(icons, 2)
+
+
+func test_a_reset_keeps_forged_orange_and_refunds_as_before() -> void:
+	_save().tree.acts_cleared = 1
+	_save().essences.add(Essences.BLUE, 1000)
+	_save().essences.add(Essences.PURPLE, 5)
+	section.forge_bar.buttons[1].pressed.emit()
+	section.select(&"skill_q")
+	section.info.cost_bar.buy()
+	var spent := _save().tree.spent()
+	var blue := _save().essences.amount(Essences.BLUE)
+	var orange := _save().essences.amount(Essences.ORANGE)
+	section.reset_button.pressed.emit()
+	confirm.answer(true)
+	assert_eq(_save().essences.amount(Essences.BLUE), blue + spent.x)
+	assert_eq(_save().essences.amount(Essences.ORANGE), orange + spent.y)
+	assert_gte(_save().essences.amount(Essences.ORANGE), 1, "the forged orange stays")
+
+
+func test_a_forge_is_kept_by_the_next_save_and_writes_no_file_itself() -> void:
+	_save().essences.add(Essences.BLUE, 240)
+	section.forge_bar.buttons[1].pressed.emit()
+	for n in range(1, SaveGame.SLOTS + 1):
+		assert_false(_save().slot_exists(n), "slot %d" % n)
+	assert_true(_save().save())
+	_save().essences.from_dict({})
+	assert_true(_save().load_slot(1))
+	assert_eq(_save().essences.amount(Essences.ORANGE), 1)
+	assert_eq(_save().essences.amount(Essences.BLUE), 120)

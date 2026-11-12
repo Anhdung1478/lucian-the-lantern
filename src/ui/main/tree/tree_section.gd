@@ -2,9 +2,9 @@ class_name TreeSection
 extends Control
 ## The Evolution Tree page of the main screen: one TreePage per branch, with
 ## the BranchTabs under them to switch pages, Reset tree at the top right of
-## the page, and the NodeInfoPanel as a column on the right (as the Journey's
-## map and panel). It opens on the first branch with a free upgrade, otherwise
-## on Skills. The cost bar asks first (TreePurchasePopup). Buying and
+## the page with the ForgeBar beside it, and the NodeInfoPanel as a column on
+## the right (as the Journey's map and panel). It opens on the first branch with a free upgrade, otherwise
+## on Skills. The cost bar asks first (TreePurchasePopup). Buying, forging and
 ## resetting change the save in memory only; nothing here writes a file.
 
 ## In this section (the content area, y 72–992 on screen): the pages, the tabs
@@ -16,6 +16,8 @@ const MARGIN := 24.0
 ## How far in from the page's sides the tabs start.
 const TABS_INSET := 24.0
 const RESET_SIZE := Vector2(260, 52)
+## The forge sits left of Reset tree, clear of the tree's top and the header.
+const FORGE_GAP := 20.0
 const PURPLE_ICON := preload("res://assets/art/ui/essence_purple.svg")
 
 ## Branch -> its TreePage.
@@ -25,6 +27,7 @@ var views := {}
 var tabs := BranchTabs.new()
 var info: NodeInfoPanel
 var reset_button: Button
+var forge_bar: ForgeBar
 ## The main screen's Yes / No pop-up, set before the section is added.
 var confirm: ConfirmPopup
 ## The open "buy this level?" question, or null.
@@ -72,6 +75,10 @@ func _ready() -> void:
 	UiStyle.style_button(reset_button, 22)
 	reset_button.pressed.connect(_ask_reset)
 	add_child(reset_button)
+
+	forge_bar = ForgeBar.new(essences)
+	forge_bar.position = reset_button.position - Vector2(FORGE_GAP + ForgeBar.SIZE.x, 0)
+	add_child(forge_bar)
 
 	tree.changed.connect(refresh)
 	essences.changed.connect(refresh)

@@ -30,7 +30,7 @@ const SAVE_PREFIX := "user://screenshot_save_slot_"
 ## Scenarios that start from the game's root scene (the main screen).
 const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "title_settings", "the_end",
 	"journey_map", "journey_endless", "endless_wave", "endless_boss", "endless_pick", "endless_run_over",
-	"exit_cancel", "tree_icons", "tree_free", "tree_rules", "backpack_slots",
+	"exit_cancel", "tree_icons", "tree_free", "tree_rules", "tree_forge", "backpack_slots",
 	"skin_preview", "tree_boots", "title_difficulty"]
 ## Endless map choices (Journey.ENDLESS_MAPS indices) for the Endless scenarios.
 const RANDOM_MAP := 0
@@ -236,6 +236,8 @@ func _run(scenario: String) -> void:
 			await scenario_tree_free()
 		"tree_rules":
 			await scenario_tree_rules()
+		"tree_forge":
+			await scenario_tree_forge()
 		"backpack_slots":
 			await scenario_backpack_slots()
 		"skin_preview":
@@ -1744,6 +1746,28 @@ func scenario_tree_free() -> void:
 	await wait(0.3)
 	print("badges after claiming Ghost (expect false): ", save.tree.has_free())
 	await shot("tree_free_3_claimed")
+
+
+## The essence forge on the tree page: with blue to spare, after forging 10
+## and 1 (the amounts at the top change), then with too little blue, with the
+## hover card on the off button; and on the Stats page.
+func scenario_tree_forge() -> void:
+	var save := SaveGame.instance()
+	save.essences.add(Essences.BLUE, 1500)
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	await mouse_move(Vector2(960, 1060))
+	await wait(0.3)
+	await shot("tree_forge_0_blue_to_spare")
+	section.forge_bar.buttons[10].pressed.emit()
+	section.forge_bar.buttons[1].pressed.emit()
+	await wait(0.3)
+	print("blue 180, orange 11 (expect): ", save.essences.amount(Essences.BLUE), " ", save.essences.amount(Essences.ORANGE))
+	await shot("tree_forge_1_after")
+	section.show_branch(&"stats")
+	await mouse_move(section.forge_bar.buttons[10].get_global_rect().get_center())
+	await wait(1.5)
+	await shot("tree_forge_2_short_hover_stats")
 
 
 ## Phase 10's per-level rules on the pages. Act 1 cleared, Q 3, W 3 (E 1 from
