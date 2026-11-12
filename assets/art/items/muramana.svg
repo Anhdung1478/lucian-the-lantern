@@ -1,19 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Muramana: a katana on the diagonal with a gold guard and blue-wrapped hilt, a blue mana glow running along its edge -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c2458"/><stop offset="1" stop-color="#060818"/></linearGradient><linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f8ff"/><stop offset="1" stop-color="#94a8cc"/></linearGradient><radialGradient id="aura"><stop offset="0" stop-color="#3a7aff" stop-opacity="0.35"/><stop offset="1" stop-color="#3a7aff" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="38" cy="26" r="24" fill="url(#aura)"/>
-  <path d="M 54 11 C 48 22 37 34 24 45" fill="none" stroke="#3a8cff" stroke-width="9" stroke-linecap="round" opacity="0.2"/>
-  <path d="M 54 11 C 48 22 37 34 24 45" fill="none" stroke="#5ab8ff" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
-  <line x1="18.9" y1="46.1" x2="8.5" y2="56.5" stroke="#0c1018" stroke-width="7"/>
-  <line x1="18.9" y1="46.1" x2="8.5" y2="56.5" stroke="#1c2a6e" stroke-width="5"/>
-  <line x1="18.9" y1="46.1" x2="8.5" y2="56.5" stroke="#4a6ad0" stroke-width="5" stroke-dasharray="1.6 2.4"/>
-  <circle cx="7.8" cy="57.2" r="2.4" fill="#c8962e" stroke="#0c1018" stroke-width="1"/>
-  <path d="M 20 41 C 33 31 45 20 56 6 L 54 11 C 48 22 37 34 24 45 Z" fill="url(#steel)" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round"/>
-  <path d="M 53.3 10.6 C 47.3 21.3 36.3 33.3 23.3 44.3" fill="none" stroke="#d8f2ff" stroke-width="1.4" stroke-linecap="round"/>
-  <polygon points="19.3,40.3 24.7,45.7 23.3,47.1 17.9,41.7" fill="#e8c060" stroke="#0c1018" stroke-width="1"/>
-  <ellipse cx="19.9" cy="45.1" rx="7.5" ry="2.4" transform="rotate(45 19.9 45.1)" fill="#c8962e" stroke="#0c1018" stroke-width="1.2"/>
-  <circle cx="44" cy="26" r="1.2" fill="#cfeaff"/>
-  <circle cx="33" cy="37.5" r="1" fill="#cfeaff" opacity="0.85"/>
-  <circle cx="51" cy="16.5" r="0.9" fill="#cfeaff" opacity="0.85"/>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <!-- Muramana: a slender curved katana with a glowing blue edge, a round gold guard and a blue-wrapped hilt -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4a8cff" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#2a4aa8" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#2a4aa8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="blade" x1="26" y1="0" x2="42" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4fbff"/>
+      <stop offset="0.5" stop-color="#9ac4ff"/>
+      <stop offset="1" stop-color="#4a64b8"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="20" y1="0" x2="44" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe7a3"/>
+      <stop offset="0.5" stop-color="#e2a93b"/>
+      <stop offset="1" stop-color="#a8641a"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <g transform="rotate(45 32 32)">
+    <path d="M 31 -2 C 42 10 41 30 39 42 L 28 42 C 31 30 28 12 31 -2 Z" fill="url(#blade)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 30.5 6 C 33 16 33 28 31.5 40" fill="none" stroke="#3a8cff" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M 36 12 C 38 20 38 30 36.5 38" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>
+    <!-- round guard -->
+    <ellipse cx="33.5" cy="44" rx="11" ry="4.4" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.5"/>
+    <path d="M 26 42.6 C 30 41.2 36 41.2 40 42.6" fill="none" stroke="#fff4d0" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- hilt -->
+    <path d="M 30 47 L 37 47 L 36.5 57 L 30.5 57 Z" fill="#2f4ed0" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 30.5 50 L 36.8 54 M 36.6 50 L 30.6 54" stroke="#9ab4ff" stroke-width="1.4" stroke-linecap="round"/>
+    <circle cx="33.5" cy="60" r="3.2" fill="#e2a93b" stroke="#1a1d24" stroke-width="2.5"/>
+    <circle cx="32.6" cy="59" r="1" fill="#ffe7a3"/>
+  </g>
+  <path d="M 52 12 L 53.4 15.6 L 57 17 L 53.4 18.4 L 52 22 L 50.6 18.4 L 47 17 L 50.6 15.6 Z" fill="#dceaff" transform="translate(0 -4)"/>
+  <path d="M 10 48 L 10.9 50.1 L 13 51 L 10.9 51.9 L 10 54 L 9.1 51.9 L 7 51 L 9.1 50.1 Z" fill="#8ab4ff"/>
 </svg>

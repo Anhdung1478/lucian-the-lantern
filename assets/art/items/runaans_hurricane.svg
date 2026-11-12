@@ -1,24 +1,58 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Runaan's Hurricane: a drawn green bow with a nocked arrow and three wind swirls around it -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#164a4a"/><stop offset="1" stop-color="#061414"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#9ff5d0" stop-opacity="0.4"/><stop offset="1" stop-color="#3fd0a0" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="34" cy="32" r="24" fill="url(#glow)"/>
-  <polyline points="23,6 18,32 23,58" fill="none" stroke="#e9fff3" stroke-width="1.1"/>
-  <path d="M 23 5 C 47 13 51 51 23 59 L 22 57 C 40 49 40 15 22 7 Z" fill="#3cb768" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 26 9.5 C 43 15.5 45 48.5 26 54.5" fill="none" stroke="#b6f5c8" stroke-width="1.2" stroke-linecap="round"/>
-  <circle cx="23" cy="5.8" r="1.8" fill="#e8c66a" stroke="#0c1018" stroke-width="1"/>
-  <circle cx="23" cy="58.2" r="1.8" fill="#e8c66a" stroke="#0c1018" stroke-width="1"/>
-  <rect x="35.5" y="27" width="8.5" height="10" rx="2" fill="#c99a3c" stroke="#0c1018" stroke-width="1.5"/>
-  <path d="M 36 30 L 43.5 30 M 36 34 L 43.5 34" stroke="#7a5a1e" stroke-width="1"/>
-  <line x1="18" y1="32" x2="53" y2="32" stroke="#0c1018" stroke-width="3.6" stroke-linecap="round"/>
-  <line x1="18" y1="32" x2="53" y2="32" stroke="#f3ead0" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="51.5,27.5 59,32 51.5,36.5 53,32" fill="#e9fff3" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round"/>
-  <polygon points="19,32 21.5,27.5 27,27.5 25,32" fill="#7fe0b0" stroke="#0c1018" stroke-width="1.2" stroke-linejoin="round"/>
-  <polygon points="19,32 21.5,36.5 27,36.5 25,32" fill="#7fe0b0" stroke="#0c1018" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M 40 15 L 50 15 C 56 15 57 8 52 7.5 C 48.5 7.2 48 11.5 51 11.5" fill="none" stroke="#0c1018" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
-  <path d="M 40 15 L 50 15 C 56 15 57 8 52 7.5 C 48.5 7.2 48 11.5 51 11.5" fill="none" stroke="#dffff2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 40 49 L 50 49 C 56 49 57 56 52 56.5 C 48.5 56.8 48 52.5 51 52.5" fill="none" stroke="#0c1018" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
-  <path d="M 40 49 L 50 49 C 56 49 57 56 52 56.5 C 48.5 56.8 48 52.5 51 52.5" fill="none" stroke="#dffff2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 3.5 41 L 10 41 C 15 41 15.5 34 11 33.5 C 8 33.2 7.5 37.5 10 37.5" fill="none" stroke="#0c1018" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
-  <path d="M 3.5 41 L 10 41 C 15 41 15.5 34 11 33.5 C 8 33.2 7.5 37.5 10 37.5" fill="none" stroke="#dffff2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <!-- Runaan's Hurricane: an upright green bow drawn back with a long arrow aimed right, two more bolts flying off above and below it, wind curls behind -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5ee8a8" stop-opacity="0.5"/>
+      <stop offset="0.6" stop-color="#1a7a58" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#1a7a58" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="limb" x1="22" y1="6" x2="46" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9af0c0"/>
+      <stop offset="0.5" stop-color="#3ac888"/>
+      <stop offset="1" stop-color="#1a7a58"/>
+    </linearGradient>
+    <linearGradient id="head" x1="0" y1="-6" x2="0" y2="6" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4f7fb"/>
+      <stop offset="0.5" stop-color="#b9c4d4"/>
+      <stop offset="1" stop-color="#7c8799"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="-5" y1="0" x2="5" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4f7fb"/>
+      <stop offset="0.5" stop-color="#b9c4d4"/>
+      <stop offset="1" stop-color="#7c8799"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <!-- wind curls -->
+  <path d="M 2.5 15 L 8.5 15 C 13.5 15 14 8.5 10 8.2 C 7 8 6.5 11.5 9 11.8 M 2.5 49 L 8.5 49 C 13.5 49 14 55.5 10 55.8 C 7 56 6.5 52.5 9 52.2" fill="none" stroke="#1a1d24" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 2.5 15 L 8.5 15 C 13.5 15 14 8.5 10 8.2 C 7 8 6.5 11.5 9 11.8 M 2.5 49 L 8.5 49 C 13.5 49 14 55.5 10 55.8 C 7 56 6.5 52.5 9 52.2" fill="none" stroke="#dffff2" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- side bolts -->
+  <g transform="translate(44.5 24.5) rotate(50)">
+    <path d="M -1.5 1 L 1.5 1 L 1.5 -10 L -1.5 -10 Z" fill="#f3ead0" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M 0 -19 L 5 -8.5 L 0 -10.5 L -5 -8.5 Z" fill="url(#bolt)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(44.5 39.5) rotate(130)">
+    <path d="M -1.5 1 L 1.5 1 L 1.5 -10 L -1.5 -10 Z" fill="#f3ead0" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M 0 -19 L 5 -8.5 L 0 -10.5 L -5 -8.5 Z" fill="url(#bolt)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  </g>
+  <!-- drawn string -->
+  <path d="M 22 5 L 9 32 L 22 59" fill="none" stroke="#1a1d24" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 22 5 L 9 32 L 22 59" fill="none" stroke="#f3ead0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- bow -->
+  <path d="M 22 4 C 48 12 50 52 22 60 L 21 57.5 C 41 50 41 14 21 6.5 Z" fill="url(#limb)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 25 7.6 C 37 12.5 42.5 21 44 29" fill="none" stroke="#e6fff3" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M 39.5 40 C 37 48 31 54.5 24 57.6" fill="none" stroke="#0f5a40" stroke-width="1.4" stroke-linecap="round"/>
+  <circle cx="22" cy="5.2" r="2.5" fill="#e2a93b" stroke="#1a1d24" stroke-width="1.8"/>
+  <circle cx="22" cy="58.8" r="2.5" fill="#e2a93b" stroke="#1a1d24" stroke-width="1.8"/>
+  <!-- gold grip -->
+  <rect x="37.2" y="26" width="8.6" height="12" rx="2" fill="#e2a93b" stroke="#1a1d24" stroke-width="2.2"/>
+  <path d="M 37.8 29.4 L 45.2 29.4 M 37.8 34.6 L 45.2 34.6" stroke="#a8641a" stroke-width="1.4"/>
+  <!-- main arrow -->
+  <path d="M 11 30.4 L 50 30.4 L 50 33.6 L 11 33.6 Z" fill="#f3ead0" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M 13 31.4 L 48 31.4" stroke="#ffffff" stroke-width="1" stroke-linecap="round"/>
+  <path d="M 62 32 L 49 25.5 L 51.5 32 L 49 38.5 Z" fill="url(#head)" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M 9.5 32 L 13.5 25.5 L 20 25.5 L 17 32 Z M 9.5 32 L 13.5 38.5 L 20 38.5 L 17 32 Z" fill="#5ee8a8" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <!-- sparkles -->
+  <path d="M 50 3 L 50.9 5.1 L 53 6 L 50.9 6.9 L 50 9 L 49.1 6.9 L 47 6 L 49.1 5.1 Z" fill="#c8ffe4"/>
+  <path d="M 50 55 L 50.9 57.1 L 53 58 L 50.9 58.9 L 50 61 L 49.1 58.9 L 47 58 L 49.1 57.1 Z" fill="#8af0c0"/>
 </svg>

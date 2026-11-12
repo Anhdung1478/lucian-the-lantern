@@ -1,20 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Bloodthirster: a crimson broad blade pointing down, gold winged guard, blood drops falling from the tip -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a1016"/><stop offset="1" stop-color="#12060a"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#ff3a46" stop-opacity="0.5"/><stop offset="1" stop-color="#ff3a46" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="32" r="24" fill="url(#glow)"/>
-  <path d="M 24 18 L 40 18 L 39.5 37 L 32 47 L 24.5 37 Z" fill="#9a101c" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <polygon points="25.6,19 32,19 32,45 25.9,36.6" fill="#e23440"/>
-  <polyline points="25.4,19.5 25.8,36.6 31,43.6" fill="none" stroke="#ffb4a8" stroke-width="1"/>
-  <line x1="32" y1="20" x2="32" y2="39" stroke="#4a0610" stroke-width="1.5"/>
-  <rect x="29.5" y="7" width="5" height="8.5" fill="#3a1a1a" stroke="#0c1018" stroke-width="1.5"/>
-  <path d="M 29.5 9.6 L 34.5 9.6 M 29.5 12.2 L 34.5 12.2" stroke="#8a4a32" stroke-width="1"/>
-  <path d="M 15 10.5 C 18 14.5 24 15 32 15 C 40 15 46 14.5 49 10.5 C 49 16 44 19.5 32 20 C 20 19.5 15 16 15 10.5 Z" fill="#d9a441" stroke="#0c1018" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M 17 13 C 20 16 25 16.5 32 16.5 C 39 16.5 44 16 47 13" fill="none" stroke="#ffe39a" stroke-width="0.9"/>
-  <circle cx="32" cy="17.6" r="2.2" fill="#ff3a46" stroke="#0c1018" stroke-width="1"/>
-  <circle cx="32" cy="4.8" r="2.6" fill="#d9a441" stroke="#0c1018" stroke-width="1.5"/>
-  <circle cx="32" cy="4.8" r="1.1" fill="#ff3a46"/>
-  <path d="M 32 49 C 33.5 51.1 34.7 52.6 34.7 54 C 34.7 55.5 33.5 56.6 32 56.6 C 30.5 56.6 29.3 55.5 29.3 54 C 29.3 52.6 30.5 51.1 32 49 Z" fill="#e0202e" stroke="#0c1018" stroke-width="1.2"/>
-  <circle cx="31" cy="54.2" r="0.7" fill="#ffc4c4"/>
-  <circle cx="32" cy="59" r="1.2" fill="#e0202e" stroke="#0c1018" stroke-width="0.8"/>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <!-- Bloodthirster: a broad crimson blade with a straight edge and a short point, a gold guard drooping like wings over the grip, a glowing ruby, and a drop of blood falling from the edge -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff3a46" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#8a1426" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#8a1426" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="11" y1="0" x2="53" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe7a3"/>
+      <stop offset="0.5" stop-color="#e2a93b"/>
+      <stop offset="1" stop-color="#a8641a"/>
+    </linearGradient>
+    <radialGradient id="rubyglow" cx="32" cy="41" r="8" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff5a64" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ff5a64" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="drop" x1="42" y1="42" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff6a72"/>
+      <stop offset="0.5" stop-color="#d81a2c"/>
+      <stop offset="1" stop-color="#8a0a16"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <g transform="rotate(45 32 32)">
+    <!-- blade: dark half, then the lit half -->
+    <path d="M 32 1 L 41 13 L 41 38 L 23 38 L 23 13 Z" fill="#a3141f" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 24.3 13.4 L 32 3.2 L 32 36.8 L 24.3 36.8 Z" fill="#e8404c"/>
+    <path d="M 32 5 L 32 36" stroke="#5e0a14" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 36 15 L 36 34" stroke="#6e0c16" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+    <path d="M 25.4 15 L 25.4 35.5 M 25.8 12.6 L 30.6 6.2" stroke="#ffc0bc" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
+    <!-- guard drooping back over the grip -->
+    <path d="M 11 50 C 12 41 22 37 32 37 C 42 37 52 41 53 50 C 48 46.5 41 45 32 45 C 23 45 16 46.5 11 50 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 14.5 45.5 C 17 41 24 39 30.5 38.8" fill="none" stroke="#fff4d0" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 18 47 C 22 45.5 26 44.8 29 44.6 M 46 47 C 42 45.5 38 44.8 35 44.6" fill="none" stroke="#a8641a" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- grip and pommel -->
+    <path d="M 29 45.5 L 35 45.5 L 34.6 55 L 29.4 55 Z" fill="#6b1a24" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 29.6 48.6 L 34.6 47.6 M 29.7 52.2 L 34.5 51.2" stroke="#3a0e14" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="32" cy="58.4" r="3.6" fill="#e2a93b" stroke="#1a1d24" stroke-width="2.5"/>
+    <circle cx="32" cy="58.4" r="1.4" fill="#e0243c"/>
+    <!-- glowing ruby -->
+    <circle cx="32" cy="41" r="8" fill="url(#rubyglow)"/>
+    <circle cx="32" cy="41" r="3.8" fill="#e0243c" stroke="#1a1d24" stroke-width="1.8"/>
+    <circle cx="30.8" cy="39.8" r="1.2" fill="#ffd6db"/>
+  </g>
+  <!-- blood: a bead on the edge and a falling drop -->
+  <path d="M 42.6 35.4 C 44 36.6 44.8 37.8 44.6 39 C 44.4 40.2 43 40.6 42.2 39.8 C 41.4 39 41.4 37.4 42.6 35.4 Z" fill="#d81a2c" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 47 42 C 50 46.5 52 49 52 52 C 52 55 49.8 57 47 57 C 44.2 57 42 55 42 52 C 42 49 44 46.5 47 42 Z" fill="url(#drop)" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 44.6 50.5 C 44.6 49 45.3 47.6 46.2 46.4" fill="none" stroke="#ffd6db" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- sparkles -->
+  <path d="M 12 8 L 13.4 11.6 L 17 13 L 13.4 14.4 L 12 18 L 10.6 14.4 L 7 13 L 10.6 11.6 Z" fill="#ffc2c9"/>
+  <path d="M 56 26 L 56.9 28.1 L 59 29 L 56.9 29.9 L 56 32 L 55.1 29.9 L 53 29 L 55.1 28.1 Z" fill="#ff8a96"/>
 </svg>

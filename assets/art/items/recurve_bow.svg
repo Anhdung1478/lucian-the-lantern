@@ -1,13 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Recurve Bow: an upright warm-wood recurve bow with gold-capped tips, a leather-wrapped grip and a taut string -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <path d="M 46 10 L 46 54" stroke="#efe6cc" stroke-width="1.3" stroke-linecap="round"/>
-  <path d="M 34 4 C 44 3 48 10 44 15 C 36 23 18 22 18 32 C 18 42 36 41 44 49 C 48 54 44 61 34 60" fill="none" stroke="#0c1018" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 34 4 C 44 3 48 10 44 15 C 36 23 18 22 18 32 C 18 42 36 41 44 49 C 48 54 44 61 34 60" fill="none" stroke="#9a5a2a" stroke-width="4.2" stroke-linecap="round"/>
-  <path d="M 34 4 C 44 3 48 10 44 15 C 36 23 18 22 18 32 C 18 42 36 41 44 49 C 48 54 44 61 34 60" fill="none" stroke="#e2a666" stroke-width="1.3" stroke-linecap="round" transform="translate(-0.9 -0.5)"/>
-  <path d="M 34 4 L 38 4 M 34 60 L 38 59.9" stroke="#e6b44a" stroke-width="4.2" stroke-linecap="round"/>
-  <circle cx="34.8" cy="3.2" r="0.9" fill="#fff0b0"/>
-  <circle cx="34.8" cy="59.2" r="0.9" fill="#fff0b0"/>
-  <rect x="14" y="25.5" width="8" height="13" rx="2.5" fill="#4a2a18" stroke="#0c1018" stroke-width="1.8"/>
-  <path d="M 14.9 29.5 L 21.1 28.5 M 14.9 33 L 21.1 32 M 14.9 36.5 L 21.1 35.5" stroke="#8a5a34" stroke-width="1.1"/>
+  <!-- Recurve Bow: an upright wooden bow, limbs sweeping out from a leather grip and curling back at gold-capped tips, a taut string on the right -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f0c040" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#f0c040" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="grip" x1="13" y1="0" x2="23" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b9793f"/>
+      <stop offset="0.5" stop-color="#8a5327"/>
+      <stop offset="1" stop-color="#5d3516"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <!-- string, its ends tucked behind the curled tips -->
+  <path d="M 47 12 L 47 52" stroke="#1a1d24" stroke-width="4.2" stroke-linecap="round"/>
+  <path d="M 47 12 L 47 52" stroke="#f3ead2" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- the limbs: outline, wood, shade on the lower right, light on the upper left -->
+  <path d="M 34 6 C 44 5 48 11.5 44 16.2 C 36 23.6 18 22.7 18 32 C 18 41.3 36 40.4 44 47.8 C 48 52.5 44 59 34 58" fill="none" stroke="#1a1d24" stroke-width="8.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 34 6 C 44 5 48 11.5 44 16.2 C 36 23.6 18 22.7 18 32 C 18 41.3 36 40.4 44 47.8 C 48 52.5 44 59 34 58" fill="none" stroke="#a8682f" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 34 6 C 44 5 48 11.5 44 16.2 C 36 23.6 18 22.7 18 32 C 18 41.3 36 40.4 44 47.8 C 48 52.5 44 59 34 58" fill="none" stroke="#6b3f20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(1.1 0.8)"/>
+  <path d="M 34 6 C 44 5 48 11.5 44 16.2 C 36 23.6 18 22.7 18 32 C 18 41.3 36 40.4 44 47.8 C 48 52.5 44 59 34 58" fill="none" stroke="#dca066" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" transform="translate(-1 -0.7)"/>
+  <path d="M 35 6.6 C 43 6 46.6 11 43.4 15.2 C 35.6 22.6 19 22.2 17.8 30 M 18 35 C 18.6 40.6 27 41.2 34 43.4" fill="none" stroke="#fff0d6" stroke-width="1" stroke-linecap="round" transform="translate(-1.6 -1.1)" opacity="0.9"/>
+  <!-- gold tip caps -->
+  <circle cx="33.6" cy="6" r="3.3" fill="#e2a93b" stroke="#1a1d24" stroke-width="2"/>
+  <circle cx="32.6" cy="5" r="1.1" fill="#ffe7a3"/>
+  <circle cx="33.6" cy="58" r="3.3" fill="#e2a93b" stroke="#1a1d24" stroke-width="2"/>
+  <circle cx="32.6" cy="57" r="1.1" fill="#ffe7a3"/>
+  <!-- leather grip -->
+  <rect x="13.2" y="25" width="9.6" height="14" rx="2.8" fill="url(#grip)" stroke="#1a1d24" stroke-width="2.5"/>
+  <path d="M 14.4 29 L 21.6 27.8 M 14.4 32.8 L 21.6 31.6 M 14.4 36.6 L 21.6 35.4" stroke="#5d3516" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 15.1 27 L 15.1 36.6" stroke="#e0b07a" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
 </svg>

@@ -1,29 +1,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Kraken Slayer: a steel harpoon-trident pointing up-right, a teal kraken tentacle coiled around its wooden shaft -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e2d5a"/><stop offset="1" stop-color="#040b1a"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#3fd8c8" stop-opacity="0.35"/><stop offset="1" stop-color="#3fd8c8" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="45" cy="19" r="20" fill="url(#glow)"/>
-  <g transform="rotate(45 32 32)" stroke-linejoin="round">
-    <path d="M 28 52 C 28 47 37 47 37 42" fill="none" stroke="#04201c" stroke-width="7.5" stroke-linecap="round"/>
-    <path d="M 28 52 C 28 47 37 47 37 42" fill="none" stroke="#1d8a80" stroke-width="5" stroke-linecap="round"/>
-    <path d="M 32 22 L 32 63" stroke="#06101c" stroke-width="6.5" stroke-linecap="round"/>
-    <path d="M 32 22 L 32 63" stroke="#7a5236" stroke-width="3.6" stroke-linecap="round"/>
-    <path d="M 31.1 28 L 31.1 61" stroke="#b08458" stroke-width="1" stroke-linecap="round"/>
-    <circle cx="32" cy="64" r="3" fill="#a9bac8" stroke="#06101c" stroke-width="1.6"/>
-    <path d="M 21 20 L 21 10 L 22 2.5 L 25 10 L 25 18 Q 32 23 39 18 L 39 10 L 42 2.5 L 43 10 L 43 20 Q 32 30 21 20 Z" fill="#a9bac8" stroke="#06101c" stroke-width="1.8"/>
-    <path d="M 30 24 L 30 7 L 26.5 9 L 32 -2 L 37.5 9 L 34 7 L 34 24 Z" fill="#dfe8ee" stroke="#06101c" stroke-width="1.8"/>
-    <path d="M 31.2 1 L 28.6 7.6" stroke="#ffffff" stroke-width="1" stroke-linecap="round"/>
-    <rect x="28.5" y="22.5" width="7" height="4.5" rx="1" fill="#c9a45c" stroke="#06101c" stroke-width="1.5"/>
-    <g fill="none" stroke="#04201c" stroke-linecap="round">
-      <path d="M 40 56 C 35 57.5 28 56.5 28 52" stroke-width="9"/>
-      <path d="M 37 42 C 37 37 27 39 27 34" stroke-width="6.5"/>
-      <path d="M 27 34 C 27 29.5 34.5 28.5 35 31.5" stroke-width="5.5"/>
+  <!-- Kraken Slayer: a steel harpoon-trident on the diagonal, three barbed prongs, a gold collar, and a glowing teal kraken tentacle coiled twice round the wooden shaft -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3fd8c8" stop-opacity="0.5"/>
+      <stop offset="0.6" stop-color="#1a6a80" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#1a6a80" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="steel" x1="16" y1="0" x2="48" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4f7fb"/>
+      <stop offset="0.5" stop-color="#b9c4d4"/>
+      <stop offset="1" stop-color="#7c8799"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="29.6" y1="0" x2="34.4" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b07a48"/>
+      <stop offset="0.5" stop-color="#8a5a34"/>
+      <stop offset="1" stop-color="#5a3520"/>
+    </linearGradient>
+    <linearGradient id="tent" x1="24" y1="0" x2="42" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7af0dc"/>
+      <stop offset="0.5" stop-color="#2fb8a8"/>
+      <stop offset="1" stop-color="#1a7a80"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <g transform="rotate(45 32 32)">
+    <!-- tentacle, whole length: outlines, then flesh (the back turn shows darker) -->
+    <g fill="none" stroke="#1a1d24" stroke-linecap="round">
+      <path d="M 41.5 58.5 C 36 57.6 29 55.5 26.5 52.2" stroke-width="8.8"/>
+      <path d="M 26.5 52.2 C 23.5 48.5 34 47.5 37.5 44.2" stroke-width="7.8"/>
+      <path d="M 37.5 44.2 C 40.5 40.5 30 40 26.5 35.6" stroke-width="7.2"/>
+      <path d="M 26.5 35.6 C 24.5 33 24.5 30 27.5 29.6 C 29.6 29.4 30 31.6 28.4 32.2" stroke-width="5.8"/>
     </g>
-    <g fill="none" stroke="#2bb3a3" stroke-linecap="round">
-      <path d="M 40 56 C 35 57.5 28 56.5 28 52" stroke-width="6.5"/>
-      <path d="M 37 42 C 37 37 27 39 27 34" stroke-width="4"/>
-      <path d="M 27 34 C 27 29.5 34.5 28.5 35 31.5" stroke-width="3"/>
-    </g>
-    <g fill="#c8fff4"><circle cx="32.1" cy="56.3" r="1.2"/><circle cx="32" cy="38" r="0.9"/><circle cx="28.6" cy="30.9" r="0.7"/></g>
+    <path d="M 41.5 58.5 C 36 57.6 29 55.5 26.5 52.2" fill="none" stroke="url(#tent)" stroke-width="6.2" stroke-linecap="round"/>
+    <path d="M 26.5 52.2 C 23.5 48.5 34 47.5 37.5 44.2" fill="none" stroke="#1d8a80" stroke-width="5.2" stroke-linecap="round"/>
+    <path d="M 37.5 44.2 C 40.5 40.5 30 40 26.5 35.6" fill="none" stroke="url(#tent)" stroke-width="4.6" stroke-linecap="round"/>
+    <path d="M 26.5 35.6 C 24.5 33 24.5 30 27.5 29.6 C 29.6 29.4 30 31.6 28.4 32.2" fill="none" stroke="url(#tent)" stroke-width="3.3" stroke-linecap="round"/>
+    <!-- shaft and butt cap -->
+    <path d="M 29.6 28 L 34.4 28 L 34.4 60 L 29.6 60 Z" fill="url(#wood)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 31 31 L 31 58" stroke="#d2a070" stroke-width="1.1" stroke-linecap="round" opacity="0.8"/>
+    <circle cx="32" cy="62" r="2.8" fill="#b9c4d4" stroke="#1a1d24" stroke-width="2"/>
+    <!-- the two turns that pass in front of the shaft -->
+    <path d="M 41.5 58.5 C 36 57.6 29 55.5 26.5 52.2" fill="none" stroke="#1a1d24" stroke-width="8.8" stroke-linecap="butt"/>
+    <path d="M 41.5 58.5 C 36 57.6 29 55.5 26.5 52.2" fill="none" stroke="url(#tent)" stroke-width="6.2" stroke-linecap="butt"/>
+    <path d="M 37.5 44.2 C 40.5 40.5 30 40 26.5 35.6" fill="none" stroke="#1a1d24" stroke-width="7.2" stroke-linecap="butt"/>
+    <path d="M 37.5 44.2 C 40.5 40.5 30 40 26.5 35.6" fill="none" stroke="url(#tent)" stroke-width="4.6" stroke-linecap="butt"/>
+    <!-- glowing suckers and a lit ridge -->
+    <path d="M 39 56.4 C 35 55.6 30.4 54 28.2 51.6 M 36.6 41.6 C 35 40 31 39.2 28.4 36.6" fill="none" stroke="#c8fff4" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+    <circle cx="35" cy="59.4" r="1.15" fill="#d6fff6"/>
+    <circle cx="30.4" cy="57.8" r="1.15" fill="#d6fff6"/>
+    <circle cx="33.6" cy="42.8" r="1" fill="#d6fff6"/>
+    <circle cx="25.6" cy="30.6" r="0.8" fill="#d6fff6"/>
+    <!-- trident head -->
+    <path d="M 32 -4 L 37 6.5 L 34.2 5.6 L 34.2 22.4 C 38 22.4 41.5 20 41.5 16 L 41.5 13.2 L 39 13.6 L 43.5 4.5 L 48 13.6 L 45.5 13.2 L 45.5 16 C 45.5 23 39 27 32 27 C 25 27 18.5 23 18.5 16 L 18.5 13.2 L 16 13.6 L 20.5 4.5 L 25 13.6 L 22.5 13.2 L 22.5 16 C 22.5 20 26 22.4 29.8 22.4 L 29.8 5.6 L 27 6.5 Z" fill="url(#steel)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 32 2 L 32 21 M 43.5 8.5 L 43.5 18 M 20.5 8.5 L 20.5 18" stroke="#7c8799" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M 30.9 1.2 L 28.9 5.2 M 30.9 8 L 30.9 20.5 M 19.6 9.5 L 19.6 18.5 C 20 21.8 23 24.6 28 25.4" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+    <!-- gold collar -->
+    <rect x="28.4" y="25.6" width="7.2" height="4.6" rx="1.2" fill="#e2a93b" stroke="#1a1d24" stroke-width="2"/>
+    <path d="M 29.8 27 L 34 27" stroke="#ffe7a3" stroke-width="1.1" stroke-linecap="round"/>
   </g>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <!-- sparkles -->
+  <path d="M 12 7 L 13.4 10.6 L 17 12 L 13.4 13.4 L 12 17 L 10.6 13.4 L 7 12 L 10.6 10.6 Z" fill="#d6fff6"/>
+  <path d="M 52 47 L 52.9 49.1 L 55 50 L 52.9 50.9 L 52 53 L 51.1 50.9 L 49 50 L 51.1 49.1 Z" fill="#8af0e0"/>
 </svg>
