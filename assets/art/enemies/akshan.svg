@@ -1,22 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-  <!-- Akshan: the rogue sentinel seen from above, scarf trailing behind, his boomerang-gun held forward (+X). -->
+  <!-- Akshan, the rogue Sentinel, seen from above, facing +X: a teal hooded cloak with a gold Sentinel trim spread
+       behind him, a red scarf streaming back from his neck, and his gold grappling-hook gun (the Avengerang) levelled
+       forward in both hands, its cable reel on the side and a three-pronged silver hook at the muzzle. -->
+  <defs>
+    <linearGradient id="cloak" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#3a7487"/>
+      <stop offset="1" stop-color="#1f4654"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff4c4"/>
+      <stop offset="1" stop-color="#d9a446"/>
+    </linearGradient>
+  </defs>
   <g transform="translate(50 50)">
-    <ellipse cx="-2" cy="4" rx="38" ry="36" fill="#000000" opacity="0.25"/>
-    <!-- scarf trailing behind -->
-    <path d="M -20 -8 L -42 -14 L -34 -4 L -44 4 L -32 8 L -40 18 L -18 12 Z" fill="#b8453a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <!-- shoulders and coat -->
-    <ellipse cx="-2" cy="0" rx="22" ry="30" fill="#3a3f4d" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -14 -18 Q -18 0 -14 18" fill="none" stroke="#565d70" stroke-width="3" stroke-linecap="round"/>
-    <!-- arms reaching forward -->
-    <path d="M 4 -22 L 26 -8" stroke="#1a1d24" stroke-width="10" stroke-linecap="round"/>
-    <path d="M 4 -22 L 26 -8" stroke="#5a4636" stroke-width="6" stroke-linecap="round"/>
-    <path d="M 4 22 L 26 8" stroke="#1a1d24" stroke-width="10" stroke-linecap="round"/>
-    <path d="M 4 22 L 26 8" stroke="#5a4636" stroke-width="6" stroke-linecap="round"/>
-    <!-- the Avengerang -->
-    <path d="M 24 -12 L 40 0 L 24 12 L 30 0 Z" fill="#ffe08a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <!-- head, hair and mask -->
-    <circle cx="2" cy="0" r="12" fill="#d9a77a" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -10 0 Q -8 -12 4 -12 Q -2 -2 4 12 Q -8 12 -10 0 Z" fill="#23262e" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M 6 -6 L 12 -4 L 12 4 L 6 6 Z" fill="#1a1d24"/>
+    <!-- the cloak, spread behind him, its hem in three soft points -->
+    <path d="M 5 -21 Q -10 -29 -24 -27 L -30 -29 Q -36 -16 -34 -4 L -38 1 L -34 5 Q -36 18 -30 27 L -24 26 Q -10 29 5 21 Z" fill="url(#cloak)" stroke="#1a1d24" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M -24 -27 L -30 -29 Q -36 -16 -34 -4 L -38 1 L -34 5 Q -36 18 -30 27 L -24 26" fill="none" stroke="#f0d48a" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M -6 -20 Q -18 -20 -28 -16 M -6 20 Q -18 21 -28 18" fill="none" stroke="#163a46" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- red scarf streaming back, its end forked -->
+    <path d="M -1 -6 Q -14 -12 -30 -14 L -25 -8 L -32 -4 Q -16 -1 -1 3 Z" fill="#cc4a3c" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M -4 -5 Q -15 -9 -26 -10" fill="none" stroke="#f3907a" stroke-width="2" stroke-linecap="round"/>
+    <!-- arms reaching forward to the gun -->
+    <path d="M 2 -18 L 16 -6 M 2 18 L 17 8" stroke="#1a1d24" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 2 -18 L 16 -6 M 2 18 L 17 8" stroke="#3b3a44" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 9 -12 L 16 -6 M 10 13 L 17 8" stroke="#c88f62" stroke-width="6" stroke-linecap="round"/>
+    <!-- shoulders under the cloak, a leather strap across -->
+    <ellipse cx="0" cy="0" rx="12" ry="21" fill="#2f6576" stroke="#1a1d24" stroke-width="3.5"/>
+    <path d="M -8 -14 Q -11 0 -8 14" fill="none" stroke="#6ab2c4" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <path d="M -3 -19 L 5 18" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
+    <path d="M -3 -19 L 5 18" stroke="#8a6040" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- the Avengerang: a chunky gold grappling gun, its cable reel, its hook -->
+    <path d="M 12 -4 L 32 -3 L 38 2 L 32 7 L 12 8 Q 8 2 12 -4 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 15 2 L 31 2" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+    <path d="M 18 -4 L 26 -3.5 M 18 8 L 26 7.5" stroke="#9a6e2a" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="22" cy="10" r="5" fill="#5c4a3a" stroke="#1a1d24" stroke-width="2"/>
+    <circle cx="22" cy="10" r="2.2" fill="#e6ecf2"/>
+    <path d="M 37 2 L 43 -5 M 38 2 L 46 2 M 37 2 L 43 9" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 37 2 L 43 -5 M 38 2 L 46 2 M 37 2 L 43 9" stroke="#eef2f6" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="16" cy="-6" r="3.5" fill="#c88f62" stroke="#1a1d24" stroke-width="1.5"/>
+    <circle cx="17" cy="8" r="3.5" fill="#c88f62" stroke="#1a1d24" stroke-width="1.5"/>
+    <!-- hood up, its point trailing back, face in its opening -->
+    <path d="M 13 0 C 13 -9 7 -12 0 -12 C -7 -12 -13 -7 -19 0 C -13 7 -7 12 0 12 C 7 12 13 9 13 0 Z" fill="#3a7a8c" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -15 -2 C -10 -7 -5 -9.5 1 -9.5" fill="none" stroke="#8fd2e0" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    <path d="M -15 0 Q -6 0 3 0" fill="none" stroke="#24566a" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 6 -8 Q 15 -6 15 0 Q 15 6 6 8 Q 9 0 6 -8 Z" fill="#b97f55" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 7.5 -6 Q 10 0 7.5 6" fill="none" stroke="#2a2420" stroke-width="2.5" stroke-linecap="round"/>
   </g>
 </svg>

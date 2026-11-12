@@ -1,45 +1,100 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150">
-  <!-- Infernal Drake: an orange-red drake seen from above, wings spread wide, lava glowing through cracks in its hide, head forward (+X). -->
+  <!-- Infernal Drake, seen from above, head forward (+X): a red-orange drake with its wings spread, lava glowing
+       through cracks in its hide and wings, flames streaming back along its spine, dark horns swept back, embers at
+       its jaws and a burning spade at the tip of its tail. -->
+  <defs>
+    <linearGradient id="membrane" x1="1" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#c2401f"/>
+      <stop offset="1" stop-color="#e05a2a"/>
+    </linearGradient>
+    <linearGradient id="hide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d24a24"/>
+      <stop offset="0.5" stop-color="#b23a1c"/>
+      <stop offset="1" stop-color="#d24a24"/>
+    </linearGradient>
+    <radialGradient id="ember">
+      <stop offset="0" stop-color="#fff2a0"/>
+      <stop offset="0.5" stop-color="#ffb43a" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#ff5a1a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
   <g transform="translate(75 75)">
-    <ellipse cx="-4" cy="4" rx="58" ry="62" fill="#000000" opacity="0.22"/>
-    <!-- wings, spread -->
-    <g stroke="#1a1d24" stroke-width="3" stroke-linejoin="round">
-      <path d="M 8 -15 Q 28 -44 -2 -71 Q -10 -57 -24 -60 Q -26 -47 -40 -42 Q -32 -30 -22 -13 Z" fill="#c9482a"/>
-      <path d="M 8 15 Q 28 44 -2 71 Q -10 57 -24 60 Q -26 47 -40 42 Q -32 30 -22 13 Z" fill="#c9482a"/>
+    <!-- tail, its spade tip burning -->
+    <path d="M -24 -9 Q -44 -10 -58 -3 Q -62 0 -58 3 Q -44 10 -24 9 Z" fill="url(#hide)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -30 0 L -56 0" stroke="#ff7a2a" stroke-width="3.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -30 0 L -56 0" stroke="#ffd04a" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+    <circle cx="-66" cy="0" r="9" fill="url(#ember)"/>
+    <path d="M -56 0 L -64 -9 L -73 0 L -64 9 Z" fill="#7a2412" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M -58 0 Q -64 -5 -68 0 Q -64 5 -58 0 Z" fill="#ffd04a"/>
+    <!-- hind legs, wings, fore legs -->
+    <path d="M -18 -12 L -24 -24" stroke="#1a1d24" stroke-width="9" stroke-linecap="round"/>
+    <path d="M -18 -12 L -24 -24" stroke="#a8381c" stroke-width="5" stroke-linecap="round"/>
+    <path d="M -24 -24 L -30 -28 M -24 -24 L -24 -30 M -24 -24 L -19 -29" stroke="#1a1d24" stroke-width="3.5" stroke-linecap="round"/>
+    <g transform="scale(1 -1)">
+    <path d="M -18 -12 L -24 -24" stroke="#1a1d24" stroke-width="9" stroke-linecap="round"/>
+    <path d="M -18 -12 L -24 -24" stroke="#a8381c" stroke-width="5" stroke-linecap="round"/>
+    <path d="M -24 -24 L -30 -28 M -24 -24 L -24 -30 M -24 -24 L -19 -29" stroke="#1a1d24" stroke-width="3.5" stroke-linecap="round"/>
     </g>
-    <path d="M 2 -20 Q 6 -44 -8 -58 Q -16 -50 -26 -50 Q -26 -38 -32 -36 Q -24 -26 -18 -18 Z" fill="#8f2c16" opacity="0.55"/>
-    <path d="M 2 20 Q 6 44 -8 58 Q -16 50 -26 50 Q -26 38 -32 36 Q -24 26 -18 18 Z" fill="#8f2c16" opacity="0.55"/>
-    <!-- wing bones -->
-    <path d="M 6 -15 L -2 -70 M 6 -15 L -24 -59 M 6 -15 L -39 -42 M 6 15 L -2 70 M 6 15 L -24 59 M 6 15 L -39 42" stroke="#1a1d24" stroke-width="5" stroke-linecap="round" fill="none"/>
-    <path d="M 6 -15 L -2 -70 M 6 -15 L -24 -59 M 6 -15 L -39 -42 M 6 15 L -2 70 M 6 15 L -24 59 M 6 15 L -39 42" stroke="#6e2212" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-    <!-- lava cracks in the wings -->
-    <path d="M -4 -26 L -10 -36 L -6 -44 L -14 -52 M -18 -30 L -26 -38 M -4 26 L -10 36 L -6 44 L -14 52 M -18 30 L -26 38" stroke="#ff7a2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
-    <path d="M -4 -26 L -10 -36 L -6 -44 L -14 -52 M -18 -30 L -26 -38 M -4 26 L -10 36 L -6 44 L -14 52 M -18 30 L -26 38" stroke="#ffd04a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <!-- tail with a spade tip -->
-    <path d="M -24 -9 Q -48 -6 -62 0 Q -48 6 -24 9 Z" fill="#b83c22" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -58 0 L -68 -9 L -74 0 L -68 9 Z" fill="#8f2c16" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70 Q -8 -60 -24 -64 Q -26 -52 -40 -48 Q -32 -38 -38 -28 Q -26 -24 -18 -13 Z" fill="url(#membrane)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 2 -18 L 8 -44 L -6 -60 Q -12 -56 -22 -58 Q -24 -48 -34 -45 Q -28 -37 -32 -30 Q -22 -24 -14 -16 Z" fill="#8a2612" opacity="0.55"/>
+    <path d="M -2 -68 Q -8 -60 -22 -62 M -26 -62 Q -28 -52 -38 -48 M -38 -46 Q -32 -38 -36 -30" fill="none" stroke="#ff8a3a" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+    <path d="M -4 -24 L -10 -34 L -6 -42 L -14 -50 M -16 -26 L -24 -36 L -22 -44 M -26 -30 L -34 -36" fill="none" stroke="#ff7a2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
+    <path d="M -4 -24 L -10 -34 L -6 -42 L -14 -50 M -16 -26 L -24 -36 L -22 -44 M -26 -30 L -34 -36" fill="none" stroke="#ffd04a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 8 -52 L -24 -64 M 8 -52 L -40 -48 M 8 -52 L -38 -28" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 8 -52 L -24 -64 M 8 -52 L -40 -48 M 8 -52 L -38 -28" fill="none" stroke="#5e1d10" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70" fill="none" stroke="#1a1d24" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70" fill="none" stroke="#a8381c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 6 -17 L 17 -33" stroke="#f08a50" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 18 -34 L 23 -38 L 19 -31 Z M -2 -70 L 1 -75 L 2 -68 Z" fill="#2a120c" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <g transform="scale(1 -1)">
+    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70 Q -8 -60 -24 -64 Q -26 -52 -40 -48 Q -32 -38 -38 -28 Q -26 -24 -18 -13 Z" fill="url(#membrane)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 2 -18 L 8 -44 L -6 -60 Q -12 -56 -22 -58 Q -24 -48 -34 -45 Q -28 -37 -32 -30 Q -22 -24 -14 -16 Z" fill="#8a2612" opacity="0.55"/>
+    <path d="M -2 -68 Q -8 -60 -22 -62 M -26 -62 Q -28 -52 -38 -48 M -38 -46 Q -32 -38 -36 -30" fill="none" stroke="#ff8a3a" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+    <path d="M -4 -24 L -10 -34 L -6 -42 L -14 -50 M -16 -26 L -24 -36 L -22 -44 M -26 -30 L -34 -36" fill="none" stroke="#ff7a2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
+    <path d="M -4 -24 L -10 -34 L -6 -42 L -14 -50 M -16 -26 L -24 -36 L -22 -44 M -26 -30 L -34 -36" fill="none" stroke="#ffd04a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 8 -52 L -24 -64 M 8 -52 L -40 -48 M 8 -52 L -38 -28" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 8 -52 L -24 -64 M 8 -52 L -40 -48 M 8 -52 L -38 -28" fill="none" stroke="#5e1d10" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70" fill="none" stroke="#1a1d24" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70" fill="none" stroke="#a8381c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 6 -17 L 17 -33" stroke="#f08a50" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 18 -34 L 23 -38 L 19 -31 Z M -2 -70 L 1 -75 L 2 -68 Z" fill="#2a120c" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    </g>
+    <path d="M 12 -10 L 22 -19" stroke="#1a1d24" stroke-width="8.5" stroke-linecap="round"/>
+    <path d="M 12 -10 L 22 -19" stroke="#b83c1e" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M 22 -19 L 28 -20 M 22 -19 L 25 -24 M 22 -19 L 20 -25" stroke="#1a1d24" stroke-width="3.5" stroke-linecap="round"/>
+    <g transform="scale(1 -1)">
+    <path d="M 12 -10 L 22 -19" stroke="#1a1d24" stroke-width="8.5" stroke-linecap="round"/>
+    <path d="M 12 -10 L 22 -19" stroke="#b83c1e" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M 22 -19 L 28 -20 M 22 -19 L 25 -24 M 22 -19 L 20 -25" stroke="#1a1d24" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
     <!-- body -->
-    <ellipse cx="-6" cy="0" rx="30" ry="19" fill="#c2401f" stroke="#1a1d24" stroke-width="3"/>
-    <ellipse cx="-8" cy="0" rx="20" ry="11" fill="#9c3219"/>
+    <ellipse cx="-4" cy="0" rx="28" ry="17" fill="url(#hide)" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -26 -8 Q -6 -15 16 -8 M -26 8 Q -6 15 16 8" fill="none" stroke="#8a2a14" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M -22 -11 Q -6 -16 10 -12" fill="none" stroke="#f0864a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
     <!-- lava cracks in the hide -->
-    <path d="M -28 -5 L -20 -2 L -14 -9 L -6 -4 L 2 -10 L 10 -6 M -26 7 L -16 4 L -10 11 L -2 6 L 8 9" stroke="#ff7a2a" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
-    <path d="M -28 -5 L -20 -2 L -14 -9 L -6 -4 L 2 -10 L 10 -6 M -26 7 L -16 4 L -10 11 L -2 6 L 8 9" stroke="#ffd04a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <!-- spines down the back -->
-    <g fill="#3a1a12" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round">
-      <path d="M -30 -3 L -40 0 L -30 3 Z"/>
-      <path d="M -18 -3 L -27 0 L -18 3 Z"/>
-      <path d="M -6 -3 L -15 0 L -6 3 Z"/>
-      <path d="M 6 -3 L -3 0 L 6 3 Z"/>
-    </g>
+    <path d="M -24 -4 L -18 -8 L -12 -3 L -4 -9 L 4 -4 L 10 -8 M -22 5 L -14 9 L -8 4 L 0 9 L 8 5" stroke="#ff7a2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+    <path d="M -24 -4 L -18 -8 L -12 -3 L -4 -9 L 4 -4 L 10 -8 M -22 5 L -14 9 L -8 4 L 0 9 L 8 5" stroke="#ffd04a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- flames streaming back along the spine -->
+    <path d="M 14 0 Q 6 -6 -4 -5 Q 0 -2 -8 0 Q 0 2 -4 5 Q 6 6 14 0 Z M -6 0 Q -14 -6 -24 -5 Q -20 -2 -28 0 Q -20 2 -24 5 Q -14 6 -6 0 Z M -24 0 Q -32 -5 -40 -4 Q -37 -1 -44 0 Q -37 1 -40 4 Q -32 5 -24 0 Z" fill="#ff8a2a" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M 10 0 Q 4 -3 -2 -2 Q 2 0 -2 2 Q 4 3 10 0 Z M -9 0 Q -15 -3 -21 -2 Q -17 0 -21 2 Q -15 3 -9 0 Z M -27 0 Q -32 -2 -37 -2 Q -34 0 -37 2 Q -32 2 -27 0 Z" fill="#ffe27a"/>
     <!-- neck and head -->
-    <path d="M 14 -9 L 34 -7 L 34 7 L 14 9 Z" fill="#c2401f" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M 36 -9 L 22 -20 L 31 -5 Z M 36 9 L 22 20 L 31 5 Z" fill="#3a1a12" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <ellipse cx="42" cy="0" rx="14" ry="11" fill="#d24a24" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M 50 -7 Q 62 -5 66 0 Q 62 5 50 7 Z" fill="#d24a24" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M 38 0 L 48 0" stroke="#ff7a2a" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="46" cy="-6" r="2.4" fill="#ffe14a"/>
-    <circle cx="46" cy="6" r="2.4" fill="#ffe14a"/>
-    <circle cx="62" cy="-2.5" r="1.2" fill="#1a1d24"/>
-    <circle cx="62" cy="2.5" r="1.2" fill="#1a1d24"/>
+    <path d="M 12 -10 Q 26 -9 38 -8 L 38 8 Q 26 9 12 10 Z" fill="url(#hide)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 16 -6 L 24 -6 M 16 6 L 24 6" stroke="#8a2a14" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 42 -8 Q 34 -16 24 -18 Q 32 -12 36 -5 Z" fill="#3a1a12" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 48 -9 Q 46 -16 40 -20 Q 42 -13 44 -7 Z" fill="#3a1a12" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 39 -8 Q 33 -13 28 -15" fill="none" stroke="#ff9a4a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    <g transform="scale(1 -1)">
+    <path d="M 42 -8 Q 34 -16 24 -18 Q 32 -12 36 -5 Z" fill="#3a1a12" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 48 -9 Q 46 -16 40 -20 Q 42 -13 44 -7 Z" fill="#3a1a12" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 39 -8 Q 33 -13 28 -15" fill="none" stroke="#ff9a4a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    </g>
+    <circle cx="67" cy="0" r="9" fill="url(#ember)"/>
+    <path d="M 34 -10 Q 46 -13 54 -8 L 64 -4 Q 68 0 64 4 L 54 8 Q 46 13 34 10 Z" fill="#d24a24" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 38 -7 Q 48 -9 56 -5" fill="none" stroke="#f0864a" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 40 0 L 56 0" stroke="#ff7a2a" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 40 0 L 56 0" stroke="#ffd04a" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 46 -9 L 53 -6 L 47 -4 Z M 46 9 L 53 6 L 47 4 Z" fill="#ffe14a" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+    <circle cx="62" cy="-2.5" r="1.4" fill="#1a1d24"/>
+    <circle cx="62" cy="2.5" r="1.4" fill="#1a1d24"/>
   </g>
 </svg>
