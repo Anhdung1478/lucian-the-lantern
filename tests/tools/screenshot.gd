@@ -48,7 +48,7 @@ const ACT_SCENARIOS := {
 	"defeat": [2, 1], "loot": [2, 2], "guardian_angel": [2, 2],
 	"resolve": [2, 1], "death_recap": [2, 1],
 	"attack_pick": [2, 1],
-	"act3_packs": [3, 1], "act3_elites": [3, 1], "act3_result": [3, 2],
+	"act3_packs": [3, 1], "act3_elites": [3, 1], "elite_traits": [3, 1], "act3_result": [3, 2],
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
 	"infernal_meteor": [3, 2], "ocean_mist": [3, 4], "elder_sky_dive": [3, 5], "elder_mark": [3, 5],
 	"act4_lane": [4, 1], "dark_lucian_q": [4, 3], "dark_lucian_r": [4, 3],
@@ -306,6 +306,8 @@ func _run(scenario: String) -> void:
 			await scenario_act3_packs()
 		"act3_elites":
 			await scenario_act3_elites()
+		"elite_traits":
+			await scenario_elite_traits()
 		"act3_result":
 			await scenario_act3_result()
 		"act3_jungle":
@@ -2755,6 +2757,30 @@ func scenario_act3_packs() -> void:
 ## leave their buffs in the HUD's row; Lucian's attacks with Red burn and
 ## slow a raptor. A big Krug splits into two. The Rift Scuttler runs and
 ## gets away: "Escaped!".
+## One elite of each trait (the stage rolls them, so spawn until each has
+## come and take the rest away), standing in a row above Lucian: the trait's
+## icon first over each bar and its ring on the ground, with the first tip.
+func scenario_elite_traits() -> void:
+	var game := game_stage()
+	game.runner._countdown = 999.0
+	var at := lucian.global_position
+	game.camera.mode = StageCamera.Mode.FREE
+	game.camera.global_position = at + Vector2(0, -170)
+	var found := {}
+	for i in 60:
+		var unit := stand(&"siege_minion", at + Vector2(0, -2000))
+		if found.has(unit.elite_trait):
+			unit.vanish()
+		else:
+			found[unit.elite_trait] = unit
+	var slot := 0
+	for id: StringName in EliteTrait.IDS:
+		(found[id] as EnemyUnit).global_position = at + Vector2(-330 + slot * 220, -230)
+		slot += 1
+	await wait(0.6)
+	await shot("elite_traits_0_row")
+
+
 func scenario_act3_elites() -> void:
 	var game := game_stage()
 	flush_tips()
