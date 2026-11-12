@@ -1,41 +1,115 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="384" height="384" viewBox="0 0 96 96">
-  <!-- Lucian HUD portrait: head and shoulders, front view. -->
+  <!-- Lucian (Classic) portrait: head and shoulders, facing the viewer. Short black hair, a short beard, his long dark coat with its high collar and pale trim; his silver-gold pistol raised at his side. Behind him the lantern's teal mist, its light on the right of his face. -->
   <defs>
-    <radialGradient id="bg" cx="0.5" cy="0.38" r="0.7">
-      <stop offset="0" stop-color="#3b3420"/>
-      <stop offset="0.55" stop-color="#171b26"/>
-      <stop offset="1" stop-color="#0b0d13"/>
+    <radialGradient id="bg" cx="0.62" cy="0.36" r="0.75">
+      <stop offset="0" stop-color="#1f5a56"/>
+      <stop offset="0.45" stop-color="#11282e"/>
+      <stop offset="1" stop-color="#070b10"/>
     </radialGradient>
-    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#6a4532"/>
-      <stop offset="1" stop-color="#4d3122"/>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#b8fff0" stop-opacity="0.55"/>
+      <stop offset="0.4" stop-color="#5fe8cf" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#5fe8cf" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4f3223"/>
+      <stop offset="0.45" stop-color="#6a4532"/>
+      <stop offset="1" stop-color="#7c533e"/>
+    </linearGradient>
+    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#141822"/>
+      <stop offset="0.6" stop-color="#222a3a"/>
+      <stop offset="1" stop-color="#2e3a4e"/>
+    </linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7d8592"/>
+      <stop offset="0.5" stop-color="#eef1f5"/>
+      <stop offset="1" stop-color="#9aa3b0"/>
     </linearGradient>
   </defs>
+  <!-- the lantern's teal mist -->
   <rect width="96" height="96" fill="url(#bg)"/>
-  <!-- light behind him -->
-  <circle cx="48" cy="38" r="30" fill="#ffe9a8" opacity="0.08"/>
-  <!-- coat and shoulders -->
-  <path d="M 8 96 Q 12 70 34 64 L 62 64 Q 84 70 88 96 Z" fill="#1d2230"/>
-  <path d="M 34 64 L 48 84 L 62 64" fill="none" stroke="#c9d1dc" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M 22 72 L 30 96 M 74 72 L 66 96" stroke="#c9d1dc" stroke-width="1.5" opacity="0.7"/>
-  <path d="M 40 66 L 48 78 L 56 66 Z" fill="#e8ecf2"/>
+  <circle cx="80" cy="26" r="30" fill="url(#glow)"/>
+  <path d="M 0 70 Q 14 62 28 68 Q 40 74 52 66 Q 66 58 80 66 Q 90 71 96 66 L 96 96 L 0 96 Z" fill="#5fe8cf" opacity="0.08"/>
+  <path d="M 0 52 Q 10 46 20 50 Q 28 53 26 58 Q 16 56 8 60 Q 3 62 0 61 Z" fill="#5fe8cf" opacity="0.1"/>
+  <path d="M 96 44 Q 86 40 78 44 Q 72 48 76 52 Q 84 49 90 52 Q 94 54 96 53 Z" fill="#5fe8cf" opacity="0.12"/>
+  <path d="M 4 30 Q 12 24 22 28" fill="none" stroke="#5fe8cf" stroke-width="1.2" stroke-linecap="round" opacity="0.25"/>
+  <path d="M 70 12 Q 80 8 90 13" fill="none" stroke="#5fe8cf" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+  <circle cx="14" cy="18" r="0.9" fill="#b8fff0" opacity="0.7"/>
+  <circle cx="22" cy="40" r="0.7" fill="#b8fff0" opacity="0.5"/>
+  <circle cx="88" cy="36" r="0.9" fill="#b8fff0" opacity="0.8"/>
+  <circle cx="72" cy="22" r="0.6" fill="#b8fff0" opacity="0.6"/>
+  <circle cx="10" cy="44" r="0.6" fill="#b8fff0" opacity="0.5"/>
+  <!-- coat: shoulders -->
+  <path d="M 2 96 C 4 82 13 74 27 70.5 L 39 66.5 L 58 66.5 L 70 70.5 C 84 74 92 82 94 96 Z" fill="url(#coat)" stroke="#1a1d24" stroke-width="1"/>
+  <path d="M 70 71 C 82 74.5 90 81 92.5 92" fill="none" stroke="#7fe8d6" stroke-width="1.1" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 18 76 Q 24 84 25 96 M 79 76 Q 73 84 72 96" fill="none" stroke="#11151d" stroke-width="1.2"/>
   <!-- neck -->
-  <path d="M 41 54 L 41 66 L 55 66 L 55 54 Z" fill="#4d3122"/>
-  <!-- head -->
-  <path d="M 31 34 Q 31 18 48 17 Q 65 18 65 34 L 64 44 Q 62 58 48 62 Q 34 58 32 44 Z" fill="url(#skin)"/>
+  <path d="M 41.5 53 L 41 67 Q 48.5 70 56 67 L 55.5 53 Z" fill="#4a2f21"/>
+  <!-- shirt and vest -->
+  <path d="M 39 66.5 L 48.5 96 L 58 66.5 Q 48.5 70 39 66.5 Z" fill="#1a1f2b"/>
+  <path d="M 42.5 66.5 L 48.5 73.5 L 54.5 66.5 L 52.4 65.4 L 48.5 69.8 L 44.6 65.4 Z" fill="#e8ecf2" stroke="#1a1d24" stroke-width="0.5" stroke-linejoin="round"/>
+  <circle cx="48.5" cy="78" r="0.9" fill="#c9d1dc"/>
+  <circle cx="48.5" cy="84" r="0.9" fill="#c9d1dc"/>
+  <circle cx="48.5" cy="90" r="0.9" fill="#c9d1dc"/>
+  <!-- lapels with pale trim -->
+  <path d="M 39 66.5 L 30 71 L 41 96 L 46 96 Z" fill="#1d2330" stroke="#c9d1dc" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M 58 66.5 L 67 71 L 56 96 L 51 96 Z" fill="#2a3446" stroke="#c9d1dc" stroke-width="1" stroke-linejoin="round"/>
+  <!-- high collar standing up on both sides of the neck -->
+  <path d="M 28 64 L 35.5 55 L 41.5 66 L 39 67.5 L 31 71 Z" fill="#1a1f2b" stroke="#c9d1dc" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M 69 64 L 61.5 55 L 55.5 66 L 58 67.5 L 66 71 Z" fill="#2c374a" stroke="#c9d1dc" stroke-width="1" stroke-linejoin="round"/>
   <!-- ears -->
-  <ellipse cx="31" cy="40" rx="3" ry="5" fill="#4d3122"/>
-  <ellipse cx="65" cy="40" rx="3" ry="5" fill="#4d3122"/>
-  <!-- short hair -->
-  <path d="M 31 33 Q 31 16 48 15 Q 65 16 65 33 Q 60 24 48 24 Q 36 24 31 33 Z" fill="#141010"/>
+  <path d="M 34.5 36 C 31 34 30 37.5 30.8 41 C 31.5 44.5 33 46 35 45.5 Z" fill="#4d3122" stroke="#1a1d24" stroke-width="0.6"/>
+  <path d="M 63 36 C 66.5 34 67.5 37.5 66.7 41 C 66 44.5 64.5 46 62.5 45.5 Z" fill="#74503c" stroke="#1a1d24" stroke-width="0.6"/>
+  <path d="M 64 38.5 Q 65.6 40.5 64.2 43" fill="none" stroke="#4d3122" stroke-width="0.7" stroke-linecap="round"/>
+  <!-- head -->
+  <path d="M 34 34 C 33.5 24 39 16 48.5 16 C 58 16 63.5 23 63.5 33 L 63.5 41 C 63.5 49 60 55 55 59 C 52.5 61.5 50.5 63 48.5 63 C 46.5 63 44 61.5 42 59.5 C 37 55 34 49 34 41 Z" fill="url(#skin)" stroke="#1a1d24" stroke-width="0.8"/>
+  <!-- shadow on the dark side of his face, cheekbone light on the lit side -->
+  <path d="M 41 16.8 C 37 18.5 33.5 24 34 34 L 34 41 C 34 49 37 55 42 59.5 C 44 61.5 46 62.8 48 63 L 46.5 59.5 C 42.5 55.5 40.5 50 41 44.5 C 41.4 40 39.6 36.5 40 31.5 C 40.5 25.5 42.5 20.5 46 16.4 Z" fill="#3e271b" opacity="0.45"/>
+  <path d="M 56 42.5 Q 59.5 41.5 61.5 44" fill="none" stroke="#94654c" stroke-width="1.4" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 58.5 18.6 C 61.8 21.6 63.5 27 63.5 33 L 63.5 41 C 63.5 48.5 60.5 54.5 55.5 58.6" fill="none" stroke="#9ff5e6" stroke-width="1.1" stroke-linecap="round" opacity="0.9"/>
+  <!-- short black hair, a crisp hairline -->
+  <path d="M 33.6 34 C 32.8 22 39 14.4 48.5 14.4 C 58 14.4 64.2 22 63.9 34 L 62.6 30.5 C 62 26.5 60 24.6 57 23.9 C 54 23.3 51 23.7 48.5 23.7 C 46 23.7 43 23.3 40 23.9 C 37 24.6 35 26.5 34.6 30.5 Z" fill="#161110" stroke="#1a1d24" stroke-width="0.6"/>
+  <path d="M 52 16.4 Q 58.6 17.8 61.6 23" fill="none" stroke="#4e5e5e" stroke-width="1.1" stroke-linecap="round"/>
+  <path d="M 34.6 30.5 L 34.4 39 L 36 39 L 36.2 31 Z M 62.6 30.5 L 62.8 39 L 61.2 39 L 61 31 Z" fill="#161110"/>
   <!-- brows and eyes -->
-  <path d="M 36 35 L 45 36 M 51 36 L 60 35" stroke="#141010" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M 38 40 L 44 40 M 52 40 L 58 40" stroke="#f2e6d0" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="41" cy="40" r="1.2" fill="#1a1210"/>
-  <circle cx="55" cy="40" r="1.2" fill="#1a1210"/>
+  <path d="M 37 35.8 Q 41 33.2 45.6 34.6 L 45.3 36.1 Q 41 35.3 37.4 37 Z" fill="#161110"/>
+  <path d="M 60 35.8 Q 56 33.2 51.4 34.6 L 51.7 36.1 Q 56 35.3 59.6 37 Z" fill="#161110"/>
+  <path d="M 38 40 Q 41.5 37.6 45 39.8 Q 41.5 41.4 38 40 Z" fill="#e6dccf"/>
+  <path d="M 52 39.8 Q 55.5 37.6 59 40 Q 55.5 41.4 52 39.8 Z" fill="#f2e8da"/>
+  <circle cx="41.6" cy="39.6" r="1.45" fill="#2a1a12"/>
+  <circle cx="55.4" cy="39.6" r="1.45" fill="#2a1a12"/>
+  <circle cx="42.1" cy="39.1" r="0.45" fill="#ffffff"/>
+  <circle cx="55.9" cy="39.1" r="0.45" fill="#ffffff"/>
+  <path d="M 37.8 40 Q 41.5 37.2 45.2 39.6 M 51.8 39.6 Q 55.5 37.2 59.2 40" fill="none" stroke="#1a1210" stroke-width="0.9" stroke-linecap="round"/>
+  <path d="M 39 42.2 Q 41.5 43 44 42.2 M 53 42.2 Q 55.5 43 58 42.2" fill="none" stroke="#4d3122" stroke-width="0.6" stroke-linecap="round"/>
   <!-- nose -->
-  <path d="M 48 41 L 46 48 L 50 48" fill="none" stroke="#3e271b" stroke-width="1.5" stroke-linejoin="round"/>
-  <!-- moustache and goatee -->
-  <path d="M 42 52 Q 48 49 54 52" fill="none" stroke="#141010" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M 44 56 Q 48 62 52 56 L 50 55 Q 48 57 46 55 Z" fill="#141010"/>
+  <path d="M 47 40 Q 46.2 44 45.4 46" fill="none" stroke="#3e271b" stroke-width="0.9" stroke-linecap="round"/>
+  <path d="M 44.6 46.4 Q 45.4 48.6 48.5 48 Q 51.6 48.6 52.4 46.4" fill="none" stroke="#3a2418" stroke-width="1" stroke-linecap="round"/>
+  <ellipse cx="49.8" cy="45.6" rx="1.3" ry="0.9" fill="#94654c" opacity="0.8"/>
+  <!-- beard: the jaw, the chin and the moustache -->
+  <path d="M 34.2 40 C 34.4 48 37.5 54.5 42 59.5 C 44 61.5 46.5 63.2 48.5 63.2 C 50.5 63.2 52.5 61.5 55 59 C 60 55 63.3 49 63.3 40 L 62.2 41 C 62 47 59.8 52 55.6 56.4 Q 54.6 55.6 54.2 51.6 Q 53.6 54.8 52 56 Q 48.5 57.2 45 56 Q 43.4 54.8 42.8 51.6 Q 42.4 55.6 41.4 56.4 C 37.2 52 35.2 47 35.2 41 Z" fill="#1c1513"/>
+  <path d="M 42.4 51 C 44.4 48.7 47 48.5 48.5 49.3 C 50 48.5 52.6 48.7 54.6 51 C 52.5 50.4 50.5 50.7 48.5 51.1 C 46.5 50.7 44.5 50.4 42.4 51 Z" fill="#1c1513"/>
+  <path d="M 44.6 52.4 Q 48.5 53.5 52.4 52.4" fill="none" stroke="#2a1812" stroke-width="0.8" stroke-linecap="round"/>
+  <path d="M 45.6 53.4 Q 48.5 55.4 51.4 53.4 Q 48.5 54.2 45.6 53.4 Z" fill="#7c4a3a"/>
+  <path d="M 56.5 54 C 59.5 51.5 61.5 47 61.8 42" fill="none" stroke="#4e5e5e" stroke-width="0.7" stroke-linecap="round" opacity="0.8"/>
+  <!-- his pistol raised at his side: silver with gold bands, lit by its relic light -->
+  <circle cx="83" cy="33" r="7" fill="url(#glow)"/>
+  <g transform="rotate(6 83 60)">
+    <path d="M 79.6 58 Q 74.6 58.6 74.8 63 Q 75.2 66.4 80 66" fill="none" stroke="#1a1d24" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 79.6 58 Q 74.6 58.6 74.8 63 Q 75.2 66.4 80 66" fill="none" stroke="#c99a3c" stroke-width="1" stroke-linecap="round"/>
+    <path d="M 80.4 36 L 86 36 L 86 58 L 87.6 60 L 87.6 63 L 79.4 63 L 79.4 57 L 80.4 56 Z" fill="url(#silver)" stroke="#1a1d24" stroke-width="0.8" stroke-linejoin="round"/>
+    <rect x="80.8" y="33.4" width="4.6" height="3" rx="0.6" fill="#c99a3c" stroke="#1a1d24" stroke-width="0.6"/>
+    <path d="M 83.2 39 L 83.2 51" stroke="#fff4c8" stroke-width="1.4" stroke-linecap="round"/>
+    <rect x="80" y="44.5" width="6.4" height="1.8" fill="#e3b85a" stroke="#1a1d24" stroke-width="0.4"/>
+    <path d="M 80.6 53.5 L 85.8 53.5 L 85.8 57 L 80.6 57 Z" fill="#e3b85a" stroke="#1a1d24" stroke-width="0.4"/>
+    <path d="M 80.2 63 L 87.6 63 L 91.6 76 L 84.6 77.4 Z" fill="#3a404d" stroke="#1a1d24" stroke-width="0.8" stroke-linejoin="round"/>
+    <!-- his hand round the grip -->
+    <path d="M 78.6 64.4 Q 84 62.4 90 64.6 L 91.4 73 Q 85 75.6 79.4 73.6 Z" fill="#5e3d2c" stroke="#1a1d24" stroke-width="0.8" stroke-linejoin="round"/>
+    <path d="M 79 67.2 Q 84.4 65.8 90.2 67.6 M 79.2 70.2 Q 84.6 69 90.6 70.6" fill="none" stroke="#3e271b" stroke-width="0.6"/>
+    <path d="M 88.2 65 L 90.4 71.6" stroke="#9ff5e6" stroke-width="0.8" stroke-linecap="round" opacity="0.8"/>
+    <path d="M 78.6 74 Q 85 76.8 91.6 73.8 L 93 96 L 77 96 Z" fill="#232a3a" stroke="#1a1d24" stroke-width="0.8" stroke-linejoin="round"/>
+    <path d="M 78.6 74 Q 85 76.8 91.6 73.8" fill="none" stroke="#c9d1dc" stroke-width="1.1"/>
+  </g>
+  <circle cx="83" cy="33.4" r="2.2" fill="#fffbe8"/>
 </svg>
