@@ -118,6 +118,7 @@ Reference: a node-graph tree with icons in square frames connected by lines (see
 - The player can **drag to move** around the map and **zoom** with the mouse wheel. *(Phase 10: no panning or zoom; each page fits the screen.)*
 - Essences in the top-left.
 - **Reset tree** button (costs 5 purple, refunds all blue and orange).
+- *(V2.0)* **The forge** (`ForgeBar`, a child of `TreeSection`) sits left of Reset tree on every branch page, 20 px clear of it: two buttons, **120 [blue] → 1 [orange]** and **1200 [blue] → 10 [orange]**, with the essence icons. A button forges that much orange from blue at once, with the coin sound, and the essences bar updates. It is greyed out while the blue is short, with the hover "Needs 120 blue essence" ("Needs 1200 blue essence"); when it is lit the hover reads "Forge 1 orange essence from 120 blue. This cannot be undone." ("Forge 10 orange essence from 1200 blue. ..."). There is no confirm. The forge changes the essences in memory only, like a purchase: the next Save, Start or Yes keeps it. A tree reset does not give the blue back, and forged orange stays (game design doc §9, §11).
 
 ### Node states
 | State | Look |
@@ -295,6 +296,7 @@ A **full-screen** section showing every skin, including **Classic Lucian**.
 | Currently equipped | **Equipped** (disabled) |
 
 - Classic Lucian is always owned, so it shows **Equip** or **Equipped**.
+- *(V2.0)* The big art on each card is a new front-facing bust with its own background: Classic in teal mist, High Noon under a low sun over mesas, PROJECT on a neon grid with a holo ring, Pulsefire in a time rift with a clock face, Vampire under a blood moon with bats and spires. The HUD's round portrait uses the same pictures.
 
 ### Skins
 | Skin | Cost | Bonus | Weakness |
@@ -461,7 +463,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 | 6 The Lantern | Bottom row, right | The abyss with green mist, rock islands under 6-1 to 6-4, hanging chains, the lantern and its glow, and the round rune platform under 6-5 |
 
 - Each region is a soft blob in its colors, with "ACT 3" over its name in spaced capitals.
-- **The road** is a cobbled stone path, one curve through all 22 stages in play order, with a bend between rows. It glows gold up to the latest cleared stage and is dim beyond.
+- **The road** is a cobbled stone path, one curve through all 22 stages in play order, with a bend between rows. It glows gold up to the latest cleared stage and is dim beyond. *(V2.0: the lit part has a layered warm glow, and small lights run along it from the last cleared stage to the next; a new save has none. They move only with effects on.)*
 
 **Places:**
 
@@ -475,15 +477,19 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 
 | State | Look |
 |---|---|
-| Cleared | A gold rim and a green check |
-| Open, not cleared | A pulse ring every 1.8 s and a glow |
-| Locked, in an open act | Dim, with a small lock |
-| In a locked act | Under the region's dark fog, with a chain X and a lock; the region's name turns grey |
-| Picked | A white outline |
-| Hovered | A faint outline |
+| Cleared | A gold rim, a warm glow and a green check *(V2.0: a larger check)* |
+| Open, not cleared | A pulse ring every 1.8 s and a glow *(V2.0: a gold glow and ring, two pulse rings half a beat apart, and a stronger glow on the next stage; with effects off, one still faint ring)* |
+| Locked, in an open act | Dim, with a small lock *(V2.0: a stone medallion with a readable number)* |
+| In a locked act | Under the region's fog, with a chain X and a lock; the region's name turns grey *(V2.0: a thin cool-grey fog at 50% (was a near-black 84%) with drifting wisps, so the dimmed terrain shows through; the stages are stone medallions with a readable number)* |
+| Picked | A white outline *(V2.0: stronger)* |
+| Hovered | A faint outline *(V2.0: stronger)* |
 
 - The Endless portal is chained and dim, with a lock, until Act 3 is cleared.
-- *(V1.4.3)* The pulses, the portal's swirl and the token's bob run only while the Journey shows. On the Tree or the Skin Shop they stop, and a place that opens meanwhile starts when the Journey shows again.
+- *(V1.4.3)* The portal's swirl and the token's bob run only while the Journey shows. On the Tree or the Skin Shop they stop, and a place that opens meanwhile starts when the Journey shows again. *(V2.0: the pulse rings, the fog's wisps and the road's lights are extras: they run only while the Journey shows and effects are on (`Juice.on()`). With effects off the Journey is still and complete: the pulse is one faint ring, the road glows without lights and the fog has no wisps.)*
+- *(V2.0)* **The redraw:**
+  - **Bosses** wear a gold laurel around their medallion: bronze before the stage is cleared, bright once it is (`has_laurel()`).
+  - **Act titles** ("ACT 3") have a gold rule with a diamond. A cleared act has a green check after its "ACT n", and the current act's title is the brightest.
+  - **Fog:** the terrain of a locked act shows dimmed through the fog, and its chains and locks stay (see the states above).
 - **Hover texts:**
   - A stage: its name and waves ("Stage 3-4 · The Jungle", "5 waves + mini boss"; V2.0: "7 waves + mini boss"), plus "Clear 3-3 first" when it is locked in an open act.
   - A locked act, its region or its stages: "Clear Act 4 first".
@@ -500,7 +506,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
   - The act's story line.
   - "Cleared" (green, with a check) or "Not cleared yet".
   - *(V2.0)* **Resolve:** while the stage has Resolve stacks, a green line with the Resolve icon under the status: "Resolve 3 / 5: +30% damage, -30% taken" (the share follows the difficulty: 10% a stack on Easy and Normal, 5% on Hard). Hovering it says "Lucian fell here 3 times." and "Each defeat makes this stage a little easier, up to 5 times, until it is cleared." There is no line with no stacks, on a cleared stage, with the Gameplay setting off or on Extreme. Game design doc §3.
-  - **ENEMIES:** a 44 px round icon for each of the stage's enemies, once each, in wave order (the mini boss is in the portrait). Each icon's hover is its name.
+  - **ENEMIES:** a 44 px round icon for each of the stage's enemies, once each, in wave order (the mini boss is in the portrait). Each icon's hover is its name. *(V2.0: the icons are 52 px and sit in a dark tray anchored above Start.)*
   - **Start:** "Start" for Act 1's one stage, else "Start stage 4".
 - **Training:** "PRACTICE", "TRAINING", the dummy, the text (as before) and **Start Training**.
 - **Endless:**
