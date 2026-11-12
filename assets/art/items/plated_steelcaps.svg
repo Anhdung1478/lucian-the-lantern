@@ -1,19 +1,70 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Plated Steelcaps: a brown leather boot whose shin is covered by three overlapping riveted steel plates, with a big steel toe cap -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4452"/><stop offset="1" stop-color="#0e1116"/></linearGradient><linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9a6a3e"/><stop offset="1" stop-color="#4a2a14"/></linearGradient><linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2e8f0"/><stop offset="1" stop-color="#6a7484"/></linearGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <path d="M 3 37 L 11 37 M 4 45 L 11 45" stroke="#e6f0ff" stroke-width="2.2" stroke-linecap="round" opacity="0.4"/>
-  <path d="M 15 45 L 56 45 C 61 45 61.5 52 56.5 52 L 30 52 L 29 56 L 16 56 Z" fill="#2a2a30" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 19 10 L 38 10 L 38.5 29 C 44 32 51 33 55.5 36.5 C 59.5 39.5 59.5 45 56 46 L 16.5 46 C 16 36 17.5 22 19 10 Z" fill="url(#leather)" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 17 37 C 21 37 24 40 25 46" fill="none" stroke="#2a1606" stroke-width="1.4" stroke-linecap="round"/>
-  <path d="M 39.5 31.5 C 42 32.8 43 33 44 33.3" fill="none" stroke="#c8925a" stroke-width="1.3" stroke-linecap="round"/>
-  <g fill="url(#steel)" stroke="#0c1018" stroke-width="1.6" stroke-linejoin="round">
-    <path d="M 17.3 26 Q 29 28.5 40 26 L 40 32 Q 29 35.5 16.8 33.5 Z"/>
-    <path d="M 17.8 19 Q 29 21.5 40 19 L 40 26.5 Q 29 29 17.3 26.5 Z"/>
-    <path d="M 18.4 12 L 40 12 L 40 19.5 Q 29 22 17.9 19.5 Z"/>
-    <path d="M 44 32 C 48 37 48 42 45.5 46 L 56 46 C 59.5 45 59.5 39.5 55.5 36.5 C 52 34 48 32.8 44 32 Z"/>
+  <!-- Plated Steelcaps: a brown leather work boot side-on, toe to the right, its shin wrapped in four overlapping steel lames fixed with bronze rivets, a big domed steel toe cap, and a flat, heavy sole -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d9b07a" stop-opacity="0.45"/>
+      <stop offset="0.6" stop-color="#8a7a66" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#8a7a66" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="leather" x1="14" y1="10" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c98d52"/>
+      <stop offset="0.5" stop-color="#8a5327"/>
+      <stop offset="1" stop-color="#5d3516"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f7fb"/>
+      <stop offset="0.5" stop-color="#b9c4d4"/>
+      <stop offset="1" stop-color="#7c8799"/>
+    </linearGradient>
+    <linearGradient id="cap" x1="45" y1="35" x2="62" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4f7fb"/>
+      <stop offset="0.45" stop-color="#b9c4d4"/>
+      <stop offset="1" stop-color="#6a7486"/>
+    </linearGradient>
+    <linearGradient id="sole" x1="12" y1="48" x2="40" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5e5650"/>
+      <stop offset="0.5" stop-color="#3c3632"/>
+      <stop offset="1" stop-color="#24201e"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <g transform="translate(-4.5 0)">
+  <!-- the leather boot -->
+  <path d="M 17 9 L 37 9 C 37.4 18 38 25 39.6 30 C 44.5 33 50.5 34.5 55.5 37.5 C 60 40.2 62 45 61 50 L 12 50 C 10 46 10.4 40.5 13.6 36.5 C 15.6 32 17.2 22 17 9 Z" fill="url(#leather)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 11.4 40.6 C 17.5 39.8 22 43.4 24 50" fill="none" stroke="#5d3516" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M 41 33 C 43 34 44.4 34.6 45.4 35" fill="none" stroke="#f0c48e" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 14.2 38.4 C 15.4 36.6 16.2 35.4 16.8 34.4" fill="none" stroke="#f0c48e" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- steel lames, bottom first so each overlaps the one below -->
+  <g stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M 13.6 26.6 C 22 25 33 25 41.8 26.8 L 42.4 33.2 C 33 35.4 22 35.2 12.8 33.6 Z" fill="url(#steel)"/>
+    <path d="M 14 19.4 C 22 17.8 32.6 17.8 41 19.6 L 41.6 27.4 C 32.6 29.4 22 29.2 13.4 27.6 Z" fill="url(#steel)"/>
+    <path d="M 14.2 12.2 C 22 10.6 32.2 10.6 40.4 12.4 L 41 20.2 C 32.4 22.2 22 22 13.8 20.4 Z" fill="url(#steel)"/>
+    <path d="M 13.4 4.6 C 21.6 3 32.4 3 41 4.8 L 40.6 13 C 32.2 15 22 14.8 14 13.2 Z" fill="url(#steel)"/>
   </g>
-  <path d="M 20 14.2 L 38 14.2 M 19.6 21.6 Q 29 23.6 38 21.6 M 19 28.6 Q 29 30.6 38 28.6 M 47 34.2 C 51 35.2 54 36.6 56 39" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.85"/>
-  <g fill="#4a5466" stroke="#0c1018" stroke-width="0.6"><circle cx="20.5" cy="16.5" r="1.2"/><circle cx="37.5" cy="16.5" r="1.2"/><circle cx="20" cy="23.8" r="1.2"/><circle cx="37.5" cy="23.6" r="1.2"/><circle cx="19.5" cy="30.8" r="1.2"/><circle cx="37.5" cy="30.4" r="1.2"/><circle cx="50.5" cy="42" r="1.2"/><circle cx="55" cy="41.5" r="1.2"/></g>
-  <path d="M 17.5 6 L 39.5 6 L 40 12.5 L 17 12.5 Z" fill="#4a2a14" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 19 8.6 L 38.5 8.6" stroke="#b8c2d0" stroke-width="1.2" stroke-linecap="round"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M 16.2 6.6 C 23 5.4 31 5.4 38 6.6 M 16.6 14 C 23 12.8 31 12.8 37.6 14 M 16.4 21.2 C 23 20 31 20 38.2 21.2 M 16 28.4 C 23 27.2 31 27.2 39 28.6" stroke="#ffffff" stroke-width="1.4"/>
+    <path d="M 15.4 11.4 C 22 12.6 32 12.8 39.4 11.2 M 15.6 18.8 C 22 20 32 20.2 39.8 18.6 M 15.2 26 C 22 27.2 32 27.4 40.2 25.8 M 14.8 32 C 22 33.4 32 33.6 40.8 31.8" stroke="#5d6778" stroke-width="1.5"/>
+  </g>
+  <g fill="#c8873a" stroke="#1a1d24" stroke-width="1.2">
+    <circle cx="17.6" cy="9" r="1.4"/><circle cx="37.4" cy="9.2" r="1.4"/>
+    <circle cx="17.8" cy="16.6" r="1.4"/><circle cx="37.6" cy="16.8" r="1.4"/>
+    <circle cx="17.6" cy="23.8" r="1.4"/><circle cx="38" cy="24" r="1.4"/>
+    <circle cx="17.2" cy="31" r="1.4"/><circle cx="38.6" cy="31" r="1.4"/>
+  </g>
+  <!-- instep strap with a bronze buckle -->
+  <path d="M 39.6 32.6 L 44.2 34.4 C 45.6 39 46.2 44 45.8 49.6 L 41.2 49.6 C 41.6 44.2 41.2 38.6 39.6 32.6 Z" fill="#4a2a12" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 41.8 35.4 C 42.8 39 43.2 42 43.2 44.4" fill="none" stroke="#8a5327" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M 40.6 39.6 L 46.4 39.6 L 46.6 45.6 L 40.8 45.6 Z" fill="none" stroke="#1a1d24" stroke-width="3.6" stroke-linejoin="round"/>
+  <path d="M 40.6 39.6 L 46.4 39.6 L 46.6 45.6 L 40.8 45.6 Z" fill="none" stroke="#d89a4a" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M 43.6 39.8 L 43.6 45.4" stroke="#1a1d24" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- domed steel toe cap -->
+  <path d="M 44.6 50 C 44 42.4 47.6 35.8 53.8 35.4 C 59 35.2 63 39.8 62.8 45.4 L 62.2 50 Z" fill="url(#cap)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 47.6 43 C 48.4 39.6 50.8 37.6 54 37.6" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M 58.6 39.2 C 60.4 41.4 61 44.4 60.6 47.8" fill="none" stroke="#5d6778" stroke-width="1.5" stroke-linecap="round"/>
+  <g fill="#c8873a" stroke="#1a1d24" stroke-width="1.2"><circle cx="47.4" cy="47" r="1.3"/><circle cx="49.2" cy="40.8" r="1.3"/></g>
+  <!-- flat, heavy sole -->
+  <path d="M 9.6 49 L 61.6 49 C 63 49 63.8 50 63.8 51.6 L 63.8 55.8 C 63.8 56.9 63 57.6 61.8 57.6 L 11.4 57.6 C 10.3 57.6 9.6 56.9 9.6 55.8 Z" fill="url(#sole)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 11.6 51.4 L 61.6 51.4" stroke="#8a807a" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M 24.6 52.8 L 24.6 57.2" stroke="#24201e" stroke-width="1.6" stroke-linecap="round"/>
+  </g>
 </svg>

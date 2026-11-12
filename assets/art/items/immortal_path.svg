@@ -1,24 +1,87 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Immortal Path: the fanged crimson boot made grand, a gold cuff over longer ivory fangs, gold toe cap and heel plate, a glowing ruby on the ankle and blood drops below -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c1a1c"/><stop offset="1" stop-color="#140806"/></linearGradient><radialGradient id="aura"><stop offset="0" stop-color="#ff4a3a" stop-opacity="0.45"/><stop offset="1" stop-color="#ff2a2a" stop-opacity="0"/></radialGradient><linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e03a44"/><stop offset="1" stop-color="#6a0a16"/></linearGradient><radialGradient id="gem" cx="0.4" cy="0.35" r="0.65"><stop offset="0" stop-color="#ffe0dc"/><stop offset="0.45" stop-color="#ff3a46"/><stop offset="1" stop-color="#7a0614"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="30" r="28" fill="url(#aura)"/>
-  <path d="M 3 25 L 12 25 M 2 35 L 12 35 M 5 45 L 11 45" stroke="#ffb4a8" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
-  <path d="M 15 45 L 56 45 C 61 45 61.5 52 56.5 52 L 30 52 L 29 56 L 16 56 Z" fill="#2a0a0e" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 17.5 48.6 L 57 48.6" stroke="#e0b04a" stroke-width="1.2"/>
-  <path d="M 19 10 L 38 10 L 38.5 29 C 44 32 51 33 55.5 36.5 C 59.5 39.5 59.5 45 56 46 L 16.5 46 C 16 36 17.5 22 19 10 Z" fill="url(#leather)" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 21.5 24 C 20.8 30 20.3 35 20.3 38" fill="none" stroke="#ff9a9a" stroke-width="1.3" stroke-linecap="round"/>
-  <path d="M 16.6 36 C 21 36 24.5 39.5 25.5 46 L 16.5 46 C 16.3 42 16.4 39 16.6 36 Z" fill="#e0b04a" stroke="#0c1018" stroke-width="1.6" stroke-linejoin="round"/>
-  <path d="M 46.5 32.5 C 49.5 37 49.5 42 47 46 L 56 46 C 59.5 45 59.5 39.5 55.5 36.5 C 52.5 34.3 49.5 33.3 46.5 32.5 Z" fill="#e0b04a" stroke="#0c1018" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M 49.5 35.2 C 52.5 36.2 54.8 37.8 56 40" fill="none" stroke="#fff0b0" stroke-width="1.1" stroke-linecap="round"/>
-  <circle cx="30" cy="31" r="7" fill="url(#aura)"/>
-  <circle cx="30" cy="31" r="3.8" fill="url(#gem)" stroke="#e0b04a" stroke-width="1.6"/>
-  <circle cx="30" cy="31" r="5" fill="none" stroke="#0c1018" stroke-width="0.9"/>
-  <circle cx="28.9" cy="29.9" r="1" fill="#ffffff"/>
-  <path d="M 19 12 L 22.5 23 L 26 12 Z M 26 12 L 28 18 L 30 12 Z M 30.5 12 L 32.5 18 L 34.5 12 Z M 34.5 12 L 37.5 23 L 40 12 Z" fill="#f4eadc" stroke="#0c1018" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M 17 5 L 40 5 L 40.5 13.5 L 16.5 13.5 Z" fill="#e0b04a" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 18.5 7.4 L 38.8 7.4" stroke="#fff0b0" stroke-width="1.2" stroke-linecap="round"/>
-  <circle cx="28.5" cy="10" r="1.8" fill="#ff3a46" stroke="#3a0408" stroke-width="0.8"/>
-  <path d="M 58.5 52.5 C 59.8 54.5 60.8 55.8 60.8 57.1 C 60.8 58.5 59.8 59.5 58.5 59.5 C 57.2 59.5 56.2 58.5 56.2 57.1 C 56.2 55.8 57.2 54.5 58.5 52.5 Z" fill="#e0202e" stroke="#0c1018" stroke-width="1.1"/>
-  <circle cx="52.5" cy="58" r="1.2" fill="#e0202e" stroke="#0c1018" stroke-width="0.8"/>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <!-- Immortal Path: the fanged crimson maw-boot made grand, side-on, toe to the right: a gold crest along the upper jaw ending in a back-swept gold horn, a glowing ruby eye, longer ivory fangs, a gold toe cap and heel plate, a blood-drop emblem, gold sparkles -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff6a6a" stop-opacity="0.58"/>
+      <stop offset="0.6" stop-color="#b0202e" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#b0202e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="leather" x1="14" y1="16" x2="54" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ee5866"/>
+      <stop offset="0.5" stop-color="#aa1e30"/>
+      <stop offset="1" stop-color="#5e0e1a"/>
+    </linearGradient>
+    <linearGradient id="jaw" x1="14" y1="2" x2="40" y2="22" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e04656"/>
+      <stop offset="0.5" stop-color="#981c2a"/>
+      <stop offset="1" stop-color="#4a0a12"/>
+    </linearGradient>
+    <linearGradient id="fang" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffaf0"/>
+      <stop offset="0.6" stop-color="#eadcc2"/>
+      <stop offset="1" stop-color="#b8a284"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="4" y1="0" x2="60" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe7a3"/>
+      <stop offset="0.5" stop-color="#e2a93b"/>
+      <stop offset="1" stop-color="#a8641a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="24.4" cy="10.6" r="7" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffb0a0" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#ff2a3a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sole" x1="12" y1="48" x2="40" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5a2a30"/>
+      <stop offset="0.5" stop-color="#3a161c"/>
+      <stop offset="1" stop-color="#220a0e"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <g transform="translate(-3 0.8)">
+  <!-- the back-swept gold horn -->
+  <path d="M 16.6 13.4 C 12.6 12.4 9.2 10 6.4 5.6 C 11 6.6 14.6 7.8 18.6 9.6 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 14.6 10.4 C 12 9.6 10 8.4 8.4 7" fill="none" stroke="#fff4d0" stroke-width="1.1" stroke-linecap="round"/>
+  <!-- throat and tongue -->
+  <path d="M 16 21.4 C 22 14.6 31 9.6 42.4 8 L 40.6 20.8 C 32 23 24 23.4 16 21.4 Z" fill="#3a0810" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 19.6 21.6 C 24 17.4 31.4 16.4 38 18.6 C 32.4 21.8 25.6 22.8 19.6 21.6 Z" fill="#c8404e"/>
+  <!-- lower fangs -->
+  <g fill="url(#fang)" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round">
+    <path d="M 31 22.8 L 34.2 10.8 L 37.8 22 Z"/>
+    <path d="M 22.2 22.8 L 24.4 15.6 L 27.2 23 Z"/>
+  </g>
+  <!-- the boot -->
+  <path d="M 16.4 21.4 C 24 23.4 32 23 40.6 20.4 C 40.6 25 41 28.2 42 31 C 46.4 33.4 51.6 34.8 56 37.6 C 60.4 40.4 62.2 45 61.2 50 L 12 50 C 10 46 10.4 40.5 13.6 36.5 C 15.8 32 16.6 27 16.4 21.4 Z" fill="url(#leather)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 17.6 23.4 C 25 25.2 32.4 24.8 40.6 22.4" fill="none" stroke="url(#gold)" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M 19 28 C 19.2 32 18.6 35 17.2 37.6" fill="none" stroke="#ffb0b6" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 43.4 33 C 45.4 33.8 47 34.4 48.4 34.8" fill="none" stroke="#ffb0b6" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- gold heel plate and toe cap -->
+  <path d="M 11.4 40.4 C 17.5 39.6 22 43.2 24 50 L 12 50 C 10.4 46.8 10.4 43.4 11.4 40.4 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 47.4 35 C 50.6 39 51.4 44.6 49.8 50 L 61.2 50 C 62.2 45 60.4 40.4 56 37.6 C 53.2 36 50.4 35.4 47.4 35 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 50.4 37 C 53.6 37.8 56.6 39.4 58.4 42" fill="none" stroke="#fff4d0" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M 55 40.4 C 57.4 43 58 46.4 57.6 49" fill="none" stroke="#a8641a" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- longer upper fangs -->
+  <g fill="url(#fang)" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round">
+    <path d="M 36.8 9.4 L 39.4 21.2 L 42.8 8.6 Z"/>
+    <path d="M 28.2 12 L 30.6 19.6 L 33.4 11 Z"/>
+    <path d="M 21.2 15.8 L 22.8 20.4 L 25.2 14.6 Z"/>
+  </g>
+  <!-- the upper jaw with a gold crest -->
+  <path d="M 12.8 21.6 C 13.6 12 21.6 4.4 34.4 1.6 C 39.6 0.6 45 1 45.2 4.6 C 45.4 7.4 43.2 8.6 40.6 9 C 31.6 10.6 23.6 15 17.8 22.6 Z" fill="url(#jaw)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 14.6 15.4 C 17.6 8.4 25 3.8 34.6 2.4 C 38.8 1.8 42.6 2 44 3.4" fill="none" stroke="#1a1d24" stroke-width="4.6" stroke-linecap="round"/>
+  <path d="M 14.6 15.4 C 17.6 8.4 25 3.8 34.6 2.4 C 38.8 1.8 42.6 2 44 3.4" fill="none" stroke="url(#gold)" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M 18.6 20.4 C 24 15.2 31 11.6 40.2 10" fill="none" stroke="#e0606e" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- the glowing ruby eye -->
+  <circle cx="24.4" cy="10.6" r="7" fill="url(#glow)"/>
+  <path d="M 20.6 12 C 22 9.8 25.2 8.6 27.8 9.4 C 26.8 11.8 23.4 13 20.6 12 Z" fill="#ff3a4a" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 23.6 10.6 C 24 10.2 24.6 10 25.2 10" fill="none" stroke="#ffe0e0" stroke-width="1" stroke-linecap="round"/>
+  <!-- blood-drop emblem in a gold setting -->
+  <path d="M 28.4 28 C 30.8 31.6 32.4 33.8 32.4 36 C 32.4 38.4 30.6 40 28.4 40 C 26.2 40 24.4 38.4 24.4 36 C 24.4 33.8 26 31.6 28.4 28 Z" fill="#ff4a56" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M 26.6 35.6 C 26.6 34.6 27 33.6 27.6 32.8" fill="none" stroke="#ffd0d4" stroke-width="1.1" stroke-linecap="round"/>
+  <!-- dark sole with a gold welt -->
+  <path d="M 9.6 49 L 58 49 C 62 49 63.2 52.2 62.6 54.4 C 62 56.6 60 57.6 57.5 57.6 L 34.5 57.6 C 32.4 57.6 31.8 54.6 29.8 54.6 L 27.6 54.6 L 27.2 57.6 L 11.6 57.6 C 10.2 57.6 9.6 56.8 9.6 55.4 Z" fill="url(#sole)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 11.6 51.6 L 59.6 51.6" stroke="url(#gold)" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- sparkles -->
+  <path d="M 53 13 L 54.4 16.6 L 58 18 L 54.4 19.4 L 53 23 L 51.6 19.4 L 48 18 L 51.6 16.6 Z" fill="#fff0d0"/>
+  <path d="M 61 27 L 61.8 29.2 L 64 30 L 61.8 30.8 L 61 33 L 60.2 30.8 L 58 30 L 60.2 29.2 Z" fill="#ffb0a0"/>
+  </g>
 </svg>

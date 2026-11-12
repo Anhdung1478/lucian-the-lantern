@@ -1,18 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Slightly Magical Boots: the same plain brown leather boot, now with a faint teal glow, teal-stitched cuff and laces, and a small teal sparkle on the toe -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b47a44"/><stop offset="1" stop-color="#6a3e1c"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#5ff0e0" stop-opacity="0.42"/><stop offset="1" stop-color="#2ab8c8" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="36" cy="32" r="28" fill="url(#glow)"/>
-  <path d="M 3 25 L 12 25 M 2 35 L 12 35 M 5 45 L 11 45" stroke="#bff8f0" stroke-width="2.2" stroke-linecap="round" opacity="0.5"/>
-  <path d="M 15 45 L 56 45 C 61 45 61.5 52 56.5 52 L 30 52 L 29 56 L 16 56 Z" fill="#3a2414" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 18 48.6 L 56 48.6" stroke="#6a4a2a" stroke-width="0.9" stroke-dasharray="1.8 1.6"/>
-  <path d="M 19 10 L 38 10 L 38.5 29 C 44 32 51 33 55.5 36.5 C 59.5 39.5 59.5 45 56 46 L 16.5 46 C 16 36 17.5 22 19 10 Z" fill="url(#leather)" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 46.5 32.5 C 49.5 37 49.5 42 47 46 M 17 36 C 21 36 24 39 25 46" fill="none" stroke="#4a2a12" stroke-width="1.4" stroke-linecap="round"/>
-  <path d="M 34.5 16 L 39 17.5 M 34.5 20.5 L 39 22 M 34.5 25 L 39 26.5" stroke="#8ff4ea" stroke-width="1.3" stroke-linecap="round"/>
-  <path d="M 21.5 16 C 20.8 25 20.3 33 20.3 41 M 40 31.5 C 45 33.5 50 34.5 54 37" fill="none" stroke="#e2b07a" stroke-width="1.3" stroke-linecap="round"/>
-  <path d="M 17.5 6 L 39.5 6 L 40 13 L 17 13 Z" fill="#c8915a" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 19 10.8 L 38.5 10.8" stroke="#5ff0e0" stroke-width="1" stroke-dasharray="1.8 1.4"/>
-  <path d="M 19 8.2 L 38 8.2" stroke="#ecc28c" stroke-width="1.2" stroke-linecap="round"/>
-  <path d="M 52 33 L 53.1 36.4 L 56.5 37.5 L 53.1 38.6 L 52 42 L 50.9 38.6 L 47.5 37.5 L 50.9 36.4 Z" fill="#e8fffb" stroke="#1a7a80" stroke-width="0.6" stroke-linejoin="round"/>
-  <path d="M 48 9 L 48.8 11.2 L 51 12 L 48.8 12.8 L 48 15 L 47.2 12.8 L 45 12 L 47.2 11.2 Z" fill="#8ff4ea"/>
-  <circle cx="44" cy="20" r="1" fill="#8ff4ea"/>
+  <!-- Slightly Magical Boots: a soft brown pull-on boot side-on, toe to the right: a wide folded cuff with a scalloped, teal-stitched hem, a pointed toe, a thin sole, and a small teal crystal charm hanging from the cuff on a cord -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7fe6d6" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#7fe6d6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="leather" x1="14" y1="14" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c98d52"/>
+      <stop offset="0.5" stop-color="#94592a"/>
+      <stop offset="1" stop-color="#5d3516"/>
+    </linearGradient>
+    <linearGradient id="cuff" x1="12" y1="4" x2="40" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f2cf9a"/>
+      <stop offset="0.5" stop-color="#d09a5e"/>
+      <stop offset="1" stop-color="#94602e"/>
+    </linearGradient>
+    <linearGradient id="sole" x1="12" y1="52" x2="40" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6e4a2e"/>
+      <stop offset="0.5" stop-color="#4a2f1c"/>
+      <stop offset="1" stop-color="#2b1a0f"/>
+    </linearGradient>
+    <linearGradient id="gem" x1="22" y1="22" x2="28" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c8fbf2"/>
+      <stop offset="0.5" stop-color="#3fc9b6"/>
+      <stop offset="1" stop-color="#17786d"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <g transform="translate(-5 0)">
+  <!-- the soft upper with a pointed toe -->
+  <path d="M 16.5 16 L 37.5 16 C 37.6 23 38.2 29.5 40.4 34.2 C 44 38.2 50 40.2 55.2 43.4 C 58.2 45.3 60.8 46.6 63 46.8 C 63.2 50.6 60.8 53.6 56.4 53.6 L 12.2 53.6 C 10.8 49 11.6 44 14.8 40 C 16.9 34 16.9 26 16.5 16 Z" fill="url(#leather)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- soft creases at the ankle and the toe seam -->
+  <path d="M 19.5 39 C 23 37.8 27 38.4 30 40.2 M 21 43.6 C 25 42.6 29 43.4 32 45.2" fill="none" stroke="#5d3516" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 50 40.5 C 53 44 53.6 49 52.6 53.4" fill="none" stroke="#5d3516" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 51.8 41.8 C 54.6 45 55.2 49 54.4 52.6" fill="none" stroke="#5ed9c6" stroke-width="1" stroke-linecap="round" stroke-dasharray="1.4 1.4"/>
+  <!-- highlights -->
+  <path d="M 19 21 C 19.4 28 19 34 17.4 39.5" fill="none" stroke="#f6d3a6" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 42.5 36.6 C 47 39.4 51.5 41.4 55.6 44.2 C 57.8 45.5 59.8 46.4 61.5 46.8" fill="none" stroke="#f6d3a6" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+  <!-- shadow cast by the cuff on the shaft -->
+  <path d="M 16.5 22.6 C 18.6 25 21.6 24.6 23 22.6 C 25.2 25.4 30 25.4 31.4 22.8 C 33.4 25.2 36.2 25 37.3 23.6 L 37.3 20 L 16.8 20 Z" fill="#5d3516" opacity="0.75"/>
+  <!-- the folded cuff, flared at the top, scalloped hem -->
+  <path d="M 10.4 4.2 C 20 6.6 33 6.6 44.2 3.8 C 42.6 8.8 41.8 13.4 41.8 18.4 C 41 22.8 35.2 23.2 34.4 19.4 C 33.2 23.6 27.4 23.8 26.6 19.8 C 25.4 23.6 19.8 23.4 19 19.8 C 17.8 22.8 14 22.4 13.2 19.2 C 13.2 13.8 12.4 8.8 10.4 4.2 Z" fill="url(#cuff)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- the inside of the boot opening -->
+  <path d="M 12.4 5 C 21 7.8 33 7.8 42.4 4.6 C 33 2.2 21 2.2 12.4 5 Z" fill="#3a2214" stroke="#1a1d24" stroke-width="1.6" stroke-linejoin="round"/>
+  <!-- teal stitching along the lobed hem, fold shading -->
+  <path d="M 15 18 C 15.6 19.8 17.4 20.2 18.4 18.4 M 20.4 18.4 C 21.4 20.8 24.6 20.8 25.4 18.6 M 27.8 18.6 C 28.8 21 32 21 32.8 18.4 M 35.6 18.2 C 36.6 20.6 39.4 20.4 40.2 18" fill="none" stroke="#5ed9c6" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="1.4 1.2"/>
+  <path d="M 14 9.4 C 14.8 12 15.2 14.6 15.2 17" fill="none" stroke="#fbe0b8" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 26.6 8.4 L 26.6 17.6 M 34.4 8.2 L 34.4 17.2" fill="none" stroke="#9a5f2c" stroke-width="1.3" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 40.2 8.4 C 39.6 11.6 39.4 14.4 39.6 16.6" fill="none" stroke="#7d4a22" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- the crystal charm on its cord -->
+  <path d="M 30.6 21.6 C 30.4 24 29.8 25.6 28.9 27" fill="none" stroke="#1a1d24" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M 30.6 21.6 C 30.4 24 29.8 25.6 28.9 27" fill="none" stroke="#e8d4ac" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M 28.8 26 L 32 30.8 L 28.8 37 L 25.6 30.8 Z" fill="url(#gem)" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M 28.8 27.8 L 27.2 30.8 L 28.8 33.8" fill="none" stroke="#e6fffb" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- thin sole with a low heel -->
+  <path d="M 10.4 52.8 L 57 52.8 C 60.6 52.8 62.6 50.6 63.6 48 C 65 51.6 63.2 57.6 57.4 57.6 L 12.2 57.6 C 11 57.6 10.4 56.8 10.4 55.6 Z" fill="url(#sole)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 12.4 54.8 L 57 54.8 C 59.4 54.8 61.2 53.4 62.2 51.6" fill="none" stroke="#9a7456" stroke-width="1.1" stroke-linecap="round"/>
+  <path d="M 24.5 55.2 L 24.5 57.4" stroke="#2b1a0f" stroke-width="1.4" stroke-linecap="round"/>
+  </g>
 </svg>

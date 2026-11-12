@@ -1,29 +1,81 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Crimson Lucidity: the Ionian boot dyed crimson, with blue bands and a longer blue ribbon, a gold cuff and toe tip, and a glowing sapphire -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e3266"/><stop offset="1" stop-color="#0a0818"/></linearGradient><radialGradient id="aura"><stop offset="0" stop-color="#7cc4ff" stop-opacity="0.45"/><stop offset="1" stop-color="#3a7fe0" stop-opacity="0"/></radialGradient><linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2404c"/><stop offset="1" stop-color="#6a0c1c"/></linearGradient><radialGradient id="gem" cx="0.4" cy="0.35" r="0.65"><stop offset="0" stop-color="#eafaff"/><stop offset="0.45" stop-color="#4fa8ff"/><stop offset="1" stop-color="#1450b0"/></radialGradient><clipPath id="upper"><path d="M 19 10 L 38 10 L 38.5 29 C 45 33 53 35 61 33 C 60.5 40 58.5 45 55 46 L 16.5 46 C 16 36 17.5 22 19 10 Z"/></clipPath></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="30" r="28" fill="url(#aura)"/>
-  <path d="M 2 40 L 12 40 M 4 48 L 12 48" stroke="#cfe6ff" stroke-width="2.2" stroke-linecap="round" opacity="0.6"/>
-  <path d="M 18 8 C 13 4 9 8.5 2.5 6 C 5 11 9 13 13 12 C 9.5 15 6.5 20 2 22 C 8 23.5 14 19 18.5 13 Z" fill="#3a7fea" stroke="#0a1830" stroke-width="1.6" stroke-linejoin="round"/>
-  <path d="M 16 9.6 C 12 7.6 9 9.6 5 8.4 M 16.5 13 C 13 16.5 9.5 19.8 5.5 21.2" fill="none" stroke="#e0b04a" stroke-width="1" stroke-linecap="round"/>
-  <path d="M 15 45 L 54 45 C 58 44.5 60.5 41 61.5 36.5 C 62.5 44 60 51.5 55 52 L 30 52 L 29 56 L 16 56 Z" fill="#2a0a14" stroke="#0a0818" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 17.5 48.6 L 56 48.6" stroke="#e0b04a" stroke-width="1.2"/>
-  <path d="M 19 10 L 38 10 L 38.5 29 C 45 33 53 35 61 33 C 60.5 40 58.5 45 55 46 L 16.5 46 C 16 36 17.5 22 19 10 Z" fill="url(#leather)"/>
-  <g clip-path="url(#upper)">
-    <path d="M 10 25 L 44 15 L 44 20 L 10 30 Z M 10 36 L 44 26 L 44 31 L 10 41 Z" fill="#3a7fea"/>
-    <path d="M 10 25 L 44 15 M 10 36 L 44 26" stroke="#9cc8ff" stroke-width="1.1"/>
-    <path d="M 10 30 L 44 20 M 10 41 L 44 31" stroke="#e0b04a" stroke-width="1"/>
-    <path d="M 52 34 C 54.5 38 54.5 42 52.5 46 L 64 46 L 64 30 Z" fill="#e0b04a"/>
-    <path d="M 52 34 C 54.5 38 54.5 42 52.5 46" fill="none" stroke="#0a0818" stroke-width="1.4"/>
+  <!-- Crimson Lucidity: the slender Ionian boot dyed crimson, side-on with its upturned toe tipped in gold: three slanting blue bands, a flared gold cuff crowned with a glowing sapphire, three long blue ribbon tails streaming back from a gold knot, blue sparkles -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff6a7a" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#a8202f" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#a8202f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cloth" x1="16" y1="8" x2="56" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f05a6a"/>
+      <stop offset="0.5" stop-color="#b42234"/>
+      <stop offset="1" stop-color="#64101b"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="2" x2="40" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8ccaff"/>
+      <stop offset="0.5" stop-color="#3a7fe0"/>
+      <stop offset="1" stop-color="#1f4a9a"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="14" y1="2" x2="62" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe7a3"/>
+      <stop offset="0.5" stop-color="#e2a93b"/>
+      <stop offset="1" stop-color="#a8641a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="31" cy="6" r="8.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#bfe4ff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#3a8cff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gem" x1="27" y1="1" x2="35" y2="11" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e8f4ff"/>
+      <stop offset="0.45" stop-color="#4a9aff"/>
+      <stop offset="1" stop-color="#1a3c90"/>
+    </linearGradient>
+    <linearGradient id="sole" x1="12" y1="48" x2="40" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5a2a36"/>
+      <stop offset="0.5" stop-color="#3a1620"/>
+      <stop offset="1" stop-color="#220a10"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <g transform="translate(-2 0.6)">
+  <!-- three ribbon tails streaming back -->
+  <g transform="translate(3.4 0)">
+  <g stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round">
+    <path d="M 18.6 12.4 C 15.4 17 13.6 23.4 8 25.4 L 3.4 27.4 L 6.6 29.4 L 6.4 33 L 9.8 30 C 15.8 28.6 17.6 21.6 20 16.4 Z" fill="url(#blue)"/>
+    <path d="M 19.4 9.2 C 15 11.4 12 16.6 6.4 16.2 L 1.6 16.8 L 4.2 20.4 L 2.8 24.4 L 7.2 22 C 13.8 22.6 17 17.2 20 14.6 Z" fill="url(#blue)"/>
+    <path d="M 19.6 4.8 C 15 2 11 6 6 3.6 L 2.4 2.2 L 4.2 6.2 L 2.4 10.4 L 6.4 9.6 C 11.6 11.8 15.6 7.8 19.8 10.2 Z" fill="url(#blue)"/>
   </g>
-  <path d="M 19 10 L 38 10 L 38.5 29 C 45 33 53 35 61 33 C 60.5 40 58.5 45 55 46 L 16.5 46 C 16 36 17.5 22 19 10 Z" fill="none" stroke="#0a0818" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 40.5 31.8 C 44 33.6 47.5 34.6 50.5 35" fill="none" stroke="#ff9a9a" stroke-width="1.2" stroke-linecap="round"/>
-  <path d="M 54.5 35.6 C 56.5 35.6 58 35.2 59.5 34.6" fill="none" stroke="#fff0b0" stroke-width="1.1" stroke-linecap="round"/>
-  <path d="M 17 5 L 40 5 L 40.5 13.5 L 16.5 13.5 Z" fill="#e0b04a" stroke="#0a0818" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 18.5 7.4 L 38.8 7.4" stroke="#fff0b0" stroke-width="1.2" stroke-linecap="round"/>
-  <path d="M 19 11.2 L 38.5 11.2" stroke="#3a7fea" stroke-width="1.5" stroke-linecap="round"/>
-  <circle cx="35" cy="9.5" r="6" fill="url(#aura)"/>
-  <path d="M 35 5 L 38.6 9.3 L 35 13.6 L 31.4 9.3 Z" fill="url(#gem)" stroke="#0a1830" stroke-width="1.1" stroke-linejoin="round"/>
-  <circle cx="34.2" cy="8.2" r="0.8" fill="#ffffff"/>
-  <path d="M 50 13 L 51 16 L 54 17 L 51 18 L 50 21 L 49 18 L 46 17 L 49 16 Z" fill="#e8f4ff"/>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <path d="M 17 7.2 C 13.6 6 11 7.6 7.4 6.6 M 17 12.6 C 14.6 14.6 12.6 17.6 8.6 18.6 M 17.4 16.4 C 16 20.4 14 24 10 26.4" fill="none" stroke="#bfe0ff" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+  <!-- the slender crimson boot -->
+  <path d="M 19.8 8 L 34.6 8 C 34.8 16.5 35.2 24 36.8 30 C 40 34.4 46 37 51.8 39.4 C 56 41 59.8 40 62.8 36.4 C 63.6 44 59.4 50.6 53.4 50.6 L 14.6 50.6 C 12.8 46.6 13.6 41.4 16.4 37.6 C 18.8 33 20 22.5 19.8 8 Z" fill="url(#cloth)"/>
+  <g fill="url(#blue)">
+    <path d="M 19.8 13.4 L 34.7 17.4 L 34.8 22.2 L 19.8 18.2 Z"/>
+    <path d="M 19.7 24.4 L 35.2 28 L 36.2 31.6 L 19 29.2 Z"/>
+    <path d="M 16.4 37.6 C 17 36.6 17.6 35.6 18 34.6 L 42 36.4 C 43.4 37.2 44.8 37.8 46.4 38.4 L 45.6 42 Z"/>
+  </g>
+  <path d="M 19.8 18.2 L 34.8 22.2 M 19 29.2 L 36.2 31.6 M 16.4 37.6 L 45.6 42" fill="none" stroke="#173a80" stroke-width="1.5"/>
+  <path d="M 21 14.2 L 33 17.4 M 21 25.2 L 33.6 28" fill="none" stroke="#bfe0ff" stroke-width="1.1" stroke-linecap="round"/>
+  <!-- gold toe tip -->
+  <path d="M 55.2 40.6 C 58.2 40.4 60.8 39 62.8 36.4 C 63.4 42 61.4 47 57.4 49.6 C 57.6 46.2 57 43.2 55.2 40.6 Z" fill="url(#gold)"/>
+  <path d="M 19.8 8 L 34.6 8 C 34.8 16.5 35.2 24 36.8 30 C 40 34.4 46 37 51.8 39.4 C 56 41 59.8 40 62.8 36.4 C 63.6 44 59.4 50.6 53.4 50.6 L 14.6 50.6 C 12.8 46.6 13.6 41.4 16.4 37.6 C 18.8 33 20 22.5 19.8 8 Z" fill="none" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 55.2 40.6 C 57 43.2 57.6 46.2 57.4 49.6" fill="none" stroke="#1a1d24" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 22 21 C 22.2 28 21.6 34 20 38" fill="none" stroke="#ffb0b8" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 46 42.8 C 49 43.8 51.6 44.2 54 44" fill="none" stroke="#64101b" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 47.4 39.8 C 50.4 41 53 41.6 55 41.8" fill="none" stroke="#ffb0b8" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- gold cuff with a glowing sapphire, gold ribbon knot -->
+  <path d="M 17.8 11 L 36.8 11 L 39.6 3 C 31.6 4.4 23.4 4.4 15.4 3 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 18.2 5.4 C 21.6 6 24.6 6.2 26.6 6.2" stroke="#fff4d0" stroke-width="1.3" stroke-linecap="round"/>
+  <path d="M 19.2 9 L 26.6 9" stroke="#a8641a" stroke-width="1.3" stroke-linecap="round"/>
+  <circle cx="31" cy="6" r="8.5" fill="url(#glow)"/>
+  <path d="M 31 1.6 L 34.6 6.4 L 31 11.2 L 27.4 6.4 Z" fill="url(#gem)" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M 30.4 4 L 29.2 6.2" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round"/>
+  <path d="M 16.8 5.2 C 19.4 4.8 21.6 6.4 21.6 8.2 C 21.6 10 19.4 11.4 16.8 10.8 C 15.4 9.4 15.4 6.6 16.8 5.2 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- thin sole -->
+  <path d="M 12.8 49.8 L 53.4 49.8 C 58.2 49.8 61.6 46.6 63 43.4 C 63.6 48.6 61.8 57.6 55 57.6 L 14.4 57.6 C 13.2 57.6 12.8 56.8 12.8 55.6 Z" fill="url(#sole)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 14.8 52 L 53.4 52 C 57 52 59.6 50 61 47.8" fill="none" stroke="#e2a93b" stroke-width="1.1" stroke-linecap="round"/>
+  <!-- sparkles -->
+  <path d="M 50 12 L 51.4 15.6 L 55 17 L 51.4 18.4 L 50 22 L 48.6 18.4 L 45 17 L 48.6 15.6 Z" fill="#dff0ff"/>
+  <path d="M 58 26 L 58.8 28.2 L 61 29 L 58.8 29.8 L 58 32 L 57.2 29.8 L 55 29 L 57.2 28.2 Z" fill="#8ccaff"/>
+  </g>
 </svg>
