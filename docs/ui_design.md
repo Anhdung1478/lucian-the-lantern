@@ -71,6 +71,7 @@ From V2.0 every stage screen follows one style, the title's and the Journey's: d
   - **Kraken Slayer**: the hit count; glows before the 3rd hit.
   - Spellblade ready, Spear of Shojin stacks, Jak'Sho stacks, Archangel's mana charge.
 - A dark sweep shows the time that has run out; a number shows stacks, charge or shield.
+- *(V2.0)* **The Lantern's gift** shows as a buff icon once picked, with the boon's stat icon, no timer and no number, until the stage ends. Its card reads "The Lantern's gift: Keen Edge. +10% attack damage until the stage ends." (the boon's name, then its effect; game design doc §3, §14).
 - **Hover** the cursor over an icon to see its effect. *(V1.4.3: the card stays live while hovered. The time left, counts and values update, and when another buff moves into the hovered icon, the card shows that one.)*
 - *(V2.0)* **Look:** a buff icon is a rounded cell with a rim, in the cells' style. **Resolve** shows as one (a fist under a rising chevron) while the stage has stacks and the Gameplay setting is on: the number is the stacks, there is no sweep. Its card reads "+30% damage dealt, -30% damage taken. You fell here 3 times." (§5; game design doc §3).
 - **Built in Phase 8:** three crowd-control debuffs, in the style of `debuff_slow.svg` (64 × 64, a tinted dark backdrop, `#1a1d24` outlines): **Rooted** (a boot bound by green vines), **Stunned** (yellow stars circling a head) and **Feared** (a frightened purple ghost). Each has a sweep for its time and a one-line text on hover. They sit after "Slowed", the strongest first (stun, fear, root).
@@ -252,7 +253,9 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 **Built in V2.0 (units and combat):**
 - **`Juice.on()`** (`src/combat/juice.gd`) gates the extras below. It is false on Low quality and when the game runs headless (the tests and the bots), true otherwise. Shadows and health bars are no extras: they always show.
 - **Shadows and motion.** Every unit has a soft shadow on the ground. With `Juice.on()`: a walk sway, a lunge on a melee hit, a recoil on a shot, a squash when hit, a spawn fade-in and a death burst.
-- **Health bars.** An enemy's bar has a dark frame and a gradient fill. A pale **ghost** of the lost health holds 0.3 s, then drains (with `Juice.on()`). An elite's bar has a gold rim and diamond. Lucian's bar is green with a tick every 100 HP. The damage-number rules above are unchanged.
+- **Health bars.** An enemy's bar has a dark frame and a gradient fill. A pale **ghost** of the lost health holds 0.3 s, then drains (with `Juice.on()`). An elite's bar has a gold rim and diamond. *(V2.0: an elite with a trait shows the trait's small icon first over its bar, before any status icons. It never runs out and has no timer; the tip below names the trait.)* Lucian's bar is green with a tick every 100 HP. The damage-number rules above are unchanged.
+- **The trait ring** (`EliteRing`): a thin ring (3 px, 75% alpha) on the ground, 10 px outside the unit's radius, under an elite with a trait, in the trait's colour: Swift pale blue `#7fd8ff`, Armored steel grey `#a9b4c4`, Vampiric crimson `#d0305a`, Volatile orange `#ff7a2a`. It lies at the shadow's depth, under the units and every ground warning. It is an extra: with low effects (`Juice.on()` false) there is no ring, and the icon over the bar still shows.
+- **The trait tips:** the first time each trait appears in a stage, the tip banner (see Act 1 tips) shows one line: Swift "Swift elites move and attack faster.", Armored "Armored elites take less damage: armor penetration helps.", Vampiric "Vampiric elites heal when they hit you: Grievous Wounds cuts it.", Volatile "Volatile elites explode where they die: step away." A Volatile elite's death leaves the usual red ground warning, radius 150, for 1.0 s.
 - **The target ring** (`TargetRing`): a thin red ring on the ground under the enemy Lucian is ordered to attack. It fades in on a new target and goes when the order goes.
 - **Shots** have a soft glow and trail (`ShotGlow`; not on skin shots). A hit makes a small **spark** (`HitSpark`). Damage numbers **pop** when they appear; a crit's is bigger.
 - **Warnings:** a ground warning keeps its red fill. It gains a dark underline and marching dashes along its edge (the dashes move only with `Juice.on()`).
@@ -303,7 +306,7 @@ Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the 
 
 - **When:** at the end of a stage, cleared or lost. The game pauses, the HUD hides, and ESC and P do nothing while it shows.
 - **Banner:** **STAGE CLEARED** in gold, or **DEFEATED** in red. Losing Act 1 before its first clear reads **GAME OVER** in red. Under it, the stage's name.
-- **Stats** (left column): Time, Waves, Kills, Damage dealt, Damage taken, Gold earned, Level reached. Numbers have commas under 10,000 and read "41.2k" above.
+- **Stats** (left column): Time, Waves, Kills, Damage dealt, Damage taken, Gold earned, Level reached *(V2.0: and, when the stage had a Lantern's gift picked, **Gift** with the boon's name, after Level reached; no row when none was picked)*. Numbers have commas under 10,000 and read "41.2k" above.
 - **Rewards** (right column): each essence collected, with its icon and color ("+275 blue essence"; "No essences" when there are none), then the lines in green: first-clear or repeat purple, a mini boss's purple, Act 1's lines, "Stage 3-3 is open" or "Act 4 is open".
 - **Buttons** (each auto-saves first; **Main screen** is lit in gold):
 
@@ -381,6 +384,8 @@ Built in Phase 9. After each Endless boss wave (10, 20, …) the break waits for
 - A card shows the modifier's icon (64 px; none for Nothing), its downside in red and its reward in green (20 px). A long downside wraps to 2 lines.
 - The game is paused, and the backpack and the menu are closed. ESC and P do nothing. A click picks (only the first click counts), plays `buff`, closes the panel and lets the full 20 s break count down.
 - The modifiers and what they do are in the game design doc §14.
+
+**The Lantern's gift (V2.0):** the story's pick is this same panel (`ModifierPick`, `ModifierCard`) with the modifier-pick layout and a different title and cards. The title reads **THE LANTERN'S GIFT**. The three cards are boons: the boon's stat icon in the medallion, its **name in gold** over a rule and its **effect in green** ("Keen Edge" over "+10% attack damage"). The game is paused, the backpack and the menu are closed, ESC and P do nothing, and only the first click counts; a click plays `buff`, closes the panel and lets the break count down in full. It opens on the break after half the stage's waves (game design doc §3; the boons are in §14).
 
 **Built in V2.0 (`ModifierPick`, `ModifierCard`):** the title reads **CHOOSE A MODIFIER** in spaced capitals between gold rules, over three ornate cards (320 × 250). Each card has the modifier's icon in a medallion on its top edge (Nothing has a diamond), the downside in red over a rule and the reward in green. A hovered card **lifts** 10 px and its rim turns gold with a soft light (on Low quality only the rim changes). The button keeps its place, so the mouse never falls off a lifted card. The layer, the backdrop, the pause and the pick are as above.
 
