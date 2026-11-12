@@ -148,7 +148,7 @@ It is one target: after that kill Lucian stops and idles. A dead or untargetable
 | Type | Skills | Notes |
 |---|---|---|
 | Normal enemy | None | Melee or ranged, AD or AP damage |
-| Elite | None | Can have a **special normal attack** (e.g. siege minion's shell) or a **special trait** |
+| Elite | None | Can have a **special normal attack** (e.g. siege minion's shell) or a **special trait** *(V2.0: from Act 3 every elite also gets one random trait of four, see "Elite traits" below)* |
 | Mini boss | 2 skills | |
 | Boss | At least 3 skills | Exception: Thresh in Act 1 has only 2 |
 
@@ -258,6 +258,27 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 **The death recap.** On DEFEATED, GAME OVER and RUN OVER, a block **WHAT HIT YOU** names the enemy that struck the last blow, the three sources that did the most damage as shares, one tip for the top source and, when the save can buy a node, "You can afford an upgrade in the Evolution Tree." (`DeathRecap`, `StageStats.record_hit`; the tip table is in `ui_design.md` §1).
 
 **Summon totals.** The Maiden of the Mist calls 12 ghouls and the Broodmother 10 spiderlings in all (see "Summons" above).
+
+**Elite traits.** From Act 3 an elite comes with one random trait on top of its own kit. Story elites get one in Acts 3 to 6, Endless elites from wave 11 (§14). The stage rolls it when the elite spawns, one of four with the same chance (`EliteTrait`, `src/core/elite_trait.gd`):
+
+| Trait | What it does |
+|---|---|
+| **Swift** | +25% move speed, and it attacks 15% faster (attack interval ÷ 1.15) |
+| **Armored** | +40 armor and +40 magic resist |
+| **Vampiric** | Heals 30% of the damage its hits deal to Lucian (or its own drain, if that is higher). It goes through `Enemy.heal`, so Grievous Wounds cuts it by 40%. Burns do not heal it |
+| **Volatile** | On death it leaves a red circle (radius 150) that explodes after 1.0 s for 2× its basic damage as magic damage. Lucian can step out of it. The circle stays after the elite is gone |
+
+- **Who:** only an elite that is not a summon and does not escape (the Rift Scuttler). Mini bosses and bosses never get one. No trait in Acts 1 and 2 or in Training.
+- **Pay:** a unit with a trait pays **+25% gold and XP** (`EliteTrait.PAY_BONUS`). Its blue and orange essence are as before.
+- **Shown:** a small icon for the trait comes first over the elite's health bar, a thin ring in the trait's colour lies on the ground under it (not with low effects), and the first time each trait appears in a stage a tip names it (`ui_design.md` §1).
+- The result screen pauses the stage, so a Volatile circle cannot hit Lucian after STAGE CLEARED.
+
+**The Lantern's gift.** Halfway through a story stage Lucian picks one of three boons. It lasts until the stage ends.
+- **When:** every story stage with 4 or more waves, on the break after wave ⌊waves ÷ 2⌋: wave 2 of a stage of 4 or 5 waves, wave 3 of 6 or 7, wave 4 of 8 or 9. Once a stage. Not on a boss wave's break, not over a dead Lucian or a shown result. Not in Act 1's tutorial (2 waves), Endless or Training.
+- **The pick:** THE LANTERN'S GIFT, 3 different cards drawn from the 8 boons in §14, with the stage's rng. The game is paused, the screens are locked (ESC and P do nothing) and the break is held. A click picks, the buff sound plays, and the break then counts down in full, with the merchant as usual.
+- Percent boons multiply Lucian's stats like a skin's, flat boons add like the tree's.
+- It shows as a buff icon with no timer and as a row "Gift" on the end screen (`ui_design.md` §1, §5).
+- Code: `LanternGifts` (`src/core/lantern_gifts.gd`), `GiftDirector` (`src/stage/gift_director.gd`).
 
 ---
 
@@ -468,8 +489,10 @@ Placeholder numbers. Ability haste doesn't shorten them, and each spell keeps it
 |---|---|---|---|
 | **Stage gold** | Enemies | Merchant, refresh | Yes, every stage |
 | **Blue essence** | All enemies | Evolution Tree | No |
-| **Orange essence** | Rare from enemies, more from elites | Evolution Tree (better upgrades need blue + orange) | No |
+| **Orange essence** | Rare from enemies, more from elites, and forged from blue | Evolution Tree (better upgrades need blue + orange) | No |
 | **Purple essence** | Mini bosses and bosses | Skins, Evolution Tree reset | No |
+
+*(V2.0: **the essence forge.** Orange can also be made from blue: **120 blue → 1 orange**, or 1200 blue → 10 orange, with two buttons beside Reset tree on every page of the Evolution Tree (`main_screen.md` Section 1). A forge cannot be undone. A tree reset refunds what the nodes cost, so it does not give the blue back and the forged orange stays. `Essences.FORGE_BLUE`, `Essences.forge`.)*
 
 ### Drop rates (placeholder)
 
@@ -564,7 +587,7 @@ Skins can only be changed **outside stages**.
 *(V1.5.0: PROJECT's move speed is +8% (was +15%). Pulsefire gives +30% W damage and +25 ability haste (was +15% AP and +15 ability haste); its −10% attack speed stays. The W bonus multiplies Ardent Blaze's cross damage.)*
 
 **Built in Phase 5:**
-- Bought and equipped in the Skin Shop (`main_screen.md`). Lucian's body sprite and the HUD portrait follow the equipped skin.
+- Bought and equipped in the Skin Shop (`main_screen.md`). Lucian's body sprite and the HUD portrait follow the equipped skin. *(V2.0: all five bodies and portraits are redrawn, see `main_screen.md` Section 2.)*
 - Attack speed, move speed, ability haste and lifesteal are added like item stats. The AD, AP and max HP percentages multiply the final stats, after item passives.
 - Vampire's kill heal works on real kills; training dummies never die, so only the tests show it for now.
 
@@ -578,27 +601,28 @@ Skins can only be changed **outside stages**.
 | Pulsefire | White | Blue and white, pale blue rings, a glowing core between them |
 | Vampire | Silver with a red gem | Black iron with a crimson rim, crimson rings |
 
-**Built in V1.1: skin effects.** Each skin has its own look and sounds for Q, W, E, R, basic attacks and the muzzle flash. Classic keeps 1.0's. Hitboxes, damage and timing don't change.
+**Built in V1.1: skin effects.** Each skin has its own look and sounds for Q, W, E, R, basic attacks and the muzzle flash. *(V2.0: Classic has its own effects too, "the Sentinel's light", in the first column.)* Hitboxes, damage and timing don't change.
 
-| | **High Noon**: hellfire gunslinger | **PROJECT**: hologram | **Pulsefire**: time rift | **Vampire**: blood |
-|---|---|---|---|---|
-| **Palette** | Ember orange `#ff6a2a`, deep red `#c8300a`, hot white `#fff6e0`, smoke grey | Cyan `#38e8ff`, pale cyan `#7ff4ff`, gunmetal `#1c2029`, magenta for glitches | White core `#f4f8ff`, pale blue `#7fd8ff`, deep blue `#4a5cff` | Crimson `#d01830`, bright red `#ff3a50`, black red `#4a0812` |
-| **Q beam** | Red edges, an orange core and a white-hot centre. Embers drift off and a smoke puff hangs at the muzzle. | Bright cyan edge lines over a see-through fill, with scan lines sweeping along. It breaks into pixels instead of fading. | A white core with blue edges. Rings ripple down the beam and a clock-face ring shows at the muzzle. | Black-red edges and a crimson core. Drops spray off and fall, and it drains away from Lucian's end outward. |
-| **W missile** | A molten slug with a smoke tail | A spinning diamond "data packet" | An orb with two orbiting rings | A blood orb with a dripping tail |
-| **W cross** | Burning arms, a charred ring under it, embers flying out along the 4 arms | Built from grid squares that light up from the centre outward, then flicker off | Comes with a shockwave ring and a ticking clock flash at the centre | A blood splash, with four small bats flying out along the arms |
-| **E dash** | A fire streak along the ground and dust kicked up where he started | A glitch: 3 offset copies of Lucian split cyan/magenta, with broken scan-line pieces | 3-4 fading blue afterimages of Lucian's body, with a ring at both ends | A red mist trail with 5-6 bats flapping along it |
-| **R bullets** | Heavy orange tracers | Thin cyan laser bolts | Pale blue pulse bolts with a small ring at the tip | Crimson bullets with a dark drip streak |
-| **Basic attack** | Orange tracer | Cyan bolt | Pale blue pulse with a tiny ring | Crimson bullet |
-| **Muzzle flash** | Star-shaped, with sparks | Square, with hex sparks | A small blue ring | Red |
+| | **Classic**: the Sentinel's light | **High Noon**: hellfire gunslinger | **PROJECT**: hologram | **Pulsefire**: time rift | **Vampire**: blood |
+|---|---|---|---|---|---|
+| **Palette** | Warm white `#fff4d0`, gold `#ffcf5a`, teal edge `#8fe3b0` (the lantern's colour) | Ember orange `#ff6a2a`, deep red `#c8300a`, hot white `#fff6e0`, smoke grey | Cyan `#38e8ff`, pale cyan `#7ff4ff`, gunmetal `#1c2029`, magenta for glitches | White core `#f4f8ff`, pale blue `#7fd8ff`, deep blue `#4a5cff` | Crimson `#d01830`, bright red `#ff3a50`, black red `#4a0812` |
+| **Q beam** | A white-hot core, a gold body and a thin teal edge, with a four-point star at the muzzle and up to 14 motes. It fades from Lucian's end outward in 0.25 s. | Red edges, an orange core and a white-hot centre. Embers drift off and a smoke puff hangs at the muzzle. | Bright cyan edge lines over a see-through fill, with scan lines sweeping along. It breaks into pixels instead of fading. | A white core with blue edges. Rings ripple down the beam and a clock-face ring shows at the muzzle. | Black-red edges and a crimson core. Drops spray off and fall, and it drains away from Lucian's end outward. |
+| **W missile** | A small star with a short tail | A molten slug with a smoke tail | A spinning diamond "data packet" | An orb with two orbiting rings | A blood orb with a dripping tail |
+| **W cross** | Four arms with a bright centre, a thin teal ring out to 1.5 widths and a star flare | Burning arms, a charred ring under it, embers flying out along the 4 arms | Built from grid squares that light up from the centre outward, then flicker off | Comes with a shockwave ring and a ticking clock flash at the centre | A blood splash, with four small bats flying out along the arms |
+| **E dash** | A streak with 3 fading echoes of Lucian and a ring where he lands | A fire streak along the ground and dust kicked up where he started | A glitch: 3 offset copies of Lucian split cyan/magenta, with broken scan-line pieces | 3-4 fading blue afterimages of Lucian's body, with a ring at both ends | A red mist trail with 5-6 bats flapping along it |
+| **R bullets** | Gold-white tracers with a teal tip | Heavy orange tracers | Thin cyan laser bolts | Pale blue pulse bolts with a small ring at the tip | Crimson bullets with a dark drip streak |
+| **Basic attack** | A gold-white tracer with a teal tip | Orange tracer | Cyan bolt | Pale blue pulse with a tiny ring | Crimson bullet |
+| **Muzzle flash** | A four-point star | Star-shaped, with sparks | Square, with hex sparks | A small blue ring | Red |
 
 Rules for every skin:
 - **The main shapes match the hitboxes.** Q's beam is drawn `length x width` and W's cross arms are drawn `bar` size. Small details may reach a little past the edge.
 - **The main shapes last as long as Classic's:** Q's beam 0.25 s, W's cross 0.35 s, the muzzle flash 0.08 s, and the dash trail fades in 0.3 s.
 - **Details stay at most 0.6 s** (embers, drops, bats, afterimages, rings), at low alpha.
 - **Low effects:** only the main shapes, in the skin's colours: the beam, the missile, the cross and the bullets. No particles, rings, bats, afterimages, scan lines or pixel break-up. The muzzle flash and the dash trail are off, as in 1.0.
+- **Classic's low effects:** no motes, flares or rings, only the main shapes. The plain 1.0 look (`SkinFx`) is now only the fallback for a skin with no effect set; no skin uses it.
 - **Others keep their looks:** Senna's shots, item effects (Galeforce, Rocketbelt, Runaan's), Dark Lucian's Q and trail, and the Act 1 E-lesson trail.
 
-Sounds are synthesized, four per themed skin (`cast_q_<skin>`, `cast_w_<skin>`, `cast_e_<skin>`, `shot_<skin>`). The shot sound plays for basic attacks, Lightslinger's second shot and every R bullet. Each is as loud as the Classic sound it replaces.
+Sounds are synthesized, four per themed skin (`cast_q_<skin>`, `cast_w_<skin>`, `cast_e_<skin>`, `shot_<skin>`). The shot sound plays for basic attacks, Lightslinger's second shot and every R bullet. Each is as loud as the Classic sound it replaces. Classic keeps the original sounds.
 
 | | Q | W | E | Shot |
 |---|---|---|---|---|
@@ -715,6 +739,8 @@ They count as **bonus** stats (yellow in the stats panel) from the start of ever
 | Refresh cost −25 gold (2 levels: 100 → 75 → 50 gold) | 200B → 500B + 5O |
 
 Stage gold, bonus XP and essence drops work since Phase 6: +10% gold, XP or blue per kill for each level, and the essence node also raises the chance of orange (§9).
+
+*(V2.0: blue is never stranded. A node that lacks only orange can be paid by forging orange from blue, 120 blue for 1 (§9). The skilled bot does it: when a level lacks only orange and its blue pays the level and the forge, it forges exactly the orange it is missing, and the bought line says "forged N orange".)*
 
 **Balance goal:** in 5–7 hours a skilled player can afford all skills, R, 4–5 equip slots and some stats, but not the full tree. The rest is a goal for Endless mode. *(V2.0: the story takes a skilled player about 4–5 hours (§1).)*
 
@@ -878,6 +904,22 @@ A new pick **replaces** the previous modifier (they do not stack).
 | 4 | −5% AD | +10% gold |
 | 5 | Bosses and mini bosses +25% max HP | ×1.5 purple essence |
 | 6 | Nothing | Nothing |
+
+**Elite traits (V2.0).** From **wave 11** every elite spawns with one random trait, as in the story from Act 3 (§3, "Elite traits"), with the same rules and pay. The "Elites appear twice as often" modifier makes more of them.
+
+### The Lantern's gift (V2.0)
+The story has a pick of its own, beside Modifiers: halfway through a stage the Lantern offers 3 of 8 boons (§3). Endless has no gift; its pick is the modifier. Both use one panel (`ModifierPick`, `ModifierCard`): a modifier card shows its downside in red over its reward in green, a gift card its name in **gold** over its effect in green. The title reads CHOOSE A MODIFIER or THE LANTERN'S GIFT.
+
+| # | Boon | Effect |
+|---|---|---|
+| 1 | Keen Edge | +10% attack damage |
+| 2 | Quick Hands | +12% attack speed |
+| 3 | Focus | +15 ability haste |
+| 4 | Second Wind | +150 max health, and heals 150 |
+| 5 | Light Step | +6% move speed |
+| 6 | Thirst | +6% omnivamp |
+| 7 | Ward | +20 armor and +20 magic resist |
+| 8 | Fortune | +20% gold from kills |
 
 ### Built in Phase 9
 Endless plays. Every number is a placeholder: the constants sit at the top of `src/core/endless_plan.gd` and `endless_modifiers.gd`.
@@ -1115,7 +1157,7 @@ A playtest bot (`tests/tools/autoplay.gd`) played the story headless at three sk
 
 Bosses and mini bosses don't scale and keep their numbers (except the Ocean Drake's mist). Endless keeps its own scaling (`EndlessPlan`).
 
-**Tools:** `tests/tools/autoplay.gd` plays the story at a tier (skilled, average, novice), retries a lost stage, farms the last cleared one after 3 losses, and prints each try (kills, damage taken by enemy, what killed him). `AUTOPLAY_DIFFICULTY=hard` plays it on a difficulty. `tests/tools/stage_budget.gd` prints every stage's HP per wave, XP, gold, blue and the level Lucian ends at. Both run headless only. *(V1.5.0: between stages the bot buys skins with purple, through the Skin Shop's own call: every one it can afford, in Skin Shop order. It wears the last one bought, or with `AUTOPLAY_SKIN=<id>` (`classic` for none) it saves up for that one first and wears it once owned. Each try's line names the skin worn. The bot also follows the new item rules: it buys onto a free equip slot when its backpack is full, equips to make room for loot, and keeps one penetration item. `stage_budget.gd` counts an Ancient Krug's splits in the XP, gold and blue too, applies each stage's gold share, and after the stages prints each boss's and mini boss's wall, its HP ÷ the gold earned in its stage before its wave, and each act's average gold per stage, the boss's own gold included.)* *(V2.0: the bot plays more like a player and measures how long the story takes. It walks to the merchant in each break, and waits its tier's `idle` seconds before pressing Skip. It goes for summoners first (`focus`, the share of the time it does), fumbles some actions (`fumble`) and backs away from a melee enemy when its health is below the tier's `panic` share. `AUTOPLAY_RUN=<name>` gives a run its own save and settings files, so runs can go side by side. `AUTOPLAY_TIER="panic=0.2,react=0.4"` plays a tier with some numbers changed. `AUTOPLAY_RESOLVE=off` plays with the Resolve setting off. Each try prints its Resolve. A run ends with a per-stage summary and an **estimate of the play time**: the stage time, plus `between` seconds for each stage or farm run and `retry` seconds for each failed try. The tiers' numbers are in the table below.)*
+**Tools:** `tests/tools/autoplay.gd` plays the story at a tier (skilled, average, novice), retries a lost stage, farms the last cleared one after 3 losses, and prints each try (kills, damage taken by enemy, what killed him). `AUTOPLAY_DIFFICULTY=hard` plays it on a difficulty. `tests/tools/stage_budget.gd` prints every stage's HP per wave, XP, gold, blue and the level Lucian ends at. Both run headless only. *(V1.5.0: between stages the bot buys skins with purple, through the Skin Shop's own call: every one it can afford, in Skin Shop order. It wears the last one bought, or with `AUTOPLAY_SKIN=<id>` (`classic` for none) it saves up for that one first and wears it once owned. Each try's line names the skin worn. The bot also follows the new item rules: it buys onto a free equip slot when its backpack is full, equips to make room for loot, and keeps one penetration item. `stage_budget.gd` counts an Ancient Krug's splits in the XP, gold and blue too, applies each stage's gold share, and after the stages prints each boss's and mini boss's wall, its HP ÷ the gold earned in its stage before its wave, and each act's average gold per stage, the boss's own gold included.)* *(V2.0: the bot plays more like a player and measures how long the story takes. It walks to the merchant in each break, and waits its tier's `idle` seconds before pressing Skip. It goes for summoners first (`focus`, the share of the time it does), fumbles some actions (`fumble`) and backs away from a melee enemy when its health is below the tier's `panic` share. `AUTOPLAY_RUN=<name>` gives a run its own save and settings files, so runs can go side by side. `AUTOPLAY_TIER="panic=0.2,react=0.4"` plays a tier with some numbers changed. `AUTOPLAY_RESOLVE=off` plays with the Resolve setting off. Each try prints its Resolve. A run ends with a per-stage summary and an **estimate of the play time**: the stage time, plus `between` seconds for each stage or farm run and `retry` seconds for each failed try. The tiers' numbers are in the table below.)* *(V2.0: the bot picks the Lantern's gift. The skilled tier, after its `idle` seconds, takes the first card in the order Keen Edge, Quick Hands, Thirst, Second Wind, Focus, Ward, Light Step, Fortune; the others click the first card after `idle`. Each try's line ends with "gift <name or none>".)*
 
 | Tier | react | kite | panic | warn | bolt | focus | fumble | idle | between | retry |
 |---|---|---|---|---|---|---|---|---|---|---|
