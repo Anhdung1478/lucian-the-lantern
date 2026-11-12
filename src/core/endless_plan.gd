@@ -45,6 +45,10 @@ const BOSS_WAVE_SHARE := 0.6
 ## power at tier k (1 and 2), then all of it.
 const LATE_ACT := 5
 const LATE_POWER: Array[float] = [0.8, 0.9]
+## The first mini boss (tier 1, wave MINI_BOSS_EVERY) deals this share of
+## its power: it comes with a full wave while Lucian is level 8 to 10 with
+## two items, and ended most runs of an average player.
+const FIRST_MINI_BOSS_POWER := 0.7
 ## Kills pay like act 1 + (w − 1) / REWARD_ACT_WAVES, at least like the
 ## acts the save has cleared, at most like the last act.
 const REWARD_ACT_WAVES := 10
@@ -199,10 +203,12 @@ static func boss_power(w: int, id := &"") -> float:
 
 
 ## Mini boss `id`'s damage multiplier in wave `w`, as a boss's, grown since
-## the first mini boss wave (MINI_BOSS_EVERY).
+## the first mini boss wave (MINI_BOSS_EVERY); the first one deals
+## FIRST_MINI_BOSS_POWER of it.
 static func mini_boss_power(w: int, id := &"") -> float:
 	var tier := _mini_boss_tier(w)
-	return _power(tier, w, MINI_BOSS_EVERY) * late_share(id, tier)
+	var first := FIRST_MINI_BOSS_POWER if tier == 1 else 1.0
+	return _power(tier, w, MINI_BOSS_EVERY) * late_share(id, tier) * first
 
 
 ## The share of its power boss or mini boss `id` deals at tier `tier`:

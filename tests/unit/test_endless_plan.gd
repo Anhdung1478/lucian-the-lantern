@@ -292,7 +292,7 @@ func test_boss_and_mini_boss_hp_follow_the_table() -> void:
 ## was ×1, ×1.15, ×1.45, ×1.6 at waves 10, 20, 40, 50 and at 5, 15, 35, 45).
 func test_boss_and_mini_boss_damage_keeps_up_with_the_waves() -> void:
 	assert_eq(EndlessPlan.boss_power(10), 1.0, "the first boss")
-	assert_eq(EndlessPlan.mini_boss_power(5), 1.0, "the first mini boss")
+	assert_almost_eq(EndlessPlan.mini_boss_power(5), 0.7, 0.0001, "the first mini boss comes with a full wave at level 8 to 10: a share of its power")
 	for w in [20, 30, 40, 50]:
 		var growth := sqrt(EndlessPlan.damage_scale(w) / EndlessPlan.damage_scale(10))
 		assert_almost_eq(EndlessPlan.boss_power(w), growth, 0.0001, "boss %d" % w)
@@ -306,7 +306,7 @@ func test_boss_and_mini_boss_damage_keeps_up_with_the_waves() -> void:
 	assert_almost_eq(EndlessPlan.mini_boss_power(35), 1.9453, 0.0001)
 	assert_almost_eq(EndlessPlan.mini_boss_power(45), 2.2563, 0.0001)
 	assert_eq(EndlessPlan.boss_power(1), 1.0, "called up early: never less than tier 1's")
-	assert_eq(EndlessPlan.mini_boss_power(1), 1.0)
+	assert_almost_eq(EndlessPlan.mini_boss_power(1), 0.7, 0.0001, "called up early: the first mini boss's")
 
 
 ## The planned HP of a normal wave: normal_count enemies at the normal pool's
