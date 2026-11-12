@@ -1,32 +1,70 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-  <!-- Karthus: a robed lich seen from above in pale purple, a tattered hooded robe, a bare skull under the hood with glowing eyes, bony hands holding a tall skull-topped staff out front, facing forward (+X). -->
-  <g transform="translate(50 50)">
-    <ellipse cx="-3" cy="4" rx="42" ry="40" fill="#000000" opacity="0.25"/>
-    <!-- tattered robe trailing behind -->
-    <path d="M -8 -26 Q -30 -34 -44 -26 L -38 -16 L -46 -8 L -38 0 L -46 8 L -38 16 L -44 26 Q -30 34 -8 26 Z" fill="#6f5a9c" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -14 -20 Q -30 -22 -38 -14 M -14 20 Q -30 22 -38 14 M -16 0 L -40 0" stroke="#4a3a75" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-    <!-- shoulders -->
-    <ellipse cx="0" cy="0" rx="22" ry="29" fill="#8d77c4" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -6 -22 Q 6 0 -6 22" stroke="#5d4a92" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <!-- the staff, held out front on the right -->
-    <path d="M -12 20 L 40 20" stroke="#1a1d24" stroke-width="7" stroke-linecap="round"/>
-    <path d="M -12 20 L 40 20" stroke="#cfc4e6" stroke-width="3.5" stroke-linecap="round"/>
-    <!-- skull on the staff -->
-    <circle cx="40" cy="20" r="9" fill="#efe9f7" stroke="#1a1d24" stroke-width="2.5"/>
-    <path d="M 44 15 L 49 17 M 44 25 L 49 23" stroke="#1a1d24" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="42" cy="17" r="2" fill="#b57bff"/>
-    <circle cx="42" cy="23" r="2" fill="#b57bff"/>
-    <!-- bony arms and hands -->
-    <path d="M 8 -8 L 22 -14 L 30 -8 M 8 10 L 20 20 L 28 20" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <path d="M 8 -8 L 22 -14 L 30 -8 M 8 10 L 20 20 L 28 20" stroke="#efe9f7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <!-- hood and skull -->
-    <circle cx="6" cy="0" r="16" fill="#5d4a92" stroke="#1a1d24" stroke-width="3"/>
-    <ellipse cx="11" cy="0" rx="9" ry="8" fill="#efe9f7" stroke="#1a1d24" stroke-width="2"/>
-    <path d="M 14 -5 L 19 -3 M 14 5 L 19 3" stroke="#1a1d24" stroke-width="2.2" stroke-linecap="round"/>
-    <circle cx="13" cy="-4" r="2.2" fill="#b57bff"/>
-    <circle cx="13" cy="4" r="2.2" fill="#b57bff"/>
-    <!-- pale glow of the soul fire -->
-    <circle cx="13" cy="-4" r="3.6" fill="#d8b8ff" opacity="0.35"/>
-    <circle cx="13" cy="4" r="3.6" fill="#d8b8ff" opacity="0.35"/>
+  <!-- Karthus, the Deathsinger, seen from above, facing +X: a lich floating in a tattered violet-grey robe whose
+       ragged hem trails behind him into pale green soul wisps, a high mantle with bone spikes on his shoulders, a
+       crowned skull with green-lit eyes under his hood, his open book of the dead in his left hand (y < 0) with
+       glowing runes, and his long bone staff in his right (y > 0), a green soul flame at its head. -->
+  <defs>
+    <radialGradient id="soul">
+      <stop offset="0" stop-color="#f2fff4"/>
+      <stop offset="0.4" stop-color="#b8ffc8" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#5ee08a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="wisp">
+      <stop offset="0" stop-color="#b8ffc8" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#5ee08a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="robe" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#7464a6"/>
+      <stop offset="1" stop-color="#43386a"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(50 50) scale(1.04)">
+    <!-- soul wisps off the hem -->
+    <ellipse cx="-40" cy="-16" rx="9" ry="7" fill="url(#wisp)"/>
+    <ellipse cx="-43" cy="4" rx="9" ry="7" fill="url(#wisp)"/>
+    <ellipse cx="-38" cy="22" rx="9" ry="7" fill="url(#wisp)"/>
+    <!-- the tattered robe, floating, its hem trailing behind -->
+    <path d="M 6 -26 Q -16 -36 -34 -28 L -38 -32 L -40 -22 L -47 -16 L -40 -10 L -46 -2 L -39 3 L -46 10 L -39 15 L -44 24 L -35 27 L -34 34 Q -16 36 6 26 Z" fill="url(#robe)" stroke="#1a1d24" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M -38 -32 L -40 -22 L -47 -16 L -40 -10 L -46 -2 L -39 3 L -46 10 L -39 15 L -44 24 L -35 27 L -34 34" fill="none" stroke="#9dffb8" stroke-width="2" stroke-linejoin="round" opacity="0.65"/>
+    <path d="M -8 -28 Q -24 -28 -36 -20 M -12 -12 Q -26 -12 -40 -8 M -12 12 Q -26 12 -40 10 M -8 28 Q -22 30 -34 26" fill="none" stroke="#1f1a30" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M -10 -20 Q -24 -20 -36 -14 M -12 2 L -40 0 M -10 20 Q -22 21 -36 19" fill="none" stroke="#9a8ac8" stroke-width="2" stroke-linecap="round"/>
+    <!-- the bone staff, held out on his right, its soul flame -->
+    <path d="M -16 24 L 40 15" stroke="#1a1d24" stroke-width="7" stroke-linecap="round"/>
+    <path d="M -16 24 L 40 15" stroke="#d8cfb8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 4 21 L 8 20.4 M 20 18.4 L 24 17.8" stroke="#8a7f68" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="42" cy="15" r="9" fill="url(#soul)"/>
+    <path d="M 36 9 Q 42 8 46 12 L 48 15 L 46 18 Q 42 22 36 21 Q 39 15 36 9 Z" fill="#e8e2d0" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+    <circle cx="42" cy="15" r="3" fill="#7dffa8" stroke="#1a1d24" stroke-width="1.2"/>
+    <!-- bony arms: the right one to the staff, the left one holding the book -->
+    <path d="M 4 18 L 16 21 M 4 -18 L 16 -18" stroke="#1a1d24" stroke-width="7" stroke-linecap="round"/>
+    <path d="M 4 18 L 16 21 M 4 -18 L 16 -18" stroke="#4a3d6a" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="17" cy="20.5" r="3.4" fill="#e8e2d0" stroke="#1a1d24" stroke-width="1.5"/>
+    <!-- the open book of the dead -->
+    <circle cx="27" cy="-17" r="13" fill="url(#wisp)"/>
+    <path d="M 18 -26 L 36 -27 L 36 -8 L 18 -9 Z" fill="#3a2a22" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 19.5 -24.5 L 27 -25 L 27 -9.5 L 19.5 -10.5 Z M 27 -25 L 34.5 -25.5 L 34.5 -9.5 L 27 -9.5 Z" fill="#efe6cc"/>
+    <path d="M 27 -25 L 27 -9.5" stroke="#8a7a5a" stroke-width="2"/>
+    <path d="M 21.5 -21.5 L 25 -21.5 M 21.5 -17.5 L 25 -17.5 M 21.5 -13.5 L 24 -13.5 M 29 -22 L 32.5 -22 M 29 -18 L 32.5 -18 M 29 -14 L 31.5 -14" stroke="#3ccf74" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="17" cy="-18" r="3.4" fill="#e8e2d0" stroke="#1a1d24" stroke-width="1.5"/>
+    <!-- the high mantle, bone spikes on the shoulders -->
+    <path d="M 8 -10 Q 8 -26 -4 -27 Q -14 -26 -15 -12 L -15 12 Q -14 26 -4 27 Q 8 26 8 10 Z" fill="#5a4c84" stroke="#1a1d24" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M -11 -18 Q -14 0 -11 18" fill="none" stroke="#8a7ab8" stroke-width="2.2" stroke-linecap="round"/>
+    <g fill="#e8e2d0" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round">
+      <path d="M 0 -24 L -6 -34 L 4 -26 Z M -8 -22 L -17 -29 L -6 -18 Z"/>
+      <path d="M 0 24 L -6 34 L 4 26 Z M -8 22 L -17 29 L -6 18 Z"/>
+    </g>
+    <!-- hood, and the crowned skull in it -->
+    <path d="M 14 -10 Q 12 -15 2 -15 Q -9 -15 -14 -7 L -20 0 L -14 7 Q -9 15 2 15 Q 12 15 14 10 Z" fill="#3a3058" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -10 -10 Q -4 -13.5 4 -13" fill="none" stroke="#7a68a8" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 0 -9 L -5 -13 L 2 -11 L 0 -17 L 5 -11 L 8 -14 L 8 -8 Z M 0 9 L -5 13 L 2 11 L 0 17 L 5 11 L 8 14 L 8 8 Z" fill="#c9b880" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+    <ellipse cx="9" cy="0" rx="8.5" ry="8" fill="#ece6d6" stroke="#1a1d24" stroke-width="2"/>
+    <path d="M 2 -4 Q 6 -6 10 -6" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="13" cy="-3.5" r="5" fill="url(#soul)"/>
+    <circle cx="13" cy="3.5" r="5" fill="url(#soul)"/>
+    <circle cx="13" cy="-3.5" r="2.1" fill="#1a3a24"/>
+    <circle cx="13" cy="3.5" r="2.1" fill="#1a3a24"/>
+    <circle cx="13" cy="-3.5" r="1.2" fill="#9dffb8"/>
+    <circle cx="13" cy="3.5" r="1.2" fill="#9dffb8"/>
+    <path d="M 17 -2 L 18 2" stroke="#8a826e" stroke-width="2" stroke-linecap="round"/>
   </g>
 </svg>

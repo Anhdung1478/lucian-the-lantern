@@ -1,25 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
-  <!-- Elise: a spider queen seen from above, a black and crimson carapace, a swollen abdomen marked with a red hourglass, eight long legs, pale eyes and fangs forward (+X). -->
+  <!-- Elise, the Spider Queen, seen from above, facing +X: a woman's torso, bare pale shoulders in a crimson gown
+       with black lace down the back, black hair under a spiked red crown, her pale face forward and her sleeved arms
+       reaching ahead to spit her web; behind her the gown swells into a black spider's abdomen with a red hourglass,
+       and eight long spider legs spread from her back, black and crimson with bone-pale tips. -->
+  <defs>
+    <linearGradient id="gown" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#e0384e"/>
+      <stop offset="1" stop-color="#9a1a2c"/>
+    </linearGradient>
+    <radialGradient id="mark">
+      <stop offset="0" stop-color="#ff6a6a"/>
+      <stop offset="1" stop-color="#c4263a"/>
+    </radialGradient>
+  </defs>
   <g transform="translate(48 48)">
-    <ellipse cx="-2" cy="4" rx="42" ry="40" fill="#000000" opacity="0.25"/>
-    <!-- legs -->
-    <path d="M 8 -10 L 26 -28 L 40 -34 M 2 -12 L 10 -36 L 6 -44 M -6 -12 L -22 -34 L -32 -38 M -10 -8 L -32 -16 L -44 -12 M 8 10 L 26 28 L 40 34 M 2 12 L 10 36 L 6 44 M -6 12 L -22 34 L -32 38 M -10 8 L -32 16 L -44 12" fill="none" stroke="#1a1d24" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 8 -10 L 26 -28 L 40 -34 M 2 -12 L 10 -36 L 6 -44 M -6 -12 L -22 -34 L -32 -38 M -10 -8 L -32 -16 L -44 -12 M 8 10 L 26 28 L 40 34 M 2 12 L 10 36 L 6 44 M -6 12 L -22 34 L -32 38 M -10 8 L -32 16 L -44 12" fill="none" stroke="#a3202d" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- abdomen -->
-    <ellipse cx="-18" cy="0" rx="22" ry="17" fill="#201a22" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -30 0 Q -18 -8 -6 0 Q -18 8 -30 0 Z" fill="#c4263a"/>
-    <path d="M -22 -10 L -14 10 M -22 10 L -14 -10" stroke="#c4263a" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-    <!-- carapace -->
-    <ellipse cx="6" cy="0" rx="17" ry="14" fill="#7b1626" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -4 -8 Q 8 -12 16 -6 M -4 8 Q 8 12 16 6" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linecap="round"/>
-    <!-- head, eyes and fangs -->
-    <ellipse cx="22" cy="0" rx="9" ry="8" fill="#201a22" stroke="#1a1d24" stroke-width="2.5"/>
-    <g fill="#f4eaea" stroke="#1a1d24" stroke-width="1">
-      <circle cx="26" cy="-4" r="2.2"/>
-      <circle cx="26" cy="4" r="2.2"/>
-      <circle cx="22" cy="-6" r="1.6"/>
-      <circle cx="22" cy="6" r="1.6"/>
+    <!-- the spider legs from her back -->
+    <path d="M -3 -12 L 10 -36 L 26 -43 M -6 -12 L -7 -40 L 1 -50 M -8 -11 L -24 -34 L -34 -40 M -10 -8 L -34 -20 L -47 -16" fill="none" stroke="#1a1d24" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -3 -12 L 10 -36 L 26 -43 M -6 -12 L -7 -40 L 1 -50 M -8 -11 L -24 -34 L -34 -40 M -10 -8 L -34 -20 L -47 -16" fill="none" stroke="#2a2030" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 1.5 -20.4 L 10 -36 M -6.3 -21.8 L -7 -40 M -13.6 -19.0 L -24 -34 M -18.4 -12.2 L -34 -20" fill="none" stroke="#8e1a2a" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 18.8 -39.9 L 26 -43 M -2.6 -45.5 L 1 -50 M -29.5 -37.3 L -34 -40 M -41.1 -17.8 L -47 -16" fill="none" stroke="#eadfd2" stroke-width="2.2" stroke-linecap="round"/>
+    <g transform="scale(1 -1)">
+    <path d="M -3 -12 L 10 -36 L 26 -43 M -6 -12 L -7 -40 L 1 -50 M -8 -11 L -24 -34 L -34 -40 M -10 -8 L -34 -20 L -47 -16" fill="none" stroke="#1a1d24" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -3 -12 L 10 -36 L 26 -43 M -6 -12 L -7 -40 L 1 -50 M -8 -11 L -24 -34 L -34 -40 M -10 -8 L -34 -20 L -47 -16" fill="none" stroke="#2a2030" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 1.5 -20.4 L 10 -36 M -6.3 -21.8 L -7 -40 M -13.6 -19.0 L -24 -34 M -18.4 -12.2 L -34 -20" fill="none" stroke="#8e1a2a" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 18.8 -39.9 L 26 -43 M -2.6 -45.5 L 1 -50 M -29.5 -37.3 L -34 -40 M -41.1 -17.8 L -47 -16" fill="none" stroke="#eadfd2" stroke-width="2.2" stroke-linecap="round"/>
     </g>
-    <path d="M 30 -3 L 38 -2 L 31 0 Z M 30 3 L 38 2 L 31 0 Z" fill="#e8e2d0" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- the abdomen behind her, a red hourglass on it -->
+    <ellipse cx="-21" cy="0" rx="14" ry="11.5" fill="#1e1820" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -31 -5 Q -22 -10 -12 -7" fill="none" stroke="#4a3a4e" stroke-width="2" stroke-linecap="round"/>
+    <path d="M -30 -5 L -21 0 L -30 5 Z M -12 -4 L -21 0 L -12 4 Z" fill="url(#mark)" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- arms reaching forward -->
+    <path d="M 2 -16 L 15 -12 L 24 -5" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2 -16 L 15 -12 L 24 -5" fill="none" stroke="#f2e4da" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 18 -10.5 L 20 -9" stroke="#d42a40" stroke-width="3.8" stroke-linecap="round"/>
+    <g transform="scale(1 -1)">
+    <path d="M 2 -16 L 15 -12 L 24 -5" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2 -16 L 15 -12 L 24 -5" fill="none" stroke="#f2e4da" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 18 -10.5 L 20 -9" stroke="#d42a40" stroke-width="3.8" stroke-linecap="round"/>
+    </g>
+    <!-- her gown, bright crimson, black lace down the back -->
+    <ellipse cx="0" cy="0" rx="12" ry="19" fill="url(#gown)" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M 7 -14 Q 12 -6 12 0 Q 12 6 7 14" fill="none" stroke="#ff7a88" stroke-width="2" stroke-linecap="round"/>
+    <path d="M -11 -6 L -2 0 L -11 6" fill="none" stroke="#1e1820" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -6 -15 Q -10 -8 -10 0 Q -10 8 -6 15" fill="none" stroke="#1e1820" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- head: black hair under a spiked red crown, her pale face forward -->
+    <path d="M 8 -8 L 0 -13 L 6 -6 Z M 4 -5 L -6 -8 L 3 -3 Z" fill="#d42a40" stroke="#1a1d24" stroke-width="1.6" stroke-linejoin="round"/>
+    <g transform="scale(1 -1)">
+    <path d="M 8 -8 L 0 -13 L 6 -6 Z M 4 -5 L -6 -8 L 3 -3 Z" fill="#d42a40" stroke="#1a1d24" stroke-width="1.6" stroke-linejoin="round"/>
+    </g>
+    <ellipse cx="7" cy="0" rx="9.5" ry="9" fill="#141018" stroke="#1a1d24" stroke-width="2.5"/>
+    <path d="M -1 -5 Q 5 -8 10 -4 M -1 5 Q 5 8 10 4" fill="none" stroke="#4e3e56" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 11 -6.5 Q 20 -5 20 0 Q 20 5 11 6.5 Q 14.5 0 11 -6.5 Z" fill="#f2e4da" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+    <circle cx="2" cy="0" r="2.6" fill="#d42a40" stroke="#1a1d24" stroke-width="1"/>
   </g>
 </svg>
