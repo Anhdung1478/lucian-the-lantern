@@ -31,6 +31,8 @@ Lucian reaches Thresh for the final fight. When Thresh falls, Lucian shoots thro
 
 ## Elites
 
+*(V2.0: from Act 3 an elite also gets one random trait on top of its own kit: Swift, Armored, Vampiric or Volatile. Game design doc §3, "Elite traits".)*
+
 ### Spectral Rider
 - **Special normal attack:** charges in a straight line. The player dodges sideways.
 
@@ -256,4 +258,4 @@ The waves hold about **1,043k HP**, plus 90k for the two mini bosses and Thresh 
 
 
 ### Art
-Hand-written SVGs: the Mist Walker (a lean grey ghoul trailing mist), the Lantern Soul (a teal-green wisp with a sad face), the Spectral Rider (a ghost knight on a spectral horse), the Chain Warden (a hooded jailer with a chain and a hook), and Hecarim (a spectral centaur with a lance and green-blue flame, 136 × 112). Karthus, revived reuses Karthus's art, tinted; Thresh reuses Act 1's.
+*(V2.0: the Mist Walker, Lantern Soul, Spectral Rider and Chain Warden are redrawn with no baked shadow: the Mist Walker is hooded with cyan eyes and a mist wake, the Lantern Soul a teal soul with a halo and chain links, the Rider an armoured rider on a ghost horse with a lance, the Warden cowled with spiked pauldrons, and its hook is shorter so it no longer clips.)* Hand-written SVGs: the Mist Walker (a lean grey ghoul trailing mist), the Lantern Soul (a teal-green wisp with a sad face), the Spectral Rider (a ghost knight on a spectral horse), the Chain Warden (a hooded jailer with a chain and a hook), and Hecarim (a spectral centaur with a lance and green-blue flame, 136 × 112). Karthus, revived reuses Karthus's art, tinted; Thresh reuses Act 1's.

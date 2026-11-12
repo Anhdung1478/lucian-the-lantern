@@ -30,6 +30,8 @@ Lucian reaches the Shadow Isles and fights through its corrupted forest to find 
 
 ## Elites
 
+*(V2.0: from Act 3 an elite also gets one random trait on top of its own kit: Swift, Armored, Vampiric or Volatile. Game design doc §3, "Elite traits".)*
+
 ### Maiden of the Mist
 - Tanky melee ghost, **AD** damage.
 - **Trait:** summons 2 small ghouls every few seconds until she is killed. *(V2.0: until she has called 12 ghouls in all, `summon_total`.)*
@@ -226,4 +228,4 @@ The waves hold about **264k HP**, plus 41.5k for the three bosses (Maokai 8500, 
 The waves hold about **408k HP**, plus 48.5k for the three bosses (Maokai 10500, Elise 15000, Karthus 23000). Act 5 has 33 waves. Lucian ends the stages at level 11, 12, 13, 14 and 15, with 6,140, 7,460, 9,460, 11,200 and 12,220 gold before the boss waves (an average of 9,356 a stage with the bosses' gold). The walls (a boss's health divided by the gold earned in its stage before its wave) are 1.88 for Maokai, 1.64 for Elise and 1.88 for Karthus.
 
 ### Art
-Hand-written SVGs, as Phase 7's: the sapling (a walking dead tree with a glowing green core), the spiderling (a dark spider with bone-pale legs and a pale mark, so it shows on the forest floor), the ghoul, the Maiden (a veiled ghost woman in a teal shroud), the Broodmother (a huge spider with a bone-white carapace), Maokai (a treant, 116 px), Elise (a spider-queen in red and black, 96 px) and Karthus (a robed lich with a skull staff, 100 px).
+*(V2.0: the sapling, spiderling, ghoul, Maiden and Broodmother are redrawn with no baked shadow: the sapling has knotted bark, green cracks and root-feet, the spiderling is glossy with four red eyes, the ghoul has ribs, claws and green pinpoint eyes, the Maiden a torn two-layer shroud and reaching arms, and the Broodmother is bone-white with egg-sacs and six green eyes.)* Hand-written SVGs, as Phase 7's: the sapling (a walking dead tree with a glowing green core), the spiderling (a dark spider with bone-pale legs and a pale mark, so it shows on the forest floor), the ghoul, the Maiden (a veiled ghost woman in a teal shroud), the Broodmother (a huge spider with a bone-white carapace), Maokai (a treant, 116 px), Elise (a spider-queen in red and black, 96 px) and Karthus (a robed lich with a skull staff, 100 px).

@@ -42,6 +42,8 @@ Monsters always come in packs, mixing small and big ones (except Gromp).
 
 ## Elites
 
+*(V2.0: from Act 3 an elite also gets one random trait on top of its own kit: Swift, Armored, Vampiric or Volatile. The Rift Scuttler gets none, since it escapes. Game design doc §3, "Elite traits".)*
+
 ### Blue Sentinel
 - **Special normal attack:** a slam that slows Lucian.
 - **Trait – Blue buff:** when killed, Lucian gets for **60 seconds**:
@@ -274,4 +276,4 @@ The paths make two loops. Each loop's inner jungle is a wall of its own, so no w
 Enemies and Lucian walk straight while nothing blocks the line to their goal. When a wall does, they follow a path baked from the map's walls (agent radius 36), asked again every 0.4 s or when the goal moves 120. Lucian's moves, chases, merchant visits and cast walks use it too, on every map. A click inside a wall walks to the closest reachable point.
 
 ### Art
-Hand-written SVGs, top-down, facing right: the 10 monsters (red-crested raptors, grey-blue wolves with teal eyes, mossy rock Krugs, a green-purple toad, a blue stone golem, a red thorned beast, a purple shelled crab), the two drakes (150 px), the Elder Dragon (180 px), the Blast Cone (108 px) and Honeyfruit (56 px), the Blue and Red buff icons, the slow and burn icons, and Elder's Mark. *(V2.0: the Blast Cone's and the Honeyfruit's SVGs, `blast_cone.svg` and `honeyfruit.svg`, are no longer used: both are drawn in code with `MapArt.leaf`.)*
+Hand-written SVGs, top-down, facing right: the 10 monsters (red-crested raptors, grey-blue wolves with teal eyes, mossy rock Krugs, a green-purple toad, a blue stone golem, a red thorned beast, a green-teal shelled crab), the two drakes (150 px), the Elder Dragon (180 px), the Blast Cone (108 px) and Honeyfruit (56 px), the Blue and Red buff icons, the slow and burn icons, and Elder's Mark. *(V2.0: the monsters are redrawn with no baked shadow, as the game draws one under every unit: the leader raptor and the leader wolf are bigger, the Krugs darker with orange cracks and a spike crown, the Blue Sentinel has runes and glow gems, the Red Brambleback bone thorns and a flame crest, and the Rift Scuttler is green-teal, not purple.)* *(V2.0: the Blast Cone's and the Honeyfruit's SVGs, `blast_cone.svg` and `honeyfruit.svg`, are no longer used: both are drawn in code with `MapArt.leaf`.)*
