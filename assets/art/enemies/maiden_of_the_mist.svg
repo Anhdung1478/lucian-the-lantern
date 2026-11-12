@@ -1,22 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="92" height="92" viewBox="0 0 92 92">
-  <!-- Maiden of the Mist: a tall veiled ghost woman seen from above in a teal shroud, a long flowing hem trailing behind, pale hands reaching forward (+X), a veiled face with two cold glowing eyes. -->
+  <!-- Maiden of the Mist: a tall wraith in a torn teal veil seen from above, a long ragged shroud streaming behind, a draped veil over a pale head with two cold glowing eyes, thin pale arms with long fingers reaching forward (+X). -->
   <g transform="translate(46 46)">
-    <ellipse cx="-2" cy="4" rx="40" ry="35" fill="#000000" opacity="0.25"/>
-    <!-- flowing shroud trailing behind -->
-    <path d="M -10 -24 Q -34 -34 -42 -20 Q -36 -12 -44 -6 Q -36 0 -44 6 Q -36 12 -42 20 Q -34 34 -10 24 Z" fill="#2f7f86" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -14 -18 Q -30 -22 -36 -14 M -14 0 L -38 0 M -14 18 Q -30 22 -36 14" fill="none" stroke="#5fc0c4" stroke-width="2" stroke-linecap="round"/>
-    <!-- arms, long and thin -->
-    <path d="M 4 -16 L 22 -20 L 34 -12 M 4 16 L 22 20 L 34 12" fill="none" stroke="#1a1d24" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 4 -16 L 22 -20 L 34 -12 M 4 16 L 22 20 L 34 12" fill="none" stroke="#3f9aa0" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="35" cy="-12" r="4.5" fill="#dff1f0" stroke="#1a1d24" stroke-width="2.5"/>
-    <circle cx="35" cy="12" r="4.5" fill="#dff1f0" stroke="#1a1d24" stroke-width="2.5"/>
-    <!-- shoulders and body -->
-    <ellipse cx="-2" cy="0" rx="22" ry="25" fill="#3f9aa0" stroke="#1a1d24" stroke-width="3.5"/>
-    <path d="M -14 -14 Q -4 0 -14 14" fill="none" stroke="#2f7f86" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- veiled head -->
-    <circle cx="10" cy="0" r="13" fill="#bfe6e6" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -2 -10 Q -8 0 -2 10" fill="none" stroke="#7fc4c6" stroke-width="2" stroke-linecap="round"/>
-    <ellipse cx="15" cy="-4.5" rx="2.2" ry="3" fill="#8ffcff"/>
-    <ellipse cx="15" cy="4.5" rx="2.2" ry="3" fill="#8ffcff"/>
+    <!-- outer ragged mist shroud -->
+    <path d="M -8 -26 Q -30 -38 -42 -26 L -36 -21 L -44 -15 L -36 -10 L -45 -3 L -36 2 L -45 9 L -36 13 L -44 19 L -36 23 L -42 28 Q -30 38 -8 26 Z" fill="#256a74" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -10 -22 Q -28 -30 -36 -24 M -12 0 L -38 -3 M -12 4 L -37 8 M -10 22 Q -28 30 -36 24" fill="none" stroke="#7fe0e0" stroke-width="2.4" stroke-linecap="round"/>
+    <!-- inner torn veil layer -->
+    <path d="M -4 -22 Q -22 -26 -30 -16 L -24 -11 L -32 -4 L -24 2 L -32 8 L -24 12 L -30 18 Q -22 26 -4 22 Z" fill="#3f9aa0" stroke="#1a1d24" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M -8 -12 L -22 -9 M -8 0 L -24 1 M -8 12 L -22 9" fill="none" stroke="#a6ecec" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+    <!-- arms -->
+    <path d="M 2 -16 L 20 -21 L 32 -13 M 2 16 L 20 21 L 32 13" fill="none" stroke="#1a1d24" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2 -16 L 20 -21 L 32 -13 M 2 16 L 20 21 L 32 13" fill="none" stroke="#6fc4c8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- long fingers -->
+    <path d="M 32 -13 L 41 -17 M 32 -13 L 42 -12 M 32 -13 L 40 -7 M 32 13 L 41 17 M 32 13 L 42 12 M 32 13 L 40 7" fill="none" stroke="#1a1d24" stroke-width="4.2" stroke-linecap="round"/>
+    <path d="M 32 -13 L 41 -17 M 32 -13 L 42 -12 M 32 -13 L 40 -7 M 32 13 L 41 17 M 32 13 L 42 12 M 32 13 L 40 7" fill="none" stroke="#eaf8f6" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="32" cy="-13" r="4.2" fill="#eaf8f6" stroke="#1a1d24" stroke-width="2.5"/>
+    <circle cx="32" cy="13" r="4.2" fill="#eaf8f6" stroke="#1a1d24" stroke-width="2.5"/>
+    <!-- shoulders -->
+    <ellipse cx="-2" cy="0" rx="19" ry="24" fill="#4cb0b4" stroke="#1a1d24" stroke-width="3.5"/>
+    <path d="M -10 -17 Q -16 0 -10 17" fill="none" stroke="#2f7f86" stroke-width="3" stroke-linecap="round"/>
+    <path d="M -2 -20 Q 6 -22 12 -16" fill="none" stroke="#c4f4f2" stroke-width="2.4" stroke-linecap="round"/>
+    <!-- head under a veil -->
+    <circle cx="10" cy="0" r="13.5" fill="#d4eeee" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M 12 -12 Q 0 -10 -3 0 Q 0 10 12 12 Q 4 6 4 0 Q 4 -6 12 -12 Z" fill="#6fc4c8" opacity="0.8"/>
+    <path d="M -2 -9 Q -7 0 -2 9" fill="none" stroke="#3f9aa0" stroke-width="2.4" stroke-linecap="round"/>
+    <ellipse cx="15" cy="-5" rx="2.6" ry="3.4" fill="#1a1d24"/>
+    <ellipse cx="15" cy="5" rx="2.6" ry="3.4" fill="#1a1d24"/>
+    <ellipse cx="15.5" cy="-5" rx="1.7" ry="2.4" fill="#8ffcff"/>
+    <ellipse cx="15.5" cy="5" rx="1.7" ry="2.4" fill="#8ffcff"/>
   </g>
 </svg>

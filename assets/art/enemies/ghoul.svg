@@ -1,18 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
-  <!-- Ghoul: a hunched pale ghost seen from above, rounded shoulders, long dangling arms reaching forward (+X), a tattered trailing hem and dark hollow eyes. -->
+  <!-- Ghoul: a thin clawed corpse seen from above, narrow hunched ribs and spine, long gaunt arms ending in hooked claws reaching forward (+X), a bald skull with hollow sockets and glowing pinpoint eyes, a tattered rag behind. -->
   <g transform="translate(22 22)">
-    <ellipse cx="-1" cy="2" rx="19" ry="17" fill="#000000" opacity="0.25"/>
-    <!-- tattered hem trailing behind -->
-    <path d="M -8 -9 L -20 -7 L -15 -3 L -21 0 L -15 3 L -20 7 L -8 9 Z" fill="#aeb8bd" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <!-- arms -->
-    <path d="M 0 -9 L 12 -12 L 19 -8 M 0 9 L 12 12 L 19 8" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 0 -9 L 12 -12 L 19 -8 M 0 9 L 12 12 L 19 8" fill="none" stroke="#d6dde0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- hunched body -->
-    <ellipse cx="-3" cy="0" rx="13" ry="12" fill="#d6dde0" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -10 -5 Q -4 0 -10 5" fill="none" stroke="#9aa5ab" stroke-width="1.5" stroke-linecap="round"/>
-    <!-- head -->
-    <circle cx="7" cy="0" r="6.5" fill="#e6ecee" stroke="#1a1d24" stroke-width="2.5"/>
-    <ellipse cx="9.5" cy="-2.5" rx="1.8" ry="2.2" fill="#1a1d24"/>
-    <ellipse cx="9.5" cy="2.5" rx="1.8" ry="2.2" fill="#1a1d24"/>
+    <!-- rags behind -->
+    <path d="M -7 -8 L -20 -8 L -15 -4 L -21 0 L -15 4 L -20 8 L -7 8 Z" fill="#6f7f86" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- arms and claws -->
+    <path d="M 0 -8 L 10 -13 L 17 -10 M 0 8 L 10 13 L 17 10" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 0 -8 L 10 -13 L 17 -10 M 0 8 L 10 13 L 17 10" fill="none" stroke="#c9d6d0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 17 -10 L 21 -14 M 17 -10 L 22 -10 M 17 -10 L 20 -5 M 17 10 L 21 14 M 17 10 L 22 10 M 17 10 L 20 5" fill="none" stroke="#1a1d24" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M 17 -10 L 21 -14 M 17 -10 L 22 -10 M 17 -10 L 20 -5 M 17 10 L 21 14 M 17 10 L 22 10 M 17 10 L 20 5" fill="none" stroke="#f0f4e8" stroke-width="1.6" stroke-linecap="round"/>
+    <!-- thin hunched torso -->
+    <ellipse cx="-4" cy="0" rx="11" ry="10" fill="#a9b8b0" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M -12 0 L 4 0 M -9 -6 L -7 6 M -4 -7 L -2 7" fill="none" stroke="#5f6e68" stroke-width="2" stroke-linecap="round"/>
+    <path d="M -9 -8 Q -2 -10 4 -7" fill="none" stroke="#e4ece6" stroke-width="2" stroke-linecap="round"/>
+    <!-- skull -->
+    <ellipse cx="7" cy="0" rx="7" ry="6.5" fill="#e4ece6" stroke="#1a1d24" stroke-width="2.6"/>
+    <ellipse cx="9" cy="-3" rx="2.2" ry="2.6" fill="#1a1d24"/>
+    <ellipse cx="9" cy="3" rx="2.2" ry="2.6" fill="#1a1d24"/>
+    <circle cx="9.6" cy="-3" r="1.1" fill="#9dff8a"/>
+    <circle cx="9.6" cy="3" r="1.1" fill="#9dff8a"/>
   </g>
 </svg>
