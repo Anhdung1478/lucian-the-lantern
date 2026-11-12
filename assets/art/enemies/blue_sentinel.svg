@@ -1,30 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112">
-  <!-- Blue Sentinel: a hulking blue stone golem seen from above, a glowing blue rune crest on its head, two great stone fists forward (+X). -->
+  <!-- Blue Sentinel: a hulking blue stone golem from above, glowing cyan runes down its back and a rune crest on its head, two great stone fists forward (+X). -->
   <g transform="translate(56 56)">
-    <ellipse cx="0" cy="5" rx="47" ry="43" fill="#000000" opacity="0.25"/>
-    <!-- arms and fists -->
-    <path d="M 2 -30 L 34 -30 M 2 30 L 34 30" stroke="#1a1d24" stroke-width="20" stroke-linecap="round"/>
-    <path d="M 2 -30 L 34 -30 M 2 30 L 34 30" stroke="#2f4c72" stroke-width="14" stroke-linecap="round"/>
-    <path d="M 32 -42 L 47 -37 L 49 -24 L 38 -19 L 28 -26 Z" fill="#4a72a6" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M 32 42 L 47 37 L 49 24 L 38 19 L 28 26 Z" fill="#4a72a6" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -2 -32 L 28 -25" stroke="#1a1d24" stroke-width="22" stroke-linecap="round"/>
+    <path d="M -2 -32 L 28 -25" stroke="#2f4a7a" stroke-width="16" stroke-linecap="round"/>
+    <path d="M 20 -35 L 32 -38 L 41 -31 L 42 -20 L 33 -13 L 21 -17 Z" fill="#4a6fa8" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 24 -33 L 34 -35 L 38 -30 L 28 -28 Z" fill="#7aa0d8" opacity="0.9"/>
+    <path d="M 33 -34 L 33 -16" stroke="#2f4a7a" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="24" cy="-25" r="3" fill="#7fe3ff"/><path d="M -2 32 L 28 25" stroke="#1a1d24" stroke-width="22" stroke-linecap="round"/>
+    <path d="M -2 32 L 28 25" stroke="#2f4a7a" stroke-width="16" stroke-linecap="round"/>
+    <path d="M 20 15 L 32 12 L 41 19 L 42 30 L 33 37 L 21 33 Z" fill="#4a6fa8" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 24 17 L 34 15 L 38 20 L 28 22 Z" fill="#7aa0d8" opacity="0.9"/>
+    <path d="M 33 16 L 33 34" stroke="#2f4a7a" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="24" cy="25" r="3" fill="#7fe3ff"/>
     <!-- stone body -->
-    <path d="M -38 -12 L -30 -34 L -10 -42 L 10 -38 L 22 -22 L 24 0 L 22 22 L 10 38 L -10 42 L -30 34 L -38 12 Z" fill="#3e5f8a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <!-- shoulder boulders -->
-    <path d="M -14 -44 L 4 -46 L 12 -34 L 0 -26 L -16 -30 Z" fill="#5a82b4" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -14 44 L 4 46 L 12 34 L 0 26 L -16 30 Z" fill="#5a82b4" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -30 -20 L -20 -8 M -30 20 L -20 8 M -34 0 L -24 0" stroke="#27405e" stroke-width="3" stroke-linecap="round"/>
+    <path d="M -30 -16 L -22 -33 L -4 -38 L 14 -32 L 20 -14 L 20 14 L 14 32 L -4 38 L -22 33 L -30 16 Z" fill="#4a6fa8" stroke="#1a1d24" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -22 -33 L -4 -38 L 6 -22 L -12 -14 Z M -4 38 L -22 33 L -16 17 L 0 20 Z" fill="#7aa0d8" opacity="0.7"/>
+    <path d="M -12 -14 L -17 17 M -12 -14 L 6 -22 M 6 -22 L 14 -32 M 4 0 L 14 32 M 4 0 L 20 -14" fill="none" stroke="#2f4a7a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
     <!-- glowing runes down its back -->
-    <g stroke="#7fe3ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
-      <path d="M -22 -6 L -16 0 L -22 6"/>
-      <path d="M -10 -14 L -4 -10"/>
-      <path d="M -10 14 L -4 10"/>
-    </g>
+    <path d="M -24 0 L -4 0" stroke="#1a1d24" stroke-width="7" stroke-linecap="round"/>
+    <path d="M -24 0 L -4 0" stroke="#7fe3ff" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="-14" cy="-15" r="4.5" fill="none" stroke="#7fe3ff" stroke-width="2.5"/>
+    <circle cx="-14" cy="15" r="4.5" fill="none" stroke="#7fe3ff" stroke-width="2.5"/>
+    <path d="M -22 -26 L -16 -22 M -22 26 L -16 22" stroke="#7fe3ff" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- shoulder boulders -->
+    <path d="M -10 -34 L 0 -43 L 11 -37 L 12 -26 L 2 -21 L -8 -25 Z" fill="#4a6fa8" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -10 34 L 0 43 L 11 37 L 12 26 L 2 21 L -8 25 Z" fill="#4a6fa8" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -6 -33 L 1 -39 L 7 -35" fill="none" stroke="#7aa0d8" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M -6 33 L 1 39 L 7 35" fill="none" stroke="#7aa0d8" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="2" cy="-31" r="3" fill="#7fe3ff"/><circle cx="2" cy="31" r="3" fill="#7fe3ff"/>
     <!-- head with the rune crest -->
-    <path d="M 4 -14 L 18 -12 L 24 0 L 18 12 L 4 14 L -2 0 Z" fill="#4a72a6" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <circle cx="6" cy="0" r="12" fill="#7fe3ff" opacity="0.3"/>
-    <path d="M -8 0 L 2 -8 L 14 0 L 2 8 Z" fill="#bff3ff" stroke="#2a8fc8" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M -2 0 L 10 0 M 4 -4 L 4 4" stroke="#2a8fc8" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="19" cy="-5" r="2.2" fill="#bff3ff"/>
-    <circle cx="19" cy="5" r="2.2" fill="#bff3ff"/>
+    <path d="M 4 -13 L 18 -10 L 23 0 L 18 10 L 4 13 L -2 0 Z" fill="#7aa0d8" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 8 -9 L 15 0 L 8 9" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 8 -9 L 15 0 L 8 9" fill="none" stroke="#7fe3ff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="2" cy="0" r="4" fill="#7fe3ff" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 18 -5 L 22 -2 M 18 5 L 22 2" stroke="#7fe3ff" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="-6" cy="-6" r="5" fill="#ffffff" opacity="0.2"/>
   </g>
 </svg>
