@@ -13,7 +13,7 @@ const BOX := Rect2(0, -14, 132, 262)
 ## the right in her units and how far its light reaches.
 const MOON_WAY := Vector2(0.3, -1.0)
 const LANTERN_AT := Vector2(420, 90)
-const LANTERN_REACH := 620.0
+const LANTERN_REACH := 820.0
 ## Her rim, and how solid she is at her feet, from her waist down.
 const RIM_TOP := Color(0.85, 1.0, 0.96, 1.0)
 const RIM_FEET := Color(0.37, 0.85, 0.75, 0.0)

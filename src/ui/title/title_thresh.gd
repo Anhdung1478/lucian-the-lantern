@@ -48,19 +48,22 @@ const FACE := "M 66.6 31.6 C 69.6 24.6 76.6 20.6 83.6 22.6 C 87.6 29.6 87.6 41.6
 const SLEEVE := "M 66 73 C 60 86 52 95 44 99 L 45 114 L 49.6 104 L 53 120 L 57 104.6 L 62.4 114 L 63 98 C 66 92 68 86 70.6 79 Z"
 const ARM := "M 61 70 C 57 80 51 89 45 95 C 40 98.6 34 99.6 28 100 L 28 106 C 35 106.6 42 106 49 103 C 56 98 62 90 68 82 Z"
 const PAULDRON := "M 50 75 C 52 63 62 55 74 55 L 85 59 L 83 76 C 72 80.6 60 80.6 50 75 Z"
-const SPIKES: Array[String] = ["M 54 68 L 36 47 L 61 61 Z", "M 61 60.6 L 51 36 L 69 56.6 Z", "M 70 57 L 70 34 L 78 56.6 Z"]
-## The lines between the near pauldron's plates.
-const PAULDRON_LAMES: Array[String] = ["M 52 70 C 61 73.4 72 73.6 83.4 69.6", "M 56 63.6 C 64 66 73 66.4 84 63"]
+const SPIKES: Array[String] = ["M 54 68 L 34 48 L 61 61 Z", "M 60 61 L 47 37 L 68 57 Z", "M 67 57.4 L 61.6 39 L 75 56.4 Z"]
+## The lines between the pauldrons' plates.
+const PAULDRON_LAMES: Array[String] = ["M 51 71 C 58 63 70 62 84 66.6", "M 56 63 C 62 58.6 72 58 84.6 61.4"]
+const FAR_LAMES: Array[String] = ["M 110 70 C 118 64 130 64 139 70"]
 const HAND := "M 29.4 99.4 L 22.4 99.2 L 17.4 102.6 L 21.4 103.4 L 17.6 107 L 22.6 106.2 L 21.4 110.6 L 25.8 107.2 L 30.4 106.6 Z"
 ## The ribs across his chest: where each starts at his breastbone, where it
 ## curves round, and where it ends.
 const RIBS: Array[String] = [
-	"M 110 74 Q 88 72 69 83",
-	"M 109 84 Q 88 82 71.6 93.4",
-	"M 107 94 Q 88 92.6 74.4 104",
-	"M 104 104 Q 89 103.4 77.4 114",
+	"M 112 70 C 100 70 84 74 70.6 85",
+	"M 111 79 C 99 79.6 85 84 73 95",
+	"M 109 88.6 C 98 89.6 86 94 76 105",
+	"M 106 98 C 96 99.4 87 103.6 79 114",
+	"M 102 107.6 C 95 109 89 112.4 82.4 121",
 ]
-const RIB_WIDTH := Vector2(2.2, 5.0)
+## A rib's width at its ends, and how much wider it swells in its middle.
+const RIB_WIDTH := Vector2(1.4, 3.6)
 ## The tabard hanging from his waist down the front of his robe, its
 ## tattered end, and its colour.
 const TABARD := "M 86 128 L 112 126 C 113 160 112 196 110 226 L 105 236 L 101 226 L 97 240 L 93 228 L 89 236 C 87.6 200 87 160 86 128 Z"
@@ -86,6 +89,11 @@ const CHAINS: Array[String] = [
 ]
 const LINK := 5.4
 const CHAIN_FROM := Vector2(-12, 274)
+## The grin in the dark of his face: its middle, how wide and how many
+## teeth.
+const GRIN_MIDDLE := Vector2(76.4, 49.6)
+const GRIN_WIDTH := 11.0
+const GRIN_TEETH := 8
 ## His eyes in the dark of his face, and the glow round them.
 const EYES: Array[Vector2] = [Vector2(73.4, 38), Vector2(80.6, 37.4)]
 const EYE_TILT: Array[float] = [0.22, -0.14]
@@ -148,6 +156,7 @@ func _paint(paint: TitlePaint) -> void:
 	for spike in FAR_SPIKES:
 		_spike(paint, TitlePaint.outline(spike))
 	_part(paint, TitlePaint.outline(FAR_PAULDRON), IRON)
+	_lames(paint, FAR_LAMES)
 	for k in 4:
 		paint.chain(TitlePaint.outline(CHAINS[k]), LINK, 1.2, CHAIN, CHAIN_EDGE)
 	_paint_hood(paint)
@@ -181,9 +190,9 @@ func _paint_chest(paint: TitlePaint) -> void:
 	paint.glow_in(torso, Vector2(86, 96), 34.0, Color(SOUL, 0.85))
 	for rib in RIBS:
 		var line := TitlePaint.outline(rib)
-		paint.taper(line, RIB_WIDTH.x + 1.4, RIB_WIDTH.y + 1.4, Color(0.0, 0.01, 0.0, 0.85))
-		paint.taper(line, RIB_WIDTH.x, RIB_WIDTH.y, TitlePaint.linear(line[0], line[-1], IRON.darkened(0.4), IRON.lerp(lit_tint, 0.12)))
-		paint.taper(TitlePaint.moved(line, Vector2(0.0, -RIB_WIDTH.y * 0.4)), 0.0, RIB_WIDTH.y * 0.3, Color(MOON_RIM_TOP, 0.4))
+		paint.taper(line, RIB_WIDTH.x + 1.4, RIB_WIDTH.x + 1.4, Color(0.0, 0.01, 0.0, 0.85), RIB_WIDTH.y)
+		paint.taper(line, RIB_WIDTH.x, RIB_WIDTH.x, TitlePaint.linear(line[0], line[-1], IRON.darkened(0.45), IRON.lerp(lit_tint, 0.16)), RIB_WIDTH.y)
+		paint.taper(TitlePaint.moved(line, Vector2(0.0, -RIB_WIDTH.y * 0.35)), 0.0, 0.0, Color(MOON_RIM_TOP, 0.4), RIB_WIDTH.y * 0.3)
 	paint.taper(TitlePaint.outline("M 68.6 76 C 72 92 76 108 80 124"), 3.4, 2.0, IRON)
 
 
@@ -201,10 +210,12 @@ func _paint_hood(paint: TitlePaint) -> void:
 	for k in EYES.size():
 		paint.glow(EYES[k], Vector2(6.4, 5), Color(SOUL, 0.7))
 		paint.oval(EYES[k], Vector2(2.4, 1.1), EYE, EYE_TILT[k])
-	# A faint grin of teeth under them.
-	for k in 6:
-		var x := 71.6 + k * 1.6
-		paint.line(Vector2(x, 48.6 + absf(k - 2.5) * 0.3), Vector2(x, 50.6 + absf(k - 2.5) * 0.3), 0.7, Color(SOUL, 0.35))
+	# A faint grin under them: teeth along a curve, lit from inside.
+	paint.glow(GRIN_MIDDLE, Vector2(8, 3.6), Color(SOUL, 0.25))
+	for k in GRIN_TEETH:
+		var t := float(k) / (GRIN_TEETH - 1)
+		var at := GRIN_MIDDLE + Vector2((t - 0.5) * GRIN_WIDTH, (t - 0.5) * (t - 0.5) * -6.0 + (t - 0.5) * 1.6)
+		paint.line(at - Vector2(0, 1.0), at + Vector2(0, 1.0), 0.6, Color(SOUL, 0.5))
 
 
 ## The near pauldron and its spikes.
@@ -213,7 +224,13 @@ func _paint_pauldron(paint: TitlePaint) -> void:
 		_spike(paint, TitlePaint.outline(spike))
 	var pauldron := TitlePaint.outline(PAULDRON)
 	_part(paint, pauldron, IRON)
-	for lame in PAULDRON_LAMES:
+	_lames(paint, PAULDRON_LAMES)
+
+
+## The lines between a pauldron's plates: a dark seam with the moon on the
+## plate's edge above it.
+func _lames(paint: TitlePaint, lames: Array[String]) -> void:
+	for lame in lames:
 		var line := TitlePaint.outline(lame)
 		paint.taper(line, 1.2, 1.2, Color(0, 0, 0, 0.65))
 		paint.taper(TitlePaint.moved(line, Vector2(0, -1.0)), 0.6, 0.6, Color(MOON_RIM_TOP, 0.25))

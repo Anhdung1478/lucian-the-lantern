@@ -122,6 +122,10 @@ const NEAR_GRASS_HEIGHT := Vector2(18, 64)
 const NEAR_GRAVES: Array[Vector4] = [Vector4(70, 3.4, 0, -0.12), Vector4(1890, 3.0, 1, 0.1)]
 ## The dark at the bottom of the screen: how high it reaches and its alpha.
 const BOTTOM_SHADE := Vector2(220, 0.55)
+## Light pooled on the ground: the lantern's green under it and Senna's
+## teal under her (half width, half height, alpha), on the ground's top.
+const LANTERN_POOL := Vector3(300, 46, 0.2)
+const SENNA_POOL := Vector3(170, 30, 0.14)
 ## The dark behind the centred column, so it reads: its size and alpha.
 const SCRIM_SIZE := Vector2(1150, 1300)
 const SCRIM_ALPHA := 0.62
@@ -447,7 +451,8 @@ func _paint_spire(paint: TitlePaint, top: Vector2, width: float, base: float, br
 
 
 ## The middle layer: the ridge with its dead trees, the haze over it, the
-## ground with its grass, the gravestones and the chain.
+## ground with its grass, the gravestones, the light pooled on the ground
+## and the chain.
 func _paint_middle(paint: TitlePaint) -> void:
 	var rng := _rng(3)
 	paint.shape(_skyline(_place(Vector2(0, RIDGE)).y, Vector2(0, 40), Vector2(120, 260), rng), RIDGE_COLOR)
@@ -458,7 +463,11 @@ func _paint_middle(paint: TitlePaint) -> void:
 	for grave in GRAVES:
 		var at := _place(Vector2(grave.x, grave.y))
 		var shrink := lerpf(0.55, 1.0, clampf(inverse_lerp(_place(Vector2(0, HORIZON)).y, size.y, at.y), 0.0, 1.0))
-		_paint_grave(paint, at, int(grave.z), grave.w, shrink, GRAVE_COLOR, Color(MOONLIGHT, 0.3))
+		_paint_grave(paint, at, int(grave.z), grave.w, shrink, GRAVE_COLOR, Color(MOONLIGHT, 0.42))
+	var ground := _place(Vector2(0, GROUND + 40.0)).y
+	paint.glow(Vector2(senna.hem().x, ground), Vector2(SENNA_POOL.x, SENNA_POOL.y), Color(SENNA_COLOR, SENNA_POOL.z))
+	if thresh.visible:
+		paint.glow(Vector2(thresh.lantern().x, ground), Vector2(LANTERN_POOL.x, LANTERN_POOL.y), Color(SOUL_COLOR, LANTERN_POOL.z))
 	_paint_chain(paint)
 
 

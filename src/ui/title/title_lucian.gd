@@ -12,7 +12,7 @@ const BOX := Rect2(0, -12, 146, 260)
 ## light reaches.
 const MOON_WAY := Vector2(-0.55, -0.83)
 const LANTERN_AT := Vector2(330, 100)
-const LANTERN_REACH := 520.0
+const LANTERN_REACH := 760.0
 
 ## His colours: the coat, the trousers and boots, the vest and shirt, the
 ## belt and its gold, his skin and his hair.
@@ -52,14 +52,14 @@ const MUSTACHE := "M 79.2 25 L 80.8 25.2 L 81.3 26.4 L 79.8 26.7 C 78.9 26.5 78.
 const EYE := "M 77.1 18.5 L 79.3 18.1 L 78.8 19.3 Z"
 const BROW := "M 75.8 16.8 L 78 16.1 L 80.2 16.3"
 const NEAR_ARM := "M 52.4 44 C 57 40.4 63 41.6 64.4 46 C 64.2 56 62.6 66 61.6 74 C 64.6 81 67.4 88 70.4 94.6 L 64.6 99.6 C 60 92.6 56 85 53.6 78 C 51.4 67 51 55 52.4 44 Z"
-const NEAR_HAND := "M 63.2 96 C 64.6 93.6 68 92.8 70.4 93.6 C 72.6 94.6 73.2 97.6 72.2 100.4 C 71 102.6 67.4 103.6 64.8 102.8 C 63 101.8 62.4 98.4 63.2 96 Z"
+const NEAR_HAND := "M 64 96.4 C 65.2 94.4 68 93.8 70 94.4 C 71.8 95.2 72.4 97.6 71.6 99.8 C 70.6 101.8 67.6 102.6 65.4 102 C 63.8 101.2 63.4 98.4 64 96.4 Z"
 ## Senna's relic gun in his near hand, drawn pointing right from its grip
 ## and turned down by RELIC_ANGLE at RELIC_AT: the curved guard over it,
 ## the receiver, the barrel and the muzzle cap; the rings on the barrel
 ## (x) and its core.
 const RELIC_AT := Vector2(67.6, 98.2)
 const RELIC_ANGLE := 0.38
-const RELIC_GUARD := "M -6 -6.4 C 0 -11 12 -11.4 22 -6 L 22 -4.4 C 12 -8 2 -8 -4 -5.4 Z"
+const RELIC_GUARD := "M -6 -6.2 C 2 -9.6 14 -9.6 25 -5 L 25 -3.6 C 14 -7 2 -7 -5 -4.6 Z"
 const RELIC_BODY := "M -7 -4.6 C -7 -6.6 -5 -7 -3 -7 L 10 -6.6 L 13 -4 L 13 4 L 10 5.6 L -3.6 5.6 C -6 5.6 -7.4 4 -7 2 Z"
 const RELIC_BARREL := "M 12 -3.6 L 30 -3.2 L 30 2.8 L 12 3.4 Z"
 const RELIC_CAP := "M 29 -4.8 L 34.6 -4.4 L 35.6 0 L 34.6 4 L 29 4.4 Z"
@@ -187,8 +187,8 @@ func _paint_near_arm(paint: TitlePaint) -> void:
 	var hand := TitlePaint.outline(NEAR_HAND)
 	_part(paint, hand, SKIN)
 	paint.rim(hand, Vector2(0.7, 0.4), Color(TEAL, 0.55))
-	paint.stroke("M 67.4 94.2 Q 68.8 97.4 68.2 102.4", 0.45, Color(0, 0, 0, 0.5))
-	paint.stroke("M 70 94.6 Q 71 97.6 70.4 101.6", 0.45, Color(0, 0, 0, 0.5))
+	paint.stroke("M 67.4 94.6 Q 68.6 97.6 68 101.8", 0.4, Color(0, 0, 0, 0.5))
+	paint.stroke("M 69.8 95 Q 70.6 97.6 70.2 101", 0.4, Color(0, 0, 0, 0.5))
 
 
 
