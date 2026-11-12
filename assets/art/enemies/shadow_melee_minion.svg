@@ -1,22 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
-  <!-- Shadow Melee Minion: the melee minion in black-purple with violet glows, same shape and facing (+X). -->
+  <!-- Shadow Melee Minion: black-purple with violet glows sword-and-shield soldier from above, crested helmet, blade forward (+X). -->
   <g transform="translate(36 36)">
-    <circle cx="0" cy="0" r="27" fill="none" stroke="#8a4fe0" stroke-width="3" opacity="0.45"/>
-    <ellipse cx="0" cy="3" rx="26" ry="24" fill="#000000" opacity="0.25"/>
-    <!-- back arm -->
-    <ellipse cx="6" cy="-19" rx="8" ry="6" fill="#2a1a3d" stroke="#1a1d24" stroke-width="3"/>
-    <!-- shoulders and body -->
-    <ellipse cx="-2" cy="0" rx="14" ry="23" fill="#33204a" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -10 -14 Q -4 0 -10 14" fill="none" stroke="#150d22" stroke-width="3" stroke-linecap="round"/>
-    <!-- short blade held forward -->
-    <path d="M 14 14 L 38 14 L 33 10.5 L 14 10.5 Z" fill="#b89cff" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <rect x="8" y="8" width="7" height="9" rx="2" fill="#150d22" stroke="#1a1d24" stroke-width="3"/>
-    <!-- front arm -->
-    <ellipse cx="12" cy="13" rx="7" ry="6" fill="#2a1a3d" stroke="#1a1d24" stroke-width="3"/>
-    <!-- round crimson helmet -->
-    <circle cx="2" cy="0" r="13" fill="#3d2660" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -10 0 L 12 0" stroke="#9a5cf0" stroke-width="4" stroke-linecap="round"/>
-    <path d="M 8 -7 Q 13 0 8 7" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="-2" cy="-6" r="3" fill="#c9a4ff" opacity="0.7"/>
+    <path d="M -16 -4 Q -26 -2 -30 -8 Q -24 0 -30 6 Q -22 4 -16 5 Z" fill="#8a5ad8" opacity="0.8" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- sword arm and blade -->
+    <ellipse cx="9" cy="18" rx="8" ry="5.5" fill="#221838" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 17 14.5 L 38 14.5 L 45 17.5 L 38 20.5 L 17 20.5 Z" fill="#b9b4d6" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 20 17.5 L 39 17.5" stroke="#7d7aa0" stroke-width="2" stroke-linecap="round"/>
+    <rect x="13" y="11" width="5" height="13" rx="2" fill="#c9a0ff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="13" cy="17.5" r="4.5" fill="#56407e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- shield arm -->
+    <ellipse cx="3" cy="-18" rx="8" ry="5.5" fill="#221838" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- body, back plate -->
+    <ellipse cx="-3" cy="0" rx="12.5" ry="22" fill="#3a2a56" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -9 -15 Q -13 0 -9 15" fill="none" stroke="#221838" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="-1" cy="-19" r="7" fill="#56407e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="-1" cy="19" r="7" fill="#56407e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- round shield -->
+    <circle cx="9" cy="-21" r="9.5" fill="#221838" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="9" cy="-21" r="6" fill="#3a2a56" stroke="#c9a4ff" stroke-width="2" stroke-opacity="0.95"/>
+    <circle cx="9" cy="-21" r="2.6" fill="#c9a0ff" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- helmet with crest -->
+    <ellipse cx="-12" cy="0" rx="5" ry="4" fill="#b98cff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="1" cy="0" r="12.5" fill="#56407e" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -10 0 L 11 0" stroke="#1a1d24" stroke-width="8.5" stroke-linecap="round"/>
+    <path d="M -10 0 L 11 0" stroke="#b98cff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 8 -6.5 Q 13 0 8 6.5" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linecap="round"/>
+    <path d="M -6 -9 Q -1 -12 5 -10" fill="none" stroke="#c9a4ff" stroke-width="2.5" stroke-linecap="round" opacity="0.95"/>
+    <circle cx="-3" cy="-5" r="3.2" fill="#ffffff" opacity="0.3"/>
   </g>
 </svg>
