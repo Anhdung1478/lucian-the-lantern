@@ -59,7 +59,7 @@ From V2.0 every stage screen follows one style, the title's and the Journey's: d
 **Built in V2.0 (the Lantern look; layout and behaviour as above):**
 - **The bottom bar** is an ornate plate. The **portrait** is round, in a gold ring, with the level in a gold badge on the ring and a slim gold XP bar.
 - **Health and mana bars** (`HudBar`) have a dark well with a thin rim and a gradient fill with a light line along its top. Health has a tick every 100 HP, a taller one every 1000 (ticks closer than 5 px are left out); mana has none. The white shield segment after the health stays. A **ghost** chunk (pale) shows the damage just taken and drains away in 0.4 s.
-- **Cells:** skill, summoner, item, potion and boots cells are dark wells with a rim by item kind (fragment, legendary, boots, potion). The key label sits in a small tab at the cell's corner. Rank dots are small gold diamonds.
+- **Cells:** skill, summoner, item, potion and boots cells are dark wells with a rim by item kind (fragment, legendary, boots, potion). *(V2.0: the 59 item icons were drawn again and have no frame or background of their own any more: each is its object alone, drawn large on a soft aura in its color, so the cell's rim is the only frame. A fragment is plain; a legendary carries one glowing part and a few sparkles; an upgraded boot is its base boot made richer.)* The key label sits in a small tab at the cell's corner. Rank dots are small gold diamonds.
 - **Low health:** below 30% health a soft red vignette pulses at the screen's edges (`LowHealthVignette`, one pulse every 2.4 s). It grows as health falls, is gone at 30% or more, when Lucian is dead and on Low quality, and never takes the mouse.
 
 ### Buff icons (above the skill bar)
@@ -90,25 +90,27 @@ From V2.0 every stage screen follows one style, the title's and the Journey's: d
 
 | Stat | Icon | Color |
 |---|---|---|
-| AD | one-headed axe | orange |
-| AP | round-headed missile | dark blue |
-| Armor | breastplate inside a second frame | yellow |
-| Magic resist | circle inside a circle frame | light blue |
-| Attack speed | dagger with speed lines | light yellow |
+| AD | broad sword, point up and right | orange |
+| AP | mage's staff with a crystal in its fork | dark blue |
+| Armor | heater shield | yellow |
+| Magic resist | round ward with a glowing orb | light blue |
+| Attack speed | double chevron | light yellow |
 | Ability haste | hourglass | white |
-| Crit chance | pointed missile | red |
-| Move speed | boot with speed lines | white |
+| Crit chance | impact burst | red |
+| Move speed | winged boot | white |
 | Health | heart | green |
 | Mana | droplet | blue |
-| Health / mana regen | heart and droplet under an up arrow | green |
-| Heal & shield power | cross over a shield | teal |
-| Armor / Magic pen | arrow through a breastplate / a circle | orange-red / violet |
-| Life steal | fang and a drop of blood | crimson |
-| Omnivamp | swirling drop | magenta |
-| Attack range | crosshair | grey |
-| Tenacity | broken chain | tan |
+| Health / mana regen | heart with an up arrow | green |
+| Heal & shield power | healing cross | teal |
+| Armor / Magic pen | the armor shield / the magic resist ward run through by a spear | orange-red / violet |
+| Life steal | fang over a drop of blood | crimson |
+| Omnivamp | drop of blood curling into a swirl | magenta |
+| Attack range | reticle | grey |
+| Tenacity | anchor | tan |
+| Slow resist | snowflake struck through | cyan |
+| Summoner haste | refresh arrow around a spark | lime |
 
-Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`.
+Icons live in `assets/art/stats/`, colors and texts in `src/ui/stat_style.gd`. *(V2.0: the 20 icons were drawn again as one set: a bold glyph in the stat's color with a darker tone on its lower right, one light accent and a dark outline, made to read at 14 px. Before, they were flat pictograms of different weights: AD was an axe, AP and crit chance were missiles, armor a breastplate in a frame, tenacity a broken chain. The Evolution Tree's stat nodes keep their own larger pictures, `assets/art/tree/stat_*.svg`.)*
 
 ### Short key names (V1.4.2)
 The labels on the HUD's item and potion slots, skill slots, summoner slots and the backpack's cells are small, so a long key name is shortened there (`GameSettings.short_key_label`). The skill and summoner slots' hover cards use the same short name in their header ("[M4]", "Summoner spell [Bcksp]"), because a long name such as "Backspace" would overflow a skill card's box (V1.4.3). Settings, sentence-style hints and tips (the potion cards' and empty potion cells' "press 7 to drink", stage tips, the cutscene) and the Journey's D / F labels keep the full name (`GameSettings.key_label`).
@@ -498,7 +500,7 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - Works in the **backpack**, the **merchant's shop**, the **recipe table** and the **HUD item slots**.
 - Layout like LoL: icon, name and cost; stat lines; each passive / active with its name; for a legendary, its recipe.
 - **Recipe hints (V1.4.2):** a fragment's card in the shop lists what it builds into with the items you hold: "Builds into **Muramana** with Tear (you have it)", one line for each partner you own in a backpack or equip cell. At most 3 lines, then "+N more". An extra line, "Upgrades your Boots into X", shows when the fragment fits the boots you wear. With no partner owned, the usual footer stays. Cards elsewhere (backpack, HUD) don't show hints.
-- Each stat line is the **stat icon, the amount in the stat's color, then the name**, e.g. `[axe] +65 Attack Damage`.
+- Each stat line is the **stat icon, the amount in the stat's color, then the name**, e.g. `[sword] +65 Attack Damage`.
 
 ### Built in Phase 10
 - **54 cells: 6 rows of 9.** The equip row below is unchanged.

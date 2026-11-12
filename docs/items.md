@@ -9,6 +9,10 @@ cell** give stats and passives; the backpack is storage. Each item's passive cou
 however many copies are equipped. Since Phase 3 most passives and all three actives work in
 combat; see *What works in combat* at the end.
 
+**Icons** (`assets/art/items/`, drawn in 64 units and stored at 128 px): *(V2.0)* each icon is the
+item alone on a soft aura, with no frame of its own; the cell it sits in draws a rim by kind
+(fragment, legendary, boots, potion). `docs/ui_design.md` has the cells.
+
 **Energized** attacks work like LoL: moving and attacking build stacks; at 100 the next attack is Energized.
 In this game: +9 per basic attack, +1 per 24 units walked, and dashes count double (Flash doesn't
 count). The charge only builds while an Energized item is equipped.
