@@ -15,7 +15,7 @@
 | **Platform** | PC (mouse + keyboard) |
 | **Graphics** | Top-down view like LoL, simpler and less detailed |
 | **Character** | Lucian (more champions could be added later) |
-| **Target length** | A skilled player needs at least 5–7 hours to beat the story *(V2.0: a skilled player wins the story in about 4–5 hours, a novice in about 7–10. Measured with the bots on Normal: skilled 3 h 56 and 4 h 22 of stage time, about 4 h 13 and 4 h 40 of play; average 4 h 56, about 5 h 32; novice: see the report.)* |
+| **Target length** | A skilled player needs at least 5–7 hours to beat the story *(V2.0: a skilled player wins the story in about 4–5 hours, a novice in about 7–10. Measured with the bots on Normal: skilled 4 h 05 and 4 h 35 of stage time, about 4 h 23 and 4 h 54 of play; average 4 h 54, about 5 h 29; novice 5 h 16 and 5 h 58, about 6 h 43 and 7 h 34. The novice is at the low end since the Lantern's gift; see the report.)* |
 
 **Design rule:** this is not LoL. Everything taken from LoL (stats, items, skills, UI, enemies) should stay only about **70–80% similar**, adapted to fit this game.
 
@@ -39,12 +39,12 @@ Minutes for a skilled player's first clear of each act, counting a few deaths, s
 | Act | Stages | Waves (+ boss / mini boss waves) | Minutes (stage time, skilled bots) |
 |---|---|---|---|
 | 1 | 1 | 2 + 1 | not measured apart |
-| 2 | 3 | 14 + 1 | 23–25 |
-| 3 | 5 | 31 + 3 | 39–60 |
-| 4 | 3 | 20 + 1 | 32–34 |
-| 5 | 5 | 33 + 3 | 73–82 |
-| 6 | 5 | 43 + 3 | 62–66 |
-| **All** | 22 | 143 + 12 | **236–262 (3 h 56 to 4 h 22) of stage time; about 4 h 13 to 4 h 40 of play** |
+| 2 | 3 | 14 + 1 | 24–26 |
+| 3 | 5 | 31 + 3 | 48–69 |
+| 4 | 3 | 20 + 1 | 30–34 |
+| 5 | 5 | 33 + 3 | 60–105 |
+| 6 | 5 | 43 + 3 | 60–61 |
+| **All** | 22 | 143 + 12 | **246–276 (4 h 05 to 4 h 35) of stage time; about 4 h 23 to 4 h 54 of play** |
 
 **Rules of thumb:**
 - A wave should take a skilled player **about 2 minutes** of fighting.
@@ -975,7 +975,7 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 | Mini boss HP | 9000 × (1 + 0.3(k − 1)), k = (w + 5) / 10 | Wave 5: 9000 · 15: 11700 · 25: 14400 · 45: 19800 |
 | Boss and mini boss damage | basic damage and every skill hit × max(1 + 0.15(k − 1), √(damage_scale(w) / damage_scale(f))), f = 10 for a boss, 5 for a mini boss; × 0.8 at tier 1 and × 0.9 at tier 2 for one from Acts 5–6 | Bosses, waves 10–50: ×1.0, ×1.27, ×1.54, ×1.81, ×2.08. Mini bosses, waves 5–45: ×1.0, ×1.32, ×1.63, ×1.95, ×2.26 (before the Acts 5–6 share) |
 
-*(V2.0: the first mini boss, wave 5, deals 0.7 of its power (`EndlessPlan.FIRST_MINI_BOSS_POWER`), so 0.56 for one from Acts 5 and 6. It comes with a full wave while Lucian is level 8 to 10 with two items: it ended 6 of 7 runs of the average and novice bots, and the runs that passed it reached wave 20 and 41. From wave 15 on a mini boss deals all of its power, as before.)*
+*(V2.0: the first mini boss, wave 5, deals 0.7 of its power (`EndlessPlan.FIRST_MINI_BOSS_POWER`), so 0.56 for one from Acts 5 and 6. It comes with a full wave while Lucian is level 8 to 10 with two items: it ended 6 of 8 runs of the average and novice bots, and the runs that passed it reached wave 20 and 41. From wave 15 on a mini boss deals all of its power, as before.)*
 
 *(V1.5.0: so the bosses keep up with the waves. Before: boss HP 15000 × (1 + 0.3(k − 1)) (wave 20: 19500, 30: 24000, 50: 33000), and damage × (1 + 0.15(k − 1)) (×1, ×1.15, ×1.3, …). The planned HP of a wave is `EndlessPlan.wave_hp`: its normal and elite counts at their pools' mean HP (the pools of the acts cleared), × the wave's HP scale, before the difficulty and modifier #5. It is the same every run. damage_scale is the normal and elite damage row above, so the first boss and the first mini boss hit ×1.0. The Act 5–6 share softens Karthus, Thresh, Maokai, Elise, Karthus revived and Hecarim at their first two tiers.)*
 
