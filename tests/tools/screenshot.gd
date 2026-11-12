@@ -61,7 +61,7 @@ const ACT_SCENARIOS := {
 	"hecarim_onslaught": [6, 4], "thresh_box": [6, 5], "thresh_phase2": [6, 5], "thresh_lantern": [6, 5],
 	"ending_cutscene": [6, 5],
 	"level_up": [2, 1],
-	"wave_banner": [3, 2], "wave_banner_boss": [1, 1],
+	"wave_banner": [3, 2], "wave_banner_boss": [1, 1], "lantern_gift": [2, 2],
 	"units_motion": [2, 1],
 	"wave_preview": [3, 2], "wave_preview_boss": [1, 1],
 }
@@ -433,6 +433,8 @@ func _run(scenario: String) -> void:
 			await scenario_wave_banner()
 		"wave_banner_boss":
 			await scenario_wave_banner_boss()
+		"lantern_gift":
+			await scenario_lantern_gift()
 		"units_motion":
 			await scenario_units_motion()
 		_:
@@ -2360,6 +2362,36 @@ func scenario_wave_banner() -> void:
 	await wait(WaveBanner.FADE + 0.4)
 	print("banner (expect [\"MINI BOSS\", \"Infernal Drake\"]): ", banner.shown, "  info: ", info_text())
 	await shot("wave_banner_2_mini_boss")
+
+
+## The Lantern's gift on 2-2 (5 waves): two waves won for real, then the
+## pick's three cards over the paused game, the second hovered; a click on the
+## first: the break counts down and the gift's icon sits in the buff row
+## (hovered: its card).
+func scenario_lantern_gift() -> void:
+	var game := game_stage()
+	await clear_wave()
+	await clear_wave()
+	await wait(0.3)
+	var pick := game.gifts.pick
+	print("pick open (expect true), paused (expect true), held (expect true): ", pick != null, " ", paused, " ", game.runner.held)
+	if pick == null:
+		return
+	var offered := pick.ids.duplicate()
+	print("offered: ", offered.map(LanternGifts.display_name))
+	await shot("lantern_gift_0_cards")
+	await mouse_move(control_center(pick.cards[1]))
+	await wait(ModifierCard.LIFT_TIME + 0.1)
+	await shot("lantern_gift_0_hovered")
+	pick.cards[0].pressed.emit()
+	await wait(0.3)
+	print("picked (expect %d): %d, paused (expect false): %s, info: %s" % [offered[0], game.lucian.gift, paused, info_text()])
+	var row := buff_icon(LanternGifts.BUFF)
+	print("buff row shown (expect true): ", row != null)
+	if row:
+		await mouse_move(control_center(row))
+		await wait_for_tooltip(row)
+	await shot("lantern_gift_1_picked")
 
 
 ## The wave banner at its most crowded, the tutorial's boss wave: "BOSS"

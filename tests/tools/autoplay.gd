@@ -29,7 +29,9 @@ extends SceneTree
 ## picked up and crafted (after how many waves), and what was equipped at
 ## the end; and the Resolve stacks it was played with.
 ## In a break the bot walks to the merchant, shops, looks around for its
-## tier's `idle` seconds and presses Skip.
+## tier's `idle` seconds and presses Skip. Halfway through a stage, at the
+## Lantern's gift, it waits `idle` seconds, then picks the skilled tier's
+## favorite of the three cards (the others take the first); each try prints it.
 ## The run ends with a summary: the stage time and an estimate of the play
 ## time (the slot's clock also runs on the end screen and the main screen:
 ## `between` seconds before each stage, `retry` before each Retry), one line
@@ -162,10 +164,10 @@ func _campaign() -> void:
 				if r.cleared:
 					row.clear = r.time
 					row.resolve = r.resolve
-				_say("%s try %d: %s  resolve %d  time %s  waves %s  kills %d  minHP %d%%  lvl %d  pots %d  dodges %d  dealt %d  taken %d  gold %d  blue+%d  tree %s  skin %s%s" % [
+				_say("%s try %d: %s  resolve %d  time %s  waves %s  kills %d  minHP %d%%  lvl %d  pots %d  dodges %d  dealt %d  taken %d  gold %d  blue+%d  tree %s  skin %s  gift %s%s" % [
 					id, tries, "CLEARED" if r.cleared else "FAILED ", r.resolve, StageResult.clock(r.time), r.waves, r.kills, int(r.min_hp * 100), r.level,
 					r.potions, r.dodges, int(r.dealt), int(r.damage_taken), r.gold, r.blue, _tree_text(save), Skins.find(save.skin).display_name,
-					("  died to " + r.killer) if not r.cleared else ""])
+					r.gift, ("  died to " + r.killer) if not r.cleared else ""])
 				if bought != "":
 					_say("    bought: " + bought)
 				if skins != "":
@@ -333,6 +335,7 @@ func _play(act: int, number: int, first_try := false) -> Dictionary:
 		"blue": save.essences.amount(Essences.BLUE) - blue_before, "killer": bot.last_hit_by,
 		"taken_by": bot.taken_by, "kills": stage.stats.kills, "dealt": stage.stats.damage_dealt, "gold": stage.stats.gold_earned,
 		"items": bot.item_log, "equipped": bot.equipped_text(), "resolve": stage.lucian.resolve,
+		"gift": LanternGifts.display_name(stage.lucian.gift) if stage.lucian.gift != LanternGifts.NONE else "none",
 	}
 	save.finish_stage(&"cleared" if cleared else &"failed", setup.stage_id)
 	paused = false
@@ -352,17 +355,21 @@ class Bot extends Node:
 	## of summoners (a Maiden, a Broodmother) it goes for first, as a player
 	## who knows them does; fumble: share of its decisions in a fight that are
 	## wasted on an aimless step (a new player's hands: no shot, no cast);
-	## idle: seconds it looks around after shopping before it presses Skip;
+	## idle: seconds it looks around after shopping before it presses Skip (and
+	## before it picks the Lantern's gift); gift: it picks by GIFT_ORDER;
 	## between: seconds on the end screen and the main screen (the tree, the
 	## Journey) before each new stage or farm run; retry: seconds on the
 	## DEFEATED screen before a Retry. The summary's play time counts the last
 	## two; the stage clock doesn't.
 	const TIERS := {
-		"skilled": {"react": 0.15, "kite": 90.0, "panic": 0.0, "warn": 1.0, "bolt": 0.5, "e_dps": true, "focus": 1.0, "fumble": 0.0, "idle": 1.0, "between": 45.0, "retry": 10.0},
-		"average": {"react": 0.25, "kite": 40.0, "panic": 0.0, "warn": 0.8, "bolt": 0.2, "e_dps": false, "focus": 0.5, "fumble": 0.08, "idle": 3.0, "between": 75.0, "retry": 15.0},
-		"novice": {"react": 0.35, "kite": -INF, "panic": 0.25, "warn": 0.5, "bolt": 0.0, "e_dps": false, "focus": 0.0, "fumble": 0.25, "idle": 6.0, "between": 120.0, "retry": 20.0},
+		"skilled": {"react": 0.15, "kite": 90.0, "panic": 0.0, "warn": 1.0, "bolt": 0.5, "e_dps": true, "focus": 1.0, "fumble": 0.0, "idle": 1.0, "gift": true, "between": 45.0, "retry": 10.0},
+		"average": {"react": 0.25, "kite": 40.0, "panic": 0.0, "warn": 0.8, "bolt": 0.2, "e_dps": false, "focus": 0.5, "fumble": 0.08, "idle": 3.0, "gift": false, "between": 75.0, "retry": 15.0},
+		"novice": {"react": 0.35, "kite": -INF, "panic": 0.25, "warn": 0.5, "bolt": 0.0, "e_dps": false, "focus": 0.0, "fumble": 0.25, "idle": 6.0, "gift": false, "between": 120.0, "retry": 20.0},
 	}
 	## A summoner this far past his reach is still worth walking to.
+	## The skilled tier's gifts, best first (LanternGifts ids): Keen Edge, Quick
+	## Hands, Thirst, Second Wind, Focus, Ward, Light Step, Fortune.
+	const GIFT_ORDER := [1, 2, 6, 4, 3, 7, 5, 8]
 	const FOCUS_WALK := 200.0
 	## A wasted decision is a step this long in any direction.
 	const FUMBLE_STEP := 90.0
@@ -394,8 +401,12 @@ class Bot extends Node:
 	## after shopping.
 	var _walked := 0.0
 	var _idled := 0.0
+	## Seconds the Lantern's gift pick has been open.
+	var _gift_open := 0.0
 
 	func _ready() -> void:
+		# The gift's pick pauses the game: the bot still has to click it.
+		process_mode = Node.PROCESS_MODE_ALWAYS
 		lucian = stage.lucian
 		_rng.randomize()
 		lucian.damage_received.connect(_on_hit)
@@ -440,6 +451,9 @@ class Bot extends Node:
 	func _physics_process(delta: float) -> void:
 		if lucian.dead or stage.result.visible or stage.cutscene:
 			return
+		if get_tree().paused:
+			_pick_gift(delta)
+			return
 		min_hp = minf(min_hp, lucian.hp / lucian.stats.max_hp)
 		for slot in [ChampionProgress.Slot.R, ChampionProgress.Slot.Q, ChampionProgress.Slot.W, ChampionProgress.Slot.E]:
 			while lucian.try_rank_up(slot):
@@ -449,6 +463,24 @@ class Bot extends Node:
 			return
 		_think = tier.react
 		_decide()
+
+	## The Lantern's gift: after `idle` seconds the skilled tier clicks the
+	## card first in GIFT_ORDER; the others click the first card.
+	func _pick_gift(delta: float) -> void:
+		if stage.gifts == null or stage.gifts.pick == null:
+			return
+		_gift_open += delta
+		if _gift_open < tier.idle:
+			return
+		_gift_open = 0.0
+		var pick := stage.gifts.pick
+		var card := 0
+		if tier.gift:
+			for id in GIFT_ORDER:
+				if id in pick.ids:
+					card = pick.ids.find(id)
+					break
+		pick.cards[card].pressed.emit()
 
 	func _enemies() -> Array[EnemyUnit]:
 		var found: Array[EnemyUnit] = []
