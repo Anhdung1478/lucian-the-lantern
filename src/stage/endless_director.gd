@@ -127,7 +127,7 @@ func _on_boss_cleared(_wave: int) -> void:
 	_open_pick.call_deferred()
 
 
-## The pick over a paused game, the backpack and menu closed and the screens
+## The pick over a paused game, the backpack, settings and menu closed and the screens
 ## locked (no ESC, no P). None once the run is over or a debug jump let the
 ## break go.
 func _open_pick() -> void:
@@ -136,6 +136,8 @@ func _open_pick() -> void:
 	var screens := stage.screens
 	if screens.backpack.visible:
 		screens.set_backpack_open(false)
+	if screens.settings.visible:
+		screens.set_settings_open(false)
 	screens.set_menu_open(false)
 	screens.locked = true
 	pick = ModifierPick.new(EndlessModifiers.offer(stage.rng, modifier))

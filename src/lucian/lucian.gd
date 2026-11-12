@@ -1513,11 +1513,12 @@ func _stat_bonus() -> Dictionary:
 
 
 ## Skin multipliers (AD, AP, max HP), after item passives; then Endless's
-## (run_scale) and the Lantern's gift's.
+## (run_scale) and the Lantern's gift's. Attack speed keeps its cap.
 func _scale_by_skin(block: StatBlock) -> void:
 	for multipliers: Dictionary in [skin.scale, run_scale, LanternGifts.scale(gift)]:
 		for key: StringName in multipliers:
 			block.set(key, block.get(key) * multipliers[key])
+	block.attack_speed = minf(block.attack_speed, UnitStats.MAX_ATTACK_SPEED)
 
 
 ## Recomputes stats from the level, the equipped items, the tree and the

@@ -350,3 +350,31 @@ func test_the_result_names_the_gift_and_has_no_row_without_one() -> void:
 	_texts(picked.result, picked_texts)
 	assert_has(picked_texts, "Gift")
 	assert_has(picked_texts, "Ward")
+
+
+## Quick Hands multiplies the final attack speed: it must not pass the cap
+## every other source stops at.
+func test_quick_hands_stays_under_the_attack_speed_cap() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	lucian.tree_bonus = {&"attack_speed": 10.0}
+	lucian._refresh_stats(true)
+	assert_eq(lucian.stats.attack_speed, UnitStats.MAX_ATTACK_SPEED, "capped without the gift")
+	lucian.set_gift(2)
+	assert_almost_eq(lucian.stats.attack_speed, UnitStats.MAX_ATTACK_SPEED, 0.0001, "Quick Hands stays at the cap")
+
+
+## The settings page (over the ESC menu) closes for the pick like the menu
+## does: its Back would bring the menu up, and Resume would unpause the game
+## under the pick.
+func test_the_pick_closes_the_settings_page() -> void:
+	var stage := await _stage(2, 2)
+	for wave in stage.gifts.offer_wave - 1:
+		await _win_wave(stage)
+	stage.screens.set_menu_open(true)
+	stage.screens.set_settings_open(true)
+	await _win_wave(stage)
+	assert_not_null(stage.gifts.pick, "the pick is up")
+	assert_false(stage.screens.settings.visible, "the settings page closed")
+	assert_false(stage.screens.menu.visible, "the menu stays closed")
+	assert_true(get_tree().paused, "the game waits for the pick")

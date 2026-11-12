@@ -40,7 +40,7 @@ func _on_break_started(_seconds: float) -> void:
 	_open_pick.call_deferred()
 
 
-## The pick over a paused game, the backpack and menu closed and the screens
+## The pick over a paused game, the backpack, settings and menu closed and the screens
 ## locked (no ESC, no P). None once the stage is over.
 func _open_pick() -> void:
 	if pick or not runner.held or stage.lucian.dead or stage.result.visible:
@@ -48,6 +48,8 @@ func _open_pick() -> void:
 	var screens := stage.screens
 	if screens.backpack.visible:
 		screens.set_backpack_open(false)
+	if screens.settings.visible:
+		screens.set_settings_open(false)
 	screens.set_menu_open(false)
 	screens.locked = true
 	pick = ModifierPick.new(LanternGifts.offer(stage.rng), true)
