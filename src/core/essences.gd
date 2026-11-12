@@ -8,6 +8,8 @@ const BLUE := &"blue"
 const ORANGE := &"orange"
 const PURPLE := &"purple"
 const KINDS: Array[StringName] = [BLUE, ORANGE, PURPLE]
+## Blue essence that forges 1 orange essence.
+const FORGE_BLUE := 120
 
 var _amounts := {BLUE: 0, ORANGE: 0, PURPLE: 0}
 
@@ -40,6 +42,18 @@ func spend(blue: int, orange := 0, purple := 0) -> bool:
 	_amounts[BLUE] -= blue
 	_amounts[ORANGE] -= orange
 	_amounts[PURPLE] -= purple
+	changed.emit()
+	return true
+
+
+## Forges `count` orange essence from blue (FORGE_BLUE each). False, and
+## nothing changes, when `count` is not above 0 or the blue is short. It
+## cannot be undone.
+func forge(count: int) -> bool:
+	if count <= 0 or _amounts[BLUE] < count * FORGE_BLUE:
+		return false
+	_amounts[BLUE] -= count * FORGE_BLUE
+	_amounts[ORANGE] += count
 	changed.emit()
 	return true
 
