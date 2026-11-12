@@ -79,6 +79,9 @@ var runner: WaveRunner
 ## Endless mode's flow (its runner, spawn strength, the best); null in the
 ## story and Training.
 var endless: EndlessDirector
+## The Lantern's gift pick of a story stage with 4 or more waves; null in
+## Endless, Training and the tutorial.
+var gifts: GiftDirector
 ## Each wave's start, announced on the HUD's layer; null in Training.
 var wave_banner: WaveBanner
 ## Lucian's invulnerable flag as a cutscene found it (debug God mode survives).
@@ -275,6 +278,8 @@ func show_result(is_cleared: bool) -> void:
 		["Gold earned", StageStats.format(stats.gold_earned)],
 		["Level reached", str(lucian.progress.level)],
 	])
+	if lucian.gift != LanternGifts.NONE:
+		rows.append(["Gift", LanternGifts.display_name(lucian.gift)])
 	if endless:
 		endless.add_result(rows, reward_lines)
 	if not is_cleared:
@@ -485,6 +490,10 @@ func _start_waves() -> void:
 		runner = endless.start(self)
 	else:
 		runner = WaveRunner.new(WavePlan.waves(run.stage_id), run.boss)
+		if LanternGifts.offer_wave(runner.wave_count()) > 0:
+			gifts = GiftDirector.new()
+			add_child(gifts)
+			gifts.start(self, runner)
 	runner.spawn_requested.connect(_spawn_wave_enemy)
 	runner.wave_started.connect(_on_wave_started)
 	wave_banner = WaveBanner.new()

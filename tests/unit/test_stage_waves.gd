@@ -24,6 +24,15 @@ func _stage(act: int, stage_number: int) -> Stage:
 	return stage
 
 
+## Starts the next wave. The Lantern's gift pick, open at the break after
+## half the waves, takes its first card first (it holds the break).
+func _start_wave(stage: Stage) -> void:
+	if stage.gifts and stage.gifts.pick:
+		stage.gifts.pick.cards[0].pressed.emit()
+		await wait_process_frames(1)
+	stage.skip_break()
+
+
 func _lethal() -> DamageInfo:
 	return DamageInfo.create(99999.0, DamageInfo.Type.TRUE, &"test")
 
@@ -89,7 +98,7 @@ func _shoot(stage: Stage, enemy: Enemy, amount: float) -> void:
 func test_a_shot_that_ends_the_stage_shows_the_result_safely() -> void:
 	var stage: Stage = await _stage(2, 1)
 	for wave in WavePlan.waves("2-1").size():
-		stage.skip_break()
+		await _start_wave(stage)
 		for i in 20:
 			stage.runner.tick(WaveRunner.GROUP_GAP)
 		var enemies := get_tree().get_nodes_in_group(&"enemies")
@@ -125,7 +134,7 @@ func test_skip_gives_the_regen_of_the_time_skipped() -> void:
 func test_clearing_every_wave_shows_stage_cleared() -> void:
 	var stage: Stage = await _stage(2, 1)
 	for wave in WavePlan.waves("2-1").size():
-		stage.skip_break()
+		await _start_wave(stage)
 		await _kill_wave(stage)
 		await wait_process_frames(1)
 	assert_true(stage.result.visible)
@@ -332,7 +341,7 @@ func test_the_result_lists_the_stats() -> void:
 func test_stage_is_open_shows_on_a_first_clear_only() -> void:
 	var stage: Stage = await _stage(2, 1)
 	for wave in WavePlan.waves("2-1").size():
-		stage.skip_break()
+		await _start_wave(stage)
 		await _kill_wave(stage)
 		await wait_process_frames(1)
 	assert_true("Stage 2-2 is open" in stage.reward_lines, str(stage.reward_lines))
@@ -343,7 +352,7 @@ func test_stage_is_open_shows_on_a_first_clear_only() -> void:
 	await wait_process_frames(2)
 	again.lucian.invulnerable = true
 	for wave in WavePlan.waves("2-1").size():
-		again.skip_break()
+		await _start_wave(again)
 		await _kill_wave(again)
 		await wait_process_frames(1)
 	assert_true(again.result.visible)
@@ -453,9 +462,9 @@ func test_a_split_brings_2_units_where_it_died_and_the_wave_waits_for_them() -> 
 func test_a_split_on_the_last_wave_never_ends_the_stage() -> void:
 	var stage: Stage = await _stage(2, 1)
 	for wave in WavePlan.waves("2-1").size() - 1:
-		stage.skip_break()
+		await _start_wave(stage)
 		await _kill_wave(stage)
-	stage.skip_break()
+	await _start_wave(stage)
 	# A boss's kind, so its loot is sure.
 	var krug := _alone_in_wave(stage, _krug(&"boss"))
 	assert_true(stage.runner.is_last_enemy())

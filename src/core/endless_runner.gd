@@ -17,8 +17,6 @@ var elite_mult := 1
 ## The waves draw from the first `acts` acts (EndlessPlan.cleared_pool): the
 ## acts the save has cleared, which EndlessDirector sets. Every act until then.
 var acts := Journey.ACTS.size()
-## The break after a boss wave waits while this is true.
-var held := false
 ## The run's last mini boss (and the inherited `boss`, its last boss): neither
 ## comes twice in a row.
 var mini_boss := &""
@@ -66,20 +64,6 @@ func next_kind() -> StringName:
 	if EndlessPlan.is_boss_wave(wave + 1):
 		return &"boss"
 	return &"mini_boss" if EndlessPlan.is_mini_boss_wave(wave + 1) else &"normal"
-
-
-## The held break ends: its countdown runs from the start.
-func release() -> void:
-	held = false
-
-
-func tick(delta: float) -> void:
-	if not held:
-		super(delta)
-
-
-func skip() -> float:
-	return 0.0 if held else super()
 
 
 ## Never: there is no stage to clear.

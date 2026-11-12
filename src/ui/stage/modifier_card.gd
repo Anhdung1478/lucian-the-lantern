@@ -2,7 +2,8 @@ class_name ModifierCard
 extends Button
 ## One card of the modifier pick (ModifierPick): an ornate plate with the
 ## modifier's icon in a medallion on its top edge (Nothing has a diamond),
-## its downside in red over its reward in green. Hovered, the card lifts and
+## its downside in red over its reward in green. A gift's card (LanternGifts)
+## has its name in gold over its effect in green. Hovered, the card lifts and
 ## its rim turns gold (with low effects only the rim changes). The button
 ## keeps its place, so the mouse never falls off a lifted card.
 
@@ -26,8 +27,9 @@ const LIT_GLOW_SIZE := 14
 ## Nothing's medallion holds a diamond this big.
 const EMPTY_MARK := 7.0
 
-## The modifier it picks (an EndlessModifiers id).
+## What it picks: an EndlessModifiers id, or a LanternGifts id when `gift`.
 var id := EndlessModifiers.NOTHING
+var gift := false
 ## The mouse is on it: the rim is gold.
 var lit := false
 
@@ -36,8 +38,9 @@ var _face := Control.new()
 var _tween: Tween
 
 
-func _init(modifier := EndlessModifiers.NOTHING) -> void:
+func _init(modifier := EndlessModifiers.NOTHING, is_gift := false) -> void:
 	id = modifier
+	gift = is_gift
 	custom_minimum_size = SIZE
 	focus_mode = Control.FOCUS_NONE
 	for state: StringName in [&"normal", &"hover", &"pressed", &"disabled", &"focus"]:
@@ -54,12 +57,13 @@ func _init(modifier := EndlessModifiers.NOTHING) -> void:
 	lines.add_theme_constant_override(&"separation", LINE_GAP)
 	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_face.add_child(lines)
-	lines.add_child(_line(EndlessModifiers.downside(id), ModifierPick.DOWNSIDE_COLOR))
+	lines.add_child(_line(LanternGifts.display_name(id) if gift else EndlessModifiers.downside(id),
+			UiStyle.GOLD_COLOR if gift else ModifierPick.DOWNSIDE_COLOR))
 	var rule := Ornament.divider()
 	rule.custom_minimum_size.x = RULE_WIDTH
 	rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	lines.add_child(rule)
-	lines.add_child(_line(EndlessModifiers.reward(id), ModifierPick.REWARD_COLOR))
+	lines.add_child(_line(LanternGifts.text(id) if gift else EndlessModifiers.reward(id), ModifierPick.REWARD_COLOR))
 	mouse_entered.connect(set_lit.bind(true))
 	mouse_exited.connect(set_lit.bind(false))
 
@@ -103,7 +107,7 @@ func _draw_face() -> void:
 		rim.shadow_size = LIT_GLOW_SIZE
 		_face.draw_style_box(rim, rect)
 	var at := Vector2(rect.size.x * 0.5, 0.0)
-	var icon := EndlessModifiers.icon(id)
+	var icon := LanternGifts.icon(id) if gift else EndlessModifiers.icon(id)
 	Ornament.draw_medallion(_face, at, MEDALLION, icon, ICON_SIZE, LIGHT, rim_color())
 	if icon == null:
 		_face.draw_colored_polygon(Plate.diamond(at, EMPTY_MARK), UiStyle.BORDER_COLOR)

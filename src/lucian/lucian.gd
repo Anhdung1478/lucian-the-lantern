@@ -156,6 +156,9 @@ var tree_bonus := {}
 ## Endless's modifier (#3, #4): stat multipliers keyed like a skin's scale,
 ## applied with it (set_run_scale).
 var run_scale := {}
+## The Lantern's gift of this stage (a LanternGifts id): its stats join the
+## tree's and the skin's (set_gift).
+var gift := LanternGifts.NONE
 ## The save's difficulty: it scales the hits he takes and sets what a
 ## Resolve stack is worth.
 var difficulty := Difficulty.NORMAL
@@ -536,6 +539,13 @@ func apply_skin(new_skin: SkinData) -> void:
 func set_run_scale(stat_scale: Dictionary) -> void:
 	run_scale = stat_scale.duplicate()
 	_refresh_stats(true)
+
+
+## The Lantern's gift `id` (LanternGifts.NONE clears it): its stats count at
+## once, and what it adds to max HP heals him.
+func set_gift(id: int) -> void:
+	gift = id
+	_refresh_stats(false)
 
 
 ## Learns rank 1 of `slot` in the middle of a stage (Senna teaches E in Act 1's
@@ -1144,6 +1154,8 @@ func buffs() -> Array[Dictionary]:
 	var found: Array[Dictionary] = []
 	if resolve > 0:
 		found.append(Resolve.buff(resolve, defeats, difficulty))
+	if gift != LanternGifts.NONE:
+		found.append(LanternGifts.buff(gift))
 	if item_catalog:
 		for potion in item_catalog.potions():
 			var drinks := restores.count(potion.id)
@@ -1491,7 +1503,7 @@ func _stat_bonus() -> Dictionary:
 	var total := inventory.equipped_bonus()
 	if has_slightly_quicker():
 		total[&"move_speed"] = total.get(&"move_speed", 0.0) + SLIGHTLY_QUICKER
-	var sources: Array[Dictionary] = [tree_bonus, skin.flat]
+	var sources: Array[Dictionary] = [tree_bonus, skin.flat, LanternGifts.flat(gift)]
 	for stat_buff: Dictionary in _stat_buffs.values():
 		sources.append(stat_buff.bonus)
 	for source in sources:
@@ -1501,9 +1513,9 @@ func _stat_bonus() -> Dictionary:
 
 
 ## Skin multipliers (AD, AP, max HP), after item passives; then Endless's
-## (run_scale).
+## (run_scale) and the Lantern's gift's.
 func _scale_by_skin(block: StatBlock) -> void:
-	for multipliers: Dictionary in [skin.scale, run_scale]:
+	for multipliers: Dictionary in [skin.scale, run_scale, LanternGifts.scale(gift)]:
 		for key: StringName in multipliers:
 			block.set(key, block.get(key) * multipliers[key])
 

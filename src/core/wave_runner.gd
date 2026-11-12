@@ -23,6 +23,9 @@ var state := State.INTRO
 ## The wave being fought or coming next (1-based); the boss wave is last.
 var wave := 0
 var boss := &""
+## The break waits while this is true (no countdown, no skip), until
+## release(): the Endless modifier pick and the Lantern's gift hold it.
+var held := false
 
 var _waves: Array = []
 var _countdown := INTRO_TIME
@@ -89,7 +92,14 @@ func is_last_enemy() -> bool:
 	return state == State.FIGHT and _is_last_wave() and alive() == 1
 
 
+## The held break ends: its countdown runs from the start.
+func release() -> void:
+	held = false
+
+
 func tick(delta: float) -> void:
+	if held:
+		return
 	match state:
 		State.INTRO, State.BREAK:
 			_countdown -= delta
@@ -104,7 +114,7 @@ func tick(delta: float) -> void:
 
 ## Starts the next wave now. Returns the seconds skipped (0 mid-wave).
 func skip() -> float:
-	if not is_waiting():
+	if not is_waiting() or held:
 		return 0.0
 	var skipped := maxf(_countdown, 0.0)
 	_start_next()
