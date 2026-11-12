@@ -22,7 +22,7 @@
     <!-- tail, its spade tip burning -->
     <path d="M -24 -9 Q -44 -10 -58 -3 Q -62 0 -58 3 Q -44 10 -24 9 Z" fill="url(#hide)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
     <path d="M -30 0 L -56 0" stroke="#ff7a2a" stroke-width="3.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30 0 L -56 0" stroke="#ffd04a" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+    <path d="M -30 0 L -56 0" stroke="#ffd04a" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
     <circle cx="-66" cy="0" r="9" fill="url(#ember)"/>
     <path d="M -56 0 L -64 -9 L -73 0 L -64 9 Z" fill="#7a2412" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
     <path d="M -58 0 Q -64 -5 -68 0 Q -64 5 -58 0 Z" fill="#ffd04a"/>
@@ -73,7 +73,7 @@
     <path d="M -22 -11 Q -6 -16 10 -12" fill="none" stroke="#f0864a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
     <!-- lava cracks in the hide -->
     <path d="M -24 -4 L -18 -8 L -12 -3 L -4 -9 L 4 -4 L 10 -8 M -22 5 L -14 9 L -8 4 L 0 9 L 8 5" stroke="#ff7a2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
-    <path d="M -24 -4 L -18 -8 L -12 -3 L -4 -9 L 4 -4 L 10 -8 M -22 5 L -14 9 L -8 4 L 0 9 L 8 5" stroke="#ffd04a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M -24 -4 L -18 -8 L -12 -3 L -4 -9 L 4 -4 L 10 -8 M -22 5 L -14 9 L -8 4 L 0 9 L 8 5" stroke="#ffd04a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     <!-- flames streaming back along the spine -->
     <path d="M 14 0 Q 6 -6 -4 -5 Q 0 -2 -8 0 Q 0 2 -4 5 Q 6 6 14 0 Z M -6 0 Q -14 -6 -24 -5 Q -20 -2 -28 0 Q -20 2 -24 5 Q -14 6 -6 0 Z M -24 0 Q -32 -5 -40 -4 Q -37 -1 -44 0 Q -37 1 -40 4 Q -32 5 -24 0 Z" fill="#ff8a2a" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
     <path d="M 10 0 Q 4 -3 -2 -2 Q 2 0 -2 2 Q 4 3 10 0 Z M -9 0 Q -15 -3 -21 -2 Q -17 0 -21 2 Q -15 3 -9 0 Z M -27 0 Q -32 -2 -37 -2 Q -34 0 -37 2 Q -32 2 -27 0 Z" fill="#ffe27a"/>
@@ -92,7 +92,7 @@
     <path d="M 34 -10 Q 46 -13 54 -8 L 64 -4 Q 68 0 64 4 L 54 8 Q 46 13 34 10 Z" fill="#d24a24" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
     <path d="M 38 -7 Q 48 -9 56 -5" fill="none" stroke="#f0864a" stroke-width="2" stroke-linecap="round"/>
     <path d="M 40 0 L 56 0" stroke="#ff7a2a" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
-    <path d="M 40 0 L 56 0" stroke="#ffd04a" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 40 0 L 56 0" stroke="#ffd04a" stroke-width="2" stroke-linecap="round"/>
     <path d="M 46 -9 L 53 -6 L 47 -4 Z M 46 9 L 53 6 L 47 4 Z" fill="#ffe14a" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
     <circle cx="62" cy="-2.5" r="1.4" fill="#1a1d24"/>
     <circle cx="62" cy="2.5" r="1.4" fill="#1a1d24"/>

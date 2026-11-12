@@ -27,7 +27,7 @@
     <path d="M -32 -11 Q -56 -12 -74 -4 Q -78 0 -74 4 Q -56 12 -32 11 Z" fill="url(#hide)" stroke="#1a1d24" stroke-width="3.5" stroke-linejoin="round"/>
     <path d="M -38 -6 Q -54 -7 -68 -2 M -38 6 Q -54 7 -68 2" fill="none" stroke="#a898cc" stroke-width="2" stroke-linecap="round"/>
     <path d="M -36 -5 L -42 0 L -36 5 M -50 -4 L -56 0 L -50 4 M -62 -3 L -67 0 L -62 3" fill="none" stroke="#7b62b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="-80" cy="0" r="11" fill="url(#flare)"/>
+    <circle cx="-80" cy="0" r="10" fill="url(#flare)"/>
     <path d="M -72 -5 Q -80 -14 -88 -10 Q -83 -6 -87 -2 L -81 0 L -87 2 Q -83 6 -88 10 Q -80 14 -72 5 Z" fill="#9a6cff" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
     <path d="M -72 -3 Q -78 -8 -82 -6 Q -79 -3 -80 0 Q -79 3 -82 6 Q -78 8 -72 3 Z" fill="#f6f0ff"/>
     <!-- hind legs, wings, fore legs -->
