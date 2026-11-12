@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" path="res://assets/art/lucian/lucian_body.svg" id="3_body"]
 [ext_resource type="Texture2D" path="res://assets/art/lucian/lucian_body_one_gun.svg" id="4_one_gun"]
 
-[ext_resource type="Script" path="res://src/lucian/skin_fx/skin_fx.gd" id="5_fx"]
+[ext_resource type="Script" path="res://src/lucian/skin_fx/classic/classic_fx.gd" id="5_fx"]
 
 [sub_resource type="Resource" id="Resource_fx"]
 script = ExtResource("5_fx")

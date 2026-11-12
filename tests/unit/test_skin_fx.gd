@@ -63,7 +63,7 @@ func _peak(sound: StringName) -> float:
 func test_every_skin_has_an_effect_set() -> void:
 	for skin in Skins.ALL:
 		assert_not_null(skin.fx, str(skin.id))
-	assert_eq(Skins.find(&"classic").fx.get_script(), SkinFx)
+	assert_eq(Skins.find(&"classic").fx.get_script(), ClassicFx)
 
 
 func test_beams_and_crosses_keep_the_size_they_are_given() -> void:
@@ -118,7 +118,7 @@ func test_themed_pieces_show_details_on_high_and_none_on_low() -> void:
 			for piece: Node2D in [_beam(skin.fx), _blast(skin.fx), skin.fx.muzzle_flash()]:
 				add_child_autofree(piece)
 				if not piece is FxPiece:
-					assert_eq(skin.fx.get_script(), SkinFx, "%s: only Classic's pieces are not FxPieces" % skin.id)
+					assert_eq(skin.fx.get_script(), ClassicFx, "%s: only Classic's pieces are not FxPieces" % skin.id)
 					continue
 				var label := "%s %s on %s" % [skin.id, piece.get_script().get_global_name(), quality]
 				if quality == "low":
@@ -133,8 +133,8 @@ func test_classic_pieces_are_the_effects_of_1_0() -> void:
 	var blast := _blast(fx)
 	var trail := fx.e_trail(null)
 	var flash := fx.muzzle_flash()
-	assert_eq(beam.get_script(), LaserBeam)
-	assert_eq(blast.get_script(), CrossBlast)
+	assert_eq(beam.get_script(), ClassicBeam)
+	assert_eq(blast.get_script(), ClassicBlast)
 	assert_eq(trail.get_script(), DashTrail)
 	assert_eq(trail.color, DashTrail.LIGHT)
 	assert_eq(flash.get_script(), MuzzleFlash)
@@ -185,6 +185,38 @@ func test_every_skin_but_classic_has_a_set_of_its_own() -> void:
 			continue
 		assert_true(themed.has(skin.id), str(skin.id))
 		assert_ne(skin.fx.get_script(), SkinFx, str(skin.id))
+
+
+func test_classic_beam_fades_from_lucians_end_outward() -> void:
+	var beam := _beam(Skins.find(&"classic").fx) as ClassicBeam
+	add_child_autofree(beam)
+	beam.age = beam.lifetime * 0.5
+	assert_lt(beam.piece_alpha(0.0), beam.piece_alpha(0.5))
+	assert_lt(beam.piece_alpha(0.5), beam.piece_alpha(1.0))
+	beam.age = beam.lifetime
+	assert_eq(beam.piece_alpha(1.0), 0.0)
+	beam.age = 0.0
+	assert_eq(beam.piece_alpha(0.0), 1.0)
+	assert_eq(beam.piece_alpha(1.0), 1.0)
+
+
+func test_classic_beam_is_one_plain_fade_on_low_effects() -> void:
+	GameSettings.instance().set_value(&"quality", "low")
+	var beam := _beam(Skins.find(&"classic").fx) as ClassicBeam
+	add_child_autofree(beam)
+	beam.age = beam.lifetime * 0.5
+	assert_eq(beam.piece_alpha(0.0), beam.piece_alpha(1.0))
+	assert_eq(beam.details(), 0)
+
+
+func test_classic_ring_stays_inside_the_cross() -> void:
+	var blast := _blast(Skins.find(&"classic").fx) as ClassicBlast
+	for step in 11:
+		var radius := blast.ring_radius(step / 10.0)
+		assert_lte(radius, BAR.y * 1.5 + 0.001, "t %d/10" % step)
+		assert_gte(radius, BAR.y * 0.5 - 0.001, "t %d/10" % step)
+	assert_almost_eq(blast.ring_radius(1.0), BAR.y * 1.5, 0.001)
+	blast.free()
 
 
 func test_pulsefire_shockwave_stays_inside_the_cross() -> void:

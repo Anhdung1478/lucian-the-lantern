@@ -100,7 +100,7 @@ func test_the_cross_lands_on_the_dummy() -> void:
 	var preview := _open(&"classic")
 	preview.play(&"w")
 	await wait_seconds(0.8)
-	var blasts := _effects(preview, CrossBlast)
+	var blasts := _effects(preview, ClassicBlast)
 	assert_eq(blasts.size(), 1)
 	# A missile stops on the frame it runs out of range: up to one frame's
 	# travel (1600 px/s) past the dummy.
