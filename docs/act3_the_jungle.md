@@ -181,6 +181,7 @@ Each comes last in its stage's last wave, out of the pit. All skill hits count a
 | | Infernal Drake (3-2) | Ocean Drake (3-4) |
 |---|---|---|
 | HP | 6500 *(9000 before V1.5.0; V2.0: 8500)* | 10000 *(V2.0: 12500)* |
+| Look *(V2.0)* | Bat wings, lava cracks, spine flames and embers | Ribbed fin-wings, a frill, barbels and a fluke tail |
 | Armor / MR | 40 / 40 | 40 / 50 |
 | Basic attack | A fireball, 50 magic (700 px/s), that burns 10 magic a second for 2 s. Range 600, every 1.6 s. | A water shot, 55 magic (800 px/s). Range 600, every 1.5 s. |
 | Speed / radius | 260 / 70 | 260 / 70 |
@@ -192,7 +193,7 @@ Each comes last in its stage's last wave, out of the pit. All skill hits count a
 A mini boss has a wide health bar, a 12 px skull on the radar, and the boss bar while no boss is out.
 
 ### Boss: Elder Dragon (`elder_dragon`, 3-5)
-It comes in the boss wave, after waves 1–5, in the middle of the pit.
+It comes in the boss wave, after waves 1–5, in the middle of the pit. *(V2.0: the sprite is pale violet-white, not near-black: violet wings on ivory bones, a flame mane and a horn crown.)*
 
 | | |
 |---|---|

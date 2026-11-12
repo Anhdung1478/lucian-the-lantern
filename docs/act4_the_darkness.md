@@ -138,4 +138,4 @@ The plan's palette (lane `#2a2633`, edge `#3b2a52`, river `#1d1630`, ripples `#7
 *(V2.0: the map is redrawn with `MapArt` in black and violet, with wisps and a haze. It keeps Act 1's layout; the colours in the table are the base of the new drawing. Game design doc §13, "Built in V2.0".)*
 
 ### Art
-Hand-written SVGs: the four shadow minions (the minions in black-purple with violet glows *(V2.0: redrawn with no baked shadow: the same four as Act 1's, a shield and blade, a hooded caster, a cannon cart and a horned brute, in purple-black with violet rims and wisps)*) and Dark Lucian (Lucian's silhouette in black and violet, red eyes, two dark guns).
+Hand-written SVGs: the four shadow minions (the minions in black-purple with violet glows *(V2.0: redrawn with no baked shadow: the same four as Act 1's, a shield and blade, a hooded caster, a cannon cart and a horned brute, in purple-black with violet rims and wisps)*) and Dark Lucian (Lucian's silhouette in black and violet, red eyes, two dark guns). *(V2.0: Dark Lucian is Lucian's own pose in black with a violet rim and smoke, red eyes, the guns where Lucian's are.)*

@@ -130,7 +130,7 @@ Until 1-1 is cleared, Act 1 is the tutorial:
 Her kills give gold, XP and essence like Lucian's.
 
 ### Thresh (`thresh_1`)
-He rises from the river for the boss wave. Bosses don't scale with the wave.
+He rises from the river for the boss wave. Bosses don't scale with the wave. *(V2.0: the sprite is redrawn to match the title art: a hooded jailer with a pale rim, spiked pauldrons, a chain sickle and a glowing soul lantern.)*
 
 | | |
 |---|---|

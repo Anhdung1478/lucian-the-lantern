@@ -108,7 +108,7 @@ Health of each wave, in thousands: 2-1 3.0 · 3.7 · 5.5 · 6.0; 2-2 3.9 · 5.3 
 **Empower:** every 0.25 s, melee and ranged minions within 500 deal **+15% damage** for 0.5 s. A small icon (a red chevron over a fist) shows over their HP bars. Siege and super minions are never empowered.
 
 ### Akshan (`akshan`)
-He enters from the top gate in stage 3's boss wave, alone.
+He enters from the top gate in stage 3's boss wave, alone. *(V2.0: the sprite is redrawn: a teal hooded cloak with gold trim, a red scarf and a grappling gun with a hook.)*
 
 | | |
 |---|---|

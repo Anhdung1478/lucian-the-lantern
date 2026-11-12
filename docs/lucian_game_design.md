@@ -276,7 +276,7 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 **The Lantern's gift.** Halfway through a story stage Lucian picks one of three boons. It lasts until the stage ends.
 - **When:** every story stage with 4 or more waves, on the break after wave ⌊waves ÷ 2⌋: wave 2 of a stage of 4 or 5 waves, wave 3 of 6 or 7, wave 4 of 8 or 9. Once a stage. Not on a boss wave's break, not over a dead Lucian or a shown result. Not in Act 1's tutorial (2 waves), Endless or Training.
 - **The pick:** THE LANTERN'S GIFT, 3 different cards drawn from the 8 boons in §14, with the stage's rng. The game is paused, the screens are locked (ESC and P do nothing) and the break is held. A click picks, the buff sound plays, and the break then counts down in full, with the merchant as usual.
-- Percent boons multiply Lucian's stats like a skin's, flat boons add like the tree's.
+- Percent boons multiply Lucian's stats like a skin's, flat boons add like the tree's. *(V2.0: Quick Hands keeps the 2.5 attack speed cap, as the cap is applied after the multipliers.)*
 - It shows as a buff icon with no timer and as a row "Gift" on the end screen (`ui_design.md` §1, §5).
 - Code: `LanternGifts` (`src/core/lantern_gifts.gd`), `GiftDirector` (`src/stage/gift_director.gd`).
 
