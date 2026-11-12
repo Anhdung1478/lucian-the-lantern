@@ -170,8 +170,9 @@ func test_the_two_starting_boots_share_the_first_cell_of_a_second_tier_line() ->
 	var choice: RecipeChoice = greaves._parts[0]
 	assert_eq(choice.icons.map(func(icon: ItemIcon) -> StringName: return icon.item.id), [&"walkers", &"charmed"])
 	for icon: ItemIcon in choice.icons:
-		assert_not_null(icon.tooltip_content(), "each pair has its own card")
-		icon.tooltip_content().free()
+		var card := icon.tooltip_content()
+		assert_not_null(card, "each pair has its own card")
+		card.free()
 	assert_eq((greaves._parts[1] as ItemIcon).item.id, &"sword", "then the fragment")
 	assert_eq(greaves._result.item.id, &"greaves")
 	assert_eq(greaves._name.text, "greaves")
