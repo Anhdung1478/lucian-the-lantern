@@ -254,7 +254,7 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 - **`Juice.on()`** (`src/combat/juice.gd`) gates the extras below. It is false on Low quality and when the game runs headless (the tests and the bots), true otherwise. Shadows and health bars are no extras: they always show.
 - **Shadows and motion.** Every unit has a soft shadow on the ground. With `Juice.on()`: a walk sway, a lunge on a melee hit, a recoil on a shot, a squash when hit, a spawn fade-in and a death burst.
 - **Health bars.** An enemy's bar has a dark frame and a gradient fill. A pale **ghost** of the lost health holds 0.3 s, then drains (with `Juice.on()`). An elite's bar has a gold rim and diamond. *(V2.0: an elite with a trait shows the trait's small icon first over its bar, before any status icons. It never runs out and has no timer; the tip below names the trait.)* Lucian's bar is green with a tick every 100 HP. The damage-number rules above are unchanged.
-- **The trait ring** (`EliteRing`): a thin ring (3 px, 75% alpha) on the ground, 10 px outside the unit's radius, under an elite with a trait, in the trait's colour: Swift pale blue `#7fd8ff`, Armored steel grey `#a9b4c4`, Vampiric crimson `#d0305a`, Volatile orange `#ff7a2a`. It lies at the shadow's depth, under the units and every ground warning. It is an extra: with low effects (`Juice.on()` false) there is no ring, and the icon over the bar still shows.
+- **The trait ring** (`EliteRing`): a thin ring (3 px, 75% alpha) on the ground, 10 px outside the unit's radius, under an elite with a trait, in the trait's colour: Swift pale blue `#7fd8ff`, Armored steel grey `#a9b4c4`, Vampiric crimson `#d0305a`, Volatile orange `#ff7a2a`. It lies at the shadow's depth, under the units and every ground warning. It is an extra: with low effects (`Juice.on()` false) there is no ring, and the icon over the bar still shows. *(V2.0: under the Black Mist's veil the ring hides together with the health bar.)*
 - **The trait tips:** the first time each trait appears in a stage, the tip banner (see Act 1 tips) shows one line: Swift "Swift elites move and attack faster.", Armored "Armored elites take less damage: armor penetration helps.", Vampiric "Vampiric elites heal when they hit you: Grievous Wounds cuts it.", Volatile "Volatile elites explode where they die: step away." A Volatile elite's death leaves the usual red ground warning, radius 150, for 1.0 s.
 - **The target ring** (`TargetRing`): a thin red ring on the ground under the enemy Lucian is ordered to attack. It fades in on a new target and goes when the order goes.
 - **Shots** have a soft glow and trail (`ShotGlow`; not on skin shots). A hit makes a small **spark** (`HitSpark`). Damage numbers **pop** when they appear; a crit's is bigger.
@@ -281,7 +281,7 @@ Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the 
 - **ESC does nothing here** (it is consumed). The window's close button still asks to quit.
 - The first two credit lines ("Lucian: The Lantern", "Made with Godot 4") are placeholders.
 
-**Built in V2.0:** the sketch above is the old look. Now `TheEndScreen` shows **the title's scene** (Lucian and Senna, Thresh hidden) under a dawn tint, and an ornate card stands on the right (centred in the part right of 36% of the width, so it never covers Lucian's arm or Senna). The card holds THE END, "Senna is free.", the story time and the credits, with **Continue** under them. The texts, ESC and the continue targets are as above.
+**Built in V2.0:** the sketch above is the old look. Now `TheEndScreen` shows **the title's scene** (Lucian and Senna, Thresh hidden, the chain lying broken and the lantern's green gone from the two figures) under a dawn tint, and an ornate card stands on the right (centred in the part right of 36% of the width, so it never covers Lucian's arm or Senna). The card holds THE END, "Senna is free.", the story time and the credits, with **Continue** under them. The texts, ESC and the continue targets are as above.
 
 ### Stage result: the end screen
 *(Phase 6 had a 560 px panel with one Continue button over the HUD. Phase 7 replaced it with this full-screen summary.)*
@@ -723,21 +723,23 @@ The game opens here (built in Phase 6).
 - **Built in V2.0:** every change of screen **fades in from black** over 0.25 s (the title, the main screen, a stage and the end screen; `Game` switches them). `ScreenFade` is a black cover on layer 100, above every pop-up, that never takes input. Off on Low quality and when run headless.
 
 ### Built in Phase 10
-**The story on the title screen:** Lucian and Senna on the left face Thresh on the right, under the Shadow Isles moon. The figures are backlit silhouettes (the user's choice in planning): dark bodies with a moonlight rim on one edge, and colour accents. The centred column (lantern, title, buttons, slot list) is unchanged.
+**The story on the title screen:** Lucian and Senna on the left face Thresh on the right, under the Shadow Isles moon. The figures are backlit dark bodies. *(V2.0: they are no longer SVG silhouettes with a moonlight rim on one edge. `TitleLucian`, `TitleSenna` and `TitleThresh` paint them in code through the `TitlePaint` brush: shaded parts, a cool moon rim on the outer edge, and a green lantern fill and rim on the side that faces the lantern. The three SVG files, `title_lucian.svg`, `title_senna.svg` and `title_thresh.svg`, are deleted.)* The centred column (lantern, title, buttons, slot list) is unchanged.
 
 | Figure | Where (1920 × 1080) | Look |
 |---|---|---|
-| Senna | x 0–398, 790 tall, behind Lucian | A hooded spirit in ghostly teal that fades toward the ground (her soul is taken), her relic cannon on her shoulder with teal rings and a glowing core |
-| Lucian | x 190–679, 870 tall | In his long coat, facing right. His own slim pistol is aimed, with a gold glint at its muzzle. Senna's heavy relic gun is raised beside his head, with teal rings. |
-| Thresh | x 1258–1880, 1010 tall | Looming and facing left: a tall hood with green eyes, spiked shoulders, chains across his body and down to the ground, the sickle on a chain, and the green lantern held out |
+| Senna | x 0–398, 790 tall, behind Lucian | A hooded spirit in see-through teal that fades toward the ground (her soul is taken), a calm face under the hood, her soul glowing inside her, and her relic cannon across her body with teal rings and a glowing core *(V2.0)* |
+| Lucian | x 190–679, 870 tall | In his long coat, facing right, his face in profile, the coat with a collar, folds and tattered tails. His own slim pistol is aimed, with a gold band and a glint at its muzzle. Senna's heavy relic gun is held low at his side, its rings lit teal *(V2.0: it was raised beside his head)*. |
+| Thresh | x 1258–1880, 1010 tall | Looming and facing left: a tall hood with burning eyes and a grin, spiked pauldrons, ribs with green light between them, a cape and tabard, chains link by link across his body and down to the ground, the sickle on a chain, and the green lantern held out, caging souls *(V2.0)* |
 
 - **The scene** (`TitleBackdrop`), drawn once:
-  - a teal-black sky with stars, and a large pale moon at the upper left with halos;
-  - far isles under a haze, and a Shadow Isles cliff at the right, with Helia's ruined arches and spires on it (some broken, with faint green windows);
+  - a teal-black sky with stars (some bright, with glints), and a large pale moon at the upper left with halos, and clouds across it *(V2.0)*;
+  - far isles under a haze with a far tower and rock spires, and a Shadow Isles cliff at the right, with Helia's ruined arches and spires on it (some broken, with faint green windows) *(V2.0)*;
   - four dead trees and nine gravestones;
-  - a faint spectral chain along the ground, from Thresh toward Senna;
+  - light pools on the ground, green under the lantern and teal under Senna *(V2.0)*;
+  - a faint spectral chain along the ground, from Thresh toward Senna. When Thresh is hidden (The End) the chain lies broken *(V2.0)*;
+  - a near layer in front of the figures: tall grass, two near graves (bottom left and bottom right) and a dark fade at the bottom *(V2.0)*;
   - a soft dark shade behind the column, so the buttons read.
-- **What moves:** three bands of ground mist, green mist on Thresh's side, the lantern's glow pulse, nine souls rising from the lantern with fading trails, 22 teal motes around Senna, three lights running along the chain, and a gold twinkle on Lucian's muzzle.
+- **What moves:** three bands of ground mist, green mist on Thresh's side, the lantern's glow pulse, 11 souls rising from the lantern with fading trails *(V2.0: it was nine)*, Thresh's eyes flickering, Senna's shimmer and her teal motes, lights running along the chain, the pulse of the relic core, and a gold glint on Lucian's muzzle. *(V2.0: all of it is off on Low quality, and applies at once when the setting changes. The still art is a few meshes, drawn once when the title opens.)*
 - On a wider screen, Lucian and Senna keep to the left edge and Thresh to the right; only the middle widens. Nothing here takes the mouse, so every button works as before.
 
 ## 8. Sounds
