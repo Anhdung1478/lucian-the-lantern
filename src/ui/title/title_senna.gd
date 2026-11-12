@@ -10,17 +10,24 @@ extends TitleFigure
 ## The art's frame, in units.
 const BOX := Rect2(0, -14, 132, 262)
 ## Towards the moon (behind her, up and to her right), the lantern far to
-## the right in her units and how far its light reaches.
+## the right in her units, how far its light reaches and how wide its rim
+## on her is.
 const MOON_WAY := Vector2(0.3, -1.0)
 const LANTERN_AT := Vector2(420, 90)
 const LANTERN_REACH := 820.0
-## Her rim, and how solid she is at her feet, from her waist down.
+const LANTERN_WIDTH := 0.7
+## Her rim at her top and her feet, and what her parts are tinted towards
+## on the moon's side.
 const RIM_TOP := Color(0.85, 1.0, 0.96, 1.0)
 const RIM_FEET := Color(0.37, 0.85, 0.75, 0.0)
-## What her parts are tinted towards on the moon's side.
 const LIT_TINT := Color("7fe6d4")
+## How solid she is at her feet, fading from this height down.
 const FEET_ALPHA := 0.0
 const FADE_FROM := 84.0
+## Her middle, where her motes drift, and the robe's hem in front of her,
+## where the chain from the lantern ends.
+const MIDDLE := Vector2(72, 104)
+const HEM := Vector2(60, 236)
 
 ## Her colours: the robe, the mantle, her face and hair, the cannon and
 ## its light, the dark inside her hood.
@@ -33,6 +40,9 @@ const CANNON := Color("0e2c2b")
 const CANNON_EDGE := Color(0.85, 1.0, 0.96, 0.55)
 const TEAL := Color("b8fff0")
 const HOOD_DARK := Color(0.0, 0.03, 0.04, 0.85)
+## Her closed eye, lips and nostril; the dark ring round the cannon's core.
+const FEATURE := Color(0.02, 0.1, 0.1, 0.85)
+const CORE_RIM := Color(0.02, 0.08, 0.09)
 ## Where her soul shines from inside her, under her mantle.
 const SOUL_AT := Vector2(76, 66)
 ## Her aura: soft glows (middle, size) behind her, and their alpha.
@@ -51,9 +61,11 @@ const MANTLE_SHAPE := "M 59.6 37 C 54 43 49.6 52 47.6 63 C 53 69 63 71.6 74 70.6
 const HOOD := "M 58 46 C 53 38 51 28 52.6 18 C 53.4 12 50.6 7 46.6 2.6 C 56 1 63 -0.6 72 -0.2 C 83 0.4 89.4 6.6 90.2 13.4 C 87.4 13.4 84.6 14.4 82.6 16.6 C 80.4 19.6 79.6 24 79.8 28.4 C 80 33 81.4 37.6 84 41.6 L 70 47 Z"
 ## The hood's folds, wrapping round it from its opening to its back.
 const HOOD_FOLDS: Array[String] = ["M 86 7 C 76 4.4 64 6 56 11", "M 82 19 C 72 17 62 20.6 55.6 28", "M 80.6 32 C 72 31.6 64 35 58.6 42"]
-## The trim along the hood's opening: its colour and width.
+## The trim along the hood's opening: its colour, its width and the box
+## round the opening it keeps to.
 const TRIM := Color("2f7a72")
 const TRIM_WIDTH := 1.6
+const TRIM_BOX := "M 78 10 L 92 10 L 92 46 L 78 46 Z"
 const FACE := "M 80.6 13.6 C 82.6 14.4 83.6 15.8 83.8 17.6 L 84.4 19.4 L 84.2 21 L 86.4 24.6 L 84.6 25.6 L 85 26.8 L 84.4 27.6 L 84.8 28.6 L 84.2 31.4 C 83.6 33 82.4 33.8 81 34 L 80.6 40.6 L 76 41.6 L 76 15 Z"
 const EYE := "M 81.6 20.6 Q 82.7 21.5 84 20.9"
 const ARM := "M 52 50 C 56 46 62 47 64 52 C 66 60 67 68 70 74 L 82 79 L 84 86 L 70 86 C 63 84 59 78 57 70 C 55 62 53 56 52 50 Z"
@@ -62,6 +74,7 @@ const HAND := "M 80 77.4 L 86.6 78.4 L 87.6 85 L 81 86.6 Z"
 ## the hood and at its end.
 const LOCKS: Array[String] = ["M 80.6 33.4 C 81.4 42 80.8 52 82.4 62", "M 78.6 36 C 78.8 46 77.6 56 78.6 66", "M 82 34.2 C 83.6 42 84 50 85.6 57"]
 const LOCK_WIDTH := Vector2(2.2, 0.7)
+## The robe's folds, down from her chest to its hem.
 const ROBE_FOLDS: Array[String] = [
 	"M 60 72 C 58 120 50 170 34 220",
 	"M 72 98 C 72 140 70 190 64 234",
@@ -69,9 +82,10 @@ const ROBE_FOLDS: Array[String] = [
 	"M 54 100 C 50 140 44 180 30 214",
 ]
 ## The relic cannon, drawn along +x from its breech and laid at CANNON_AT,
-## turned by CANNON_ANGLE: the stock, the grip, the barrel with its rail,
-## the flared muzzle; the rings round the barrel (x), the relic core in its
-## stock and the muzzle's light.
+## turned by CANNON_ANGLE: the stock, the grip, the fin under the barrel,
+## the barrel with its rail, the flared muzzle; the rings round the barrel
+## (x; half width, top and bottom), the relic core in its stock and the
+## muzzle's light.
 const CANNON_AT := Vector2(90, 106)
 const CANNON_ANGLE := -2.18
 const STOCK := "M -2 -9.4 C -8 -9.4 -10.6 -5 -10.6 0 C -10.6 5.4 -8 10.6 -1.6 10.6 L 26 9.6 L 28 4 L 28 -5 L 26 -9 Z"
@@ -81,6 +95,7 @@ const RAIL := "M 32 -5.6 C 54 -11 82 -10.4 104 -4.8 Z"
 const FIN := "M 40 5.4 C 60 9.4 80 9.4 98 4.8 Z"
 const MUZZLE := "M 106 -6.4 L 114 -7 L 122 -11.6 L 129 -10.6 L 129 10.4 L 122 11.4 L 114 6.8 L 106 6.2 Z"
 const RINGS: Array[float] = [46.0, 68.0, 90.0]
+const RING := Vector3(1.8, -6.4, 6.2)
 const CORE := Vector2(9, 0.4)
 const MUZZLE_LIGHT := Vector2(131, 0)
 
@@ -92,7 +107,7 @@ func _init() -> void:
 	moon_way = MOON_WAY.normalized()
 	lantern_at = LANTERN_AT
 	lantern_reach = LANTERN_REACH
-	lantern_width = 0.7
+	lantern_width = LANTERN_WIDTH
 	lit_tint = LIT_TINT
 	rim_top = RIM_TOP
 	rim_feet = RIM_FEET
@@ -102,13 +117,13 @@ func _init() -> void:
 
 ## Her middle, in the parent's coordinates: where her motes drift.
 func middle() -> Vector2:
-	return at(Vector2(72, 104))
+	return at(MIDDLE)
 
 
 ## Where the robe's hem meets the ground in front of her, in the parent's
 ## coordinates: where the chain from the lantern ends.
 func hem() -> Vector2:
-	return at(Vector2(60, 236))
+	return at(HEM)
 
 
 func _paint(paint: TitlePaint) -> void:
@@ -141,35 +156,36 @@ func _paint_cannon(paint: TitlePaint) -> void:
 		_part(paint, outline, CANNON)
 		paint.rim(outline, moon_way * rim_width, CANNON_EDGE)
 	for x in RINGS:
-		paint.shape(_cannon(PackedVector2Array([Vector2(x - 1.8, -6.4), Vector2(x + 1.8, -6.3), Vector2(x + 1.8, 6.1), Vector2(x - 1.8, 6.2)])), TEAL)
+		var ring := Rect2(x - RING.x, RING.y, RING.x * 2.0, RING.z - RING.y)
+		paint.shape(_cannon(PackedVector2Array([ring.position, Vector2(ring.end.x, ring.position.y), ring.end, Vector2(ring.position.x, ring.end.y)])), TEAL)
 		paint.glow(_cannon(PackedVector2Array([Vector2(x, 0)]))[0], Vector2(9, 9), Color(TEAL, 0.25))
 	var core := _cannon(PackedVector2Array([CORE]))[0]
-	paint.oval(core, Vector2(4.4, 4.4), Color(0.02, 0.08, 0.09))
+	paint.oval(core, Vector2(4.4, 4.4), CORE_RIM)
 	paint.oval(core, Vector2(3, 3), TEAL)
 	paint.glow(core, Vector2(11, 11), Color(TEAL, 0.45))
 	paint.glow(_cannon(PackedVector2Array([MUZZLE_LIGHT]))[0], Vector2(12, 12), Color(TEAL, 0.8))
 
 
 ## Her head: the face, lit from within, the shadow of the hood's brim on
-## it, her closed eye and lips; then the hood over it and her locks.
+## it, her closed eye and lips; then the hood over it with the trim along
+## its opening, and her locks.
 func _paint_head(paint: TitlePaint) -> void:
 	var face := TitlePaint.outline(FACE)
 	_part(paint, face, SKIN)
 	paint.glow_in(face, Vector2(84, 28), 12.0, Color(TEAL, 0.4))
 	paint.shape(face, TitlePaint.linear(Vector2(0, 14), Vector2(0, 22), HOOD_DARK, Color(HOOD_DARK, 0.0)))
-	paint.stroke(EYE, 0.55, Color(0.02, 0.1, 0.1, 0.9))
-	paint.stroke("M 84.4 27.2 L 83.2 27.2", 0.45, Color(0.02, 0.1, 0.1, 0.8))
-	paint.oval(Vector2(85.2, 24.6), Vector2(0.4, 0.28), Color(0.02, 0.1, 0.1, 0.8))
+	paint.stroke(EYE, 0.55, FEATURE)
+	paint.stroke("M 84.4 27.2 L 83.2 27.2", 0.45, FEATURE)
+	paint.oval(Vector2(85.2, 24.6), Vector2(0.4, 0.28), FEATURE)
 	var hood := TitlePaint.outline(HOOD)
 	_part(paint, hood, MANTLE)
 	for fold in HOOD_FOLDS:
 		_fold(paint, fold, FOLD_WIDTH * 0.6)
-	paint.rim_inside(hood, Vector2(TRIM_WIDTH, 0.0), TitlePaint.outline("M 78 10 L 92 10 L 92 46 L 78 46 Z"), TRIM)
+	paint.rim_inside(hood, Vector2(TRIM_WIDTH, 0.0), TitlePaint.outline(TRIM_BOX), TRIM)
 	for lock in LOCKS:
 		var line := TitlePaint.outline(lock)
 		paint.taper(line, LOCK_WIDTH.x, LOCK_WIDTH.y, HAIR)
 		paint.taper(TitlePaint.moved(line, Vector2(0.5, -0.2)), LOCK_WIDTH.x * 0.3, 0.0, Color(TEAL, 0.35))
-
 
 
 ## `outline`, drawn in the cannon's own frame, where it lies on her shoulder.

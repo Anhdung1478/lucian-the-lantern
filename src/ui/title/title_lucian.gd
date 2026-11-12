@@ -9,10 +9,11 @@ extends TitleFigure
 ## The art's frame, in units.
 const BOX := Rect2(0, -12, 146, 260)
 ## Towards the moon, and where the lantern is in his units, how far its
-## light reaches.
+## light reaches and how wide its rim on him is.
 const MOON_WAY := Vector2(-0.55, -0.83)
 const LANTERN_AT := Vector2(330, 100)
 const LANTERN_REACH := 760.0
+const LANTERN_WIDTH := 0.7
 
 ## His colours: the coat, the trousers and boots, the vest and shirt, the
 ## belt and its gold, his skin and his hair.
@@ -29,6 +30,17 @@ const STEEL := Color("2c3540")
 const RELIC := Color("3a4e51")
 const TEAL := Color("b8fff0")
 const MUZZLE := Color("fff1c4")
+## The small lights and darks: the moon along the pistol's barrel, on his
+## knuckles and on the soles; the creases; his eye, its pupil, his nostril;
+## and the dark the coat takes on towards its hem.
+const STEEL_LIGHT := Color(0.85, 0.9, 1.0, 0.55)
+const KNUCKLE_LIGHT := Color(1.0, 0.86, 0.7, 0.3)
+const SOLE_LIGHT := Color(0.55, 0.66, 0.82, 0.3)
+const CREASE := Color(0.0, 0.0, 0.0, 0.5)
+const EYE_WHITE := Color(0.85, 0.9, 0.86, 0.55)
+const PUPIL := Color(0.05, 0.04, 0.04)
+const NOSTRIL := Color(0.12, 0.06, 0.04)
+const HEM_SHADE := Color(0.0, 0.0, 0.02, 0.45)
 
 ## His parts, back to front.
 const BACK_LEG := "M 52 124 L 67 127 C 64.6 146 61 162 59.4 178 C 58 194 55.6 212 53.4 229 L 43.6 229 C 44 220 43 210 43.4 200 C 43.8 190 45.4 182 46 174 C 47 158 48.6 142 52 124 Z"
@@ -53,10 +65,10 @@ const EYE := "M 77.1 18.5 L 79.3 18.1 L 78.8 19.3 Z"
 const BROW := "M 75.8 16.8 L 78 16.1 L 80.2 16.3"
 const NEAR_ARM := "M 52.4 44 C 57 40.4 63 41.6 64.4 46 C 64.2 56 62.6 66 61.6 74 C 64.6 81 67.4 88 70.4 94.6 L 64.6 99.6 C 60 92.6 56 85 53.6 78 C 51.4 67 51 55 52.4 44 Z"
 const NEAR_HAND := "M 64 96.4 C 65.2 94.4 68 93.8 70 94.4 C 71.8 95.2 72.4 97.6 71.6 99.8 C 70.6 101.8 67.6 102.6 65.4 102 C 63.8 101.2 63.4 98.4 64 96.4 Z"
-## Senna's relic gun in his near hand, drawn pointing right from its grip
-## and turned down by RELIC_ANGLE at RELIC_AT: the curved guard over it,
-## the receiver, the barrel and the muzzle cap; the rings on the barrel
-## (x) and its core.
+## Senna's relic gun in his near hand, drawn pointing right from where he
+## holds it and turned down by RELIC_ANGLE at RELIC_AT: the receiver, the
+## barrel, the muzzle cap and the curved guard over them; the rings on the
+## barrel (x, half width, top and bottom) and its core.
 const RELIC_AT := Vector2(67.6, 98.2)
 const RELIC_ANGLE := 0.38
 const RELIC_GUARD := "M -6 -6.2 C 2 -9.6 14 -9.6 25 -5 L 25 -3.6 C 14 -7 2 -7 -5 -4.6 Z"
@@ -64,6 +76,7 @@ const RELIC_BODY := "M -7 -4.6 C -7 -6.6 -5 -7 -3 -7 L 10 -6.6 L 13 -4 L 13 4 L 
 const RELIC_BARREL := "M 12 -3.6 L 30 -3.2 L 30 2.8 L 12 3.4 Z"
 const RELIC_CAP := "M 29 -4.8 L 34.6 -4.4 L 35.6 0 L 34.6 4 L 29 4.4 Z"
 const RELIC_RINGS: Array[float] = [17.0, 23.5]
+const RELIC_RING := Vector3(1.1, -3.5, 3.1)
 const RELIC_CORE := Vector2(3, -0.6)
 ## The pistol's muzzle, where it glints.
 const MUZZLE_AT := Vector2(140.4, 53.6)
@@ -91,7 +104,7 @@ func _init() -> void:
 	moon_way = MOON_WAY.normalized()
 	lantern_at = LANTERN_AT
 	lantern_reach = LANTERN_REACH
-	lantern_width = 0.7
+	lantern_width = LANTERN_WIDTH
 
 
 ## Where his pistol's muzzle is, in the parent's coordinates.
@@ -112,7 +125,7 @@ func _paint(paint: TitlePaint) -> void:
 	_fold(paint, "M 84.4 172 Q 90 177 97 172.6", FOLD_WIDTH * 0.8)
 	_part(paint, TitlePaint.outline(FRONT_BOOT), BOOTS)
 	for sole in ["M 39 244.6 L 60.4 244.6", "M 88.2 244.6 L 114.2 244.6"]:
-		paint.stroke(sole, 0.8, Color(MOON_RIM_FEET, 0.3))
+		paint.stroke(sole, 0.8, SOLE_LIGHT)
 	_paint_far_arm(paint)
 	_paint_head(paint)
 	_paint_coat(paint)
@@ -126,27 +139,26 @@ func _paint_far_arm(paint: TitlePaint) -> void:
 	for fold in SLEEVE_FOLDS:
 		_fold(paint, fold, FOLD_WIDTH * 0.7)
 	_part(paint, TitlePaint.outline(PISTOL), STEEL)
-	paint.line(Vector2(119, 51.6), Vector2(137.4, 51.6), 0.6, Color(0.85, 0.9, 1.0, 0.55))
+	paint.line(Vector2(119, 51.6), Vector2(137.4, 51.6), 0.6, STEEL_LIGHT)
 	paint.line(Vector2(131, 51.2), Vector2(131, 55.6), 1.2, GOLD)
 	paint.line(Vector2(122.6, 58.2), Vector2(121.8, 64), 0.8, Color(GOLD, 0.6))
 	paint.glow(MUZZLE_AT, Vector2(6, 6), Color(MUZZLE, 0.5))
 	paint.oval(MUZZLE_AT, Vector2(1.1, 1.1), MUZZLE)
 	_part(paint, TitlePaint.outline(FAR_FIST), SKIN)
-	paint.stroke("M 116.6 52.2 Q 119.4 51.2 121.6 52.8", 0.5, Color(1, 0.86, 0.7, 0.3))
+	paint.stroke("M 116.6 52.2 Q 119.4 51.2 121.6 52.8", 0.5, KNUCKLE_LIGHT)
 
 
-## The long coat: shaded and rimmed, darker towards its hem, its folds,
+## The long coat: shaded, darker towards its hem, its folds,
 ## the vest, the shirt's collar and the belt with its gold buckle.
 func _paint_coat(paint: TitlePaint) -> void:
 	var coat := TitlePaint.outline(COAT_SHAPE)
 	_part(paint, coat, COAT)
-	# The coat darkens towards its hem.
-	paint.shape(coat, TitlePaint.linear(Vector2(0, 120), Vector2(0, 226), Color(0, 0, 0, 0.0), Color(0, 0, 0.02, 0.45)))
+	paint.shape(coat, TitlePaint.linear(Vector2(0, 120), Vector2(0, 226), Color(HEM_SHADE, 0.0), HEM_SHADE))
 	for fold in COAT_FOLDS:
 		_fold(paint, fold, FOLD_WIDTH)
 	_part(paint, TitlePaint.outline(VEST_SHAPE), VEST)
 	paint.fill(SHIRT_SHAPE, SHIRT)
-	paint.stroke("M 70.2 40 C 71 60 71.6 80 72.2 96", 0.7, Color(0, 0, 0, 0.5))
+	paint.stroke("M 70.2 40 C 71 60 71.6 80 72.2 96", 0.7, CREASE)
 	_part(paint, TitlePaint.outline(BELT_SHAPE), BELT)
 	paint.fill("M 64 95.6 L 68.4 95.4 L 68.6 100.4 L 64.2 100.6 Z", GOLD)
 	paint.fill("M 65.2 96.8 L 67.4 96.7 L 67.5 99.2 L 65.3 99.3 Z", BELT)
@@ -163,10 +175,10 @@ func _paint_head(paint: TitlePaint) -> void:
 	paint.fill(MUSTACHE, HAIR)
 	paint.oval(Vector2(69.6, 21.6), Vector2(1.5, 2.3), SKIN.darkened(0.25), 0.2)
 	paint.oval(Vector2(69.8, 21.8), Vector2(0.7, 1.3), SKIN.darkened(0.6), 0.2)
-	paint.fill(EYE, Color(0.85, 0.9, 0.86, 0.55))
-	paint.oval(Vector2(78.6, 18.7), Vector2(0.45, 0.45), Color(0.05, 0.04, 0.04))
+	paint.fill(EYE, EYE_WHITE)
+	paint.oval(Vector2(78.6, 18.7), Vector2(0.45, 0.45), PUPIL)
 	paint.stroke(BROW, 0.8, HAIR)
-	paint.oval(Vector2(81.3, 23.9), Vector2(0.45, 0.3), Color(0.12, 0.06, 0.04))
+	paint.oval(Vector2(81.3, 23.9), Vector2(0.45, 0.3), NOSTRIL)
 
 
 ## The near arm, low at his side, with Senna's relic gun: its light on the
@@ -180,16 +192,16 @@ func _paint_near_arm(paint: TitlePaint) -> void:
 	for part in [RELIC_BODY, RELIC_BARREL, RELIC_CAP, RELIC_GUARD]:
 		_part(paint, _relic(TitlePaint.outline(part)), RELIC)
 	for x in RELIC_RINGS:
-		paint.shape(_relic(PackedVector2Array([Vector2(x - 1.1, -3.5), Vector2(x + 1.1, -3.5), Vector2(x + 1.1, 3.1), Vector2(x - 1.1, 3.1)])), TEAL)
+		var ring := Rect2(x - RELIC_RING.x, RELIC_RING.y, RELIC_RING.x * 2.0, RELIC_RING.z - RELIC_RING.y)
+		paint.shape(_relic(PackedVector2Array([ring.position, Vector2(ring.end.x, ring.position.y), ring.end, Vector2(ring.position.x, ring.end.y)])), TEAL)
 	paint.glow(_relic(PackedVector2Array([Vector2(18.5, 0)]))[0], Vector2(14, 9), Color(TEAL, 0.28))
 	paint.oval(core, Vector2(2.4, 2.4), TEAL)
 	paint.glow(core, Vector2(8, 8), Color(TEAL, 0.55))
 	var hand := TitlePaint.outline(NEAR_HAND)
 	_part(paint, hand, SKIN)
 	paint.rim(hand, Vector2(0.7, 0.4), Color(TEAL, 0.55))
-	paint.stroke("M 67.4 94.6 Q 68.6 97.6 68 101.8", 0.4, Color(0, 0, 0, 0.5))
-	paint.stroke("M 69.8 95 Q 70.6 97.6 70.2 101", 0.4, Color(0, 0, 0, 0.5))
-
+	paint.stroke("M 67.4 94.6 Q 68.6 97.6 68 101.8", 0.4, CREASE)
+	paint.stroke("M 69.8 95 Q 70.6 97.6 70.2 101", 0.4, CREASE)
 
 
 ## `outline`, drawn in the relic gun's own frame, where it lies in his hand.

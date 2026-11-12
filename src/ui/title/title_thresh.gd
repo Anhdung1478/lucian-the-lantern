@@ -11,11 +11,13 @@ extends TitleFigure
 
 ## The art's frame, in units.
 const BOX := Rect2(-12, -8, 176, 286)
-## Towards the moon, and his lantern (its middle) and how far its light
-## reaches.
+## Towards the moon and the moonlit rim's width; his lantern (its middle),
+## how far its light reaches and how wide its rim on him is.
 const MOON_WAY := Vector2(-0.85, -0.53)
+const RIM_WIDTH := 0.8
 const LANTERN_MIDDLE := Vector2(21, 139)
 const LANTERN_REACH := 115.0
+const LANTERN_WIDTH := 1.0
 
 ## His colours: the robe, the iron of his armour, the dark of his face, his
 ## bone-pale claws, the chains, his eyes and the souls' green.
@@ -27,6 +29,12 @@ const CHAIN := Color("466454")
 const CHAIN_EDGE := Color(0.01, 0.02, 0.015, 0.95)
 const EYE := Color("eafff2")
 const SOUL := Color("8fe3b0")
+## The darks: the edge under a rib, the inner edge of his face, the seams
+## between plates and the robe towards its hem.
+const RIB_EDGE := Color(0.0, 0.01, 0.0, 0.85)
+const FACE_EDGE := Color(0.0, 0.0, 0.0, 0.6)
+const SEAM := Color(0.0, 0.0, 0.0, 0.65)
+const HEM_SHADE := Color(0.0, 0.0, 0.0, 0.5)
 ## A fold in his robe: its shadow, the light on its ridge and its width.
 const FOLD_DARK := Color(0.0, 0.0, 0.0, 0.6)
 const FOLD_LIGHT := Color(0.7, 0.85, 0.95, 0.2)
@@ -38,7 +46,6 @@ const FAR_ARM := "M 119 68 L 139 66 C 143 92 147 116 150 140 L 152 150 L 147.6 1
 const FAR_HAND := "M 138 144 L 148.6 142.6 L 150.6 150 L 148 156 L 144.6 152 L 142.6 157 L 140 152 Z"
 const SICKLE := "M 140 186 C 162 181 178 198 173 232 C 167 213 157 202 138.6 198 Z"
 const SICKLE_HAFT := "M 141.6 177 L 146.4 177 L 145.6 196 L 140.6 196 Z"
-const SICKLE_RING := Vector2(144, 174)
 const ROBE_SHAPE := "M 82 118 L 120 116 C 127 150 137 190 146 228 C 150 244 154 260 157 276 L 149 266 L 146 277 L 137 263 L 131 276 L 122 262 L 113 277 L 106 265 L 99 276 L 92 260 L 85 275 L 77 262 L 67 273 L 61 256 L 50 268 L 47 254 L 34 262 L 38 250 L 24 254 C 40 236 54 212 62 190 C 70 166 77 144 82 118 Z"
 const TORSO := "M 63 70 C 90 65 112 61 135 63 C 133 88 125 108 117 128 L 83 131 C 77 110 69 90 63 70 Z"
 const FAR_PAULDRON := "M 108 62 C 116 54 130 55 137 62 C 141 69 139 77 134 81 L 110 77 Z"
@@ -53,8 +60,8 @@ const SPIKES: Array[String] = ["M 54 68 L 34 48 L 61 61 Z", "M 60 61 L 47 37 L 6
 const PAULDRON_LAMES: Array[String] = ["M 51 71 C 58 63 70 62 84 66.6", "M 56 63 C 62 58.6 72 58 84.6 61.4"]
 const FAR_LAMES: Array[String] = ["M 110 70 C 118 64 130 64 139 70"]
 const HAND := "M 29.4 99.4 L 22.4 99.2 L 17.4 102.6 L 21.4 103.4 L 17.6 107 L 22.6 106.2 L 21.4 110.6 L 25.8 107.2 L 30.4 106.6 Z"
-## The ribs across his chest: where each starts at his breastbone, where it
-## curves round, and where it ends.
+## The ribs across his chest, each from his spine round his side to his
+## breastbone.
 const RIBS: Array[String] = [
 	"M 112 70 C 100 70 84 74 70.6 85",
 	"M 111 79 C 99 79.6 85 84 73 95",
@@ -85,25 +92,34 @@ const CHAINS: Array[String] = [
 	"M 81 125 C 95 131 109 129 120 123",
 	"M 47 101 C 51 122 65 132 81 125",
 	"M 81 126 C 69 160 57 214 43 262 C 39 270 29 273 -12 274",
-	"M 145 152 C 146 160 145.6 166 144.4 172",
 ]
 const LINK := 5.4
+## The sickle's chain from his far hand, and the ring it hangs from.
+const SICKLE_CHAIN := "M 145 152 C 146 160 145.6 166 144.4 172"
+const SICKLE_RING := Vector2(144, 174)
 const CHAIN_FROM := Vector2(-12, 274)
-## The grin in the dark of his face: its middle, how wide and how many
-## teeth.
+## The grin in the dark of his face: its middle, how wide, how many teeth,
+## and how much it bows up at its ends and tilts.
 const GRIN_MIDDLE := Vector2(76.4, 49.6)
 const GRIN_WIDTH := 11.0
 const GRIN_TEETH := 8
+const GRIN_BOW := 6.0
+const GRIN_TILT := 1.6
 ## His eyes in the dark of his face, and the glow round them.
 const EYES: Array[Vector2] = [Vector2(73.4, 38), Vector2(80.6, 37.4)]
 const EYE_TILT: Array[float] = [0.22, -0.14]
-## The lantern on its short chain, drawn round LANTERN_MIDDLE: the ring and
-## the cap, the cage's frame, its bars (x), the bottom; the souls caged in
-## its light (offset, size).
+## The lantern on its short chain from his hand, drawn round
+## LANTERN_MIDDLE: the ring and the cap, the cage's frame and its glass, the
+## flame, the bars (x), the bottom; the souls caged in its light (offset,
+## size).
+const LANTERN_HOOK := Vector2(24, 104)
 const LANTERN_TOP := Vector2(21, 109)
 const CAP := "M 11.6 121.4 L 21 113.4 L 30.4 121.4 Z"
 const CAP_BAND := "M 10.6 120.8 L 31.4 120.8 L 31.4 124.8 L 10.6 124.8 Z"
 const CAGE := "M 13.4 124.8 L 28.6 124.8 L 32.4 138 L 28.6 151.4 L 13.4 151.4 L 9.6 138 Z"
+const GLASS := Color("1b4a33")
+const GLASS_LIGHT := Color("c9ffe0")
+const FLAME := "M 21 129 Q 25.4 137 21 146.6 Q 16.6 137 21 129 Z"
 const BARS: Array[float] = [15.4, 21.0, 26.6]
 const BASE_BAND := "M 11.6 151 L 30.4 151 L 30.4 155 L 11.6 155 Z"
 const BASE := "M 14 155 L 28 155 L 25 159.6 L 21 165 L 17 159.6 Z"
@@ -115,10 +131,10 @@ func _init() -> void:
 	fold_dark = FOLD_DARK
 	fold_light = FOLD_LIGHT
 	moon_way = MOON_WAY.normalized()
-	rim_width = 0.8
+	rim_width = RIM_WIDTH
 	lantern_at = LANTERN_MIDDLE
 	lantern_reach = LANTERN_REACH
-	lantern_width = 1.0
+	lantern_width = LANTERN_WIDTH
 
 
 ## Where his lantern's light is, in the parent's coordinates.
@@ -143,7 +159,7 @@ func _paint(paint: TitlePaint) -> void:
 		_fold(paint, fold, FOLD_WIDTH)
 	_part(paint, TitlePaint.outline(FAR_ARM), ROBE)
 	_fold(paint, "M 128 80 Q 136 110 142 140", FOLD_WIDTH * 0.7)
-	paint.chain(TitlePaint.outline(CHAINS[4]), LINK, 1.2, CHAIN, CHAIN_EDGE)
+	paint.chain(TitlePaint.outline(SICKLE_CHAIN), LINK, 1.2, CHAIN, CHAIN_EDGE)
 	paint.ring(SICKLE_RING, Vector2(2.6, 2.6), 1.4, IRON.lightened(0.15))
 	_part(paint, TitlePaint.outline(SICKLE_HAFT), IRON)
 	var sickle := TitlePaint.outline(SICKLE)
@@ -157,8 +173,8 @@ func _paint(paint: TitlePaint) -> void:
 		_spike(paint, TitlePaint.outline(spike))
 	_part(paint, TitlePaint.outline(FAR_PAULDRON), IRON)
 	_lames(paint, FAR_LAMES)
-	for k in 4:
-		paint.chain(TitlePaint.outline(CHAINS[k]), LINK, 1.2, CHAIN, CHAIN_EDGE)
+	for chain in CHAINS:
+		paint.chain(TitlePaint.outline(chain), LINK, 1.2, CHAIN, CHAIN_EDGE)
 	_paint_hood(paint)
 	_part(paint, TitlePaint.outline(SLEEVE), ROBE)
 	_part(paint, TitlePaint.outline(ARM), ROBE)
@@ -179,7 +195,7 @@ func _paint_robe(paint: TitlePaint) -> void:
 	var tabard := TitlePaint.outline(TABARD)
 	_part(paint, tabard, TABARD_COLOR)
 	_fold(paint, "M 99 132 C 99.6 170 99 200 98 232", FOLD_WIDTH * 0.6)
-	paint.shape(robe, TitlePaint.linear(Vector2(0, 200), Vector2(0, 278), Color(0, 0, 0, 0.0), Color(0, 0, 0, 0.5)))
+	paint.shape(robe, TitlePaint.linear(Vector2(0, 200), Vector2(0, 278), Color(HEM_SHADE, 0.0), HEM_SHADE))
 
 
 ## The chest: dark, the souls' green glowing inside it, the ribs over it
@@ -190,14 +206,14 @@ func _paint_chest(paint: TitlePaint) -> void:
 	paint.glow_in(torso, Vector2(86, 96), 34.0, Color(SOUL, 0.85))
 	for rib in RIBS:
 		var line := TitlePaint.outline(rib)
-		paint.taper(line, RIB_WIDTH.x + 1.4, RIB_WIDTH.x + 1.4, Color(0.0, 0.01, 0.0, 0.85), RIB_WIDTH.y)
+		paint.taper(line, RIB_WIDTH.x + 1.4, RIB_WIDTH.x + 1.4, RIB_EDGE, RIB_WIDTH.y)
 		paint.taper(line, RIB_WIDTH.x, RIB_WIDTH.x, TitlePaint.linear(line[0], line[-1], IRON.darkened(0.45), IRON.lerp(lit_tint, 0.16)), RIB_WIDTH.y)
 		paint.taper(TitlePaint.moved(line, Vector2(0.0, -RIB_WIDTH.y * 0.35)), 0.0, 0.0, Color(MOON_RIM_TOP, 0.4), RIB_WIDTH.y * 0.3)
 	paint.taper(TitlePaint.outline("M 68.6 76 C 72 92 76 108 80 124"), 3.4, 2.0, IRON)
 
 
-## The hood: shaded and rimmed with its folds, the dark of his face, the
-## green glow in it and his burning eyes.
+## The hood: shaded, its folds, the dark of his face, the green glow in
+## it, his burning eyes and his grin.
 func _paint_hood(paint: TitlePaint) -> void:
 	var hood := TitlePaint.outline(HOOD)
 	_part(paint, hood, ROBE)
@@ -206,7 +222,7 @@ func _paint_hood(paint: TitlePaint) -> void:
 	var face := TitlePaint.outline(FACE)
 	paint.shape(face, FACE_DARK)
 	paint.glow_in(face, Vector2(76, 44), 16.0, Color(SOUL, 0.3))
-	paint.rim(face, Vector2(1.4, 0.0), Color(0, 0, 0, 0.6))
+	paint.rim(face, Vector2(1.4, 0.0), FACE_EDGE)
 	for k in EYES.size():
 		paint.glow(EYES[k], Vector2(6.4, 5), Color(SOUL, 0.7))
 		paint.oval(EYES[k], Vector2(2.4, 1.1), EYE, EYE_TILT[k])
@@ -214,7 +230,7 @@ func _paint_hood(paint: TitlePaint) -> void:
 	paint.glow(GRIN_MIDDLE, Vector2(8, 3.6), Color(SOUL, 0.25))
 	for k in GRIN_TEETH:
 		var t := float(k) / (GRIN_TEETH - 1)
-		var at := GRIN_MIDDLE + Vector2((t - 0.5) * GRIN_WIDTH, (t - 0.5) * (t - 0.5) * -6.0 + (t - 0.5) * 1.6)
+		var at := GRIN_MIDDLE + Vector2((t - 0.5) * GRIN_WIDTH, -(t - 0.5) * (t - 0.5) * GRIN_BOW + (t - 0.5) * GRIN_TILT)
 		paint.line(at - Vector2(0, 1.0), at + Vector2(0, 1.0), 0.6, Color(SOUL, 0.5))
 
 
@@ -232,22 +248,22 @@ func _paint_pauldron(paint: TitlePaint) -> void:
 func _lames(paint: TitlePaint, lames: Array[String]) -> void:
 	for lame in lames:
 		var line := TitlePaint.outline(lame)
-		paint.taper(line, 1.2, 1.2, Color(0, 0, 0, 0.65))
+		paint.taper(line, 1.2, 1.2, SEAM)
 		paint.taper(TitlePaint.moved(line, Vector2(0, -1.0)), 0.6, 0.6, Color(MOON_RIM_TOP, 0.25))
 
 
 ## The lantern on its short chain: its light round it, the iron cap and
 ## cage, the green inside with the souls caged in it, the bars over them.
 func _paint_lantern(paint: TitlePaint) -> void:
-	paint.chain(PackedVector2Array([Vector2(24, 104), LANTERN_TOP]), 4.0, 1.0, CHAIN, CHAIN_EDGE)
+	paint.chain(PackedVector2Array([LANTERN_HOOK, LANTERN_TOP]), 4.0, 1.0, CHAIN, CHAIN_EDGE)
 	paint.ring(LANTERN_TOP + Vector2(0, 2), Vector2(2.4, 2.4), 1.2, IRON.lightened(0.2))
 	paint.glow(LANTERN_MIDDLE, Vector2(30, 30), Color(SOUL, 0.35))
 	_part(paint, TitlePaint.outline(CAP), IRON)
 	_part(paint, TitlePaint.outline(CAP_BAND), IRON.lightened(0.1))
 	var cage := TitlePaint.outline(CAGE)
-	paint.shape(cage, Color("1b4a33"))
-	paint.glow_in(cage, LANTERN_MIDDLE, 16.0, Color("c9ffe0"))
-	paint.fill("M 21 129 Q 25.4 137 21 146.6 Q 16.6 137 21 129 Z", Color(EYE, 0.85))
+	paint.shape(cage, GLASS)
+	paint.glow_in(cage, LANTERN_MIDDLE, 16.0, GLASS_LIGHT)
+	paint.fill(FLAME, Color(EYE, 0.85))
 	for soul in SOULS:
 		var spot := LANTERN_MIDDLE + Vector2(soul.x, soul.y)
 		paint.glow(spot, Vector2.ONE * soul.z * 2.6, Color(EYE, 0.6))

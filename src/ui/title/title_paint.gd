@@ -136,9 +136,9 @@ func shape(outline: PackedVector2Array, color: Variant) -> void:
 		colors.append(tints[index])
 
 
-## Fills each of `outlines`.
-func shapes(outlines: Array[PackedVector2Array], color: Variant) -> void:
-	for piece in outlines:
+## Fills each of `pieces`.
+func shapes(pieces: Array[PackedVector2Array], color: Variant) -> void:
+	for piece in pieces:
 		shape(piece, color)
 
 
@@ -158,30 +158,30 @@ func rim_inside(outline: PackedVector2Array, toward: Vector2, inside: PackedVect
 
 ## A line along the open `path`, `width` wide.
 func stroke(path: String, width: float, color: Variant) -> void:
-	for line in outlines(path):
-		taper(line, width, width, color)
+	for track in outlines(path):
+		taper(track, width, width, color)
 
 
-## A line along `line`, from `from_width` wide at its start to `to_width`
-## at its end, `swell` wider in its middle: a fold, a strand, a branch or a
-## blade.
-func taper(line: PackedVector2Array, from_width: float, to_width: float, color: Variant, swell := 0.0) -> void:
-	var count := line.size()
+## A line along the points of `track`, from `from_width` wide at its start
+## to `to_width` at its end, `swell` wider in its middle: a fold, a strand,
+## a branch or a blade.
+func taper(track: PackedVector2Array, from_width: float, to_width: float, color: Variant, swell := 0.0) -> void:
+	var count := track.size()
 	if count < 2:
 		return
 	var left := PackedVector2Array()
 	var right := PackedVector2Array()
 	for k in count:
-		var before := line[maxi(k - 1, 0)]
-		var after := line[mini(k + 1, count - 1)]
+		var before := track[maxi(k - 1, 0)]
+		var after := track[mini(k + 1, count - 1)]
 		var side := (after - before).normalized().orthogonal()
 		if k > 0 and k < count - 1:
-			var into := (line[k] - before).normalized().orthogonal()
-			side = (side / maxf(side.dot(into), 1.0 / MITER_LIMIT))
+			var into := (track[k] - before).normalized().orthogonal()
+			side /= maxf(side.dot(into), 1.0 / MITER_LIMIT)
 		var t := float(k) / (count - 1)
 		var half := (lerpf(from_width, to_width, t) + swell * sin(PI * t)) * 0.5
-		left.append(line[k] + side * half)
-		right.append(line[k] - side * half)
+		left.append(track[k] + side * half)
+		right.append(track[k] - side * half)
 	var tints_left := _tints(left, color)
 	var tints_right := _tints(right, color)
 	for k in count - 1:
@@ -268,11 +268,6 @@ func glow_in(outline: PackedVector2Array, center: Vector2, radius: float, color:
 		var wedge := PackedVector2Array([center, center + Vector2.from_angle(TAU * k / GLOW_SIDES) * radius,
 			center + Vector2.from_angle(TAU * (k + 1) / GLOW_SIDES) * radius])
 		shapes(overlap(wedge, outline), tint)
-
-
-## How many triangles it holds.
-func count() -> int:
-	return floori(points.size() / 3.0)
 
 
 ## Draws everything gathered so far on `canvas`, inside its _draw, and

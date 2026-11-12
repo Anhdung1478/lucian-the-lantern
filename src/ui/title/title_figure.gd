@@ -105,14 +105,13 @@ func _part(paint: TitlePaint, outline: PackedVector2Array, base: Color) -> void:
 	var reach := _reach(outline, middle, across)
 	paint.shape(outline, _solid(TitlePaint.linear(middle + across * reach, middle - across * reach,
 		base.lerp(lit_tint, LIT_SIDE), base.darkened(DARK_SIDE))))
+	paint.rim(outline, moon_way * rim_width, _moon_tint(INNER_RIM))
 	if lantern_lit:
-		var way := (lantern_at - middle).normalized()
+		var way := _lantern_way(outline)
 		var green: Color = _lantern_tint().call(middle)
 		paint.shape(outline, TitlePaint.linear(middle, middle + way * _reach(outline, middle, way),
 			Color(green, 0.0), Color(green, green.a * FILL_ALPHA)))
-	paint.rim(outline, moon_way * rim_width, _moon_tint(INNER_RIM))
-	if lantern_lit:
-		paint.rim(outline, _lantern_way(outline) * lantern_width, _lantern_tint(LANTERN_RIM * INNER_RIM))
+		paint.rim(outline, way * lantern_width, _lantern_tint(LANTERN_RIM * INNER_RIM))
 	_parts.append(outline)
 
 
@@ -124,12 +123,16 @@ func _paint_outline(paint: TitlePaint) -> void:
 	var moon := _moon_tint()
 	var green := _lantern_tint(LANTERN_RIM)
 	for outline in _parts:
-		for band in [moon_way * rim_width * SOFT_REACH, moon_way * rim_width]:
-			paint.shapes(_outline_band(outline, band), _faded(moon, SOFT_ALPHA) if band.length() > rim_width else moon)
+		_shine(paint, outline, moon_way * rim_width, moon)
 		if lantern_lit:
-			var way := _lantern_way(outline)
-			paint.shapes(_outline_band(outline, way * lantern_width * SOFT_REACH), _faded(green, SOFT_ALPHA))
-			paint.shapes(_outline_band(outline, way * lantern_width), green)
+			_shine(paint, outline, _lantern_way(outline) * lantern_width, green)
+
+
+## Lights the band of `outline` on the figure's outline that faces
+## `toward`, as wide as `toward` is long: a soft wide band, then a crisp one.
+func _shine(paint: TitlePaint, outline: PackedVector2Array, toward: Vector2, tint: Callable) -> void:
+	paint.shapes(_outline_band(outline, toward * SOFT_REACH), _faded(tint, SOFT_ALPHA))
+	paint.shapes(_outline_band(outline, toward), tint)
 
 
 ## The band of `outline` facing `toward` (as TitlePaint.rim) with nothing
