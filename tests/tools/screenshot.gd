@@ -1057,6 +1057,13 @@ func scenario_craft_shop() -> void:
 	await wait(0.2)
 	print("preview (expect Berserker's Greaves, fee 300): ", panel.craft_preview().display_name, " ", panel.craft_fee())
 	await shot("craft_shop_3_boots")
+	# The recipe table's boots lines, under their heading.
+	var recipes: RecipeTable = backpack._recipes
+	print("boots line lit and first (expect berserkers_greaves true): ", recipes.rows()[0].made.id, " ", recipes.rows()[0].lit)
+	recipes._scroll.scroll_vertical = int(recipes._boots_heading.position.y)
+	await wait(0.2)
+	await shot("craft_shop_3b_boots_recipes")
+	recipes._scroll.scroll_vertical = 0
 	await click(panel.craft_button())
 	await wait(0.2)
 	await press_key(KEY_ENTER, true)
