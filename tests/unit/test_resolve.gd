@@ -1,7 +1,7 @@
 extends GutTest
 ## R1: Resolve. Each defeat on a story stage not yet cleared gives a stack
 ## there, up to 5: more damage dealt and less taken, 10% a stack on Easy and
-## Normal, 5% on Hard, none on Extreme, until the stage is cleared.
+## Normal, 5% on Hard, 3% on Extreme, until the stage is cleared.
 
 const STAGE_SCENE := "res://src/stage/stage.tscn"
 
@@ -23,17 +23,16 @@ func after_each() -> void:
 # --- The rule ------------------------------------------------------------------
 
 
-func test_a_stack_is_worth_10_percent_5_on_hard_and_nothing_on_extreme() -> void:
-	assert_eq(Difficulty.LEVELS.map(func(level: int) -> float: return Difficulty.resolve_step(level)), [0.1, 0.1, 0.05, 0.0])
+func test_a_stack_is_worth_10_percent_5_on_hard_and_3_on_extreme() -> void:
+	assert_eq(Difficulty.LEVELS.map(func(level: int) -> float: return Difficulty.resolve_step(level)), [0.1, 0.1, 0.05, 0.03])
 	assert_eq(Difficulty.resolve_step(7), 0.1, "an unknown level is Normal")
 
 
 func test_each_defeat_is_a_stack_up_to_5() -> void:
 	assert_eq(Resolve.MAX_STACKS, 5)
-	for level in [Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD]:
+	for level in Difficulty.LEVELS:
 		assert_eq(range(8).map(func(defeats: int) -> int: return Resolve.stacks(defeats, level)), [0, 1, 2, 3, 4, 5, 5, 5],
 			Difficulty.name_of(level))
-	assert_eq(Resolve.stacks(3, Difficulty.EXTREME), 0, "Extreme has no Resolve")
 	assert_eq(Resolve.stacks(-2, Difficulty.NORMAL), 0)
 
 
@@ -48,9 +47,10 @@ func test_a_stack_raises_the_damage_dealt_and_lowers_the_damage_taken() -> void:
 	assert_almost_eq(Resolve.damage_dealt_scale(5, Difficulty.HARD), 1.25, 0.0001)
 	assert_almost_eq(Resolve.damage_taken_scale(5, Difficulty.HARD), 0.75, 0.0001)
 	assert_almost_eq(Resolve.damage_dealt_scale(2, Difficulty.HARD), 1.1, 0.0001)
-	assert_almost_eq(Resolve.damage_dealt_scale(5, Difficulty.EXTREME), 1.0, 0.0001)
-	assert_almost_eq(Resolve.damage_taken_scale(5, Difficulty.EXTREME), 1.0, 0.0001)
+	assert_almost_eq(Resolve.damage_dealt_scale(5, Difficulty.EXTREME), 1.15, 0.0001)
+	assert_almost_eq(Resolve.damage_taken_scale(5, Difficulty.EXTREME), 0.85, 0.0001)
 	assert_eq([Resolve.percent(3, Difficulty.NORMAL), Resolve.percent(3, Difficulty.HARD), Resolve.percent(5, Difficulty.EASY)], [30, 15, 50])
+	assert_eq([Resolve.percent(1, Difficulty.EXTREME), Resolve.percent(5, Difficulty.EXTREME)], [3, 15])
 
 
 # --- On Lucian -----------------------------------------------------------------
@@ -79,7 +79,7 @@ func _enemy(hp := 10000.0) -> Enemy:
 
 
 func test_lucian_takes_less_with_each_stack_on_top_of_the_difficulty() -> void:
-	var expected := {Difficulty.EASY: 0.8 * 0.7, Difficulty.NORMAL: 0.7, Difficulty.HARD: 1.1 * 0.85, Difficulty.EXTREME: 1.3}
+	var expected := {Difficulty.EASY: 0.8 * 0.7, Difficulty.NORMAL: 0.7, Difficulty.HARD: 1.1 * 0.85, Difficulty.EXTREME: 1.3 * 0.91}
 	for level: int in expected:
 		var lucian := _lucian(3, level)
 		assert_almost_eq(lucian.damage_taken_scale, expected[level], 0.0001, Difficulty.name_of(level))
@@ -259,13 +259,15 @@ func test_no_line_with_the_setting_off_but_the_defeat_is_counted() -> void:
 	_assert_no_line(stage, "the setting is off")
 
 
-func test_no_line_on_extreme_but_the_defeat_is_counted() -> void:
+## Extreme's stack is the smallest, so no stage there is a dead end either.
+func test_extreme_has_the_smallest_resolve() -> void:
 	var stage: Stage = await _stage(2, 1, 1, Difficulty.EXTREME)
-	assert_eq([stage.lucian.resolve, stage.lucian.damage_dealt_scale], [0, 1.0])
-	assert_almost_eq(stage.lucian.damage_taken_scale, Difficulty.scale(Difficulty.EXTREME), 0.0001)
+	assert_eq(stage.lucian.resolve, 1)
+	assert_almost_eq(stage.lucian.damage_dealt_scale, 1.03, 0.0001)
+	assert_almost_eq(stage.lucian.damage_taken_scale, Difficulty.scale(Difficulty.EXTREME) * 0.97, 0.0001)
 	stage.show_result(false)
 	assert_eq(SaveGame.instance().defeats_on("2-1"), 2)
-	_assert_no_line(stage, "Extreme")
+	assert_has(_result_texts(stage), "Resolve 2 / 5: +6% damage, -6% damage taken on your next try")
 
 
 func test_a_replay_of_a_cleared_stage_has_no_resolve_and_counts_no_defeat() -> void:

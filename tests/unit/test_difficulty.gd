@@ -56,7 +56,7 @@ func test_each_level_says_what_it_does_to_resolve() -> void:
 	assert_eq(Resolve.describe(Difficulty.EASY), tenth)
 	assert_eq(Resolve.describe(Difficulty.NORMAL), tenth)
 	assert_eq(Resolve.describe(Difficulty.HARD), "Resolve: each defeat on a stage gives +5% damage dealt and -5% damage taken there, up to 5 times.")
-	assert_eq(Resolve.describe(Difficulty.EXTREME), "No Resolve: a defeat makes no stage easier.")
+	assert_eq(Resolve.describe(Difficulty.EXTREME), "Resolve: each defeat on a stage gives +3% damage dealt and -3% damage taken there, up to 5 times.")
 	assert_eq(Difficulty.describe(Difficulty.NORMAL), "Enemies have 100% HP and deal 100% damage.\n" + tenth)
 	for level in Difficulty.LEVELS:
 		assert_eq(Difficulty.describe(level).get_slice("\n", 1), Resolve.describe(level), Difficulty.name_of(level))

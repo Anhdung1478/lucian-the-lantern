@@ -4,7 +4,7 @@ extends RefCounted
 ## so every player gets through in the end. Each defeat on a stage not yet
 ## cleared gives one stack there, up to MAX_STACKS. A stack raises the damage
 ## Lucian deals and lowers the damage he takes by the difficulty's step
-## (Difficulty.resolve_step: none on Extreme). Clearing the stage ends it;
+## (Difficulty.resolve_step: the least on Extreme). Clearing the stage ends it;
 ## replays of a cleared stage, Training and Endless never have it. With the
 ## Gameplay setting off the defeats are still counted, but nothing applies.
 
@@ -23,7 +23,7 @@ static func enabled() -> bool:
 
 
 ## The stacks `defeats` defeats give on `difficulty`: one each, up to
-## MAX_STACKS; none where a stack is worth nothing (Extreme).
+## MAX_STACKS; none where a stack is worth nothing (no difficulty today).
 static func stacks(defeats: int, difficulty: int) -> int:
 	return clampi(defeats, 0, MAX_STACKS) if Difficulty.resolve_step(difficulty) > 0.0 else 0
 

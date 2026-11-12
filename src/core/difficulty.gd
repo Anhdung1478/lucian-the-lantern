@@ -19,8 +19,9 @@ const SCALES: Array[float] = [0.8, 1.0, 1.1, 1.3]
 ## boss's sure orange are multiplied by this (KillRewards).
 const ESSENCE_SCALES: Array[float] = [1.0, 1.0, 1.2, 1.5]
 ## What one stack of Resolve is worth: that share more damage dealt and less
-## damage taken (Resolve). Extreme has none.
-const RESOLVE_STEPS: Array[float] = [0.1, 0.1, 0.05, 0.0]
+## damage taken (Resolve). Extreme has the least: enough that no stage there
+## is a dead end, since the difficulty can't be changed after a new game.
+const RESOLVE_STEPS: Array[float] = [0.1, 0.1, 0.05, 0.03]
 
 
 static func is_level(level: int) -> bool:

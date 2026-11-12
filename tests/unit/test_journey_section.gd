@@ -913,7 +913,7 @@ func test_the_resolve_line_follows_the_difficulty_and_the_setting() -> void:
 	assert_string_starts_with(panel.resolve_row.get_meta(&"hover_text"), "Lucian fell here 7 times.")
 	_save().difficulty = Difficulty.EXTREME
 	section.refresh()
-	assert_false(panel.resolve_row.visible, "Extreme has no Resolve")
+	assert_eq(panel.resolve_label.text, "Resolve 5 / 5: +15% damage, -15% taken", "Extreme has the smallest")
 	_save().difficulty = Difficulty.NORMAL
 	_settings = GameSettings.instance()
 	GameSettings._instance = GameSettings.new(SETTINGS_PATH)

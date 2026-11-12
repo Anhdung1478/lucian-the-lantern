@@ -226,16 +226,14 @@ func test_a_stage_carries_its_defeats_and_their_resolve_stacks() -> void:
 	assert_eq([setup.defeats, setup.resolve], [7, 5], "at most 5 stacks")
 
 
-func test_resolve_stacks_on_hard_and_not_on_extreme() -> void:
+func test_resolve_stacks_on_every_difficulty() -> void:
 	var save := SaveGame.new("user://test_setup_")
 	for i in 2:
 		save.record_defeat("1-1")
-	for level in [Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD]:
+	for level in Difficulty.LEVELS:
 		save.difficulty = level
-		assert_eq(StageSetup.for_stage(save, 1, 1).resolve, 2, Difficulty.name_of(level))
-	save.difficulty = Difficulty.EXTREME
-	var extreme := StageSetup.for_stage(save, 1, 1)
-	assert_eq([extreme.defeats, extreme.resolve], [2, 0], "Extreme has no Resolve")
+		var setup := StageSetup.for_stage(save, 1, 1)
+		assert_eq([setup.defeats, setup.resolve], [2, 2], Difficulty.name_of(level))
 
 
 func test_the_tutorial_counts_like_any_stage() -> void:
