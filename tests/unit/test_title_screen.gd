@@ -112,7 +112,7 @@ func test_the_arrow_keys_and_enter_work_the_title_pages() -> void:
 # --- The backdrop: the night scene and the three figures -------------------------
 
 
-func test_the_backdrop_and_the_figures_ignore_the_mouse_and_load_their_art() -> void:
+func test_the_backdrop_and_the_figures_ignore_the_mouse_and_keep_their_art_s_shape() -> void:
 	var title := _title()
 	var backdrop := title.backdrop
 	assert_is(backdrop, TitleBackdrop)
@@ -121,14 +121,14 @@ func test_the_backdrop_and_the_figures_ignore_the_mouse_and_load_their_art() -> 
 	assert_eq(backdrop.size, title.size, "fills the screen")
 	assert_eq(backdrop.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 	var layers := backdrop.find_children("*", "Control", true, false)
-	assert_gte(layers.size(), 4, "the three figures and the moving layer")
+	assert_gte(layers.size(), 5, "the three figures, the near layer and the moving layer")
 	for layer: Control in layers:
 		assert_eq(layer.mouse_filter, Control.MOUSE_FILTER_IGNORE, layer.name)
-	for figure: TextureRect in [backdrop.lucian, backdrop.senna, backdrop.thresh]:
-		assert_not_null(figure.texture, figure.name)
-		if figure.texture:
-			assert_gt(figure.texture.get_height(), 1000, "%s's art is imported large, so it stays sharp" % figure.name)
+	for figure: TitleFigure in [backdrop.lucian, backdrop.senna, backdrop.thresh]:
+		assert_almost_eq(figure.size.x / figure.size.y, figure.box.size.x / figure.box.size.y, 0.01, "%s keeps its art's shape" % figure.name)
 	assert_lt(backdrop.senna.get_index(), backdrop.lucian.get_index(), "Senna stands behind Lucian")
+	assert_lt(backdrop.thresh.get_index(), backdrop.foreground.get_index(), "the near grass and graves stand in front of the figures")
+	assert_lt(backdrop.foreground.get_index(), backdrop.effects.get_index(), "the mist rolls in front of everything")
 
 
 func test_lucian_and_senna_stand_left_of_the_column_and_thresh_right_of_it() -> void:
@@ -142,14 +142,14 @@ func test_lucian_and_senna_stand_left_of_the_column_and_thresh_right_of_it() -> 
 			await wait_process_frames(2)
 		var column := title.column.get_global_rect()
 		assert_gt(column.size.x, 400.0, "the %s column is laid out" % page)
-		for figure: TextureRect in [backdrop.lucian, backdrop.senna]:
+		for figure: TitleFigure in [backdrop.lucian, backdrop.senna]:
 			var rect := figure.get_global_rect()
 			assert_lt(rect.get_center().x, middle, "%s left of centre" % figure.name)
 			assert_lt(rect.end.x, column.position.x, "%s clear of the %s column" % [figure.name, page])
 		var thresh := backdrop.thresh.get_global_rect()
 		assert_gt(thresh.get_center().x, middle, "Thresh right of centre")
 		assert_gt(thresh.position.x, column.end.x, "Thresh clear of the %s column" % page)
-	for figure: TextureRect in [backdrop.lucian, backdrop.senna, backdrop.thresh]:
+	for figure: TitleFigure in [backdrop.lucian, backdrop.senna, backdrop.thresh]:
 		var rect := figure.get_global_rect()
 		assert_gt(rect.end.y, title.size.y - 60.0, "%s stands at the bottom" % figure.name)
 		assert_lte(rect.end.y, title.size.y, "%s's feet show" % figure.name)
@@ -176,16 +176,62 @@ func test_the_scene_is_drawn_once_and_only_its_effects_move_while_it_shows() -> 
 	var title := _title()
 	var backdrop := title.backdrop
 	await wait_process_frames(2)
-	watch_signals(backdrop)
+	var still: Array[Control] = [backdrop, backdrop.lucian, backdrop.senna, backdrop.thresh, backdrop.foreground]
+	for layer in still:
+		watch_signals(layer)
 	watch_signals(backdrop.effects)
 	await wait_process_frames(4)
-	assert_signal_emit_count(backdrop, "draw", 0, "the scene is drawn once")
+	for layer in still:
+		assert_signal_emit_count(layer, "draw", 0, "%s is drawn once" % layer.name)
 	assert_gt(get_signal_emit_count(backdrop.effects, "draw"), 2, "mist, wisps and motes move")
 	assert_true(backdrop.is_processing())
 	title.visible = false
 	assert_false(backdrop.is_processing(), "hidden")
 	title.visible = true
 	assert_true(backdrop.is_processing(), "shown again")
+
+
+func test_on_low_effects_nothing_moves() -> void:
+	var settings := GameSettings.instance()
+	var quality: Variant = settings.get_value(&"quality")
+	settings.set_value(&"quality", "high", false)
+	var backdrop := _title().backdrop
+	await wait_process_frames(1)
+	assert_true(backdrop.is_processing())
+	assert_true(backdrop.effects.visible)
+	settings.set_value(&"quality", "low", false)
+	assert_false(backdrop.is_processing(), "low effects: the scene stands still")
+	assert_false(backdrop.effects.visible, "and the mist, souls and glints are gone")
+	assert_almost_eq(backdrop.senna.modulate.a, TitleBackdrop.SENNA_ALPHA, 0.001, "Senna does not shimmer")
+	watch_signals(backdrop.effects)
+	await wait_process_frames(3)
+	assert_signal_emit_count(backdrop.effects, "draw", 0)
+	settings.set_value(&"quality", "medium", false)
+	assert_true(backdrop.is_processing(), "back on")
+	assert_true(backdrop.effects.visible)
+	settings.set_value(&"quality", quality, false)
+
+
+func test_a_backdrop_opened_on_low_effects_stands_still() -> void:
+	var settings := GameSettings.instance()
+	var quality: Variant = settings.get_value(&"quality")
+	settings.set_value(&"quality", "low", false)
+	var backdrop := TitleBackdrop.new()
+	add_child_autofree(backdrop)
+	assert_false(backdrop.is_processing())
+	assert_false(backdrop.effects.visible)
+	settings.set_value(&"quality", quality, false)
+
+
+func test_hiding_thresh_takes_his_lantern_s_light_off_the_others() -> void:
+	var backdrop := TitleBackdrop.new()
+	backdrop.thresh.visible = false
+	add_child_autofree(backdrop)
+	assert_false(backdrop.lucian.lantern_lit, "Lucian")
+	assert_false(backdrop.senna.lantern_lit, "Senna")
+	backdrop.thresh.visible = true
+	assert_true(backdrop.lucian.lantern_lit, "Thresh is back")
+	assert_true(backdrop.senna.lantern_lit)
 
 
 func test_every_button_is_still_found_and_clicks_through_the_backdrop() -> void:
@@ -271,7 +317,7 @@ func test_the_difficulty_page_fits_and_clears_the_figures() -> void:
 	await wait_process_frames(2)
 	var column := title.column.get_global_rect()
 	assert_true(title.get_global_rect().encloses(column), "%s on screen" % column)
-	for figure: TextureRect in [title.backdrop.lucian, title.backdrop.senna]:
+	for figure: TitleFigure in [title.backdrop.lucian, title.backdrop.senna]:
 		assert_lt(figure.get_global_rect().end.x, column.position.x, figure.name)
 	assert_gt(title.backdrop.thresh.get_global_rect().position.x, column.end.x)
 

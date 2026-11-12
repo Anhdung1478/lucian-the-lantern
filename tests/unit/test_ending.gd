@@ -210,6 +210,8 @@ func test_the_first_clear_shows_the_end_screen_with_the_play_time() -> void:
 	assert_eq(end.time_label.text, "Story time: 1:02:05")
 	assert_eq(end.credit_labels.size(), 3)
 	assert_eq(end.credit_labels[2].text, "A fan game. League of Legends characters belong to Riot Games.")
+	assert_false(end.backdrop.thresh.visible, "Thresh is gone from the scene")
+	assert_false(end.backdrop.lucian.lantern_lit, "and his lantern's light with him")
 	end.continue_button.pressed.emit()
 	await wait_process_frames(3)
 	assert_is(game.screen, MainScreen)
