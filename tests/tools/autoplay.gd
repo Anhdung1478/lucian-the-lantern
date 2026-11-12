@@ -38,12 +38,31 @@ extends SceneTree
 ## per stage ("summary 2-1: tries 4,
 ## cleared in 3:10 with Resolve 3, spent 8:02"; its farm runs too) and the
 ## tree and essences it ended with.
+## AUTOPLAY_LOAD=1 loads the run's save file (same tier, difficulty and
+## AUTOPLAY_RUN) instead of starting a new one, and plays on from it; the
+## stages it has cleared are skipped (the last stage given ends the story part
+## even when it is cleared already). Without a file it starts new.
+## AUTOPLAY_ENDLESS=<runs> plays that many Endless runs once the story part
+## ends (and Endless is open: Act 3 cleared), between them spending essences
+## as the story does; with AUTOPLAY_LOAD=1 on a finished story that is all it
+## plays. AUTOPLAY_ENDLESS_MAP=<index> picks the map (Journey.ENDLESS_MAPS
+## index, default 0 = Random). A run ends when Lucian falls, or at
+## AUTOPLAY_ENDLESS_WAVES waves won (default 80) or ENDLESS_TIME_LIMIT
+## seconds of stage time. The bot answers a modifier pick after its tier's
+## `idle` seconds (the skilled tier by MODIFIER_ORDER, the others take the
+## first card). Each run prints a line, its damage and items, and the run
+## ends with "summary endless:" and the story's "summary rates:" for
+## comparison.
 
 const SAVE_PREFIX := "user://autoplay_save_slot_"
 const SETTINGS_PATH := "user://autoplay_settings.json"
 const STAGE_SCENE := "res://src/stage/stage.tscn"
 ## One stage may not run longer than this (game seconds).
 const STAGE_LIMIT := 2400.0
+## One Endless run may not run longer than this (game seconds).
+const ENDLESS_TIME_LIMIT := 5400.0
+## An Endless run stops after this many waves won (AUTOPLAY_ENDLESS_WAVES).
+const ENDLESS_WAVE_LIMIT := 80
 ## The tree, in the order a player would buy it: [node id, level wanted].
 const BUY_ORDER := [
 	[&"ghost", 1], [&"skill_e", 1],
@@ -78,6 +97,13 @@ var tier := {}
 ## spent (seconds over every try), farms, farm_time (the replays of an
 ## earlier stage made while stuck here)}.
 var stage_rows: Array[Dictionary] = []
+## The story part's essences won, for the summary's rates.
+## The save came from its file (AUTOPLAY_LOAD=1).
+var loaded := false
+var story_blue := 0
+var story_orange := 0
+## One row per Endless run: {wave (waves won), time, blue, orange, stop}.
+var endless_rows: Array[Dictionary] = []
 
 
 func _initialize() -> void:
@@ -104,16 +130,22 @@ func _initialize() -> void:
 	if OS.get_environment("AUTOPLAY_RESOLVE").to_lower() == "off":
 		GameSettings.instance().set_value(Resolve.SETTING, false)
 	difficulty = Difficulty.from_key(OS.get_environment("AUTOPLAY_DIFFICULTY").to_lower())
-	var save := SaveGame.new("%s%s_%s_%s" % [SAVE_PREFIX, skill, Difficulty.KEYS[difficulty], "" if run == "" else run + "_"])
+	var save := SaveGame.new(save_prefix(skill, difficulty, run))
 	SaveGame._instance = save
-	save.start_new(1, difficulty)
+	if OS.get_environment("AUTOPLAY_LOAD") == "1":
+		loaded = save.slot_exists(1) and save.load_slot(1)
+		print("autoplay: loaded %s" % save.path(1) if loaded else "autoplay: no save file %s; starting new" % save.path(1))
+		if loaded:
+			difficulty = save.difficulty
+	if not loaded:
+		save.start_new(1, difficulty)
 	print("autoplay: %s on %s (%s), Resolve %s" % [skill, Difficulty.name_of(difficulty), Difficulty.scale_text(difficulty),
 		"on" if Resolve.enabled() else "off"])
 	wanted_skin = StringName(OS.get_environment("AUTOPLAY_SKIN").to_lower())
 	if wanted_skin != &"" and Skins.find(wanted_skin).id != wanted_skin:
 		print("autoplay: no skin %s; wearing the last one bought" % wanted_skin)
 		wanted_skin = &""
-	if first_stage != "1-1":
+	if first_stage != "1-1" and not loaded:
 		var before: Array[String] = []
 		for id in Journey.all_stage_ids(Journey.ACTS.size()):
 			if id == first_stage:
@@ -129,6 +161,16 @@ func _initialize() -> void:
 	if OS.get_environment("AUTOPLAY_TRACE") != "":
 		trace_every = float(OS.get_environment("AUTOPLAY_TRACE"))
 	_campaign.call_deferred()
+
+
+## The save file prefix of a run: tier, difficulty and AUTOPLAY_RUN's name.
+static func save_prefix(tier_name: String, level: int, run_name: String) -> String:
+	return "%s%s_%s_%s" % [SAVE_PREFIX, tier_name, Difficulty.KEYS[level], "" if run_name == "" else run_name + "_"]
+
+
+## Essences per hour: `amount` over `seconds` of play.
+static func per_hour(amount: int, seconds: float) -> float:
+	return amount * 3600.0 / seconds if seconds > 0.0 else 0.0
 
 
 func _say(line: String) -> void:
@@ -148,6 +190,10 @@ func _campaign() -> void:
 		for number in range(1, Journey.stage_count(act) + 1):
 			var id := Journey.stage_id(act, number)
 			if id in save.cleared:
+				# A loaded save may already be past the last stage asked for.
+				if loaded and id == last_stage:
+					await _finish(started)
+					return
 				continue
 			var tries := 0
 			var row := {"id": id, "tries": 0, "clear": -1.0, "resolve": 0, "spent": 0.0, "farms": 0, "farm_time": 0.0}
@@ -159,6 +205,8 @@ func _campaign() -> void:
 				var r: Dictionary = await _play(act, number, tries == 1)
 				total += r.time
 				act_time += r.time
+				story_blue += r.blue
+				story_orange += r.orange
 				row.tries = tries
 				row.spent += r.time
 				if r.cleared:
@@ -172,13 +220,7 @@ func _campaign() -> void:
 					_say("    bought: " + bought)
 				if skins != "":
 					_say("    bought skin: " + skins)
-				var parts: PackedStringArray = []
-				var by: Dictionary = r.taken_by
-				var ids := by.keys()
-				ids.sort_custom(func(a: String, b: String) -> bool: return by[a] > by[b])
-				for key: String in ids:
-					parts.append("%s %d" % [key, by[key]])
-				_say("    taken by: " + ", ".join(parts))
+				_say("    taken by: " + _taken_text(r.taken_by))
 				_say("    items: %s  | end: %s" % [" · ".join(r.items) if not r.items.is_empty() else "none", r.equipped])
 				if r.cleared:
 					farm_from = Vector2i(act, number)
@@ -189,27 +231,33 @@ func _campaign() -> void:
 					var f: Dictionary = await _play(farm_from.x, farm_from.y)
 					total += f.time
 					act_time += f.time
+					story_blue += f.blue
+					story_orange += f.orange
 					row.farms += 1
 					row.farm_time += f.time
 					_say("  farm %s: %s  time %s  blue+%d" % [Journey.stage_id(farm_from.x, farm_from.y),
 						"cleared" if f.cleared else "failed", StageResult.clock(f.time), f.blue])
 				if tries >= max_tries:
 					_say("WALL at %s after %d tries; total game time %s" % [id, tries, StageResult.clock(total)])
-					_finish(started)
+					await _finish(started)
 					return
 			if id == last_stage:
 				_say("Act %d time %s; total %s" % [act, StageResult.clock(act_time), StageResult.clock(total)])
-				_finish(started)
+				await _finish(started)
 				return
 		_say("== Act %d done in %s game time (total %s); essences B%d O%d P%d" % [act, StageResult.clock(act_time), StageResult.clock(total),
 			save.essences.amount(Essences.BLUE), save.essences.amount(Essences.ORANGE), save.essences.amount(Essences.PURPLE)])
-	_finish(started)
+	await _finish(started)
 
 
-## The summary (a line per stage tried, then the tree and essences the run
-## ended with), the real time, and the run is over.
+## The Endless runs, if asked for, then the summary (a line per stage tried,
+## then the tree and essences the run ended with), the real time, and the run
+## is over.
 func _finish(started: int) -> void:
 	var save := SaveGame.instance()
+	var runs := int(OS.get_environment("AUTOPLAY_ENDLESS"))
+	if runs > 0:
+		await _endless(save, runs)
 	_say("== Summary: %s on %s, Resolve %s" % [skill, Difficulty.name_of(difficulty), "on" if Resolve.enabled() else "off"])
 	for row in stage_rows:
 		var outcome := "cleared in %s with Resolve %d" % [StageResult.clock(row.clear), row.resolve] if row.clear >= 0.0 else "not cleared"
@@ -225,10 +273,72 @@ func _finish(started: int) -> void:
 	var outside: float = visits * tier.between + retries * tier.retry
 	_say("summary time: %s in stages; with %d visits to the main screen at %d s and %d retries at %d s, about %s of play time" % [
 		_hours(in_stages), visits, int(tier.between), retries, int(tier.retry), _hours(in_stages + outside)])
+	if not endless_rows.is_empty():
+		_endless_summary(in_stages)
 	_say("summary tree: %s; essences B%d O%d P%d" % [_tree_text(save), save.essences.amount(Essences.BLUE),
 		save.essences.amount(Essences.ORANGE), save.essences.amount(Essences.PURPLE)])
 	_say("real seconds: %d" % ((Time.get_ticks_msec() - started) / 1000))
 	quit()
+
+
+## Plays `runs` Endless runs on AUTOPLAY_ENDLESS_MAP, spending the essences
+## between them; says so and plays none when Act 3 is not cleared.
+func _endless(save: SaveGame, runs: int) -> void:
+	if not Journey.is_endless_open(save.cleared):
+		_say("endless: not open (Act %d cleared of %d needed); no runs" % [Journey.acts_cleared(save.cleared), Journey.ENDLESS_ACT])
+		return
+	var map := clampi(int(OS.get_environment("AUTOPLAY_ENDLESS_MAP")), 0, Journey.ENDLESS_MAPS.size() - 1)
+	var wave_cap := int(OS.get_environment("AUTOPLAY_ENDLESS_WAVES")) if OS.get_environment("AUTOPLAY_ENDLESS_WAVES") != "" else ENDLESS_WAVE_LIMIT
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	_say("endless: %d runs on %s, stopping at %d waves or %s" % [runs, Journey.ENDLESS_MAPS[map], wave_cap, StageResult.clock(ENDLESS_TIME_LIMIT)])
+	for k in range(1, runs + 1):
+		var bought := _spend(save)
+		var skins := _buy_skins(save)
+		var r: Dictionary = await _play_setup(StageSetup.for_endless(save, map, rng), false, ENDLESS_TIME_LIMIT, wave_cap)
+		endless_rows.append({"wave": r.waves_won, "time": r.time, "blue": r.blue, "orange": r.orange})
+		var ending: String = "stopped at cap (%s)" % r.stop if r.stop != "" else "died to " + r.killer
+		_say("endless run %d: wave %d  time %s  kills %d  lvl %d  dealt %d  taken %d  gold %d  blue+%d  orange+%d  modifiers %s  %s" % [
+			k, r.waves_won, StageResult.clock(r.time), r.kills, r.level, int(r.dealt), int(r.damage_taken), r.gold, r.blue, r.orange,
+			", ".join(r.modifiers) if not r.modifiers.is_empty() else "none", ending])
+		if bought != "":
+			_say("    bought: " + bought)
+		if skins != "":
+			_say("    bought skin: " + skins)
+		_say("    taken by: " + _taken_text(r.taken_by))
+		_say("    items: %s  | end: %s" % [" · ".join(r.items) if not r.items.is_empty() else "none", r.equipped])
+
+
+## The summary's Endless lines, and the story's rates beside them when this
+## process played a story stage (`story_time` seconds of stage time).
+func _endless_summary(story_time: float) -> void:
+	var best := 0
+	var waves := 0
+	var time := 0.0
+	var blue := 0
+	var orange := 0
+	for row in endless_rows:
+		best = maxi(best, row.wave)
+		waves += row.wave
+		time += row.time
+		blue += row.blue
+		orange += row.orange
+	var n := endless_rows.size()
+	_say("summary endless: runs %d, best wave %d, average wave %.1f, average time %s, blue per hour %d, orange per hour %d" % [
+		n, best, float(waves) / n, StageResult.clock(time / n), per_hour(blue, time), per_hour(orange, time)])
+	if not stage_rows.is_empty():
+		_say("summary rates: story blue per hour %d, orange per hour %d" % [per_hour(story_blue, story_time), per_hour(story_orange, story_time)])
+	_say("summary time endless: %s in runs" % _hours(time))
+
+
+## "id n, id n": damage taken per enemy id, the most first.
+func _taken_text(by: Dictionary) -> String:
+	var parts: PackedStringArray = []
+	var ids := by.keys()
+	ids.sort_custom(func(a: String, b: String) -> bool: return by[a] > by[b])
+	for key: String in ids:
+		parts.append("%s %d" % [key, by[key]])
+	return ", ".join(parts)
 
 
 ## "4 h 12" for seconds.
@@ -308,19 +418,33 @@ func _buy_skins(save: SaveGame) -> String:
 
 
 func _play(act: int, number: int, first_try := false) -> Dictionary:
+	return await _play_setup(StageSetup.for_stage(SaveGame.instance(), act, number), first_try, STAGE_LIMIT, 0)
+
+
+## Plays `setup`'s stage until its result shows, `time_limit` seconds pass or
+## (Endless, when `wave_cap` > 0) that many waves are won; "stop" in the
+## result says which cap ended it, "" when the result did.
+func _play_setup(setup: StageSetup, first_try: bool, time_limit: float, wave_cap: int) -> Dictionary:
 	var save := SaveGame.instance()
-	var setup := StageSetup.for_stage(save, act, number)
 	var stage: Stage = load(STAGE_SCENE).instantiate()
 	stage.setup(setup)
 	root.add_child(stage)
 	var blue_before := save.essences.amount(Essences.BLUE)
+	var orange_before := save.essences.amount(Essences.ORANGE)
 	var bot := Bot.new()
 	bot.stage = stage
 	bot.tier = tier
 	stage.add_child(bot)
 	var next_trace := 0.0
 	var tracing := first_try and trace_every > 0.0
-	while not stage.result.visible and stage.elapsed < STAGE_LIMIT:
+	var stop := ""
+	while not stage.result.visible:
+		if stage.elapsed >= time_limit:
+			stop = "%s of stage time" % StageResult.clock(time_limit)
+			break
+		if wave_cap > 0 and stage.endless.runner.waves_cleared >= wave_cap:
+			stop = "%d waves" % wave_cap
+			break
 		await process_frame
 		if stage.cutscene and not stage.cutscene.skipped:
 			stage.cutscene.skip()
@@ -332,7 +456,8 @@ func _play(act: int, number: int, first_try := false) -> Dictionary:
 		"cleared": cleared, "time": stage.elapsed, "min_hp": bot.min_hp, "level": stage.lucian.progress.level,
 		"potions": bot.potions, "dodges": bot.dodges, "hits": bot.hits, "damage_taken": stage.stats.damage_taken,
 		"waves": "%d/%d" % [stage.runner.waves_done(), stage.runner.total_waves()],
-		"blue": save.essences.amount(Essences.BLUE) - blue_before, "killer": bot.last_hit_by,
+		"blue": save.essences.amount(Essences.BLUE) - blue_before, "orange": save.essences.amount(Essences.ORANGE) - orange_before,
+		"stop": stop, "modifiers": bot.modifier_log, "waves_won": stage.runner.waves_done(), "killer": bot.last_hit_by,
 		"taken_by": bot.taken_by, "kills": stage.stats.kills, "dealt": stage.stats.damage_dealt, "gold": stage.stats.gold_earned,
 		"items": bot.item_log, "equipped": bot.equipped_text(), "resolve": stage.lucian.resolve,
 		"gift": LanternGifts.display_name(stage.lucian.gift) if stage.lucian.gift != LanternGifts.NONE else "none",
@@ -370,6 +495,12 @@ class Bot extends Node:
 	## The skilled tier's gifts, best first (LanternGifts ids): Keen Edge, Quick
 	## Hands, Thirst, Second Wind, Focus, Ward, Light Step, Fortune.
 	const GIFT_ORDER := [1, 2, 6, 4, 3, 7, 5, 8]
+	## The skilled tier's Endless modifiers, best first (EndlessModifiers ids):
+	## +15% blue for -10% HP and +10% gold for -5% AD cost little and pay what
+	## the bot spends; Nothing beats the three with a deadly downside: enemies
+	## 20% faster (+30% gold), elites twice as often (x1.5 orange drops) and
+	## bosses +25% HP (x1.5 purple, which the bot hardly uses), worst last.
+	const MODIFIER_ORDER := [3, 4, EndlessModifiers.NOTHING, 1, 2, 5]
 	const FOCUS_WALK := 200.0
 	## A wasted decision is a step this long in any direction.
 	const FUMBLE_STEP := 90.0
@@ -403,6 +534,8 @@ class Bot extends Node:
 	var _idled := 0.0
 	## Seconds the Lantern's gift pick has been open.
 	var _gift_open := 0.0
+	## The Endless modifiers picked, in order ("3 (+15% blue)").
+	var modifier_log: PackedStringArray = []
 
 	func _ready() -> void:
 		# The gift's pick pauses the game: the bot still has to click it.
@@ -452,7 +585,7 @@ class Bot extends Node:
 		if lucian.dead or stage.result.visible or stage.cutscene:
 			return
 		if get_tree().paused:
-			_pick_gift(delta)
+			_pick_card(delta)
 			return
 		min_hp = minf(min_hp, lucian.hp / lucian.stats.max_hp)
 		for slot in [ChampionProgress.Slot.R, ChampionProgress.Slot.Q, ChampionProgress.Slot.W, ChampionProgress.Slot.E]:
@@ -464,23 +597,33 @@ class Bot extends Node:
 		_think = tier.react
 		_decide()
 
-	## The Lantern's gift: after `idle` seconds the skilled tier clicks the
-	## card first in GIFT_ORDER; the others click the first card.
-	func _pick_gift(delta: float) -> void:
-		if stage.gifts == null or stage.gifts.pick == null:
+	## The Lantern's gift or an Endless modifier on screen: after `idle`
+	## seconds the skilled tier clicks the card first in GIFT_ORDER (or
+	## MODIFIER_ORDER); the others click the first card.
+	func _pick_card(delta: float) -> void:
+		var pick: ModifierPick = null
+		if stage.gifts and stage.gifts.pick:
+			pick = stage.gifts.pick
+		elif stage.endless and stage.endless.pick:
+			pick = stage.endless.pick
+		if pick == null:
 			return
 		_gift_open += delta
 		if _gift_open < tier.idle:
 			return
 		_gift_open = 0.0
-		var pick := stage.gifts.pick
-		var card := 0
-		if tier.gift:
-			for id in GIFT_ORDER:
-				if id in pick.ids:
-					card = pick.ids.find(id)
-					break
+		var card := best_card(pick.ids, GIFT_ORDER if pick.gifts else MODIFIER_ORDER) if tier.gift else 0
+		if not pick.gifts:
+			var id := pick.ids[card]
+			modifier_log.append("%d (%s)" % [id, EndlessModifiers.reward(id)])
 		pick.cards[card].pressed.emit()
+
+	## The index in `ids` of the card first in `order`; 0 when none is.
+	static func best_card(ids: Array[int], order: Array) -> int:
+		for id in order:
+			if id in ids:
+				return ids.find(id)
+		return 0
 
 	func _enemies() -> Array[EnemyUnit]:
 		var found: Array[EnemyUnit] = []
