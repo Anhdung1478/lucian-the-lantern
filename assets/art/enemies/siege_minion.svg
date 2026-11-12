@@ -1,22 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
-  <!-- Siege Minion: a wheeled cannon cart seen from above, barrel forward (+X), red crest. -->
+  <!-- Siege Minion: crimson cannon cart with a crew minion behind it, barrel forward (+X). -->
   <g transform="translate(48 48)">
-    <ellipse cx="0" cy="4" rx="38" ry="34" fill="#000000" opacity="0.25"/>
     <!-- wheels -->
-    <rect x="-22" y="-37" width="30" height="11" rx="5" fill="#4a3a30" stroke="#1a1d24" stroke-width="3"/>
-    <rect x="-22" y="26" width="30" height="11" rx="5" fill="#4a3a30" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -14 -37 v 11 M -4 -37 v 11 M -14 26 v 11 M -4 26 v 11" stroke="#1a1d24" stroke-width="2"/>
+    <rect x="-30" y="-36" width="22" height="11" rx="3.5" fill="#5e4630" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <rect x="2" y="-36" width="22" height="11" rx="3.5" fill="#5e4630" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <rect x="-30" y="25" width="22" height="11" rx="3.5" fill="#5e4630" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <rect x="2" y="25" width="22" height="11" rx="3.5" fill="#5e4630" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -25 -30.5 L -13 -30.5 M 7 -30.5 L 19 -30.5 M -25 30.5 L -13 30.5 M 7 30.5 L 19 30.5" stroke="#9aa0b0" stroke-width="2.5" stroke-linecap="round"/>
     <!-- cart bed -->
-    <rect x="-34" y="-24" width="52" height="48" rx="8" fill="#7a2a2a" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -34 -10 H 18 M -34 10 H 18" stroke="#4e1717" stroke-width="3"/>
-    <!-- barrel -->
-    <rect x="2" y="-10" width="44" height="20" rx="5" fill="#5a606c" stroke="#1a1d24" stroke-width="3"/>
-    <rect x="32" y="-12" width="9" height="24" rx="3" fill="#7d8492" stroke="#1a1d24" stroke-width="3"/>
-    <rect x="43" y="-8" width="5" height="16" rx="2" fill="#16181e" stroke="#1a1d24" stroke-width="2"/>
-    <!-- breech and fuse -->
-    <circle cx="4" cy="0" r="10" fill="#7d8492" stroke="#1a1d24" stroke-width="3"/>
-    <circle cx="4" cy="0" r="3.5" fill="#ff8a3a"/>
-    <!-- red crest -->
-    <path d="M -34 0 L -26 -14 L -18 0 L -26 14 Z" fill="#d03a3a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="-31" y="-24" width="58" height="48" rx="8" fill="#8a6a46" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -27 -8 L 23 -8 M -27 8 L 23 8" stroke="#5e4630" stroke-width="2.5" stroke-linecap="round"/>
+    <rect x="-26" y="-19" width="48" height="38" rx="5" fill="none" stroke="#a83232" stroke-width="3.5"/>
+    <circle cx="-23" cy="-16" r="2.5" fill="#f2c14e"/><circle cx="-23" cy="16" r="2.5" fill="#f2c14e"/>
+    <!-- crew minion peeking over the back -->
+    <ellipse cx="-24" cy="0" rx="6" ry="11" fill="#a83232" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="-20" cy="0" r="9" fill="#d03a3a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -28 0 L -13 0" stroke="#ff5a4a" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="-22" cy="-4" r="2.8" fill="#ffffff" opacity="0.3"/>
+    <!-- iron carriage and barrel -->
+    <circle cx="2" cy="0" r="14" fill="#4a4f5c" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -10 -9.5 L 34 -8 L 36 -12 L 44 -12 L 44 12 L 36 12 L 34 8 L -10 9.5 Z" fill="#6b7080" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -6 -5 L 32 -4.2" stroke="#9aa0b0" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
+    <rect x="12" y="-10" width="5" height="20" rx="1.5" fill="#4a4f5c" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <ellipse cx="44" cy="0" rx="3" ry="7.5" fill="#2a1018"/>
+    <circle cx="-11" cy="0" r="7" fill="#4a4f5c" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -15 -2 L -20 -9" stroke="#1a1d24" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="-21" cy="-10" r="5" fill="#ffb347" opacity="0.4"/><circle cx="-21" cy="-10" r="2.8" fill="#ffb347"/>
   </g>
 </svg>

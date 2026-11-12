@@ -1,29 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112">
-  <!-- Super Minion: a big armored brute seen from above, glowing red runes and two fists forward (+X). -->
+  <!-- Super Minion: crimson horned armored brute from above, glowing runes, two gauntlets forward (+X). -->
   <g transform="translate(56 56)">
-    <ellipse cx="0" cy="5" rx="44" ry="40" fill="#000000" opacity="0.25"/>
-    <!-- arms and fists -->
-    <path d="M 4 -30 L 38 -24" stroke="#1a1d24" stroke-width="20" stroke-linecap="round"/>
-    <path d="M 4 -30 L 38 -24" stroke="#6a2020" stroke-width="14" stroke-linecap="round"/>
-    <path d="M 4 30 L 38 24" stroke="#1a1d24" stroke-width="20" stroke-linecap="round"/>
-    <path d="M 4 30 L 38 24" stroke="#6a2020" stroke-width="14" stroke-linecap="round"/>
-    <circle cx="44" cy="-23" r="12" fill="#8a2a2a" stroke="#1a1d24" stroke-width="3"/>
-    <circle cx="44" cy="23" r="12" fill="#8a2a2a" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M 40 -29 v 12 M 47 -29 v 12 M 40 17 v 12 M 47 17 v 12" stroke="#3a1010" stroke-width="2" stroke-linecap="round"/>
-    <!-- armored body -->
-    <ellipse cx="-4" cy="0" rx="26" ry="42" fill="#4a4f5c" stroke="#1a1d24" stroke-width="3"/>
-    <ellipse cx="-2" cy="-33" rx="14" ry="11" fill="#7a2a2a" stroke="#1a1d24" stroke-width="3"/>
-    <ellipse cx="-2" cy="33" rx="14" ry="11" fill="#7a2a2a" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -18 -18 Q -22 0 -18 18" fill="none" stroke="#2c303a" stroke-width="4" stroke-linecap="round"/>
-    <!-- glowing runes -->
-    <g stroke="#ff4a3a" stroke-width="3" stroke-linecap="round" fill="none">
-      <path d="M -14 -14 L -8 -4 L -14 6"/>
-      <path d="M -2 -12 L 4 -4 L -2 4"/>
-      <path d="M -14 14 L -8 20"/>
-    </g>
-    <!-- helmet -->
-    <circle cx="6" cy="0" r="14" fill="#6a2020" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -6 0 L 18 0" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
-    <path d="M 12 -6 L 18 0 L 12 6" fill="none" stroke="#ff4a3a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- arms and gauntlets -->
+    <path d="M -2 -28 L 28 -19" stroke="#1a1d24" stroke-width="18" stroke-linecap="round"/>
+    <path d="M -2 -28 L 28 -19" stroke="#6e1e22" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="32" cy="-19" r="10.5" fill="#6b7080" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 40 -25 L 46 -22 L 41 -20 M 40 -13 L 46 -16 L 41 -18" fill="#e6eaf0" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 27 -24 Q 32 -28 37 -24" fill="none" stroke="#9aa0b0" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M -2 28 L 28 19" stroke="#1a1d24" stroke-width="18" stroke-linecap="round"/>
+    <path d="M -2 28 L 28 19" stroke="#6e1e22" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="32" cy="19" r="10.5" fill="#6b7080" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 40 13 L 46 16 L 41 18 M 40 25 L 46 22 L 41 20" fill="#e6eaf0" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 27 14 Q 32 10 37 14" fill="none" stroke="#9aa0b0" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- armored torso -->
+    <ellipse cx="-4" cy="0" rx="20" ry="30" fill="#a83232" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -17 -19 Q -23 0 -17 19 M -7 -24 L -7 24" fill="none" stroke="#6e1e22" stroke-width="3" stroke-linecap="round"/>
+    <path d="M -14 -9 L -5 0 L -14 9 M -3 -13 L 7 0 L -3 13" fill="none" stroke="#ffcf4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- pauldrons with spikes -->
+    <path d="M -9 -33 L -22 -41 L -16 -27 Z M -9 33 L -22 41 L -16 27 Z" fill="#a9afbc" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="-2" cy="-28" r="12" fill="#d03a3a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="-2" cy="28" r="12" fill="#d03a3a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="-2" cy="-28" r="6" fill="none" stroke="#f2c14e" stroke-width="2.5"/>
+    <circle cx="-2" cy="28" r="6" fill="none" stroke="#f2c14e" stroke-width="2.5"/>
+    <!-- horns and helmet -->
+    <path d="M 2 -11 Q 12 -27 30 -26 Q 20 -19 14 -9 Z" fill="#e9e2cf" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M 2 11 Q 12 27 30 26 Q 20 19 14 9 Z" fill="#e9e2cf" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="5" cy="0" r="14" fill="#6e1e22" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -9 0 L 10 0" stroke="#1a1d24" stroke-width="8" stroke-linecap="round"/>
+    <path d="M -9 0 L 10 0" stroke="#ff5a4a" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 12 -6 L 19 -2.5 L 19 2.5 L 12 6 Z" fill="#ffcf4a" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -3 -11 Q 4 -15 11 -11" fill="none" stroke="#ff9a8a" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <circle cx="0" cy="-5" r="3.5" fill="#ffffff" opacity="0.28"/>
   </g>
 </svg>

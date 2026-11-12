@@ -1,23 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="68" height="68" viewBox="0 0 68 68">
-  <!-- Ranged Minion: red-team caster seen from above, hooded, a glowing purple orb held forward (+X). -->
+  <!-- Ranged Minion: crimson hooded caster from above, glowing orb held forward (+X). -->
   <g transform="translate(34 34)">
-    <ellipse cx="0" cy="3" rx="24" ry="22" fill="#000000" opacity="0.25"/>
+    
     <!-- cloak -->
-    <path d="M -22 0 Q -20 -22 0 -22 Q 8 -22 8 -12 L 8 12 Q 8 22 0 22 Q -20 22 -22 0 Z" fill="#6e1f2c" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -16 -6 Q -10 0 -16 6" fill="none" stroke="#3c1019" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 8 -16 Q -6 -23 -22 -13 L -30 0 L -22 13 Q -6 23 8 16 Q 13 0 8 -16 Z" fill="#6e1e22" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -6 -11 L -23 -5 M -6 11 L -23 5" fill="none" stroke="#a83232" stroke-width="3" stroke-linecap="round"/>
     <!-- arms reaching forward -->
-    <path d="M 2 -10 L 22 -4" stroke="#1a1d24" stroke-width="9" stroke-linecap="round"/>
-    <path d="M 2 -10 L 22 -4" stroke="#8c2a3a" stroke-width="5" stroke-linecap="round"/>
-    <path d="M 2 10 L 22 4" stroke="#1a1d24" stroke-width="9" stroke-linecap="round"/>
-    <path d="M 2 10 L 22 4" stroke="#8c2a3a" stroke-width="5" stroke-linecap="round"/>
-    <!-- glowing purple orb -->
-    <circle cx="28" cy="0" r="13" fill="#c47cff" opacity="0.3"/>
-    <circle cx="28" cy="0" r="8.5" fill="#b05cf0" stroke="#1a1d24" stroke-width="3"/>
-    <circle cx="26" cy="-2.5" r="3" fill="#f0dcff"/>
+    <path d="M 3 -14 L 21 -6" stroke="#1a1d24" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 3 -14 L 21 -6" stroke="#a83232" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 3 14 L 21 6" stroke="#1a1d24" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 3 14 L 21 6" stroke="#a83232" stroke-width="5" stroke-linecap="round"/>
+    <!-- mantle -->
+    <ellipse cx="0" cy="0" rx="10" ry="19" fill="#a83232" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="2" cy="-15" r="6" fill="#d03a3a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="2" cy="15" r="6" fill="#d03a3a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M -5 -12 Q -8 0 -5 12" fill="none" stroke="#f2c14e" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- orb -->
+    <circle cx="27" cy="0" r="12.5" fill="#d9a8ff" opacity="0.35"/>
+    <circle cx="27" cy="0" r="7.5" fill="#b45cff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="24.5" cy="-2.5" r="2.5" fill="#ffffff" opacity="0.85"/>
+    <circle cx="21" cy="-9" r="2" fill="#b45cff" opacity="0.9"/><circle cx="33" cy="9" r="2" fill="#b45cff" opacity="0.9"/>
+    <circle cx="21" cy="-6" r="4" fill="#d03a3a" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="21" cy="6" r="4" fill="#d03a3a" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
     <!-- hood -->
-    <ellipse cx="-2" cy="0" rx="13" ry="15" fill="#a02d3e" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M 4 -8 Q 9 0 4 8" fill="#1a1d24"/>
-    <circle cx="6" cy="-2.5" r="1.4" fill="#ff5a4a"/>
-    <circle cx="6" cy="2.5" r="1.4" fill="#ff5a4a"/>
+    <path d="M -9 -7 L -19 0 L -9 7 Z" fill="#d03a3a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="-1" cy="0" r="11.5" fill="#d03a3a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <ellipse cx="5.5" cy="0" rx="6" ry="7.5" fill="#2a1018"/>
+    <circle cx="7.5" cy="-3" r="2" fill="#ffcf4a"/><circle cx="7.5" cy="3" r="2" fill="#ffcf4a"/>
+    <path d="M -8 -8 Q -2 -12 4 -10" fill="none" stroke="#ff9a8a" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <circle cx="-4" cy="-4" r="3.2" fill="#ffffff" opacity="0.28"/>
   </g>
 </svg>
