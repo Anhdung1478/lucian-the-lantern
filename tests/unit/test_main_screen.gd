@@ -8,7 +8,12 @@ var _prefix := ""
 var _calls: Array[String] = []
 
 
+## Whether the extras drew before: the pulses and drifts run only with Juice on.
+var _renders := Juice.renders
+
+
 func before_each() -> void:
+	Juice.renders = true
 	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
 	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
 		SaveGame._instance = SaveGame.new(PREFIX)
@@ -22,6 +27,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	Juice.renders = _renders
 	SaveGame.instance().prefix = _prefix
 	_remove_files()
 

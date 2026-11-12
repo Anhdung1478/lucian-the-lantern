@@ -3,11 +3,12 @@ extends Control
 ## One place on the Journey map (JourneyMap): a stage, the Training dummy or
 ## the Endless portal. A normal stage is a 56 px medallion with its id; a
 ## mini boss (76 px, grey ring) and a boss (100 px, red ring) show that
-## enemy's art, with the id on a plate below. Its state shows: cleared (a
-## gold rim and a green check), open (a soft pulse), locked (dim, a small
-## lock), fogged (its act is locked: the map's fog covers it), picked (a white
-## outline). The pulse (and the portal's swirl) runs only while the place is
-## on screen. A click on an open place emits `chosen`. The hover text says the
+## enemy's art, with the id on a plate below; a boss also wears a gold laurel.
+## Its state shows: cleared (a gold rim, a warm glow and a green check), open
+## (a gold glow and ring, pulsing with Juice on), locked (a dim stone
+## medallion, a small lock), fogged (its act is locked: the map's fog covers
+## it), picked (a white outline). The pulse (and the portal's swirl) runs only
+## while the place is on screen. A click on an open place emits `chosen`. The hover text says the
 ## stage and its waves, or what to clear first.
 
 ## An open place was clicked.
@@ -36,7 +37,7 @@ const ART_ZOOM := 1.12
 ## An open stage's pulse: one ring every PULSE_TIME seconds, growing by
 ## PULSE_GROWTH.
 const PULSE_TIME := 1.8
-const PULSE_GROWTH := 12.0
+const PULSE_GROWTH := 14.0
 ## The Endless portal's swirl: turns per second and arms.
 const PORTAL_SPIN := 0.12
 const PORTAL_ARMS := 3
@@ -50,8 +51,15 @@ const CLEARED_RIM := UiStyle.GOLD_COLOR
 const FACE_COLOR := Color("1d1a15")
 const PLATE_COLOR := Color("15130f")
 const SELECT_COLOR := Color.WHITE
-const LOCKED_TINT := Color(0.58, 0.58, 0.63)
-const FOGGED_TINT := Color(0.42, 0.42, 0.47)
+const LOCKED_TINT := Color(0.74, 0.74, 0.8)
+const FOGGED_TINT := Color(0.8, 0.8, 0.88)
+## A locked stone medallion's face, and its id.
+const STONE_FACE := Color("2e2c28")
+const STONE_TEXT := Color("d2cbb9")
+## The laurel's leaves each side of a boss, and how far they rise and fall.
+const LAUREL_LEAVES := 7
+const LAUREL_FROM := 1.0
+const LAUREL_TO := -1.25
 const PORTAL_GREEN := Color("5ad0a0")
 const PORTAL_PURPLE := Color("9a5cff")
 const PORTAL_STONE := Color("2b2733")
@@ -68,6 +76,8 @@ var locked := false
 var fogged := false
 var cleared := false
 var selected := false
+## The stage the map leads to next.
+var is_next := false
 ## The boss or mini boss (null otherwise), and the art the medallion shows.
 var enemy: EnemyData
 var art: Texture2D
@@ -195,6 +205,18 @@ func set_state(is_locked: bool, is_fogged: bool, is_cleared: bool) -> void:
 	queue_redraw()
 
 
+## Marks the stage the road leads to next.
+func set_next(on: bool) -> void:
+	if is_next != on:
+		is_next = on
+		queue_redraw()
+
+
+## A boss wears a laurel.
+func has_laurel() -> bool:
+	return kind == BOSS
+
+
 func set_selected(on: bool) -> void:
 	if selected != on:
 		selected = on
@@ -240,10 +262,15 @@ func _hover_text() -> String:
 	return text
 
 
-## Open stages pulse; an open portal swirls.
+## Open stages pulse (with Juice on); an open portal swirls.
 func _animated() -> bool:
 	if kind == ENDLESS:
 		return not locked
+	return Juice.on() and _is_open_stage()
+
+
+## A stage that can be played and is not yet cleared.
+func _is_open_stage() -> bool:
 	return is_stage() and not locked and not cleared
 
 
@@ -269,11 +296,13 @@ func _draw() -> void:
 	if selected:
 		draw_arc(middle, r + 6.0, 0.0, TAU, 64, SELECT_COLOR, 3.0, true)
 	elif _hovered and not locked:
-		draw_arc(middle, r + 5.0, 0.0, TAU, 64, Color(1, 1, 1, 0.45), 2.0, true)
+		draw_arc(middle, r + 5.0, 0.0, TAU, 64, Color(1, 1, 1, 0.6), 2.0, true)
 	if PLATE_WIDTHS.has(kind):
 		_draw_plate(middle, r)
 	if cleared:
 		_draw_check(middle + Vector2(r, -r) * 0.72)
+	if has_laurel():
+		_draw_laurel(middle, r)
 	if locked and not fogged and kind != ENDLESS:
 		_draw_lock(middle + Vector2(r, r) * 0.72)
 
@@ -282,25 +311,37 @@ func _draw_medallion(middle: Vector2, r: float) -> void:
 	var glow := JourneyMap.glow()
 	if kind == BOSS:
 		draw_texture_rect(glow, Rect2(middle - Vector2.ONE * r * 1.8, Vector2.ONE * r * 3.6), false, Color(BOSS_COLOR, 0.28))
-	if _animated():
-		var t := fmod(_time, PULSE_TIME) / PULSE_TIME
-		draw_texture_rect(glow, Rect2(middle - Vector2.ONE * r * 1.7, Vector2.ONE * r * 3.4), false,
-			Color(UiStyle.GOLD_COLOR, 0.16 + 0.1 * sin(_time * TAU / PULSE_TIME)))
-		draw_arc(middle, r + 3.0 + PULSE_GROWTH * t, 0.0, TAU, 64, Color(UiStyle.TITLE_COLOR, 0.75 * (1.0 - t)), 2.5, true)
+	if cleared:
+		draw_texture_rect(glow, Rect2(middle - Vector2.ONE * r * 1.6, Vector2.ONE * r * 3.2), false, Color(UiStyle.GOLD_COLOR, 0.2))
+	if _is_open_stage():
+		var beat := sin(_time * TAU / PULSE_TIME) if _animated() else 0.0
+		draw_texture_rect(glow, Rect2(middle - Vector2.ONE * r * 1.9, Vector2.ONE * r * 3.8), false,
+			Color(UiStyle.GOLD_COLOR, (0.3 if is_next else 0.22) + 0.1 * beat))
+		draw_arc(middle, r + 4.0, 0.0, TAU, 64, Color(UiStyle.TITLE_COLOR, 0.55), 2.0, true)
+		if _animated():
+			for ring in 2:
+				var t := fposmod(_time / PULSE_TIME + ring * 0.5, 1.0)
+				draw_arc(middle, r + 3.0 + PULSE_GROWTH * t, 0.0, TAU, 64, Color(UiStyle.TITLE_COLOR, 0.7 * (1.0 - t)), 2.5, true)
+		else:
+			draw_arc(middle, r + 3.0 + PULSE_GROWTH * 0.55, 0.0, TAU, 64, Color(UiStyle.TITLE_COLOR, 0.25), 2.0, true)
+	if selected:
+		draw_texture_rect(glow, Rect2(middle - Vector2.ONE * r * 1.7, Vector2.ONE * r * 3.4), false, Color(1, 1, 1, 0.14))
 	draw_circle(middle + Vector2(0, 4), r + 1.0, Color(0, 0, 0, 0.55))
 	var ring := ring_color()
 	if cleared and kind != NORMAL:
 		draw_circle(middle, r + 3.0, CLEARED_RIM)
-	draw_circle(middle, r, ring.darkened(0.3))
+	var stone := locked and art == null
+	draw_circle(middle, r, ring.darkened(0.15 if stone else 0.3))
 	draw_arc(middle, r - RIM * 0.5, PI * 1.08, PI * 1.92, 24, ring.lightened(0.3), RIM * 0.6, true)
 	draw_arc(middle, r - RIM * 0.5, PI * 0.12, PI * 0.88, 24, ring.darkened(0.6), RIM * 0.5, true)
 	var face := r - RIM
-	draw_circle(middle, face, FACE_COLOR)
+	draw_circle(middle, face, STONE_FACE if stone else FACE_COLOR)
 	if art:
 		JourneyMap.draw_round_art(self, art, middle, face - 1.0, ART_ZOOM)
 	else:
-		draw_circle(middle + Vector2(0, -face * 0.25), face * 0.7, FACE_COLOR.lightened(0.05))
-		_draw_centered(stage_id, middle, ID_FONT, UiStyle.GOLD_COLOR if cleared else UiStyle.TITLE_COLOR)
+		draw_circle(middle + Vector2(0, -face * 0.25), face * 0.7, (STONE_FACE if stone else FACE_COLOR).lightened(0.06))
+		var id_color := UiStyle.GOLD_COLOR if cleared else (STONE_TEXT if stone else UiStyle.TITLE_COLOR)
+		_draw_centered(stage_id, middle, ID_FONT, id_color)
 	draw_arc(middle, face, 0.0, TAU, 48, Color(0, 0, 0, 0.65), 1.5, true)
 
 
@@ -358,9 +399,30 @@ func _draw_plate(middle: Vector2, r: float) -> void:
 
 
 func _draw_check(at: Vector2) -> void:
-	draw_circle(at, 11.0, Color("0e2414"))
-	draw_arc(at, 11.0, 0.0, TAU, 24, CHECK_COLOR, 2.0, true)
-	draw_polyline(PackedVector2Array([at + Vector2(-5, 0), at + Vector2(-1.5, 4), at + Vector2(5, -4)]), CHECK_COLOR, 3.0, true)
+	draw_circle(at + Vector2(0, 2), 13.0, Color(0, 0, 0, 0.5))
+	draw_circle(at, 13.0, CHECK_COLOR.darkened(0.45))
+	draw_arc(at, 12.0, 0.0, TAU, 28, CHECK_COLOR.lightened(0.25), 2.5, true)
+	draw_polyline(PackedVector2Array([at + Vector2(-5.5, 0), at + Vector2(-1.5, 4.5), at + Vector2(5.5, -4.5)]), Color.WHITE, 3.0, true)
+
+
+## A gold laurel around the medallion's sides: leaves in two arcs, bright
+## once the stage is cleared, bronze before.
+func _draw_laurel(middle: Vector2, r: float) -> void:
+	var gold := CLEARED_RIM if cleared else RIM_COLOR.lightened(0.15)
+	for side in [-1.0, 1.0]:
+		for i in LAUREL_LEAVES:
+			var f := float(i) / (LAUREL_LEAVES - 1)
+			var angle := lerpf(LAUREL_FROM, LAUREL_TO, f)
+			var direction := Vector2(side * cos(angle), sin(angle))
+			var rising := Vector2(side * sin(angle), -cos(angle)).rotated(side * 0.3)
+			var base := middle + direction * (r + 7.0)
+			var across := rising.orthogonal() * (5.0 - 1.2 * f)
+			var length := 17.0 - 3.0 * f
+			var leaf := PackedVector2Array([base, base + rising * length * 0.5 + across, base + rising * length, base + rising * length * 0.5 - across])
+			draw_colored_polygon(leaf, gold.darkened(0.2 * f))
+			leaf.append(base)
+			draw_polyline(leaf, Color(0.05, 0.04, 0.02, 0.85), 1.2, true)
+			draw_line(base, base + rising * length * 0.85, gold.lightened(0.5), 1.0, true)
 
 
 func _draw_lock(at: Vector2) -> void:

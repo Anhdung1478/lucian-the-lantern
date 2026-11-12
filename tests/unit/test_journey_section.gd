@@ -8,7 +8,12 @@ var section: JourneySection
 var _settings: GameSettings
 
 
+## Whether the extras drew before: the pulses and drifts run only with Juice on.
+var _renders := Juice.renders
+
+
 func before_each() -> void:
+	Juice.renders = true
 	# Run alone (-gconfig=), the pre-run hook is skipped: never touch the real save.
 	if SaveGame._instance == null or SaveGame._instance.prefix == SaveGame.DEFAULT_PREFIX:
 		SaveGame._instance = SaveGame.new(PREFIX)
@@ -19,6 +24,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	Juice.renders = _renders
 	_remove_save_files()
 	if _settings:
 		GameSettings._instance = _settings
@@ -344,6 +350,50 @@ func test_the_journey_animates_only_while_it_shows() -> void:
 	assert_true(map.endless.is_processing(), "shown again: the portal swirls")
 	assert_true(map.is_processing(), "shown again: the token bobs")
 	assert_false(_node("4-1").is_processing(), "4-1, cleared meanwhile, stands still")
+
+
+## A locked act's terrain shows through its fog.
+func test_the_fog_is_thin_enough_to_see_the_terrain() -> void:
+	assert_lt(JourneyMap.FOG_COLOR.a, 0.6)
+	assert_gt(JourneyNode.FOGGED_TINT.v, 0.7, "a fogged stage keeps most of its light")
+
+
+## The lights and the wisps move with Juice on and stand still (drawn, evenly
+## spaced) with it off.
+func test_the_lights_and_wisps_move_only_with_juice_on() -> void:
+	var map := section.map
+	assert_true(map.is_drifting(), "Juice on: Acts 2-6 are fogged, the wisps drift")
+	assert_true(_node("1-1").is_processing(), "Juice on: the open stage pulses")
+	Juice.renders = false
+	map.refresh(_save().cleared, 0, null)
+	_node("1-1").set_state(false, false, false)
+	assert_false(map.is_drifting(), "Juice off: the map stands still")
+	assert_false(_node("1-1").is_processing(), "Juice off: no pulse")
+	assert_true(map.is_processing() == map.token.visible, "Juice off: only the token's bob runs")
+
+
+## The road leads from the latest cleared stage to the next one; the act the
+## player is on is the next stage's, and a cleared act is marked.
+func test_the_road_leads_to_the_next_stage() -> void:
+	_clear(1, ["2-1"] as Array[String])
+	var map := section.map
+	assert_eq(map.current_act, 2)
+	assert_true(map.is_act_cleared(1))
+	assert_false(map.is_act_cleared(2))
+	assert_true(_node("2-2").is_next)
+	assert_false(_node("2-1").is_next)
+	assert_true(map._lead_to > map._lead_from, "a lead from 2-1 to 2-2")
+	_clear(Journey.ACTS.size())
+	assert_eq(map.current_act, 0, "everything cleared: no current act")
+	assert_true(map.is_act_cleared(6))
+
+
+func test_a_boss_wears_a_laurel() -> void:
+	assert_true(_node("1-1").has_laurel())
+	assert_true(_node("3-5").has_laurel())
+	assert_false(_node("3-2").has_laurel(), "a mini boss has none")
+	assert_false(_node("2-1").has_laurel())
+	assert_false(section.map.training.has_laurel())
 
 
 func test_the_token_wears_the_equipped_skin() -> void:

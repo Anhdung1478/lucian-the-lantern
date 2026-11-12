@@ -4,7 +4,9 @@ extends Control
 ## regions along one winding stone road (a Curve2D through every stage in
 ## play order), Training beside 1-1 and the Endless portal in the
 ## bottom-right corner, off the road. The road glows gold up to the latest
-## cleared stage and is dim beyond; a locked act lies under fog with a chain;
+## cleared stage and is dim beyond, with small lights leading on to the next
+## stage; a locked act lies under a thin fog, its terrain dimmed but readable,
+## with a chain;
 ## Lucian's token (the equipped skin's portrait) floats over the picked place
 ## and moves with the pick. A click on an open place emits `node_chosen`.
 ## Nothing here saves.
@@ -59,23 +61,38 @@ const FRAME_INNER := Color(0.79, 0.64, 0.36, 0.28)
 const FRAME_INSET := 7.0
 ## The road: its dark edge, stone and cobbles, dim and lit.
 const ROAD_EDGE := Color(0.03, 0.025, 0.02, 0.9)
-const ROAD_DIM := Color("332f29")
+const ROAD_DIM := Color("3d382f")
 const ROAD_LIT := Color("b8913f")
 const ROAD_LIT_CORE := Color(1.0, 0.91, 0.66, 0.85)
 const ROAD_WIDTH := 16.0
 const ROAD_EDGE_WIDTH := 24.0
 const COBBLE_STEP := 13.0
+## The lights that lead from the latest cleared stage to the next one: their
+## spacing, speed (px per second), halo and color.
+const LIGHT_GAP := 36.0
+const LIGHT_SPEED := 34.0
+const LIGHT_HALO := 15.0
+const LIGHT_COLOR := Color("ffe39a")
 ## The region names: the act line and the name, in spaced capitals.
 const ACT_FONT := 15
 const NAME_FONT := 25
 const NAME_COLOR := UiStyle.TITLE_COLOR
 const ACT_COLOR := Color("c9a45c")
 const FOGGED_NAME := Color(0.56, 0.57, 0.62)
+## The title of the act the player is on, and of the others once open.
+const CURRENT_NAME := Color("fff6dc")
+const OPEN_NAME := Color("e6cf93")
+const ACT_RULE_ALPHA := 0.75
+const ACT_CHECK_RADIUS := 8.0
 const NAME_OUTLINE := Color(0.02, 0.02, 0.02, 0.9)
 ## The fog over a locked act, and its chain and lock.
-const FOG_COLOR := Color(0.025, 0.025, 0.035, 0.84)
-const FOG_WISP := Color(0.62, 0.64, 0.72, 0.05)
+## A cool grey that lets the terrain show through, dim and desaturated.
+const FOG_COLOR := Color(0.12, 0.13, 0.18, 0.5)
+const FOG_WISP := Color(0.72, 0.76, 0.86, 0.08)
 const FOG_GROWTH := 24.0
+## How far a wisp drifts (px) and how fast (radians per second).
+const WISP_DRIFT := Vector2(26.0, 9.0)
+const WISP_SPEED := 0.22
 const CHAIN_COLOR := Color("7d848e")
 const CHAIN_REACH := Vector2(92, 34)
 const FOG_LOCK_RADIUS := 26.0
@@ -114,6 +131,8 @@ var endless := JourneyNode.landmark(JourneyNode.ENDLESS)
 ## Per act: the region's hover area; a fogged one says what to clear.
 var regions: Array[Control] = []
 var road := Curve2D.new()
+## The act the player is on (the next stage's), 0 once every stage is cleared.
+var current_act := 0
 ## The latest cleared stage, which the road glows up to ("" for none), and
 ## that glow's length along the road.
 var lit_stage := ""
@@ -130,8 +149,20 @@ var token_texture: Texture2D
 
 var _by_id := {}
 var _fogged: Array[bool] = [false, false, false, false, false, false]
-## Drawn over the places: the fog, the region names and the frame.
+var _cleared_acts: Array[bool] = [false, false, false, false, false, false]
+## The road from the latest cleared stage to the next one, as offsets along
+## it (equal when there is none): the lights run over it.
+var _lead_from := 0.0
+var _lead_to := 0.0
+## Under the places, over the road: the lights that lead to the next stage.
+var _lights := Control.new()
+## Drawn over the places: the fog with its chains and locks, the drifting
+## wisps over it, then the region names and the frame.
+var _fog := Control.new()
+var _mist := Control.new()
 var _overlay := Control.new()
+## The lights and the wisps move: Juice is on and the map shows.
+var _drifting := false
 var _token_base := Vector2.ZERO
 var _time := 0.0
 
@@ -148,6 +179,10 @@ func _init() -> void:
 		area.mouse_filter = Control.MOUSE_FILTER_PASS
 		add_child(area)
 		regions.append(area)
+	_lights.size = SIZE
+	_lights.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_lights.draw.connect(_draw_lights)
+	add_child(_lights)
 	training.place(TRAINING_AT)
 	_add_place(training)
 	for act in range(1, Journey.ACTS.size() + 1):
@@ -159,10 +194,13 @@ func _init() -> void:
 			_by_id[node.stage_id] = node
 	endless.place(ENDLESS_AT)
 	_add_place(endless)
-	_overlay.size = SIZE
-	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for layer: Control in [_fog, _mist, _overlay]:
+		layer.size = SIZE
+		layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(layer)
+	_fog.draw.connect(_draw_fog)
+	_mist.draw.connect(_draw_mist)
 	_overlay.draw.connect(_draw_overlay)
-	add_child(_overlay)
 	token.size = Vector2(TOKEN_SIZE + 16.0, TOKEN_SIZE + 28.0)
 	token.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	token.visible = false
@@ -182,6 +220,9 @@ func _notification(what: int) -> void:
 func _process(delta: float) -> void:
 	_time += delta
 	token.position = _token_base + _bob()
+	if _drifting:
+		_lights.queue_redraw()
+		_mist.queue_redraw()
 
 
 ## The stage with this id, or null.
@@ -194,11 +235,23 @@ func is_fogged(act: int) -> bool:
 	return _fogged[act - 1]
 
 
+## True once every stage of `act` is cleared.
+func is_act_cleared(act: int) -> bool:
+	return _cleared_acts[act - 1]
+
+
+## True while the lights and the wisps move: only with Juice on, while the
+## map shows.
+func is_drifting() -> bool:
+	return _drifting
+
+
 ## Locks, opens and marks every place from these cleared stages; Endless
 ## shows `best`; the token wears `portrait`.
 func refresh(cleared: Array[String], best: int, portrait: Texture2D) -> void:
 	for act in range(1, Journey.ACTS.size() + 1):
 		_fogged[act - 1] = not Journey.is_act_open(act, cleared)
+		_cleared_acts[act - 1] = Journey.act_cleared(act, cleared)
 		if _fogged[act - 1]:
 			regions[act - 1].set_meta(&"hover_text", "Clear Act %d first" % (act - 1))
 		elif regions[act - 1].has_meta(&"hover_text"):
@@ -216,10 +269,16 @@ func refresh(cleared: Array[String], best: int, portrait: Texture2D) -> void:
 	endless.set_state(not Journey.is_endless_open(cleared), false, false)
 	endless.set_best(best)
 	lit_offset = road.get_closest_offset(node_for(lit_stage).center) if lit_stage != "" else 0.0
+	current_act = next_node.act if next_node else 0
+	_lead_from = lit_offset
+	_lead_to = road.get_closest_offset(next_node.center) if next_node else lit_offset
+	for node in nodes:
+		node.set_next(node == next_node)
 	token_texture = portrait
 	queue_redraw()
-	_overlay.queue_redraw()
-	token.queue_redraw()
+	for layer: Control in [_lights, _fog, _mist, _overlay, token]:
+		layer.queue_redraw()
+	_sync_process()
 
 
 ## Lights `node` (white outline) and no other place, and floats Lucian's
@@ -356,9 +415,15 @@ static func _radial(offsets: PackedFloat32Array, colors: PackedColorArray) -> Gr
 
 
 ## The token bobs only while it shows and the map is on screen: another
-## section shown stops it.
+## section shown stops it. The lights and wisps move only with Juice on.
 func _sync_process() -> void:
-	set_process(token.visible and is_visible_in_tree())
+	var shown := is_inside_tree() and is_visible_in_tree()
+	var was := _drifting
+	_drifting = shown and Juice.on() and (_fogged.has(true) or _lead_to > _lead_from)
+	set_process(shown and (token.visible or _drifting))
+	if was and not _drifting:
+		_lights.queue_redraw()
+		_mist.queue_redraw()
 
 
 ## How far the token has bobbed from its place over the picked medallion.
@@ -620,8 +685,10 @@ func _draw_road() -> void:
 	draw_polyline(all, ROAD_EDGE, ROAD_EDGE_WIDTH, true)
 	if lit_offset > 0.0:
 		var lit := _road_points(0.0, lit_offset)
-		draw_polyline(lit, Color(UiStyle.GOLD_COLOR, 0.12), ROAD_EDGE_WIDTH + 18.0, true)
-		draw_polyline(lit, Color(UiStyle.GOLD_COLOR, 0.22), ROAD_EDGE_WIDTH + 6.0, true)
+		draw_polyline(lit, Color(UiStyle.GOLD_COLOR, 0.05), ROAD_EDGE_WIDTH + 52.0, true)
+		draw_polyline(lit, Color(UiStyle.GOLD_COLOR, 0.09), ROAD_EDGE_WIDTH + 34.0, true)
+		draw_polyline(lit, Color(UiStyle.GOLD_COLOR, 0.14), ROAD_EDGE_WIDTH + 18.0, true)
+		draw_polyline(lit, Color(UiStyle.GOLD_COLOR, 0.26), ROAD_EDGE_WIDTH + 6.0, true)
 		draw_polyline(lit, ROAD_LIT, ROAD_WIDTH, true)
 	if lit_offset < whole:
 		draw_polyline(_road_points(lit_offset, whole), ROAD_DIM, ROAD_WIDTH, true)
@@ -633,7 +700,7 @@ func _draw_road() -> void:
 		var ahead := road.sample_baked(minf(at + 1.0, whole))
 		var across := (ahead - here).normalized().orthogonal()
 		var lit_here := at <= lit_offset
-		var stone := Color(1.0, 0.86, 0.5, 0.55) if lit_here else Color(0.48, 0.44, 0.38, 0.55)
+		var stone := Color(1.0, 0.86, 0.5, 0.55) if lit_here else Color(0.58, 0.53, 0.45, 0.6)
 		draw_circle(here + across * (3.6 if row % 2 == 0 else -3.6), 2.6, stone)
 		at += COBBLE_STEP * 0.5
 		row += 1
@@ -641,34 +708,80 @@ func _draw_road() -> void:
 		draw_polyline(_road_points(0.0, lit_offset), ROAD_LIT_CORE, 2.0, true)
 
 
-## The fog over locked acts with their chains and locks, the region names
-## and the frame: over the places.
-func _draw_overlay() -> void:
+## The lights that lead from the latest cleared stage to the next one: a
+## warm lane over the dim road and small lights running along it (standing
+## still, evenly spaced, with Juice off).
+func _draw_lights() -> void:
+	var length := _lead_to - _lead_from
+	if length <= 0.0:
+		return
+	_lights.draw_polyline(_road_points(_lead_from, _lead_to), Color(UiStyle.GOLD_COLOR, 0.2), ROAD_WIDTH - 4.0, true)
+	var at := fposmod(_time * LIGHT_SPEED, LIGHT_GAP) if _drifting else LIGHT_GAP * 0.5
+	while at < length:
+		var fade := minf(minf(at, length - at) / 26.0, 1.0)
+		var here := road.sample_baked(_lead_from + at)
+		_lights.draw_texture_rect(glow(), Rect2(here - Vector2.ONE * LIGHT_HALO, Vector2.ONE * LIGHT_HALO * 2.0), false, Color(LIGHT_COLOR, 0.55 * fade))
+		_lights.draw_circle(here, 2.8, Color(1.0, 0.97, 0.82, 0.95 * fade))
+		at += LIGHT_GAP
+
+
+## The fog over locked acts with their chains and locks.
+func _draw_fog() -> void:
 	for act in REGIONS.size():
 		if not _fogged[act]:
 			continue
 		var region: Dictionary = REGIONS[act]
 		for rect: Rect2 in region["blobs"]:
-			_overlay.draw_texture_rect(blob(), rect.grow(FOG_GROWTH), false, FOG_COLOR)
+			_fog.draw_texture_rect(blob(), rect.grow(FOG_GROWTH), false, FOG_COLOR)
+		var lock_at: Vector2 = region["lock_at"]
+		draw_chain(_fog, lock_at - CHAIN_REACH, lock_at + CHAIN_REACH, CHAIN_COLOR)
+		draw_chain(_fog, lock_at + Vector2(-CHAIN_REACH.x, CHAIN_REACH.y), lock_at + Vector2(CHAIN_REACH.x, -CHAIN_REACH.y), CHAIN_COLOR)
+		_fog.draw_circle(lock_at + Vector2(0, 3), FOG_LOCK_RADIUS, Color(0, 0, 0, 0.6))
+		_fog.draw_circle(lock_at, FOG_LOCK_RADIUS, Color("15161a"))
+		_fog.draw_arc(lock_at, FOG_LOCK_RADIUS, 0.0, TAU, 40, CHAIN_COLOR, 2.5, true)
+		_fog.draw_texture_rect(LOCK, Rect2(lock_at - Vector2(17, 17), Vector2(34, 34)), false)
+
+
+## The wisps over the fog, each drifting on its own slow loop (still with
+## Juice off).
+func _draw_mist() -> void:
+	var seconds := _time if _drifting else 0.0
+	for act in REGIONS.size():
+		if not _fogged[act]:
+			continue
 		var rng := _rng(40 + act)
-		var area: Rect2 = region["area"]
+		var area: Rect2 = REGIONS[act]["area"]
 		for i in 9:
 			var at := area.position + Vector2(rng.randf(), rng.randf()) * area.size
 			var radius := rng.randf_range(50.0, 110.0)
-			_overlay.draw_texture_rect(glow(), Rect2(at - Vector2(radius * 1.6, radius), Vector2(radius * 3.2, radius * 2.0)), false, FOG_WISP)
-		var lock_at: Vector2 = region["lock_at"]
-		draw_chain(_overlay, lock_at - CHAIN_REACH, lock_at + CHAIN_REACH, CHAIN_COLOR)
-		draw_chain(_overlay, lock_at + Vector2(-CHAIN_REACH.x, CHAIN_REACH.y), lock_at + Vector2(CHAIN_REACH.x, -CHAIN_REACH.y), CHAIN_COLOR)
-		_overlay.draw_circle(lock_at + Vector2(0, 3), FOG_LOCK_RADIUS, Color(0, 0, 0, 0.6))
-		_overlay.draw_circle(lock_at, FOG_LOCK_RADIUS, Color("15161a"))
-		_overlay.draw_arc(lock_at, FOG_LOCK_RADIUS, 0.0, TAU, 40, CHAIN_COLOR, 2.5, true)
-		_overlay.draw_texture_rect(LOCK, Rect2(lock_at - Vector2(17, 17), Vector2(34, 34)), false)
+			var drift := Vector2(sin(seconds * WISP_SPEED + i * 1.7) * WISP_DRIFT.x, cos(seconds * WISP_SPEED * 0.8 + i * 2.3) * WISP_DRIFT.y)
+			_mist.draw_texture_rect(glow(), Rect2(at + drift - Vector2(radius * 1.6, radius), Vector2(radius * 3.2, radius * 2.0)), false, FOG_WISP)
+
+
+## The region names, each with a gold rule and a diamond under it, and the
+## frame: over the fog. The act the player is on is brightest; a cleared act
+## carries a green check.
+func _draw_overlay() -> void:
 	for act in REGIONS.size():
 		var at: Vector2 = REGIONS[act]["name_at"]
 		var fogged := _fogged[act]
-		draw_text(_overlay, "ACT %d" % (act + 1), at + Vector2(0, ACT_FONT), ACT_FONT, FOGGED_NAME if fogged else ACT_COLOR, false, 3)
-		draw_text(_overlay, String(Journey.ACTS[act]["name"]).to_upper(), at + Vector2(0, ACT_FONT + 6.0 + NAME_FONT), NAME_FONT,
-			FOGGED_NAME if fogged else NAME_COLOR, false, 3)
+		var is_current := act + 1 == current_act
+		var act_line := "ACT %d" % (act + 1)
+		var title := String(Journey.ACTS[act]["name"]).to_upper()
+		var title_color := FOGGED_NAME if fogged else (CURRENT_NAME if is_current else OPEN_NAME)
+		draw_text(_overlay, act_line, at + Vector2(0, ACT_FONT), ACT_FONT, FOGGED_NAME if fogged else ACT_COLOR, false, 3)
+		if _cleared_acts[act]:
+			var check_at := at + Vector2(text_font(_overlay, 3).get_string_size(act_line, HORIZONTAL_ALIGNMENT_LEFT, -1, ACT_FONT).x + 18.0, ACT_FONT * 0.55)
+			_overlay.draw_circle(check_at, ACT_CHECK_RADIUS, Color("0e2414"))
+			_overlay.draw_arc(check_at, ACT_CHECK_RADIUS, 0.0, TAU, 20, JourneyNode.CHECK_COLOR, 1.5, true)
+			_overlay.draw_polyline(PackedVector2Array([check_at + Vector2(-3.5, 0), check_at + Vector2(-1, 2.5), check_at + Vector2(3.5, -2.5)]), JourneyNode.CHECK_COLOR, 2.0, true)
+		var baseline := at + Vector2(0, ACT_FONT + 6.0 + NAME_FONT)
+		draw_text(_overlay, title, baseline, NAME_FONT, title_color, false, 3)
+		var width := text_font(_overlay, 3).get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_FONT).x
+		var rule := Color(UiStyle.BORDER_COLOR, 0.35 if fogged else (ACT_RULE_ALPHA if is_current else 0.5))
+		var y := baseline.y + 11.0
+		_overlay.draw_polyline_colors(PackedVector2Array([Vector2(at.x + 10.0, y), Vector2(at.x + width, y)]), PackedColorArray([rule, Color(rule, 0.0)]), 1.5)
+		_overlay.draw_colored_polygon(Plate.diamond(Vector2(at.x + 4.0, y), 4.0), rule)
 	draw_frame(_overlay, SIZE)
 
 
