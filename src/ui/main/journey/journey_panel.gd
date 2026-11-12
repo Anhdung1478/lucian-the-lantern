@@ -17,6 +17,8 @@ const CONTENT_WIDTH := 400.0
 const START_HEIGHT := 64.0
 const LOADOUT_HEIGHT := 114.0
 const GAP := 16.0
+## The stage box's height, from the top margin to just over Start's rule.
+const BOX_HEIGHT := SIZE.y - PAD * 2.0 - 4.0 - LOADOUT_HEIGHT - START_HEIGHT - GAP * 2.0
 ## Between the rows of a box (Endless's is fuller).
 const ROW_GAP := 12
 const ENDLESS_ROW_GAP := 9
@@ -25,8 +27,9 @@ const ICON_SIZE := 26.0
 const CHIP_HEIGHT := 34.0
 ## The Resolve line: small enough for its longest text to fit on one line.
 const RESOLVE_FONT := 16
-## The roster's round icons.
-const ROSTER_ICON := 44.0
+## The roster's tray (its padding) and round icons.
+const TRAY_PAD := 12.0
+const ROSTER_ICON := 52.0
 ## How far down the picked place's color glows from the top.
 const GLOW_HEIGHT := 300.0
 const GLOW_ALPHA := 0.3
@@ -90,6 +93,8 @@ func _init() -> void:
 	for box: VBoxContainer in [stage_box, training_box, endless_box]:
 		box.position = Vector2(PAD, PAD + 4.0)
 		box.size = Vector2(CONTENT_WIDTH, 0)
+		if box == stage_box:
+			box.size.y = BOX_HEIGHT
 		box.add_theme_constant_override(&"separation", ENDLESS_ROW_GAP if box == endless_box else ROW_GAP)
 		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(box)
@@ -289,12 +294,30 @@ func _build_stage() -> void:
 	resolve_label = UiStyle.label("", RESOLVE_FONT, UiStyle.GOOD_COLOR)
 	resolve_row = _icon_row(_icon(Resolve.ICON), resolve_label)
 	stage_box.add_child(resolve_row)
-	stage_box.add_child(divider())
-	stage_box.add_child(UiStyle.label("ENEMIES", 16, CAPTION_COLOR))
+	# The spare height sits above the enemies, which rest on Start's rule.
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage_box.add_child(spacer)
+	var tray := PanelContainer.new()
+	var tray_style := StyleBoxFlat.new()
+	tray_style.bg_color = Color(0, 0, 0, 0.28)
+	tray_style.border_color = Color(UiStyle.BORDER_COLOR, 0.3)
+	tray_style.set_border_width_all(1)
+	tray_style.set_corner_radius_all(10)
+	tray_style.set_content_margin_all(TRAY_PAD)
+	tray.add_theme_stylebox_override(&"panel", tray_style)
+	tray.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage_box.add_child(tray)
+	var enemies := VBoxContainer.new()
+	enemies.add_theme_constant_override(&"separation", 8)
+	enemies.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tray.add_child(enemies)
+	enemies.add_child(UiStyle.label("ENEMIES", 16, CAPTION_COLOR))
 	roster.add_theme_constant_override(&"h_separation", 8)
 	roster.add_theme_constant_override(&"v_separation", 8)
-	roster.custom_minimum_size.x = CONTENT_WIDTH
-	stage_box.add_child(roster)
+	roster.custom_minimum_size.x = CONTENT_WIDTH - TRAY_PAD * 2.0
+	enemies.add_child(roster)
 
 
 func _build_training() -> void:
