@@ -259,7 +259,14 @@ func _spend(save: SaveGame) -> String:
 		if not save.tree.next_level_open(id):
 			continue
 		if not save.tree.can_buy(id, save.essences):
-			break
+			# Short of orange only: forge it from blue, if the blue still
+			# pays this level's blue cost after that.
+			var price := save.tree.cost(id)
+			var missing := price.y - save.essences.amount(Essences.ORANGE)
+			if missing <= 0 or not save.essences.can_afford(price.x + missing * Essences.FORGE_BLUE):
+				break
+			save.essences.forge(missing)
+			bought.append("forged %d orange" % missing)
 		save.tree.buy(id, save.essences)
 		bought.append("%s%d" % [id, save.tree.level(id)])
 	# D: Heal once bought, else Ghost; F: Flash, else Ghost.
