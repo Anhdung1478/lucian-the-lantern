@@ -1,23 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Void Staff: a tilted dark staff whose claw holds a swirling purple-magenta void vortex orb -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#24123a"/><stop offset="1" stop-color="#07030d"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#c040ff" stop-opacity="0.55"/><stop offset="1" stop-color="#c040ff" stop-opacity="0"/></radialGradient><radialGradient id="orb"><stop offset="0" stop-color="#0a0012"/><stop offset="0.45" stop-color="#3a0f66"/><stop offset="0.8" stop-color="#b23cf0"/><stop offset="1" stop-color="#ffb0f5"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="34" cy="24" r="23" fill="url(#glow)"/>
-  <g transform="matrix(0.891 0.454 -0.454 0.891 14.602 -12.82)">
-    <rect x="32" y="38" width="4" height="20" rx="1" fill="#4a3266" stroke="#0c1018" stroke-width="1.5"/>
-    <rect x="32.8" y="39" width="1" height="18" fill="#9a78c8"/>
-    <rect x="31.5" y="48" width="5" height="2.5" fill="#b9a6d6" stroke="#0c1018" stroke-width="1"/>
-    <path d="M 32 58 L 36 58 L 34 62 Z" fill="#b9a6d6" stroke="#0c1018" stroke-width="1.2" stroke-linejoin="round"/>
+  <!-- Void Staff (legendary): a dark iron staff whose claw holds a swirling black-violet void orb with a magenta rim, on the diagonal. -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d04af0" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#7a2fb0" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#7a2fb0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="iron" x1="26" y1="0" x2="38" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8a8fb0"/>
+      <stop offset="0.5" stop-color="#4a4a6c"/>
+      <stop offset="1" stop-color="#25253c"/>
+    </linearGradient>
+    <radialGradient id="orb" cx="30" cy="12" r="12" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8a2ab0"/>
+      <stop offset="0.55" stop-color="#2a0f48"/>
+      <stop offset="1" stop-color="#0e0420"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <g transform="rotate(45 32 32)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M 29.5 28 L 34.5 28 L 34.5 56 L 29.5 56 Z" fill="url(#iron)"/>
+    <path d="M 30.8 32 L 30.8 52" fill="none" stroke="#c0c4e0" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>
+    <path d="M 29.5 40 L 34.5 40 M 29.5 47 L 34.5 47" fill="none" stroke="#25253c" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 28 55 L 36 55 L 32 63 Z" fill="url(#iron)"/>
+    <!-- claw -->
+    <path d="M 32 33 C 12 33 11 11 19 0 C 17 13 24 24 32 24 C 40 24 47 13 45 0 C 53 11 52 33 32 33 Z" fill="url(#iron)"/>
+    <!-- orb -->
+    <circle cx="32" cy="13" r="11" fill="url(#orb)" stroke="#d84ae8" stroke-width="2"/>
+    <path d="M 32 5 C 40 6 41 14 35 15 C 30 16 29 11 32 10.5" fill="none" stroke="#f0a0ff" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 25 10 C 26 7 28 5.8 30.5 5.2" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
   </g>
-  <circle cx="34" cy="24" r="15.5" fill="url(#orb)"/>
-  <path d="M 34 24 C 34 19 41 18.5 43 23.5 C 45 30 38 36.5 29.5 35" fill="none" stroke="#ff7ae0" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
-  <path d="M 34 24 C 34 19 41 18.5 43 23.5 C 45 30 38 36.5 29.5 35" fill="none" stroke="#ff7ae0" stroke-width="1.8" stroke-linecap="round" opacity="0.9" transform="matrix(-0.5 0.866 -0.866 -0.5 71.785 6.555)"/>
-  <path d="M 34 24 C 34 19 41 18.5 43 23.5 C 45 30 38 36.5 29.5 35" fill="none" stroke="#ff7ae0" stroke-width="1.8" stroke-linecap="round" opacity="0.9" transform="matrix(-0.5 -0.866 0.866 -0.5 30.215 65.445)"/>
-  <circle cx="34" cy="24" r="1.6" fill="#ffd8fa"/>
-  <circle cx="34" cy="24" r="15.5" fill="none" stroke="#0c1018" stroke-width="2"/>
-  <path d="M 22.5 17 C 25 11.5 30 9.5 34.5 9.5" fill="none" stroke="#ffd8fa" stroke-width="1.3" stroke-linecap="round" opacity="0.8"/>
-  <g transform="matrix(0.891 0.454 -0.454 0.891 14.602 -12.82)">
-    <path d="M 19.5 27 C 21 36 27 41.5 32 42 L 36 42 C 41 41.5 47 36 48.5 27 C 45 34 40 37.5 34 37.8 C 28 37.5 23 34 19.5 27 Z" fill="#b9a6d6" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M 21.8 30.5 C 23.8 35.8 28 39.6 32 40.2" fill="none" stroke="#ece2ff" stroke-width="0.9" stroke-linecap="round"/>
-  </g>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <!-- sparkles -->
+  <path d="M 55 14 L 56.1 17 L 59.1 18.1 L 56.1 19.2 L 55 22.2 L 53.9 19.2 L 50.9 18.1 L 53.9 17 Z" fill="#f6d8ff"/>
+  <path d="M 10 46 L 10.9 48.1 L 13 49 L 10.9 49.9 L 10 52 L 9.1 49.9 L 7 49 L 9.1 48.1 Z" fill="#e090f5"/>
 </svg>

@@ -1,25 +1,76 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Spirit Visage: a serene jade spirit mask with glowing eyes, framed by a wreath of leaves -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c4628"/><stop offset="1" stop-color="#06100a"/></linearGradient><linearGradient id="leaf" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#74d26e"/><stop offset="0.5" stop-color="#74d26e"/><stop offset="0.5" stop-color="#2f8a3e"/><stop offset="1" stop-color="#2f8a3e"/></linearGradient><linearGradient id="mask" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8f6d2"/><stop offset="1" stop-color="#5fae6a"/></linearGradient><radialGradient id="eye"><stop offset="0" stop-color="#eaffd8" stop-opacity="0.9"/><stop offset="0.5" stop-color="#7cff9a" stop-opacity="0.45"/><stop offset="1" stop-color="#7cff9a" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <g fill="url(#leaf)" stroke="#0c1810" stroke-width="1.2" stroke-linejoin="round">
-    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(25 15) rotate(-30)"/>
-    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(39 15) rotate(30)"/>
-    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(19 24) rotate(-60)"/>
-    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(45 24) rotate(60)"/>
-    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(18 35) rotate(-95)"/>
-    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(46 35) rotate(95)"/>
-    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(21 46) rotate(-125)"/>
-    <path d="M 0 0 C 3.5 -3.5 3.5 -8.5 0 -12 C -3.5 -8.5 -3.5 -3.5 0 0 Z" transform="translate(43 46) rotate(125)"/>
+  <!-- Spirit Visage (legendary): a serene pale-jade face mask with dark eye holes and glowing green eyes, a glowing gem on the brow, framed by a wreath of green leaves. -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7affb0" stop-opacity="0.5"/>
+      <stop offset="0.6" stop-color="#2f9a60" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#2f9a60" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="jade" x1="16" y1="8" x2="48" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e6fbe2"/>
+      <stop offset="0.5" stop-color="#94d9a0"/>
+      <stop offset="1" stop-color="#3f945a"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <!-- laurel leaves along both sides: a dark leaf, its lit half, then the outline -->
+  <g transform="translate(25 55) rotate(-60)">
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 Z" fill="#7fd36e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
   </g>
-  <path d="M 32 12 C 41 12 46 20 46 31 C 46 44 40 54 32 57 C 24 54 18 44 18 31 C 18 20 23 12 32 12 Z" fill="url(#mask)" stroke="#0c1810" stroke-width="2"/>
-  <path d="M 32 12 C 41 12 46 20 46 31 C 46 44 40 54 32 57 Z" fill="#1e5a2c" opacity="0.28"/>
-  <path d="M 21 24 C 22 18 26 14.5 30 14" fill="none" stroke="#f4fff0" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
-  <path d="M 22 38 C 24 40 24 43 22.5 46 M 42 38 C 40 40 40 43 41.5 46" fill="none" stroke="#3a8a4a" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
-  <path d="M 21 26 C 24 24 28 24.5 30 26.5 M 43 26 C 40 24 36 24.5 34 26.5 M 28.5 47 C 30.5 48.3 33.5 48.3 35.5 47" fill="none" stroke="#2e6a3a" stroke-width="1.4" stroke-linecap="round"/>
-  <path d="M 32 34 C 32.5 37 33 40 31 42" fill="none" stroke="#3a7a46" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
-  <circle cx="26" cy="30.5" r="6" fill="url(#eye)"/>
-  <circle cx="38" cy="30.5" r="6" fill="url(#eye)"/>
-  <path d="M 21.5 31 C 23.5 28 28 28 30 30.5 C 28 33 23.5 33 21.5 31 Z M 42.5 31 C 40.5 28 36 28 34 30.5 C 36 33 40.5 33 42.5 31 Z" fill="#f0ffe8" stroke="#0c1810" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M 32 16.5 C 34 18.5 34 21.5 32 23.5 C 30 21.5 30 18.5 32 16.5 Z" fill="#7dffa8" stroke="#0c1810" stroke-width="1"/>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <g transform="translate(39 55) rotate(60)">
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
+    <path d="M 0 0 C -5.5 -4.5 -5.5 -12 0 -17 Z" fill="#7fd36e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(19 46) rotate(-45)">
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 Z" fill="#7fd36e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(45 46) rotate(45)">
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
+    <path d="M 0 0 C -5.5 -4.5 -5.5 -12 0 -17 Z" fill="#7fd36e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(17 35) rotate(-30)">
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 Z" fill="#7fd36e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(47 35) rotate(30)">
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
+    <path d="M 0 0 C -5.5 -4.5 -5.5 -12 0 -17 Z" fill="#7fd36e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(18 23) rotate(-15)">
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 Z" fill="#7fd36e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(46 23) rotate(15)">
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
+    <path d="M 0 0 C -5.5 -4.5 -5.5 -12 0 -17 Z" fill="#7fd36e"/>
+    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+  <!-- mask -->
+  <path d="M 32 7 C 42.5 7 48 15 48 25 C 48 31 46.5 35 46.5 40 C 46.5 50 40 57 32 59 C 24 57 17.5 50 17.5 40 C 17.5 35 16 31 16 25 C 16 15 21.5 7 32 7 Z" fill="url(#jade)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 19.5 22 C 20.5 15 25 10.5 30 9.8" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 20.5 41 C 22.5 44 22.5 47 21.5 50 M 43.5 41 C 41.5 44 41.5 47 42.5 50" fill="none" stroke="#4f9e64" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- brows -->
+  <path d="M 19.5 25 C 22.5 22.5 27 22.5 30 24.8 M 44.5 25 C 41.5 22.5 37 22.5 34 24.8" fill="none" stroke="#3c8452" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- eye holes and glowing eyes -->
+  <path d="M 19.5 30.5 C 22 26.8 27.5 26.8 30 30.5 C 27.5 33.6 22 33.6 19.5 30.5 Z M 44.5 30.5 C 42 26.8 36.5 26.8 34 30.5 C 36.5 33.6 42 33.6 44.5 30.5 Z" fill="#103020" stroke="#1a1d24" stroke-width="1.6" stroke-linejoin="round"/>
+  <ellipse cx="24.8" cy="30.4" rx="2.6" ry="1.6" fill="#a8ffc8"/>
+  <ellipse cx="39.2" cy="30.4" rx="2.6" ry="1.6" fill="#a8ffc8"/>
+  <!-- nose and mouth -->
+  <path d="M 32 31 C 32.6 35 33 38 30.8 40.5" fill="none" stroke="#3c8452" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 27.5 47 C 30 48.6 34 48.6 36.5 47" fill="none" stroke="#2e6a3e" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- brow gem -->
+  <path d="M 32 12.5 L 35 17 L 32 21.5 L 29 17 Z" fill="#6dffa0" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M 32 14.6 L 33.4 17 L 32 19.4 L 30.6 17 Z" fill="#eafff0"/>
+  <!-- sparkles -->
+  <path d="M 56 50 L 56.9 52.1 L 59 53 L 56.9 53.9 L 56 56 L 55.1 53.9 L 53 53 L 55.1 52.1 Z" fill="#e0ffec"/>
+  <path d="M 9 54 L 9.8 55.8 L 11.6 56.6 L 9.8 57.4 L 9 59.2 L 8.2 57.4 L 6.4 56.6 L 8.2 55.8 Z" fill="#9affc0"/>
 </svg>

@@ -1,23 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Fimbulwinter: a jagged faceted ice shard with two splinters at its base and a white snowflake beside it -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#255a82"/><stop offset="1" stop-color="#081420"/></linearGradient><linearGradient id="sh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e0f6ff"/><stop offset="1" stop-color="#3f8cc4"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#bfefff" stop-opacity="0.45"/><stop offset="1" stop-color="#bfefff" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="30" cy="34" r="26" fill="url(#glow)"/>
-  <circle cx="51" cy="13" r="10" fill="url(#glow)"/>
-  <g fill="url(#sh)" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round">
-    <polygon points="20,40 9,30 12,46 22,52"/>
-    <polygon points="39,40 51,33 48,47 33,55"/>
+  <!-- Fimbulwinter (legendary): a cluster of frost crystals, a tall central one with a glowing pale core, two small ones beside it. -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7fd6ff" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#2f8fd0" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#2f8fd0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ice" x1="10" y1="4" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f2fcff"/>
+      <stop offset="0.5" stop-color="#9edcff"/>
+      <stop offset="1" stop-color="#3f86cc"/>
+    </linearGradient>
+    <linearGradient id="icedark" x1="10" y1="20" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b7e6ff"/>
+      <stop offset="1" stop-color="#2f6fb5"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <g stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M 4 36 L 13 24 L 23 35 L 23 55 L 12 60 L 4 52 Z" fill="url(#icedark)"/>
+    <path d="M 60 38 L 51 26 L 41 37 L 41 55 L 52 60 L 60 52 Z" fill="url(#icedark)"/>
+    <path d="M 32 2 L 43 14 L 43 46 L 32 61 L 21 46 L 21 14 Z" fill="url(#ice)"/>
   </g>
-  <polygon points="30,4 22,16 17,30 29,32" fill="#d8f4ff"/>
-  <polygon points="17,30 19,48 28,60 29,32" fill="#a4dcf6"/>
-  <polygon points="30,4 39,18 42,34 29,32" fill="#7cc6ee"/>
-  <polygon points="29,32 42,34 36,50 28,60" fill="#3f8cc4"/>
-  <polygon points="30,4 22,16 27,22" fill="#f6fdff"/>
-  <polygon points="30,4 39,18 42,34 36,50 28,60 19,48 17,30 22,16" fill="none" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <polyline points="29.5,7 22.8,17 18.6,29" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
-  <path d="M 51 7 L 51 19 M 45.8 10 L 56.2 16 M 45.8 16 L 56.2 10" stroke="#0c1018" stroke-width="3.6" stroke-linecap="round"/>
-  <path d="M 51 7 L 51 19 M 45.8 10 L 56.2 16 M 45.8 16 L 56.2 10" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
-  <circle cx="51" cy="13" r="1.6" fill="#ffffff"/>
-  <circle cx="12" cy="15" r="0.9" fill="#ffffff" opacity="0.8"/>
-  <circle cx="55" cy="54" r="0.8" fill="#ffffff" opacity="0.7"/>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <!-- shade half of the central crystal -->
+  <path d="M 32 4 L 42 15 L 42 46 L 32 59 Z" fill="#2f6fb5" opacity="0.4"/>
+  <path d="M 32 4 L 32 59 M 21 14 L 32 24 L 43 14" fill="none" stroke="#3c7fc2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 13 26 L 13 56 M 51 28 L 51 56" fill="none" stroke="#3c7fc2" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+  <!-- glowing core -->
+  <path d="M 32 28 L 36.5 37 L 32 46 L 27.5 37 Z" fill="#f4feff" stroke="#8fe0ff" stroke-width="1.4" stroke-linejoin="round"/>
+  <!-- highlights -->
+  <path d="M 25 18 L 25 40" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 8 38 L 8 48" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+  <!-- sparkles -->
+  <path d="M 53 8 L 54.2 11.3 L 57.5 12.5 L 54.2 13.7 L 53 17 L 51.8 13.7 L 48.5 12.5 L 51.8 11.3 Z" fill="#f4feff"/>
+  <path d="M 10 12 L 10.9 14.1 L 13 15 L 10.9 15.9 L 10 18 L 9.1 15.9 L 7 15 L 9.1 14.1 Z" fill="#b7e6ff"/>
 </svg>

@@ -1,10 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Chain Vest: a sleeveless grey chainmail vest seen from the front, rows of interlocking rings inside a stitched leather trim -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><linearGradient id="mail" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a94a2"/><stop offset="1" stop-color="#4a525e"/></linearGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <path d="M 20 7 L 26 7 Q 27 19 32 24 Q 37 19 38 7 L 44 7 Q 45 16 52 20 L 52 55 Q 32 60 12 55 L 12 20 Q 19 16 20 7 Z" fill="none" stroke="#0c1018" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M 20 7 L 26 7 Q 27 19 32 24 Q 37 19 38 7 L 44 7 Q 45 16 52 20 L 52 55 Q 32 60 12 55 L 12 20 Q 19 16 20 7 Z" fill="url(#mail)" stroke="#7a4a2a" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M14 21a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm13.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.8 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zM16.3 25a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zM14 29a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zM16.3 33a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zM14 37a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zM16.3 41a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zM14 45a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zM16.3 49a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0zm4.6 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0z" fill="none" stroke="#d6dde6" stroke-width="1.1" opacity="0.9"/>
-  <path d="M 20 7 L 26 7 Q 27 19 32 24 Q 37 19 38 7 L 44 7 Q 45 16 52 20 L 52 55 Q 32 60 12 55 L 12 20 Q 19 16 20 7 Z" fill="none" stroke="#b47a46" stroke-width="0.9" stroke-dasharray="1.8 1.6" stroke-linejoin="round"/>
-  <path d="M 14.6 21.5 Q 19.5 18.5 21.6 10" fill="none" stroke="#c2cad4" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
-  <g fill="#e0b04a" stroke="#3a2410" stroke-width="0.7"><circle cx="23" cy="10.5" r="1.4"/><circle cx="41" cy="10.5" r="1.4"/></g>
+  <!-- Chain Vest (fragment): a plain steel chainmail shirt with a leather hem, facing the viewer. -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9fb0c6" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#9fb0c6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mail" x1="8" y1="6" x2="54" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4f7fb"/>
+      <stop offset="0.5" stop-color="#b9c4d4"/>
+      <stop offset="1" stop-color="#7c8799"/>
+    </linearGradient>
+    <linearGradient id="leather" x1="18" y1="52" x2="46" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b9793f"/>
+      <stop offset="0.5" stop-color="#8a5327"/>
+      <stop offset="1" stop-color="#5d3516"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <path d="M 19 5 L 26 5 C 28 11 36 11 38 5 L 45 5 L 59 14 L 53 29 L 46 26 L 46 58 L 18 58 L 18 26 L 11 29 L 5 14 Z" fill="url(#mail)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- ring rows -->
+  <path d="M 20 20 q 2 2.6 4 0 t 4 0 t 4 0 t 4 0 t 4 0 t 4 0 M 20 27 q 2 2.6 4 0 t 4 0 t 4 0 t 4 0 t 4 0 t 4 0 M 20 34 q 2 2.6 4 0 t 4 0 t 4 0 t 4 0 t 4 0 t 4 0 M 20 41 q 2 2.6 4 0 t 4 0 t 4 0 t 4 0 t 4 0 t 4 0 M 20 48 q 2 2.6 4 0 t 4 0 t 4 0 t 4 0 t 4 0 t 4 0" fill="none" stroke="#6b7689" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 9 16 q 2 2.6 4 0 t 4 0 M 47 16 q 2 2.6 4 0 t 4 0 M 11 22 q 2 2.6 4 0 t 3 0 M 46 22 q 2 2.6 4 0 t 3 0" fill="none" stroke="#6b7689" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- neck opening -->
+  <path d="M 26 5 C 28 11 36 11 38 5 L 36 5 C 34 8 30 8 28 5 Z" fill="#3b4354" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- leather hem -->
+  <path d="M 18 52 L 46 52 L 46 58 L 18 58 Z" fill="url(#leather)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 20 54.5 L 44 54.5" stroke="#d9a066" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- highlight -->
+  <path d="M 21 10 L 21 24 M 8 15 L 12 21" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
 </svg>

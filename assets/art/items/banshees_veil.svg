@@ -1,14 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Banshee's Veil: a translucent violet-blue hood around an empty glowing void, ghostly wisps trailing below, a spell-shield gem at the throat -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2758"/><stop offset="1" stop-color="#0b0b1a"/></linearGradient><linearGradient id="veil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b0a4ff"/><stop offset="0.6" stop-color="#6858dc"/><stop offset="1" stop-color="#3a2f9a"/></linearGradient><radialGradient id="void" cx="0.5" cy="0.45" r="0.55"><stop offset="0" stop-color="#8676ff" stop-opacity="0.8"/><stop offset="0.6" stop-color="#241c5a"/><stop offset="1" stop-color="#0d0a24"/></radialGradient><radialGradient id="aura"><stop offset="0" stop-color="#9f8fff" stop-opacity="0.45"/><stop offset="1" stop-color="#9f8fff" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="30" r="28" fill="url(#aura)"/>
-  <path d="M 14 50 C 12 54 16 56 13 60 M 50 50 C 52 54 48 56 51 60" fill="none" stroke="#c4baff" stroke-width="2.2" stroke-linecap="round" opacity="0.5"/>
-  <path d="M 25 54 C 23 57 27 59 25 61 M 39 54 C 41 57 37 59 40 61" fill="none" stroke="#c4baff" stroke-width="2.2" stroke-linecap="round" opacity="0.7"/>
-  <path d="M 32 6 C 45 6 51 16 51 28 C 51 38 52 44 56 50 C 52 52 50 50 47 53 C 45 56 42 53 39 56 C 36 59 34 55 32 57 C 30 55 28 59 25 56 C 22 53 19 56 17 53 C 14 50 12 52 8 50 C 12 44 13 38 13 28 C 13 16 19 6 32 6 Z" fill="url(#veil)" fill-opacity="0.86" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 45 34 C 46 41 47 46 49 51 M 19 34 C 18 41 17 46 15 51" fill="none" stroke="#3a2f9a" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
-  <path d="M 16 30 C 16 20 21 11 30 9" fill="none" stroke="#ece8ff" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
-  <path d="M 32 14 C 40 14 44 22 44 30 C 44 38 39 43 32 43 C 25 43 20 38 20 30 C 20 22 24 14 32 14 Z" fill="url(#void)" stroke="#d8d0ff" stroke-width="1.5"/>
-  <polygon points="32,43 36,47.5 32,52 28,47.5" fill="#8ff0ff" stroke="#0c1018" stroke-width="1.2" stroke-linejoin="round"/>
-  <polygon points="32,44.5 34.6,47.5 32,47.5" fill="#eaffff"/>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <!-- Banshee's Veil (legendary): a pale violet spectral hooded veil with a tattered hem around an empty dark void, a glowing cyan spell-shield gem at the throat. -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9a7bff" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#5a3fc0" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#5a3fc0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="veil" x1="10" y1="4" x2="54" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ece4ff"/>
+      <stop offset="0.5" stop-color="#a28ce8"/>
+      <stop offset="1" stop-color="#5a46a8"/>
+    </linearGradient>
+    <radialGradient id="void" cx="32" cy="23" r="13" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7a66f0"/>
+      <stop offset="0.45" stop-color="#2c2170"/>
+      <stop offset="1" stop-color="#0e0a26"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <path d="M 32 3 C 46 3 50 15 48 27 C 52 39 56 49 59 60 L 51 55 L 47 62 L 40 55 L 34 63 L 29 55 L 22 62 L 17 55 L 10 61 C 12 49 14 39 16 27 C 14 15 18 3 32 3 Z" fill="url(#veil)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- folds -->
+  <path d="M 21 36 C 20 44 18 50 16 55 M 43 36 C 44 44 46 50 48 55 M 32 40 L 32 56" fill="none" stroke="#6a55b8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 19 9 C 15 18 15 28 13 40" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+  <!-- hood opening: an empty void with a faint violet glow deep inside -->
+  <path d="M 32 10 C 41.5 10 44 19.5 42 28.5 C 39 35 25 35 22 28.5 C 20 19.5 22.5 10 32 10 Z" fill="url(#void)" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 25 14.5 C 23.2 18.5 23 23 23.8 27" fill="none" stroke="#d8ccff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+  <!-- spell-shield gem at the throat -->
+  <path d="M 32 32 L 37 37.5 L 32 43 L 27 37.5 Z" fill="#7feeff" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M 32 34.6 L 34.6 37.5 L 32 40.4 L 29.4 37.5 Z" fill="#eaffff"/>
+  <!-- sparkles -->
+  <path d="M 54 9 L 55.2 12.3 L 58.5 13.5 L 55.2 14.7 L 54 18 L 52.8 14.7 L 49.5 13.5 L 52.8 12.3 Z" fill="#e6f6ff"/>
+  <path d="M 9 20 L 9.9 22.1 L 12 23 L 9.9 23.9 L 9 26 L 8.1 23.9 L 6 23 L 8.1 22.1 Z" fill="#c4b0ff"/>
 </svg>

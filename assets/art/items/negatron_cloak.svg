@@ -1,17 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Negatron Cloak: a dark purple cloak seen from the back, its pointed hood lying down between the shoulders, magenta trim and a faint violet aura -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><radialGradient id="aura"><stop offset="0" stop-color="#b45cff" stop-opacity="0.5"/><stop offset="0.6" stop-color="#7a2ad0" stop-opacity="0.18"/><stop offset="1" stop-color="#5a1aa0" stop-opacity="0"/></radialGradient><linearGradient id="cloth" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5e2c92"/><stop offset="0.55" stop-color="#43206e"/><stop offset="1" stop-color="#2a1248"/></linearGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
-  <path d="M 18 12 Q 32 7 46 12 C 50 22 54 40 58 54 Q 52 58 46 55 Q 39 59 32 56 Q 25 59 18 55 Q 12 58 6 54 C 10 40 14 22 18 12 Z" fill="url(#cloth)" stroke="#0c0818" stroke-width="2.2" stroke-linejoin="round"/>
-  <path d="M 25 18 Q 21 36 18 54 M 39 18 Q 43 36 46 54 M 32 32 L 32 55" fill="none" stroke="#1c0a32" stroke-width="1.6" stroke-linecap="round"/>
-  <path d="M 18.5 16 C 15.5 26 12.5 40 9.5 52" fill="none" stroke="#8a5ac8" stroke-width="1.4" stroke-linecap="round"/>
-  <path d="M 7.5 52.3 Q 12 56 18 53.3 Q 25 57 32 54.3 Q 39 57 46 53.3 Q 52 56 56.5 52.3" fill="none" stroke="#e040c0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 18 12 Q 32 7 46 12" fill="none" stroke="#e040c0" stroke-width="2" stroke-linecap="round"/>
-  <path d="M 22 10.5 Q 32 14 42 10.5 Q 41 23 32 32 Q 23 23 22 10.5 Z" fill="#4c2480" stroke="#0c0818" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M 23.6 12.6 Q 32 15.6 40.4 12.6 Q 39.4 22.6 32 30 Q 24.6 22.6 23.6 12.6 Z" fill="none" stroke="#e040c0" stroke-width="1.4" stroke-linejoin="round"/>
-  <path d="M 32 16 L 32 27.5" stroke="#2a1048" stroke-width="1.2" stroke-linecap="round"/>
-  <circle cx="32" cy="31" r="2.6" fill="#ff7ae6" stroke="#2a0a2a" stroke-width="1.1"/>
-  <circle cx="31.2" cy="30.3" r="0.8" fill="#ffffff"/>
-  <circle cx="9" cy="14" r="1.2" fill="#d9a0ff"/>
-  <circle cx="56" cy="22" r="1" fill="#d9a0ff"/>
+  <!-- Negatron Cloak (fragment): a heavy violet cloak seen from the back, its pointed hood lying down between the shoulders, a magenta collar and a magenta-trimmed scalloped hem. -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b45cff" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#b45cff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cloth" x1="8" y1="10" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9161d6"/>
+      <stop offset="0.5" stop-color="#5c2f9c"/>
+      <stop offset="1" stop-color="#2e1559"/>
+    </linearGradient>
+    <linearGradient id="hood" x1="18" y1="9" x2="44" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ad80ec"/>
+      <stop offset="0.5" stop-color="#6e3db4"/>
+      <stop offset="1" stop-color="#3e1d78"/>
+    </linearGradient>
+    <linearGradient id="trim" x1="4" y1="0" x2="60" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff8ae6"/>
+      <stop offset="0.5" stop-color="#e040c0"/>
+      <stop offset="1" stop-color="#a0208a"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <!-- cloak body -->
+  <path d="M 21 9 C 26 7 38 7 43 9 C 49 10 54 13.5 55.5 19.5 C 57 32 58 44 61 55 Q 55.2 60.5 49.4 56 Q 43.6 61 37.8 56.5 Q 32 61.5 26.2 56.5 Q 20.4 61 14.6 56 Q 8.8 60.5 3 55 C 6 44 7 32 8.5 19.5 C 10 13.5 15 10 21 9 Z" fill="url(#cloth)"/>
+  <!-- magenta hem trim -->
+  <path d="M 3.6 52.6 Q 8.8 58 14.6 53.6 Q 20.4 58.6 26.2 54.1 Q 32 59.1 37.8 54.1 Q 43.6 58.6 49.4 53.6 Q 55.2 58 60.4 52.6" fill="none" stroke="url(#trim)" stroke-width="3.6" stroke-linejoin="round"/>
+  <!-- folds -->
+  <path d="M 21 30 C 19 40 17 48 14.6 54 M 43 30 C 45 40 47 48 49.4 54 M 27 40 C 26.5 46 26.3 50 26.2 54 M 37 40 C 37.5 46 37.7 50 37.8 54" fill="none" stroke="#2a1150" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 12.5 22 C 10.5 32 8.5 42 6 51" fill="none" stroke="#c7a6f5" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 21 9 C 26 7 38 7 43 9 C 49 10 54 13.5 55.5 19.5 C 57 32 58 44 61 55 Q 55.2 60.5 49.4 56 Q 43.6 61 37.8 56.5 Q 32 61.5 26.2 56.5 Q 20.4 61 14.6 56 Q 8.8 60.5 3 55 C 6 44 7 32 8.5 19.5 C 10 13.5 15 10 21 9 Z" fill="none" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- the hood, lying down the back -->
+  <path d="M 16 11 C 24 15 40 15 48 11 C 49 26 42 38 32 47 C 22 38 15 26 16 11 Z" fill="url(#hood)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 32 22 L 32 42" stroke="#33176a" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M 19 17 C 20 25 23.5 33 28 39" fill="none" stroke="#d6bdfa" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 20 16.5 C 20.5 26 25.5 35 32 41.5 C 38.5 35 43.5 26 44 16.5" fill="none" stroke="#e040c0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  <!-- the hood's open mouth, dark lining edged in magenta -->
+  <path d="M 19.5 11.5 C 25 13.8 39 13.8 44.5 11.5 C 42 16.8 37.5 19.3 32 19.6 C 26.5 19.3 22 16.8 19.5 11.5 Z" fill="#1c0a38" stroke="#e040c0" stroke-width="2" stroke-linejoin="round"/>
+  <!-- collar -->
+  <path d="M 19 9.5 C 25 5 39 5 45 9.5 L 44.5 12.5 C 38.5 9.5 25.5 9.5 19.5 12.5 Z" fill="url(#trim)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  <!-- tassel bead at the hood point -->
+  <circle cx="32" cy="48.5" r="2.8" fill="#e040c0" stroke="#1a1d24" stroke-width="1.8"/>
+  <circle cx="31.2" cy="47.7" r="0.8" fill="#ffd0f4"/>
 </svg>

@@ -1,18 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Malignance: a cracked dark crystal mask with glowing eye slits, purple-red flames rising behind it -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a1040"/><stop offset="1" stop-color="#120410"/></linearGradient><linearGradient id="flame" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb0c8"/><stop offset="0.35" stop-color="#ff3a6a"/><stop offset="1" stop-color="#8a1fb0"/></linearGradient><linearGradient id="mask" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5a2a6a"/><stop offset="1" stop-color="#1a0820"/></linearGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <path d="M 32 3.5 C 36 10.5 44 12.5 43.5 20 C 47 16.5 49.5 12.5 49 7 C 56 14.5 58.5 27 52 38 L 12 38 C 5.5 27 8 14.5 15 7 C 14.5 12.5 17 16.5 20.5 20 C 20 12.5 28 10.5 32 3.5 Z" fill="url(#flame)" stroke="#0c1018" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M 32 12 C 34.5 17 39 19 38.5 25 C 41 23 43 20 43 16.5 C 47 21 48 28 45 34 L 19 34 C 16 28 17 21 21 16.5 C 21 20 23 23 25.5 25 C 25 19 29.5 17 32 12 Z" fill="#ffd0de" opacity="0.55"/>
-  <path d="M 32 17 L 45.5 22.5 L 50 36 L 44.5 51 L 32 59.5 L 19.5 51 L 14 36 L 18.5 22.5 Z" fill="url(#mask)" stroke="#0c1018" stroke-width="2" stroke-linejoin="round"/>
-  <polygon points="32,18.2 19.3,23.2 15.1,36 20.3,50.4 32,58.3" fill="#4f2560" opacity="0.75"/>
-  <polygon points="32,18.2 41,22 32,27.5 23,22" fill="#7a4a96" opacity="0.8"/>
-  <polyline points="18.8,23 32,17.6 45.2,23" fill="none" stroke="#c890e0" stroke-width="1" opacity="0.85"/>
-  <ellipse cx="24" cy="37" rx="6" ry="3.5" fill="#ff3a6a" opacity="0.35"/>
-  <ellipse cx="40" cy="37" rx="6" ry="3.5" fill="#ff3a6a" opacity="0.35"/>
-  <polygon points="18.5,34.5 29,36 28.2,39.5 21,38.5" fill="#ff5a8a" stroke="#0c1018" stroke-width="1" stroke-linejoin="round"/>
-  <polygon points="45.5,34.5 35,36 35.8,39.5 43,38.5" fill="#ff5a8a" stroke="#0c1018" stroke-width="1" stroke-linejoin="round"/>
-  <polyline points="36.5,18.8 33.5,25 37,29.5 34,33.5" fill="none" stroke="#ff7ab0" stroke-width="1.2" stroke-linejoin="round"/>
-  <polyline points="22,46.5 26.5,49.5 25,54.5" fill="none" stroke="#ff7ab0" stroke-width="1.2" stroke-linejoin="round"/>
-  <polyline points="44.5,43.5 39.5,46.5 40.5,50.5" fill="none" stroke="#ff7ab0" stroke-width="1.2" stroke-linejoin="round"/>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <!-- Malignance (legendary): a dark demon mask with magenta horns, a flame crown and glowing slanted eyes. -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff4fb0" stop-opacity="0.5"/>
+      <stop offset="0.6" stop-color="#a02a80" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#a02a80" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mask" x1="12" y1="14" x2="52" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7a5a9e"/>
+      <stop offset="0.5" stop-color="#43285f"/>
+      <stop offset="1" stop-color="#1f0f36"/>
+    </linearGradient>
+    <linearGradient id="horn" x1="4" y1="2" x2="22" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff8cc4"/>
+      <stop offset="0.5" stop-color="#e03088"/>
+      <stop offset="1" stop-color="#90185c"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="32" y1="1" x2="32" y2="16" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd36b"/>
+      <stop offset="0.5" stop-color="#ff6aa8"/>
+      <stop offset="1" stop-color="#d02a80"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <g stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M 15 20 C 6 17 2 9 6 2 C 13 5 19 9 24 15 Z" fill="url(#horn)"/>
+    <path d="M 49 20 C 58 17 62 9 58 2 C 51 5 45 9 40 15 Z" fill="#b82474"/>
+    <path d="M 23 16 C 25 8 29 9 32 1 C 35 9 39 8 41 16 Z" fill="url(#flame)"/>
+    <path d="M 13 17 C 22 12 42 12 51 17 L 53 35 C 51 47 41 57 32 62 C 23 57 13 47 11 35 Z" fill="url(#mask)"/>
+  </g>
+  <!-- crack and brow -->
+  <path d="M 32 15 L 30 24 L 33 30 L 31 37" fill="none" stroke="#ff6aa8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 16 23 L 27 27 M 48 23 L 37 27" fill="none" stroke="#2a1244" stroke-width="2" stroke-linecap="round"/>
+  <!-- eyes -->
+  <path d="M 16 29 L 28 32 L 26 37.5 L 17.5 35 Z" fill="#ff8cd0" stroke="#fff0fa" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M 48 29 L 36 32 L 38 37.5 L 46.5 35 Z" fill="#ff8cd0" stroke="#fff0fa" stroke-width="0.9" stroke-linejoin="round"/>
+  <!-- mouth slit -->
+  <path d="M 24 48 L 32 53 L 40 48" fill="none" stroke="#ff6aa8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 15 24 C 14 33 16 40 20 46" fill="none" stroke="#b894e0" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  <!-- sparkles -->
+  <path d="M 55 38 L 56 40.6 L 58.6 41.6 L 56 42.6 L 55 45.2 L 54 42.6 L 51.4 41.6 L 54 40.6 Z" fill="#ffd6ee"/>
+  <path d="M 8 44 L 8.9 46.1 L 11 47 L 8.9 47.9 L 8 50 L 7.1 47.9 L 5 47 L 7.1 46.1 Z" fill="#ff9acb"/>
 </svg>

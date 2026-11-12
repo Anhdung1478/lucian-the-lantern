@@ -1,24 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Morellonomicon: a thick closed green tome with gold corners and a glowing arcane eye rune on the cover -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#173d24"/><stop offset="1" stop-color="#06120a"/></linearGradient><linearGradient id="cover" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3fae62"/><stop offset="1" stop-color="#1d5c32"/></linearGradient><radialGradient id="rune"><stop offset="0" stop-color="#b6ffd0" stop-opacity="0.8"/><stop offset="1" stop-color="#4fe08a" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <rect x="15" y="10" width="36" height="48" rx="3" fill="#163e22" stroke="#0c1018" stroke-width="2"/>
-  <polygon points="12,5.5 44,5.5 49.5,10.5 49.5,56 15,56 10,51" fill="#eadfb4" stroke="#0c1018" stroke-width="1.5" stroke-linejoin="round"/>
-  <polyline points="45.8,7.2 45.8,52.7 11.8,52.7" fill="none" stroke="#b5a675" stroke-width="0.8"/>
-  <polyline points="47.7,8.8 47.7,54.3 13.7,54.3" fill="none" stroke="#b5a675" stroke-width="0.8"/>
-  <rect x="10" y="5" width="34" height="46" rx="2.5" fill="url(#cover)"/>
-  <rect x="10" y="5" width="6" height="46" rx="2.5" fill="#174a28"/>
-  <rect x="10.5" y="12" width="5.5" height="2" fill="#d9b25a"/>
-  <rect x="10.5" y="42" width="5.5" height="2" fill="#d9b25a"/>
-  <line x1="16" y1="5.5" x2="16" y2="50.5" stroke="#0c1018" stroke-width="1"/>
-  <rect x="10" y="5" width="34" height="46" rx="2.5" fill="none" stroke="#0c1018" stroke-width="2"/>
-  <polygon points="37,6.2 42.8,6.2 42.8,12" fill="#d9b25a" stroke="#0c1018" stroke-width="1" stroke-linejoin="round"/>
-  <polygon points="42.8,44 42.8,49.8 37,49.8" fill="#d9b25a" stroke="#0c1018" stroke-width="1" stroke-linejoin="round"/>
-  <circle cx="30" cy="28" r="13" fill="url(#rune)"/>
-  <circle cx="30" cy="28" r="10" fill="none" stroke="#7dffb0" stroke-width="1.5"/>
-  <path d="M 30 14.5 L 30 17 M 30 39 L 30 41.5 M 17.5 28 L 20 28 M 40 28 L 42.5 28" stroke="#7dffb0" stroke-width="1.5" stroke-linecap="round"/>
-  <path d="M 22 28 C 25 23.5 35 23.5 38 28 C 35 32.5 25 32.5 22 28 Z" fill="#0f2a18" stroke="#b6ffd0" stroke-width="1.4" stroke-linejoin="round"/>
-  <circle cx="30" cy="28" r="3.6" fill="#7dffb0"/>
-  <ellipse cx="30" cy="28" rx="1.2" ry="2.9" fill="#0c1018"/>
-  <circle cx="31.2" cy="26.8" r="0.8" fill="#ffffff"/>
-  <rect x="1.5" y="1.5" width="61" height="61" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity="0.8"/>
+  <!-- Morellonomicon (legendary): a thick closed green tome seen from the front, its pages showing at the side and foot, gold spine bands and corners, and a glowing green eye inside a rune ring on the cover. -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6cf09a" stop-opacity="0.5"/>
+      <stop offset="0.6" stop-color="#238a4c" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#238a4c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cover" x1="8" y1="4" x2="48" y2="55" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#58c47a"/>
+      <stop offset="0.5" stop-color="#2e8a4c"/>
+      <stop offset="1" stop-color="#164f2b"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="12" y1="8" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff6dc"/>
+      <stop offset="0.5" stop-color="#eadfb4"/>
+      <stop offset="1" stop-color="#bfae7c"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="8" y1="4" x2="50" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe7a3"/>
+      <stop offset="0.5" stop-color="#e2a93b"/>
+      <stop offset="1" stop-color="#a8641a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="30" cy="29.5" r="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c8ffdc" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#6cf09a" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#6cf09a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="iris" cx="29" cy="28" r="6" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#eafff0"/>
+      <stop offset="0.45" stop-color="#7dffb0"/>
+      <stop offset="1" stop-color="#22a855"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+  <!-- back cover and page block -->
+  <path d="M 46 4 L 55.5 9.5 L 55.5 61 L 14 61 L 8 55 Z" fill="#164f2b" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 47 7 L 53 10.5 L 53 58.5 L 15 58.5 L 11 55 L 47 55 Z" fill="url(#paper)"/>
+  <path d="M 50 12 L 50 55.5 M 15 56.8 L 51 56.8" fill="none" stroke="#b09c6a" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- front cover -->
+  <rect x="7" y="3" width="42" height="52" rx="2.5" fill="url(#cover)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- spine -->
+  <path d="M 7 5.5 C 7 4 8 3 9.5 3 L 15 3 L 15 55 L 9.5 55 C 8 55 7 54 7 52.5 Z" fill="#1d5c32" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 7.5 12 L 14.5 12 M 7.5 46 L 14.5 46" stroke="#e2a93b" stroke-width="2.6" stroke-linecap="butt"/>
+  <path d="M 10 17 L 10 41" stroke="#5fb479" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 19 7.5 L 44.5 7.5 L 44.5 50.5 L 19 50.5 Z" fill="none" stroke="#174d2a" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M 18 8 L 18 49" stroke="#8fe0a6" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+  <!-- gold corners -->
+  <path d="M 49 3 L 49 13 L 39 3 Z M 49 55 L 49 45 L 39 55 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <!-- rune ring and eye -->
+  <circle cx="31.5" cy="29" r="14" fill="url(#glow)"/>
+  <circle cx="31.5" cy="29" r="11" fill="none" stroke="#9dffc0" stroke-width="1.8"/>
+  <path d="M 31.5 15 L 31.5 18 M 31.5 40 L 31.5 43 M 17.5 29 L 20.5 29 M 42.5 29 L 45.5 29" stroke="#9dffc0" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M 21.5 29 C 25 23 38 23 41.5 29 C 38 35 25 35 21.5 29 Z" fill="#0d2a18" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+  <circle cx="31.5" cy="29" r="4.6" fill="url(#iris)"/>
+  <ellipse cx="31.5" cy="29" rx="1.3" ry="3.4" fill="#0d1a12"/>
+  <circle cx="29.8" cy="27.3" r="1.1" fill="#ffffff"/>
+  <!-- sparkles -->
+  <path d="M 57 3 L 58.1 6 L 61.1 7.1 L 58.1 8.2 L 57 11.2 L 55.9 8.2 L 52.9 7.1 L 55.9 6 Z" fill="#e2ffe9"/>
+  <path d="M 59.5 36 L 60.3 37.8 L 62.1 38.6 L 60.3 39.4 L 59.5 41.2 L 58.7 39.4 L 56.9 38.6 L 58.7 37.8 Z" fill="#8ff0b0"/>
 </svg>
