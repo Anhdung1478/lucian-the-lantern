@@ -1,7 +1,7 @@
 class_name TitleSenna
 extends TitleFigure
 ## Senna's spirit on the title, behind Lucian, facing right: a hooded robe
-## with a mantle over her shoulders, her relic cannon over her shoulder,
+## with a mantle over her shoulders, her relic cannon on her near shoulder,
 ## its barrel up and back, her near hand on its grip. Her face is calm under
 ## the hood, eyes closed, locks falling from it. She is teal and ghostly:
 ## lit from within, rimmed in teal, fading into the mist below her waist,
@@ -19,8 +19,8 @@ const RIM_TOP := Color(0.85, 1.0, 0.96, 1.0)
 const RIM_FEET := Color(0.37, 0.85, 0.75, 0.0)
 ## What her parts are tinted towards on the moon's side.
 const LIT_TINT := Color("7fe6d4")
-const FEET_ALPHA := 0.05
-const FADE_FROM := 96.0
+const FEET_ALPHA := 0.0
+const FADE_FROM := 84.0
 
 ## Her colours: the robe, the mantle, her face and hair, the cannon and
 ## its light, the dark inside her hood.
@@ -28,16 +28,20 @@ const ROBE := Color("0f3534")
 const MANTLE := Color("134241")
 const SKIN := Color("2a5f5a")
 const HAIR := Color("0e2b2a")
-const CANNON := Color("235a55")
+const CANNON := Color("0e2c2b")
+## The light along the cannon's top edge, so it reads over her robe.
+const CANNON_EDGE := Color(0.85, 1.0, 0.96, 0.55)
 const TEAL := Color("b8fff0")
 const HOOD_DARK := Color(0.0, 0.03, 0.04, 0.85)
+## Where her soul shines from inside her, under her mantle.
+const SOUL_AT := Vector2(76, 66)
 ## Her aura: soft glows (middle, size) behind her, and their alpha.
 const AURA: Array[Rect2] = [Rect2(74, 24, 34, 36), Rect2(70, 110, 52, 130), Rect2(30, 30, 30, 30)]
 const AURA_ALPHA := 0.07
 ## A fold in her robe: its shadow, the light on its ridge and its width.
-const FOLD_DARK := Color(0.0, 0.05, 0.06, 0.5)
-const FOLD_LIGHT := Color(0.72, 1.0, 0.94, 0.16)
-const FOLD_WIDTH := 3.0
+const FOLD_DARK := Color(0.0, 0.05, 0.06, 0.6)
+const FOLD_LIGHT := Color(0.72, 1.0, 0.94, 0.24)
+const FOLD_WIDTH := 4.0
 
 ## Her parts, back to front.
 const ROBE_SHAPE := "M 62 36 C 56 42 52 48 50 56 C 46 80 44 110 40 140 C 36 170 28 200 14 226 L 27 222 L 28 237 L 41 228 L 50 241 L 60 234 L 72 243 L 84 236 L 97 241 C 98 214 96 180 94 150 C 92 120 92 90 92 66 C 91 54 87 46 80 40 Z"
@@ -115,24 +119,27 @@ func _paint(paint: TitlePaint) -> void:
 	_part(paint, robe, ROBE)
 	for fold in ROBE_FOLDS:
 		_fold(paint, fold, FOLD_WIDTH)
-	paint.glow_in(robe, Vector2(78, 70), 46.0, Color(TEAL, 0.22))
+	paint.glow_in(robe, SOUL_AT, 46.0, Color(TEAL, 0.34))
 	_part(paint, TitlePaint.outline(SASH), MANTLE)
-	_paint_cannon(paint)
 	var mantle := TitlePaint.outline(MANTLE_SHAPE)
 	_part(paint, mantle, MANTLE)
 	_fold(paint, "M 62 44 Q 60 56 61 68", FOLD_WIDTH * 0.7)
 	_fold(paint, "M 76 44 Q 80 56 79 69", FOLD_WIDTH * 0.6)
+	paint.glow_in(mantle, SOUL_AT, 30.0, Color(TEAL, 0.3))
 	_paint_head(paint)
+	_paint_cannon(paint)
 	_part(paint, TitlePaint.outline(ARM), MANTLE)
 	_fold(paint, "M 57 58 Q 60 68 66 76", FOLD_WIDTH * 0.6)
 	_part(paint, TitlePaint.outline(HAND), SKIN)
 
 
-## The relic cannon over her shoulder: its parts, its teal rings, its core
-## and the light at its muzzle.
+## The relic cannon on her shoulder: its parts with the light along their
+## tops, its teal rings, its core and the light at its muzzle.
 func _paint_cannon(paint: TitlePaint) -> void:
 	for part in [GRIP, STOCK, FIN, BARREL, RAIL, MUZZLE]:
-		_part(paint, _cannon(TitlePaint.outline(part)), CANNON)
+		var outline := _cannon(TitlePaint.outline(part))
+		_part(paint, outline, CANNON)
+		paint.rim(outline, moon_way * rim_width, CANNON_EDGE)
 	for x in RINGS:
 		paint.shape(_cannon(PackedVector2Array([Vector2(x - 1.8, -6.4), Vector2(x + 1.8, -6.3), Vector2(x + 1.8, 6.1), Vector2(x - 1.8, 6.2)])), TEAL)
 		paint.glow(_cannon(PackedVector2Array([Vector2(x, 0)]))[0], Vector2(9, 9), Color(TEAL, 0.25))
