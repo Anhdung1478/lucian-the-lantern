@@ -40,7 +40,7 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 - **The Lantern's gift:** halfway through each story stage of four or more waves, pick one of three boons that last until the stage ends (more attack damage, attack speed, haste, health, speed, omnivamp, armor or gold).
 - **Elite traits:** from Act 3 on, and from wave 11 in Endless, each elite comes with one trait: Swift, Armored, Vampiric or Volatile. Its icon is over the health bar, and it pays 25% more gold and XP.
 - **Between waves and after a defeat:** the break shows what the next wave brings, and a defeat shows what hit you most, with a tip.
-- **Look:** from V2.0 the HUD, the backpack, the merchant, the end screens and every map were redrawn in the same look as the title: navy and gold, with the lantern's teal light, soft shadows and small effects (the effects are off on Low quality). The title picture, the Journey map, every enemy and boss, Lucian and his five skins were drawn again too, and the Classic skin has its own skill effects.
+- **Look:** from V2.0 the HUD, the backpack, the merchant, the end screens and every map were redrawn in the same look as the title: navy and gold, with the lantern's teal light, soft shadows and small effects (the effects are off on Low quality). The title picture, the Journey map, every enemy and boss, Lucian and his five skins, every item icon and every stat icon were drawn again too, and the Classic skin has its own skill effects.
 - **Music:** a score made in code, one piece per act, that follows the fight: its drums grow with the enemies left, and a boss brings its own layer.
 - **Other:** three save slots, rebindable keys, and three cast modes for each key.
 
