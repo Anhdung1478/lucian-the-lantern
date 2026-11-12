@@ -1,8 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- Attack Damage: a one-headed axe -->
-  <g transform="rotate(25 32 32)">
-  <path d="M 34 4 L 41 4 L 41 61 L 34 61 Z" fill="#b8692a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 36 12 C 29 12 23 9 17 4 C 7 14 6 31 12 40 C 19 35 28 31 36 31 Z" fill="#ff9a3c" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 16 9 C 10 17 10 29 13 35" fill="none" stroke="#ffd2a3" stroke-width="3" stroke-linecap="round"/>
+  <!-- Attack Damage: a broad sword, point to the top right -->
+  <g transform="rotate(45 32 32)">
+    <rect x="28" y="46" width="8" height="14" fill="#c2611d" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="32" cy="63" r="4.5" fill="#ff9a3c"/>
+    <path d="M 32 58.5 A 4.5 4.5 0 0 1 32 67.5 Z" fill="#c2611d"/>
+    <circle cx="32" cy="63" r="4.5" fill="none" stroke="#1a1d24" stroke-width="3"/>
+    <path d="M 32 -3 L 38.5 6 L 38.5 41 L 25.5 41 L 25.5 6 Z" fill="#ff9a3c"/>
+    <path d="M 32 -3 L 38.5 6 L 38.5 41 L 32 41 Z" fill="#c2611d"/>
+    <path d="M 29 8 L 29 30" fill="none" stroke="#ffd9ae" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 32 -3 L 38.5 6 L 38.5 41 L 25.5 41 L 25.5 6 Z" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="16" y="40" width="32" height="8" rx="3" fill="#ff9a3c"/>
+    <path d="M 32 40 L 45 40 A 3 3 0 0 1 48 43 L 48 45 A 3 3 0 0 1 45 48 L 32 48 Z" fill="#c2611d"/>
+    <rect x="16" y="40" width="32" height="8" rx="3" fill="none" stroke="#1a1d24" stroke-width="3"/>
   </g>
 </svg>

@@ -1,9 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- Ability Power: a round-headed missile -->
-  <g transform="rotate(45 32 32)">
-    <path d="M 28 46 L 32 58 L 36 46 Z" fill="#9fb3ff" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M 24 34 L 13 50 L 24 47 Z M 40 34 L 51 50 L 40 47 Z" fill="#4a6cf7" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M 24 46 L 24 20 A 8 8 0 0 1 40 20 L 40 46 Z" fill="#4a6cf7" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <circle cx="32" cy="22" r="3" fill="#c9d4ff"/>
-  </g>
+  <!-- Ability Power: a mage's staff, a crystal held in its fork -->
+  <path d="M 9.5 54.5 L 31 33" fill="none" stroke="#1a1d24" stroke-width="12" stroke-linecap="round"/>
+  <path d="M 31 33 Q 26.5 25 29.5 16 M 31 33 Q 40 37.5 48 34.5" fill="none" stroke="#1a1d24" stroke-width="10.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 9.5 54.5 L 31 33" fill="none" stroke="#4a6cf7" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 11.6 54.5 L 31 35.1" fill="none" stroke="#3451cf" stroke-width="3"/>
+  <path d="M 31 33 Q 26.5 25 29.5 16 M 31 33 Q 40 37.5 48 34.5" fill="none" stroke="#4a6cf7" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 55.02 8.98 L 54.31 23.83 L 45.83 32.31 L 33.81 30.19 L 31.69 18.17 L 40.17 9.69 Z" fill="#4a6cf7"/>
+  <path d="M 55.02 8.98 L 54.31 23.83 L 45.83 32.31 L 33.81 30.19 Z" fill="#3451cf"/>
+  <path d="M 35.5 18.6 L 41.5 12.6" fill="none" stroke="#b9c8ff" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 55.02 8.98 L 54.31 23.83 L 45.83 32.31 L 33.81 30.19 L 31.69 18.17 L 40.17 9.69 Z" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
 </svg>

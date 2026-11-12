@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- Critical Strike Chance: a pointed missile -->
-  <g transform="rotate(45 32 32)">
-    <path d="M 28 46 L 32 58 L 36 46 Z" fill="#ffb37a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M 24 34 L 13 50 L 24 47 Z M 40 34 L 51 50 L 40 47 Z" fill="#ff4b4b" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M 24 46 L 24 22 L 32 5 L 40 22 L 40 46 Z" fill="#ff4b4b" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 24 30 L 40 30 M 24 36 L 40 36" stroke="#1a1d24" stroke-width="2"/>
+  <!-- Critical Strike Chance: an impact burst with a bright core -->
+  <g transform="rotate(12 32 32)">
+    <path d="M 32 5.5 L 37.36 19.06 L 47.56 16.44 L 44.94 26.64 L 58.5 32 L 44.94 37.36 L 47.56 47.56 L 37.36 44.94 L 32 58.5 L 26.64 44.94 L 16.44 47.56 L 19.06 37.36 L 5.5 32 L 19.06 26.64 L 16.44 16.44 L 26.64 19.06 Z" fill="#ff4b4b"/>
+    <path d="M 47.56 16.44 L 44.94 26.64 L 58.5 32 L 44.94 37.36 L 47.56 47.56 L 37.36 44.94 L 32 58.5 L 26.64 44.94 L 16.44 47.56 Z" fill="#b82626"/>
+    <path d="M 32 21.5 L 33.91 27.38 L 39.42 24.58 L 36.62 30.09 L 42.5 32 L 36.62 33.91 L 39.42 39.42 L 33.91 36.62 L 32 42.5 L 30.09 36.62 L 24.58 39.42 L 27.38 33.91 L 21.5 32 L 27.38 30.09 L 24.58 24.58 L 30.09 27.38 Z" fill="#ffd2c4"/>
+    <path d="M 32 5.5 L 37.36 19.06 L 47.56 16.44 L 44.94 26.64 L 58.5 32 L 44.94 37.36 L 47.56 47.56 L 37.36 44.94 L 32 58.5 L 26.64 44.94 L 16.44 47.56 L 19.06 37.36 L 5.5 32 L 19.06 26.64 L 16.44 16.44 L 26.64 19.06 Z" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
   </g>
 </svg>
