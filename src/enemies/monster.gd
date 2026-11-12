@@ -75,7 +75,7 @@ func _swarm(delta: float) -> void:
 		return
 	face(target.global_position)
 	if _attack_left <= 0.0:
-		_attack_left = data.attack_interval
+		_attack_left = attack_interval
 		_attack()
 
 
@@ -98,7 +98,7 @@ func _spit(delta: float) -> void:
 		return
 	var distance := distance_to_target()
 	if distance <= attack_range + Lucian.HIT_RADIUS and _attack_left <= 0.0:
-		_attack_left = data.attack_interval
+		_attack_left = attack_interval
 		_stand_left = SPIT_STAND
 		face(target.global_position)
 		_attack()

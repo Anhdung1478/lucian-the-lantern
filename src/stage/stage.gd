@@ -72,6 +72,8 @@ var extra_dummies: Array[TrainingDummy] = []
 ## Essences collected in this stage, for the HUD and the result panel.
 var collected := {Essences.BLUE: 0, Essences.ORANGE: 0, Essences.PURPLE: 0}
 var rng := RandomNumberGenerator.new()
+## False: elites spawn with no trait (the tests that pin an elite's stats).
+var elite_traits := true
 ## The stage's waves; null in Training.
 var runner: WaveRunner
 ## Endless mode's flow (its runner, spawn strength, the best); null in the
@@ -385,16 +387,22 @@ func set_dummy_count(count: int) -> void:
 ## Puts an enemy of type `id` on the map at `at`, wired for damage and heal
 ## numbers, the debug meter, rewards, escapes, summons and a Thresh's end
 ## (Act 1's at half HP, the final one's fall).
-func spawn_enemy(id: StringName, at: Vector2, wave := 1) -> EnemyUnit:
-	return spawn_unit(load(ENEMY_PATH % id), at, wave)
+func spawn_enemy(id: StringName, at: Vector2, wave := 1, summon := false) -> EnemyUnit:
+	return spawn_unit(load(ENEMY_PATH % id), at, wave, summon)
 
 
-## spawn_enemy for data in hand (tests build it in code).
-func spawn_unit(data: EnemyData, at: Vector2, wave := 1) -> EnemyUnit:
+## spawn_enemy for data in hand (tests build it in code). A `summon` is
+## marked summoned at once and never gets an elite trait.
+func spawn_unit(data: EnemyData, at: Vector2, wave := 1, summon := false) -> EnemyUnit:
 	var unit := _new_unit(data)
 	unit.setup(data, maxi(run.act, 1), wave, lucian)
+	unit.summoned = summon
 	if endless:
 		endless.scale(unit)
+	if elite_traits and EliteTrait.applies(data, run, wave, summon):
+		var trait_id := EliteTrait.pick(rng)
+		EliteTrait.apply(unit, trait_id)
+		hud.tips.show_tip(StringName("trait_" + trait_id), EliteTrait.tip(trait_id))
 	unit.max_hp *= WavePlan.hp_share(run.stage_id, data.id)
 	unit.damage *= WavePlan.damage_share(run.stage_id, data.id)
 	# The difficulty's damage is on Lucian's side (damage_taken_scale), so
@@ -801,7 +809,7 @@ func _on_enemy_died(enemy: Enemy) -> void:
 ## chance), and its place in the kill count.
 func _pay_kill(unit: EnemyUnit) -> void:
 	var boss_scale := EndlessPlan.reward_scale(unit.data.kind, unit.wave) if endless else 1.0
-	var reward := KillRewards.roll(unit.data, _reward_act(unit), run, rng, unit.summoned, boss_scale, unit.killed_by == &"smite")
+	var reward := KillRewards.roll(unit.data, _reward_act(unit), run, rng, unit.summoned, boss_scale, unit.killed_by == &"smite", unit.elite_trait != &"")
 	wallet.add(reward.gold)
 	stats.gold_earned += reward.gold
 	stats.kills += 1
@@ -879,8 +887,7 @@ func _on_summon_requested(unit: EnemyUnit, id: StringName, at: Vector2) -> void:
 func _spawn_summon(from: WeakRef, id: StringName, at: Vector2, wave: int, jumps: int) -> void:
 	if jumps != _jumps:
 		return
-	var summon := spawn_enemy(id, at, wave)
-	summon.summoned = true
+	var summon := spawn_enemy(id, at, wave, true)
 	summon.summoner = from.get_ref() as EnemyUnit
 
 

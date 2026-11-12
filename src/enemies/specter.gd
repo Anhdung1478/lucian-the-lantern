@@ -88,7 +88,7 @@ func _charger(delta: float) -> void:
 		if distance > attack_range + Lucian.HIT_RADIUS or (_attack_left > 0.0 and distance > CHARGE_CLOSE):
 			walk_toward(target.global_position, delta)
 		return
-	_attack_left = data.attack_interval
+	_attack_left = attack_interval
 	var toward := global_position.direction_to(target.global_position)
 	face(target.global_position)
 	_mark = GroundWarning.line(global_position, toward, CHARGE_LENGTH, CHARGE_WIDTH, CHARGE_WARN)
@@ -116,7 +116,7 @@ func _warden(delta: float) -> void:
 		return
 	var distance := distance_to_target()
 	if distance <= attack_range + Lucian.HIT_RADIUS and _attack_left <= 0.0:
-		_attack_left = data.attack_interval
+		_attack_left = attack_interval
 		var toward := global_position.direction_to(target.global_position)
 		face(target.global_position)
 		_mark = GroundWarning.line(global_position, toward, CHAIN_LENGTH, CHAIN_WIDTH, CHAIN_WARN)

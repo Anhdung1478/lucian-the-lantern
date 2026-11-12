@@ -83,6 +83,13 @@ var veiled := false:
 var damage := 0.0
 var attack_range := 0.0
 var move_speed := 0.0
+## Seconds between its basic attacks.
+var attack_interval := 0.0
+## The share of the damage its hits deal to Lucian that it heals (the data's
+## drain, or a Vampiric elite's).
+var drain := 0.0
+## Its elite trait (EliteTrait); &"" for none.
+var elite_trait := &""
 ## Its Boss.skill_hit damage times this (Endless's boss and mini boss power).
 var skill_scale := 1.0
 ## Its basic attack's on-hit burn times this: in Endless, its damage over
@@ -144,6 +151,8 @@ func setup(enemy_data: EnemyData, act: int, of_wave: int, foe: Lucian) -> void:
 	damage = data.damage * data.damage_scale(act, wave)
 	attack_range = data.attack_range
 	move_speed = data.move_speed
+	attack_interval = data.attack_interval
+	drain = data.drain
 
 
 func _ready() -> void:
@@ -178,6 +187,9 @@ func _ready() -> void:
 	elif data.kind == &"elite":
 		health_bar.size = ELITE_BAR
 		health_bar.badge = true
+		if elite_trait != &"":
+			health_bar.trait_icon = EliteTrait.icon(elite_trait)
+			_add_trait_ring()
 	health_bar.position = Vector2(0, -data.radius - 34.0)
 	health_bar.z_index = 10
 	add_child(health_bar)
@@ -186,9 +198,9 @@ func _ready() -> void:
 		projectile_parent = get_parent()
 	if warning_parent == null:
 		warning_parent = get_parent()
-	_attack_left = randf_range(0.2, data.attack_interval)
+	_attack_left = randf_range(0.2, attack_interval)
 	_summon_left = data.summon_every
-	if data.drain > 0.0 and is_instance_valid(target):
+	if drain > 0.0 and is_instance_valid(target):
 		target.damage_received.connect(_drain)
 	_appear()
 
@@ -297,6 +309,8 @@ func _die() -> void:
 		return
 	super()
 	_show_death()
+	if elite_trait == EliteTrait.VOLATILE:
+		EliteTrait.leave_blast(self)
 	if summoned and is_instance_valid(summoner):
 		summoner.summon_killed(self)
 
@@ -402,7 +416,7 @@ func _think(delta: float) -> void:
 		return
 	face(target.global_position)
 	if _attack_left <= 0.0:
-		_attack_left = data.attack_interval
+		_attack_left = attack_interval
 		_attack()
 
 
@@ -449,10 +463,10 @@ func _heal_number_step(delta: float) -> void:
 
 
 ## Lucian took a hit (`damage_received`): when it was its own basic attack
-## (no burn tick), it heals data.drain of the damage.
+## (no burn tick), it heals `drain` of the damage.
 func _drain(info: DamageInfo, amount: float) -> void:
 	if info.attacker == self and info.source == &"basic" and not info.over_time:
-		heal(amount * data.drain)
+		heal(amount * drain)
 
 
 func _show_hit() -> void:
@@ -505,6 +519,17 @@ func _fade_out() -> void:
 	fade.tween_property(sprite, "modulate", FREED_COLOR, FREED_TIME * 0.4)
 	fade.tween_property(self, "modulate:a", 0.0, FREED_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	fade.chain().tween_callback(queue_free)
+
+
+## The ring on the ground in its trait's color (an extra: off on low effects).
+func _add_trait_ring() -> void:
+	if not Juice.on():
+		return
+	var ring := EliteRing.new()
+	ring.color = EliteTrait.color(elite_trait)
+	ring.radius = data.radius
+	add_child(ring)
+	move_child(ring, shadow.get_index() + 1)
 
 
 ## The sprite's color: the data's tint, darkened to a silhouette when veiled.

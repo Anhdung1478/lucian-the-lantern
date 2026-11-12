@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Vampiric: a fang with a drop of blood -->
+  <rect width="64" height="64" fill="#2a1420"/>
+  <path d="M 16 10 L 48 10 C 48 26 42 40 32 52 C 22 40 16 26 16 10 Z" fill="#f1ead8" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M 36 12 C 36 26 34 38 32 46 C 40 36 44 24 44 12 Z" fill="#cdbfa4"/>
+  <path d="M 16 10 L 48 10 C 48 26 42 40 32 52 C 22 40 16 26 16 10 Z" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M 32 40 C 38 48 40 52 40 56 C 40 61 36 62 32 62 C 28 62 24 61 24 56 C 24 52 26 48 32 40 Z" fill="#d0305a" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+</svg>

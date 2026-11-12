@@ -31,9 +31,10 @@ const SUMMON_SHARE := 0.25
 ## data's extras are not. Sure orange, the boss's and the data's extra, is
 ## multiplied by the difficulty's essence scale, rounded. `smite_kill`:
 ## Smite's hit killed it (Enemy.killed_by), which raises an elite's orange
-## chance.
-static func roll(data: EnemyData, act: int, run: StageSetup, rng: RandomNumberGenerator, summoned := false, boss_scale := 1.0, smite_kill := false) -> Dictionary:
-	var scale := data.reward_scale(act) * (SUMMON_SHARE if summoned else 1.0)
+## chance. `traited`: an elite with a trait, which pays EliteTrait.PAY_BONUS
+## more gold and XP.
+static func roll(data: EnemyData, act: int, run: StageSetup, rng: RandomNumberGenerator, summoned := false, boss_scale := 1.0, smite_kill := false, traited := false) -> Dictionary:
+	var scale := data.reward_scale(act) * (SUMMON_SHARE if summoned else 1.0) * (1.0 + EliteTrait.PAY_BONUS if traited else 1.0)
 	var reward := {
 		"gold": roundi(data.gold * scale * WavePlan.gold_share(run.stage_id, data.id) * (1.0 + run.gold_bonus) * run.gold_mult),
 		"xp": roundi(data.xp * scale * (1.0 + run.xp_bonus)),

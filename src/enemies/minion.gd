@@ -38,7 +38,7 @@ func _think(delta: float) -> void:
 	else:
 		face(target.global_position)
 	if distance <= attack_range + Lucian.HIT_RADIUS and _attack_left <= 0.0:
-		_attack_left = data.attack_interval
+		_attack_left = attack_interval
 		_attack()
 
 

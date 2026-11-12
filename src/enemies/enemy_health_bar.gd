@@ -23,6 +23,8 @@ const BADGE_LINE := Color(0.02, 0.03, 0.05)
 
 ## Elites: a gold rim, and a small gold diamond at the bar's left end.
 var badge := false
+## An elite's trait icon (EliteTrait), the first one over the bar. Null = none.
+var trait_icon: Texture2D
 
 var _ratio := 1.0
 var _ghost := BarGhost.new()
@@ -60,6 +62,18 @@ func _process(delta: float) -> void:
 		queue_redraw()
 
 
+## What shows over the bar, in order: the trait icon (it never runs out), then
+## the enemy's statuses as {id, stacks, left, duration, icon}.
+func shown() -> Array[Dictionary]:
+	var found: Array[Dictionary] = []
+	if trait_icon:
+		found.append({"id": &"trait", "stacks": 1, "left": 1.0, "duration": 1.0, "icon": trait_icon})
+	var enemy := get_parent() as Enemy
+	if enemy:
+		found.append_array(enemy.statuses())
+	return found
+
+
 func _draw() -> void:
 	_since_draw = 0.0
 	_ghost.moved = false
@@ -78,7 +92,7 @@ func _draw() -> void:
 	if enemy == null:
 		return
 	_seen_version = enemy.status_version
-	var statuses := enemy.statuses()
+	var statuses := shown()
 	var x := -(statuses.size() * (STATUS_SIZE + STATUS_GAP) - STATUS_GAP) * 0.5
 	var font := ThemeDB.fallback_font
 	for status in statuses:
