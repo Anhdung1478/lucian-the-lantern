@@ -719,7 +719,7 @@ The game opens here (built in Phase 6).
 - **Built in V1.3:** after the slot (and its Overwrite question), **CHOOSE DIFFICULTY**: "Enemy HP and damage. It can't be changed later.", then four buttons, **Easy ×0.8**, **Normal ×1.0** (in gold), **Hard ×1.1** and **Extreme ×1.3**, and Back. Hovering one says what it does ("Enemies have 110% HP and deal 110% damage. Blue and orange essence ×1.2."; before V1.5.0, "Blue essence ×1.2."). A pick writes the new game and starts Act 1. Back or ESC returns to the slot list.
 - Loading a slot opens the main screen on Journey.
 - The slot buttons are 520 px wide, so the longest text keeps room around it. The gear menu's Save as copy uses the same list.
-- **Built in V2.0:** each difficulty's hover text has a second line about Resolve. Easy and Normal: "Resolve: each defeat on a stage gives +10% damage dealt and -10% damage taken there, up to 5 times." Hard: the same with 5%. Extreme: "No Resolve: a defeat makes no stage easier." (game design doc §17).
+- **Built in V2.0:** each difficulty's hover text has a second line about Resolve. Easy and Normal: "Resolve: each defeat on a stage gives +10% damage dealt and -10% damage taken there, up to 5 times." Hard: the same with 5%. Extreme: the same with 3%. (game design doc §17).
 - **Built in V2.0:** every change of screen **fades in from black** over 0.25 s (the title, the main screen, a stage and the end screen; `Game` switches them). `ScreenFade` is a black cover on layer 100, above every pop-up, that never takes input. Off on Low quality and when run headless.
 
 ### Built in Phase 10

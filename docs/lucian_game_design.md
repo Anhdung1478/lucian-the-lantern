@@ -246,7 +246,7 @@ Acts 5 and 6 play this way too (`act5_shadow_isles.md`, `act6_the_lantern.md`). 
 ### Built in V2.0
 **Resolve.** A story stage that beats Lucian gets a little easier each time, so every player gets through in the end.
 - Each **defeat** on a story stage **not yet cleared** adds one stack of Resolve for that stage, up to **5**. Leaving a stage is no defeat.
-- A stack gives **+10% damage dealt and -10% damage taken** on Easy and Normal, **5%** on Hard and **none** on Extreme (`Difficulty.RESOLVE_STEPS`, §17). Damage dealt covers attacks, skills, items and Lucian's burns, and is multiplied before the enemy's armor and magic resist. Damage taken is multiplied on top of the difficulty's scale, before armor and magic resist.
+- A stack gives **+10% damage dealt and -10% damage taken** on Easy and Normal, **5%** on Hard and **3%** on Extreme (`Difficulty.RESOLVE_STEPS`, §17). Damage dealt covers attacks, skills, items and Lucian's burns, and is multiplied before the enemy's armor and magic resist. Damage taken is multiplied on top of the difficulty's scale, before armor and magic resist.
 - **Clearing the stage clears its stacks.** A cleared stage replayed, Training and Endless have none.
 - The save keeps the defeats per stage (`"defeats"`, §15). The stacks of a try are read when the stage starts.
 - The Gameplay setting **Resolve** (on by default) turns the effect off. The defeats are still counted, so the stacks come back when it is turned on.
@@ -975,6 +975,8 @@ Endless plays. Every number is a placeholder: the constants sit at the top of `s
 | Mini boss HP | 9000 × (1 + 0.3(k − 1)), k = (w + 5) / 10 | Wave 5: 9000 · 15: 11700 · 25: 14400 · 45: 19800 |
 | Boss and mini boss damage | basic damage and every skill hit × max(1 + 0.15(k − 1), √(damage_scale(w) / damage_scale(f))), f = 10 for a boss, 5 for a mini boss; × 0.8 at tier 1 and × 0.9 at tier 2 for one from Acts 5–6 | Bosses, waves 10–50: ×1.0, ×1.27, ×1.54, ×1.81, ×2.08. Mini bosses, waves 5–45: ×1.0, ×1.32, ×1.63, ×1.95, ×2.26 (before the Acts 5–6 share) |
 
+*(V2.0: the first mini boss, wave 5, deals 0.7 of its power (`EndlessPlan.FIRST_MINI_BOSS_POWER`), so 0.56 for one from Acts 5 and 6. It comes with a full wave while Lucian is level 8 to 10 with two items: it ended 6 of 7 runs of the average and novice bots, and the runs that passed it reached wave 20 and 41. From wave 15 on a mini boss deals all of its power, as before.)*
+
 *(V1.5.0: so the bosses keep up with the waves. Before: boss HP 15000 × (1 + 0.3(k − 1)) (wave 20: 19500, 30: 24000, 50: 33000), and damage × (1 + 0.15(k − 1)) (×1, ×1.15, ×1.3, …). The planned HP of a wave is `EndlessPlan.wave_hp`: its normal and elite counts at their pools' mean HP (the pools of the acts cleared), × the wave's HP scale, before the difficulty and modifier #5. It is the same every run. damage_scale is the normal and elite damage row above, so the first boss and the first mini boss hit ×1.0. The Act 5–6 share softens Karthus, Thresh, Maokai, Elise, Karthus revived and Hecarim at their first two tiers.)*
 
 - Wave 1 is as easy as Act 1. The HP passes Act 6's last story wave (×7.6) at wave 34. *(V2.0: Act 6's last story wave is wave 9, so its scale is ×2.75 × 1.8 = ×4.95. The Endless HP passes it at wave 24: ×4.87 at wave 23, ×5.12 at wave 24. The ×7.6 was already out of date after V1.3.)*
@@ -1198,7 +1200,9 @@ A stage that has beaten Lucian gets easier (§3, "Built in V2.0"). What one stac
 | Easy | +10% damage dealt, -10% damage taken | +50% dealt, -50% taken |
 | **Normal** | +10% damage dealt, -10% damage taken | +50% dealt, -50% taken |
 | Hard | +5% damage dealt, -5% damage taken | +25% dealt, -25% taken |
-| Extreme | none | none |
+| Extreme | +3% damage dealt, -3% damage taken | +15% dealt, -15% taken |
+
+*(V2.0: Extreme had none at first. Measured that way, the skilled bot needed 21 and 24 tries on 5-1 and 5-2, and 15 on 3-2 once elites had traits. The difficulty can't be changed after a new game, so a wall there was a dead end. With the Gameplay setting off, Extreme plays with none.)*
 
 - The damage taken is multiplied by 1 - 0.1 × stacks (so five stacks halve it on Normal), on top of the difficulty's own scale.
 - Training, Endless and a cleared stage never have it.
