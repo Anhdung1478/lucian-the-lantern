@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <!-- Lucian, top-down, facing +X. Center of the image = center of his body. His own relic pistol is in his left hand (y = -15), Senna's relic gun in his right (y = +15). -->
+  <!-- Lucian, top-down, facing +X. Center of the image = center of his body. A long dark coat with a pale rim, its tails split behind him; short black hair; his own slim silver-gold pistol in his left hand (muzzle at 46, -15) and Senna's gunmetal relic gun with teal rings in his right (muzzle at 46, 15). The game draws his shadow. -->
   <defs>
     <radialGradient id="muzzle">
       <stop offset="0" stop-color="#fffbe8"/>
@@ -11,46 +11,81 @@
       <stop offset="0.4" stop-color="#b8fff0" stop-opacity="0.95"/>
       <stop offset="1" stop-color="#5fe8cf" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#11141c"/>
-      <stop offset="1" stop-color="#232a3a"/>
+    <linearGradient id="tail" gradientUnits="userSpaceOnUse" x1="-6" y1="0" x2="-48" y2="0">
+      <stop offset="0" stop-color="#2b3346"/>
+      <stop offset="1" stop-color="#171b26"/>
+    </linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1f5"/>
+      <stop offset="0.5" stop-color="#b9c0cb"/>
+      <stop offset="1" stop-color="#737c8a"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a3d35"/>
+      <stop offset="0.65" stop-color="#1d1713"/>
     </linearGradient>
   </defs>
   <g transform="translate(64 64)">
-    <!-- shadow -->
-    <ellipse cx="-4" cy="3" rx="34" ry="30" fill="#000000" opacity="0.28"/>
-    <!-- long coat flaring out behind him, split in the middle -->
-    <path d="M -4 -23 L -38 -33 Q -47 -16 -45 -3 L -16 -2 Z" fill="url(#coat)" stroke="#c9d1dc" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M -4 23 L -38 33 Q -47 16 -45 3 L -16 2 Z" fill="url(#coat)" stroke="#c9d1dc" stroke-width="2" stroke-linejoin="round"/>
-    <!-- arms reaching forward -->
-    <path d="M 0 -20 L 20 -15" stroke="#1d2230" stroke-width="10" stroke-linecap="round"/>
-    <path d="M 0 20 L 20 15" stroke="#1d2230" stroke-width="10" stroke-linecap="round"/>
-    <path d="M 4 -21 L 18 -17" stroke="#c9d1dc" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M 4 21 L 18 17" stroke="#c9d1dc" stroke-width="1.5" stroke-linecap="round"/>
-    <!-- his own relic pistol (left) -->
-    <path d="M 18 -19 L 42 -18 L 44 -15 L 42 -12 L 18 -11 Z" fill="#3a404d" stroke="#9aa3b2" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M 26 -15 L 40 -15" stroke="#ffe9a8" stroke-width="2" stroke-linecap="round"/>
-    <!-- Senna's relic gun (right): her cannon in small. A heavy stock, a thick gunmetal barrel, two glowing teal rings, a muzzle cap -->
-    <rect x="25" y="6.5" width="16" height="17" rx="5" fill="#b8fff0" opacity="0.2"/>
-    <path d="M 12 9 L 25 7.5 L 25 22.5 L 12 21 Q 8.5 15 12 9 Z" fill="#3a4650" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-    <rect x="24" y="10" width="19" height="10" rx="2" fill="#4c5a64" stroke="#1a1d24" stroke-width="1.5"/>
-    <rect x="27.5" y="7.5" width="3.5" height="15" rx="1.3" fill="#b8fff0" stroke="#1a1d24" stroke-width="1"/>
-    <rect x="35" y="7.5" width="3.5" height="15" rx="1.3" fill="#b8fff0" stroke="#1a1d24" stroke-width="1"/>
-    <path d="M 42 9 L 46 11.5 L 46 18.5 L 42 21 Z" fill="#2c363e" stroke="#1a1d24" stroke-width="1.2" stroke-linejoin="round"/>
+    <!-- the coat's lining, seen in the split between its tails -->
+    <path d="M -15 -2.5 L -47 -6 L -47 6 L -15 2.5 Z" fill="#0f1219" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <!-- long coat tails flaring out behind him -->
+    <path d="M -4 -21 C -14 -29 -30 -34 -42 -33 L -47.5 -26 Q -45 -20 -49 -14 Q -46 -9 -48 -3 L -16 -1.5 Q -10 -10 -4 -21 Z" fill="url(#tail)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -4 21 C -14 29 -30 34 -42 33 L -47.5 26 Q -45 20 -49 14 Q -46 9 -48 3 L -16 1.5 Q -10 10 -4 21 Z" fill="url(#tail)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <!-- folds -->
+    <path d="M -13 -12 Q -28 -17 -45 -19 M -17 -5.5 Q -30 -7 -45.5 -8.5" fill="none" stroke="#11151d" stroke-width="2" stroke-linecap="round"/>
+    <path d="M -13 12 Q -28 17 -45 19 M -17 5.5 Q -30 7 -45.5 8.5" fill="none" stroke="#11151d" stroke-width="2" stroke-linecap="round"/>
+    <path d="M -10 -19 Q -24 -25 -40 -26.5 M -10 19 Q -24 25 -40 26.5" fill="none" stroke="#3a4560" stroke-width="2" stroke-linecap="round"/>
+    <!-- pale rim along the outer edges and the hem -->
+    <path d="M -6.5 -19.5 C -15.5 -26.5 -30 -31.2 -41 -30.6 L -45 -25.6 Q -42.8 -20 -46.4 -14 Q -43.8 -9 -45.4 -4.6" fill="none" stroke="#c9d1dc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -6.5 19.5 C -15.5 26.5 -30 31.2 -41 30.6 L -45 25.6 Q -42.8 20 -46.4 14 Q -43.8 9 -45.4 4.6" fill="none" stroke="#c9d1dc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- back and shoulders -->
+    <path d="M -12 -21 Q -6 -27.5 3 -26 Q 10 -24 11.5 -16 L 12 -8 Q 13 0 12 8 L 11.5 16 Q 10 24 3 26 Q -6 27.5 -12 21 Q -16 11 -16 0 Q -16 -11 -12 -21 Z" fill="#232a39" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M -14.5 -6 Q -15.5 0 -14.5 6" fill="none" stroke="#c9d1dc" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- arms reaching forward: sleeves with pale cuffs -->
+    <path d="M 1 -21 L 17 -16.5" stroke="#1a1d24" stroke-width="12.5" stroke-linecap="round"/>
+    <path d="M 1 -21 L 17 -16.5" stroke="#262e3f" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 1 21 L 17 16.5" stroke="#1a1d24" stroke-width="12.5" stroke-linecap="round"/>
+    <path d="M 1 21 L 17 16.5" stroke="#262e3f" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 3 -24.6 L 13 -21.8 M 3 24.6 L 13 21.8" stroke="#8f9ab0" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M 15.6 -21.2 L 13.2 -12.8 M 15.6 21.2 L 13.2 12.8" stroke="#c9d1dc" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- shoulder tops catching the light, with a pale seam -->
+    <path d="M -10 -21.5 Q -3 -27 5 -24.5 Q 6 -19 0 -16.5 Q -7 -16 -10 -21.5 Z" fill="#323c52"/>
+    <path d="M -10 21.5 Q -3 27 5 24.5 Q 6 19 0 16.5 Q -7 16 -10 21.5 Z" fill="#323c52"/>
+    <path d="M -9 -23.5 Q -2 -27.6 5.5 -25.3 M -9 23.5 Q -2 27.6 5.5 25.3" fill="none" stroke="#c9d1dc" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- his own pistol (left): slim, silver with gold bands, a lit relic line -->
+    <path d="M 16.5 -18.5 L 41 -18.5 Q 43.5 -18.3 43.8 -16.4 L 43.8 -13.6 Q 43.5 -11.7 41 -11.5 L 16.5 -11.5 Q 14.8 -15 16.5 -18.5 Z" fill="url(#silver)" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="22" y="-19.2" width="2.6" height="8.4" rx="0.8" fill="#e3b85a" stroke="#1a1d24" stroke-width="1"/>
+    <rect x="36.5" y="-18.8" width="2" height="7.6" rx="0.6" fill="#e3b85a" stroke="#1a1d24" stroke-width="0.8"/>
+    <path d="M 26 -15 L 35 -15" stroke="#fff4c8" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 43.2 -17.2 L 46 -16.2 L 46 -13.8 L 43.2 -12.8 Z" fill="#c99a3c" stroke="#1a1d24" stroke-width="1" stroke-linejoin="round"/>
+    <!-- Senna's relic gun (right): her cannon in small. A heavy gunmetal stock with a teal core, a thick barrel, two glowing teal rings, a muzzle cap -->
+    <rect x="25" y="6.5" width="16" height="17" rx="5" fill="#b8fff0" opacity="0.22"/>
+    <path d="M 11 9 L 25 7.5 L 25 22.5 L 11 21 Q 7.5 15 11 9 Z" fill="#3a4650" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 12 10.5 L 23.5 9.3" stroke="#56666f" stroke-width="1.4" stroke-linecap="round"/>
+    <circle cx="13" cy="15" r="2.2" fill="#b8fff0" stroke="#1a1d24" stroke-width="1"/>
+    <rect x="24" y="10" width="19" height="10" rx="2" fill="#4c5a64" stroke="#1a1d24" stroke-width="2"/>
+    <path d="M 26 12 L 41 12" stroke="#6f818c" stroke-width="1.4" stroke-linecap="round"/>
+    <rect x="27.5" y="7.5" width="3.5" height="15" rx="1.3" fill="#b8fff0" stroke="#1a1d24" stroke-width="1.2"/>
+    <rect x="35" y="7.5" width="3.5" height="15" rx="1.3" fill="#b8fff0" stroke="#1a1d24" stroke-width="1.2"/>
+    <path d="M 42 9 L 46 11.5 L 46 18.5 L 42 21 Z" fill="#2c363e" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
     <!-- hands -->
-    <circle cx="20" cy="-15" r="4.5" fill="#5a3a2a"/>
-    <circle cx="20" cy="15" r="4.5" fill="#5a3a2a"/>
+    <circle cx="19.5" cy="-15" r="4.3" fill="#5e3d2c" stroke="#1a1d24" stroke-width="1.8"/>
+    <circle cx="19.5" cy="15" r="4.3" fill="#5e3d2c" stroke="#1a1d24" stroke-width="1.8"/>
+    <path d="M 18 -17.5 Q 20.5 -18 22 -16 M 18 12.5 Q 20.5 12 22 14" fill="none" stroke="#8a5a40" stroke-width="1.2" stroke-linecap="round"/>
     <!-- muzzle light -->
     <circle cx="46" cy="-15" r="7" fill="url(#muzzle)"/>
     <circle cx="46" cy="15" r="7" fill="url(#senna_muzzle)"/>
-    <!-- shoulders and torso -->
-    <ellipse cx="0" cy="0" rx="15" ry="26" fill="#1d2230" stroke="#c9d1dc" stroke-width="2"/>
-    <path d="M -10 -21 L -10 21" stroke="#2f3850" stroke-width="3"/>
-    <!-- high collar -->
-    <path d="M -7 -15 Q 6 0 -7 15" fill="none" stroke="#c9d1dc" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- head: skin with short black hair seen from above -->
-    <circle cx="2" cy="0" r="11" fill="#5a3a2a"/>
-    <circle cx="0" cy="0" r="9.5" fill="#171313"/>
-    <path d="M 9 -5 Q 12 0 9 5" fill="none" stroke="#6e4835" stroke-width="2"/>
+    <!-- high collar standing up behind his neck -->
+    <path d="M 7 -12.5 Q -2 -17.5 -10 -13 Q -15.5 -7 -15.5 0 Q -15.5 7 -10 13 Q -2 17.5 7 12.5 L 5 9 Q -2 12.5 -7.5 9.5 Q -11.5 5.5 -11.5 0 Q -11.5 -5.5 -7.5 -9.5 Q -2 -12.5 5 -9 Z" fill="#2c3447" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 3 -13.4 Q -3 -15.6 -9 -12.3 Q -14 -7 -14 0 Q -14 7 -9 12.3 Q -3 15.6 3 13.4" fill="none" stroke="#c9d1dc" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- head: ears, the face's front edge, short black hair seen from above -->
+    <ellipse cx="1.5" cy="-10" rx="2.4" ry="1.8" fill="#4d3122" stroke="#1a1d24" stroke-width="1"/>
+    <ellipse cx="1.5" cy="10" rx="2.4" ry="1.8" fill="#4d3122" stroke="#1a1d24" stroke-width="1"/>
+    <circle cx="2" cy="0" r="10" fill="#6a4532" stroke="#1a1d24" stroke-width="2"/>
+    <path d="M 11.4 -1.8 Q 13.8 0 11.4 1.8 Z" fill="#5a3a2a" stroke="#1a1d24" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 9.5 -6.5 Q 11.5 -3.5 11.6 -1.5 M 9.5 6.5 Q 11.5 3.5 11.6 1.5" fill="none" stroke="#8a5a40" stroke-width="1.1" stroke-linecap="round"/>
+    <path d="M 5.5 -8.4 Q -1 -10.8 -6.8 -6.2 Q -9.4 0 -6.8 6.2 Q -1 10.8 5.5 8.4 Q 6.8 4 7 0 Q 6.8 -4 5.5 -8.4 Z" fill="url(#hair)"/>
+    <path d="M 8.6 -4 Q 10 0 8.6 4" fill="none" stroke="#8a5a40" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M -4 -5.2 Q 0 -7.4 4 -6" fill="none" stroke="#4a3f38" stroke-width="1.2" stroke-linecap="round"/>
   </g>
 </svg>
