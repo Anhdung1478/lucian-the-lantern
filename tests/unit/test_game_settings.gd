@@ -327,3 +327,9 @@ func test_resolve_is_on_by_default_and_is_saved() -> void:
 	settings.set_value(Resolve.SETTING, false)
 	assert_signal_emitted_with_parameters(settings, "changed", [Resolve.SETTING])
 	assert_eq(GameSettings.new(PATH).get_value(Resolve.SETTING), false)
+
+
+func test_the_camera_zoom_is_a_setting_that_survives_a_reload() -> void:
+	assert_eq(settings.get_value(&"camera_zoom"), 1.0)
+	settings.set_value(&"camera_zoom", 0.8)
+	assert_almost_eq(float(GameSettings.new(PATH).get_value(&"camera_zoom")), 0.8, 0.0001)

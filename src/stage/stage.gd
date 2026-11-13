@@ -202,10 +202,12 @@ func skip_break() -> void:
 
 
 ## Cutscenes: the world stops (tweens still move it), the HUD hides, and
-## ESC and P do nothing.
+## ESC and P do nothing. The camera shows the plain view, whatever the
+## player's zoom, which comes back after.
 func freeze(on: bool) -> void:
 	for node: Node in [$World, $Warnings, $Projectiles, camera]:
 		node.process_mode = Node.PROCESS_MODE_DISABLED if on else Node.PROCESS_MODE_INHERIT
+	camera.plain_view(on)
 	hud.visible = not on
 	screens.locked = on
 	if on:

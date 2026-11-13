@@ -3,8 +3,9 @@ extends Control
 ## Bottom right: the map as a plate with a gold diamond at each corner of its
 ## frame, and dots, no terrain. Lucian is a
 ## blue dot, an enemy red (an elite bigger), a boss a red skull (a mini boss
-## a smaller one); Senna a small pale-blue dot and the merchant gold. Never
-## takes clicks, so right-clicks under it still move Lucian.
+## a smaller one); Senna a small pale-blue dot and the merchant gold. A pale
+## frame marks the part of the map the camera shows. Never takes clicks, so
+## right-clicks under it still move Lucian.
 
 const WIDTH := 260.0
 const RADIUS := 6.0
@@ -20,6 +21,10 @@ const LUCIAN_COLOR := Color("4fa8ff")
 const ENEMY_COLOR := Color("e0475a")
 const ALLY_COLOR := Color("a8d8ff")
 const MERCHANT_COLOR := Color("ffcf5a")
+## The camera's view: a pale frame over a faint wash, under the dots.
+const VIEW_COLOR := Color(1, 1, 1, 0.8)
+const VIEW_FILL := Color(1, 1, 1, 0.05)
+const VIEW_WIDTH := 1.5
 
 var bounds := Rect2(0, 0, 4800, 2700)
 var lucian: Lucian
@@ -39,6 +44,18 @@ func setup(map_bounds: Rect2, target: Lucian) -> void:
 ## Where a world point sits on the radar.
 func to_radar(point: Vector2) -> Vector2:
 	return (point - bounds.position) / bounds.size * size
+
+
+## The part of the world on screen: `canvas` is the viewport's canvas
+## transform, which the camera sets, and `screen` the viewport's size.
+static func view_rect(canvas: Transform2D, screen: Vector2) -> Rect2:
+	return canvas.affine_inverse() * Rect2(Vector2.ZERO, screen)
+
+
+## Where the view `seen` (in world units) sits on the radar, cut at the
+## plate's edge. No area when none of it is over the map.
+func view_frame(seen: Rect2) -> Rect2:
+	return Rect2(to_radar(seen.position), seen.size / bounds.size * size).intersection(Rect2(Vector2.ZERO, size))
 
 
 static func dot_size(kind: StringName) -> float:
@@ -70,6 +87,11 @@ func _draw() -> void:
 	Plate.draw_on(self, Rect2(Vector2.ZERO, size), RADIUS, false, Hud.PLATE_OPACITY)
 	for corner in corners(size):
 		draw_colored_polygon(Plate.diamond(corner, CORNER_DIAMOND), UiStyle.GOLD_COLOR)
+	var viewport := get_viewport()
+	var frame := view_frame(view_rect(viewport.canvas_transform, viewport.get_visible_rect().size))
+	if frame.has_area():
+		draw_rect(frame, VIEW_FILL)
+		draw_rect(frame, VIEW_COLOR, false, VIEW_WIDTH)
 	for merchant: Node2D in get_tree().get_nodes_in_group(&"merchants"):
 		draw_circle(to_radar(merchant.global_position), DOT, MERCHANT_COLOR)
 	for ally: Node2D in get_tree().get_nodes_in_group(&"allies"):

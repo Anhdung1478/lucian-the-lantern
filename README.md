@@ -68,6 +68,7 @@ Every key can be changed in **Settings → Controls**.
 | Stats panel | C (Ctrl + C toggles, hold for more) |
 | Camera mode | Y |
 | Center camera on Lucian | Space |
+| Zoom the camera | Mouse wheel (fixed) |
 | Menu | Esc |
 
 ## Run from source

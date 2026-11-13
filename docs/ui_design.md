@@ -195,6 +195,8 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 
 *(V2.0: the radar is a plate with a gold diamond at each corner of its frame. The dots are as above.)*
 
+*(V2.0: a pale frame on the radar, under the dots, marks the part of the map the camera shows. It moves with the camera, grows and shrinks with the zoom (the mouse wheel, game design doc §2) and stops at the radar's edge.)*
+
 ### Act 1 tips
 - On Act 1's first play, tips show one at a time under the boss bar, in a gold-bordered panel, 7 s each. The list is in `act1_the_loss.md`.
 - The time only runs while the game does. A replay has no tips.
@@ -653,7 +655,7 @@ The result cell is gold once the craft can be paid for, shows a red cross when t
 | Tab | Contents |
 |---|---|
 | Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. *(V1.4.3: a slider applies live while it is dragged and is saved once, when let go; a wheel or key step is saved at once.)* ~~No music yet.~~ *(V1.5.0: the Music slider sets the score, §8.)* |
-| Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A double-click doesn't bind the left button (the second press is ignored); a separate later click still does. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound *(V1.5.0: F3 + Q works only in a debug build; in the released game it does nothing)*; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. Each skill, summoner and item key also has a **cast mode** picker: Quick cast, Quick + indicator, Normal cast (Reset to defaults sets them back to Quick cast). |
+| Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A double-click doesn't bind the left button (the second press is ignored); a separate later click still does. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound *(V1.5.0: F3 + Q works only in a debug build; in the released game it does nothing)*; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. Each skill, summoner and item key also has a **cast mode** picker: Quick cast, Quick + indicator, Normal cast (Reset to defaults sets them back to Quick cast). *(V2.0: the hint under the list also says that the mouse wheel zooms the camera in a stage; the wheel is not in the list and can't be rebound.)* |
 | Graphics | Window mode (windowed, borderless fullscreen, fullscreen), Resolution (1280×720, 1366×768, 1600×900, 1920×1080, 2560×1440, 3840×2160; sizes too big for a window on this screen, title bar included, are greyed out and marked "too big"; sets and centers the window, greyed out in borderless/fullscreen; *V1.3.1:* only at launch and when changed here, so starting a stage leaves a maximized or resized window alone), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails, muzzle flashes or summoner spell effects (Flash sparks, Ghost afterimages, Barrier bubble, Heal and Clarity bursts); Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
 | Gameplay | Cast queue (on by default; see the game design doc §2). It was called Skill queue before V1.4.2. *(V2.0: and Resolve, on by default.)* |
 

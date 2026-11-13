@@ -74,6 +74,7 @@ Minutes for a skilled player's first clear of each act, counting a few deaths, s
 | Hold C | Show the extra stats (health / mana regen, heal & shield power, penetration, life steal, omnivamp, range, tenacity) |
 | Y | Toggle camera between free-cam and Lucian cam (follows Lucian). Default: free-cam |
 | Space | Move the camera back over Lucian; hold it to keep the camera on him (free-cam stays free once let go) |
+| Mouse wheel | *(V2.0)* Zoom the camera: up closer, down wider, a notch a step of 0.1, from 0.7× to 1.4× (1.0× is the plain view). It works while the game runs, not in a menu or the backpack. The level is kept in the settings, so the next stage opens at it. The wheel can't be rebound. A cutscene plays at 1.0×. |
 
 **Cast modes (Settings → Controls, one per key):** for Q / W / E / R, D / F and item keys 1–6.
 - **Quick cast** (default): casts toward the cursor on press.

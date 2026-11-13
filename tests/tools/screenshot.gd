@@ -49,6 +49,7 @@ const ACT_SCENARIOS := {
 	"resolve": [2, 1], "death_recap": [2, 1],
 	"attack_pick": [2, 1],
 	"act3_packs": [3, 1], "act3_elites": [3, 1], "elite_traits": [3, 1], "act3_result": [3, 2],
+	"camera_zoom": [3, 1],
 	"act3_jungle": [3, 2], "act3_water": [3, 4], "act3_pit": [3, 5],
 	"infernal_meteor": [3, 2], "ocean_mist": [3, 4], "elder_sky_dive": [3, 5], "elder_mark": [3, 5],
 	"act4_lane": [4, 1], "dark_lucian_q": [4, 3], "dark_lucian_r": [4, 3],
@@ -306,6 +307,8 @@ func _run(scenario: String) -> void:
 			await scenario_act3_packs()
 		"act3_elites":
 			await scenario_act3_elites()
+		"camera_zoom":
+			await scenario_camera_zoom()
 		"elite_traits":
 			await scenario_elite_traits()
 		"act3_result":
@@ -2818,6 +2821,31 @@ func scenario_elite_traits() -> void:
 		slot += 1
 	await wait(0.6)
 	await shot("elite_traits_0_row")
+
+
+## The camera's zoom and its frame on the radar, in a jungle fight: the
+## plain view, the widest (three notches of the wheel down) and the closest
+## (seven up from there). The frame on the radar grows and shrinks with it.
+func scenario_camera_zoom() -> void:
+	var game := game_stage()
+	flush_tips()
+	game.runner._countdown = 999.0
+	lucian.invulnerable = true
+	var at := lucian.global_position
+	for offset: Vector2 in [Vector2(-420, -260), Vector2(380, -300), Vector2(520, 180), Vector2(-900, 120), Vector2(1150, -420), Vector2(-1250, -520)]:
+		stand(&"siege_minion", open_ground(at + offset))
+	game.camera.mode = StageCamera.Mode.FOLLOW
+	await wait(0.6)
+	var radar := game.hud.radar
+	var names := ["plain", "wide", "close"]
+	var notches := [0, -3, 7]
+	for i in names.size():
+		game.camera.zoom_by(notches[i])
+		await wait(0.8)
+		var seen := Radar.view_rect(root.canvas_transform, root.get_visible_rect().size)
+		print("%s: level %.2f, view %.2f (expect 1.00, 0.70, 1.40), sees %s, frame on the radar %s" % [
+			names[i], game.camera.zoom_level, game.camera.zoom.x, seen.size.round(), radar.view_frame(seen).size.round()])
+		await shot("camera_zoom_%d_%s" % [i, names[i]])
 
 
 func scenario_act3_elites() -> void:

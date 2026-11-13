@@ -195,6 +195,47 @@ func test_the_radar_maps_the_world_onto_itself() -> void:
 	assert_eq(radar.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 
 
+func test_the_radar_reads_the_cameras_view_from_the_viewport() -> void:
+	var screen := Vector2(1920, 1080)
+	# A camera over (2600, 1600) at 1.0, then at 0.5.
+	var plain := Transform2D(0.0, screen * 0.5 - Vector2(2600, 1600))
+	assert_eq(Radar.view_rect(plain, screen), Rect2(1640, 1060, 1920, 1080))
+	var wide := Transform2D(0.0, Vector2.ONE * 0.5, 0.0, screen * 0.5 - Vector2(2600, 1600) * 0.5)
+	var seen := Radar.view_rect(wide, screen)
+	assert_almost_eq(seen.position, Vector2(680, 520), Vector2.ONE * 0.01)
+	assert_almost_eq(seen.size, Vector2(3840, 2160), Vector2.ONE * 0.01)
+
+
+func test_the_radar_frames_the_view_and_cuts_it_at_its_edge() -> void:
+	var radar := Radar.new()
+	add_child_autofree(radar)
+	radar.setup(Rect2(0, 0, 5200, 3200), null)
+	assert_eq(radar.view_frame(Rect2(1640, 1060, 1920, 1080)), Rect2(82, 53, 96, 54))
+	# The camera shows the wall past the map's corner; the frame stops at the plate.
+	var corner := radar.view_frame(Rect2(-64, -64, 1920, 1080))
+	assert_almost_eq(corner.position, Vector2.ZERO, Vector2.ONE * 0.01)
+	assert_almost_eq(corner.size, Vector2(92.8, 50.8), Vector2.ONE * 0.01)
+	assert_false(radar.view_frame(Rect2(9000, 9000, 1920, 1080)).has_area(), "a view off the map has no frame")
+
+
+func test_the_radars_frame_follows_the_stage_camera() -> void:
+	SaveGame.instance().reset()
+	var stage: Stage = load("res://src/stage/stage.tscn").instantiate()
+	stage.setup(StageSetup.for_stage(SaveGame.instance(), 1, 1))
+	add_child_autofree(stage)
+	stage.camera.edge_margin = -INF
+	await wait_physics_frames(3)
+	var viewport := stage.get_viewport()
+	var screen := viewport.get_visible_rect().size
+	var seen := Radar.view_rect(viewport.canvas_transform, screen)
+	assert_almost_eq(seen.get_center(), stage.camera.get_screen_center_position(), Vector2.ONE)
+	assert_almost_eq(seen.size, screen, Vector2.ONE, "the whole screen at 1.0")
+	stage.camera.zoom = Vector2.ONE * 0.8
+	await wait_physics_frames(3)
+	seen = Radar.view_rect(viewport.canvas_transform, screen)
+	assert_almost_eq(seen.size, screen / 0.8, Vector2.ONE, "more of the map when the view widens")
+
+
 func test_the_radar_marks_its_four_frame_corners() -> void:
 	assert_eq(Radar.corners(Vector2(260, 160)), PackedVector2Array([Vector2(0, 0), Vector2(260, 0), Vector2(260, 160), Vector2(0, 160)]))
 

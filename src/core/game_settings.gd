@@ -1,7 +1,7 @@
 class_name GameSettings
 extends RefCounted
-## The player's settings: volumes, graphics, gameplay options and key
-## bindings. Saved to user://settings.json (shared by every save slot) on
+## The player's settings: volumes, graphics, gameplay options, the camera's
+## zoom and key bindings. Saved to user://settings.json (shared by every save slot) on
 ## every change (a slider being dragged: once, when let go), with a
 ## "version" field. Missing or unknown entries fall back to the defaults. A
 ## missing or broken file loads "<path>.tmp" instead, a save whose rename
@@ -35,6 +35,9 @@ const DEFAULTS := {
 	## Key (action name) -> "indicator" or "normal". Keys not listed use quick
 	## cast. See CAST_MODES.
 	&"cast_modes": {},
+	## The stage camera's view (StageCamera.SETTING): 1.0 is the plain one,
+	## less is wider. The mouse wheel sets it; no Settings row does.
+	&"camera_zoom": 1.0,
 }
 const WINDOW_MODES := ["windowed", "borderless", "fullscreen"]
 const RESOLUTIONS := ["1280x720", "1366x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"]

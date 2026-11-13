@@ -73,7 +73,7 @@ const CONTROL_GROUPS := {
 	&"move": "MOVE AND ATTACK", &"skill_q": "SKILLS", &"summoner_d": "SUMMONER SPELLS",
 	&"item_1": "ITEMS", &"open_backpack": "INTERFACE",
 }
-const CONTROLS_HINT := "ESC or a click elsewhere cancels a binding. Ctrl + a skill key ranks it up. Quick + indicator casts on release, Normal on left-click; right-click or ESC cancels either."
+const CONTROLS_HINT := "ESC or a click elsewhere cancels a binding. Ctrl + a skill key ranks it up. Quick + indicator casts on release, Normal on left-click; right-click or ESC cancels either. The mouse wheel zooms the camera in a stage."
 ## Pressed alone, these never become a binding.
 const MODIFIER_KEYS := [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META]
 const WHEEL_BUTTONS := [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN, MOUSE_BUTTON_WHEEL_LEFT, MOUSE_BUTTON_WHEEL_RIGHT]
