@@ -1,7 +1,8 @@
 class_name TitleScreen
 extends Control
 ## The screen the game opens on: Thresh's lantern, the title, and Start new
-## game, Load game, Settings and Exit the game. The two game buttons turn
+## game, Load game, Settings and Exit the game; top right, the languages
+## (LanguagePicker). The two game buttons turn
 ## the panel into the slot list. A new game in a used slot asks first, then
 ## the difficulty page picks Easy, Normal, Hard or Extreme and the slot is
 ## written at once (if it can't be, a red notice says so and the player stays
@@ -17,6 +18,8 @@ signal exit_requested
 
 const LANTERN := preload("res://assets/art/ui/title_lantern.svg")
 const BUTTON_SIZE := Vector2(420, 64)
+## The language picker's gap from the screen's corner.
+const LANGUAGE_MARGIN := 24
 const COULD_NOT_START := "Could not write slot %d. The game can't start until it can save."
 const BROKEN_LOAD := "Slot %d's save can't be read, so it can't be loaded.
 You can only overwrite it with a new game."
@@ -27,6 +30,8 @@ var backdrop := TitleBackdrop.new()
 var settings := SettingsScreen.new()
 var confirm := ConfirmPopup.new()
 var slot_list := SlotList.new()
+## Top right: the languages, each named in itself.
+var language_picker := LanguagePicker.new()
 ## The centred column: the lantern, the title and the menu or the slot page.
 var column: VBoxContainer
 var load_button: Button
@@ -197,6 +202,9 @@ func _build() -> void:
 	_slots_page.add_child(error_label)
 	_button(_slots_page, "Back", show_menu)
 	_build_difficulty_page()
+	language_picker.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, LANGUAGE_MARGIN)
+	language_picker.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	add_child(language_picker)
 	settings.setup(GameSettings.instance())
 	settings.back_requested.connect(func() -> void: settings.close())
 	add_child(settings)
@@ -229,7 +237,12 @@ func _build_difficulty_page() -> void:
 
 
 func _open_settings() -> void:
-	settings.open()
+	open_settings()
+
+
+## Settings over the screen, on tab `at`.
+func open_settings(at := 0) -> void:
+	settings.open(at)
 
 
 func _button(parent: Control, text: String, action: Callable) -> Button:

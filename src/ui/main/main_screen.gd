@@ -216,8 +216,13 @@ func _update_covered() -> void:
 
 
 func _open_settings() -> void:
+	open_settings()
+
+
+## Settings over the screen, on tab `at`.
+func open_settings(at := 0) -> void:
 	gear.close()
-	settings.open()
+	settings.open(at)
 
 
 func _close_settings() -> void:

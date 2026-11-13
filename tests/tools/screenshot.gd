@@ -105,6 +105,11 @@ func _initialize() -> void:
 	if FileAccess.file_exists(settings_path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(settings_path))
 	GameSettings._instance = GameSettings.new(settings_path)
+	# SCREENSHOT_LANG=vi: every scenario in that language (Lang.CODES).
+	var language := OS.get_environment("SCREENSHOT_LANG")
+	if language != "":
+		GameSettings.instance().set_value(&"language", language, false)
+		GameSettings.instance().apply_language()
 	# Scratch save slots too, so every run starts from a new game.
 	var save := SaveGame.new(save_prefix)
 	for n in range(1, SaveGame.SLOTS + 1):

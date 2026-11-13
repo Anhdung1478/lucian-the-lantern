@@ -1,7 +1,7 @@
 class_name GameSettings
 extends RefCounted
 ## The player's settings: volumes, graphics, gameplay options, the camera's
-## zoom and key bindings. Saved to user://settings.json (shared by every save slot) on
+## zoom, the language and key bindings. Saved to user://settings.json (shared by every save slot) on
 ## every change (a slider being dragged: once, when let go), with a
 ## "version" field. Missing or unknown entries fall back to the defaults. A
 ## missing or broken file loads "<path>.tmp" instead, a save whose rename
@@ -38,6 +38,8 @@ const DEFAULTS := {
 	## The stage camera's view (StageCamera.SETTING): 1.0 is the plain one,
 	## less is wider. The mouse wheel sets it; no Settings row does.
 	&"camera_zoom": 1.0,
+	## The language of the game's text: a code in Lang.CODES.
+	&"language": Lang.ENGLISH,
 }
 const WINDOW_MODES := ["windowed", "borderless", "fullscreen"]
 const RESOLUTIONS := ["1280x720", "1366x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"]
@@ -238,12 +240,19 @@ func apply() -> void:
 
 
 ## Every setting but the window's size and place (apply_resolution): audio,
-## input and display. A stage under the Game uses this, so starting one never
-## un-maximizes, resizes or re-centers the window.
+## input, display and the language. A stage under the Game uses this, so
+## starting one never un-maximizes, resizes or re-centers the window.
 func apply_engine() -> void:
 	apply_audio()
 	apply_input()
 	apply_display()
+	apply_language()
+
+
+## Turns the game's text to the language chosen. Screens already built keep
+## their text; the Game builds the title or the main screen again.
+func apply_language() -> void:
+	Lang.use(_values[&"language"])
 
 
 func apply_audio() -> void:
@@ -399,6 +408,8 @@ func _load() -> void:
 			if DEFAULTS[name] is int and value is float:
 				value = int(value)
 			if name == &"resolution" and not RESOLUTIONS.has(value):
+				continue
+			if name == &"language" and not Lang.CODES.has(value):
 				continue
 			if typeof(value) == typeof(DEFAULTS[name]):
 				_values[name] = value

@@ -139,6 +139,7 @@ func _ready() -> void:
 		settings.apply_engine()
 	settings.changed.connect(_on_setting_changed)
 	lucian.queue_casts = settings.get_value(&"queue_casts")
+	screens.settings.language_locked = true
 	screens.settings.setup(settings)
 	screens.controller = lucian.get_node("Controller")
 	if not Sfx.exists():

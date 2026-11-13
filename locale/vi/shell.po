@@ -1,0 +1,22 @@
+# Lucian: The Lantern - Vietnamese (the title, Settings, the menus and the pop-ups).
+# Each msgid is the English text as the code or the data has it; Lang.t()
+# looks it up. A msgstr keeps its msgid's values (%d, %s, {name}) in the
+# same order, and its BBCode tags. docs/translation.md has the rules.
+msgid ""
+msgstr ""
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Settings > Gameplay: the row that picks the language.
+msgid "Language"
+msgstr "Ngôn ngữ"
+
+#. Settings > Gameplay: under the Language row, on the title and the main screen.
+msgid "The language of the game's text. The screen is built again in it at once."
+msgstr "Ngôn ngữ của văn bản trong trò chơi. Màn hình sẽ được dựng lại ngay bằng ngôn ngữ đã chọn."
+
+#. Settings > Gameplay: under the Language row while a stage is being played.
+msgid "Not during a stage: change it on the title screen or the main screen."
+msgstr "Không đổi được khi đang trong màn chơi: hãy đổi ở màn hình tiêu đề hoặc màn hình chính."

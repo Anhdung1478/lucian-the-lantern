@@ -1,0 +1,842 @@
+# Lucian: The Lantern - Vietnamese (words every part of the game shares: stats, names, buttons).
+# Each msgid is the English text as the code or the data has it; Lang.t()
+# looks it up. A msgstr keeps its msgid's values (%d, %s, {name}) in the
+# same order, and its BBCode tags. docs/translation.md has the rules.
+msgid ""
+msgstr ""
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. display_name of data/enemies/akshan.tres
+msgid "Akshan"
+msgstr "Akshan"
+
+#. display_name of data/enemies/blue_sentinel.tres
+msgid "Blue Sentinel"
+msgstr "Khổng Lồ Đá Xanh"
+
+#. display_name of data/enemies/broodmother.tres
+msgid "Broodmother"
+msgstr "Mẹ Bầy Nhện"
+
+#. display_name of data/enemies/chain_warden.tres
+msgid "Chain Warden"
+msgstr "Cai Ngục Xích"
+
+#. display_name of data/enemies/dark_lucian.tres
+msgid "Dark Lucian"
+msgstr "Lucian Hắc Ám"
+
+#. display_name of data/enemies/elder_dragon.tres
+msgid "Elder Dragon"
+msgstr "Rồng Ngàn Tuổi"
+
+#. display_name of data/enemies/elise.tres
+msgid "Elise"
+msgstr "Elise"
+
+#. display_name of data/enemies/ghoul.tres
+msgid "Ghoul"
+msgstr "Xác Sống"
+
+#. display_name of data/enemies/gromp.tres
+msgid "Gromp"
+msgstr "Cóc Thành Tinh"
+
+#. display_name of data/enemies/hecarim.tres
+msgid "Hecarim"
+msgstr "Hecarim"
+
+#. display_name of data/enemies/infernal_drake.tres
+msgid "Infernal Drake"
+msgstr "Rồng Lửa"
+
+#. display_name of data/enemies/karthus.tres
+msgid "Karthus"
+msgstr "Karthus"
+
+#. display_name of data/enemies/karthus_revived.tres
+msgid "Karthus, Revived"
+msgstr "Karthus Sống Lại"
+
+#. display_name of data/enemies/krug.tres
+msgid "Krug"
+msgstr "Quái Krug"
+
+#. display_name of data/enemies/krug_big.tres
+msgid "Ancient Krug"
+msgstr "Quái Krug Cổ Đại"
+
+#. display_name of data/enemies/lantern_soul.tres
+msgid "Lantern Soul"
+msgstr "Linh Hồn Lồng Đèn"
+
+#. display_name of data/enemies/maiden_of_the_mist.tres
+msgid "Maiden of the Mist"
+msgstr "Thiếu Nữ Sương Mù"
+
+#. display_name of data/enemies/maokai.tres
+msgid "Maokai"
+msgstr "Maokai"
+
+#. display_name of data/enemies/melee_minion.tres
+msgid "Melee Minion"
+msgstr "Lính Cận Chiến"
+
+#. display_name of data/enemies/mist_walker.tres
+msgid "Mist Walker"
+msgstr "Kẻ Đi Trong Sương"
+
+#. display_name of data/enemies/murkwolf.tres
+msgid "Murk Wolf"
+msgstr "Sói Hắc Ám Nhỏ"
+
+#. display_name of data/enemies/murkwolf_big.tres
+msgid "Greater Murk Wolf"
+msgstr "Sói Hắc Ám"
+
+#. display_name of data/enemies/ocean_drake.tres
+msgid "Ocean Drake"
+msgstr "Rồng Nước"
+
+#. display_name of data/enemies/ranged_minion.tres
+msgid "Ranged Minion"
+msgstr "Lính Đánh Xa"
+
+#. display_name of data/enemies/raptor.tres
+msgid "Raptor"
+msgstr "Chim Biến Dị"
+
+#. display_name of data/enemies/raptor_big.tres
+msgid "Crimson Raptor"
+msgstr "Chim Biến Dị Lớn"
+
+#. display_name of data/enemies/red_brambleback.tres
+msgid "Red Brambleback"
+msgstr "Bụi Gai Đỏ Thành Tinh"
+
+#. display_name of data/enemies/rift_scuttler.tres
+msgid "Rift Scuttler"
+msgstr "Cua Kỳ Cục"
+
+#. display_name of data/enemies/sapling.tres
+msgid "Sapling"
+msgstr "Chồi Non"
+
+#. display_name of data/enemies/shadow_melee_minion.tres
+msgid "Shadow Melee Minion"
+msgstr "Lính Cận Chiến Bóng Tối"
+
+#. display_name of data/enemies/shadow_ranged_minion.tres
+msgid "Shadow Ranged Minion"
+msgstr "Lính Đánh Xa Bóng Tối"
+
+#. display_name of data/enemies/shadow_siege_minion.tres
+msgid "Shadow Siege Minion"
+msgstr "Lính Xe Pháo Bóng Tối"
+
+#. display_name of data/enemies/shadow_super_minion.tres
+msgid "Shadow Super Minion"
+msgstr "Lính Siêu Cấp Bóng Tối"
+
+#. display_name of data/enemies/siege_minion.tres
+msgid "Siege Minion"
+msgstr "Lính Xe Pháo"
+
+#. display_name of data/enemies/spectral_rider.tres
+msgid "Spectral Rider"
+msgstr "Kỵ Sĩ Ma"
+
+#. display_name of data/enemies/spiderling.tres
+msgid "Spiderling"
+msgstr "Nhện Con"
+
+#. display_name of data/enemies/super_minion.tres
+msgid "Super Minion"
+msgstr "Lính Siêu Cấp"
+
+#. display_name of data/enemies/thresh_1.tres
+msgid "Thresh"
+msgstr "Thresh"
+
+#. effect_name of data/items/boots/armored_advance.tres
+msgid "Plating"
+msgstr "Giáp Cốt"
+
+#. effect_name of data/items/boots/armored_advance.tres
+msgid "Noxian Endurance"
+msgstr "Sức Bền Noxus"
+
+#. display_name of data/items/boots/armored_advance.tres
+msgid "Armored Advance"
+msgstr "Giày Xung Kích"
+
+#. display_name of data/items/boots/berserkers_greaves.tres
+msgid "Berserker's Greaves"
+msgstr "Giày Cuồng Nộ"
+
+#. display_name of data/items/boots/boots_of_speed.tres
+msgid "Boots of Speed"
+msgstr "Giày Thường"
+
+#. display_name of data/items/boots/boots_of_swiftness.tres
+msgid "Boots of Swiftness"
+msgstr "Giày Bạc"
+
+#. effect_name of data/items/boots/chainlaced_crushers.tres
+msgid "Noxian Persistence"
+msgstr "Sức Bền Noxus"
+
+#. display_name of data/items/boots/chainlaced_crushers.tres
+msgid "Chainlaced Crushers"
+msgstr "Giày Giáp Sắt"
+
+#. effect_name of data/items/boots/crimson_lucidity.tres
+msgid "Noxian Haste"
+msgstr "Noxus Thần Tốc"
+
+#. display_name of data/items/boots/crimson_lucidity.tres
+msgid "Crimson Lucidity"
+msgstr "Giày Đỏ Khai Sáng"
+
+#. effect_name of data/items/boots/gluttonous_greaves.tres
+msgid "Slay"
+msgstr "Hạ Gục"
+
+#. display_name of data/items/boots/gluttonous_greaves.tres
+msgid "Gluttonous Greaves"
+msgstr "Giày Phàm Ăn"
+
+#. display_name of data/items/boots/gunmetal_greaves.tres
+msgid "Gunmetal Greaves"
+msgstr "Giày Hắc Kim"
+
+#. effect_name of data/items/boots/immortal_path.tres
+msgid "Now and Forever"
+msgstr "Bây Giờ Và Mãi Mãi"
+
+#. display_name of data/items/boots/immortal_path.tres
+msgid "Immortal Path"
+msgstr "Giày Bất Tử"
+
+#. display_name of data/items/boots/ionian_boots_of_lucidity.tres
+msgid "Ionian Boots of Lucidity"
+msgstr "Giày Khai Sáng Ionia"
+
+#. display_name of data/items/boots/mercurys_treads.tres
+msgid "Mercury's Treads"
+msgstr "Giày Thủy Ngân"
+
+#. display_name of data/items/boots/plated_steelcaps.tres
+msgid "Plated Steelcaps"
+msgstr "Giày Thép Gai"
+
+#. effect_name of data/items/boots/slightly_magical_boots.tres
+msgid "Slightly Quicker"
+msgstr "Nhanh Hơn Chút"
+
+#. display_name of data/items/boots/slightly_magical_boots.tres
+msgid "Slightly Magical Boots"
+msgstr "Giày Xịn"
+
+#. display_name of data/items/boots/sorcerers_shoes.tres
+msgid "Sorcerer's Shoes"
+msgstr "Giày Pháp Sư"
+
+#. display_name of data/items/boots/spellslingers_shoes.tres
+msgid "Spellslinger's Shoes"
+msgstr "Giày Ma Pháp Sư"
+
+#. effect_name of data/items/boots/swiftmarch.tres
+msgid "Noxian Fervor"
+msgstr "Tinh Thần Noxus"
+
+#. display_name of data/items/boots/swiftmarch.tres
+msgid "Swiftmarch"
+msgstr "Giày Nhanh Nhẹn"
+
+#. display_name of data/items/fragments/bf_sword.tres
+msgid "B.F. Sword"
+msgstr "Kiếm B.F."
+
+#. display_name of data/items/fragments/chain_vest.tres
+msgid "Chain Vest"
+msgstr "Giáp Lưới"
+
+#. display_name of data/items/fragments/cloak_of_agility.tres
+msgid "Cloak of Agility"
+msgstr "Áo Choàng Tím"
+
+#. display_name of data/items/fragments/giants_belt.tres
+msgid "Giant's Belt"
+msgstr "Đai Khổng Lồ"
+
+#. display_name of data/items/fragments/needlessly_large_rod.tres
+msgid "Needlessly Large Rod"
+msgstr "Gậy Quá Khổ"
+
+#. display_name of data/items/fragments/negatron_cloak.tres
+msgid "Negatron Cloak"
+msgstr "Áo Choàng Bạc"
+
+#. display_name of data/items/fragments/recurve_bow.tres
+msgid "Recurve Bow"
+msgstr "Cung Gỗ"
+
+#. display_name of data/items/fragments/tear_of_the_goddess.tres
+msgid "Tear of the Goddess"
+msgstr "Nước Mắt Nữ Thần"
+
+#. effect_name of data/items/legendary/archangels_staff.tres
+msgid "Awe"
+msgstr "Tuyệt"
+
+#. effect_name of data/items/legendary/archangels_staff.tres
+msgid "Mana Charge"
+msgstr "Dòng Chảy Năng Lượng"
+
+#. display_name of data/items/legendary/archangels_staff.tres
+msgid "Archangel's Staff"
+msgstr "Quyền Trượng Thiên Thần"
+
+#. effect_name of data/items/legendary/banshees_veil.tres
+msgid "Annul"
+msgstr "Hóa Giải"
+
+#. display_name of data/items/legendary/banshees_veil.tres
+msgid "Banshee's Veil"
+msgstr "Dây Chuyền Chữ Thập"
+
+#. effect_name of data/items/legendary/black_cleaver.tres
+msgid "Carve"
+msgstr "Nghiền Vụn"
+
+#. effect_name of data/items/legendary/black_cleaver.tres
+msgid "Fervor"
+msgstr "Hăng Hái"
+
+#. display_name of data/items/legendary/black_cleaver.tres
+msgid "Black Cleaver"
+msgstr "Rìu Đen"
+
+#. effect_name of data/items/legendary/bloodthirster.tres
+msgid "Ichorshield"
+msgstr "Khiên Máu"
+
+#. display_name of data/items/legendary/bloodthirster.tres
+msgid "Bloodthirster"
+msgstr "Huyết Kiếm"
+
+#. effect_name of data/items/legendary/deaths_dance.tres
+msgid "Ignore Pain"
+msgstr "Chịu Đòn"
+
+#. effect_name of data/items/legendary/deaths_dance.tres
+msgid "Defy"
+msgstr "Thách Thức"
+
+#. display_name of data/items/legendary/deaths_dance.tres
+msgid "Death's Dance"
+msgstr "Vũ Điệu Tử Thần"
+
+#. effect_name of data/items/legendary/essence_reaver.tres
+msgid "Spellblade"
+msgstr "Kiếm Phép"
+
+#. display_name of data/items/legendary/essence_reaver.tres
+msgid "Essence Reaver"
+msgstr "Lưỡi Hái Linh Hồn"
+
+#. effect_name of data/items/legendary/fimbulwinter.tres
+msgid "Everlasting"
+msgstr "Vĩnh Hằng"
+
+#. display_name of data/items/legendary/fimbulwinter.tres
+msgid "Fimbulwinter"
+msgstr "Băng Giáp Vĩnh Cửu"
+
+#. effect_name of data/items/legendary/galeforce.tres
+msgid "Cloudburst"
+msgstr "Giông Tố"
+
+#. display_name of data/items/legendary/galeforce.tres
+msgid "Galeforce"
+msgstr "Cung Phong Linh"
+
+#. effect_name of data/items/legendary/guardian_angel.tres
+msgid "Rebirth"
+msgstr "Tái Sinh"
+
+#. display_name of data/items/legendary/guardian_angel.tres
+msgid "Guardian Angel"
+msgstr "Giáp Thiên Thần"
+
+#. effect_name of data/items/legendary/hextech_gunblade.tres
+msgid "Lightning Bolt"
+msgstr "Cầu Sét"
+
+#. display_name of data/items/legendary/hextech_gunblade.tres
+msgid "Hextech Gunblade"
+msgstr "Kiếm Súng Hextech"
+
+#. effect_name of data/items/legendary/hextech_rocketbelt.tres
+msgid "Supersonic"
+msgstr "Lướt Siêu Thanh"
+
+#. display_name of data/items/legendary/hextech_rocketbelt.tres
+msgid "Hextech Rocketbelt"
+msgstr "Đai Tên Lửa Hextech"
+
+#. effect_name of data/items/legendary/immortal_shieldbow.tres
+msgid "Lifeline"
+msgstr "Bảo Hiểm Ma Pháp"
+
+#. display_name of data/items/legendary/immortal_shieldbow.tres
+msgid "Immortal Shieldbow"
+msgstr "Nỏ Tử Thủ"
+
+#. effect_name of data/items/legendary/infinity_edge.tres
+msgid "Perfection"
+msgstr "Hoàn Hảo"
+
+#. display_name of data/items/legendary/infinity_edge.tres
+msgid "Infinity Edge"
+msgstr "Vô Cực Kiếm"
+
+#. effect_name of data/items/legendary/jaksho_the_protean.tres
+msgid "Voidborn Resilience"
+msgstr "Vỏ Bọc Hư Không"
+
+#. display_name of data/items/legendary/jaksho_the_protean.tres
+msgid "Jak'Sho, The Protean"
+msgstr "Jak'Sho, Vỏ Bọc Thích Nghi"
+
+#. effect_name of data/items/legendary/kaenic_rookern.tres
+msgid "Magebane"
+msgstr "Chống Pháp Sư"
+
+#. display_name of data/items/legendary/kaenic_rookern.tres
+msgid "Kaenic Rookern"
+msgstr "Vòng Sắt Cổ Tự"
+
+#. effect_name of data/items/legendary/kraken_slayer.tres
+msgid "Bring It Down"
+msgstr "Bắn Hạ"
+
+#. display_name of data/items/legendary/kraken_slayer.tres
+msgid "Kraken Slayer"
+msgstr "Móc Diệt Thủy Quái"
+
+#. effect_name of data/items/legendary/lord_dominiks_regards.tres
+msgid "Giant Slayer"
+msgstr "Diệt Khổng Lồ"
+
+#. display_name of data/items/legendary/lord_dominiks_regards.tres
+msgid "Lord Dominik's Regards"
+msgstr "Nỏ Thần Dominik"
+
+#. effect_name of data/items/legendary/malignance.tres
+msgid "Scorn"
+msgstr "Ai Oán"
+
+#. effect_name of data/items/legendary/malignance.tres
+msgid "Hatefog"
+msgstr "Màn Sương Căm Hận"
+
+#. display_name of data/items/legendary/malignance.tres
+msgid "Malignance"
+msgstr "Hỏa Khuẩn"
+
+#. effect_name of data/items/legendary/morellonomicon.tres
+msgid "Affliction"
+msgstr "Giày Vò"
+
+#. display_name of data/items/legendary/morellonomicon.tres
+msgid "Morellonomicon"
+msgstr "Quỷ Thư Morello"
+
+#. effect_name of data/items/legendary/mortal_reminder.tres
+msgid "Sepsis"
+msgstr "Nhiễm Trùng"
+
+#. display_name of data/items/legendary/mortal_reminder.tres
+msgid "Mortal Reminder"
+msgstr "Lời Nhắc Tử Vong"
+
+#. effect_name of data/items/legendary/muramana.tres
+msgid "Shock"
+msgstr "Chấn Động"
+
+#. display_name of data/items/legendary/muramana.tres
+msgid "Muramana"
+msgstr "Thần Kiếm Muramana"
+
+#. effect_name of data/items/legendary/nashors_tooth.tres
+msgid "Icathian Bite"
+msgstr "Vết Cắn Icathia"
+
+#. display_name of data/items/legendary/nashors_tooth.tres
+msgid "Nashor's Tooth"
+msgstr "Nanh Nashor"
+
+#. effect_name of data/items/legendary/navori_flickerblade.tres
+msgid "Transcendence"
+msgstr "Thăng Tiến Sức Mạnh"
+
+#. display_name of data/items/legendary/navori_flickerblade.tres
+msgid "Navori Flickerblade"
+msgstr "Đao Chớp Navori"
+
+#. effect_name of data/items/legendary/rabadons_deathcap.tres
+msgid "Magical Opus"
+msgstr "Tinh Hoa Phép Thuật"
+
+#. display_name of data/items/legendary/rabadons_deathcap.tres
+msgid "Rabadon's Deathcap"
+msgstr "Mũ Phù Thủy Rabadon"
+
+#. effect_name of data/items/legendary/rapid_firecannon.tres
+msgid "Sharpshooter"
+msgstr "Thiện Xạ"
+
+#. display_name of data/items/legendary/rapid_firecannon.tres
+msgid "Rapid Firecannon"
+msgstr "Đại Bác Liên Thanh"
+
+#. effect_name of data/items/legendary/runaans_hurricane.tres
+msgid "Wind's Fury"
+msgstr "Gió Cuồng Nộ"
+
+#. display_name of data/items/legendary/runaans_hurricane.tres
+msgid "Runaan's Hurricane"
+msgstr "Cuồng Cung Runaan"
+
+#. effect_name of data/items/legendary/shadowflame.tres
+msgid "Cinderbloom"
+msgstr "Lửa Hắc Ám"
+
+#. display_name of data/items/legendary/shadowflame.tres
+msgid "Shadowflame"
+msgstr "Ngọn Lửa Hắc Hóa"
+
+#. effect_name of data/items/legendary/spear_of_shojin.tres
+msgid "Focused Will"
+msgstr "Tâm Lực"
+
+#. display_name of data/items/legendary/spear_of_shojin.tres
+msgid "Spear of Shojin"
+msgstr "Ngọn Giáo Shojin"
+
+#. effect_name of data/items/legendary/spirit_visage.tres
+msgid "Boundless Vitality"
+msgstr "Nguồn Sống Bất Tận"
+
+#. display_name of data/items/legendary/spirit_visage.tres
+msgid "Spirit Visage"
+msgstr "Giáp Tâm Linh"
+
+#. effect_name of data/items/legendary/statikk_shiv.tres
+msgid "Electroshock"
+msgstr "Điện Giật"
+
+#. display_name of data/items/legendary/statikk_shiv.tres
+msgid "Statikk Shiv"
+msgstr "Dao Điện Statikk"
+
+#. effect_name of data/items/legendary/stormrazor.tres
+msgid "Bolt"
+msgstr "Điện Xẹt"
+
+#. display_name of data/items/legendary/stormrazor.tres
+msgid "Stormrazor"
+msgstr "Phong Thần Kiếm"
+
+#. effect_name of data/items/legendary/thornmail.tres
+msgid "Thorns"
+msgstr "Gai"
+
+#. display_name of data/items/legendary/thornmail.tres
+msgid "Thornmail"
+msgstr "Giáp Gai"
+
+#. display_name of data/items/legendary/void_staff.tres
+msgid "Void Staff"
+msgstr "Trượng Hư Vô"
+
+#. display_name of data/items/potions/hp_potion.tres
+msgid "Health Potion"
+msgstr "Bình Máu"
+
+#. display_name of data/items/potions/mp_potion.tres
+msgid "Mana Potion"
+msgstr "Bình Năng Lượng"
+
+#. display_name of data/skills/e_relentless_pursuit.tres
+msgid "Relentless Pursuit"
+msgstr "Truy Cùng Diệt Tận"
+
+#. display_name of data/skills/q_piercing_light.tres
+msgid "Piercing Light"
+msgstr "Tia Sáng Xuyên Thấu"
+
+#. display_name of data/skills/r_the_culling.tres
+msgid "The Culling"
+msgstr "Thanh Trừng"
+
+#. display_name of data/skills/w_ardent_blaze.tres
+msgid "Ardent Blaze"
+msgstr "Tia Sáng Rực Cháy"
+
+#. display_name of data/skins/classic.tres
+msgid "Classic"
+msgstr "Mặc Định"
+
+#. display_name of data/skins/high_noon.tres
+msgid "High Noon"
+msgstr "Cao Bồi"
+
+#. display_name of data/skins/project.tres
+msgid "PROJECT"
+msgstr "SIÊU PHẨM"
+
+#. display_name of data/skins/pulsefire.tres
+msgid "Pulsefire"
+msgstr "Vũ Khí Tối Thượng"
+
+#. display_name of data/skins/vampire.tres
+msgid "Vampire"
+msgstr "Ma Cà Rồng"
+
+#. display_name of data/summoners/barrier.tres
+msgid "Barrier"
+msgstr "Lá Chắn"
+
+#. display_name of data/summoners/clarity.tres
+msgid "Clarity"
+msgstr "Minh Mẫn"
+
+#. display_name of data/summoners/flash.tres
+msgid "Flash"
+msgstr "Tốc Biến"
+
+#. display_name of data/summoners/ghost.tres
+msgid "Ghost"
+msgstr "Tốc Hành"
+
+#. display_name of data/summoners/heal.tres
+msgid "Heal"
+msgstr "Hồi Máu"
+
+#. display_name of data/summoners/smite.tres
+msgid "Smite"
+msgstr "Trừng Phạt"
+
+#. display_name of data/tree/backpack_slots.tres
+msgid "Backpack Slots"
+msgstr "Ô Ba Lô"
+
+#. display_name of data/tree/barrier_upgrade.tres
+msgid "Barrier Upgrade"
+msgstr "Nâng Cấp Lá Chắn"
+
+#. display_name of data/tree/bonus_xp.tres
+msgid "Bonus XP"
+msgstr "Thêm Kinh Nghiệm"
+
+#. display_name of data/tree/boots.tres
+msgid "Boots"
+msgstr "Giày"
+
+#. display_name of data/tree/clarity_upgrade.tres
+msgid "Clarity Upgrade"
+msgstr "Nâng Cấp Minh Mẫn"
+
+#. display_name of data/tree/equip_slots.tres
+msgid "Equip Slots"
+msgstr "Ô Trang Bị"
+
+#. display_name of data/tree/essence_drop.tres
+msgid "Essence Drops"
+msgstr "Tinh Chất Rơi Ra"
+
+#. display_name of data/tree/flash_upgrade.tres
+msgid "Flash Upgrade"
+msgstr "Nâng Cấp Tốc Biến"
+
+#. display_name of data/tree/ghost_upgrade.tres
+msgid "Ghost Upgrade"
+msgstr "Nâng Cấp Tốc Hành"
+
+#. display_name of data/tree/heal_upgrade.tres
+msgid "Heal Upgrade"
+msgstr "Nâng Cấp Hồi Máu"
+
+#. display_name of data/tree/merchant_stock.tres
+msgid "Merchant Stock"
+msgstr "Hàng Của Thương Nhân"
+
+#. display_name of data/tree/passive.tres
+msgid "Passive – Lightslinger"
+msgstr "Nội Tại – Xạ Thủ Ánh Sáng"
+
+#. display_name of data/tree/refresh_cost.tres
+msgid "Cheaper Refresh"
+msgstr "Làm Mới Rẻ Hơn"
+
+#. display_name of data/tree/skill_e.tres
+msgid "E – Relentless Pursuit"
+msgstr "E – Truy Cùng Diệt Tận"
+
+#. display_name of data/tree/skill_q.tres
+msgid "Q – Piercing Light"
+msgstr "Q – Tia Sáng Xuyên Thấu"
+
+#. display_name of data/tree/skill_r.tres
+msgid "R – The Culling"
+msgstr "R – Thanh Trừng"
+
+#. display_name of data/tree/skill_w.tres
+msgid "W – Ardent Blaze"
+msgstr "W – Tia Sáng Rực Cháy"
+
+#. display_name of data/tree/smite_upgrade.tres
+msgid "Smite Upgrade"
+msgstr "Nâng Cấp Trừng Phạt"
+
+#. display_name of data/tree/stage_gold.tres
+msgid "Stage Gold"
+msgstr "Vàng Mỗi Màn"
+
+#. display_name of data/tree/stat_ad.tres
+msgid "Attack Damage"
+msgstr "Sức Mạnh Công Kích"
+
+#. display_name of data/tree/stat_ap.tres
+msgid "Ability Power"
+msgstr "Sức Mạnh Phép Thuật"
+
+#. display_name of data/tree/stat_armor.tres
+msgid "Armor"
+msgstr "Giáp"
+
+#. display_name of data/tree/stat_attack_speed.tres
+msgid "Attack Speed"
+msgstr "Tốc Độ Đánh"
+
+#. display_name of data/tree/stat_hp.tres
+msgid "Health"
+msgstr "Máu"
+
+#. display_name of data/tree/stat_hp_regen.tres
+msgid "Health Regen"
+msgstr "Hồi Máu Cơ Bản"
+
+#. display_name of data/tree/stat_mana.tres
+msgid "Mana"
+msgstr "Năng Lượng"
+
+#. display_name of data/tree/stat_mana_regen.tres
+msgid "Mana Regen"
+msgstr "Hồi Năng Lượng Cơ Bản"
+
+#. display_name of data/tree/stat_mr.tres
+msgid "Magic Resist"
+msgstr "Kháng Phép"
+
+#. display_name of data/tree/summoner_slot_2.tres
+msgid "Second Summoner Slot"
+msgstr "Ô Phép Bổ Trợ Thứ Hai"
+
+#. stat name
+msgid "Critical Strike Chance"
+msgstr "Tỉ Lệ Chí Mạng"
+
+#. stat name, short
+msgid "Crit Chance"
+msgstr "Tỉ Lệ Chí Mạng"
+
+#. stat name
+msgid "Ability Haste"
+msgstr "Điểm Hồi Kỹ Năng"
+
+#. stat name
+msgid "Move Speed"
+msgstr "Tốc Độ Di Chuyển"
+
+#. stat name
+msgid "Life Steal"
+msgstr "Hút Máu"
+
+#. stat name
+msgid "Omnivamp"
+msgstr "Hút Máu Toàn Phần"
+
+#. stat name
+msgid "Armor Penetration"
+msgstr "Xuyên Giáp"
+
+#. stat name
+msgid "Magic Penetration"
+msgstr "Xuyên Kháng Phép"
+
+#. stat name
+msgid "Heal and Shield Power"
+msgstr "Sức Mạnh Lá Chắn và Hồi Máu"
+
+#. stat name
+msgid "Tenacity"
+msgstr "Kháng Hiệu Ứng"
+
+#. stat name
+msgid "Slow Resist"
+msgstr "Kháng Làm Chậm"
+
+#. stat name
+msgid "Summoner Spell Haste"
+msgstr "Điểm Hồi Phép Bổ Trợ"
+
+#. stat name
+msgid "Attack Range"
+msgstr "Tầm Đánh"
+
+#. the stage's money
+msgid "Gold"
+msgstr "Vàng"
+
+#. button: one page back
+msgid "Back"
+msgstr "Quay lại"
+
+#. button
+msgid "Cancel"
+msgstr "Hủy"
+
+#. button
+msgid "Yes"
+msgstr "Có"
+
+#. button
+msgid "No"
+msgstr "Không"
+
+#. button
+msgid "Close"
+msgstr "Đóng"
+
+#. button and heading
+msgid "Settings"
+msgstr "Cài đặt"
+
+#. button: skip a break or a scene
+msgid "Skip"
+msgstr "Bỏ qua"
+
+#. a champion's name stays
+msgid "Lucian"
+msgstr "Lucian"
+
+#. a champion's name stays
+msgid "Senna"
+msgstr "Senna"

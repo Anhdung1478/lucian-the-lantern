@@ -3,7 +3,7 @@ extends CanvasLayer
 ## Settings, opened from the ESC menu, the title screen or the main screen's
 ## gear: Audio (volumes), Controls (rebinding, and a cast mode for each skill,
 ## item and summoner key), Graphics (window, resolution, VSync, FPS cap,
-## quality, FPS counter) and Gameplay (cast queue, Resolve). Every change
+## quality, FPS counter) and Gameplay (language, cast queue, Resolve). Every change
 ## applies at once and is saved; a volume slider being dragged saves once,
 ## when it is let go. ESC or Back returns to the menu; while waiting for a
 ## new key, ESC cancels instead.
@@ -74,11 +74,18 @@ const CONTROL_GROUPS := {
 	&"item_1": "ITEMS", &"open_backpack": "INTERFACE",
 }
 const CONTROLS_HINT := "ESC or a click elsewhere cancels a binding. Ctrl + a skill key ranks it up. Quick + indicator casts on release, Normal on left-click; right-click or ESC cancels either. The mouse wheel zooms the camera in a stage."
+const LANGUAGE_NOTE := "The language of the game's text. The screen is built again in it at once."
+const LANGUAGE_LOCKED_NOTE := "Not during a stage: change it on the title screen or the main screen."
 ## Pressed alone, these never become a binding.
 const MODIFIER_KEYS := [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META]
 const WHEEL_BUTTONS := [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN, MOUSE_BUTTON_WHEEL_LEFT, MOUSE_BUTTON_WHEEL_RIGHT]
 
 var settings: GameSettings
+## A stage's Settings: the language can't be changed there, since only the
+## title and the main screen are built again in a new one. Set before setup.
+var language_locked := false
+## The tab shown.
+var tab := 0
 
 var _panel: PanelContainer
 var _tab_buttons: Array[Button] = []
@@ -109,10 +116,10 @@ func setup(game_settings: GameSettings) -> void:
 	_build()
 
 
-func open() -> void:
+func open(at := 0) -> void:
 	visible = true
 	_stop_listening()
-	show_tab(0)
+	show_tab(at)
 
 
 func close() -> void:
@@ -121,7 +128,8 @@ func close() -> void:
 	visible = false
 
 
-func show_tab(tab: int) -> void:
+func show_tab(index: int) -> void:
+	tab = index
 	for i in _pages.size():
 		_pages[i].visible = i == tab
 		_style_tab(_tab_buttons[i], i == tab)
@@ -199,6 +207,8 @@ func _on_changed(key: StringName) -> void:
 			settings.apply_resolution()
 		&"vsync", &"max_fps", &"quality":
 			settings.apply_display()
+		&"language":
+			settings.apply_language()
 
 
 func _refresh_bindings() -> void:
@@ -481,6 +491,12 @@ func _build_resolution(page: Control) -> OptionButton:
 
 func _build_gameplay() -> Control:
 	var page := _page(3)
+	var names: Array = []
+	for code in Lang.CODES:
+		names.append(Lang.NAMES[code])
+	var language := _option(page, Lang.t("Language"), &"language", names, Lang.CODES,
+		Lang.t(LANGUAGE_LOCKED_NOTE if language_locked else LANGUAGE_NOTE))
+	language.disabled = language_locked
 	_toggle(page, "Cast queue", &"queue_casts",
 		"A skill, item active or summoner spell pressed during a cast time or a dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept.")
 	_toggle(page, "Resolve", Resolve.SETTING,

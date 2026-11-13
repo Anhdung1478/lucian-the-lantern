@@ -1,0 +1,10 @@
+# Lucian: The Lantern - Vietnamese (the main screen: the Journey, the Evolution Tree, the Skin Shop).
+# Each msgid is the English text as the code or the data has it; Lang.t()
+# looks it up. A msgstr keeps its msgid's values (%d, %s, {name}) in the
+# same order, and its BBCode tags. docs/translation.md has the rules.
+msgid ""
+msgstr ""
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"

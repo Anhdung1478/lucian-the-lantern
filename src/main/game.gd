@@ -33,6 +33,7 @@ var music := Music.new()
 func _ready() -> void:
 	_rng.randomize()
 	GameSettings.instance().apply()
+	GameSettings.instance().changed.connect(_on_setting_changed)
 	get_tree().auto_accept_quit = false
 	add_child(Sfx.new())
 	add_child(music)
@@ -55,6 +56,29 @@ func _notification(what: int) -> void:
 			ask_to_exit()
 		else:
 			ask_to_quit()
+
+
+## A new language: the title or the main screen is built again in it, with
+## Settings open on the tab it was on. A stage keeps the language it started
+## in (its Settings locks the choice).
+func _on_setting_changed(key: StringName) -> void:
+	if key != &"language":
+		return
+	GameSettings.instance().apply_language()
+	# Once the click that chose it is over: it came from the screen going.
+	_rebuild_screen.call_deferred()
+
+
+func _rebuild_screen() -> void:
+	if not (screen is TitleScreen or screen is MainScreen):
+		return
+	var open_tab: int = screen.settings.tab if screen.settings.visible else -1
+	if screen is TitleScreen:
+		show_title()
+	else:
+		show_main_screen()
+	if open_tab >= 0:
+		screen.call(&"open_settings", open_tab)
 
 
 func show_title() -> void:
