@@ -159,8 +159,8 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData], sell_cell: Co
 	_gold_label.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
 	_gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_gold_label.flash = true
+	# No reserved width: the coin hugs the number whatever its size.
 	tabs.add_child(_gold_label)
-	_gold_label.reserve("99999")
 
 	# The pages share one plain holder, so a new page can rise into place.
 	# Each page ends with its own hint, right under what it explains; a short
