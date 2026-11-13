@@ -100,6 +100,14 @@ func test_a_wheel_release_and_another_button_leave_the_view() -> void:
 	assert_eq(camera.zoom_level, 1.0)
 
 
+func test_a_camera_not_set_up_ignores_the_wheel() -> void:
+	var camera := StageCamera.new()
+	add_child_autofree(camera)
+	camera._unhandled_input(_wheel(MOUSE_BUTTON_WHEEL_UP))
+	assert_eq(camera.zoom_level, 1.0)
+	assert_eq(camera.zoom, Vector2.ONE)
+
+
 func test_the_view_stops_at_its_closest_and_its_widest() -> void:
 	var camera := _camera()
 	for i in 12:

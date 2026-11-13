@@ -98,8 +98,10 @@ func center_on_target() -> void:
 
 ## `steps` notches closer (wider when negative), kept between the widest view
 ## this map allows and the closest. The new level is a setting at once and is
-## saved once the wheel rests.
+## saved once the wheel rests. Nothing before setup.
 func zoom_by(steps: int) -> void:
+	if _target == null:
+		return
 	var level := clampf(snappedf(zoom_level + steps * ZOOM_STEP, 0.01), min_zoom(), ZOOM_MAX)
 	_easing = not is_equal_approx(level, zoom.x)
 	if is_equal_approx(level, zoom_level):
