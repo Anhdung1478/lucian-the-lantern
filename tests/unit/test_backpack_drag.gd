@@ -209,7 +209,7 @@ func test_the_backpack_recentres_when_the_window_changes_shape() -> void:
 	assert_almost_eq(centres.y, 1260.0, 1.0, "the viewport is wider")
 	assert_almost_eq(centres.x, centres.y, 1.0, "centred again at once, before being shown")
 	own.open()
-	view.size = Vector2i(1440, 1080)
+	view.size = Vector2i(1500, 1080)
 	centres = _centres(own)
 	assert_almost_eq(centres.x, centres.y, 1.0, "and while shown")
 	view.remove_child(own)

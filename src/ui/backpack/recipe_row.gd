@@ -1,7 +1,8 @@
 class_name RecipeRow
 extends PanelContainer
-## One line of the recipe table: [part] + [part] = [what it makes], then its
-## name. A legendary's parts are its two fragments. Upgraded boots' are the
+## One line of the recipe table: [part] [part] [what it makes], then its
+## name (the cells sit close together; no "+" or "=" between them, so the name
+## gets the room). A legendary's parts are its two fragments. Upgraded boots' are the
 ## boots they come from and their fragment; the starting boots share the
 ## first cell of a second-tier line (RecipeChoice), since either pair makes
 ## the same boots. With both parts held (or worn) the line is lit: a raised
@@ -10,14 +11,12 @@ extends PanelContainer
 ## its card.
 
 const ICON_SIZE := 40.0
-## Between the cells; the name keeps twice that from the result. The signs
-## have SIGN_GAP of air each side (the cells never touch a sign).
-const GAP := 5
-const SIGN_GAP := 4
-## Around the line (its right side keeps UiStyle.INSET from the name).
+## Between the cells; the name keeps twice that from the result.
+const GAP := 4
+## Around the line (its right side keeps NAME_INSET from the name: the name needs the room).
 const PAD := 4.0
 const PAD_Y := 6.0
-const SIGN_FONT := UiStyle.FONT_TAG
+const NAME_INSET := 6.0
 const NAME_FONT := UiStyle.FONT_NOTE
 ## Room for a long name on two lines ("Lord Dominik's / Regards").
 const NAME_WIDTH := 112.0
@@ -36,22 +35,20 @@ var lit_t := 0.0
 ## several items.
 var _parts: Array[Control] = []
 var _result: ItemIcon
-var _signs: Array[Label] = []
 var _name: Label
 
 
 func _init(item: ItemData, catalog: ItemCatalog) -> void:
 	made = item
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", SIGN_GAP)
+	row.add_theme_constant_override(&"separation", GAP)
 	add_child(row)
 	var parts := RecipeTable.parts(made, catalog)
 	for part in 2:
 		_parts.append(_part(row, parts[part], catalog))
-		_signs.append(_sign(row, "+" if part == 0 else "="))
 	_result = _icon(row, made, catalog)
-	# Blanks between the result and its name make the gap there twice GAP.
-	_blank(row, GAP * 2 - 2 * SIGN_GAP)
+	# An empty child between the result and its name makes the gap there twice GAP.
+	_blank(row, 0.0)
 	_name = UiStyle.label(Lang.t(made.display_name), NAME_FONT)
 	_name.custom_minimum_size.x = NAME_WIDTH
 	_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -66,8 +63,8 @@ func _init(item: ItemData, catalog: ItemCatalog) -> void:
 	style.set_content_margin_all(PAD)
 	style.content_margin_top = PAD_Y
 	style.content_margin_bottom = PAD_Y
-	# The name keeps INSET from the row's right edge, lit or not.
-	style.content_margin_right = UiStyle.INSET
+	# The name keeps NAME_INSET from the row's right edge, lit or not.
+	style.content_margin_right = NAME_INSET
 	add_theme_stylebox_override(&"panel", style)
 	refresh(null)
 
@@ -81,14 +78,12 @@ func refresh(inventory: Inventory) -> void:
 	UiMotion.lit(self, lit, _show_lit)
 
 
-## The lit look part way (`t`, 0 to 1): the fill, the name and the signs.
+## The lit look part way (`t`, 0 to 1): the fill and the name.
 func _show_lit(t: float) -> void:
 	(get_theme_stylebox(&"panel") as StyleBoxFlat).bg_color = Color(LIT_FILL, t)
 	# Exactly gold once lit (a lerp to 1 is not quite).
 	var gold := t >= 1.0
 	_name.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if gold else UiStyle.TEXT_COLOR.lerp(UiStyle.GOLD_COLOR, t))
-	for sign in _signs:
-		sign.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if gold else UiStyle.DIM_COLOR.lerp(UiStyle.GOLD_COLOR, t))
 
 
 ## A part's cell: its one item, or the items it can be sharing the cell.
@@ -109,12 +104,6 @@ func _icon(row: HBoxContainer, item: ItemData, catalog: ItemCatalog) -> ItemIcon
 	icon.custom_minimum_size = Vector2(ICON_SIZE, ICON_SIZE)
 	row.add_child(icon)
 	return icon
-
-
-func _sign(row: HBoxContainer, text: String) -> Label:
-	var label := UiStyle.label(text, SIGN_FONT, UiStyle.DIM_COLOR)
-	row.add_child(label)
-	return label
 
 
 ## A plain space `width` wide.

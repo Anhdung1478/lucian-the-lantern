@@ -9,7 +9,7 @@ extends Plate
 ## lit gold and come first, so what can be crafted shows without scrolling.
 ## Every icon has its card.
 
-const WIDTH := 320.0
+const WIDTH := 332.0
 const MAX_HEIGHT := 820.0
 const PAD := 14.0
 const ROW_GAP := 2
