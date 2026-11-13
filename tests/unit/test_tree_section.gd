@@ -1044,3 +1044,22 @@ func test_every_node_fits_the_info_column() -> void:
 			var need := section.info._column.get_combined_minimum_size()
 			assert_lte(need.x, JourneyPanel.CONTENT_WIDTH, "%s: not wider than the panel" % data.id)
 			assert_lte(need.y, room.y, "%s: not taller than the panel" % data.id)
+
+
+## Review r3 D3-1: the neighbour list is two columns while every name fits one,
+## else a single column of shorter rows.
+func test_the_node_list_goes_to_one_column_when_a_name_would_clip() -> void:
+	_save().tree.max_all()
+	var original := Lang.code()
+	section.select(&"stat_ad")
+	await wait_process_frames(2)
+	assert_eq(section.info._near.columns, 2, "English names fit two columns")
+	Lang.use("vi")
+	section.select(&"stat_armor")
+	section.select(&"stat_ad")
+	await wait_process_frames(2)
+	var clipped := section.info._near.columns
+	var row_height: float = section.info.near_rows[&"stat_ad"].custom_minimum_size.y
+	Lang.use(original)
+	assert_eq(clipped, 1, "a Vietnamese name would clip, so one column")
+	assert_eq(row_height, NodeInfoPanel.NEAR_ROW_TIGHT)

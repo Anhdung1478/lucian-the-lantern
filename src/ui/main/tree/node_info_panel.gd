@@ -30,6 +30,10 @@ const LIST_ICON := 32.0
 const LIST_FONT := UiStyle.FONT_ROW
 ## The neighbour list under a picked node's ladder: two columns of small rows.
 const NEAR_ROW := Vector2(196, 31)
+## A row of the single column used when a name would clip in two (22 px on screen).
+const NEAR_ROW_TIGHT := 26.0
+## The most rows the tight single column holds (nine: 198 px on screen).
+const NEAR_TIGHT_MAX := 9
 const NEAR_GAP := 8
 ## Up to this many known nodes the small rows take the full width.
 const NEAR_ONE_COLUMN := 5
@@ -426,9 +430,18 @@ func _fill_list() -> void:
 	var known := 0
 	for node_id: StringName in near_rows:
 		known += int((near_rows[node_id] as Button).visible)
-	_near.columns = 1 if known <= NEAR_ONE_COLUMN else 2
+	# Two columns only while every name fits one; else a single column of
+	# shorter rows (nine fit between the level table and the buy bar).
+	var clips := false
 	for node_id: StringName in near_rows:
-		(near_rows[node_id] as Button).custom_minimum_size.x = 0.0 if _near.columns == 1 else NEAR_ROW.x
+		clips = clips or _clips_in_two_columns(near_rows[node_id])
+	_near.columns = 1 if known <= NEAR_ONE_COLUMN or (clips and known <= NEAR_TIGHT_MAX) else 2
+	var tight := known > NEAR_ONE_COLUMN and _near.columns == 1
+	_near.add_theme_constant_override(&"v_separation", 0 if tight else NEAR_ROW_GAP)
+	for node_id: StringName in near_rows:
+		var small: Button = near_rows[node_id]
+		small.custom_minimum_size.x = 0.0 if _near.columns == 1 else NEAR_ROW.x
+		small.custom_minimum_size.y = NEAR_ROW_TIGHT if tight else NEAR_ROW.y
 	var show_near := id != &"" and not TreeNodeView.is_hidden(tree, id)
 	_near_caption.visible = show_near
 	_near.visible = show_near
@@ -450,6 +463,20 @@ func _fill_list() -> void:
 		caption.visible = caption_rows > 0
 	more_label.visible = unknown > 0
 	more_label.text = Lang.t("%d more to discover") % unknown
+
+
+## True when the small `row`'s name needs more than a two-column row's room
+## (a level tag, shown only once bought, may still clip it: the hover note).
+func _clips_in_two_columns(row: Button) -> bool:
+	if not row.visible:
+		return false
+	var title: Label = row.get_node(^"Line/Name")
+	var line: HBoxContainer = row.get_node(^"Line")
+	var separation := float(line.get_theme_constant(&"separation"))
+	var room := NEAR_ROW.x - line.offset_left + line.offset_right - NEAR_ICON - 2.0 * separation
+	var size := NEAR_FONT
+	var text := title.get_theme_font(&"font").get_string_size(title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
+	return text > room
 
 
 ## The rows' icon, name and level, from the tree (hidden nodes show nothing,
