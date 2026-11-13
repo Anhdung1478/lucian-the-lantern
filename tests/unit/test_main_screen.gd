@@ -297,7 +297,9 @@ func test_the_gear_menu_works_with_the_arrow_keys_and_enter() -> void:
 	assert_true(main.gear.is_showing_slots(), "Save as copy")
 	assert_eq(main.gear.keys.lit, -1, "the slot page starts unlit")
 	main._input(_key(KEY_DOWN))
-	assert_eq(main.gear.keys.lit_button().text, "Slot 2 · empty", "the current slot is skipped")
+	var slots: SlotList = main.gear._slot_list
+	var lit_row := slots.buttons.find(main.gear.keys.lit_button())
+	assert_eq(slots.row_text(lit_row), "Slot 2 · empty", "the current slot is skipped")
 	main._input(_key(KEY_ENTER))
 	assert_false(main.gear.visible)
 	assert_true(SaveGame.instance().slot_exists(2))
