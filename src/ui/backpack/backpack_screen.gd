@@ -3,7 +3,7 @@ extends CanvasLayer
 ## The backpack (P), in the Lantern look: an ornate plate headed BACKPACK
 ## with 9x6 dark cells (a line under them says how many are open while some
 ## are locked), and below it one plain strip as wide, its cells on the
-## backpack's nine columns: the equip slots 1-6, a faint gold rule, then the
+## backpack's nine columns: the equip slots 1-6, then the
 ## boots cell and the Health and Mana potion cells on keys 7 and 8. The
 ## recipe table sits top-left while it is open, shop or not.
 ##
@@ -54,12 +54,6 @@ const TABLE_GAP := 20.0
 const PACK_PAD := 22.0
 const HEADING_GAP := 14
 const MARGIN := 16.0
-## The strip's rule between the equip slots and the gear cells: its colour
-## and how far it stays from the strip's top and bottom (at 0.3 alpha a
-## 1 px line in a 5 px gap all but vanishes once the canvas is scaled down).
-const RULE_COLOR := Color(UiStyle.BORDER_COLOR, 0.5)
-const RULE_INSET := 10.0
-const RULE_WIDTH := 1.2
 const HOLD_TO_PICK := 0.2
 const MOVE_TO_PICK := 6.0
 const GHOST_SIZE := 56.0
@@ -727,15 +721,13 @@ func _build() -> void:
 	box.add_child(_open_note)
 
 	# One strip as wide as the backpack, its cells on the backpack's columns:
-	# the equip slots, a faint rule, then [Boots][HP 7][MP 8]. Added in index
+	# the equip slots, then [Boots][HP 7][MP 8]. Added in index
 	# order (60, 61, 62) so _cells stays in inventory order; the boots cell is
 	# then moved in front of the potions.
 	var strip := Plate.new(PACK_PAD, false)
 	_column.add_child(strip)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", CELL_GAP)
-	row.draw.connect(_draw_strip_rule.bind(row))
-	row.sort_children.connect(row.queue_redraw)
 	strip.add_child(row)
 	for i in Inventory.EQUIP_SIZE:
 		_add_cell(row, Inventory.EQUIP_START + i, ItemCell.Style.EQUIP)
@@ -770,17 +762,6 @@ func _build() -> void:
 	_top.add_child(_ghost)
 	add_child(_confirm)
 	redraw_cells()
-
-
-## The strip's faint gold rule, in the gap between the sixth equip slot and
-## the boots.
-func _draw_strip_rule(row: HBoxContainer) -> void:
-	if row.get_child_count() <= Inventory.EQUIP_SIZE:
-		return
-	var left := row.get_child(Inventory.EQUIP_SIZE - 1) as Control
-	var right := row.get_child(Inventory.EQUIP_SIZE) as Control
-	var x := roundf((left.position.x + left.size.x + right.position.x) * 0.5)
-	row.draw_line(Vector2(x, RULE_INSET), Vector2(x, row.size.y - RULE_INSET), RULE_COLOR, RULE_WIDTH)
 
 
 ## Centered above the HUD panel; with the shop open, the backpack and the

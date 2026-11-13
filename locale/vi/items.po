@@ -337,6 +337,10 @@ msgstr "Chỉ chế tạo được mảnh ghép và giày"
 msgid "Sells for %d gold"
 msgstr "Bán được %d vàng"
 
+#. Potions tab row, under the price: how many of this potion Lucian holds in its potion cell, over the most one cell stacks.
+msgid "Carrying %d / %d"
+msgstr "Đang mang %d / %d"
+
 #. Hover text of the Undo sale button. The item sold, its price.
 msgid "Buy back %s for %d gold"
 msgstr "Mua lại %s với giá %d vàng"

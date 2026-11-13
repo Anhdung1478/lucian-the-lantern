@@ -19,8 +19,8 @@ extends Control
 
 enum Kind { INPUT, RESULT }
 
-const SIZE := 64.0
-const ICON_INSET := 5.0
+const SIZE := 77.0
+const ICON_INSET := 6.0
 const PLACEHOLDER := Color(1, 1, 1, 0.3)
 const PLACEHOLDER_FONT := UiStyle.FONT_TAG
 ## The result's "?" and the cross over two inputs that make nothing.

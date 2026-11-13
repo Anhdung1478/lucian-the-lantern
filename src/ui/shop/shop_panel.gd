@@ -88,9 +88,9 @@ const NOTE_COLORS := {
 }
 const CRAFT_BUTTON_SIZE := Vector2(176, 42)
 ## The Craft tab's bench: the box around its three slots.
-const BENCH_PAD := 16.0
-const BENCH_GAP := 14
-const SIGN_FONT := 26
+const BENCH_PAD := 24.0
+const BENCH_GAP := 18
+const SIGN_FONT := 30
 const GOLD_FONT := 22
 
 var screen: BackpackScreen
@@ -150,6 +150,8 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData], sell_cell: Co
 		SlideHighlight.clear_rest(button)
 		tabs.add_child(button)
 		_tab_buttons.append(button)
+	# One track behind the three tabs: the unchosen ones keep a surface.
+	_tab_highlight.track_tabs.assign(_tab_buttons)
 	var gap := Control.new()
 	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tabs.add_child(gap)
@@ -173,11 +175,14 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData], sell_cell: Co
 	for slot in MerchantStock.SLOTS:
 		items.add_child(ShopSlot.new(screen, slot))
 	var potion_rows := _column(ROW_GAP)
+	# Fewer rows than the page has room for: the block sits in the middle of
+	# the room above the hint, so no band opens between rows and foot.
+	potion_rows.size_flags_vertical = Control.SIZE_EXPAND | Control.SIZE_SHRINK_CENTER
 	for potion in potions:
 		potion_rows.add_child(ShopSlot.new(screen, -1, potion))
 	var craft := _build_craft_page()
 	_rows = [items, potion_rows, craft]
-	_pages = [_column(GAP), _column(GAP), craft]
+	_pages = [_column(GAP), _column(GAP), _column(GAP)]
 	for tab in _pages.size():
 		var page := _pages[tab]
 		if page != _rows[tab]:
@@ -572,9 +577,12 @@ func _column(gap: int) -> VBoxContainer:
 	return column
 
 
-## The bench, the note and the fee row (the page's hint goes under them).
+## The bench, the note and the fee row as one block (the page's hint goes
+## under it, at the page's foot).
 func _build_craft_page() -> VBoxContainer:
 	var page := _column(GAP_L)
+	# The block (bench, note, fee row) is centred in the room above the hint.
+	page.size_flags_vertical = Control.SIZE_EXPAND | Control.SIZE_SHRINK_CENTER
 	var bench := PanelContainer.new()
 	var inset := StyleBoxFlat.new()
 	inset.bg_color = ShopSlot.ROW_FILL

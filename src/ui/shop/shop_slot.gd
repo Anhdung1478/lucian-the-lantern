@@ -14,6 +14,14 @@ extends Control
 ## the two buttons.
 const WIDTH := 500.0
 const HEIGHT := 78.0
+## A potion's row is bigger: the Potions tab has only two, and they fill the
+## page (a larger well, the name and the effect a size up, and under the
+## price what Lucian carries).
+const POTION_HEIGHT := 128.0
+const POTION_WELL := 88.0
+const POTION_LINE_FONT := UiStyle.FONT_BODY
+const POTION_NAME_BASELINE := -8.0
+const POTION_LINE_BASELINE := 26.0
 ## The well with the icon, the room around it and between it and the text.
 const WELL := 56.0
 const PAD := 6.0
@@ -70,7 +78,7 @@ func _init(owner_screen: BackpackScreen, slot := -1, potion_item: ItemData = nul
 	screen = owner_screen
 	stock_slot = slot
 	potion = potion_item
-	custom_minimum_size = Vector2(WIDTH, HEIGHT)
+	custom_minimum_size = Vector2(WIDTH, POTION_HEIGHT if potion else HEIGHT)
 	mouse_filter = MOUSE_FILTER_STOP
 
 
@@ -99,6 +107,14 @@ func title() -> String:
 		return Lang.t("SOLD")
 	var shown := item()
 	return Lang.t(shown.display_name) if shown else ""
+
+
+## What Lucian carries of the potion this row sells, as "Carrying 3 / 9" (the
+## potion cell's count over the stack limit the card names); "" for an item.
+func carrying_text() -> String:
+	if potion == null:
+		return ""
+	return Lang.t("Carrying %d / %d") % [screen.inventory.count_at(Inventory.potion_cell(potion)), potion.max_stack]
 
 
 ## The key that drinks the potion this row sells, as bound now ("" for an
@@ -191,7 +207,8 @@ func _watch_sold() -> void:
 
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, size)
-	var well := Rect2(PAD, (size.y - WELL) * 0.5, WELL, WELL)
+	var side := POTION_WELL if potion else WELL
+	var well := Rect2(PAD, (size.y - side) * 0.5, side, side)
 	var shown := item()
 	var font := ThemeDB.fallback_font
 	var text_x := well.end.x + TEXT_GAP
@@ -221,12 +238,20 @@ func _draw() -> void:
 	var price := str(shown.cost)
 	var price_width := font.get_string_size(price, HORIZONTAL_ALIGNMENT_LEFT, -1, PRICE_FONT).x
 	var price_x := size.x - PAD - 6.0 - price_width
-	draw_string(font, Vector2(price_x, middle + 7.0), price, HORIZONTAL_ALIGNMENT_LEFT, -1, PRICE_FONT, price_color)
-	draw_texture_rect(COIN, Rect2(price_x - COIN_SIZE - 5.0, middle - COIN_SIZE * 0.5, COIN_SIZE, COIN_SIZE), false)
+	# A potion's price shares the name's line, what Lucian carries is under it.
+	var price_y := middle + (POTION_NAME_BASELINE if potion else 0.0) + (0.0 if potion else 7.0)
+	draw_string(font, Vector2(price_x, price_y), price, HORIZONTAL_ALIGNMENT_LEFT, -1, PRICE_FONT, price_color)
+	var coin_middle := price_y - 7.0
+	draw_texture_rect(COIN, Rect2(price_x - COIN_SIZE - 5.0, coin_middle - COIN_SIZE * 0.5, COIN_SIZE, COIN_SIZE), false)
 	var text_width := price_x - COIN_SIZE - 5.0 - TEXT_GAP - text_x
 	var name_color := UiStyle.TEXT_COLOR if shown.is_fragment() or shown.is_potion() else UiStyle.TITLE_COLOR
-	draw_string(font, Vector2(text_x, middle + NAME_BASELINE), title(), HORIZONTAL_ALIGNMENT_LEFT, text_width, NAME_FONT, name_color)
-	_draw_line(shown, Vector2(text_x, middle + LINE_BASELINE))
+	var name_baseline := POTION_NAME_BASELINE if potion else NAME_BASELINE
+	draw_string(font, Vector2(text_x, middle + name_baseline), title(), HORIZONTAL_ALIGNMENT_LEFT, text_width, NAME_FONT, name_color)
+	if potion:
+		var carrying := carrying_text()
+		var carry_width := font.get_string_size(carrying, HORIZONTAL_ALIGNMENT_LEFT, -1, LINE_FONT).x
+		draw_string(font, Vector2(size.x - PAD - 6.0 - carry_width, middle + POTION_LINE_BASELINE), carrying, HORIZONTAL_ALIGNMENT_LEFT, -1, LINE_FONT, UiStyle.DIM_COLOR)
+	_draw_line(shown, Vector2(text_x, middle + (POTION_LINE_BASELINE if potion else LINE_BASELINE)))
 
 
 ## The row's box: a dark strip with a thin rim.
@@ -243,6 +268,7 @@ func _draw_row(rect: Rect2, fill: Color, rim: Color) -> void:
 ## sits before its amount, and the next stat a little further off.
 func _draw_line(shown: ItemData, at: Vector2) -> void:
 	var font := ThemeDB.fallback_font
+	var font_size := POTION_LINE_FONT if potion else LINE_FONT
 	var x := at.x
 	for part: Dictionary in line_parts(shown):
 		if part.icon:
@@ -250,5 +276,5 @@ func _draw_line(shown: ItemData, at: Vector2) -> void:
 				x += LINE_GAP
 			draw_texture_rect(part.icon, Rect2(x, at.y - LINE_ICON + 4.0, LINE_ICON, LINE_ICON), false)
 			x += LINE_ICON + 2.0
-		draw_string(font, Vector2(x, at.y), part.text, HORIZONTAL_ALIGNMENT_LEFT, -1, LINE_FONT, part.color)
-		x += font.get_string_size(part.text, HORIZONTAL_ALIGNMENT_LEFT, -1, LINE_FONT).x + LINE_SPACE
+		draw_string(font, Vector2(x, at.y), part.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, part.color)
+		x += font.get_string_size(part.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x + LINE_SPACE

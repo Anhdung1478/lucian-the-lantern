@@ -79,3 +79,18 @@ func test_clear_rest_makes_the_rest_box_clear() -> void:
 	assert_eq(rest.bg_color.a, 0.0)
 	assert_eq(rest.border_color.a, 0.0)
 	assert_eq((tabs[0].get_theme_stylebox(&"hover") as StyleBoxFlat).bg_color, UiStyle.button_style(&"hover").bg_color)
+
+
+func test_no_track_unless_asked() -> void:
+	var highlight := SlideHighlight.under(row)
+	assert_eq(highlight.track_rect(), Rect2())
+
+
+func test_the_track_hugs_the_tabs() -> void:
+	var members: Array[Control] = []
+	members.assign(tabs)
+	var highlight := SlideHighlight.under(row, null, members)
+	var want := tabs[0].get_rect().merge(tabs[2].get_rect()).grow(SlideHighlight.TRACK_PAD)
+	assert_eq(highlight.track_rect(), want)
+	highlight.follow(tabs[1])
+	assert_eq(highlight.rect, tabs[1].get_rect(), "the fill still sits on its tab")

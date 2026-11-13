@@ -288,3 +288,29 @@ func test_the_gold_counts_to_the_wallet() -> void:
 	wallet.spend(1200)
 	panel._process(0.0)
 	assert_eq(panel._gold_label.final_text(), "3800")
+
+
+func test_a_potion_row_says_what_lucian_carries() -> void:
+	var potion := slot(ShopPanel.POTIONS_TAB, 0)
+	var cell_index := Inventory.potion_cell(potion.potion)
+	assert_eq(potion.carrying_text(), Lang.t("Carrying %d / %d") % [inventory.count_at(cell_index), potion.potion.max_stack])
+	assert_eq(slot(ShopPanel.ITEMS_TAB, 0).carrying_text(), "", "only potions")
+
+
+func test_no_tab_leaves_an_empty_band_over_80_px() -> void:
+	# 80 px on screen is 96 units; a short page's block is centred above its hint.
+	for tab in 3:
+		panel.show_tab(tab)
+		await wait_physics_frames(2)
+		var block: Control = panel._rows[tab]
+		var hint: Control = panel._hints[tab]
+		var page: Control = panel.page(tab)
+		var above := block.get_global_rect().position.y - page.get_global_rect().position.y
+		var between := hint.get_global_rect().position.y - block.get_global_rect().end.y
+		assert_lt(above, 96.0, "tab %d: the room over its content" % tab)
+		assert_lt(between, 96.0, "tab %d: the room between content and hint" % tab)
+
+
+func test_the_tabs_share_one_track() -> void:
+	assert_eq(panel._tab_highlight.track_tabs.size(), 3)
+	assert_gt(panel._tab_highlight.track_rect().size.x, 0.0)

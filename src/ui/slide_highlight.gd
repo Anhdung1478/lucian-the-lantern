@@ -9,6 +9,9 @@ extends Node
 ##   var hl := SlideHighlight.under(tab_row)
 ##   hl.follow(_buttons[index])            # on every select; snaps the first time
 ##   SlideHighlight.clear_rest(button)      # each tab: its rest look turns clear
+## A row of tabs that has no surface of its own (the merchant's tabs, the
+## language picker) can have a shared track behind it, hugging the tabs, inside
+## which the fill slides: SlideHighlight.under(row, null, [button, button, ...]).
 ##   UiStyle.set_selected(button, on, false) # each tab: only the font eases
 ## It slides over UiMotion.BASE (cubic out), retargeting from where it is when
 ## the choice changes mid-slide; it snaps on the first follow(), whenever the
@@ -20,20 +23,31 @@ var style: StyleBox:
 	set(box):
 		style = box
 		_redraw()
+## The shared track behind the tabs (a well with a faint rim), painted under the fill.
+const TRACK_RADIUS := 6
+const TRACK_RIM_ALPHA := 0.3
+## How far the track reaches past the tabs on every side.
+const TRACK_PAD := 3.0
+
 ## The chosen button, or null.
 var target: Control
 ## The painted rect, in the bar's coordinates (moves while it slides).
 var rect := Rect2()
+
+## The tabs the track hugs (empty: no track).
+var track_tabs: Array[Control] = []
 
 var _bar: Control
 var _slide: Tween
 var _placed := false
 
 
-## A highlight painting under `bar`'s children; `box` is its fill.
-static func under(bar: Control, box: StyleBox = null) -> SlideHighlight:
+## A highlight painting under `bar`'s children; `box` is its fill. With
+## `track_for` (the tab buttons), a track hugs them behind the fill.
+static func under(bar: Control, box: StyleBox = null, track_for: Array[Control] = []) -> SlideHighlight:
 	var highlight := SlideHighlight.new()
 	highlight.style = box if box else UiStyle.button_style(&"normal", true)
+	highlight.track_tabs = track_for
 	# Internal: the bar's get_children() and MenuKeys never see it.
 	bar.add_child(highlight, false, Node.INTERNAL_MODE_BACK)
 	return highlight
@@ -54,12 +68,16 @@ func _enter_tree() -> void:
 		return
 	_bar.draw.connect(_paint)
 	_bar.resized.connect(_snap)
+	if _bar is Container:
+		_bar.sort_children.connect(_redraw)
 
 
 func _exit_tree() -> void:
 	if _bar and _bar.draw.is_connected(_paint):
 		_bar.draw.disconnect(_paint)
 		_bar.resized.disconnect(_snap)
+		if _bar is Container and _bar.sort_children.is_connected(_redraw):
+			_bar.sort_children.disconnect(_redraw)
 	_bar = null
 
 
@@ -120,7 +138,32 @@ func _target_rect() -> Rect2:
 	return to_bar * Rect2(Vector2.ZERO, target.size)
 
 
+## The track's rect in the bar's coordinates: the tabs' union and TRACK_PAD
+## around it. An empty rect without a track.
+func track_rect() -> Rect2:
+	if track_tabs.is_empty() or _bar == null:
+		return Rect2()
+	var to_bar := _bar.get_global_transform().affine_inverse()
+	var union := Rect2()
+	var first := true
+	for tab in track_tabs:
+		if not is_instance_valid(tab):
+			continue
+		var tab_rect := (to_bar * tab.get_global_transform()) * Rect2(Vector2.ZERO, tab.size)
+		union = tab_rect if first else union.merge(tab_rect)
+		first = false
+	return union.grow(TRACK_PAD) if not first else Rect2()
+
+
 func _paint() -> void:
+	var track := track_rect()
+	if track.size.x > 0.0 and track.size.y > 0.0:
+		var well := StyleBoxFlat.new()
+		well.bg_color = UiStyle.CELL_COLOR
+		well.border_color = Color(UiStyle.BORDER_COLOR, TRACK_RIM_ALPHA)
+		well.set_border_width_all(1)
+		well.set_corner_radius_all(TRACK_RADIUS)
+		_bar.draw_style_box(well, track)
 	if style and target and rect.size.x > 0.0 and rect.size.y > 0.0:
 		_bar.draw_style_box(style, rect)
 

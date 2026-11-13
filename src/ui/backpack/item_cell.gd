@@ -142,8 +142,22 @@ func _set_land(t: float) -> void:
 	queue_redraw()
 
 
-## Cards open 8 px beside the cell.
+## Whether this is an empty cell of the strip under the backpack: its note
+## opens above the strip, clear of the cells beside it.
+func _strip_note() -> bool:
+	return style in [Style.EQUIP, Style.POTION, Style.BOOTS] and item() == null and not screen.is_dragging()
+
+
+func tooltip_place() -> HoverTip.Place:
+	return HoverTip.Place.ABOVE if _strip_note() else HoverTip.Place.BESIDE
+
+
+## Cards open 8 px beside the cell; a strip cell's note above the whole strip.
 func tooltip_anchor() -> Rect2:
+	# The cell's row is in the strip's plate.
+	var strip := get_parent().get_parent() as Control if get_parent() else null
+	if _strip_note() and strip:
+		return strip.get_global_rect()
 	return get_global_rect().grow_individual(2.0, 0.0, 2.0, 0.0)
 
 

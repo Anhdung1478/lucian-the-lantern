@@ -10,12 +10,15 @@ extends PanelContainer
 ## its card.
 
 const ICON_SIZE := 40.0
-## Between the cells and signs; the name keeps twice that from the result.
+## Between the cells; the name keeps twice that from the result. The signs
+## sit closer to their cells (SIGN_GAP, less than none: a sign has room of
+## its own): the room goes to the names.
 const GAP := 5
+const SIGN_GAP := -1
 ## Around the line (its right side keeps UiStyle.INSET from the name).
 const PAD := 4.0
 const PAD_Y := 6.0
-const SIGN_FONT := 18
+const SIGN_FONT := 16
 const NAME_FONT := UiStyle.FONT_NOTE
 ## Room for a long name on two lines ("Lord Dominik's / Regards").
 const NAME_WIDTH := 112.0
@@ -41,17 +44,15 @@ var _name: Label
 func _init(item: ItemData, catalog: ItemCatalog) -> void:
 	made = item
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", GAP)
+	row.add_theme_constant_override(&"separation", SIGN_GAP)
 	add_child(row)
 	var parts := RecipeTable.parts(made, catalog)
 	for part in 2:
 		_parts.append(_part(row, parts[part], catalog))
 		_signs.append(_sign(row, "+" if part == 0 else "="))
 	_result = _icon(row, made, catalog)
-	# A blank between the result and its name doubles the gap there.
-	var blank := Control.new()
-	blank.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(blank)
+	# Blanks between the result and its name make the gap there twice GAP.
+	_blank(row, GAP * 2 - 2 * SIGN_GAP)
 	_name = UiStyle.label(Lang.t(made.display_name), NAME_FONT)
 	_name.custom_minimum_size.x = NAME_WIDTH
 	_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -115,3 +116,11 @@ func _sign(row: HBoxContainer, text: String) -> Label:
 	var label := UiStyle.label(text, SIGN_FONT, UiStyle.DIM_COLOR)
 	row.add_child(label)
 	return label
+
+
+## A plain space `width` wide.
+func _blank(row: HBoxContainer, width: float) -> void:
+	var blank := Control.new()
+	blank.custom_minimum_size.x = width
+	blank.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(blank)

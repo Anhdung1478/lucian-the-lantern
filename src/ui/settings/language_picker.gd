@@ -3,7 +3,7 @@ extends HBoxContainer
 ## The languages as a row of small buttons, each named in its own language
 ## and never translated, so a player who can't read the one in use still
 ## finds theirs. The one in use is lit gold, on a fill that slides to the next
-## choice (SlideHighlight). A click sets the "language" setting; the Game then
+## choice (SlideHighlight) inside a track hugging the buttons. A click sets the "language" setting; the Game then
 ## builds the screen again in it.
 
 const BUTTON_SIZE := Vector2(132, 40)
@@ -35,7 +35,10 @@ func _ready() -> void:
 		button.pressed.connect(choose.bind(code))
 		add_child(button)
 		buttons[code] = button
-	_highlight = SlideHighlight.under(self)
+	var tabs: Array[Control] = []
+	tabs.assign(buttons.values())
+	# A track behind the pair, so the other language reads as a button too.
+	_highlight = SlideHighlight.under(self, null, tabs)
 	for code: String in buttons:
 		UiStyle.style_button(buttons[code], FONT)
 		SlideHighlight.clear_rest(buttons[code])
