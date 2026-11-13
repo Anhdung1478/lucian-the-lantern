@@ -66,6 +66,8 @@ func _init(modifier := EndlessModifiers.NOTHING, is_gift := false) -> void:
 	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_face.add_child(lines)
 	if is_nothing():
+		# One line only: centred in the card under the medallion.
+		lines.alignment = BoxContainer.ALIGNMENT_CENTER
 		lines.add_child(_line(Lang.t("No modifier"), UiStyle.DIM_COLOR))
 	else:
 		lines.add_child(_line(LanternGifts.display_name(id) if gift else EndlessModifiers.downside(id),

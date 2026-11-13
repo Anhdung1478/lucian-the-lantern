@@ -61,14 +61,17 @@ func test_the_nothing_card_is_one_dim_line() -> void:
 
 
 ## The lines are top-aligned: the first one starts at the same height on every
-## card, whatever the card holds.
+## card that holds two lines; the one-line "No modifier" is centred under the
+## medallion.
 func test_every_cards_first_line_starts_at_the_same_height() -> void:
 	await wait_process_frames(3)
 	var tops: Array[float] = []
 	for i in 3:
 		tops.append(_labels(_card(i))[0].global_position.y - _card(i).global_position.y)
 	assert_almost_eq(tops[0], tops[1], 0.5)
-	assert_almost_eq(tops[0], tops[2], 0.5)
+	var top := ModifierCard.MEDALLION + Ornament.RING + ModifierCard.LINES_GAP
+	var room := _card(2).size.y - ModifierCard.MARGIN - top
+	assert_almost_eq(tops[2], top + (room - _labels(_card(2))[0].size.y) * 0.5, 1.0, "centred")
 	assert_almost_eq(tops[0], ModifierCard.MEDALLION + Ornament.RING + ModifierCard.LINES_GAP, 0.5)
 	assert_eq(_card(0).size.y, 216.0)
 

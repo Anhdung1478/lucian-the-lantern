@@ -75,7 +75,13 @@ const STAT_ICONS := {
 }
 ## The row of Endless's run: the lead stat, large and gold.
 const LEAD_ROW := "Waves cleared"
-const ESSENCE_ICON := 32.0
+## An essence's icon and count (40 px on screen), and the room the right
+## column gives the row of counts: each count is centred in its share of it.
+const ESSENCE_ICON := 48.0
+const ESSENCE_FONT := 48
+const ESSENCE_ROW_WIDTH := 460.0
+## The bullet's room before a reward line.
+const BULLET_ROOM := 32.0
 ## The word under an essence's count, and its row's name after a defeat.
 const ESSENCE_WORDS := {
 	Essences.BLUE: "blue",
@@ -168,11 +174,14 @@ func show_result(is_cleared: bool, stage_name: String, stats: Array, collected: 
 	main_button.text = Lang.t("Back to title" if game_over else "Main screen")
 	# After a defeat with a recap the right column is the recap, and the
 	# essences earned are the stats' last rows.
+	# Endless's run over keeps its essences on the right instead, under a
+	# REWARDS head of their own after the recap.
 	var with_recap := not cleared and not recap.is_empty()
+	var essences_apart := with_recap and title_text != ""
 	_right_head.text = Lang.t("WHAT HIT YOU" if with_recap else "REWARDS")
-	_fill_stats(stats, collected if with_recap else {})
+	_fill_stats(stats, collected if with_recap and not essences_apart else {})
 	if with_recap:
-		_fill_recap(recap, rewards)
+		_fill_recap(recap, rewards, collected if essences_apart else {})
 	else:
 		_fill_rewards(collected, rewards)
 	visible = true
@@ -244,7 +253,9 @@ func _fill_stats(pairs: Array, essences: Dictionary) -> void:
 	_clear(_stats)
 	_left_rows.clear()
 	for pair: Array in pairs:
-		_add_stat(_stat_row(pair[0], pair[1]))
+		# A gift's or modifier's name is a name, not a score: the text color.
+		var named: bool = pair[0] in ["Gift", "Modifier"]
+		_add_stat(_stat_row(pair[0], pair[1], null, true, -1, "%d", UiStyle.TEXT_COLOR if named else UiStyle.TITLE_COLOR))
 	for kind: StringName in Essences.KINDS:
 		if essences.get(kind, 0) > 0:
 			_add_stat(_stat_row(Lang.t(ESSENCE_NAMES[kind]), "", Stage.ESSENCE_ICONS[kind], false, essences[kind], "+%d", Stage.ESSENCE_COLORS[kind]))
@@ -352,34 +363,57 @@ func _fill_rewards(collected: Dictionary, rewards: Array[String]) -> void:
 	_clear(_rewards)
 	_right_rows.clear()
 	_essence_counts.clear()
-	var essences := HBoxContainer.new()
-	essences.add_theme_constant_override(&"separation", 28)
-	for kind: StringName in Essences.KINDS:
-		if collected[kind] > 0:
-			essences.add_child(_essence_cell(kind))
-	if essences.get_child_count() == 0:
-		essences.queue_free()
+	if not _add_essences(collected):
 		_add_right(UiStyle.label(Lang.t("No essences"), ROW_FONT, UiStyle.DIM_COLOR))
-	else:
-		_add_right(essences)
-		for kind: StringName in _essence_counts:
-			_count_in(_essence_counts[kind], collected[kind], REWARDS_AT)
-		# Room between the payoff and the lines under it.
-		essences.add_theme_constant_override(&"separation", 28)
-		var room := Control.new()
-		room.custom_minimum_size.y = UiStyle.GAP
-		_rewards.add_child(room)
 	for line in rewards:
 		_add_right(_reward_line(line))
 
 
-## One essence: its icon and large count over its word.
-func _essence_cell(kind: StringName) -> VBoxContainer:
+## The essences earned as one row of large counts across the column, each
+## centred in its share of the width (a kind with none is left out), with room
+## above and below. False when there is nothing to show.
+func _add_essences(collected: Dictionary) -> bool:
+	var essences := HBoxContainer.new()
+	essences.add_theme_constant_override(&"separation", 0)
+	var kinds: Array[StringName] = []
+	for kind: StringName in Essences.KINDS:
+		if collected.get(kind, 0) > 0:
+			kinds.append(kind)
+	if kinds.is_empty():
+		essences.free()
+		return false
+	for kind in kinds:
+		essences.add_child(_essence_cell(kind, collected[kind], ESSENCE_ROW_WIDTH / kinds.size()))
+	var block := VBoxContainer.new()
+	block.add_theme_constant_override(&"separation", 0)
+	block.add_child(_spacer(UiStyle.GAP_L * 1.4))
+	block.add_child(essences)
+	block.add_child(_spacer(UiStyle.GAP_L * 1.4))
+	_add_right(block)
+	for kind: StringName in _essence_counts:
+		_count_in(_essence_counts[kind], collected[kind], REWARDS_AT)
+	return true
+
+
+func _spacer(height: float) -> Control:
+	var room := Control.new()
+	room.custom_minimum_size.y = height
+	return room
+
+
+## One essence: its icon and large count over its word, centred in `share`.
+## The number steps down when its digits would not fit the share.
+func _essence_cell(kind: StringName, amount: int, share: float) -> VBoxContainer:
 	var cell := VBoxContainer.new()
+	cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cell.add_theme_constant_override(&"separation", 0)
 	var top := HBoxContainer.new()
 	top.alignment = BoxContainer.ALIGNMENT_CENTER
 	top.add_theme_constant_override(&"separation", 8)
+	var size := ESSENCE_FONT
+	var font := ThemeDB.fallback_font
+	while size > LEAD_FONT and font.get_string_size(str(amount), HORIZONTAL_ALIGNMENT_LEFT, -1, size).x + ESSENCE_ICON + 8.0 > share - 8.0:
+		size -= 4
 	var icon := TextureRect.new()
 	icon.texture = Stage.ESSENCE_ICONS[kind]
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -387,7 +421,7 @@ func _essence_cell(kind: StringName) -> VBoxContainer:
 	icon.custom_minimum_size = Vector2(ESSENCE_ICON, ESSENCE_ICON)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	top.add_child(icon)
-	var count := _count_label(LEAD_FONT, Stage.ESSENCE_COLORS[kind])
+	var count := _count_label(size, Stage.ESSENCE_COLORS[kind])
 	top.add_child(count)
 	cell.add_child(top)
 	var word := UiStyle.note(Lang.t(ESSENCE_WORDS[kind]))
@@ -406,7 +440,7 @@ func _add_right(row: Control) -> void:
 ## of the damage one per line (the name left, the share right), the tip, the
 ## Evolution Tree line when something can be bought, then the stage's own lines
 ## (Resolve).
-func _fill_recap(recap: Dictionary, lines: Array[String]) -> void:
+func _fill_recap(recap: Dictionary, lines: Array[String], essences := {}) -> void:
 	_clear(_rewards)
 	_right_rows.clear()
 	_essence_counts.clear()
@@ -420,6 +454,10 @@ func _fill_recap(recap: Dictionary, lines: Array[String]) -> void:
 	_add_right(_reward_line(recap.tip, TIP_COLOR, TIP_COLOR))
 	if recap.tree != "":
 		_add_right(_reward_line(recap.tree))
+	if not essences.is_empty():
+		_add_right(_spacer(UiStyle.GAP_L))
+		_add_right(_head(Lang.t("REWARDS")))
+		_add_essences(essences)
 	for line in lines:
 		_add_right(_reward_line(line))
 
@@ -429,7 +467,7 @@ func _reward_line(text: String, color := UiStyle.TEXT_COLOR, bullet_color := REW
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 12)
 	var bullet := Control.new()
-	bullet.custom_minimum_size = Vector2(ESSENCE_ICON, LINE_FONT)
+	bullet.custom_minimum_size = Vector2(BULLET_ROOM, LINE_FONT)
 	bullet.draw.connect(func() -> void:
 		bullet.draw_colored_polygon(Plate.diamond(Vector2(bullet.size.x * 0.5, LINE_FONT * 0.7), Ornament.DIAMOND), bullet_color))
 	row.add_child(bullet)
@@ -534,18 +572,23 @@ func _section(parent: Control, head: String) -> VBoxContainer:
 	section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	section.size_flags_stretch_ratio = 1.0
 	section.add_theme_constant_override(&"separation", 10)
+	section.add_child(_head(head))
+	var rows := VBoxContainer.new()
+	rows.add_theme_constant_override(&"separation", 6)
+	section.add_child(rows)
+	parent.add_child(section)
+	return rows
+
+
+## A column's head: spaced capitals and a rule.
+func _head(head: String) -> HBoxContainer:
 	var head_row := HBoxContainer.new()
 	head_row.add_theme_constant_override(&"separation", 12)
 	var head_label := UiStyle.label(head, HEAD_FONT, UiStyle.TITLE_COLOR)
 	Ornament.space_out(head_label, HEAD_SPACING)
 	head_row.add_child(head_label)
 	head_row.add_child(Ornament.rule(false, Ornament.RULE_WIDTH, true))
-	section.add_child(head_row)
-	var rows := VBoxContainer.new()
-	rows.add_theme_constant_override(&"separation", 6)
-	section.add_child(rows)
-	parent.add_child(section)
-	return rows
+	return head_row
 
 
 func _button(parent: Control, text: String, lit: bool, then: StringName) -> Button:

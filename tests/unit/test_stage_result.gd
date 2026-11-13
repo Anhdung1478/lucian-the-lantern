@@ -242,3 +242,20 @@ func test_the_waves_cleared_row_leads_in_gold() -> void:
 	assert_eq(lead.get_theme_font_size(&"font_size"), StageResult.LEAD_FONT)
 	var other := result._stats.get_child(1).get_child(1) as CountLabel
 	assert_eq(other.get_theme_font_size(&"font_size"), StageResult.ROW_FONT)
+
+
+## Endless's run over: the essences are the right column's REWARDS (after
+## what hit Lucian), not rows of the stats.
+func test_endless_run_over_puts_the_essences_under_a_rewards_head() -> void:
+	var recap := {"killed": "Killed by Gromp", "shares": ["Gromp 100%"], "tip": "A tip.", "tree": ""}
+	result.show_result(false, "Endless", [["Waves cleared", "3"]], _essences(40, 5, 0), ["New best: 3"] as Array[String], false, false, "RUN OVER", recap)
+	assert_eq(result._stats.get_child_count(), 1, "no essence rows on the left")
+	assert_eq(result._essence_counts[Essences.BLUE].text, "40")
+	assert_true("REWARDS" in _texts() and "WHAT HIT YOU" in _texts())
+	assert_true("New best: 3" in _texts())
+
+
+func test_gift_and_modifier_values_are_names_in_the_text_color() -> void:
+	result.show_result(true, "Stage 2-1", [["Kills", "3"], ["Gift", "Second Wind"]], _essences(), NONE)
+	assert_eq((result._stats.get_child(1).get_child(1) as Label).get_theme_color(&"font_color"), UiStyle.TEXT_COLOR)
+	assert_ne((result._stats.get_child(0).get_child(1) as Label).get_theme_color(&"font_color"), UiStyle.TEXT_COLOR)
