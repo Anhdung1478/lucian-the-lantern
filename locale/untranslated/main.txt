@@ -5,3 +5,12 @@
 Button
 # A node path inside a level row of the Evolution Tree's info panel.
 Line/
+# tree_node_view.gd: Vietnamese word pairs a node's name never breaks between (matched in the translated name, not shown alone).
+Năng Lượng
+Bổ Trợ
+Thứ Hai
+Cơ Bản
+Nâng Cấp
+Xạ Thủ
+Ánh Sáng
+Tia Sáng

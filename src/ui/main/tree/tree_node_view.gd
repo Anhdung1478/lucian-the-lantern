@@ -2,19 +2,22 @@ class_name TreeNodeView
 extends Control
 ## One Evolution Tree node on its branch page: a lantern of the tree. At rest
 ## it is three parts: the 96 px tile, one level mark under it (a pip per
-## level, none for a one-level node) and the name. The tile carries the state:
-## - hidden: dark glass with a small lock; where the name goes, the rule that
-##   opens it ("Clear Act 1", "Any 2 spells"; nothing when a drawn link says it);
-## - open: the icon in greyscale on blue-grey glass in a silver rim, dimmed
-##   (rim and icon) while the next level is too dear;
-## - lit (bought): the icon in colour on warm glass, a warm edge over the
-##   icon's own edge so the tile is lit whatever the icon; brighter while
-##   levels are left, calm once done (all pips filled).
+## level, none for a one-level node) and the name. The tile carries the state,
+## in four steps of light that read in greyscale too:
+## - hidden: the darkest glass, a faint lock; where the name goes, the rule
+##   that opens it ("Clear Act 1", "Any 2 spells"; nothing when a drawn link
+##   says it);
+## - too dear: the icon in greyscale, a step down, in a faint silver rim;
+## - can buy: the icon in greyscale in a silver rim;
+## - lit (bought): the icon in colour under a warm wash of light, with a warm
+##   edge; brighter while levels are left, a quieter edge once done.
 ## One badge at most: FREE in the level mark's place while the next level
-## costs nothing, or a lock in the tile's corner while it is closed. The
-## page's next step wears a gold rim and a soft gold light (`next`); the
-## picked node a pale ring 8 px out. Hover and selection ease in and out.
-## A left press picks it.
+## costs nothing, or a lock in a lower corner while it is closed. The page's
+## next step wears a gold rim and a soft gold light (`next`); the picked node
+## a pale ring 8 px out. Hover and selection ease in and out.
+## The look follows three eased values (light_t, known_t, pips_t): refresh()
+## sets them at once, or, from the page's purchase and reset (play()), eases
+## them from where they are, after a delay. A left press picks the node.
 
 signal chosen(id: StringName)
 
@@ -36,29 +39,39 @@ const FREE_TOP := SIZE + 4.0
 ## The picked (and hovered) ring: how far out of the tile and how wide.
 const RING_OUT := 8.0
 const RING_WIDTH := 2.5
-## The lock in the tile's corner and the hidden tile's lock.
+## The lock in a lower corner and the hidden tile's lock.
 const LOCK_RADIUS := 12.0
-const LOCK_AT := Vector2(SIZE - 17.0, SIZE - 17.0)
-const HIDDEN_LOCK := 30.0
+const LOCK_RIGHT := Vector2(SIZE - 17.0, SIZE - 17.0)
+const LOCK_LEFT := Vector2(17.0, SIZE - 17.0)
+## The nodes whose icon's subject sits in its lower right: their lock goes left.
+const LOCK_ON_LEFT: Array[StringName] = [&"equip_slots"]
+const HIDDEN_LOCK := 28.0
 ## The hover card starts this far from the tile (12 px on screen, with
 ## HoverTip's own gap).
 const CARD_GAP := 14.0
+## The purchase's beats: the light and the pip.
+const LIGHT_TIME := 0.18
+const PIP_TIME := 0.15
+const PIP_DELAY := 0.05
+## A node unveiling as it opens.
+const UNVEIL_TIME := 0.25
 const LOCK := preload("res://assets/art/ui/lock.svg")
 const GREY_SHADER := preload("res://src/ui/hud/grey_icon.gdshader")
 
-const HIDDEN_FILL := Color("1a222c")
-const HIDDEN_RIM := Color("3d4857")
-const FILL_COLOR := Color("232e3b")
+const HIDDEN_FILL := Color("10151b")
+const HIDDEN_RIM := Color("2c3542")
+const FILL_COLOR := Color("1b2430")
 const SILVER_COLOR := Color("aeb6c4")
-## Warm glass: its middle and its edge; the warm edge over the icon.
-const GLASS_MIDDLE := Color("c08a34")
-const GLASS_EDGE := Color("4d3818")
+## A greyscale icon's brightness: can buy, and too dear.
+const OPEN_ICON := Color(0.8, 0.8, 0.82)
+const DIM_ICON := Color(0.5, 0.5, 0.53)
+## The warm wash over a lit icon (added light), and its warm edge.
+const WASH := Color("ffb84a")
+const WASH_ALPHA := 0.3
 const WARM_EDGE := Color("ffd98a")
 const NEXT_COLOR := UiStyle.GOLD_COLOR
 const PIP_LIT := Color("ffd98a")
 const PIP_OFF := Color(0.6, 0.64, 0.7, 0.6)
-## A too-dear icon's tint.
-const DIM_ICON := Color(0.7, 0.7, 0.72)
 ## Older looks still read by the info column.
 const BOUGHT_COLOR := UiStyle.GOLD_COLOR
 const MAXED_COLOR := Color("6fd36f")
@@ -68,9 +81,12 @@ const RULE_TAGS := {
 	&"passive": "Any of Q, W, E",
 	&"summoner_slot_2": "Any 2 spells",
 }
+## Word pairs a name never breaks between (Vietnamese compounds).
+const KEEP_TOGETHER: Array[String] = ["Năng Lượng", "Bổ Trợ", "Thứ Hai", "Cơ Bản", "Nâng Cấp", "Xạ Thủ", "Ánh Sáng", "Tia Sáng"]
 
 ## Shared by every greyscale icon (grey_material()).
 static var _grey: ShaderMaterial
+static var _add: CanvasItemMaterial
 
 var data: TreeNodeData
 var tree: EvolutionTree
@@ -93,13 +109,26 @@ var next := false:
 var lit_t := 0.0
 ## How much of the picked ring shows (eases to `selected`).
 var selected_t := 0.0
+## 0 unlit, 1 lit (bought).
+var light_t := 0.0
+## 0 hidden, 1 known.
+var known_t := 0.0
+## The level the pips show (eases to the level).
+var pips_t := 0.0
 ## In the level mark's place while the next level is free.
 var free_badge := FreeBadge.new()
 
+## The icon in colour, and in greyscale under it.
 var _icon: TextureRect
-## Over the icon: the warm edge, the gold rim, the locks.
+var _grey_icon: TextureRect
+## Over the icons: the warm wash (added light).
+var _wash := Control.new()
+## Over the wash: the warm edge, the gold rim, the locks.
 var _over := Control.new()
 var _select_tween: Tween
+var _play: Tween
+## The state the eased values were last aimed at: (light, known, level).
+var _aim := Vector3(-1, -1, -1)
 
 
 func _init(node_data: TreeNodeData, evolution_tree: EvolutionTree, owned: Essences) -> void:
@@ -111,14 +140,19 @@ func _init(node_data: TreeNodeData, evolution_tree: EvolutionTree, owned: Essenc
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	mouse_entered.connect(func() -> void: UiMotion.lit(self, true))
 	mouse_exited.connect(func() -> void: UiMotion.lit(self, false))
-	_icon = TextureRect.new()
-	_icon.texture = data.icon
-	_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_icon.stretch_mode = TextureRect.STRETCH_SCALE
-	_icon.position = Vector2(ICON_INSET, ICON_INSET)
-	_icon.size = Vector2.ONE * (SIZE - ICON_INSET * 2.0)
-	_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_grey_icon = _icon_rect()
+	_grey_icon.material = grey_material()
+	add_child(_grey_icon)
+	_icon = _icon_rect()
 	add_child(_icon)
+	if _add == null:
+		_add = CanvasItemMaterial.new()
+		_add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	_wash.material = _add
+	_wash.size = size
+	_wash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_wash.draw.connect(_draw_wash)
+	add_child(_wash)
 	_over.size = size
 	_over.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_over.draw.connect(_draw_over)
@@ -144,22 +178,6 @@ static func state_of(evolution_tree: EvolutionTree, owned: Essences, id: StringN
 	if evolution_tree.level(id) > 0:
 		return &"bought"
 	return &"open" if evolution_tree.can_buy(id, owned) else &"poor"
-
-
-## The info column's frame colour for a state (its portrait; until it is rebuilt).
-static func state_color(state_name: StringName) -> Color:
-	match state_name:
-		&"hidden":
-			return HIDDEN_RIM
-		&"bought":
-			return BOUGHT_COLOR
-		&"maxed":
-			return MAXED_COLOR
-	return SILVER_COLOR
-
-
-static func border_width(state_name: StringName) -> int:
-	return 3 if state_name in [&"bought", &"maxed"] else 2
 
 
 ## The greyscale look of an icon not bought yet, shared.
@@ -204,14 +222,14 @@ func state() -> StringName:
 	return state_of(tree, essences, data.id)
 
 
-## Bought, but its next level is closed: the lock shows in the corner.
+## Bought, but its next level is closed: the lock shows in a lower corner.
 func locked() -> bool:
 	return tree.level(data.id) > 0 and not tree.is_maxed(data.id) and not tree.next_level_open(data.id)
 
 
 ## The icon shows in greyscale: open or too dear, nothing bought yet.
 func is_grey() -> bool:
-	return _icon.material != null
+	return state() in [&"open", &"poor"]
 
 
 ## Lit: bought (in progress or done).
@@ -224,28 +242,10 @@ func shown_name() -> String:
 	return rule_tag(tree, data.id) if state() == &"hidden" else Lang.t(data.display_name)
 
 
-## The words under the tile in lines: a long name wraps (two lines at most).
+## The words under the tile in lines: a long name wraps (two lines at most),
+## never inside a compound word.
 func name_lines() -> PackedStringArray:
-	var text := shown_name()
-	if text == "":
-		return PackedStringArray()
-	var font := _font()
-	var font_size := _name_size()
-	if font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= TreePage.NAME_MAX:
-		return PackedStringArray([text])
-	# Break where the two lines are most even.
-	var words := text.split(" ")
-	var best := PackedStringArray([text])
-	var best_width := INF
-	for cut in range(1, words.size()):
-		var first := " ".join(words.slice(0, cut))
-		var second := " ".join(words.slice(cut))
-		var wider := maxf(font.get_string_size(first, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x,
-			font.get_string_size(second, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
-		if wider < best_width:
-			best_width = wider
-			best = PackedStringArray([first, second])
-	return best
+	return _lines(shown_name(), _name_size())
 
 
 ## Everything this view draws at rest (tile, level mark and name), in its
@@ -264,16 +264,44 @@ func footprint() -> Rect2:
 	return Rect2((SIZE - width) * 0.5, 0.0, width, bottom)
 
 
-## Rereads the state from the tree.
+## Rereads the state from the tree, at once.
 func refresh() -> void:
+	play(-1.0)
+
+
+## Rereads the state from the tree and eases the look there, starting after
+## `delay` seconds; a negative delay (or UiMotion.off()) sets it at once. A
+## look already easing to the same state keeps going; a new state retargets
+## from where the look is now.
+func play(delay := 0.0) -> void:
 	var current := state()
-	var hidden := current == &"hidden"
-	var lit := current in [&"bought", &"maxed"]
-	_icon.visible = not hidden
-	_icon.material = null if lit or hidden else grey_material()
-	_icon.modulate = DIM_ICON if current == &"poor" else Color.WHITE
+	var aim := Vector3(1.0 if current in [&"bought", &"maxed"] else 0.0, 0.0 if current == &"hidden" else 1.0, tree.level(data.id))
+	var tint := DIM_ICON if current == &"poor" else OPEN_ICON
 	free_badge.visible = tree.is_free(data.id)
-	_redraw()
+	if delay < 0.0 or UiMotion.off() or not is_inside_tree():
+		_kill_play()
+		_aim = aim
+		_grey_icon.modulate = tint
+		_set_look(aim.x, aim.y, aim.z)
+		return
+	if aim == _aim:
+		_grey_icon.modulate = tint
+		_redraw()
+		return
+	_aim = aim
+	_kill_play()
+	_play = UiMotion.tween(self)
+	_play.set_parallel(true)
+	var time := UNVEIL_TIME if aim.y != known_t else LIGHT_TIME
+	_play.tween_method(func(t: float) -> void: _set_look(t, known_t, pips_t), light_t, aim.x, LIGHT_TIME).set_delay(delay)
+	_play.tween_method(func(t: float) -> void: _set_look(light_t, t, pips_t), known_t, aim.y, time).set_delay(delay)
+	_play.tween_method(func(t: float) -> void: _set_look(light_t, known_t, t), pips_t, aim.z, PIP_TIME).set_delay(delay + PIP_DELAY)
+	_play.tween_property(_grey_icon, ^"modulate", tint, LIGHT_TIME).set_delay(delay)
+
+
+## True while the look eases.
+func is_playing() -> bool:
+	return _play != null and _play.is_valid() and _play.is_running()
 
 
 ## Picks this node: emits chosen.
@@ -284,10 +312,10 @@ func click() -> void:
 ## The hover card: what the node gives now, and what its next level still
 ## needs; a hidden node says what opens it.
 func tooltip_content() -> Control:
-	var needs := tree.next_requirement_text(data.id)
 	if state() == &"hidden":
 		return TooltipCard.note(tree.requirement_text(data.id, 0))
 	var text := data.value_text(tree.level(data.id))
+	var needs := tree.next_requirement_text(data.id)
 	if needs != "":
 		text += "\n" + needs
 	return TooltipCard.note(text)
@@ -299,7 +327,7 @@ func tooltip_anchor() -> Rect2:
 	return frame.grow(CARD_GAP - HoverTip.GAP)
 
 
-## A level was bought (the purchase's light is the page's; nothing here yet).
+## Kept for callers of the old bump: the page plays a purchase now.
 func bump() -> void:
 	pass
 
@@ -310,6 +338,34 @@ func _gui_input(event: InputEvent) -> void:
 		Sfx.play(&"click", UiStyle.CLICK_DB)
 		click()
 		accept_event()
+
+
+func _icon_rect() -> TextureRect:
+	var rect := TextureRect.new()
+	rect.texture = data.icon
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.stretch_mode = TextureRect.STRETCH_SCALE
+	rect.position = Vector2(ICON_INSET, ICON_INSET)
+	rect.size = Vector2.ONE * (SIZE - ICON_INSET * 2.0)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return rect
+
+
+func _set_look(light: float, known: float, pips: float) -> void:
+	light_t = light
+	known_t = known
+	pips_t = pips
+	_icon.modulate.a = light
+	_icon.visible = light > 0.0
+	_grey_icon.modulate.a = known * (1.0 - light)
+	_grey_icon.visible = _grey_icon.modulate.a > 0.0
+	_redraw()
+
+
+func _kill_play() -> void:
+	if _play and _play.is_valid():
+		_play.kill()
+	_play = null
 
 
 func _ease_selected() -> void:
@@ -330,6 +386,7 @@ func _set_selected_t(t: float) -> void:
 
 func _redraw() -> void:
 	queue_redraw()
+	_wash.queue_redraw()
 	_over.queue_redraw()
 
 
@@ -339,6 +396,31 @@ func _font() -> Font:
 
 func _name_size() -> int:
 	return TAG_FONT if state() == &"hidden" else NAME_FONT
+
+
+## `text` in one line, or two where they are most even (never inside a
+## KEEP_TOGETHER pair), when wider than the page's NAME_MAX.
+func _lines(text: String, font_size: int) -> PackedStringArray:
+	if text == "":
+		return PackedStringArray()
+	var font := _font()
+	if font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= TreePage.NAME_MAX:
+		return PackedStringArray([text])
+	var glued := text
+	for pair in KEEP_TOGETHER:
+		glued = glued.replace(pair, pair.replace(" ", " "))
+	var words := glued.split(" ")
+	var best := PackedStringArray([text])
+	var best_width := INF
+	for cut in range(1, words.size()):
+		var first := " ".join(words.slice(0, cut)).replace(" ", " ")
+		var second := " ".join(words.slice(cut)).replace(" ", " ")
+		var wider := maxf(font.get_string_size(first, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x,
+			font.get_string_size(second, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
+		if wider < best_width:
+			best_width = wider
+			best = PackedStringArray([first, second])
+	return best
 
 
 func _tile() -> Rect2:
@@ -352,20 +434,11 @@ func _draw() -> void:
 		draw_texture_rect(JourneyMap.glow(), tile.grow(SIZE * 0.55), false, Color(NEXT_COLOR, 0.4))
 	var frame := StyleBoxFlat.new()
 	frame.set_corner_radius_all(CORNER)
-	match current:
-		&"hidden":
-			frame.bg_color = HIDDEN_FILL
-			frame.border_color = HIDDEN_RIM
-			frame.set_border_width_all(2)
-		&"open", &"poor":
-			frame.bg_color = FILL_COLOR
-			frame.border_color = Color(SILVER_COLOR, 0.8 if current == &"open" else 0.5)
-			frame.set_border_width_all(2)
-		_:
-			frame.bg_color = GLASS_EDGE
+	frame.bg_color = HIDDEN_FILL.lerp(FILL_COLOR, known_t)
+	var rim := Color(SILVER_COLOR, 0.75 if current == &"open" else 0.4)
+	frame.border_color = HIDDEN_RIM.lerp(rim, known_t)
+	frame.set_border_width_all(2)
 	draw_style_box(frame, tile)
-	if current in [&"bought", &"maxed"]:
-		draw_texture_rect(JourneyMap.glow(), tile.grow(-2.0), false, Color(GLASS_MIDDLE, 0.9))
 	# The picked ring, over the hover one, each eased by its own value.
 	var hover_a := 0.4 * lit_t * (1.0 - selected_t)
 	if selected_t > 0.0 or hover_a > 0.0:
@@ -375,51 +448,60 @@ func _draw() -> void:
 		ring.set_border_width_all(int(RING_WIDTH + 0.5) if selected_t >= 0.5 else 2)
 		ring.set_corner_radius_all(CORNER + int(RING_OUT))
 		draw_style_box(ring, tile.grow(RING_OUT))
-	# The level mark.
-	if not free_badge.visible and current != &"hidden":
-		var level := tree.level(data.id)
+	# The level mark: lit pips up to the level, the last one growing in.
+	if not free_badge.visible and known_t > 0.0:
 		var pips := pip_centers(data.max_level)
 		for i in pips.size():
-			if i < level:
-				draw_circle(pips[i], PIP * 0.5, PIP_LIT)
-			else:
-				draw_arc(pips[i], PIP * 0.5 - 0.75, 0.0, TAU, 16, PIP_OFF, 1.5, true)
-	# The name, or the rule tag.
-	var lines := name_lines()
+			var fill := clampf(pips_t - i, 0.0, 1.0)
+			draw_arc(pips[i], PIP * 0.5 - 0.75, 0.0, TAU, 16, Color(PIP_OFF, PIP_OFF.a * known_t * (1.0 - fill)), 1.5, true)
+			if fill > 0.0:
+				draw_circle(pips[i], PIP * 0.5 * lerpf(0.6, 1.0, fill), Color(PIP_LIT, fill * known_t))
+	# The name, or the rule tag: they cross over as the node opens.
+	var color := UiStyle.DIM_COLOR if current == &"poor" else UiStyle.TEXT_COLOR
+	_draw_words(Lang.t(data.display_name), NAME_FONT, color, known_t)
+	if known_t < 1.0:
+		_draw_words(rule_tag(tree, data.id), TAG_FONT, UiStyle.DIM_COLOR, 1.0 - known_t)
+
+
+func _draw_words(text: String, font_size: int, color: Color, alpha: float) -> void:
+	if alpha <= 0.0 or text == "":
+		return
 	var font := _font()
-	var font_size := _name_size()
-	var color := UiStyle.DIM_COLOR if current in [&"hidden", &"poor"] else UiStyle.TEXT_COLOR
+	var lines := _lines(text, font_size)
 	for i in lines.size():
 		var width := font.get_string_size(lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
 		var baseline := Vector2((SIZE - width) * 0.5, NAME_TOP + i * NAME_LINE + font.get_ascent(font_size))
-		draw_string_outline(font, baseline, lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 5, Color(0, 0, 0, 0.75))
-		draw_string(font, baseline, lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+		draw_string_outline(font, baseline, lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 5, Color(0, 0, 0, 0.75 * alpha))
+		draw_string(font, baseline, lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(color, alpha))
 
 
-## Over the icon: a lit tile's warm edge, the next step's gold rim, and the
-## locks.
+## The warm light added over a lit icon, strongest in its middle.
+func _draw_wash() -> void:
+	if light_t <= 0.0:
+		return
+	_wash.draw_texture_rect(JourneyMap.glow(), _tile().grow(-2.0), false, Color(WASH, WASH_ALPHA * light_t))
+
+
+## Over the icon: a lit tile's warm edge (quieter once done), the next step's
+## gold rim, and the locks.
 func _draw_over() -> void:
 	var current := state()
 	var tile := _tile()
 	var edge := StyleBoxFlat.new()
 	edge.draw_center = false
 	edge.set_corner_radius_all(CORNER)
-	var has_edge := true
 	if next:
 		edge.border_color = NEXT_COLOR
 		edge.set_border_width_all(3)
-	elif current == &"bought":
-		edge.border_color = Color(WARM_EDGE, 0.6)
-		edge.set_border_width_all(2)
-	elif current == &"maxed":
-		edge.border_color = Color(WARM_EDGE, 0.42)
-		edge.set_border_width_all(2)
-	else:
-		has_edge = false
-	if has_edge:
 		_over.draw_style_box(edge, tile)
-	if current == &"hidden":
-		_over.draw_texture_rect(LOCK, Rect2(tile.get_center() - Vector2.ONE * HIDDEN_LOCK * 0.5, Vector2.ONE * HIDDEN_LOCK), false, Color(1, 1, 1, 0.45))
-	elif locked():
-		_over.draw_circle(LOCK_AT, LOCK_RADIUS, Color(0.05, 0.06, 0.08, 0.95))
-		_over.draw_texture_rect(LOCK, Rect2(LOCK_AT - Vector2.ONE * 8.0, Vector2.ONE * 16.0), false, Color(1, 1, 1, 0.9))
+	elif light_t > 0.0:
+		var done := current == &"maxed"
+		edge.border_color = Color(WARM_EDGE, (0.32 if done else 0.75) * light_t)
+		edge.set_border_width_all(1 if done else 2)
+		_over.draw_style_box(edge, tile)
+	if known_t < 1.0:
+		_over.draw_texture_rect(LOCK, Rect2(tile.get_center() - Vector2.ONE * HIDDEN_LOCK * 0.5, Vector2.ONE * HIDDEN_LOCK), false, Color(1, 1, 1, 0.3 * (1.0 - known_t)))
+	if locked():
+		var at := LOCK_LEFT if data.id in LOCK_ON_LEFT else LOCK_RIGHT
+		_over.draw_circle(at, LOCK_RADIUS, Color(0.05, 0.06, 0.08, 0.95))
+		_over.draw_texture_rect(LOCK, Rect2(at - Vector2.ONE * 8.0, Vector2.ONE * 16.0), false, Color(1, 1, 1, 0.9))

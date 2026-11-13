@@ -13,13 +13,20 @@ extends Control
 ##   gold. Counted rules are said at the node (TreeNodeView's rule tag), and
 ##   a level sum is the node's ring (R: one track, one arc, ticks at 5, 9, 13).
 ## It redraws on refresh() only; nothing on it moves at rest.
+## Changes play with a cause (refresh() works out which): a purchase lights its
+## node, light runs along each link the purchase meets, and a node it opens
+## unveils once the light arrives (60 ms apart); a counted rule's node
+## unveils a beat later; R's ring eases to its new sum. A reset unlights the
+## page top to bottom in one stagger, inside 0.5 s. `lead_in` holds the start
+## until a pop-up closing over the page has gone. Off the screen, while
+## UiMotion.off() or on Low effects, everything is set at once.
 
 const SIZE := JourneyMap.SIZE
 ## Where the trunk meets the ground.
 const GROUND_Y := 850.0
 ## The trunk: its width at the roots (before TreeArt's flare) and at its top.
 const TRUNK_ROOT := 76.0
-const TRUNK_TIP := 26.0
+const TRUNK_TIP := 36.0
 const CURVE_STEPS := 28
 ## The branch switch's band over the page's top, and the line nothing of the
 ## tree crosses (48 under the switch: 40 px on screen).
@@ -33,6 +40,24 @@ const LINK_WIDTH := 3.0
 const LINK_GAP := 10.0
 const LINK_DIM := Color("3b4b54")
 const LINK_LIT := Color(1.0, 0.81, 0.35, 0.85)
+## The dot a link ends on, under the name of the node that needs it.
+const LINK_DOT := 4.0
+## The purchase: when the light leaves along a link, how long it runs, the
+## pause before a node it opens unveils, the step between several, and when a
+## counted rule's node unveils.
+const LINK_START := 0.12
+const LINK_TIME := 0.45
+const UNVEIL_AFTER := 0.05
+const UNVEIL_STEP := 0.06
+const COUNTED_UNVEIL := 0.3
+const RING_TIME := 0.45
+## The reset: the longest step between nodes, and the whole stagger's span.
+const RESET_STEP := 0.025
+const RESET_SPAN := 0.3
+## Dark pools under the names written on the trunk: their size around the
+## name and their colour.
+const NAME_POOL := Vector2(56, 34)
+const NAME_POOL_COLOR := Color(0.012, 0.03, 0.026, 0.92)
 ## The ring of a node with a level sum: radius, thickness, the open gap at the
 ## bottom (radians), its ticks and the font of its numbers.
 const RING_RADIUS := 80.0
@@ -135,6 +160,15 @@ var boughs: Array[PackedVector2Array] = []
 var links: Array[Dictionary] = []
 ## Where the trunk ends at the top.
 var trunk_top := 0.0
+## Seconds before the next change plays (a pop-up still closing over the page).
+var lead_in := 0.0
+## Node id -> the level the page shows.
+var _levels := {}
+## "from>to" -> how much of the link is lit (0 to 1).
+var _link_fill := {}
+## The ring's shown sum.
+var _ring_shown := 0.0
+var _tweens: Array[Tween] = []
 ## The page's scenery and its tree.
 var art: TreeArt
 
@@ -152,7 +186,7 @@ func _init(branch_id: StringName, evolution_tree: EvolutionTree, essences: Essen
 		view.position = centers[data.id] - Vector2.ONE * TreeNodeView.SIZE * 0.5
 		add_child(view)
 		views[data.id] = view
-
+	_snap()
 
 
 ## Levels bought in `branch` and its levels in all, as (bought, all).
@@ -163,12 +197,143 @@ static func levels(evolution_tree: EvolutionTree, branch_id: StringName) -> Vect
 	return count
 
 
-## Redraws the views, the links and the ring from the tree (a link's ends
-## follow the names, which change as nodes open).
+## Rereads the tree: a purchase or a reset plays (see the class notes), any
+## other change eases at once; off the screen everything is set.
 func refresh() -> void:
+	var rose: Array[StringName] = []
+	var fell: Array[StringName] = []
+	for id: StringName in views:
+		var shown: int = _levels.get(id, 0)
+		if tree.level(id) > shown:
+			rose.append(id)
+		elif tree.level(id) < shown:
+			fell.append(id)
+	if not is_visible_in_tree() or UiMotion.off():
+		_snap()
+		lead_in = 0.0
+	elif not fell.is_empty() and rose.is_empty():
+		_play_reset()
+		lead_in = 0.0
+	elif not rose.is_empty():
+		_play_purchase(rose)
+		lead_in = 0.0
+	else:
+		# Essence spent before the levels change: the purchase is still to come.
+		for view: TreeNodeView in views.values():
+			view.play(lead_in)
+	for id: StringName in views:
+		_levels[id] = tree.level(id)
+	queue_redraw()
+
+
+## True while a purchase or a reset plays on the page.
+func is_playing() -> bool:
+	for tween in _tweens:
+		if tween.is_valid() and tween.is_running():
+			return true
+	for view: TreeNodeView in views.values():
+		if view.is_playing():
+			return true
+	return false
+
+
+## Everything at its end state at once.
+func _snap() -> void:
+	_kill_tweens()
 	for view: TreeNodeView in views.values():
 		view.refresh()
+	for id: StringName in views:
+		_levels[id] = tree.level(id)
+		var data := tree.node(id)
+		for required in data.requires:
+			_link_fill["%s>%s" % [required, id]] = 1.0 if tree.level(required) > 0 else 0.0
+		if not data.level_sum_ids.is_empty():
+			_ring_shown = tree.level_sum(id)
 	queue_redraw()
+
+
+## A purchase of `rose` (usually one node): it lights; light runs along the
+## links its first level meets; the nodes they open unveil as it arrives; a
+## counted rule's node unveils a beat later; R's ring eases.
+func _play_purchase(rose: Array[StringName]) -> void:
+	var start := lead_in
+	var arrivals := {}
+	for id in rose:
+		views[id].play(start)
+		if _levels.get(id, 0) == 0:
+			for target: StringName in centers:
+				if id in tree.node(target).requires and tree.node(target).requires_count == 0:
+					_ease_link("%s>%s" % [id, target], 1.0, start + LINK_START, LINK_TIME)
+					arrivals[target] = start + LINK_START + LINK_TIME + UNVEIL_AFTER
+	var unveiled := 0
+	for id: StringName in views:
+		if id in rose:
+			continue
+		var view: TreeNodeView = views[id]
+		var opens := view.known_t < 1.0 and view.state() != &"hidden"
+		if not opens:
+			view.play(start)
+		elif arrivals.has(id):
+			view.play(arrivals[id] + unveiled * UNVEIL_STEP)
+			unveiled += 1
+		else:
+			view.play(start + COUNTED_UNVEIL)
+	_ease_ring(start, RING_TIME)
+
+
+## A reset: every node unlights from the page's top down, one stagger.
+func _play_reset() -> void:
+	var start := lead_in
+	var order: Array = views.keys()
+	order.sort_custom(func(a: StringName, b: StringName) -> bool: return centers[a].y < centers[b].y)
+	var step := minf(RESET_STEP, RESET_SPAN / maxf(order.size(), 1.0))
+	for i in order.size():
+		var id: StringName = order[i]
+		views[id].play(start + i * step)
+		for target: StringName in centers:
+			var key := "%s>%s" % [id, target]
+			if _link_fill.has(key):
+				_ease_link(key, 1.0 if tree.level(id) > 0 else 0.0, start + i * step, TreeNodeView.LIGHT_TIME)
+	_ease_ring(start, RESET_SPAN)
+
+
+func _ease_link(key: String, to: float, delay: float, time: float) -> void:
+	_tween().tween_method(_set_link.bind(key), _link_fill.get(key, 0.0), to, time).set_delay(delay).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+
+
+func _set_link(t: float, key: String) -> void:
+	_link_fill[key] = t
+	queue_redraw()
+
+
+func _ease_ring(delay: float, time: float) -> void:
+	for id: StringName in centers:
+		if tree.node(id).level_sum_ids.is_empty():
+			continue
+		var to := float(tree.level_sum(id))
+		if is_equal_approx(to, _ring_shown):
+			return
+		_tween().tween_method(_set_ring, _ring_shown, to, time).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		return
+
+
+func _set_ring(t: float) -> void:
+	_ring_shown = t
+	queue_redraw()
+
+
+func _tween() -> Tween:
+	var tween := UiMotion.tween(self)
+	_tweens = _tweens.filter(func(t: Tween) -> bool: return t.is_valid())
+	_tweens.append(tween)
+	return tween
+
+
+func _kill_tweens() -> void:
+	for tween in _tweens:
+		if tween.is_valid():
+			tween.kill()
+	_tweens.clear()
 
 
 ## A random number generator seeded for this page and `salt`: the same
@@ -273,9 +438,11 @@ func _lay_links() -> void:
 			var to := footprint(id)
 			var points := PackedVector2Array()
 			if to.end.y < from.position.y:
-				# The usual case: the node that needs it stands above.
+				# The usual case: the node that needs it stands above. The line
+				# grows from the needed tile's rim and ends on a dot under the
+				# other's name.
 				var x: float = centers[required].x
-				points.append(Vector2(x, from.position.y - LINK_GAP))
+				points.append(Vector2(x, from.position.y))
 				points.append(Vector2(x, to.end.y + LINK_GAP))
 			else:
 				var a: Vector2 = centers[required]
@@ -297,15 +464,47 @@ func _draw() -> void:
 	_lay_links()
 	art.draw_back(self)
 	art.draw_tree(self)
+	_draw_name_pools()
 	for link in links:
-		var lit := tree.level(link["from"]) > 0
-		draw_polyline(link["points"], LINK_LIT if lit else LINK_DIM, LINK_WIDTH, true)
+		_draw_link(link)
 	for id: StringName in centers:
 		if not tree.node(id).level_sum_ids.is_empty():
 			_draw_ring(id)
 	_draw_group_captions()
 	# The Journey map's frame, open on the right where the info column stands.
 	JourneyMap.draw_frame(self, SIZE)
+
+
+## A link: dim, gold as far as it is lit (with a bright head while the light
+## runs), and the dot it ends on.
+func _draw_link(link: Dictionary) -> void:
+	var points: PackedVector2Array = link["points"]
+	var fill: float = _link_fill.get("%s>%s" % [link["from"], link["to"]], 0.0)
+	var from := points[0]
+	var to := points[-1]
+	draw_line(from, to, LINK_DIM, LINK_WIDTH, true)
+	draw_circle(to, LINK_DOT, LINK_DIM)
+	if fill <= 0.0:
+		return
+	var head := from.lerp(to, fill)
+	draw_line(from, head, LINK_LIT, LINK_WIDTH, true)
+	if fill < 1.0:
+		draw_texture_rect(JourneyMap.glow(), Rect2(head - Vector2.ONE * 16.0, Vector2.ONE * 32.0), false, Color(LIGHT, 0.9))
+		draw_circle(head, LINK_WIDTH, Color(1, 0.97, 0.85))
+	else:
+		draw_circle(to, LINK_DOT, LINK_LIT)
+
+
+## A dark pool under each name written on the trunk, so the bark never runs
+## through its letters.
+func _draw_name_pools() -> void:
+	var glow := JourneyMap.glow()
+	for id: StringName in views:
+		if not on_trunk[id]:
+			continue
+		var drawn := footprint(id)
+		var words := Rect2(drawn.position.x, drawn.position.y + TreeNodeView.SIZE, drawn.size.x, drawn.size.y - TreeNodeView.SIZE)
+		draw_texture_rect(glow, words.grow_individual(NAME_POOL.x, NAME_POOL.y, NAME_POOL.x, NAME_POOL.y), false, NAME_POOL_COLOR)
 
 
 ## Node `id`'s level sum as a ring: one dark track and one gold arc up to the
@@ -315,11 +514,11 @@ func _draw_ring(id: StringName) -> void:
 	var center: Vector2 = centers[id]
 	var marks := data.level_sums
 	var top: int = marks[-1]
-	var total := tree.level_sum(id)
+	var total := _ring_shown
 	var start := PI * 0.5 + RING_GAP * 0.5
 	var sweep := TAU - RING_GAP
 	draw_arc(center, RING_RADIUS, start, start + sweep, 64, RING_TRACK, RING_WIDTH, true)
-	var share := clampf(float(total) / top, 0.0, 1.0)
+	var share := clampf(total / top, 0.0, 1.0)
 	if share > 0.0:
 		draw_arc(center, RING_RADIUS, start, start + sweep * share, maxi(4, int(64 * share)), UiStyle.GOLD_COLOR, RING_WIDTH, true)
 		for end: float in [start, start + sweep * share]:
@@ -327,7 +526,7 @@ func _draw_ring(id: StringName) -> void:
 	var font := get_theme_default_font()
 	for mark: int in marks:
 		var direction := Vector2.from_angle(start + sweep * mark / top)
-		var reached := total >= mark
+		var reached := total >= mark - 0.001
 		var inner := center + direction * (RING_RADIUS - RING_WIDTH * 0.5 - 2.0)
 		draw_line(inner, inner + direction * RING_TICK, UiStyle.TITLE_COLOR if reached else UiStyle.DIM_COLOR, 2.0, true)
 		var label_at := center + direction * (RING_RADIUS + 22.0)
@@ -345,6 +544,18 @@ func _draw_group_captions() -> void:
 		for id: StringName in limb["ids"]:
 			if centers[id].y < top.y:
 				top = centers[id]
+		# Centred on the group's top row when it has two or more nodes, else
+		# on the whole group's middle: a heading for the group, not one node.
+		var row: Array[float] = []
+		var all: Array[float] = []
+		for id: StringName in limb["ids"]:
+			all.append(centers[id].x)
+			if absf(centers[id].y - top.y) < 1.0:
+				row.append(centers[id].x)
+		var across := row if row.size() >= 2 else all
+		top.x = 0.0
+		for x in across:
+			top.x += x / across.size()
 		var text := Lang.t(limb["label"])
 		var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, GROUP_FONT).x
 		var baseline := Vector2(top.x - width * 0.5, top.y - TreeNodeView.SIZE * 0.5 - GROUP_LIFT)

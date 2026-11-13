@@ -4,8 +4,8 @@ extends Control
 ## frame of a TreePage per branch (one shown) and the NodeInfoPanel as a
 ## column on its right. The branch switch (BranchTabs) sits over the page's
 ## top band, inside the frame. The forge and Reset tree are quiet utilities at
-## the top bar's right end, over the info column (shown with this section only). At rest
-## the page's next step wears gold: a free level, else the cheapest one that
+## the top bar's right end, over the info column (shown with this section
+## only). At rest the page's next step wears gold: a free level, else the cheapest one that
 ## can be bought now (next_step()). It opens on the first branch with a free
 ## upgrade, otherwise on Skills. The cost bar asks first (TreePurchasePopup).
 ## Buying, forging and resetting change the save in memory only; nothing here
@@ -25,6 +25,9 @@ const UTILITIES_TOP := 16.0 - MainScreen.TOP_BAR
 const UTILITY_GAP := 18
 const RESET_FONT := 18
 const PURPLE_ICON := preload("res://assets/art/ui/essence_purple.svg")
+## How long a question's card takes to leave the page (UiMotion's close):
+## a purchase or a reset plays after it.
+const POPUP_GONE := UiMotion.EXIT + 0.03
 
 ## Branch -> its TreePage.
 var pages := {}
@@ -129,8 +132,11 @@ func select(id: StringName) -> void:
 
 
 ## Asks before buying node `id`'s next level (the cost bar's click), closing
-## a question already open.
+## a question already open. From the panel at rest, the node is picked first,
+## so the panel stays on it after the purchase.
 func ask_buy(id: StringName) -> void:
+	if info.id != id:
+		select(id)
 	if purchase:
 		purchase.close()
 	var opened := TreePurchasePopup.new(tree, id, essences)
@@ -223,9 +229,14 @@ func _clear_pick() -> void:
 		view.selected = false
 
 
+## The question's Buy: the purchase plays once its card has left the page.
 func _buy(id: StringName) -> void:
-	if info.cost_bar.id == id and info.cost_bar.buy():
-		views[id].bump()
+	if info.cost_bar.id != id:
+		return
+	var page: TreePage = pages[tree.node(id).branch]
+	page.lead_in = POPUP_GONE
+	if not info.cost_bar.buy():
+		page.lead_in = 0.0
 
 
 ## A hidden tree closes its question, so it never shows on another page.
@@ -252,5 +263,6 @@ func reset_question() -> String:
 
 
 func _reset() -> void:
+	pages[branch].lead_in = POPUP_GONE
 	if tree.reset(essences):
 		Sfx.play(&"refresh")

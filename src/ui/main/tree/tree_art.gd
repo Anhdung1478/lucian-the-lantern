@@ -68,6 +68,11 @@ const CLUMP_LIFT := Vector2(0.06, -0.06)
 ## CROWD_NODES / the page's nodes, down to CROWD_MIN.
 const CROWD_NODES := 6.0
 const CROWD_MIN := 0.5
+## A page with this many nodes or more is wide: its crown domes. How far out
+## the dome reaches, and how much lower its edge sits (a share of the lift).
+const WIDE_NODES := 10
+const DOME_REACH := 560.0
+const DOME_DROP := 0.9
 ## A crown over the trunk's tip where no node stands on it.
 const TIP_CROWN: Array[Vector3] = [Vector3(4, 70, 96), Vector3(3, 48, 64), Vector3(2, 30, 42)]
 ## The smallest mass kept when it shrinks to clear the ground or the switch,
@@ -261,15 +266,22 @@ func _lay_roots(rng: RandomNumberGenerator) -> void:
 func _lay_canopy(rng: RandomNumberGenerator) -> void:
 	var crowd := clampf(CROWD_NODES / page.centers.size(), CROWD_MIN, 1.0)
 	var shrink := lerpf(0.8, 1.0, crowd)
+	# A wide page's crown domes: its outer masses sit lower and smaller, and
+	# its outer top masses go, so sky shows along its top line.
+	var wide := page.centers.size() >= WIDE_NODES
 	for id: StringName in page.centers:
 		var center: Vector2 = page.centers[id]
 		var outward := signf(center.x - middle)
+		var out := clampf(absf(center.x - middle) / DOME_REACH, 0.0, 1.0)
+		var dome := 1.0 - out * out * DOME_DROP if wide else 1.0
 		for layer in CLUMP_LAYERS.size():
 			var spec := CLUMP_LAYERS[layer]
+			if wide and layer == 2 and out > 0.6:
+				continue
 			for k in maxi(1, roundi(spec.x * crowd)):
 				var at := center + Vector2(rng.randf_range(-CLUMP_SPREAD.x, CLUMP_SPREAD.x) + outward * rng.randf_range(0.0, 20.0),
-					rng.randf_range(-CLUMP_SPREAD.y, CLUMP_SPREAD.y * 0.5) - spec.w)
-				_add_clump(at, rng.randf_range(spec.y, spec.z) * shrink, layer, rng)
+					rng.randf_range(-CLUMP_SPREAD.y * dome, CLUMP_SPREAD.y * 0.5) - spec.w * dome)
+				_add_clump(at, rng.randf_range(spec.y, spec.z) * shrink * lerpf(1.0, 0.85, 1.0 - dome), layer, rng)
 	# Each group's bough ends in the crown.
 	for group in page.groups:
 		var anchor: Vector2 = group["anchor"]

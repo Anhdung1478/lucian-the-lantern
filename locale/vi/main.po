@@ -868,3 +868,87 @@ msgstr "Một trong Q, W, E"
 #. tree_node_view.gd: under the hidden Second Summoner Slot, the rule that opens it
 msgid "Any 2 spells"
 msgstr "2 phép bất kỳ"
+
+#. node_info_panel.gd: under a hidden node's requirement in the info panel
+msgid "Its name and levels show once it opens."
+msgstr "Tên và các cấp của nút hiện ra khi nút mở."
+
+#. node_info_panel.gd: caption over what the branch's other closed nodes wait for
+msgid "STILL HIDDEN"
+msgstr "CÒN ẨN"
+
+#. node_info_panel.gd: caption over what a finished branch gives, a row per node
+msgid "WHAT IT GIVES"
+msgstr "NHẬN ĐƯỢC"
+
+#. node_info_panel.gd: the name shown for a hidden node
+msgid "Hidden node"
+msgstr "Nút ẩn"
+
+#. node_info_panel.gd: caption over the node shown at rest when its next level costs nothing
+msgid "FREE TO CLAIM"
+msgstr "NHẬN MIỄN PHÍ"
+
+#. node_info_panel.gd: caption over the node shown at rest: the cheapest level that can be bought now
+msgid "CHEAPEST UPGRADE"
+msgstr "NÂNG CẤP RẺ NHẤT"
+
+#. node_info_panel.gd: caption over the node shown at rest when nothing can be paid for yet: the cheapest level
+msgid "SAVING FOR"
+msgstr "ĐANG DÀNH DỤM CHO"
+
+#. node_info_panel.gd: caption over what a branch with nothing open waits for
+msgid "NEXT STEP"
+msgstr "BƯỚC TIẾP THEO"
+
+#. node_info_panel.gd: title of a branch with nothing open
+msgid "Nothing to buy yet"
+msgstr "Chưa có gì để mua"
+
+#. node_info_panel.gd: under "Clear Act N" on a branch with nothing open. %d is how many nodes it opens
+msgid "Opens %d nodes on this branch."
+msgstr "Mở %d nút ở nhánh này."
+
+#. node_info_panel.gd: under "Clear Act N" when it opens one node
+msgid "Opens 1 node on this branch."
+msgstr "Mở 1 nút ở nhánh này."
+
+#. node_info_panel.gd: caption of a branch with every level bought
+msgid "BRANCH COMPLETE"
+msgstr "NHÁNH ĐÃ XONG"
+
+#. node_info_panel.gd: title of a branch with every level bought
+msgid "Every level bought"
+msgstr "Đã mua mọi cấp"
+
+#. node_info_panel.gd: how many nodes wait for a rule (one)
+msgid "1 node"
+msgstr "1 nút"
+
+#. node_info_panel.gd: how many nodes wait for a rule. %d is the count
+msgid "%d nodes"
+msgstr "%d nút"
+
+#. node_info_panel.gd: over the equip slots preview. First %d is open slots, second all
+msgid "%d of %d slots open"
+msgstr "Mở %d / %d ô trang bị"
+
+#. node_info_panel.gd: over the boots preview before any boots are bought
+msgid "No boots yet"
+msgstr "Chưa có giày"
+
+#. node_info_panel.gd: over the boots preview. %s is the boots worn
+msgid "Wearing %s"
+msgstr "Đang mang %s"
+
+#. node_info_panel.gd: over the backpack preview. First %d is open cells, second all
+msgid "%d of %d cells open"
+msgstr "Mở %d / %d ô ba lô"
+
+#. cost_bar.gd: the action of a level that costs nothing
+msgid "Claim for free"
+msgstr "Nhận miễn phí"
+
+#. node_info_panel.gd: caption at rest over what each bought node of the branch gives now
+msgid "THIS BRANCH GIVES"
+msgstr "NHÁNH NÀY CHO"

@@ -31,7 +31,7 @@ const SAVE_PREFIX := "user://screenshot_save_slot_"
 const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "title_settings", "the_end",
 	"journey_map", "journey_endless", "endless_wave", "endless_boss", "endless_pick", "endless_run_over",
 	"exit_cancel", "tree_icons", "tree_free", "tree_rules", "tree_forge", "backpack_slots",
-	"skin_preview", "tree_boots", "title_difficulty", "tree_check"]
+	"skin_preview", "tree_boots", "title_difficulty", "tree_check", "tree_motion", "tree_low"]
 ## Endless map choices (Journey.ENDLESS_MAPS indices) for the Endless scenarios.
 const RANDOM_MAP := 0
 const TRAINING_GROUND := 2
@@ -240,6 +240,10 @@ func _run(scenario: String) -> void:
 			await scenario_main_tree_states()
 		"tree_check":
 			await scenario_tree_check()
+		"tree_motion":
+			await scenario_tree_motion()
+		"tree_low":
+			await scenario_tree_low()
 		"main_skin_purchase":
 			await scenario_main_skin_purchase()
 		"tree_free":
@@ -1721,12 +1725,12 @@ func scenario_main_tree() -> void:
 	section.select(&"stat_ad")
 	await wait(0.2)
 	print("Q level, state (expect 2 bought): ", save.tree.level(&"skill_q"), " ", views[&"skill_q"].state())
-	print("stat_ad panel (expect LVL 2 / 5, +8 AD → +12 AD): ", section.info.level_label.text, ", ", section.info.value_label.text)
+	print("stat_ad panel (expect OFFENSE, +8 AD → +12 AD): ", section.info.caption_label.text, ", ", section.info.value_label.text)
 	print("blue left (expect 10000 - 1050 = 8950): ", save.essences.amount(Essences.BLUE))
 	await shot("main_tree_1_bought_info")
 	section.select(&"skill_r")
 	await wait(0.2)
-	print("R hidden (expect ???, LOCKED): ", section.info.name_label.text, ", ", section.info.cost_bar.status.text)
+	print("R hidden (expect Hidden node, Locked): ", section.info.name_label.text, ", ", section.info.cost_bar.status.text)
 	print("R requires (expect Requires: 5 levels in Q + W + E (now 4)): ", section.info.requires_label.text)
 	await shot("main_tree_2_hidden_info")
 	section.close_popup()
@@ -1747,6 +1751,26 @@ func scenario_main_tree() -> void:
 		print("tab ", branch, " shows its page, tab draw modes (expect true [0, 0, 0, 0, 0]): ", section.pages[branch].visible, " ",
 			section.tabs.buttons.map(func(tab: Button) -> int: return tab.get_draw_mode()))
 		await shot("main_tree_4_%s" % branch)
+	section.show_branch(&"stats")
+	section.select(&"stat_ap")
+	section.info.cost_bar.pressed.emit()
+	await wait(0.4)
+	await shot("main_tree_5_buy_popup")
+	section.close_popup()
+	await wait(0.3)
+	save.essences.add(Essences.PURPLE, EvolutionTree.RESET_COST)
+	section.reset_button.pressed.emit()
+	await wait(0.4)
+	print("Reset question (expect it names the refund): ", section.reset_question())
+	await shot("main_tree_6_reset_question")
+	main_screen().confirm.answer(false)
+	await wait(0.3)
+	section.close_popup()
+	section.show_branch(&"skills")
+	await wait(0.3)
+	await hover_node(views[&"skill_r"])
+	await shot("main_tree_7_hidden_hover")
+	await mouse_move(Vector2(960, 1060))
 
 
 ## After 1-1: FREE badges on the Evolution Tree button, the Summoners tab and
@@ -1807,6 +1831,8 @@ func scenario_tree_rules() -> void:
 	for id: StringName in [&"skill_q", &"skill_q", &"skill_q", &"skill_w", &"skill_w", &"skill_w", &"passive",
 			&"skill_r", &"equip_slots"]:
 		tree.buy(id, save.essences)
+	# R's first rank needs Act 2 since V1.5: put it in by hand, as the frames want it.
+	tree.from_dict(tree.to_dict().merged({"skill_r": 1}))
 	main_screen().show_section(MainScreen.SECTION_TREE)
 	var section := tree_section()
 	var info := section.info
@@ -1814,14 +1840,14 @@ func scenario_tree_rules() -> void:
 	section.select(&"skill_r")
 	await wait(0.3)
 	print("Q + W + E (expect 7), R level (expect 1): ", tree.level_sum(&"skill_r"), " ", tree.level(&"skill_r"))
-	print("R (expect LVL 1 / 3 | Q + W + E ranks: 7 / 9 | Requires: 9 levels in Q + W + E (now 7) | LOCKED): ",
-		" | ".join([info.level_label.text, info.sum_label.text, info.requires_label.text, info.cost_bar.status.text]))
+	print("R (expect Rank 1 → Rank 2 | Requires: 9 levels in Q + W + E (now 7) | Locked): ",
+		" | ".join([info.value_label.text, info.requires_label.text, info.cost_bar.status.text]))
 	print("R's lock corner (expect true): ", (section.views[&"skill_r"] as TreeNodeView).locked())
 	await shot("tree_rules_0_r_needs_9")
 	section.select(&"equip_slots")
 	await wait(0.3)
-	print("page (expect backpack), Equip Slots (expect LVL 1 / 5 | Requires: Clear Act 2 | LOCKED): ", section.branch, " ",
-		" | ".join([info.level_label.text, info.requires_label.text, info.cost_bar.status.text]))
+	print("page (expect backpack), Equip Slots (expect 2 of 6 slots open | Requires: Clear Act 2 | Locked): ", section.branch, " ",
+		" | ".join([info.preview_label.text, info.requires_label.text, info.cost_bar.status.text]))
 	print("Equip Slots' lock corner (expect true): ", (section.views[&"equip_slots"] as TreeNodeView).locked())
 	await shot("tree_rules_1_equip_needs_act_2")
 	save.set_cleared(Journey.all_stage_ids(2))
@@ -1942,11 +1968,107 @@ func scenario_tree_check() -> void:
 		section.show_branch(branch)
 		await wait(0.3)
 		await shot("tree_check_%d_%s" % [3 + [&"stats", &"backpack", &"economy"].find(branch), branch])
+	# 120 blue: lit, can buy, too dear (and hidden on Summoners) side by side.
+	save.essences.set_amount(Essences.BLUE, 120)
+	for branch: StringName in [&"stats", &"summoners"]:
+		section.show_branch(branch)
+		await wait(0.3)
+		await shot("tree_check_%d_%s_120_blue" % [10 + [&"stats", &"summoners"].find(branch), branch])
+	# Act 2, the passive and 5 ranks: R's first rank and Ghost are free: two pills.
+	save.set_cleared(Journey.all_stage_ids(2))
+	tree.from_dict({"skill_q": 3, "skill_w": 1, "skill_e": 1, "passive": 1})
+	section.show_branch(&"skills")
+	await wait(0.3)
+	await shot("tree_check_12_two_free")
+	section.select(&"skill_r")
+	await wait(0.3)
+	await shot("tree_check_13_r_picked")
 	tree.max_all()
 	for branch: StringName in [&"stats", &"summoners"]:
 		section.show_branch(branch)
 		await wait(0.3)
 		await shot("tree_check_%d_%s_maxed" % [6 + [&"stats", &"summoners"].find(branch), branch])
+
+
+## The tree's motion with motion on (the tool sets it off elsewhere): one
+## purchase (Flash on Summoners after Act 1: Flash lights, light runs up to
+## Flash Upgrade, which unveils) caught at fixed times after Buy, each from
+## the same start; then a branch switch (Stats to Economy), and a reset.
+func scenario_tree_motion() -> void:
+	var save := SaveGame.instance()
+	var tree := save.tree
+	save.set_cleared(Journey.all_stage_ids(1))
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	await mouse_move(Vector2(960, 1060))
+	for ms: int in [0, 60, 120, 200, 400, 700, 1000]:
+		UiMotion.instant = true
+		tree.from_dict({})
+		save.essences.set_amount(Essences.BLUE, 2000)
+		section.show_branch(&"summoners")
+		section.select(&"flash")
+		await wait(0.2)
+		UiMotion.instant = false
+		section.info.cost_bar.pressed.emit()
+		await wait(0.35)
+		section.purchase.buy_button.pressed.emit()
+		var start := Time.get_ticks_msec()
+		if ms > 0:
+			await wait(ms / 1000.0)
+		print("purchase frame at ", Time.get_ticks_msec() - start, " ms (aimed ", ms, ")")
+		await shot("tree_motion_buy_%04d" % ms)
+		await wait(1.2)
+	for ms: int in [0, 40, 80, 120, 200, 300]:
+		UiMotion.instant = true
+		section.show_branch(&"stats")
+		await wait(0.2)
+		UiMotion.instant = false
+		section.tabs.buttons[EvolutionTree.BRANCHES.find(&"economy")].pressed.emit()
+		var start := Time.get_ticks_msec()
+		if ms > 0:
+			await wait(ms / 1000.0)
+		print("switch frame at ", Time.get_ticks_msec() - start, " ms (aimed ", ms, ")")
+		await shot("tree_motion_switch_%04d" % ms)
+		await wait(0.5)
+	for ms: int in [0, 100, 200, 300, 500]:
+		UiMotion.instant = true
+		tree.from_dict({"stat_ad": 3, "stat_ap": 2, "stat_hp": 5, "stat_armor": 1, "stat_mr": 2, "stat_mana": 4})
+		save.essences.set_amount(Essences.PURPLE, 5)
+		section.show_branch(&"stats")
+		await wait(0.2)
+		UiMotion.instant = false
+		section.reset_button.pressed.emit()
+		await wait(0.35)
+		main_screen().confirm.answer(true)
+		var start := Time.get_ticks_msec()
+		if ms > 0:
+			await wait(ms / 1000.0)
+		print("reset frame at ", Time.get_ticks_msec() - start, " ms (aimed ", ms, ")")
+		await shot("tree_motion_reset_%04d" % ms)
+		await wait(0.8)
+	UiMotion.instant = true
+
+
+## Low effects: right after a purchase the page is already at its end state.
+func scenario_tree_low() -> void:
+	var save := SaveGame.instance()
+	save.set_cleared(Journey.all_stage_ids(1))
+	save.essences.set_amount(Essences.BLUE, 2000)
+	GameSettings.instance().set_value(&"quality", "low")
+	UiMotion.instant = false
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	await mouse_move(Vector2(960, 1060))
+	section.show_branch(&"summoners")
+	section.select(&"flash")
+	await wait(0.3)
+	section.info.cost_bar.pressed.emit()
+	await wait(0.1)
+	section.purchase.buy_button.pressed.emit()
+	print("Low effects, right after Buy: page playing (expect false): ", section.pages[&"summoners"].is_playing(),
+		", Flash Upgrade known (expect 1): ", section.views[&"flash_upgrade"].known_t)
+	await shot("tree_low_0_after_buy")
+	UiMotion.instant = true
 
 
 ## The node states. Stats: done (Health 5/5), in progress (Attack Damage 2/5,
@@ -1962,6 +2084,8 @@ func scenario_main_tree_states() -> void:
 	for id: StringName in [&"stat_ad", &"stat_ad", &"stat_hp", &"stat_hp", &"stat_hp", &"stat_hp", &"stat_hp", &"stat_armor",
 			&"skill_q", &"skill_q", &"skill_q", &"skill_w", &"skill_w", &"skill_w", &"passive", &"skill_r", &"equip_slots"]:
 		tree.buy(id, save.essences)
+	# R's first rank needs Act 2 since V1.5: put it in by hand, as the frames want it.
+	tree.from_dict(tree.to_dict().merged({"skill_r": 1}))
 	save.essences.set_amount(Essences.BLUE, 60)
 	main_screen().show_section(MainScreen.SECTION_TREE)
 	var section := tree_section()

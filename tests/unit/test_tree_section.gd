@@ -409,92 +409,81 @@ func test_picking_a_node_shows_its_page_and_a_tab_clears_the_pick() -> void:
 	_tab(&"skills").pressed.emit()
 	assert_eq(section.info.id, &"")
 	assert_false(section.views[&"flash"].selected)
-	assert_eq(section.info.name_label.text, "Skills")
+	assert_eq(section.info.name_label.text, "Clear Act 1", "a new save's Skills waits for Act 1")
 
 
 # --- The info column -------------------------------------------------------------
 
 
-func test_the_info_column_sums_up_the_branch_with_nothing_picked() -> void:
+func test_at_rest_a_new_saves_skills_says_clear_act_1_and_has_no_action() -> void:
 	var info := section.info
-	assert_true(info.visible)
 	assert_eq(info.id, &"")
-	assert_eq(info.name_label.text, "Skills")
-	assert_eq(info.blurb_label.text, TreePage.BLURBS[&"skills"])
-	assert_eq(info.levels_label.text, "Levels bought 0 / 19")
-	assert_eq(info.hint_label.text, "Pick a node")
-	assert_true(info.hint_label.is_visible_in_tree())
-	assert_false(info.cost_bar.visible)
+	assert_eq(info.subject, &"")
+	assert_eq(info.caption_label.text, "NEXT STEP")
+	assert_eq(info.name_label.text, "Clear Act 1")
+	assert_eq(info.value_label.text, "Opens 3 nodes on this branch.")
+	assert_false(info.cost_bar.visible, "no dead button")
+	assert_true(info.waiting.visible)
+	var rules: PackedStringArray = []
+	for row in info.waiting.get_children():
+		rules.append(_texts(row)[0])
+	assert_eq(rules, PackedStringArray(["Requires: Q – Piercing Light, W – Ardent Blaze or E – Relentless Pursuit",
+		"Requires: Passive – Lightslinger and Clear Act 2 and 5 levels in Q + W + E (now 0)"]))
+
+
+func test_at_rest_the_branch_lists_what_its_bought_nodes_give() -> void:
 	_buy(&"stat_ad", 2)
+	_buy(&"stat_hp")
 	_tab(&"stats").pressed.emit()
-	assert_eq(info.name_label.text, "Stats")
-	assert_eq(info.levels_label.text, "Levels bought 2 / 45")
-
-
-## Review r1 D4: the branch's kicker, name and blurb are on the page's art;
-## the panel's resting state leads with the levels bought.
-func test_the_resting_panel_leads_with_the_levels_bought() -> void:
 	var info := section.info
-	for part: CanvasItem in [info.caption_label, info.name_label, info.blurb_label]:
-		assert_false(part.is_visible_in_tree(), "said once, on the art")
-	assert_true(info.levels_label.is_visible_in_tree())
-	assert_eq(info.levels_label.get_theme_font_size(&"font_size"), UiStyle.FONT_LEAD)
+	assert_true(info.gives.visible)
+	var values: PackedStringArray = []
+	for row in info.gives.get_children():
+		if row.visible:
+			values.append(_texts(row)[-1])
+	assert_eq(values, PackedStringArray(["+8 AD", _save().tree.node(&"stat_hp").value_text(1)]))
 	section.select(&"stat_ad")
-	assert_true(info.name_label.is_visible_in_tree(), "a picked node shows its name")
-	assert_false(info.levels_label.is_visible_in_tree())
+	assert_false(info.gives.visible, "a pick shows the node alone")
 
 
-## Review r1 D8: hidden nodes are counted on one dim line, not listed as "???".
-func test_hidden_nodes_are_counted_not_listed() -> void:
+func test_at_rest_the_panel_shows_the_fact_that_chose_its_node() -> void:
 	var info := section.info
+	_tab(&"stats").pressed.emit()
+	assert_eq(info.subject, &"stat_ad", "nothing affordable: the cheapest open level")
+	assert_eq(info.caption_label.text, "SAVING FOR")
+	assert_false(section.views[&"stat_ad"].next, "no gold on what can't be bought")
+	_save().essences.add(Essences.BLUE, 60)
+	assert_eq(info.caption_label.text, "CHEAPEST UPGRADE")
+	assert_true(section.views[&"stat_ad"].next)
+	assert_true(info.cost_bar.visible)
+	assert_eq(info.cost_bar.id, &"stat_ad")
+	_save().set_cleared(Journey.all_stage_ids(1))
 	_tab(&"summoners").pressed.emit()
-	var hidden := 0
-	for node_id: StringName in info.rows:
-		var row: Control = info.rows[node_id]
-		if TreeNodeView.is_hidden(_save().tree, node_id):
-			hidden += 1
-			assert_false(row.visible, "%s has no row on show" % node_id)
-		else:
-			assert_true(row.visible, node_id)
-	assert_gt(hidden, 0)
-	assert_true(info.more_label.is_visible_in_tree())
-	assert_eq(info.more_label.text, "%d more to discover" % hidden)
+	assert_eq(info.subject, &"ghost")
+	assert_eq(info.caption_label.text, "FREE TO CLAIM")
+	assert_eq(info.cost_bar.status.text, "Claim for free")
+
+
+func test_the_rest_action_picks_its_node_then_asks() -> void:
+	_save().essences.add(Essences.BLUE, 60)
 	_tab(&"stats").pressed.emit()
-	assert_false(info.more_label.visible, "every stat is known")
+	section.info.cost_bar.pressed.emit()
+	assert_eq(section.info.id, &"stat_ad", "picked, so the panel stays on it")
+	assert_true(section.views[&"stat_ad"].selected)
+	assert_not_null(section.purchase)
+	section.purchase.buy_button.pressed.emit()
+	assert_eq(_save().tree.level(&"stat_ad"), 1)
+	assert_eq(section.info.subject, &"stat_ad")
 
 
-## Review r1 D7, r2 D2-1: a known node's pane ends with the branch's known
-## nodes as small rows, the open one marked; a hidden node shows the list.
-func test_every_node_pane_lists_the_branch_with_the_open_node_marked() -> void:
+func test_a_finished_branch_lists_what_it_gives() -> void:
+	_save().tree.max_all()
+	_tab(&"economy").pressed.emit()
 	var info := section.info
-	section.select(&"passive")
-	assert_true(info.requires_label.is_visible_in_tree())
-	assert_true(info.rows[&"skill_q"].get_parent().is_visible_in_tree(), "the full list shows under the requirement")
-	assert_false(info.near_rows[&"skill_q"].is_visible_in_tree(), "not the small one")
-	assert_false(info.levels_label.is_visible_in_tree())
-	section.select(&"stat_ad")
-	assert_true(info.near_rows[&"stat_ad"].is_visible_in_tree())
-	var style := info.near_rows[&"stat_ad"].get_theme_stylebox(&"normal") as StyleBoxFlat
-	assert_gt(style.border_color.a, 0.0, "the open node is framed")
-	var other := info.near_rows[&"stat_ap"].get_theme_stylebox(&"normal") as StyleBoxFlat
-	assert_eq(other.border_color.a, 0.0, "the others are not")
-	var picked: Array[StringName] = []
-	info.node_chosen.connect(func(node_id: StringName) -> void: picked.append(node_id))
-	info.near_rows[&"stat_ap"].pressed.emit()
-	assert_eq(picked, [&"stat_ap"] as Array[StringName], "a small row steps to its node")
-
-
-func test_the_info_column_lists_the_branch_and_a_row_picks_its_node() -> void:
-	var info := section.info
-	assert_eq(info.rows.keys(), [&"skill_q", &"skill_w", &"skill_e", &"passive", &"skill_r"])
-	assert_eq(_texts(info.rows[&"skill_q"]), PackedStringArray(["???", ""]), "hidden: no name, no level")
-	_buy(&"stat_ad", 2)
-	_tab(&"stats").pressed.emit()
-	assert_eq(info.rows.size(), 9)
-	assert_eq(_texts(info.rows[&"stat_ad"]), PackedStringArray(["Attack Damage", "2/5"]))
-	info.rows[&"stat_hp"].pressed.emit()
-	assert_eq(info.id, &"stat_hp")
-	assert_true(section.views[&"stat_hp"].selected)
+	assert_eq(info.caption_label.text, "BRANCH COMPLETE")
+	assert_true(info.gives.visible)
+	assert_eq(info.gives.get_child_count(), 5)
+	assert_false(info.cost_bar.visible)
 
 
 func test_picking_a_node_fills_the_info_column() -> void:
@@ -503,43 +492,58 @@ func test_picking_a_node_fills_the_info_column() -> void:
 	var info := section.info
 	assert_eq(info.id, &"stat_ad")
 	assert_eq(info.name_label.text, "Attack Damage")
-	assert_eq(info.caption_label.text, "STATS")
-	assert_eq(info.level_label.text, "LVL 2 / 5")
-	assert_string_contains(info.value_label.text, "+8 AD → +12 AD")
+	assert_eq(info.caption_label.text, "OFFENSE", "its group, not the branch (said once, on the switch)")
+	assert_eq(info.value_label.text, "+8 AD → +12 AD")
 	assert_true(info.cost_bar.visible)
-	assert_false(info.hint_label.is_visible_in_tree())
-	assert_false(info.blurb_label.is_visible_in_tree())
-	assert_false(info.sum_label.visible, "only R has a rank sum")
+	assert_false(info.waiting.visible)
 
 
-func test_a_picked_node_lists_each_level_with_its_value_and_cost() -> void:
+func test_a_picked_node_lists_each_level_and_its_price_once() -> void:
 	_buy(&"stat_ad", 2)
 	section.select(&"stat_ad")
 	var ladder := section.info.ladder
 	assert_eq(ladder.get_child_count(), 5)
-	assert_eq(_texts(ladder.get_child(0)), PackedStringArray(["Lv 1", "+4 AD", "50", ""]))
-	assert_eq(_texts(ladder.get_child(3)), PackedStringArray(["Lv 4", "+16 AD", "350", "3"]))
+	var row := func(i: int) -> PackedStringArray:
+		var shown: PackedStringArray = []
+		for label in [ladder.get_child(i).get_node(^"Line/Level"), ladder.get_child(i).get_node(^"Line/Value")]:
+			shown.append(label.text)
+		var tag: Label = ladder.get_child(i).get_node(^"Line/Next")
+		if tag.visible:
+			shown.append(tag.text)
+		var price: Control = ladder.get_child(i).get_node(^"Line/Price")
+		if price.visible:
+			shown.append_array(_texts(price))
+		return shown
+	assert_eq(row.call(0), PackedStringArray(["Lv 1", "+4 AD", "50"]))
+	assert_eq(row.call(2), PackedStringArray(["Lv 3", "+12 AD", "Next"]), "its price is on the action")
+	assert_eq(row.call(3), PackedStringArray(["Lv 4", "+16 AD", "350", "3"]))
 	assert_eq((ladder.get_child(0).get_node(^"Line/Value") as Label).get_theme_color(&"font_color"), UiStyle.TITLE_COLOR, "bought")
 	assert_eq((ladder.get_child(2).get_node(^"Line/Value") as Label).get_theme_color(&"font_color"), UiStyle.TEXT_COLOR, "next")
 	assert_eq((ladder.get_child(4).get_node(^"Line/Value") as Label).get_theme_color(&"font_color"), UiStyle.DIM_COLOR, "later")
+	assert_eq(section.info.cost_bar.amount_label(Essences.BLUE).text, "200")
 	section.select(&"backpack_slots")
 	assert_eq(ladder.get_child_count(), 7)
-	assert_eq(_texts(ladder.get_child(6)), PackedStringArray(["Lv 7", "54 backpack slots", "2000", "12"]))
+	assert_true(section.info.preview.visible, "the cells' preview")
+	assert_eq(section.info.preview_label.text, "5 of 54 cells open")
 
 
-func test_r_shows_its_q_w_e_ranks() -> void:
-	# R is hidden (and shows no sum) until it opens: Act 2, the passive and 5 ranks.
+func test_the_backpack_previews_go_with_their_nodes() -> void:
+	section.select(&"equip_slots")
+	assert_eq(section.info.preview_label.text, "1 of 6 slots open")
+	section.select(&"boots")
+	assert_eq(section.info.preview_label.text, "No boots yet")
+	_buy(&"boots")
+	assert_eq(section.info.preview_label.text, "Wearing Boots of Speed")
+	section.select(&"stat_ad")
+	assert_false(section.info.preview.visible)
+
+
+func test_r_says_what_its_next_rank_needs() -> void:
 	_save().tree.acts_cleared = 2
-	_save().tree.from_dict({"skill_q": 3, "skill_w": 2, "passive": 1})
-	section.select(&"skill_r")
-	var info := section.info
-	assert_true(info.sum_label.visible)
-	assert_eq(info.sum_label.text, "Q + W + E ranks: 5 / 5")
 	_save().tree.from_dict({"skill_q": 3, "skill_w": 2, "skill_e": 2, "passive": 1, "skill_r": 1})
-	assert_eq(info.sum_label.text, "Q + W + E ranks: 7 / 9")
-	assert_eq(info.requires_label.text, "Requires: 9 levels in Q + W + E (now 7)")
-	_save().tree.max_all()
-	assert_eq(info.sum_label.text, "Q + W + E ranks: 15")
+	section.select(&"skill_r")
+	assert_eq(section.info.requires_label.text, "Requires: 9 levels in Q + W + E (now 7)")
+	assert_eq(section.info.cost_bar.status.text, "Locked")
 
 
 func test_the_info_column_is_opaque() -> void:
@@ -556,7 +560,7 @@ func test_buying_q_with_the_cost_bar() -> void:
 	assert_eq(_save().tree.level(&"skill_q"), 1)
 	assert_eq(_state(&"skill_q"), &"bought")
 	assert_true(_state(&"passive") in [&"poor", &"open"], str(_state(&"passive")))
-	assert_eq(section.info.level_label.text, "LVL 1 / 5")
+	assert_eq(section.info.value_label.text, "Rank 1 → Rank 2")
 	assert_eq(_save().essences.amount(Essences.BLUE), 900)
 
 
@@ -579,24 +583,23 @@ func test_a_maxed_node_shows_only_its_value_in_green() -> void:
 	_buy(&"stat_ad", 5)
 	section.select(&"stat_ad")
 	assert_eq(section.info.value_label.text, "+20 AD")
-	assert_eq(section.info.value_label.get_theme_color(&"font_color"), TreeNodeView.MAXED_COLOR)
+	assert_eq(section.info.value_label.get_theme_color(&"font_color"), UiStyle.GOOD_COLOR)
 
 
-func test_the_cost_bar_shows_owned_against_cost_red_when_short() -> void:
+func test_the_action_shows_the_price_once_red_when_short() -> void:
 	_save().essences.add(Essences.BLUE, 30)
 	section.select(&"stat_ad")
 	var bar := section.info.cost_bar
-	assert_eq(bar.amount_label(Essences.BLUE).text, "30 / 50")
+	assert_eq(bar.amount_label(Essences.BLUE).text, "50", "the price, not owned / cost")
 	assert_eq(bar.amount_label(Essences.BLUE).get_theme_color(&"font_color"), UiStyle.ERROR_COLOR)
 	assert_false(bar.amount_label(Essences.ORANGE).get_parent().visible, "no orange needed")
 	assert_almost_eq(bar.fill(), 0.6, 0.001)
 	assert_true(bar.disabled)
-	assert_false(bar.verb.visible, "short: the red amount is the message")
 	assert_false(bar.buy())
 	_save().essences.add(Essences.BLUE, 20)
-	assert_true(bar.verb.visible, "Buy leads once it can be bought")
+	assert_false(bar.disabled)
 	assert_eq(bar.verb.text, "Buy")
-	assert_eq(bar.amount_label(Essences.BLUE).text, "50 / 50")
+	assert_eq(bar.amount_label(Essences.BLUE).get_theme_color(&"font_color"), UiStyle.TEXT_COLOR)
 
 
 func test_the_fill_is_the_smallest_share_over_the_kinds_needed() -> void:
@@ -605,9 +608,10 @@ func test_the_fill_is_the_smallest_share_over_the_kinds_needed() -> void:
 	_save().essences.set_amount(Essences.ORANGE, 1)
 	section.select(&"stat_ad")
 	var bar := section.info.cost_bar
-	assert_eq(bar.amount_label(Essences.BLUE).text, "350 / 350")
+	assert_eq(bar.amount_label(Essences.BLUE).text, "350")
 	assert_eq(bar.amount_label(Essences.BLUE).get_theme_color(&"font_color"), UiStyle.TEXT_COLOR)
-	assert_eq(bar.amount_label(Essences.ORANGE).text, "1 / 3")
+	assert_eq(bar.amount_label(Essences.ORANGE).text, "3")
+	assert_eq(bar.amount_label(Essences.ORANGE).get_theme_color(&"font_color"), UiStyle.ERROR_COLOR)
 	assert_almost_eq(bar.fill(), 1.0 / 3.0, 0.001)
 
 
@@ -615,7 +619,7 @@ func test_e_after_act_one_is_free() -> void:
 	_save().tree.acts_cleared = 1
 	section.select(&"skill_e")
 	var bar := section.info.cost_bar
-	assert_eq(bar.status.text, "Free")
+	assert_eq(bar.status.text, "Claim for free")
 	assert_false(bar.disabled)
 	assert_almost_eq(bar.fill(), 1.0, 0.001)
 	assert_true(bar.buy())
@@ -652,7 +656,7 @@ func test_buy_buys_one_level_and_closes_the_question() -> void:
 	assert_null(section.purchase, "the question closes")
 	assert_eq(_save().tree.level(&"skill_q"), 1)
 	assert_eq(_save().essences.amount(Essences.BLUE), 900)
-	assert_eq(section.info.level_label.text, "LVL 1 / 5")
+	assert_eq(section.info.value_label.text, "Rank 1 → Rank 2")
 	assert_false(_save().slot_exists(1), "no file written")
 
 
@@ -747,9 +751,9 @@ func test_the_question_s_buttons_are_clear_of_the_cost_bar() -> void:
 			"a double-click's second click can't land on %s" % button.text)
 
 
-func test_a_hidden_node_reads_unknown_locked_and_its_requirements() -> void:
+func test_a_hidden_node_reads_hidden_locked_and_its_requirements() -> void:
 	section.select(&"passive")
-	assert_eq(section.info.name_label.text, "???")
+	assert_eq(section.info.name_label.text, "Hidden node")
 	assert_true(section.info.requires_label.visible)
 	assert_eq(section.info.requires_label.text, "Requires: Q – Piercing Light, W – Ardent Blaze or E – Relentless Pursuit")
 	assert_eq(section.info.cost_bar.status.text, "Locked")
@@ -763,33 +767,52 @@ func test_a_hidden_node_reads_unknown_locked_and_its_requirements() -> void:
 func test_a_hidden_node_shows_no_value_description_or_ladder() -> void:
 	section.select(&"passive")
 	var info := section.info
-	assert_eq(info.name_label.text, "???")
-	assert_eq(info.value_label.text, "")
-	assert_eq(info.description.text, "")
-	assert_false(info.sum_label.visible)
-	assert_eq(info.ladder.get_child_count(), 0, "no ladder rows")
+	assert_false(info.value_label.visible)
+	assert_false(info.description.visible)
+	assert_false(info.ladder.visible, "no ladder")
+	assert_true(info.note_label.visible)
 	assert_true(info.requires_label.visible, "the requirement still shows")
 	section.select(&"stat_ad")
-	assert_gt(info.ladder.get_child_count(), 0, "a visible node has its ladder")
+	assert_true(info.ladder.visible)
 	assert_ne(info.description.text, "")
 
 
-## The info column's content must fit its panel for every branch and every node.
-func test_the_info_column_fits_its_panel_for_every_branch_and_node() -> void:
-	await wait_process_frames(2)
-	var limit := TreeSection.PANEL_RECT.size.y
-	for state in ["fresh", "max"]:
-		if state == "max":
+## The info column's content ends 16 above the action's rule, and the action
+## stays in its one place, for every node and rest state, in both languages.
+func _check_panel_fits(language: String) -> void:
+	Lang.use(language)
+	var info := section.info
+	var foot := info.cost_bar.position
+	for state in ["fresh", "money", "max"]:
+		if state == "money":
+			_save().set_cleared(Journey.all_stage_ids(2))
+			_save().essences.add(Essences.BLUE, 300)
+		elif state == "max":
 			_save().tree.max_all()
-			section.refresh()
+		section.refresh()
 		for branch: StringName in EvolutionTree.BRANCHES:
 			section.show_branch(branch)
 			await wait_process_frames(2)
-			assert_lte(section.info.get_combined_minimum_size().y, limit, "%s %s" % [state, branch])
+			assert_lte(info.content_bottom(), info.action_top() - 16.0, "%s %s %s" % [language, state, branch])
+			assert_lte(info._column.get_combined_minimum_size().x, JourneyPanel.CONTENT_WIDTH, "%s %s %s: not wider" % [language, state, branch])
 		for data in EvolutionTree.new().nodes():
 			section.select(data.id)
 			await wait_process_frames(2)
-			assert_lte(section.info.get_combined_minimum_size().y, limit, "%s %s" % [state, data.id])
+			assert_lte(info.content_bottom(), info.action_top() - 16.0, "%s %s %s" % [language, state, data.id])
+			assert_eq(info.cost_bar.position, foot, "the action never moves")
+			assert_lte(info._column.get_combined_minimum_size().x, JourneyPanel.CONTENT_WIDTH, "%s %s: not wider" % [language, data.id])
+	_save().tree.clear()
+	Lang.use(Lang.ENGLISH)
+
+
+func test_the_info_column_fits_its_panel_in_english() -> void:
+	await wait_process_frames(2)
+	await _check_panel_fits(Lang.ENGLISH)
+
+
+func test_the_info_column_fits_its_panel_in_vietnamese() -> void:
+	await wait_process_frames(2)
+	await _check_panel_fits(Lang.VIETNAMESE)
 
 
 func test_requirement_lines_for_all_any_two_and_an_act() -> void:
@@ -816,7 +839,7 @@ func test_escape_clears_the_pick() -> void:
 	assert_true(section.close_popup())
 	assert_eq(section.info.id, &"")
 	assert_true(section.info.visible, "the column stays")
-	assert_eq(section.info.name_label.text, "Skills")
+	assert_eq(section.info.name_label.text, "Clear Act 1")
 	assert_false(section.views[&"skill_q"].selected)
 	assert_false(section.close_popup())
 
@@ -848,7 +871,7 @@ func test_reset_asks_first_and_yes_refunds_every_node() -> void:
 	for data in _save().tree.nodes():
 		assert_eq(_save().tree.level(data.id), 0, str(data.id))
 	assert_eq(_state(&"skill_q"), &"open")
-	assert_eq(section.info.level_label.text, "LVL 0 / 5")
+	assert_eq(section.info.value_label.text, "None → +4 AD", "the pick (Attack Damage) stays, at level 0")
 	assert_eq(section.tabs.counts[1].text, "0/45")
 	assert_true(section.reset_button.disabled)
 
@@ -957,7 +980,7 @@ func test_after_act_2_r_shows_free_once_its_ranks_and_passive_are_there() -> voi
 	assert_eq(_free_nodes(), [&"skill_r"] as Array[StringName])
 	assert_eq(_free_tabs(), [&"skills"] as Array[StringName])
 	section.select(&"skill_r")
-	assert_eq(section.info.cost_bar.status.text, "Free")
+	assert_eq(section.info.cost_bar.status.text, "Claim for free")
 	assert_true(section.info.cost_bar.buy())
 	assert_eq(_save().tree.level(&"skill_r"), 1)
 	assert_eq(_free_nodes().size(), 0)
@@ -1077,35 +1100,58 @@ func test_a_forge_is_kept_by_the_next_save_and_writes_no_file_itself() -> void:
 	assert_eq(_save().essences.amount(Essences.BLUE), 120)
 
 
-## Review r1 D7: the bigger ladder rows still fit: no node's panel is wider
-## or taller than the column (the cost bar stays on the panel's foot).
-func test_every_node_fits_the_info_column() -> void:
-	_save().tree.max_all()
-	var room := section.info.size - Vector2.ONE * JourneyPanel.PAD * 2.0
-	for branch_id: StringName in EvolutionTree.BRANCHES:
-		for data in _save().tree.branch_nodes(branch_id):
-			section.select(data.id)
-			# Wrapped labels know their height once laid out.
-			await wait_process_frames(2)
-			var need := section.info._column.get_combined_minimum_size()
-			assert_lte(need.x, JourneyPanel.CONTENT_WIDTH, "%s: not wider than the panel" % data.id)
-			assert_lte(need.y, room.y, "%s: not taller than the panel" % data.id)
+# --- Motion ----------------------------------------------------------------------------
 
 
-## Review r3 D3-1: the neighbour list is two columns while every name fits one,
-## else a single column of shorter rows.
-func test_the_node_list_goes_to_one_column_when_a_name_would_clip() -> void:
-	_save().tree.max_all()
-	var original := Lang.code()
-	section.select(&"stat_ad")
-	await wait_process_frames(2)
-	assert_eq(section.info._near.columns, 2, "English names fit two columns")
-	Lang.use("vi")
-	section.select(&"stat_armor")
-	section.select(&"stat_ad")
-	await wait_process_frames(2)
-	var clipped := section.info._near.columns
-	var row_height: float = section.info.near_rows[&"stat_ad"].custom_minimum_size.y
-	Lang.use(original)
-	assert_eq(clipped, 1, "a Vietnamese name would clip, so one column")
-	assert_eq(row_height, NodeInfoPanel.NEAR_ROW_TIGHT)
+func test_with_motion_off_a_purchase_reaches_its_end_state_at_once() -> void:
+	_save().set_cleared(Journey.all_stage_ids(1))
+	_buy(&"flash")
+	var upgrade: TreeNodeView = section.views[&"flash_upgrade"]
+	assert_eq(upgrade.known_t, 1.0, "opened at once")
+	assert_eq(section.views[&"flash"].light_t, 1.0)
+	assert_eq(section.pages[&"summoners"]._link_fill["flash>flash_upgrade"], 1.0)
+	assert_false(section.pages[&"summoners"].is_playing())
+
+
+func test_a_purchase_plays_in_order_and_a_second_one_retargets() -> void:
+	var renders := UiMotion.renders
+	UiMotion.renders = true
+	_save().set_cleared(Journey.all_stage_ids(1))
+	section.show_branch(&"summoners")
+	var page: TreePage = section.pages[&"summoners"]
+	var flash: TreeNodeView = section.views[&"flash"]
+	var upgrade: TreeNodeView = section.views[&"flash_upgrade"]
+	_buy(&"flash")
+	assert_true(page.is_playing())
+	assert_lt(flash.light_t, 1.0, "the light eases in")
+	assert_eq(upgrade.known_t, 0.0, "it unveils after the light arrives")
+	await wait_seconds(TreePage.LINK_START + TreePage.LINK_TIME * 0.5)
+	assert_eq(flash.light_t, 1.0)
+	assert_eq(upgrade.known_t, 0.0, "the light is still on its way")
+	# A second purchase mid-play: the upgrade's first level.
+	_buy(&"flash_upgrade")
+	await wait_seconds(1.0)
+	UiMotion.renders = renders
+	assert_false(page.is_playing(), "everything holds still")
+	assert_eq(upgrade.known_t, 1.0)
+	assert_eq(upgrade.light_t, 1.0, "no half-lit end state")
+	assert_eq(upgrade.pips_t, 1.0)
+
+
+func test_a_reset_plays_one_stagger_inside_half_a_second() -> void:
+	var renders := UiMotion.renders
+	UiMotion.renders = true
+	_buy(&"stat_ad", 3)
+	_buy(&"stat_hp", 5)
+	_buy(&"stat_mana", 2)
+	section.show_branch(&"stats")
+	_save().essences.add(Essences.PURPLE, EvolutionTree.RESET_COST)
+	section.reset_button.pressed.emit()
+	confirm.answer(true)
+	var page: TreePage = section.pages[&"stats"]
+	assert_true(page.is_playing())
+	await wait_seconds(TreeSection.POPUP_GONE + 0.5)
+	UiMotion.renders = renders
+	assert_false(page.is_playing(), "done within 0.5 s of the question leaving")
+	for id: StringName in page.views:
+		assert_eq(page.views[id].light_t, 0.0, str(id))
