@@ -141,11 +141,28 @@ func disable(note: String) -> void:
 	disabled = true
 	_refresh_lit()
 	set_meta(&"hover_text", note)
+	# The note opens beside the card, never over the rows under this one.
+	set_meta(&"hover_place", HoverTip.Place.BESIDE)
 
 
 func enable() -> void:
 	disabled = false
 	remove_meta(&"hover_text")
+	remove_meta(&"hover_place")
+
+
+## Where a BESIDE note measures from (HoverTip): this row's height across the
+## whole card, so the note opens right of the card.
+func tooltip_anchor() -> Rect2:
+	var rect := get_global_rect()
+	var card: Node = get_parent()
+	while card != null and not card is MenuCard:
+		card = card.get_parent()
+	if card != null:
+		var card_rect := (card as MenuCard).get_global_rect()
+		rect.position.x = card_rect.position.x
+		rect.size.x = card_rect.size.x
+	return rect
 
 
 func _style() -> void:

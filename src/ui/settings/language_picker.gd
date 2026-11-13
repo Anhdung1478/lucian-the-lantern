@@ -2,8 +2,9 @@ class_name LanguagePicker
 extends HBoxContainer
 ## The languages as a row of small buttons, each named in its own language
 ## and never translated, so a player who can't read the one in use still
-## finds theirs. The one in use is lit gold. A click sets the "language"
-## setting; the Game then builds the screen again in it.
+## finds theirs. The one in use is lit gold, on a fill that slides to the next
+## choice (SlideHighlight). A click sets the "language" setting; the Game then
+## builds the screen again in it.
 
 const BUTTON_SIZE := Vector2(132, 40)
 const FONT := 18
@@ -12,6 +13,8 @@ const GAP := 8
 var settings: GameSettings
 ## Language code -> its button.
 var buttons := {}
+
+var _highlight: SlideHighlight
 
 
 func _init(game_settings: GameSettings = null) -> void:
@@ -32,8 +35,12 @@ func _ready() -> void:
 		button.pressed.connect(choose.bind(code))
 		add_child(button)
 		buttons[code] = button
+	_highlight = SlideHighlight.under(self)
+	for code: String in buttons:
+		UiStyle.style_button(buttons[code], FONT)
+		SlideHighlight.clear_rest(buttons[code])
 	settings.changed.connect(_on_changed)
-	_light()
+	_light(true)
 
 
 ## Sets the language; choosing the one in use does nothing.
@@ -47,6 +54,9 @@ func _on_changed(key: StringName) -> void:
 		_light()
 
 
-func _light() -> void:
+func _light(instant := false) -> void:
 	for code: String in buttons:
-		UiStyle.style_button(buttons[code], FONT, settings.get_value(&"language") == code)
+		var chosen: bool = settings.get_value(&"language") == code
+		UiStyle.set_selected(buttons[code], chosen, false)
+		if chosen:
+			_highlight.follow(buttons[code], instant)

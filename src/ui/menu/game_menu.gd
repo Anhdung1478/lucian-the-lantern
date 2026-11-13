@@ -5,7 +5,9 @@ extends CanvasLayer
 ## Exit the game. The last two only emit; under the game root they ask first
 ## (Leave / Cancel, Yes / No / Cancel), and Cancel comes back to this menu,
 ## still paused. The ScreenSwitcher passes it the arrow keys and Enter
-## (`keys`); nothing is lit each time it opens.
+## (`keys`); nothing is lit each time it opens. open() and close() flip
+## is_open() at once; the card and the dim fade (UiMotion overlay), so `visible`
+## trails by a moment while it closes.
 
 signal resume_requested
 signal settings_requested
@@ -24,6 +26,9 @@ var card := MenuCard.new(Lang.t("MENU"))
 var keys := MenuKeys.new()
 
 var _leave: MenuEntry
+var _backdrop: MenuBackdrop
+var _center: CenterContainer
+var _is_open := false
 
 
 func _ready() -> void:
@@ -46,13 +51,36 @@ func set_leave_enabled(enabled: bool) -> void:
 		_leave.disable(Lang.t(NOT_AVAILABLE))
 
 
+## True from open() to close(), whatever the look is doing.
+func is_open() -> bool:
+	return _is_open
+
+
+## Shows the menu: the dim fades in, the card rises in.
+func open() -> void:
+	if _is_open:
+		return
+	_is_open = true
+	visible = true
+	UiMotion.open_overlay(_backdrop, _center)
+
+
+## Hides the menu: the card and the dim fade out, then the layer is hidden.
+func close() -> void:
+	if not _is_open:
+		return
+	_is_open = false
+	keys.clear()
+	UiMotion.close_overlay(_backdrop, _center, func() -> void: visible = false)
+
+
 func _build() -> void:
-	var backdrop := MenuBackdrop.new()
-	add_child(backdrop)
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	backdrop.add_child(center)
-	center.add_child(card)
+	_backdrop = MenuBackdrop.new()
+	add_child(_backdrop)
+	_center = CenterContainer.new()
+	_center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_backdrop.add_child(_center)
+	_center.add_child(card)
 	_entry(Lang.t("Resume"), RESUME_ICON, MenuEntry.Kind.PRIMARY, "", resume_requested.emit)
 	_entry(Lang.t("Settings"), SETTINGS_ICON, MenuEntry.Kind.NORMAL, Lang.t(SETTINGS_HINT), settings_requested.emit)
 	_leave = _entry(Lang.t("Leave this stage"), LEAVE_ICON, MenuEntry.Kind.DANGER, "", leave_requested.emit)

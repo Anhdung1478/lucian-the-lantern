@@ -32,7 +32,7 @@ func _input(event: InputEvent) -> void:
 	if locked:
 		return
 	# The settings screen reads its own keys (ESC goes back to the menu).
-	if settings.visible:
+	if settings.is_open():
 		return
 	if event.is_action_pressed(&"open_menu"):
 		# ESC closes the backpack or shop first; the menu only opens over the game.
@@ -41,17 +41,20 @@ func _input(event: InputEvent) -> void:
 		elif backpack.visible:
 			set_backpack_open(false)
 		else:
-			set_menu_open(not menu.visible)
+			set_menu_open(not menu.is_open())
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed(&"open_backpack") and not menu.visible:
+	elif event.is_action_pressed(&"open_backpack") and not menu.is_open():
 		set_backpack_open(not backpack.visible)
 		get_viewport().set_input_as_handled()
-	elif menu.visible and menu.keys.handle(event):
+	elif menu.is_open() and menu.keys.handle(event):
 		get_viewport().set_input_as_handled()
 
 
 func set_menu_open(open: bool) -> void:
-	menu.visible = open
+	if open:
+		menu.open()
+	else:
+		menu.close()
 	_update_pause()
 
 
@@ -61,7 +64,11 @@ func set_settings_open(open: bool) -> void:
 		settings.open()
 	else:
 		settings.close()
-	menu.visible = not open
+	# The menu gives way to the settings and comes back once they are over.
+	if open:
+		menu.close()
+	else:
+		menu.open()
 	_update_pause()
 
 
@@ -76,7 +83,7 @@ func set_backpack_open(open: bool) -> void:
 
 ## Opens the merchant's shop beside the backpack. Not over the menu.
 func open_shop(shop: Shop) -> void:
-	if menu.visible:
+	if menu.is_open():
 		return
 	backpack.open_shop(shop)
 	_update_pause()
@@ -88,4 +95,4 @@ func is_shopping() -> bool:
 
 
 func _update_pause() -> void:
-	get_tree().paused = menu.visible or backpack.visible or settings.visible
+	get_tree().paused = menu.is_open() or backpack.visible or settings.is_open()

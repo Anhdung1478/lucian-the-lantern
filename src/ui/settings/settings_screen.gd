@@ -10,7 +10,10 @@ extends CanvasLayer
 ##
 ## The look: a lantern emblem on the panel's top edge over "SETTINGS" and a
 ## gold rule; a rail of icon tabs on the left, the open one lit gold with an
-## accent bar; each page's rows are cards that brighten on hover.
+## accent bar that slides to the next (SlideHighlight); each page's rows are
+## fills that rise on hover. It opens and closes as an overlay over the blurred
+## screen (UiMotion): is_open() flips at once, `visible` trails while it fades.
+## A tab swap keeps the card, rail and Back still and swaps only the page.
 ## UiStyle.theme() dresses the sliders, dropdowns, switches and scroll bar.
 ##
 ## Rebinding: click a binding, then press a key, or click the same binding
@@ -45,7 +48,7 @@ const TAB_ICONS := [
 ]
 const RAIL_WIDTH := 240.0
 const TAB_HEIGHT := 60.0
-const TAB_FONT := 20
+const TAB_FONT := UiStyle.FONT_ROW
 const TAB_ICON := 32
 ## The open tab's gold bar along its left edge.
 const ACCENT_WIDTH := 4
@@ -90,6 +93,12 @@ var language_locked := false
 var tab := 0
 
 var _panel: PanelContainer
+var _backdrop: MenuBackdrop
+var _center: CenterContainer
+## True from open() to close(), whatever the look is doing.
+var _is_open := false
+## The gold bar and fill behind the open tab.
+var _rail_highlight: SlideHighlight
 var _tab_buttons: Array[Button] = []
 var _pages: Array[Control] = []
 var _bind_buttons := {}
@@ -120,22 +129,40 @@ func setup(game_settings: GameSettings) -> void:
 
 
 func open(at := 0) -> void:
-	visible = true
+	_is_open = true
 	_stop_listening()
-	show_tab(at)
+	show_tab(at, true)
+	visible = true
+	UiMotion.open_overlay(_backdrop, _center)
 
 
 func close() -> void:
 	_stop_listening()
 	_end_drag()
-	visible = false
+	if not _is_open:
+		return
+	_is_open = false
+	UiMotion.close_overlay(_backdrop, _center, func() -> void: visible = false)
 
 
-func show_tab(index: int) -> void:
+## True from open() to close(), whatever the look is doing.
+func is_open() -> bool:
+	return _is_open
+
+
+## Shows page `index`: the old page fades out and the new one rises in (`instant`:
+## at once, as open() does); the accent bar slides to the tab.
+func show_tab(index: int, instant := false) -> void:
+	var from := tab
 	tab = index
-	for i in _pages.size():
-		_pages[i].visible = i == tab
-		_style_tab(_tab_buttons[i], i == tab)
+	if instant:
+		for i in _pages.size():
+			_pages[i].visible = i == tab
+	else:
+		UiMotion.swap_body(_pages[from], _pages[tab])
+	for i in _tab_buttons.size():
+		_light_tab(_tab_buttons[i], i == tab)
+	_rail_highlight.follow(_tab_buttons[tab], instant)
 
 
 func is_listening() -> bool:
@@ -149,14 +176,14 @@ func listen(action: StringName) -> void:
 	_stop_listening()
 	_listening = action
 	var button: Button = _bind_buttons[action]
-	button.text = Lang.t("Press a key...")
 	UiStyle.style_button(button, BIND_FONT, true)
+	_set_bind_text(button, Lang.t("Press a key..."))
 	# The click that started listening must not bind itself.
 	_listen_frame = Engine.get_process_frames()
 
 
 func _input(event: InputEvent) -> void:
-	if not visible:
+	if not _is_open:
 		return
 	if is_listening():
 		var key := event as InputEventKey
@@ -218,8 +245,36 @@ func _on_changed(key: StringName) -> void:
 
 func _refresh_bindings() -> void:
 	for action: StringName in _bind_buttons:
-		_bind_buttons[action].text = settings.key_label(action)
 		UiStyle.style_button(_bind_buttons[action], BIND_FONT)
+		_set_bind_text(_bind_buttons[action], settings.key_label(action))
+
+
+## Sets a binding button's text; in motion the old text fades out and the new
+## one fades in over the same slot (the button keeps its width).
+func _set_bind_text(button: Button, text: String) -> void:
+	var old := button.text
+	button.text = text
+	if old == text or old == "" or UiMotion.off() or not button.is_inside_tree():
+		return
+	var ghost := UiStyle.label(old, BIND_FONT, UiStyle.TEXT_COLOR)
+	ghost.set_anchors_preset(Control.PRESET_FULL_RECT)
+	ghost.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ghost.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(ghost)
+	var out := UiMotion.tween(ghost)
+	out.tween_property(ghost, ^"modulate:a", 0.0, UiMotion.FAST)
+	out.tween_callback(ghost.queue_free)
+	var colors := {}
+	for state: StringName in [&"font_color", &"font_hover_color"]:
+		colors[state] = button.get_theme_color(state)
+	var fade_in := UiMotion.tween(button)
+	fade_in.tween_method(func(alpha: float) -> void:
+		for state: StringName in colors:
+			button.add_theme_color_override(state, Color(colors[state], alpha)), 0.0, 1.0, UiMotion.FAST)
+	fade_in.tween_callback(func() -> void:
+		for state: StringName in colors:
+			button.add_theme_color_override(state, colors[state]))
 
 
 func _cast_mode_picker(action: StringName) -> OptionButton:
@@ -241,18 +296,16 @@ func _attack_move_mode_picker() -> OptionButton:
 
 
 func _build() -> void:
-	var backdrop := ColorRect.new()
-	backdrop.color = Color(0, 0, 0, 0.55)
-	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(backdrop)
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	backdrop.add_child(center)
+	_backdrop = MenuBackdrop.new()
+	add_child(_backdrop)
+	_center = CenterContainer.new()
+	_center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_backdrop.add_child(_center)
 	_panel = PanelContainer.new()
 	_panel.custom_minimum_size = PANEL_SIZE
 	_panel.add_theme_stylebox_override(&"panel", UiStyle.panel(Color(UiStyle.PANEL_COLOR, 1.0), UiStyle.BORDER_COLOR, 2, 0.0))
 	_panel.theme = UiStyle.theme()
-	center.add_child(_panel)
+	_center.add_child(_panel)
 	var decor := Control.new()
 	decor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	decor.draw.connect(_draw_emblem.bind(decor))
@@ -324,6 +377,7 @@ func _rail() -> Control:
 	var tabs := VBoxContainer.new()
 	tabs.add_theme_constant_override(&"separation", 6)
 	rail.add_child(tabs)
+	_rail_highlight = SlideHighlight.under(tabs, _tab_lit_box())
 	for i in TAB_NAMES.size():
 		var button := Button.new()
 		button.text = Lang.t(TAB_NAMES[i])
@@ -332,24 +386,34 @@ func _rail() -> Control:
 		button.custom_minimum_size.y = TAB_HEIGHT
 		button.add_theme_constant_override(&"icon_max_width", TAB_ICON)
 		button.add_theme_constant_override(&"h_separation", 14)
+		_prepare_tab(button)
 		button.pressed.connect(show_tab.bind(i))
 		tabs.add_child(button)
 		_tab_buttons.append(button)
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	tabs.add_child(spacer)
-	var note := UiStyle.label(Lang.t("Every change applies at once and is saved."), NOTE_FONT, UiStyle.DIM_COLOR)
-	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var note := UiStyle.note(Lang.t("Every change applies at once and is saved."), UiStyle.DIM_COLOR, RAIL_WIDTH - 24.0)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	note.custom_minimum_size.x = RAIL_WIDTH - 24.0
 	tabs.add_child(note)
 	return rail
 
 
-## The button look with the rail's shape: the open tab is lit gold with a gold
-## bar on its left edge, the others are bare until hovered.
-func _style_tab(button: Button, lit: bool) -> void:
-	UiStyle.style_button(button, TAB_FONT, lit)
+## The gold fill and bar behind the open tab (SlideHighlight paints it).
+func _tab_lit_box() -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = Color(UiStyle.GOLD_COLOR, 0.14)
+	box.border_color = UiStyle.GOLD_COLOR
+	box.border_width_left = ACCENT_WIDTH
+	box.corner_radius_top_right = 6
+	box.corner_radius_bottom_right = 6
+	return box
+
+
+## The button look with the rail's shape, at rest and clear: the highlight
+## shows through it. Hovered, a tab gets a faint fill and a dim bar.
+func _prepare_tab(button: Button) -> void:
+	UiStyle.style_button(button, TAB_FONT)
 	for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
 		var style := button.get_theme_stylebox(state) as StyleBoxFlat
 		var hover := state == &"hover" or state == &"pressed"
@@ -359,16 +423,17 @@ func _style_tab(button: Button, lit: bool) -> void:
 		style.corner_radius_top_right = 6
 		style.corner_radius_bottom_right = 6
 		style.content_margin_left = 18.0
-		if lit:
-			style.bg_color = Color(UiStyle.GOLD_COLOR, 0.14)
-			style.border_color = UiStyle.GOLD_COLOR
-		else:
-			style.bg_color = Color(1, 1, 1, 0.05 if hover else 0.0)
-			style.border_color = Color(UiStyle.BORDER_COLOR, 0.45 if hover else 0.0)
-	var icon_tint := Color.WHITE if lit else Color(1, 1, 1, 0.65)
-	button.add_theme_color_override(&"icon_normal_color", icon_tint)
+		style.bg_color = Color(1, 1, 1, 0.05 if hover else 0.0)
+		style.border_color = Color(UiStyle.BORDER_COLOR, 0.45 if hover else 0.0)
+	SlideHighlight.clear_rest(button)
 	button.add_theme_color_override(&"icon_hover_color", Color.WHITE)
 	button.add_theme_color_override(&"icon_pressed_color", Color.WHITE)
+
+
+## The open tab's text and icon light up; the others are dim.
+func _light_tab(button: Button, lit: bool) -> void:
+	UiStyle.set_selected(button, lit, false)
+	button.add_theme_color_override(&"icon_normal_color", Color.WHITE if lit else Color(1, 1, 1, 0.65))
 
 
 ## The lantern medallion on the panel's top edge, its glow spilling down.
@@ -470,7 +535,7 @@ func _build_controls() -> Control:
 			gap.custom_minimum_size.x = CAST_WIDTH
 			row.add(gap)
 	_refresh_bindings()
-	var hint := UiStyle.label(Lang.t(CONTROLS_HINT), NOTE_FONT, UiStyle.DIM_COLOR)
+	var hint := UiStyle.note(Lang.t(CONTROLS_HINT))
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	page.add_child(hint)
 	return page

@@ -85,9 +85,10 @@ func test_show_tab_shows_one_page_and_lights_its_tab() -> void:
 	for tab in 4:
 		screen.show_tab(tab)
 		assert_eq(_visible_pages(), [tab] as Array[int])
+		assert_eq(screen._rail_highlight.target, screen._tab_buttons[tab], "the gold bar sits on the open tab")
 		for i in 4:
-			var style := screen._tab_buttons[i].get_theme_stylebox(&"normal") as StyleBoxFlat
-			assert_eq(style.border_color == UiStyle.GOLD_COLOR, i == tab, "only the open tab has the gold accent bar")
+			var lit: bool = screen._tab_buttons[i].get_theme_color(&"font_color") == UiStyle.TITLE_COLOR
+			assert_eq(lit, i == tab, "only the open tab's name is lit")
 
 
 func test_a_tab_click_opens_its_page() -> void:
@@ -295,16 +296,18 @@ func test_esc_while_listening_only_cancels_the_rebind() -> void:
 	assert_eq(screen._bind_buttons[&"skill_q"].text, "Q")
 
 
-func test_a_row_card_brightens_on_hover() -> void:
+func test_a_row_card_steps_to_the_raised_surface_on_hover() -> void:
 	var slider := _control("Music volume", "HSlider")
 	var card := slider.get_parent()
 	while not card is PanelContainer:
 		card = card.get_parent()
-	var before := (card.get_theme_stylebox(&"panel") as StyleBoxFlat).border_color.a
+	var box := card.get_theme_stylebox(&"panel") as StyleBoxFlat
+	var before := box.bg_color
+	assert_eq(box.border_width_left, 0, "the fill alone, no border")
 	card.mouse_entered.emit()
-	assert_gt((card.get_theme_stylebox(&"panel") as StyleBoxFlat).border_color.a, before)
+	assert_eq(box.bg_color, UiStyle.SURFACE_RAISED)
 	card.mouse_exited.emit()
-	assert_eq((card.get_theme_stylebox(&"panel") as StyleBoxFlat).border_color.a, before)
+	assert_eq(box.bg_color, before)
 
 
 func test_a_cards_controls_let_the_mouse_reach_the_card() -> void:
