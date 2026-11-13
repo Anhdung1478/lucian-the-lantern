@@ -3,9 +3,9 @@ extends Control
 ## One slot of the merchant's Craft tab: one of the two inputs (a fragment or
 ## the boots) or the item they would make. A dark well like the backpack's
 ## cells: its rim follows the item, and an input turns gold under the mouse
-## and under a dragged item it takes. The result is gold once the craft can
-## be paid for, shows a red cross when the two inputs make nothing and a
-## faint "?" until both are in.
+## and under a dragged item it takes (eased, UiMotion.lit). The result is gold
+## once the craft can be paid for, shows a red cross when the two inputs make
+## nothing and a faint "?" until both are in.
 ##
 ## An item dragged into an input leaves the backpack view: the input keeps
 ## its inventory index, and while it does the backpack screen draws that cell
@@ -22,7 +22,7 @@ enum Kind { INPUT, RESULT }
 const SIZE := 64.0
 const ICON_INSET := 5.0
 const PLACEHOLDER := Color(1, 1, 1, 0.3)
-const PLACEHOLDER_FONT := 11
+const PLACEHOLDER_FONT := UiStyle.FONT_TAG
 ## The result's "?" and the cross over two inputs that make nothing.
 const MARK_FONT := 26
 const CROSS_REACH := 10.0
@@ -40,6 +40,11 @@ var index := -1:
 		index = value
 		queue_redraw()
 		screen.redraw_cells()
+## The gold look, 0 to 1 (UiMotion.lit).
+var lit_t := 0.0
+
+var _lit_on := false
+var _washed := false
 
 
 func _init(owner_screen: BackpackScreen, slot_kind: Kind, target := -1) -> void:
@@ -132,16 +137,22 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	var on := is_lit()
+	if on != _lit_on:
+		_lit_on = on
+		if on:
+			_washed = screen.is_dragging()
+		UiMotion.lit(self, on)
 	queue_redraw()
 
 
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, size)
-	var lit := is_lit()
-	draw_style_box(UiStyle.cell_style(rim(), lit, ItemCell.RADIUS), rect)
-	if lit and screen.is_dragging():
+	var t := lit_t
+	draw_style_box(UiStyle.cell_style_t(rim(), t, ItemCell.RADIUS), rect)
+	if t > 0.0 and _washed:
 		var wash := StyleBoxFlat.new()
-		wash.bg_color = ItemCell.DROP_WASH
+		wash.bg_color = Color(ItemCell.DROP_WASH, ItemCell.DROP_WASH.a * t)
 		wash.set_corner_radius_all(ItemCell.RADIUS)
 		draw_style_box(wash, rect)
 	var shown := item()
@@ -151,7 +162,7 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	var middle := rect.get_center()
 	if kind == Kind.INPUT:
-		draw_string(font, Vector2(0, middle.y + 4.0), Lang.t("ITEM"), HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, PLACEHOLDER_FONT, PLACEHOLDER)
+		draw_string(font, Vector2(0, middle.y + 4.0), Lang.t("Item"), HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, PLACEHOLDER_FONT, PLACEHOLDER)
 	elif screen.shop_panel().craft_state() == ShopPanel.CraftState.NO_RECIPE:
 		for side: float in [-1.0, 1.0]:
 			draw_line(middle + Vector2(-CROSS_REACH, -CROSS_REACH * side), middle + Vector2(CROSS_REACH, CROSS_REACH * side), UiStyle.BAD_COLOR, CROSS_WIDTH, true)

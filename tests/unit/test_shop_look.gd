@@ -156,9 +156,9 @@ func test_the_backpack_and_the_shop_stay_clear_of_the_recipes_on_a_narrower_scre
 	var right := own.shop_panel().get_global_rect().end.x
 	assert_gte(own._column.position.x, table.end.x, "16:10: right of the recipe table")
 	assert_lte(right, 1728.0, "and on the screen")
-	view.size = Vector2i(1200, 1080)
+	view.size = Vector2i(1440, 1080)
 	right = own._column.position.x + own._column.get_combined_minimum_size().x + BackpackScreen.SHOP_GAP + own.shop_panel().get_combined_minimum_size().x
-	assert_lte(right, 1200.0, "too narrow for all three: the shop stays on the screen, over the table")
+	assert_lte(right, 1440.0, "4:3, too narrow for all three: the shop stays on the screen, over the table")
 	assert_gte(own._column.position.x, BackpackScreen.MARGIN)
 
 
@@ -246,3 +246,45 @@ func test_a_dragged_shop_item_lights_a_cell_it_can_be_bought_into() -> void:
 	assert_false(screen.takes_drop(40), "a locked cell")
 	assert_false(screen.takes_drop(Inventory.HP_POTION_CELL))
 	button(slot(0, 0), false, Vector2(5, 5))
+
+
+func test_the_merchant_is_as_tall_as_the_backpack_column_and_lines_up_with_it() -> void:
+	var column := screen._column.get_global_rect()
+	var plate := panel.get_global_rect()
+	assert_eq(plate.position.y, column.position.y, "tops on one line")
+	assert_eq(plate.end.y, column.end.y, "bottoms on one line")
+	assert_eq(plate.position.x, column.end.x + BackpackScreen.SHOP_GAP)
+
+
+func test_the_sell_slot_sits_in_the_foot_left_with_the_message_beside_it() -> void:
+	var sell: ItemCell = screen._cells.back()
+	var foot := sell.get_parent()
+	assert_eq(foot.get_child(0), sell, "first in the foot")
+	assert_true(foot.is_ancestor_of(panel._message), "the message shares its line")
+	assert_true(foot.is_ancestor_of(panel.undo_button()))
+	assert_gt(panel.undo_button().global_position.x, panel._message.global_position.x, "the buttons on the right")
+
+
+func test_undo_sale_never_moves_between_tabs() -> void:
+	var at := panel.undo_button().global_position
+	for tab: int in [ShopPanel.POTIONS_TAB, ShopPanel.CRAFT_TAB, ShopPanel.ITEMS_TAB]:
+		panel.show_tab(tab)
+		await wait_physics_frames(2)
+		assert_eq(panel.undo_button().global_position, at, "tab %d" % tab)
+	assert_eq(panel.refresh_text(), "Refresh 100")
+
+
+func test_the_open_tab_page_is_the_only_one_shown() -> void:
+	for tab: int in [ShopPanel.CRAFT_TAB, ShopPanel.POTIONS_TAB]:
+		panel.show_tab(tab)
+		for other in 3:
+			assert_eq(panel.page(other).visible, other == tab)
+	assert_eq(panel._tab_highlight.target, panel._tab_buttons[ShopPanel.POTIONS_TAB], "the fill follows the tab")
+
+
+func test_the_gold_counts_to_the_wallet() -> void:
+	panel._process(0.0)
+	assert_eq(panel._gold_label.final_text(), "5000")
+	wallet.spend(1200)
+	panel._process(0.0)
+	assert_eq(panel._gold_label.final_text(), "3800")

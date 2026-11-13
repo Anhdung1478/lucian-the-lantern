@@ -1,10 +1,11 @@
 class_name BackpackScreen
 extends CanvasLayer
 ## The backpack (P), in the Lantern look: an ornate plate headed BACKPACK
-## with 9x6 dark cells, and below it, outside the backpack, two plain plates:
-## the equip row (slots 1-6 and the sell slot) and the gear row (the boots
-## cell, then the Health and Mana potion cells on keys 7 and 8). The recipe
-## table sits top-left while it is open, shop or not.
+## with 9x6 dark cells (a line under them says how many are open while some
+## are locked), and below it one plain strip as wide, its cells on the
+## backpack's nine columns: the equip slots 1-6, a faint gold rule, then the
+## boots cell and the Health and Mana potion cells on keys 7 and 8. The
+## recipe table sits top-left while it is open, shop or not.
 ##
 ## Dragging: holding the left button on an item (or moving while holding)
 ## picks it up; releasing drops it, decided by Inventory.drop_outcome.
@@ -15,41 +16,58 @@ extends CanvasLayer
 ## Potions are drunk only with keys 7 and 8, from their potion cells (which
 ## check that Lucian can act); the backpack has no Use button.
 ##
-## Shop mode (open_shop): the merchant's shop sits right of the backpack.
-## Shop items are bought by dragging them onto a cell or by right-clicking
-## them, and items dropped on the red sell slot are sold (boots never are).
-## A purchase goes into the backpack; with every open cell full it is refused
-## with a pop-up (BACKPACK_FULL), unless the item is dragged onto a free equip
-## slot.
+## Shop mode (open_shop): the merchant's shop sits right of the backpack, as
+## tall as its column. Shop items are bought by dragging them onto a cell or
+## by right-clicking them, and items dropped on the sell slot, in the
+## merchant's foot, are sold (boots never are). A purchase goes into the
+## backpack; with every open cell full it is refused with a pop-up
+## (BACKPACK_FULL), unless the item is dragged onto a free equip slot.
 ## On the Craft tab, two fragments (or the boots and a fragment) are dragged
 ## onto its two inputs. An item in an input leaves the backpack view (in_craft)
 ## until it is dragged back out, the tab changes or the shop closes; Craft
 ## asks first.
+##
+## Motion (none while UiMotion.off()): the screen fades in and out; the
+## merchant's panel enters from the right while the backpack eases aside to
+## make room. The screen's `visible` is whether it is open and flips at once;
+## what is drawn lives on an inner layer (_view) that stays up until the fade
+## out ends, and ignores the mouse meanwhile. A picked-up item's icon grows a
+## little; one dropped where it can't go flies back before it hides. A cell
+## that receives a bought or crafted item lands it (ItemCell.land).
 
 ## A purchase, sale or refresh went through (true) or was refused (false).
 signal traded(ok: bool)
 
+const LAYER := 30
 const COLUMNS := 9
 const CELL_GAP := 6
 ## The backpack is centered in the screen area above the HUD panel.
 const AREA_BOTTOM := 880.0
 const ROW_GAP := 18.0
-## The backpack and the shop fade in over this long (not on low effects).
-const FADE_TIME := 0.12
+## The screen fades in over this long, and out over UiMotion.EXIT.
+const FADE_TIME := UiMotion.BASE
 const SHOP_GAP := 24.0
 ## The least room between the recipe table and the backpack.
 const TABLE_GAP := 20.0
-## Between the backpack's frame and its cells, and under its heading.
+## Between the backpack's frame and its cells, and under its heading; the
+## strip under it uses the same, so its cells sit on the backpack's columns.
 const PACK_PAD := 22.0
 const HEADING_GAP := 14
-## Between a strip's frame (the equip row, the gear row) and its cells.
-const STRIP_PAD := 12.0
 const MARGIN := 16.0
-## Between the equip strip and the gear strip under it.
-const GEAR_GAP := 10
+## The strip's rule between the equip slots and the gear cells: its colour
+## and how far it stays from the strip's top and bottom (at 0.3 alpha a
+## 1 px line in a 5 px gap all but vanishes once the canvas is scaled down).
+const RULE_COLOR := Color(UiStyle.BORDER_COLOR, 0.5)
+const RULE_INSET := 10.0
+const RULE_WIDTH := 1.2
 const HOLD_TO_PICK := 0.2
 const MOVE_TO_PICK := 6.0
 const GHOST_SIZE := 56.0
+## A picked-up icon grows to GHOST_LIFT over GHOST_LIFT_TIME; one refused
+## flies back to where it came from over GHOST_BACK_TIME.
+const GHOST_LIFT := 1.08
+const GHOST_LIFT_TIME := 0.08
+const GHOST_BACK_TIME := 0.15
 ## Drop target of the sell slot while the shop is open.
 const SELL := -2
 ## Drop targets of the Craft tab's two inputs.
@@ -57,6 +75,8 @@ const CRAFT_FIRST := -3
 const CRAFT_SECOND := -4
 ## The pop-up for a purchase (or an undone sale) with no room in the backpack.
 const BACKPACK_FULL := "Your backpack is full."
+## The line under the grid while some cells are locked.
+const OPEN_NOTE := "%d of %d cells open. Buy Backpack Slots in the Evolution Tree."
 
 var inventory: Inventory
 ## The open shop, or null outside shop mode.
@@ -66,11 +86,15 @@ var shop: Shop
 ## cells included); the sell slot comes last.
 var _cells: Array[ItemCell] = []
 var _column: VBoxContainer
-## The dim backdrop and everything on it; the fade-in is its modulate.
+## What is drawn: the dim backdrop and everything on it, on an inner layer
+## that outlives `visible` by the fade out.
+var _view := CanvasLayer.new()
 var _backdrop: ColorRect
 var _fade: Tween
 var _recipes: RecipeTable
 var _shop_panel := ShopPanel.new()
+## The line under the grid: how many cells are open.
+var _open_note: Label
 ## Cell index under the pressed button, the picked-up one, and the one the
 ## picked-up item is over (-1 for none, SELL for the sell slot).
 var _press_index := -1
@@ -90,6 +114,9 @@ var _mouse := Vector2.ZERO
 ## The dragged icon sits above the debug table.
 var _top := CanvasLayer.new()
 var _ghost := ItemIcon.new()
+var _ghost_motion: Tween
+## Where the picked-up item came from, in screen coordinates.
+var _ghost_home := Rect2()
 ## The Craft button's question, and the full-backpack and one-penetration
 ## notices.
 var _confirm := ConfirmPopup.new()
@@ -98,7 +125,7 @@ var _viewport: Viewport
 
 
 func _ready() -> void:
-	layer = 30
+	layer = LAYER
 	visible = false
 
 
@@ -123,25 +150,33 @@ func setup(target_inventory: Inventory) -> void:
 	_build()
 
 
+## Opens the backpack (in shop mode when `shop` is set): visible at once,
+## then the backdrop fades in.
 func open() -> void:
+	var was_open := visible
 	visible = true
+	_shop_panel.visible = shop != null
 	redraw_cells()
-	_fade_in()
+	if not was_open:
+		_fade_in()
+	_place_column(true)
 
 
 ## Opens the backpack beside the merchant's shop.
 func open_shop(new_shop: Shop) -> void:
+	var entering := not (visible and _shop_panel.visible)
 	shop = new_shop
-	_shop_panel.visible = true
 	_shop_panel.show_tab(0)
 	_shop_panel.show_refresh_cost(shop.refresh_cost)
 	open()
-	_place_column()
+	if entering:
+		_enter_shop_panel()
 
 
 ## Closing mid-drag puts the item back. Also ends shop mode: the Craft tab's
 ## inputs give their items back and an open Craft question or notice is
-## dropped. No cell stays lit by a mouse that was over it.
+## dropped. No cell stays lit by a mouse that was over it. `visible` turns
+## false at once; the drawing fades out after.
 func close() -> void:
 	_end_drag()
 	if _confirm.is_open():
@@ -151,12 +186,16 @@ func close() -> void:
 		cell.hovered = false
 	shop = null
 	_shop_panel.clear_craft()
-	_shop_panel.visible = false
-	_place_column()
+	_fade_out()
 
 
 func is_shopping() -> bool:
 	return shop != null
+
+
+## Whether the screen is open (it may still be fading out once closed).
+func is_open() -> bool:
+	return visible
 
 
 func shop_panel() -> ShopPanel:
@@ -195,6 +234,13 @@ func craft_confirm() -> ConfirmPopup:
 ## The one-penetration rule's notice, naming the penetration item equipped.
 static func pen_limit_text(equipped: ItemData) -> String:
 	return Lang.t("Only one penetration item can be equipped,\nand %s already is.") % Lang.t(equipped.display_name)
+
+
+## The line under the grid for `open` cells of `total` ("" with none locked).
+static func open_note(open_cells: int, total := Inventory.BACKPACK_SIZE) -> String:
+	if open_cells >= total:
+		return ""
+	return Lang.t(OPEN_NOTE) % [open_cells, total]
 
 
 ## The shop slot being dragged, or null.
@@ -250,7 +296,11 @@ func refresh_shop() -> void:
 ## The shop's Undo sale button: buys back the last sale.
 func undo_sale() -> void:
 	if shop:
-		_report(shop.undo_sale())
+		var before := _contents()
+		var result := shop.undo_sale()
+		if result == Shop.Result.OK:
+			_land_changed(before)
+		_report(result)
 
 
 ## The Craft tab's Craft button: asks "Craft Muramana from ... for 1600
@@ -278,10 +328,12 @@ func craft() -> void:
 ## Yes to the Craft question.
 func _craft_now() -> void:
 	if shop:
+		var before := _contents()
 		var result := shop.craft(_shop_panel.first_input().index, _shop_panel.second_input().index)
 		if result == Shop.Result.OK:
 			_shop_panel.clear_craft()
 			Sfx.play(&"craft")
+			_land_changed(before)
 		_report(result)
 
 
@@ -373,25 +425,33 @@ func _pick_up() -> void:
 		_drag_slot = _press_slot
 		_target = -1
 		_ghost.item = _drag_slot.item()
+		_ghost_home = _drag_slot.get_global_rect()
+		_ghost_home = Rect2(_ghost_home.position + Vector2(ShopSlot.PAD, (_ghost_home.size.y - ShopSlot.WELL) * 0.5),
+			Vector2(ShopSlot.WELL, ShopSlot.WELL))
 	elif _press_input:
 		_drag_input = _press_input
 		_target = _drag_input.target()
 		_ghost.item = _drag_input.item()
+		_ghost_home = _drag_input.get_global_rect()
 	else:
 		_drag_index = _press_index
 		_target = _press_index
 		_ghost.item = inventory.item_at(_drag_index)
+		_ghost_home = _cells[_drag_index].get_global_rect()
 	_ghost.position = _mouse - _ghost.size * 0.5
 	_ghost.visible = true
+	_lift_ghost()
 	redraw_cells()
 
 
+## Drops what is held. A drop that goes nowhere (or is refused) sends the
+## icon back to where it came from before it hides.
 func _release() -> void:
+	var landed := true
 	if _drag_slot:
-		if _target >= 0:
-			_buy(_drag_slot, _target)
+		landed = _target >= 0 and _buy(_drag_slot, _target)
 	elif _drag_input:
-		_drop_from_input(_drag_input, _target)
+		landed = _drop_from_input(_drag_input, _target)
 	elif _drag_index >= 0:
 		if _target == SELL:
 			if shop.can_sell(_drag_index):
@@ -400,42 +460,59 @@ func _release() -> void:
 			else:
 				_shop_panel.show_message(Lang.t("Boots can't be sold"))
 				traded.emit(false)
+				landed = false
 		elif _target == CRAFT_FIRST or _target == CRAFT_SECOND:
 			if not _shop_panel.load_input(_target, _drag_index):
 				traded.emit(false)
+				landed = false
 		elif not in_craft(_target):
-			_drop(_drag_index, _target)
-	_end_drag()
+			landed = _drop(_drag_index, _target)
+		else:
+			landed = false
+	else:
+		landed = false
+	_end_drag(not landed)
 
 
 ## Drops the item in cell `from` on cell `to` (Inventory.apply_drop). One the
-## one-penetration rule sends back says why in the pop-up.
-func _drop(from: int, to: int) -> void:
+## one-penetration rule sends back says why in the pop-up. False when the
+## item stays where it was.
+func _drop(from: int, to: int) -> bool:
 	var blocker := inventory.drop_pen_blocker(from, to)
 	if blocker:
 		_confirm.tell(pen_limit_text(blocker))
 		Sfx.play(&"error")
-	else:
-		inventory.apply_drop(from, to)
+		return false
+	if to == from or to < 0 or inventory.drop_outcome(from, to) == Inventory.Drop.RETURN:
+		return false
+	inventory.apply_drop(from, to)
+	return true
 
 
 ## An item dragged out of a Craft input: dropped on the other input it moves
 ## there (trading places with what that held), on its own input it stays, on
 ## a free cell that takes it it moves into that cell, and anywhere else it
-## comes back to its own cell.
-func _drop_from_input(input: CraftSlot, target: int) -> void:
+## comes back to its own cell. False when it stays in its input or goes back
+## to its own cell (its icon flies there).
+func _drop_from_input(input: CraftSlot, target: int) -> bool:
 	if input.index < 0 or target == input.target():
-		return
+		return false
 	if target == CRAFT_FIRST or target == CRAFT_SECOND:
 		_shop_panel.move_input(input, target)
-		return
+		return true
 	var cell := input.index
 	input.clear()
 	if target >= 0 and inventory.drop_outcome(cell, target) == Inventory.Drop.MOVE:
 		inventory.apply_drop(cell, target)
+		return true
+	_ghost_home = _cells[cell].get_global_rect()
+	return false
 
 
-func _end_drag() -> void:
+## Ends a drag. `fly_back`: the icon goes back to where it came from before
+## it hides (at once while UiMotion.off()).
+func _end_drag(fly_back := false) -> void:
+	var was_dragging := is_dragging()
 	_press_index = -1
 	_drag_index = -1
 	_press_slot = null
@@ -443,18 +520,27 @@ func _end_drag() -> void:
 	_press_input = null
 	_drag_input = null
 	_target = -1
-	_ghost.visible = false
+	if was_dragging and fly_back and _ghost.visible:
+		_send_ghost_home()
+	else:
+		_hide_ghost()
 	redraw_cells()
 
 
-func _buy(slot: ShopSlot, cell: int) -> void:
+## Buys what `slot` sells into `cell` (-1: wherever it goes). True when it
+## went through; the cell that got it lands it.
+func _buy(slot: ShopSlot, cell: int) -> bool:
 	var item := slot.item()
+	var before := _contents()
 	var result: Shop.Result
 	if slot.potion:
 		result = shop.buy_potion(slot.potion, cell)
 	else:
 		result = shop.buy_slot(slot.stock_slot, cell)
+	if result == Shop.Result.OK:
+		_land_changed(before)
 	_report(result, slot, inventory.pen_blocker(cell, item) if cell >= 0 else null)
+	return result == Shop.Result.OK
 
 
 ## A refused trade flashes the slot's price and says why: no room in the
@@ -470,12 +556,30 @@ func _report(result: Shop.Result, slot: ShopSlot = null, blocker: ItemData = nul
 	traded.emit(result == Shop.Result.OK)
 
 
+## Every cell's item and count, to see which cells a trade filled.
+func _contents() -> Array:
+	var all := []
+	for i in Inventory.SIZE:
+		all.append([inventory.item_at(i), inventory.count_at(i)])
+	return all
+
+
+## The cells that got an item (a new one, or more of it) since `before` land it.
+func _land_changed(before: Array) -> void:
+	for i in Inventory.SIZE:
+		var now := inventory.item_at(i)
+		if now != null and (now != before[i][0] or inventory.count_at(i) > before[i][1]):
+			_cells[i].land()
+
+
 ## Inventory index of the cell at `point`; -1 outside any cell. The sell slot
 ## is SELL while the shop is open and -1 otherwise; the Craft tab's inputs
 ## are CRAFT_FIRST and CRAFT_SECOND for an item dragged from a cell or an
 ## input.
 func _cell_index_at(point: Vector2) -> int:
 	for cell in _cells:
+		if cell.index < 0 and not cell.is_visible_in_tree():
+			continue
 		if cell.get_global_rect().has_point(point):
 			if cell.index >= 0:
 				return cell.index
@@ -488,31 +592,114 @@ func _cell_index_at(point: Vector2) -> int:
 
 
 ## Every cell draws again (an item moved, or left or came back from a Craft
-## input).
+## input) and eases its gold look to match; the line under the grid follows
+## the open cells.
 func redraw_cells() -> void:
 	for cell in _cells:
-		cell.queue_redraw()
+		cell.refresh_lit()
+	if _open_note:
+		_open_note.text = open_note(inventory.unlocked_backpack)
+		_open_note.visible = _open_note.text != ""
 
 
-## Fades the backdrop in; visibility has already flipped. Skipped on low
-## effects, and by a tree-less screen.
+## Shows the drawing and fades the backdrop in from where it is. Skipped
+## while UiMotion.off(), and by a tree-less screen.
 func _fade_in() -> void:
-	if _fade:
+	if _fade and _fade.is_valid():
 		_fade.kill()
-	_backdrop.modulate.a = 1.0
-	if GameSettings.instance().low_effects() or not is_inside_tree():
+	_fade = null
+	_view.visible = true
+	_backdrop.mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_INHERITED
+	if UiMotion.off() or not is_inside_tree():
+		_backdrop.modulate.a = 1.0
 		return
-	_backdrop.modulate.a = 0.0
-	_fade = create_tween()
-	_fade.tween_property(_backdrop, "modulate:a", 1.0, FADE_TIME)
+	if _backdrop.modulate.a >= 1.0:
+		_backdrop.modulate.a = 0.0
+	_fade = UiMotion.tween(_backdrop)
+	_fade.tween_property(_backdrop, ^"modulate:a", 1.0, FADE_TIME)
+
+
+## Fades the drawing out (it ignores the mouse at once), then hides it, the
+## shop panel with it, and puts the column back in the middle.
+func _fade_out() -> void:
+	if _fade and _fade.is_valid():
+		_fade.kill()
+	_fade = null
+	_backdrop.mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_DISABLED
+	if UiMotion.off() or not is_inside_tree() or not _view.visible:
+		_after_fade_out()
+		return
+	_fade = UiMotion.tween(_backdrop)
+	_fade.tween_property(_backdrop, ^"modulate:a", 0.0, UiMotion.EXIT)
+	_fade.tween_callback(_after_fade_out)
+
+
+func _after_fade_out() -> void:
+	_fade = null
+	_view.visible = false
+	_backdrop.modulate.a = 1.0
+	_backdrop.mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_INHERITED
+	_shop_panel.visible = false
+	_place_column()
+
+
+## The merchant's panel enters from the right while the column makes room.
+func _enter_shop_panel() -> void:
+	if UiMotion.off() or not is_inside_tree():
+		return
+	var home: Vector2 = _shop_panel.get_meta(&"glide_to", _shop_panel.position)
+	_kill_glide(_shop_panel)
+	_shop_panel.position.x = home.x + UiMotion.RISE
+	_shop_panel.modulate.a = 0.0
+	_glide(_shop_panel, home, true)
+	UiMotion.tween(_shop_panel).tween_property(_shop_panel, ^"modulate:a", 1.0, UiMotion.BASE)
+
+
+func _lift_ghost() -> void:
+	_stop_ghost()
+	_ghost.pivot_offset = _ghost.size * 0.5
+	_ghost.scale = Vector2.ONE
+	if UiMotion.off():
+		_ghost.scale = Vector2.ONE * GHOST_LIFT
+		return
+	_ghost_motion = UiMotion.tween(_ghost)
+	_ghost_motion.tween_property(_ghost, ^"scale", Vector2.ONE * GHOST_LIFT, GHOST_LIFT_TIME)
+
+
+## A refused drop: the icon flies back to where it came from, then hides.
+func _send_ghost_home() -> void:
+	_stop_ghost()
+	if UiMotion.off() or not is_inside_tree() or _ghost_home.size == Vector2.ZERO:
+		_hide_ghost()
+		return
+	var to := _ghost_home.get_center() - _ghost.size * 0.5
+	_ghost_motion = UiMotion.tween(_ghost).set_parallel(true)
+	_ghost_motion.tween_property(_ghost, ^"position", to, GHOST_BACK_TIME)
+	_ghost_motion.tween_property(_ghost, ^"scale", Vector2.ONE, GHOST_BACK_TIME)
+	_ghost_motion.chain().tween_callback(_hide_ghost)
+
+
+func _hide_ghost() -> void:
+	_stop_ghost()
+	_ghost.visible = false
+	_ghost.scale = Vector2.ONE
+
+
+func _stop_ghost() -> void:
+	if _ghost_motion and _ghost_motion.is_valid():
+		_ghost_motion.kill()
+	_ghost_motion = null
 
 
 func _build() -> void:
+	_view.layer = LAYER
+	_view.visible = false
+	add_child(_view)
 	var backdrop := ColorRect.new()
 	_backdrop = backdrop
 	backdrop.color = Color(0, 0, 0, 0.45)
 	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(backdrop)
+	_view.add_child(backdrop)
 
 	_recipes = RecipeTable.new()
 	_recipes.setup(inventory.catalog, inventory)
@@ -536,44 +723,39 @@ func _build() -> void:
 	box.add_child(grid)
 	for i in Inventory.BACKPACK_SIZE:
 		_add_cell(grid, i, ItemCell.Style.BACKPACK)
+	_open_note = UiStyle.note("")
+	box.add_child(_open_note)
 
-	# The equip strip and, under it as wide, the gear strip.
-	var strips := VBoxContainer.new()
-	strips.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	strips.add_theme_constant_override(&"separation", GEAR_GAP)
-	_column.add_child(strips)
-	var strip := Plate.new(STRIP_PAD, false)
-	strips.add_child(strip)
-	var equip_row := HBoxContainer.new()
-	equip_row.add_theme_constant_override(&"separation", CELL_GAP)
-	strip.add_child(equip_row)
+	# One strip as wide as the backpack, its cells on the backpack's columns:
+	# the equip slots, a faint rule, then [Boots][HP 7][MP 8]. Added in index
+	# order (60, 61, 62) so _cells stays in inventory order; the boots cell is
+	# then moved in front of the potions.
+	var strip := Plate.new(PACK_PAD, false)
+	_column.add_child(strip)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override(&"separation", CELL_GAP)
+	row.draw.connect(_draw_strip_rule.bind(row))
+	row.sort_children.connect(row.queue_redraw)
+	strip.add_child(row)
 	for i in Inventory.EQUIP_SIZE:
-		_add_cell(equip_row, Inventory.EQUIP_START + i, ItemCell.Style.EQUIP)
-	# [Boots] ... [HP 7][MP 8], added in index order (60, 61, 62) so _cells
-	# stays in inventory order; the boots cell is then moved to the front.
-	var gear := Plate.new(STRIP_PAD, false)
-	strips.add_child(gear)
-	var gear_row := HBoxContainer.new()
-	gear_row.add_theme_constant_override(&"separation", CELL_GAP)
-	gear.add_child(gear_row)
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	gear_row.add_child(spacer)
-	_add_cell(gear_row, Inventory.HP_POTION_CELL, ItemCell.Style.POTION)
-	_add_cell(gear_row, Inventory.MP_POTION_CELL, ItemCell.Style.POTION)
-	_add_cell(gear_row, Inventory.BOOTS_CELL, ItemCell.Style.BOOTS)
-	gear_row.move_child(_cells.back(), 0)
-	_add_cell(equip_row, -1, ItemCell.Style.SELL)
+		_add_cell(row, Inventory.EQUIP_START + i, ItemCell.Style.EQUIP)
+	_add_cell(row, Inventory.HP_POTION_CELL, ItemCell.Style.POTION)
+	_add_cell(row, Inventory.MP_POTION_CELL, ItemCell.Style.POTION)
+	_add_cell(row, Inventory.BOOTS_CELL, ItemCell.Style.BOOTS)
+	row.move_child(_cells.back(), Inventory.EQUIP_SIZE)
 
+	# The sell slot lives in the merchant's foot, so it only shows in the shop.
+	var sell := ItemCell.new(-1, ItemCell.Style.SELL, self)
+	_cells.append(sell)
 	var potions: Array[ItemData] = []
 	if inventory.catalog:
 		potions = inventory.catalog.potions()
-	_shop_panel.setup(self, potions)
+	_shop_panel.setup(self, potions, sell)
 	_shop_panel.visible = false
 	backdrop.add_child(_shop_panel)
 
 	_column.resized.connect(_place_column)
+	_column.minimum_size_changed.connect(_place_column)
 	_shop_panel.resized.connect(_place_column)
 	# The shop is no taller than it needs once its wrapped note is laid out.
 	_shop_panel.minimum_size_changed.connect(_place_column)
@@ -587,25 +769,67 @@ func _build() -> void:
 	_ghost.visible = false
 	_top.add_child(_ghost)
 	add_child(_confirm)
+	redraw_cells()
+
+
+## The strip's faint gold rule, in the gap between the sixth equip slot and
+## the boots.
+func _draw_strip_rule(row: HBoxContainer) -> void:
+	if row.get_child_count() <= Inventory.EQUIP_SIZE:
+		return
+	var left := row.get_child(Inventory.EQUIP_SIZE - 1) as Control
+	var right := row.get_child(Inventory.EQUIP_SIZE) as Control
+	var x := roundf((left.position.x + left.size.x + right.position.x) * 0.5)
+	row.draw_line(Vector2(x, RULE_INSET), Vector2(x, row.size.y - RULE_INSET), RULE_COLOR, RULE_WIDTH)
 
 
 ## Centered above the HUD panel; with the shop open, the backpack and the
-## shop are centered side by side. On a narrower screen they move right, clear
-## of the recipe table, as far as the screen's edge lets them. Runs again when
-## the column or the shop resizes and when the viewport does.
-func _place_column() -> void:
-	if _column == null:
+## shop are centered side by side, tops and bottoms on the same lines (the
+## shop is as tall as the column). On a narrower screen they move right,
+## clear of the recipe table, as far as the screen's edge lets them. Runs
+## again when the column or the shop resizes and when the viewport does.
+## `animate`: the column eases to its place (opening beside the shop).
+func _place_column(animate := false) -> void:
+	if _column == null or not is_inside_tree():
 		return
 	var width := get_viewport().get_visible_rect().size.x
 	var size := _column.get_combined_minimum_size()
+	_shop_panel.custom_minimum_size.y = size.y
 	var shop_size := _shop_panel.get_combined_minimum_size() if _shop_panel.visible else Vector2.ZERO
 	var total := size.x + (SHOP_GAP + shop_size.x if _shop_panel.visible else 0.0)
 	var top := maxf((AREA_BOTTOM - size.y) * 0.5, MARGIN)
 	var clear := _recipes.position.x + _recipes.get_combined_minimum_size().x + TABLE_GAP
 	var left := minf(maxf((width - total) * 0.5, clear), width - MARGIN - total)
-	_column.position = Vector2(maxf(left, MARGIN), top)
-	_shop_panel.position = Vector2(_column.position.x + size.x + SHOP_GAP, top)
+	var column_at := Vector2(maxf(left, MARGIN), top)
+	_glide(_column, column_at, animate)
+	_glide(_shop_panel, Vector2(column_at.x + size.x + SHOP_GAP, top), animate)
 	_shop_panel.size = shop_size
+
+
+## Moves `node` to `to`: eases there over UiMotion.BASE when `animate` (and
+## motion is on and it shows), carries on toward a moved target if it is
+## already easing, else jumps.
+func _glide(node: Control, to: Vector2, animate: bool) -> void:
+	var running: Tween = node.get_meta(&"glide") if node.has_meta(&"glide") else null
+	var moving := running != null and running.is_valid() and running.is_running()
+	if moving and node.get_meta(&"glide_to") == to:
+		return
+	_kill_glide(node)
+	if not (moving or animate) or UiMotion.off() or not node.is_visible_in_tree() or node.position == to:
+		node.position = to
+		return
+	var glide := UiMotion.tween(node)
+	glide.tween_property(node, ^"position", to, UiMotion.BASE)
+	node.set_meta(&"glide", glide)
+	node.set_meta(&"glide_to", to)
+
+
+func _kill_glide(node: Control) -> void:
+	var running: Tween = node.get_meta(&"glide") if node.has_meta(&"glide") else null
+	if running and running.is_valid():
+		running.kill()
+	node.remove_meta(&"glide")
+	node.remove_meta(&"glide_to")
 
 
 func _add_cell(parent: Control, index: int, style: ItemCell.Style) -> void:

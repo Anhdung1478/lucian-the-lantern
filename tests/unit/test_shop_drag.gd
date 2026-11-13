@@ -280,7 +280,8 @@ func test_cells_stay_in_inventory_order_with_the_sell_slot_last() -> void:
 	assert_eq(cell(Inventory.BOOTS_CELL).style, ItemCell.Style.BOOTS)
 	assert_eq(cell(Inventory.HP_POTION_CELL).style, ItemCell.Style.POTION)
 	var row := cell(Inventory.BOOTS_CELL).get_parent()
-	assert_eq(row.get_child(0), cell(Inventory.BOOTS_CELL), "the boots come first in their row")
+	assert_eq(row.get_child(Inventory.EQUIP_SIZE), cell(Inventory.BOOTS_CELL), "the boots come after the six equip slots")
+	assert_true(screen.shop_panel().is_ancestor_of(sell_cell()), "the sell slot sits in the merchant's foot")
 
 
 func _wear(id: StringName, tier: int) -> ItemData:
@@ -329,7 +330,8 @@ func test_the_craft_tab_upgrades_the_boots_dragged_in() -> void:
 	assert_eq(panel.result_slot().item(), greaves)
 	panel._process(0.0)
 	assert_eq(panel._fee_label.text, "300")
-	assert_eq(panel._craft_note.text, "speed + sword → sword_greaves")
+	assert_eq(panel.craft_note(), "speed + sword → sword_greaves")
+	assert_eq(panel._craft_note.text, "sword_greaves", "under the cells, only what they make")
 	assert_false(panel.craft_button().disabled)
 	panel.craft_button().pressed.emit()
 	assert_true(screen.craft_confirm().is_open(), "Craft asks first")
@@ -685,3 +687,42 @@ func test_closing_ends_shop_mode() -> void:
 	screen.close()
 	assert_false(screen.is_shopping())
 	assert_true(screen._recipes.visible)
+
+
+func test_a_bought_item_lands_in_its_cell() -> void:
+	var renders := UiMotion.renders
+	UiMotion.renders = true
+	button(slot(0, 0), MOUSE_BUTTON_RIGHT, true, center(slot(0, 0)))
+	var landed := cell(1).land_t
+	var other := cell(2).land_t
+	await wait_seconds(ItemCell.LAND_TIME + 0.1)
+	UiMotion.renders = renders
+	assert_eq(landed, 1.0, "the cell that got it starts the landing")
+	assert_eq(other, 0.0, "no other cell")
+	assert_eq(cell(1).land_t, 0.0, "and settles")
+
+
+func test_a_refused_drop_flies_back_before_it_hides() -> void:
+	var renders := UiMotion.renders
+	UiMotion.renders = true
+	button(cell(0), MOUSE_BUTTON_LEFT, true, center(cell(0)))
+	mouse(cell(0), InputEventMouseMotion.new(), Vector2(5, 5))
+	screen._process(0.0)
+	button(cell(0), MOUSE_BUTTON_LEFT, false, Vector2(5, 5))
+	var flying := screen._ghost.visible
+	await wait_seconds(BackpackScreen.GHOST_BACK_TIME + 0.1)
+	UiMotion.renders = renders
+	assert_false(screen.is_dragging(), "the drag ends at once")
+	assert_true(flying, "the icon is still on its way back")
+	assert_false(screen._ghost.visible, "then hides")
+	assert_eq(screen._ghost.get_global_rect().get_center(), center(cell(0)), "over its own cell")
+	assert_eq(inventory.item_at(0).id, &"sword")
+
+
+func test_a_good_drop_hides_the_icon_at_once() -> void:
+	var renders := UiMotion.renders
+	UiMotion.renders = true
+	drag(cell(0), cell(3))
+	UiMotion.renders = renders
+	assert_false(screen._ghost.visible)
+	assert_eq(inventory.item_at(3).id, &"sword")

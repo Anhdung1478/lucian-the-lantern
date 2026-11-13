@@ -126,12 +126,30 @@ func test_a_corner_tag_sits_flush_in_its_corner() -> void:
 	assert_true(rect.encloses(wide))
 
 
-func test_the_equip_row_and_the_gear_row_sit_on_plain_plates() -> void:
-	for index: int in [Inventory.EQUIP_START, Inventory.BOOTS_CELL]:
-		var plate := cell(index).get_parent().get_parent() as Plate
-		assert_not_null(plate, "cell %d's row sits on a Plate" % index)
-		assert_false(plate.ornate, "only the backpack is ornate")
-	assert_eq(cell(Inventory.EQUIP_START).get_parent(), screen._cells.back().get_parent(), "the sell slot ends the equip row")
+func test_one_plain_strip_as_wide_as_the_backpack_holds_the_equip_and_gear_cells() -> void:
+	var row := cell(Inventory.EQUIP_START).get_parent()
+	for index: int in [Inventory.BOOTS_CELL, Inventory.HP_POTION_CELL, Inventory.MP_POTION_CELL]:
+		assert_eq(cell(index).get_parent(), row, "cell %d shares the strip" % index)
+	var strip := row.get_parent() as Plate
+	assert_not_null(strip, "the strip is a Plate")
+	assert_false(strip.ornate, "only the backpack is ornate")
+	var pack := cell(0).get_parent().get_parent().get_parent() as Plate
+	assert_eq(strip.size.x, pack.size.x, "as wide as the backpack")
+	assert_eq(strip.global_position.x, pack.global_position.x)
+	for column in 9:
+		var under := cell(Inventory.EQUIP_START + column) if column < Inventory.EQUIP_SIZE \
+			else row.get_child(column) as ItemCell
+		assert_eq(under.global_position.x, cell(column).global_position.x, "column %d lines up" % column)
+	assert_eq(row.get_child(Inventory.EQUIP_SIZE), cell(Inventory.BOOTS_CELL), "the boots follow slot 6")
+	assert_ne(screen._cells.back().get_parent(), row, "the sell slot is not in the strip")
+
+
+func test_locked_backpack_cells_are_counted_under_the_grid() -> void:
+	assert_false(screen._open_note.visible, "every cell open: no line")
+	inventory.unlocked_backpack = 5
+	assert_true(screen._open_note.visible)
+	assert_eq(screen._open_note.text, "5 of 54 cells open. Buy Backpack Slots in the Evolution Tree.")
+	assert_eq(screen._open_note.get_parent(), cell(0).get_parent().get_parent(), "inside the backpack's plate")
 
 
 func test_equip_slots_and_potion_cells_carry_their_key() -> void:
@@ -153,12 +171,21 @@ func test_an_empty_potion_cell_has_a_fainter_rim_of_its_potion() -> void:
 
 
 func test_opening_fades_the_backpack_in_at_once_visible() -> void:
+	var renders := UiMotion.renders
+	UiMotion.renders = true
 	screen.close()
+	assert_false(screen.visible, "closed at once")
+	assert_true(screen._view.visible, "still drawn while it fades out")
 	screen.open()
 	assert_true(screen.visible, "visible flips at once")
 	assert_eq(screen._backdrop.modulate.a, 0.0, "the fade starts clear")
 	await wait_seconds(BackpackScreen.FADE_TIME + 0.15)
 	assert_eq(screen._backdrop.modulate.a, 1.0, "and ends solid")
+	screen.close()
+	await wait_seconds(UiMotion.EXIT + 0.15)
+	UiMotion.renders = renders
+	assert_false(screen._view.visible, "the drawing goes once the fade out ends")
+	assert_eq(screen._backdrop.modulate.a, 1.0, "put back for the next opening")
 
 
 func test_low_effects_open_without_a_fade() -> void:

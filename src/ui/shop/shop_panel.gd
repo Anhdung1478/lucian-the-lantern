@@ -2,15 +2,21 @@ class_name ShopPanel
 extends Plate
 ## The merchant's shop, beside the backpack while it is open, on an ornate
 ## plate headed MERCHANT: the Items, Potions and Craft tabs with the stage
-## gold beside them, the open tab's page, a hint line, a message line, and
-## the Undo sale button (every tab; it buys back the last sale) and the
-## Refresh button (Items only) in the bottom-right corner. The Items and
-## Potions tabs list what is for sale as rows that name it (ShopSlot).
-## Refused purchases flash a red message; a full backpack and the
-## one-penetration rule are told in a pop-up instead
+## gold beside them, the open tab's page ending with its hint, and the foot: the sell
+## slot on the left with the message line beside it, the Undo sale button
+## (every tab; it buys back the last sale) and the Refresh button (Items
+## only; its slot stays on the other tabs, so Undo sale never moves) on the
+## right. The Items and Potions tabs list what is for sale as rows that name
+## it (ShopSlot). Refused purchases show a red message; a full backpack and
+## the one-penetration rule are told in a pop-up instead
 ## (BackpackScreen._report). The panel keeps one size on every tab and
-## whatever its message says, so the backpack beside it never moves: a
-## shorter tab leaves the room under its hint empty.
+## whatever its message says, and is as tall as the backpack's column beside
+## it (BackpackScreen._place_column), so nothing beside it moves.
+##
+## Motion: a tab change keeps the frame, the heading, the tabs and the foot
+## still and swaps only the page (UiMotion.swap_body); the chosen tab's fill
+## slides (SlideHighlight). The gold counts (CountLabel). The message fades
+## in and out in its fixed slot.
 ##
 ## The Craft tab: [input] + [input] -> [result], a note line, the fee and a
 ## Craft button. Two fragments make their legendary, for the legendary's cost
@@ -19,7 +25,9 @@ extends Plate
 ## backpack: an item in an input leaves the backpack view until it comes back
 ## (see CraftSlot), and changing tabs gives both back. The Craft button asks
 ## first (BackpackScreen.craft). The tab shows where it stands (craft_state):
-## the note, the result, the arrow, the fee and the button follow it.
+## the note, the result, the arrow, the fee and the button follow it. Once the
+## inputs make something the note shows only the result's name; craft_note()
+## still says the whole recipe.
 
 ## Where the Craft tab stands: nothing in its inputs; one item in; two that
 ## make nothing (or boots that are fully upgraded); a craft the wallet can't
@@ -27,17 +35,21 @@ extends Plate
 enum CraftState { EMPTY, ONE, NO_RECIPE, NO_GOLD, READY }
 
 const PAD := 22.0
-const GAP := 12
+const GAP := UiStyle.GAP
+const GAP_L := UiStyle.GAP_L
 const ROW_GAP := 6
 const TAB_SIZE := Vector2(86, 38)
-const BUTTON_FONT := 17
-const HINT_FONT := 14
-## Room for the hint's two lines and the message's one, text or not.
+const BUTTON_FONT := UiStyle.FONT_BODY
+## Room for the hint's two lines, text or not.
 const HINT_HEIGHT := 44.0
-const MESSAGE_HEIGHT := 24.0
-## The open tab's page and its hint: as tall as the Items tab's (and as wide
-## as its rows) on every tab.
-const BODY_HEIGHT := MerchantStock.SLOTS * ShopSlot.HEIGHT + (MerchantStock.SLOTS - 1) * ROW_GAP + GAP + HINT_HEIGHT
+## The open tab's page: as tall as the Items tab's rows, as wide as a row.
+const PAGE_HEIGHT := MerchantStock.SLOTS * ShopSlot.HEIGHT + (MerchantStock.SLOTS - 1) * ROW_GAP
+## The page and its hint, on every tab.
+const BODY_HEIGHT := PAGE_HEIGHT + GAP + HINT_HEIGHT
+## The foot's buttons (they keep their width in every language, so the
+## message beside the sell slot keeps its room).
+const UNDO_SIZE := Vector2(104, 40)
+const REFRESH_SIZE := Vector2(156, 40)
 const MESSAGE_TIME := 1.6
 const TAB_NAMES: Array[String] = ["Items", "Potions", "Craft"]
 const ITEMS_TAB := 0
@@ -45,7 +57,7 @@ const POTIONS_TAB := 1
 const CRAFT_TAB := 2
 ## One hint line per tab; the Potions tab's names the potion keys (hint()).
 const HINTS: Array[String] = [
-	"Right-click or drag to buy.\nDrag an item onto the red slot to sell it.",
+	"Right-click or drag to buy.\nDrag an item onto Sell to sell it.",
 	"Right-click or drag to buy. Potions fill\nthe %s and %s cells first, then the backpack.",
 	"Drag two fragments, or your boots and a\nfragment, into the slots, then pay the fee.",
 ]
@@ -71,7 +83,7 @@ const NOTE_COLORS := {
 	CraftState.EMPTY: UiStyle.DIM_COLOR,
 	CraftState.ONE: UiStyle.TEXT_COLOR,
 	CraftState.NO_RECIPE: UiStyle.ERROR_COLOR,
-	CraftState.NO_GOLD: UiStyle.TEXT_COLOR,
+	CraftState.NO_GOLD: UiStyle.TITLE_COLOR,
 	CraftState.READY: UiStyle.TITLE_COLOR,
 }
 const CRAFT_BUTTON_SIZE := Vector2(176, 42)
@@ -79,15 +91,24 @@ const CRAFT_BUTTON_SIZE := Vector2(176, 42)
 const BENCH_PAD := 16.0
 const BENCH_GAP := 14
 const SIGN_FONT := 26
+const GOLD_FONT := 22
 
 var screen: BackpackScreen
 
 var _tab := 0
 var _tab_buttons: Array[Button] = []
+var _tab_highlight: SlideHighlight
 var _pages: Array[Control] = []
-var _gold_label: Label
+## Each tab's rows (the Craft tab: its page) and its hint line.
+var _rows: Array[Control] = []
+var _hints: Array[Label] = []
+var _gold_label: CountLabel
+## The open tab's hint line.
 var _hint: Label
 var _message: Label
+var _message_fade: Tween
+## The message is fading out (it empties at the end).
+var _fading_out := false
 var _refresh: Button
 var _undo: Button
 var _message_left := 0.0
@@ -108,7 +129,8 @@ func _init() -> void:
 	super(PAD)
 
 
-func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
+## `sell_cell` is the backpack screen's sell slot: it sits in the foot.
+func setup(owner_screen: BackpackScreen, potions: Array[ItemData], sell_cell: Control = null) -> void:
 	screen = owner_screen
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override(&"separation", GAP)
@@ -118,80 +140,140 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	var tabs := HBoxContainer.new()
 	tabs.add_theme_constant_override(&"separation", 8)
 	box.add_child(tabs)
+	_tab_highlight = SlideHighlight.under(tabs)
 	for i in TAB_NAMES.size():
 		var button := Button.new()
 		button.text = Lang.t(TAB_NAMES[i])
 		button.custom_minimum_size = TAB_SIZE
 		button.pressed.connect(show_tab.bind(i))
+		UiStyle.style_button(button, BUTTON_FONT)
+		SlideHighlight.clear_rest(button)
 		tabs.add_child(button)
 		_tab_buttons.append(button)
 	var gap := Control.new()
 	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tabs.add_child(gap)
 	tabs.add_child(_coin(24.0))
-	_gold_label = UiStyle.label("0", 22, UiStyle.GOLD_COLOR)
+	_gold_label = CountLabel.new()
+	_gold_label.add_theme_font_size_override(&"font_size", GOLD_FONT)
+	_gold_label.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
+	_gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_gold_label.flash = true
 	tabs.add_child(_gold_label)
+	_gold_label.reserve("99999")
 
-	var body := _column(GAP)
-	body.custom_minimum_size = Vector2(ShopSlot.WIDTH, BODY_HEIGHT)
-	box.add_child(body)
+	# The pages share one plain holder, so a new page can rise into place.
+	# Each page ends with its own hint, right under what it explains; a short
+	# page leaves its room above the foot.
+	var pages := Control.new()
+	pages.custom_minimum_size = Vector2(ShopSlot.WIDTH, BODY_HEIGHT)
+	pages.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(pages)
 	var items := _column(ROW_GAP)
 	for slot in MerchantStock.SLOTS:
 		items.add_child(ShopSlot.new(screen, slot))
-	var potion_page := _column(ROW_GAP)
+	var potion_rows := _column(ROW_GAP)
 	for potion in potions:
-		potion_page.add_child(ShopSlot.new(screen, -1, potion))
-	_pages = [items, potion_page, _build_craft_page()]
-	for page in _pages:
-		body.add_child(page)
-	_hint = UiStyle.label(Lang.t(HINTS[0]), HINT_FONT, UiStyle.DIM_COLOR)
-	# Long key names are cut off instead of widening the shop.
-	_hint.clip_text = true
-	_hint.custom_minimum_size.y = HINT_HEIGHT
-	body.add_child(_hint)
+		potion_rows.add_child(ShopSlot.new(screen, -1, potion))
+	var craft := _build_craft_page()
+	_rows = [items, potion_rows, craft]
+	_pages = [_column(GAP), _column(GAP), craft]
+	for tab in _pages.size():
+		var page := _pages[tab]
+		if page != _rows[tab]:
+			page.add_child(_rows[tab])
+		var line := UiStyle.note(hint(tab))
+		# Long key names are cut off instead of widening the shop.
+		line.clip_text = true
+		line.custom_minimum_size.y = HINT_HEIGHT
+		page.add_child(line)
+		_hints.append(line)
+		# Sized by hand, not anchored: UiMotion moves its position as it rises,
+		# which would rewrite an anchored page's offsets.
+		page.size = pages.custom_minimum_size
+		page.visible = false
+		pages.add_child(page)
+	pages.resized.connect(func() -> void:
+		for page in _pages:
+			page.size = pages.size)
+	_hint = _hints[0]
 	GameSettings.instance().changed.connect(_on_setting_changed)
-	_message = UiStyle.label("", 16, UiStyle.ERROR_COLOR)
+
+	# The foot sits on the panel's bottom edge however tall the panel is.
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(spacer)
+	var foot := HBoxContainer.new()
+	foot.add_theme_constant_override(&"separation", GAP)
+	box.add_child(foot)
+	if sell_cell:
+		sell_cell.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		foot.add_child(sell_cell)
+	# The message's slot never changes size, whatever it says.
+	var slot := Control.new()
+	slot.custom_minimum_size.y = ItemCell.SIZE
+	slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.clip_contents = true
+	foot.add_child(slot)
+	_message = UiStyle.note("", UiStyle.ERROR_COLOR)
+	_message.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_message.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_message.max_lines_visible = 2
 	_message.clip_text = true
-	_message.custom_minimum_size.y = MESSAGE_HEIGHT
-	box.add_child(_message)
-	var bottom := HBoxContainer.new()
-	bottom.alignment = BoxContainer.ALIGNMENT_END
-	bottom.add_theme_constant_override(&"separation", 8)
-	box.add_child(bottom)
+	slot.add_child(_message)
 	_undo = Button.new()
 	_undo.text = Lang.t("Undo sale")
-	_undo.custom_minimum_size = Vector2(130, 40)
+	_undo.custom_minimum_size = UNDO_SIZE
+	_undo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	UiStyle.style_button(_undo, BUTTON_FONT)
 	_undo.pressed.connect(func() -> void: screen.undo_sale())
-	bottom.add_child(_undo)
+	foot.add_child(_undo)
+	# Refresh keeps its slot on every tab; only the button hides.
+	var refresh_slot := Control.new()
+	refresh_slot.custom_minimum_size = REFRESH_SIZE
+	refresh_slot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	refresh_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	foot.add_child(refresh_slot)
 	_refresh = Button.new()
-	_refresh.text = Lang.t("Refresh")
-	_refresh.icon = ShopSlot.COIN
-	_refresh.expand_icon = false
-	_refresh.add_theme_constant_override(&"icon_max_width", 22)
-	_refresh.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_refresh.custom_minimum_size = Vector2(160, 40)
+	_refresh.set_anchors_preset(Control.PRESET_FULL_RECT)
 	UiStyle.style_button(_refresh, BUTTON_FONT)
+	_refresh.add_child(UiStyle.price_row(Lang.t("Refresh"), 0, ShopSlot.COIN, BUTTON_FONT))
 	_refresh.pressed.connect(func() -> void: screen.refresh_shop())
-	bottom.add_child(_refresh)
+	refresh_slot.add_child(_refresh)
 	screen.inventory.changed.connect(_recheck_inputs)
 	show_tab(0)
 
 
 ## Shows what the open shop charges for a refresh.
 func show_refresh_cost(cost: int) -> void:
-	_refresh.text = Lang.t("Refresh  %d") % cost
+	UiStyle.price_amount(_refresh.get_node(^"PriceRow")).set_value(cost, true)
 
 
-## Switching tabs gives the Craft inputs' items back to the backpack.
+## The Refresh button's words and price, as shown ("Refresh 100").
+func refresh_text() -> String:
+	var row := _refresh.get_node(^"PriceRow")
+	return "%s %s" % [UiStyle.price_text(row).text, UiStyle.price_amount(row).final_text()]
+
+
+## Switching tabs gives the Craft inputs' items back to the backpack. Only
+## the page swaps; the chosen tab's fill slides to its button.
 func show_tab(tab: int) -> void:
 	if tab != _tab:
 		clear_craft()
+	var old: Control = null
+	for page in _pages:
+		if page.visible and page != _pages[tab]:
+			old = page
 	_tab = tab
-	for i in _pages.size():
-		_pages[i].visible = i == tab
-		UiStyle.style_button(_tab_buttons[i], BUTTON_FONT, i == tab)
+	UiMotion.swap_body(old, _pages[tab])
+	for i in _tab_buttons.size():
+		UiStyle.set_selected(_tab_buttons[i], i == tab, false)
+	_tab_highlight.follow(_tab_buttons[tab])
 	_refresh.visible = tab == ITEMS_TAB
+	_hint = _hints[tab]
 	_hint.text = hint(tab)
 
 
@@ -210,7 +292,7 @@ static func hint(tab: int) -> String:
 ## A rebound potion key shows in the hint at once.
 func _on_setting_changed(key: StringName) -> void:
 	if key == &"bindings":
-		_hint.text = hint(_tab)
+		_hints[POTIONS_TAB].text = hint(POTIONS_TAB)
 
 
 func undo_button() -> Button:
@@ -219,6 +301,11 @@ func undo_button() -> Button:
 
 func current_tab() -> int:
 	return _tab
+
+
+## The open tab's page.
+func page(tab: int) -> Control:
+	return _pages[tab]
 
 
 ## Shows why a purchase, refresh or craft failed, and flashes the slot's
@@ -232,14 +319,14 @@ func refuse(result: Shop.Result, slot: ShopSlot = null) -> void:
 ## A red message for MESSAGE_TIME seconds.
 func show_message(text: String) -> void:
 	_selling = false
-	_message.text = text
+	_say(text, UiStyle.ERROR_COLOR)
 	_message_left = MESSAGE_TIME
 
 
 ## The shop slots on `tab` (none on the Craft tab).
 func slots(tab: int) -> Array[ShopSlot]:
 	var found: Array[ShopSlot] = []
-	for child in _pages[tab].get_children():
+	for child in _rows[tab].get_children():
 		if child is ShopSlot:
 			found.append(child)
 	return found
@@ -345,7 +432,8 @@ func craft_state() -> CraftState:
 func _process(delta: float) -> void:
 	if screen == null or screen.shop == null:
 		return
-	_gold_label.text = str(screen.shop.wallet.gold)
+	if _gold_label.value != screen.shop.wallet.gold:
+		_gold_label.set_value(screen.shop.wallet.gold)
 	# Greyed once every open slot is sold: a refresh would change nothing.
 	_refresh.disabled = not screen.shop.can_refresh()
 	_show_undo()
@@ -354,25 +442,62 @@ func _process(delta: float) -> void:
 	# The dragged icon covers the sell slot, so its price shows here too.
 	if screen.sell_refused():
 		_selling = false
-		_message.text = Lang.t("Boots can't be sold")
-		_message.add_theme_color_override(&"font_color", UiStyle.ERROR_COLOR)
+		_say(Lang.t("Boots can't be sold"), UiStyle.ERROR_COLOR)
 		_message_left = MESSAGE_TIME
 		return
 	var preview := screen.sell_preview()
 	if preview > 0:
 		_selling = true
-		_message.text = Lang.t("Sells for %d gold") % preview
-		_message.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
+		_say(Lang.t("Sells for %d gold") % preview, UiStyle.GOLD_COLOR)
 		_message_left = 0.0
 		return
-	_message.add_theme_color_override(&"font_color", UiStyle.ERROR_COLOR)
 	if _message_left > 0.0:
 		_message_left -= delta
 		if _message_left <= 0.0:
-			_message.text = ""
+			_say("", UiStyle.ERROR_COLOR)
 	elif _selling:
 		_selling = false
-		_message.text = ""
+		_say("", UiStyle.ERROR_COLOR)
+
+
+## The message line says `text` in `color`: a line that was empty fades in
+## over FAST, an emptied line fades out over EXIT and then empties; one text
+## replacing another swaps in place. The new text is there at once (what a
+## test reads); an emptied one stays until its fade ends.
+func _say(text: String, color: Color) -> void:
+	if text == "":
+		if _message.text != "" and not _fading_out:
+			_fade_message(0.0, func() -> void: _message.text = "")
+		return
+	_message.add_theme_color_override(&"font_color", color)
+	if text == _message.text and not _fading_out:
+		return
+	var appearing := _message.text == "" or _fading_out
+	_message.text = text
+	if appearing:
+		_fade_message(1.0)
+
+
+## Fades the message to alpha `to`, then calls `then` (at once while
+## UiMotion.off()). It always ends at alpha 1, empty or not.
+func _fade_message(to: float, then := Callable()) -> void:
+	if _message_fade and _message_fade.is_valid():
+		_message_fade.kill()
+	_message_fade = null
+	_fading_out = to == 0.0
+	var done := func() -> void:
+		_fading_out = false
+		if then.is_valid():
+			then.call()
+		_message.modulate.a = 1.0
+	if UiMotion.off() or not _message.is_inside_tree():
+		done.call()
+		return
+	if to > 0.0 and _message.modulate.a >= 1.0:
+		_message.modulate.a = 0.0
+	_message_fade = UiMotion.tween(_message)
+	_message_fade.tween_property(_message, ^"modulate:a", to, UiMotion.FAST if to > 0.0 else UiMotion.EXIT)
+	_message_fade.tween_callback(done)
 
 
 ## Undo sale is greyed with nothing sold; its hover text names the item and
@@ -394,8 +519,10 @@ func _show_craft() -> void:
 	var result := craft_preview()
 	_fee_label.text = str(craft_fee()) if result else "–"
 	_fee_label.add_theme_color_override(&"font_color", UiStyle.ERROR_COLOR if state == CraftState.NO_GOLD else UiStyle.GOLD_COLOR)
-	_craft_note.text = craft_note()
+	# With a result, its name alone: the parts are named on their cells' cards.
+	_craft_note.text = Lang.t(result.display_name) if result else craft_note()
 	_craft_note.add_theme_color_override(&"font_color", NOTE_COLORS[state])
+	_craft_note.add_theme_font_size_override(&"font_size", UiStyle.FONT_BODY if result else UiStyle.FONT_NOTE)
 	_arrow.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if state == CraftState.READY else UiStyle.DIM_COLOR)
 	_craft_button.disabled = result == null
 	_craft_button.text = Lang.t(CRAFT_WORDS[state])
@@ -445,8 +572,9 @@ func _column(gap: int) -> VBoxContainer:
 	return column
 
 
+## The bench, the note and the fee row (the page's hint goes under them).
 func _build_craft_page() -> VBoxContainer:
-	var page := _column(GAP)
+	var page := _column(GAP_L)
 	var bench := PanelContainer.new()
 	var inset := StyleBoxFlat.new()
 	inset.bg_color = ShopSlot.ROW_FILL
@@ -470,20 +598,24 @@ func _build_craft_page() -> VBoxContainer:
 	row.add_child(_arrow)
 	row.add_child(_result_slot)
 
-	_craft_note = UiStyle.label("", 15, UiStyle.TEXT_COLOR)
+	_craft_note = UiStyle.note("", UiStyle.TEXT_COLOR)
 	_craft_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_craft_note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	# Long item names wrap instead of widening the shop.
 	_craft_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_craft_note.custom_minimum_size = Vector2(0, 44)
+	_craft_note.custom_minimum_size = Vector2(0, HINT_HEIGHT)
 	page.add_child(_craft_note)
 
 	var fee_row := HBoxContainer.new()
-	fee_row.add_theme_constant_override(&"separation", 6)
+	fee_row.add_theme_constant_override(&"separation", UiStyle.GAP_S)
 	page.add_child(fee_row)
-	fee_row.add_child(UiStyle.label(Lang.t("Fee"), 16, UiStyle.DIM_COLOR))
+	var fee_word := UiStyle.label(Lang.t("Fee"), UiStyle.FONT_BODY, UiStyle.DIM_COLOR)
+	fee_word.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	fee_row.add_child(fee_word)
 	fee_row.add_child(_coin(20.0))
-	_fee_label = UiStyle.label("–", 18, UiStyle.GOLD_COLOR)
+	_fee_label = UiStyle.label("–", UiStyle.FONT_ROW, UiStyle.GOLD_COLOR)
 	_fee_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_fee_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	fee_row.add_child(_fee_label)
 	_craft_button = Button.new()
 	_craft_button.text = Lang.t(CRAFT_WORDS[CraftState.EMPTY])

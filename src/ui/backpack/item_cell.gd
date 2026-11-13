@@ -2,13 +2,16 @@ class_name ItemCell
 extends Control
 ## One cell of the backpack screen: a dark well whose rim follows the item in
 ## it (UiStyle.item_rim) and turns gold under the mouse, and under a dragged
-## item it would take. It is a backpack cell or an equip slot (fainter, under
-## a chain, when locked), a potion cell (its potion faded while empty), the
-## boots cell (Boots of Speed faded while empty) or the sell slot (red while
-## the shop is open, a blank well otherwise). An equip slot and a potion cell
-## carry their key in a corner tab. Draws the item from the inventory, or
-## nothing while that item sits in a Craft input, and passes mouse input to
-## the screen.
+## item it would take; the gold eases in and out (UiMotion.lit). It is a
+## backpack cell (a fainter, empty well when locked), an equip slot (fainter,
+## under a chain, when locked: there are few and each is a goal), a potion
+## cell (its potion faded while empty), the boots cell (Boots of Speed faded
+## while empty) or the sell slot (in the merchant's foot: a dark well with a
+## red rim, filling red while an item is over it). An equip slot and a potion
+## cell carry their key in a bottom-right tab, a stack its count top-left.
+## Draws the item from the inventory, or nothing while that item sits in a
+## Craft input, and passes mouse input to the screen. A cell that just got an
+## item (bought or crafted) lands it: the icon settles from a little bigger.
 
 enum Style { BACKPACK, EQUIP, SELL, POTION, BOOTS }
 
@@ -19,19 +22,24 @@ const RADIUS := 5
 ## strongly its rim shows that item's kind.
 const PLACEHOLDER_ALPHA := 0.3
 const EMPTY_RIM_ALPHA := 0.6
-## A locked cell: a fainter well and rim under a dim chain.
+## A locked cell: a fainter well and rim (a locked equip slot under a dim
+## chain; a locked backpack cell's rim fainter still, and no chain).
 const LOCKED_FILL := Color(0.02, 0.028, 0.045, 0.55)
 const LOCKED_RIM := Color(0.36, 0.4, 0.48, 0.3)
+const LOCKED_PACK_RIM := Color(0.36, 0.4, 0.48, 0.18)
 const CHAIN_INSET := 14.0
 const CHAIN_ALPHA := 0.45
 ## The gold wash over a cell that would take the dragged item.
 const DROP_WASH := Color(1.0, 0.81, 0.35, 0.14)
-## The sell slot: red, lighter under an item, with a coin over its word.
-const SELL_FILL := Color("5e1714")
+## The sell slot: a dark well with a red rim and a coin over its word; it
+## fills red while an item is over it.
 const SELL_OVER := Color("8a2a22")
 const SELL_TEXT := Color("ffd8c8")
-const SELL_FONT := 15
+const SELL_FONT := UiStyle.FONT_TAG
 const SELL_COIN := 20.0
+## A landed item's icon starts this much bigger and settles over LAND_TIME.
+const LAND_SCALE := 0.15
+const LAND_TIME := 0.2
 const KEY_COLOR := Color("e6d3a3")
 const CHAIN := preload("res://assets/art/ui/chain.svg")
 const COIN := preload("res://assets/art/ui/gold.svg")
@@ -44,7 +52,15 @@ var screen: BackpackScreen
 var hovered := false:
 	set(value):
 		hovered = value
-		queue_redraw()
+		refresh_lit()
+## The gold look, 0 to 1 (UiMotion.lit), and the landing, 1 to 0.
+var lit_t := 0.0
+var land_t := 0.0
+
+## What refresh_lit() last eased to, and whether that was a drop's wash.
+var _lit_on := false
+var _washed := false
+var _land: Tween
 
 
 func _init(cell_index: int, cell_style: Style, owner_screen: BackpackScreen) -> void:
@@ -92,6 +108,45 @@ func is_lit() -> bool:
 	return hovered and item() != null
 
 
+## Eases the gold look toward what is_lit() says now (the sell slot: an item
+## held over it), and redraws.
+func refresh_lit() -> void:
+	var on := is_lit()
+	if style == Style.SELL:
+		on = screen.is_shopping() and screen.target_index() == BackpackScreen.SELL
+	if on != _lit_on:
+		_lit_on = on
+		if on:
+			_washed = screen.is_dragging()
+		UiMotion.lit(self, on)
+	queue_redraw()
+
+
+## The item just put in the cell lands: its icon settles from a little
+## bigger over LAND_TIME (nothing to see while UiMotion.off()).
+func land() -> void:
+	if _land and _land.is_valid():
+		_land.kill()
+	_land = null
+	land_t = 0.0
+	if UiMotion.off() or not is_inside_tree():
+		queue_redraw()
+		return
+	land_t = 1.0
+	_land = UiMotion.tween(self)
+	_land.tween_method(_set_land, 1.0, 0.0, LAND_TIME)
+
+
+func _set_land(t: float) -> void:
+	land_t = t
+	queue_redraw()
+
+
+## Cards open 8 px beside the cell.
+func tooltip_anchor() -> Rect2:
+	return get_global_rect().grow_individual(2.0, 0.0, 2.0, 0.0)
+
+
 ## The item drawn in the cell: none while it is the one being dragged.
 func _shown() -> ItemData:
 	return null if index == screen.dragged_index() else item()
@@ -137,55 +192,60 @@ func _gui_input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, size)
-	if style == Style.SELL and screen.is_shopping():
+	if style == Style.SELL:
 		_draw_sell(rect)
 		return
-	if is_locked() or style == Style.SELL:
+	if is_locked():
 		_draw_closed(rect)
 		return
-	var lit := is_lit()
-	draw_style_box(UiStyle.cell_style(rim(), lit, RADIUS), rect)
-	if lit and screen.is_dragging():
+	var t := lit_t
+	draw_style_box(UiStyle.cell_style_t(rim(), t, RADIUS), rect)
+	if t > 0.0 and _washed:
 		var wash := StyleBoxFlat.new()
-		wash.bg_color = DROP_WASH
+		wash.bg_color = Color(DROP_WASH, DROP_WASH.a * t)
 		wash.set_corner_radius_all(RADIUS)
 		draw_style_box(wash, rect)
 	# The tags sit inside the rim, which is thicker while lit.
-	var inside := rect.grow(-2.0 if lit else -1.0)
+	var inside := rect.grow(-2.0 if t >= 0.5 else -1.0)
 	var shown := _shown()
+	var icon := rect.grow(-ICON_INSET)
 	if shown:
-		ItemIcon.draw_item(self, shown, rect.grow(-ICON_INSET))
+		ItemIcon.draw_item(self, shown, icon.grow(icon.size.x * 0.5 * LAND_SCALE * land_t))
 		var count := screen.inventory.count_at(index)
-		ItemIcon.draw_tag(self, str(count) if count > 1 else "", inside, CORNER_BOTTOM_RIGHT, Color.WHITE, RADIUS - 1)
+		ItemIcon.draw_tag(self, str(count) if count > 1 else "", inside, CORNER_TOP_LEFT, Color.WHITE, RADIUS - 1)
 	else:
-		ItemIcon.draw_item(self, placeholder(), rect.grow(-ICON_INSET), Color(1, 1, 1, PLACEHOLDER_ALPHA))
-	ItemIcon.draw_tag(self, key_text(), inside, CORNER_TOP_LEFT, KEY_COLOR, RADIUS - 1)
+		ItemIcon.draw_item(self, placeholder(), icon, Color(1, 1, 1, PLACEHOLDER_ALPHA))
+	ItemIcon.draw_tag(self, key_text(), inside, CORNER_BOTTOM_RIGHT, KEY_COLOR, RADIUS - 1)
 
 
-## A cell that takes nothing: a fainter well, under a dim chain when it is
-## locked (the sell slot outside the shop has none).
+## A cell that takes nothing: a fainter well. A locked equip slot shows a
+## dim chain; a locked backpack cell shows nothing more (the line under the
+## grid says how to open them), and its rim is fainter still.
 func _draw_closed(rect: Rect2) -> void:
-	var box := UiStyle.cell_style(LOCKED_RIM, false, RADIUS)
+	var pack := style == Style.BACKPACK
+	var box := UiStyle.cell_style(LOCKED_PACK_RIM if pack else LOCKED_RIM, false, RADIUS)
 	box.bg_color = LOCKED_FILL
 	draw_style_box(box, rect)
-	if is_locked():
+	if not pack:
 		draw_texture_rect(CHAIN, rect.grow(-CHAIN_INSET), false, Color(1, 1, 1, CHAIN_ALPHA))
 
 
-## The red sell slot: a coin over "SELL", or over the gold the dragged item
-## would bring ("NO" for one that can't be sold).
+## The sell slot: a dark well with a red rim and a coin over "Sell"; an item
+## held over it fills it red (eased) and shows the gold it would bring ("NO"
+## for one that can't be sold).
 func _draw_sell(rect: Rect2) -> void:
-	var over := screen.target_index() == BackpackScreen.SELL
-	var box := UiStyle.cell_style(UiStyle.BAD_COLOR, over, RADIUS)
-	box.bg_color = SELL_OVER if over else SELL_FILL
-	box.set_border_width_all(2)
+	var t := lit_t
+	var box := UiStyle.cell_style(UiStyle.BAD_COLOR, false, RADIUS)
+	box.bg_color = UiStyle.CELL_COLOR.lerp(SELL_OVER, t)
+	box.set_border_width_all(2 if t >= 0.5 else 1)
 	draw_style_box(box, rect)
 	var font := ThemeDB.fallback_font
-	var text := Lang.t("SELL")
+	var over := screen.target_index() == BackpackScreen.SELL
+	var text := Lang.t("Sell")
 	if over:
 		text = Lang.t("NO") if screen.sell_refused() else "+%d" % screen.sell_preview()
 	var middle := rect.get_center()
 	draw_texture_rect(COIN, Rect2(middle.x - SELL_COIN * 0.5, middle.y - SELL_COIN - 1.0, SELL_COIN, SELL_COIN), false)
-	var baseline := middle.y + SELL_FONT + 2.0
+	var baseline := middle.y + SELL_FONT + 3.0
 	draw_string_outline(font, Vector2(0, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, SELL_FONT, 4, Color.BLACK)
 	draw_string(font, Vector2(0, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, SELL_FONT, UiStyle.GOLD_COLOR if over else SELL_TEXT)

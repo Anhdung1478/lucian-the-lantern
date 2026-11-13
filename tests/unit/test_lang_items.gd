@@ -208,7 +208,7 @@ func test_the_vietnamese_texts_with_values_keep_their_values() -> void:
 	assert_eq(StatStyle.stat_name(&"armor"), "Giáp")
 	assert_eq(TooltipText.plain(TooltipCard.potion_text(catalog.find(&"hp_potion"))), "Hồi 200 Máu trong 5 s.")
 	assert_eq(TooltipText.plain(TooltipText.ratio([0.6], 1, "AD")), "(+60% SMCK)")
-	assert_eq(ShopPanel.hint(ShopPanel.ITEMS_TAB), "Nhấp chuột phải hoặc kéo để mua.\nKéo món đồ vào ô đỏ để bán.")
+	assert_eq(ShopPanel.hint(ShopPanel.ITEMS_TAB), "Nhấp chuột phải hoặc kéo để mua.\nKéo món đồ vào ô Bán để bán.")
 
 
 func test_english_is_unchanged() -> void:

@@ -233,13 +233,17 @@ msgstr "Mua Giày trong Cây Tiến Hóa"
 msgid "%s potions go here: press %s to drink one"
 msgstr "Bình %s đặt ở đây: nhấn %s để uống một bình"
 
-#. The sell slot's word.
-msgid "SELL"
-msgstr "BÁN"
+#. The sell slot's word (sentence case; the Items tab's hint names it too).
+msgid "Sell"
+msgstr "Bán"
 
 #. The sell slot's word for an item that can't be sold.
 msgid "NO"
 msgstr "KHÔNG"
+
+#. Backpack: the line under the grid while some cells are locked. The open cells, all the cells.
+msgid "%d of %d cells open. Buy Backpack Slots in the Evolution Tree."
+msgstr "Đã mở %d / %d ô. Mua Ô Ba Lô trong Cây Tiến Hóa."
 
 #. Recipe table: the note under the list.
 msgid "Lit gold: you hold both parts."
@@ -254,8 +258,8 @@ msgid "Drag a fragment or your boots here from the backpack screen"
 msgstr "Kéo một mảnh ghép hoặc giày của bạn vào đây từ ba lô"
 
 #. An empty Craft input's word.
-msgid "ITEM"
-msgstr "ĐỒ"
+msgid "Item"
+msgstr "Đồ"
 
 #. Merchant tab.
 msgid "Items"
@@ -269,9 +273,9 @@ msgstr "Thuốc"
 msgid "Craft"
 msgstr "Chế Tạo"
 
-#. Merchant hint under the Items tab.
-msgid "Right-click or drag to buy.\nDrag an item onto the red slot to sell it."
-msgstr "Nhấp chuột phải hoặc kéo để mua.\nKéo món đồ vào ô đỏ để bán."
+#. Merchant hint under the Items tab. "Sell" is the sell slot's word, in the merchant's foot.
+msgid "Right-click or drag to buy.\nDrag an item onto Sell to sell it."
+msgstr "Nhấp chuột phải hoặc kéo để mua.\nKéo món đồ vào ô Bán để bán."
 
 #. Merchant hint under the Potions tab. The two %s are the keys of the health and the mana potion.
 msgid "Right-click or drag to buy. Potions fill\nthe %s and %s cells first, then the backpack."
@@ -324,10 +328,6 @@ msgstr "Hủy bán"
 #. Merchant button that rerolls the stock.
 msgid "Refresh"
 msgstr "Làm mới"
-
-#. Merchant button with its price. %d is the gold (two spaces before it).
-msgid "Refresh  %d"
-msgstr "Làm mới  %d"
 
 #. Merchant red message when a legendary or potion is dragged into a Craft input.
 msgid "Only fragments and boots are crafted"

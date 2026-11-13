@@ -6,12 +6,14 @@ extends Control
 ## Items tab (chained while locked, with a note naming the Evolution Tree
 ## node that opens it; SOLD once bought) or a potion of the Potions tab,
 ## with its key in the well's corner. Mouse input goes to the backpack
-## screen, which runs the drag.
+## screen, which runs the drag. The hover look eases in and out
+## (UiMotion.lit); a row that sells out fades its SOLD in. Its card opens
+## beside the merchant's plate, not over it (tooltip_anchor).
 
-## Narrow enough for an item's card to open on the row's right, clear of
-## the backpack, on a 16:9 screen.
-const WIDTH := 392.0
-const HEIGHT := 68.0
+## Wide enough for the foot under the rows: the sell slot, the message and
+## the two buttons.
+const WIDTH := 500.0
+const HEIGHT := 78.0
 ## The well with the icon, the room around it and between it and the text.
 const WELL := 56.0
 const PAD := 6.0
@@ -25,13 +27,18 @@ const ROW_HOVER := Color(1.0, 0.81, 0.35, 0.07)
 const CLOSED_FILL := Color(0.02, 0.03, 0.05, 0.28)
 const CLOSED_RIM := Color(0.36, 0.4, 0.48, 0.22)
 const CLOSED_TEXT := Color(0.55, 0.58, 0.65)
-const NAME_FONT := 17
-const LINE_FONT := 13
-const LINE_ICON := 16.0
+const NAME_FONT := UiStyle.FONT_ROW
+const LINE_FONT := UiStyle.FONT_NOTE
+const LINE_ICON := 18.0
+## The name's and the stat line's baselines, from the row's middle.
+const NAME_BASELINE := -5.0
+const LINE_BASELINE := 20.0
 ## Between two words of the line, and more before the next stat's icon.
 const LINE_SPACE := 4.0
 const LINE_GAP := 6.0
-const PRICE_FONT := 18
+const PRICE_FONT := UiStyle.FONT_ROW
+## How long a sold row's SOLD takes to fade in.
+const SOLD_FADE := 0.15
 const COIN_SIZE := 20.0
 const PRICE_COLOR := Color("ffcf5a")
 const TOO_EXPENSIVE := Color("ff6a5a")
@@ -48,6 +55,15 @@ var stock_slot := -1
 var potion: ItemData
 ## Seconds left of the red flash after a refused purchase.
 var flash_left := 0.0
+## The hover look, 0 to 1 (UiMotion.lit).
+var lit_t := 0.0
+
+var _lit_on := false
+## How far a sold row's SOLD has faded in, and what it was last frame (for
+## the shop it was seen in, so an open shop's sold rows don't fade again).
+var _sold_t := 1.0
+var _was_sold := false
+var _seen_shop: Shop
 
 
 func _init(owner_screen: BackpackScreen, slot := -1, potion_item: ItemData = null) -> void:
@@ -126,6 +142,14 @@ static func _part(text: String, color: Color, icon: Texture2D = null) -> Diction
 	return {"icon": icon, "text": text, "color": color}
 
 
+## Cards hang beside the merchant's plate at this row's height, never over
+## the plate (HoverTip measures BESIDE from this rect).
+func tooltip_anchor() -> Rect2:
+	var row := get_global_rect()
+	var plate := screen.shop_panel().get_global_rect()
+	return Rect2(plate.position.x - 2.0, row.position.y, plate.size.x + 4.0, row.size.y)
+
+
 func tooltip_content() -> Control:
 	if is_locked() and not screen.is_dragging():
 		return TooltipCard.note(Lang.t(LOCKED_NOTE))
@@ -140,7 +164,29 @@ func _gui_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if flash_left > 0.0:
 		flash_left = maxf(flash_left - delta, 0.0)
+	var on := item() != null and is_visible_in_tree() and get_global_rect().has_point(Pointer.in_world(self))
+	if on != _lit_on:
+		_lit_on = on
+		UiMotion.lit(self, on)
+	_watch_sold()
 	queue_redraw()
+
+
+## A row that sells out while the shop is open fades its SOLD in.
+func _watch_sold() -> void:
+	var sold := is_sold()
+	if screen.shop != _seen_shop:
+		_seen_shop = screen.shop
+		_was_sold = sold
+		_sold_t = 1.0
+		return
+	if sold == _was_sold:
+		return
+	_was_sold = sold
+	_sold_t = 1.0
+	if sold and not UiMotion.off():
+		_sold_t = 0.0
+		UiMotion.tween(self).tween_property(self, ^"_sold_t", 1.0, SOLD_FADE)
 
 
 func _draw() -> void:
@@ -157,30 +203,30 @@ func _draw() -> void:
 		draw_style_box(closed, well)
 		if is_locked():
 			draw_texture_rect(CHAIN, well.grow(-ItemCell.CHAIN_INSET + 2.0), false, Color(1, 1, 1, ItemCell.CHAIN_ALPHA))
-			draw_string(font, Vector2(text_x, middle - 4.0), title(), HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_FONT, CLOSED_TEXT)
-			draw_string(font, Vector2(text_x, middle + 16.0), Lang.t(LOCKED_NOTE), HORIZONTAL_ALIGNMENT_LEFT, size.x - text_x - PAD, LINE_FONT, UiStyle.DISABLED_FONT)
+			draw_string(font, Vector2(text_x, middle + NAME_BASELINE), title(), HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_FONT, CLOSED_TEXT)
+			draw_string(font, Vector2(text_x, middle + LINE_BASELINE), Lang.t(LOCKED_NOTE), HORIZONTAL_ALIGNMENT_LEFT, size.x - text_x - PAD, LINE_FONT, UiStyle.DISABLED_FONT)
 		else:
-			draw_string(font, Vector2(text_x, middle + 6.0), title(), HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_FONT, CLOSED_TEXT)
+			draw_string(font, Vector2(text_x, middle + 7.0), title(), HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_FONT, Color(CLOSED_TEXT, CLOSED_TEXT.a * _sold_t))
 		return
-	var hovered := get_global_rect().has_point(Pointer.in_world(self))
-	_draw_row(rect, ROW_FILL, UiStyle.GOLD_COLOR if hovered else ROW_RIM)
-	if hovered:
-		_draw_row(rect, ROW_HOVER, Color.TRANSPARENT)
-	draw_style_box(UiStyle.cell_style(UiStyle.item_rim(shown), hovered, ItemCell.RADIUS), well)
+	var t := lit_t
+	_draw_row(rect, ROW_FILL, ROW_RIM.lerp(UiStyle.GOLD_COLOR, t))
+	if t > 0.0:
+		_draw_row(rect, Color(ROW_HOVER, ROW_HOVER.a * t), Color.TRANSPARENT)
+	draw_style_box(UiStyle.cell_style_t(UiStyle.item_rim(shown), t, ItemCell.RADIUS), well)
 	if not (screen.is_dragging() and screen.dragged_shop_slot() == self):
 		ItemIcon.draw_item(self, shown, well.grow(-ICON_INSET))
-	ItemIcon.draw_tag(self, key_text(), well.grow(-2.0 if hovered else -1.0), CORNER_TOP_LEFT, KEY_COLOR, ItemCell.RADIUS - 1)
+	ItemIcon.draw_tag(self, key_text(), well.grow(-2.0 if t >= 0.5 else -1.0), CORNER_BOTTOM_RIGHT, KEY_COLOR, ItemCell.RADIUS - 1)
 	var affordable := screen.shop != null and screen.shop.wallet.can_afford(shown.cost)
 	var price_color := PRICE_COLOR if affordable and flash_left <= 0.0 else TOO_EXPENSIVE
 	var price := str(shown.cost)
 	var price_width := font.get_string_size(price, HORIZONTAL_ALIGNMENT_LEFT, -1, PRICE_FONT).x
 	var price_x := size.x - PAD - 6.0 - price_width
-	draw_string(font, Vector2(price_x, middle + 6.5), price, HORIZONTAL_ALIGNMENT_LEFT, -1, PRICE_FONT, price_color)
+	draw_string(font, Vector2(price_x, middle + 7.0), price, HORIZONTAL_ALIGNMENT_LEFT, -1, PRICE_FONT, price_color)
 	draw_texture_rect(COIN, Rect2(price_x - COIN_SIZE - 5.0, middle - COIN_SIZE * 0.5, COIN_SIZE, COIN_SIZE), false)
 	var text_width := price_x - COIN_SIZE - 5.0 - TEXT_GAP - text_x
 	var name_color := UiStyle.TEXT_COLOR if shown.is_fragment() or shown.is_potion() else UiStyle.TITLE_COLOR
-	draw_string(font, Vector2(text_x, middle - 4.0), title(), HORIZONTAL_ALIGNMENT_LEFT, text_width, NAME_FONT, name_color)
-	_draw_line(shown, Vector2(text_x, middle + 17.0))
+	draw_string(font, Vector2(text_x, middle + NAME_BASELINE), title(), HORIZONTAL_ALIGNMENT_LEFT, text_width, NAME_FONT, name_color)
+	_draw_line(shown, Vector2(text_x, middle + LINE_BASELINE))
 
 
 ## The row's box: a dark strip with a thin rim.
@@ -202,7 +248,7 @@ func _draw_line(shown: ItemData, at: Vector2) -> void:
 		if part.icon:
 			if x > at.x:
 				x += LINE_GAP
-			draw_texture_rect(part.icon, Rect2(x, at.y - LINE_ICON + 3.0, LINE_ICON, LINE_ICON), false)
+			draw_texture_rect(part.icon, Rect2(x, at.y - LINE_ICON + 4.0, LINE_ICON, LINE_ICON), false)
 			x += LINE_ICON + 2.0
 		draw_string(font, Vector2(x, at.y), part.text, HORIZONTAL_ALIGNMENT_LEFT, -1, LINE_FONT, part.color)
 		x += font.get_string_size(part.text, HORIZONTAL_ALIGNMENT_LEFT, -1, LINE_FONT).x + LINE_SPACE
