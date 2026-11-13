@@ -117,6 +117,18 @@ msgstr "Ô lưu %d · %s · lưu lúc %s"
 msgid "Slot %d · empty"
 msgstr "Ô lưu %d · trống"
 
+#. Slot list: the middle column of the slot being played (it can't be picked).
+msgid "Current"
+msgstr "Hiện tại"
+
+#. Slot list: the middle column of a slot whose save is broken, in red.
+msgid "Can't be read"
+msgstr "Không đọc được"
+
+#. Slot list: the middle column of an empty slot, greyed.
+msgid "Empty"
+msgstr "Trống"
+
 #. Play time in the slot list: %d is hours, %02d minutes.
 msgid "%dh %02dm"
 msgstr "%dg %02dp"

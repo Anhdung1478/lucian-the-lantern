@@ -451,7 +451,7 @@ func test_the_slot_list_shows_play_time() -> void:
 	SaveGame.instance().add_play_time(5025.0)
 	SaveGame.instance().copy_to(2)
 	_title().show_slots(true)
-	assert_string_contains(_title().slot_list.buttons[1].text, "1h 23m")
+	assert_string_contains(_title().slot_list.row_text(1), "1h 23m")
 
 
 func test_a_used_slot_leaves_room_around_its_text() -> void:
@@ -460,7 +460,7 @@ func test_a_used_slot_leaves_room_around_its_text() -> void:
 	_title().show_slots(false)
 	var button := _title().slot_list.buttons[1]
 	# The text's own width (and the button's padding) must not set the width.
-	assert_lte(button.get_minimum_size().x + 40.0, SlotList.BUTTON_SIZE.x, button.text)
+	assert_lte(button.get_minimum_size().x + 40.0, SlotList.BUTTON_SIZE.x, _title().slot_list.row_text(1))
 
 
 func _break_slot(n: int) -> void:
@@ -478,7 +478,7 @@ func test_a_broken_slot_says_so_and_loading_it_only_offers_a_new_game() -> void:
 	assert_false(_title().load_button.disabled, "a broken slot still opens the list, to explain it")
 	_title().show_slots(true)
 	var button := _title().slot_list.buttons[1]
-	assert_eq(button.text, "Slot 2 · can't be read")
+	assert_eq(_title().slot_list.row_text(1), "Slot 2 · can't be read")
 	assert_false(button.disabled)
 	assert_eq(button.get_theme_color(&"font_color"), UiStyle.ERROR_COLOR)
 	button.pressed.emit()

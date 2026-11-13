@@ -73,6 +73,11 @@ func light(index: int) -> void:
 	clear()
 	lit = index
 	var button := buttons[index]
+	if button.has_method(&"key_light"):
+		# A row that eases its own look (MenuEntry).
+		button.call(&"key_light", true)
+		button.set_meta(UNLIT_META, {})
+		return
 	var looks := {}
 	for state: StringName in LIT_LOOK:
 		var hover: Variant = _override(button, LIT_LOOK[state])
@@ -132,6 +137,9 @@ static func _unlight(button: Button) -> void:
 		return
 	var looks: Dictionary = button.get_meta(UNLIT_META)
 	button.remove_meta(UNLIT_META)
+	if button.has_method(&"key_light"):
+		button.call(&"key_light", false)
+		return
 	for state: StringName in looks:
 		if _override(button, state) == looks[state][1]:
 			_set_override(button, state, looks[state][0])

@@ -115,29 +115,32 @@ func test_the_mouse_moves_the_light() -> void:
 
 func test_a_lit_entry_wears_its_hover_look() -> void:
 	var entry := entries[1] as MenuEntry
-	var hover := entry.get_theme_stylebox(&"hover")
+	var hover := entry.get_theme_stylebox(&"hover") as StyleBoxFlat
 	keys.light(1)
-	assert_eq(entry.get_theme_stylebox(&"normal"), hover)
+	assert_eq(UiMotion.lit_t(entry), 1.0, "it eases to its lit look")
+	var normal := entry.get_theme_stylebox(&"normal") as StyleBoxFlat
+	assert_eq(normal.bg_color, hover.bg_color)
+	assert_eq(normal.border_color, hover.border_color)
 	assert_eq(entry.get_theme_color(&"font_color"), entry.get_theme_color(&"font_hover_color"))
 	assert_eq(entry.get_theme_color(&"icon_normal_color"), entry.get_theme_color(&"icon_hover_color"))
 
 
 func test_originals_are_restored() -> void:
 	var entry := entries[0] as MenuEntry
-	var normal := entry.get_theme_stylebox(&"normal")
+	var fill := (entry.get_theme_stylebox(&"normal") as StyleBoxFlat).bg_color
 	var font := entry.get_theme_color(&"font_color")
 	var icon := entry.get_theme_color(&"icon_normal_color")
-	var second_normal := entries[1].get_theme_stylebox(&"normal")
+	var second_fill := (entries[1].get_theme_stylebox(&"normal") as StyleBoxFlat).bg_color
 	keys.handle(_key(KEY_DOWN))
-	assert_ne(entry.get_theme_stylebox(&"normal"), normal)
+	assert_ne((entry.get_theme_stylebox(&"normal") as StyleBoxFlat).bg_color, fill)
 	keys.handle(_key(KEY_DOWN))
-	assert_eq(entry.get_theme_stylebox(&"normal"), normal)
+	assert_eq((entry.get_theme_stylebox(&"normal") as StyleBoxFlat).bg_color, fill)
 	assert_eq(entry.get_theme_color(&"font_color"), font)
 	assert_eq(entry.get_theme_color(&"icon_normal_color"), icon)
 	assert_false(entry.has_meta(MenuKeys.UNLIT_META))
 	keys.set_buttons(MenuKeys.buttons_in(page))
 	assert_eq(keys.lit, -1, "a page shown again starts unlit")
-	assert_eq(entries[1].get_theme_stylebox(&"normal"), second_normal, "set_buttons puts the light out")
+	assert_eq((entries[1].get_theme_stylebox(&"normal") as StyleBoxFlat).bg_color, second_fill, "set_buttons puts the light out")
 	assert_false(entries[1].has_meta(MenuKeys.UNLIT_META))
 
 
@@ -181,4 +184,5 @@ func test_a_new_page_drops_the_old_mouse_hooks() -> void:
 	old.mouse_entered.emit()
 	assert_eq(_lit_text(), "Resume", "a button off the page moves nothing")
 	keys.set_buttons([entries[0], entries[1]] as Array[Button])
-	assert_eq(entries[0].mouse_entered.get_connections().size(), 1, "one hook per button")
+	# The row's own hover ease is the other connection.
+	assert_eq(entries[0].mouse_entered.get_connections().size(), 2, "one hook per button")
