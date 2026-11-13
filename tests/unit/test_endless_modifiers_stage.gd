@@ -102,6 +102,9 @@ func test_after_a_boss_wave_the_pick_shows_three_cards_with_nothing_and_the_brea
 	for i in 3:
 		var texts: Array[String] = []
 		_texts(pick.cards[i], texts)
+		if i == 2:
+			assert_eq(texts, ["No modifier"], "Nothing is one dim line")
+			continue
 		assert_has(texts, EndlessModifiers.downside(pick.ids[i]))
 		assert_has(texts, EndlessModifiers.reward(pick.ids[i]))
 	assert_true(pick.cards[2].is_visible_in_tree())

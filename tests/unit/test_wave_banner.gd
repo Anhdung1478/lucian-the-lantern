@@ -162,8 +162,10 @@ func test_it_slides_down_into_place_as_it_fades_in() -> void:
 	assert_between(banner.position.y, WaveBanner.TOP - WaveBanner.SLIDE + 0.1, WaveBanner.TOP - 0.1)
 	banner._process(WaveBanner.FADE * 0.5)
 	assert_almost_eq(banner.position.y, WaveBanner.TOP, 0.01)
-	banner._process(WaveBanner.TIME + WaveBanner.FADE * 0.5)
-	assert_almost_eq(banner.position.y, WaveBanner.TOP, 0.01, "it fades out where it is")
+	banner._process(WaveBanner.TIME * 0.5)
+	assert_almost_eq(banner.position.y, WaveBanner.TOP, 0.01, "at rest until it goes")
+	banner._process(WaveBanner.TIME * 0.5 + WaveBanner.FADE * 0.5)
+	assert_between(banner.position.y, WaveBanner.TOP - WaveBanner.EXIT_RISE + 0.1, WaveBanner.TOP - 0.1, "it rises as it fades out")
 
 
 func test_with_low_effects_it_only_fades() -> void:

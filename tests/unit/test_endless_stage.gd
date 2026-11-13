@@ -448,11 +448,12 @@ func _loot(stage: Stage) -> Array[Node]:
 	return stage.get_node("World").get_children().filter(func(node: Node) -> bool: return node is LootDrop)
 
 
-## The result's stats rows as [label, value] texts, in order.
+## The result's stats rows as [label, value] texts, in order (a defeat's
+## essence rows, the last ones, are left out).
 func _result_rows(stage: Stage) -> Array:
 	var rows := []
 	for row: Node in stage.result._stats.get_children():
-		if not row.is_queued_for_deletion():
+		if not row.is_queued_for_deletion() and not (row.get_child(0) as Label).text.ends_with(" essence"):
 			rows.append([(row.get_child(0) as Label).text, (row.get_child(1) as Label).text])
 	return rows
 

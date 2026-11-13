@@ -18,11 +18,15 @@ signal _step_ended
 const LAYER := 38
 const BAR_HEIGHT := 120.0
 const CAPTION_TIME := 3.5
-## The speaker and the caption start this far into the bottom bar; a caption
-## that wraps to a second line (a longer language) starts higher, so both
-## lines stay on the bar.
-const LINES_TOP := 16.0
-const LINES_TOP_WRAPPED := 4.0
+## The speaker and the caption are centred in the bottom bar as a pair (a
+## caption that wraps to a second line, a longer language, starts higher), and
+## never nearer than this to its top edge.
+const LINES_LEAST := 4.0
+## A new caption fades in over CAPTION_IN rising CAPTION_RISE; the old one
+## fades out first, over CAPTION_OUT.
+const CAPTION_IN := 0.15
+const CAPTION_OUT := 0.08
+const CAPTION_RISE := 4.0
 ## Props are drawn over the units.
 const PROPS_Z := 20
 
@@ -57,7 +61,7 @@ func _ready() -> void:
 		add_child(bar)
 	var text := _lines
 	text.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	text.offset_top = -BAR_HEIGHT + LINES_TOP
+	text.offset_top = -BAR_HEIGHT + LINES_LEAST
 	text.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_speaker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -98,20 +102,33 @@ func skip() -> void:
 	_end_step()
 
 
-## Shows a line until Space, a click, or CAPTION_TIME.
+## Shows a line until Space, a click, or CAPTION_TIME. It fades in and rises a
+## little; the one before faded out first (at once with low effects).
 func caption(who: String, text: String) -> void:
 	if skipped:
 		return
 	_speaker.text = who
 	_caption.text = text
-	_lines.offset_top = -BAR_HEIGHT + (LINES_TOP_WRAPPED if _caption.get_line_count() > 1 else LINES_TOP)
+	_centre_lines()
+	UiMotion.enter(_lines, CAPTION_RISE, CAPTION_IN)
 	var timer := animate()
 	timer.tween_interval(CAPTION_TIME)
 	_in_caption = true
 	await step(timer)
 	_in_caption = false
+	if not skipped and not UiMotion.off():
+		var fade := UiMotion.exit(_lines, Callable(), 0.0, CAPTION_OUT)
+		if fade:
+			await fade.finished
 	_caption.text = ""
 	_speaker.text = ""
+
+
+## The speaker and the caption as one block, centred on the bottom bar.
+func _centre_lines() -> void:
+	var lines := maxi(_caption.get_line_count(), 1)
+	var height := _speaker.get_line_height() + _lines.get_theme_constant(&"separation") + _caption.get_line_height() * lines
+	_lines.offset_top = -BAR_HEIGHT + maxf((BAR_HEIGHT - height) * 0.5, LINES_LEAST)
 
 
 func wait(seconds: float) -> void:

@@ -130,7 +130,7 @@ func test_a_story_defeat_shows_the_recap() -> void:
 	var stage := await _end(StageSetup.for_stage(SaveGame.instance(), 2, 1), false)
 	assert_eq(stage.result.title.text, "DEFEATED")
 	var texts := _texts(stage)
-	for line in [HEAD, "Killed by Ranged Minion", "Ranged Minion 100%", DeathRecap.TIP_RANGED]:
+	for line in [HEAD, "Killed by Ranged Minion", "Ranged Minion", "100%", DeathRecap.TIP_RANGED]:
 		assert_true(line in texts, line)
 
 

@@ -85,50 +85,68 @@ func test_the_game_over_button_emits_title() -> void:
 	assert_signal_emitted_with_parameters(result, "chosen", [&"title"])
 
 
-## The essences read their amounts once they have counted up (COUNT_TIME).
-func test_essence_rows_and_reward_lines() -> void:
+## A clear's essences are one row of large counts (a number in the essence's
+## color, its word under it); their final numbers are on at once.
+func test_essence_counts_and_reward_lines() -> void:
 	result.show_result(true, "Stage 2-1", [], _essences(312, 4, 0), ["Stage 2-2 is open"] as Array[String])
-	result._process(StageResult.COUNT_TIME)
 	var texts := _texts()
-	assert_true("+312 blue essence" in texts, str(texts))
-	assert_true("+4 orange essence" in texts, str(texts))
-	assert_false(texts.any(func(text: String) -> bool: return text.contains("purple")))
+	assert_eq(result._essence_counts[Essences.BLUE].final_text(), "312")
+	assert_eq(result._essence_counts[Essences.BLUE].text, "312")
+	assert_eq(result._essence_counts[Essences.ORANGE].text, "4")
+	assert_false(result._essence_counts.has(Essences.PURPLE), "none earned: no count")
+	assert_true("blue" in texts and "orange" in texts, str(texts))
+	assert_false("purple" in texts)
 	assert_true("Stage 2-2 is open" in texts)
 	assert_false("No essences" in texts)
+	assert_eq(result._essence_counts[Essences.BLUE].get_theme_color(&"font_color"), Stage.ESSENCE_COLORS[Essences.BLUE])
 
 
-func test_the_essences_count_up_from_zero() -> void:
+func test_the_essences_count_up_from_zero_when_motion_is_on() -> void:
+	UiMotion.renders = true
 	result.show_result(true, "Stage 2-1", [], _essences(312, 4, 0), NONE)
-	assert_true("+0 blue essence" in _texts(), str(_texts()))
-	assert_true("+0 orange essence" in _texts())
-	assert_true(result.is_processing(), "counting")
-	result._process(StageResult.COUNT_TIME * 0.5)
-	var blue: String = _texts().filter(func(text: String) -> bool: return text.ends_with("blue essence"))[0]
-	assert_between(int(blue), 1, 311, "on its way up")
-	result._process(StageResult.COUNT_TIME * 0.5)
-	assert_true("+312 blue essence" in _texts(), str(_texts()))
-	assert_true("+4 orange essence" in _texts())
-	assert_false(result.is_processing(), "done")
+	var blue: CountLabel = result._essence_counts[Essences.BLUE]
+	assert_eq(blue.text, "0", "from zero")
+	await wait_seconds(StageResult.REWARDS_AT + CountLabel.COUNT_MAX + 0.3)
+	assert_eq(blue.text, "312")
+	assert_eq(result._essence_counts[Essences.ORANGE].text, "4")
+	UiMotion.renders = false
 
 
 func test_low_effects_show_the_final_numbers_at_once() -> void:
+	UiMotion.renders = true
 	GameSettings.instance().set_value(&"quality", "low")
-	result.show_result(true, "Stage 2-1", [], _essences(312, 4, 0), NONE)
-	assert_true("+312 blue essence" in _texts(), str(_texts()))
-	assert_true("+4 orange essence" in _texts())
-	assert_false(result.is_processing())
+	result.show_result(true, "Stage 2-1", [["Kills", "87"]], _essences(312, 4, 0), NONE)
+	assert_eq(result._essence_counts[Essences.BLUE].text, "312")
+	assert_eq(result._essence_counts[Essences.ORANGE].text, "4")
+	assert_eq((result._stats.get_child(0).get_child(1) as Label).text, "87")
+	UiMotion.renders = false
+
+
+## The buttons take clicks from the first frame: only their alpha waits.
+func test_the_buttons_take_clicks_while_they_fade_in() -> void:
+	UiMotion.renders = true
+	result.show_result(true, "Stage 2-1", [], _essences(), NONE, false, true)
+	watch_signals(result)
+	assert_eq(result.retry_button.mouse_filter, Control.MOUSE_FILTER_STOP)
+	assert_true(result.retry_button.is_visible_in_tree())
+	assert_lt(result._buttons.modulate.a, 1.0, "not yet drawn whole")
+	result.retry_button.pressed.emit()
+	assert_signal_emitted_with_parameters(result, "chosen", [&"retry"])
+	await wait_seconds(StageResult.BUTTONS_AT + UiMotion.STORY + 0.1)
+	assert_almost_eq(result._buttons.modulate.a, 1.0, 0.01)
+	assert_almost_eq(result._center.modulate.a, 1.0, 0.01)
+	assert_almost_eq(result.title.modulate.a, 1.0, 0.01)
+	UiMotion.renders = false
 
 
 ## A second result (a retry's) counts its own amounts, from zero again.
 func test_a_new_result_counts_its_own_essences() -> void:
 	result.show_result(false, "Stage 2-1", [], _essences(50, 0, 0), NONE)
-	result._process(StageResult.COUNT_TIME)
 	result.show_result(true, "Stage 2-1", [], _essences(0, 0, 7), NONE)
-	result._process(StageResult.COUNT_TIME)
-	await wait_process_frames(1)
 	var texts := _texts()
-	assert_true("+7 purple essence" in texts, str(texts))
-	assert_false(texts.any(func(text: String) -> bool: return text.contains("blue")), "the old rows are gone")
+	assert_eq(result._essence_counts.keys(), [Essences.PURPLE])
+	assert_true("purple" in texts, str(texts))
+	assert_false("blue" in texts, "the old rows are gone")
 
 
 func test_no_essences_text() -> void:
@@ -160,7 +178,9 @@ func test_a_stats_row_is_its_name_and_its_value() -> void:
 	assert_eq((rows[0].get_child(1) as Label).text, "87")
 	assert_eq((rows[1].get_child(1) as Label).text, "2 / 3")
 	assert_true(StageResult.STAT_ICONS.has("Kills"))
-	assert_false(StageResult.STAT_ICONS.has("Waves"), "no art: a diamond")
+	assert_false(StageResult.STAT_ICONS.has("Waves"), "no art: it draws wave pips")
+	assert_is(rows[0].get_child(1), CountLabel, "a whole number counts up")
+	assert_false(rows[1].get_child(1) is CountLabel, "2 / 3 is set at once")
 
 
 func test_stats_rows_show_label_and_value() -> void:
@@ -177,3 +197,48 @@ func test_the_recap_shows_on_a_defeat_and_never_on_a_clear() -> void:
 	assert_true(result.find_children("*", "Label", true, false).any(func(label: Label) -> bool: return label.text == "WHAT HIT YOU" and label.is_visible_in_tree()))
 	result.show_result(true, "Stage 2-1", [], _essences(), NONE, false, false, "", recap)
 	assert_false(result.find_children("*", "Label", true, false).any(func(label: Label) -> bool: return label.text == "WHAT HIT YOU" and label.is_visible_in_tree()))
+	assert_false("Killed by Gromp" in _texts())
+
+
+## After a defeat the right column is the recap: the killed-by line, the shares
+## one per line (name left, share right), the tips; the essences earned are the
+## stats' last rows, and the Resolve line joins the tips.
+func test_a_defeat_puts_the_recap_in_the_right_column_and_the_essences_in_the_stats() -> void:
+	var recap := {"killed": "Killed by Gromp", "shares": ["Gromp 60%", "Burning ground 40%"], "tip": "A tip.", "tree": "Buy something."}
+	result.show_result(false, "Stage 2-1", [["Kills", "3"]], _essences(32, 0, 2), ["Resolve 1 / 5"] as Array[String], false, false, "", recap)
+	var rows := result._stats.get_children()
+	assert_eq(rows.size(), 3, "Kills, then blue and purple")
+	assert_eq((rows[1].get_child(0) as Label).text, "Blue essence")
+	assert_eq((rows[1].get_child(1) as Label).text, "+32")
+	assert_eq((rows[2].get_child(1) as Label).text, "+2")
+	assert_true(result._essence_counts.is_empty(), "no large counts on the right")
+	var shares := result._rewards.get_children().filter(func(row: Node) -> bool: return row is HBoxContainer and row.get_child_count() == 2 and row.get_child(0) is Label)
+	assert_eq(shares.size(), 2)
+	assert_eq((shares[0].get_child(0) as Label).text, "Gromp")
+	assert_eq((shares[0].get_child(1) as Label).text, "60%")
+	assert_eq((shares[1].get_child(0) as Label).text, "Burning ground")
+	assert_eq((shares[1].get_child(1) as Label).horizontal_alignment, HORIZONTAL_ALIGNMENT_RIGHT)
+	var texts := _texts()
+	for text in ["A tip.", "Buy something.", "Resolve 1 / 5"]:
+		assert_true(text in texts, str(texts))
+	assert_eq(result._right_head.text, "WHAT HIT YOU")
+	result.show_result(true, "Stage 2-1", [], _essences(32, 0, 0), NONE)
+	assert_eq(result._right_head.text, "REWARDS")
+
+
+## A defeat with nothing to recap keeps the rewards column and its large counts.
+func test_a_defeat_without_a_recap_keeps_the_rewards() -> void:
+	result.show_result(false, "Stage 2-1", [], _essences(32, 0, 0), NONE)
+	assert_eq(result._right_head.text, "REWARDS")
+	assert_eq(result._essence_counts[Essences.BLUE].text, "32")
+
+
+## Endless's lead stat is large and gold.
+func test_the_waves_cleared_row_leads_in_gold() -> void:
+	result.show_result(false, "Endless", [["Waves cleared", "22"], ["Kills", "5"]], _essences(), NONE, false, false, "RUN OVER")
+	var lead := result._stats.get_child(0).get_child(1) as CountLabel
+	assert_eq(lead.text, "22")
+	assert_eq(lead.get_theme_color(&"font_color"), UiStyle.GOLD_COLOR)
+	assert_eq(lead.get_theme_font_size(&"font_size"), StageResult.LEAD_FONT)
+	var other := result._stats.get_child(1).get_child(1) as CountLabel
+	assert_eq(other.get_theme_font_size(&"font_size"), StageResult.ROW_FONT)

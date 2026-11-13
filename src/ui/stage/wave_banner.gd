@@ -4,7 +4,8 @@ extends PanelContainer
 ## capitals between gold rules, on a dark band that fades out at its ends. A
 ## wave that brings a mini boss reads MINI BOSS over its name; the boss wave
 ## reads BOSS over the boss's name, larger and in red. It fades in (sliding
-## down a little, not with low effects), stays TIME seconds and fades out.
+## down a little, not with low effects), stays TIME seconds and fades out
+## (rising a little, again not with low effects).
 ## Its time only runs while the game does, and it never takes mouse input.
 ## The stage puts it on the HUD's layer, so it hides with the HUD; setup()
 ## makes it listen to the stage's waves.
@@ -22,6 +23,8 @@ const TIME := 1.6
 const FADE := 0.2
 ## How far above its place it starts.
 const SLIDE := 16.0
+## How far it rises as it fades out.
+const EXIT_RISE := 7.0
 ## The band: its strength in the middle, and the share of its width each
 ## end takes to fade out.
 const BAND_ALPHA := 0.8
@@ -150,13 +153,16 @@ func _process(delta: float) -> void:
 	_place()
 
 
-## Its strength and place at its age: in over FADE, out over the last FADE.
+## Its strength and place at its age: in over FADE (sliding down into place),
+## out over the last FADE (rising away).
 func _place() -> void:
 	var coming := clampf(_age / FADE, 0.0, 1.0)
 	var going := clampf((FADE + TIME + FADE - _age) / FADE, 0.0, 1.0)
 	modulate.a = minf(coming, going)
-	var slide := 0.0 if GameSettings.instance().low_effects() else SLIDE * (1.0 - ease(coming, 0.4))
-	position.y = TOP - slide
+	var low := GameSettings.instance().low_effects()
+	var slide := 0.0 if low else SLIDE * (1.0 - ease(coming, 0.4))
+	var rise := 0.0 if low else EXIT_RISE * (1.0 - ease(going, 0.4))
+	position.y = TOP - slide - rise
 
 
 func _line(text: String, font_size: int, color: Color) -> Label:

@@ -109,17 +109,33 @@ msgstr "NGUỒN SÁT THƯƠNG"
 msgid "No essences"
 msgstr "Không có tinh chất"
 
-#. Result card: an essence row, counting up; %d is the amount
-msgid "+%d blue essence"
-msgstr "+%d tinh chất xanh"
+#. Result card after a clear: the word under an essence's large count
+msgid "blue"
+msgstr "xanh"
 
-#. Result card: an essence row, counting up; %d is the amount
-msgid "+%d orange essence"
-msgstr "+%d tinh chất cam"
+#. Result card after a clear: the word under an essence's large count
+msgid "orange"
+msgstr "cam"
 
-#. Result card: an essence row, counting up; %d is the amount
-msgid "+%d purple essence"
-msgstr "+%d tinh chất tím"
+#. Result card after a clear: the word under an essence's large count
+msgid "purple"
+msgstr "tím"
+
+#. Result card after a defeat: a stats row, the essence earned (the value is its amount)
+msgid "Blue essence"
+msgstr "Tinh chất xanh"
+
+#. Result card after a defeat: a stats row, the essence earned (the value is its amount)
+msgid "Orange essence"
+msgstr "Tinh chất cam"
+
+#. Result card after a defeat: a stats row, the essence earned (the value is its amount)
+msgid "Purple essence"
+msgstr "Tinh chất tím"
+
+#. Endless: the modifier pick's card that clears the modifier (one dim line)
+msgid "No modifier"
+msgstr "Không biến số"
 
 #. Result card: a reward line after a boss is cleared or killed; %s is the boss's name
 msgid "+%d purple essence (first clear)"

@@ -4,7 +4,8 @@ extends Control
 ## the stage-end screen's button. The title's scene (Lucian and the freed
 ## Senna; Thresh is gone) under a dawn tint, and on a card "THE END", "Senna is free.", the
 ## story time (the slot's play time) and the credits. Continue goes where that button said.
-## ESC does nothing here.
+## ESC does nothing here. The card pops in after the scene's fade; its lines
+## then arrive one after another, the button last (it takes clicks all along).
 
 signal continue_pressed
 
@@ -15,7 +16,14 @@ const CARD_FROM := 0.36
 const FREE_COLOR := Color("8fe3b0")
 const TITLE_FONT := 72
 const SUBTITLE_FONT := 32
-const BUTTON_SIZE := Vector2(420, 64)
+const BUTTON_SIZE := Vector2(312, 64)
+## The card pops in this long after the screen opens (the scene's fade), then its
+## lines come this far apart.
+const CARD_AT := 0.35
+const LINE_STEP := 0.12
+## Between the rule under "Senna is free.", the story time, the credits and the
+## button (20 px on screen); the credits sit 6 apart.
+const GROUP_GAP := 24.0
 const CREDITS: Array[String] = [
 	"Lucian: The Lantern",
 	"Made with Godot 4",
@@ -23,7 +31,7 @@ const CREDITS: Array[String] = [
 ]
 
 var backdrop := TitleBackdrop.new()
-var time_label := UiStyle.label("", 28, UiStyle.TEXT_COLOR)
+var time_label := UiStyle.label("", UiStyle.FONT_LEAD + 4, UiStyle.TEXT_COLOR)
 var credit_labels: Array[Label] = []
 var continue_button := Button.new()
 
@@ -66,17 +74,46 @@ func _build() -> void:
 	center.add_child(card)
 	var column := card.content
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	column.add_theme_constant_override(&"separation", 0)
 	time_label.text = Lang.t("Story time: %s") % story_time(SaveGame.instance().play_time)
-	column.add_child(_centered(time_label))
+	column.add_child(_spaced(_centered(time_label), UiStyle.GAP_L))
+	var credits := VBoxContainer.new()
+	credits.add_theme_constant_override(&"separation", UiStyle.GAP_S)
 	for line in CREDITS:
-		var credit := _centered(UiStyle.label(Lang.t(line), 20, UiStyle.DIM_COLOR))
+		var credit := _centered(UiStyle.label(Lang.t(line), UiStyle.FONT_NOTE, UiStyle.DIM_COLOR))
 		credit_labels.append(credit)
-		column.add_child(credit)
+		credits.add_child(credit)
+	column.add_child(_spaced(credits, GROUP_GAP))
 	continue_button.text = Lang.t("Continue")
 	continue_button.custom_minimum_size = BUTTON_SIZE
+	continue_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	UiStyle.style_button(continue_button, 26)
 	continue_button.pressed.connect(continue_pressed.emit)
-	column.add_child(continue_button)
+	column.add_child(_spaced(continue_button, GROUP_GAP))
+	_arrive(center, card)
+
+
+## The card pops in after the scene's fade, then "THE END", "Senna is free.",
+## the story time, the credits and the button arrive 0.12 apart. All at once
+## while UiMotion.off(). The button takes clicks from the start.
+func _arrive(center: Control, card: MenuCard) -> void:
+	Ornament.pop_in(center, UiMotion.STORY, CARD_AT)
+	var lines: Array = [card.title_label, card.subtitle_label.get_parent(), time_label]
+	lines.append_array(credit_labels)
+	lines.append(continue_button)
+	UiMotion.stagger(lines, LINE_STEP, CARD_AT + 0.1, UiMotion.RISE, UiMotion.STORY)
+
+
+## `node` in a holder with `above` of room over it: the gap between groups, which
+## the card's column (no separation) does not give.
+func _spaced(node: Control, above: float) -> Control:
+	var holder := VBoxContainer.new()
+	holder.add_theme_constant_override(&"separation", 0)
+	var room := Control.new()
+	room.custom_minimum_size.y = above
+	holder.add_child(room)
+	holder.add_child(node)
+	return holder
 
 
 func _centered(label: Label) -> Label:
