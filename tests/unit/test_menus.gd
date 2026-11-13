@@ -141,3 +141,39 @@ func test_the_stage_menu_is_a_card_with_resume_first() -> void:
 	watch_signals(menu)
 	entries["Resume"].pressed.emit()
 	assert_signal_emitted(menu, "resume_requested")
+
+
+## Review E4: a hint closer than HINT_GAP to its label is hidden.
+func test_a_hint_with_no_room_is_hidden() -> void:
+	var tight := MenuEntry.new("Leave to main menu", preload("res://assets/art/ui/menu_leave.svg"), MenuEntry.Kind.DANGER, "Title screen")
+	add_child_autofree(tight)
+	assert_false(tight.hint_label.visible, "no room: no hint")
+	var roomy := MenuEntry.new("Save", preload("res://assets/art/ui/menu_resume.svg"), MenuEntry.Kind.NORMAL, "Slot 1")
+	add_child_autofree(roomy)
+	assert_true(roomy.hint_label.visible)
+
+
+## Review E6: a card with no title is tighter above and below.
+func test_a_card_with_no_title_is_tighter() -> void:
+	var bare := MenuCard.new()
+	var titled := MenuCard.new("MENU")
+	for card in [bare, titled]:
+		add_child_autofree(card)
+	assert_lt(bare.get_theme_stylebox(&"panel").content_margin_top, titled.get_theme_stylebox(&"panel").content_margin_top)
+	assert_eq(bare.get_theme_stylebox(&"panel").content_margin_top, MenuCard.BARE_PAD.x)
+	assert_eq(bare.get_theme_stylebox(&"panel").content_margin_bottom, MenuCard.BARE_PAD.y)
+	titled.set_title("")
+	assert_eq(titled.get_theme_stylebox(&"panel").content_margin_top, MenuCard.BARE_PAD.x, "the title taken away")
+
+
+## Review E5: a long question wraps at WRAP_WIDTH and the card stays under CARD_MAX.
+func test_a_long_question_wraps_and_the_card_stays_narrow() -> void:
+	var popup := ConfirmPopup.new()
+	add_child_autofree(popup)
+	popup.ask("Craft a Hextech Gunblade from a B.F. Sword and a Needlessly Large Rod for a price of 1150 gold?", Callable())
+	await wait_process_frames(2)
+	assert_lte(popup._message.custom_minimum_size.x, ConfirmPopup.WRAP_WIDTH)
+	assert_gt(popup._message.get_line_count(), 1, "it wraps")
+	assert_lte(popup._message.get_parent().get_parent().size.x, ConfirmPopup.CARD_MAX)
+	popup.answer(true)
+	assert_false(popup.is_open())

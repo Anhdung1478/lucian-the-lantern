@@ -99,6 +99,9 @@ var _center: CenterContainer
 var _is_open := false
 ## The gold bar and fill behind the open tab.
 var _rail_highlight: SlideHighlight
+## Holds the pages, which are sized to it by hand (not anchored: a page that
+## rises or fades in must never have its offsets rewritten by a move).
+var _page_slot: Control
 var _tab_buttons: Array[Button] = []
 var _pages: Array[Control] = []
 var _bind_buttons := {}
@@ -150,11 +153,22 @@ func is_open() -> bool:
 	return _is_open
 
 
+## Every page fills the slot, shown or not, so none keeps a stale size.
+func _fit_pages() -> void:
+	if _page_slot == null:
+		return
+	for page in _pages:
+		if not UiMotion.is_moving(page):
+			page.position.x = 0.0
+		page.size = _page_slot.size
+
+
 ## Shows page `index`: the old page fades out and the new one rises in (`instant`:
 ## at once, as open() does); the accent bar slides to the tab.
 func show_tab(index: int, instant := false) -> void:
 	var from := tab
 	tab = index
+	_fit_pages()
 	if instant:
 		for i in _pages.size():
 			_pages[i].visible = i == tab
@@ -330,13 +344,15 @@ func _build() -> void:
 	side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	side.add_theme_constant_override(&"separation", 10)
 	body.add_child(side)
-	var pages := Control.new()
-	pages.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	side.add_child(pages)
+	_page_slot = Control.new()
+	_page_slot.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_page_slot.resized.connect(_fit_pages)
+	side.add_child(_page_slot)
 	for build in [_build_audio, _build_controls, _build_graphics, _build_gameplay]:
 		var page: Control = build.call()
-		page.set_anchors_preset(Control.PRESET_FULL_RECT)
-		pages.add_child(page)
+		_page_slot.add_child(page)
+		# A hidden page reports its whole list as its minimum until it is laid out.
+		page.minimum_size_changed.connect(_fit_pages)
 		_pages.append(page)
 	side.add_child(HSeparator.new())
 	var bottom := HBoxContainer.new()

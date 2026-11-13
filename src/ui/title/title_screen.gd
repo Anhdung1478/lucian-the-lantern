@@ -22,7 +22,7 @@ signal exit_requested
 const LANTERN := preload("res://assets/art/ui/title_lantern.svg")
 const BUTTON_SIZE := Vector2(420, 64)
 ## The lantern's top edge on the 1920x1080 canvas (57 px on screen), on every page.
-const COLUMN_TOP := 68.0
+const COLUMN_TOP := 58.0
 ## The space between "THE LANTERN" and the page under it (48 px on screen).
 const PAGE_GAP := 58.0
 ## Where the difficulty tip opens: right of the buttons, this far from them (12 px).
@@ -276,7 +276,16 @@ func _hold(part: Control) -> void:
 	column.add_child(holder)
 	holder.add_child(part)
 	holder.custom_minimum_size = part.get_combined_minimum_size()
-	part.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fill(holder, part)
+
+
+## `part` fills `holder` by hand, not by anchors: a rise rewrites an anchored
+## node's offsets against a holder that is not laid out yet.
+func _fill(holder: Control, part: Control) -> void:
+	part.size = holder.custom_minimum_size
+	holder.resized.connect(func() -> void:
+		part.size = holder.size
+		part.position.x = 0.0)
 
 
 ## A page heading: spaced capitals in pale gold between two short rules, like
@@ -311,12 +320,13 @@ func _place_pages() -> void:
 ## Lantern, name, subtitle and the four buttons arrive one after the other, once
 ## per visit to the title (not on a way back from a page).
 func _intro() -> void:
+	# The parts inside their holders: a child of a Container only fades.
 	var parts: Array = []
 	for holder in column.get_children():
 		if holder.has_meta(&"held"):
-			parts.append(holder)
+			parts.append(holder.get_child(0))
 	for holder in _menu.get_children():
-		parts.append(holder)
+		parts.append(holder.get_child(0))
 	UiMotion.stagger(parts, UiMotion.STAGGER + 0.01, INTRO_START, INTRO_RISE, UiMotion.STORY)
 
 
@@ -397,6 +407,6 @@ func _held_button(button: Button) -> Control:
 	var holder := Control.new()
 	holder.custom_minimum_size = BUTTON_SIZE
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	button.set_anchors_preset(Control.PRESET_FULL_RECT)
 	holder.add_child(button)
+	_fill(holder, button)
 	return holder

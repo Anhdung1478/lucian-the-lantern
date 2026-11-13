@@ -10,8 +10,10 @@ const FONT := UiStyle.FONT_ROW
 const NOTE_FONT := UiStyle.FONT_NOTE
 ## Padding above and below the controls.
 const PAD := 7.0
-## The space between the texts and the controls: a note wraps this far from them.
+## The space between the texts and the controls (24 px less the row's own 16): a
+## note wraps this far from them.
 const CONTROLS_GAP := 24
+const ROW_SEPARATION := 16
 const REST_FILL := Color(UiStyle.SURFACE_RAISED, 0.4)
 
 ## The texts, then the controls added with add().
@@ -26,13 +28,16 @@ func _init(text: String, description := "") -> void:
 	add_theme_stylebox_override(&"panel", _box)
 	mouse_entered.connect(UiMotion.lit.bind(self, true, _ease))
 	mouse_exited.connect(UiMotion.lit.bind(self, false, _ease))
-	row.add_theme_constant_override(&"separation", CONTROLS_GAP)
+	row.add_theme_constant_override(&"separation", ROW_SEPARATION)
 	add_child(row)
+	var room := MarginContainer.new()
+	room.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	room.add_theme_constant_override(&"margin_right", CONTROLS_GAP - ROW_SEPARATION)
+	row.add_child(room)
 	var texts := VBoxContainer.new()
-	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	texts.alignment = BoxContainer.ALIGNMENT_CENTER
 	texts.add_theme_constant_override(&"separation", 0)
-	row.add_child(texts)
+	room.add_child(texts)
 	texts.add_child(UiStyle.label(text, FONT))
 	if description:
 		var note := UiStyle.note(description)

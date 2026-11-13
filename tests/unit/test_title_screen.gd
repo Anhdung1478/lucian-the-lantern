@@ -540,3 +540,38 @@ func test_back_from_the_difficulty_page_clears_the_failed_save_notice() -> void:
 	assert_eq(title.notice_label.text, "", "Back clears it")
 	assert_eq(title.error_label.text, "")
 	assert_push_warning_count(1)
+
+
+## Review E1: the lantern, the name and the subtitle stay put on every page.
+func test_the_logo_stays_where_it_is_on_every_page() -> void:
+	var title := _title()
+	await wait_process_frames(2)
+	var title_label: Label = title.column.get_child(1).get_child(0)
+	var top := title_label.get_global_rect().position.y
+	title.show_slots(false)
+	await wait_process_frames(2)
+	assert_eq(title_label.get_global_rect().position.y, top, "slots")
+	title.show_difficulty(1)
+	await wait_process_frames(2)
+	assert_eq(title_label.get_global_rect().position.y, top, "difficulty")
+	title.show_menu()
+	await wait_process_frames(2)
+	assert_eq(title_label.get_global_rect().position.y, top, "back on the menu")
+	assert_true(title.is_showing_slots() == false)
+
+
+## Review E9: a used slot's row has the name, the play time and the date as three parts.
+func test_a_slot_row_is_three_parts() -> void:
+	SaveGame.instance().add_play_time(5025.0)
+	SaveGame.instance().copy_to(2)
+	_title().show_slots(true)
+	var used := _title().slot_list.buttons[1]
+	assert_eq(used.text, "", "the row's words are its parts")
+	var labels := used.find_children("*", "Label", true, false)
+	assert_eq(labels.size(), 3)
+	assert_eq(labels[0].text, "Slot 2")
+	assert_string_contains(labels[1].text, "1h 23m")
+	assert_eq(labels[2].text, SaveGame.instance().saved_at(2).substr(0, 16))
+	var empty := _title().slot_list.buttons[0].find_children("*", "Label", true, false)
+	assert_eq(empty[1].text, "Empty")
+	assert_eq(empty[1].get_theme_color(&"font_color"), UiStyle.DISABLED_FONT)
