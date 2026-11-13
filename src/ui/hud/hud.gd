@@ -31,10 +31,11 @@ const MANA_GHOST := Color("c4d9ff")
 ## The top stack, each plate UiStyle.STACK under the one above it: the stage
 ## info, then the boss bar or (in a break, when there is no boss bar) the
 ## next-wave preview, then the tips. BOSS_BAR_TOP is about where the boss bar
-## and the preview come; TIPS_TOP is the lowest a tip's top gets (the wave
-## banner keeps clear of it).
+## and the preview come, TIPS_TOP about where a tip comes under them (the
+## wave banner's place is measured from it; a new tip waits while the banner
+## shows, so the two never stack).
 const BOSS_BAR_TOP := 92.0
-const TIPS_TOP := 190.0
+const TIPS_TOP := 180.0
 ## The stage info and the preview share one width when theirs differ by less
 ## than this (24 px on screen).
 const SAME_WIDTH := 29.0
