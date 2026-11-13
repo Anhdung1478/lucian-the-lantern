@@ -137,7 +137,7 @@ func _open_pick() -> void:
 	var screens := stage.screens
 	if screens.backpack.visible:
 		screens.set_backpack_open(false)
-	if screens.settings.visible:
+	if screens.settings.is_open():
 		screens.set_settings_open(false)
 	screens.set_menu_open(false)
 	screens.locked = true

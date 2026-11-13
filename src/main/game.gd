@@ -72,7 +72,7 @@ func _on_setting_changed(key: StringName) -> void:
 func _rebuild_screen() -> void:
 	if not (screen is TitleScreen or screen is MainScreen):
 		return
-	var open_tab: int = screen.settings.tab if screen.settings.visible else -1
+	var open_tab: int = screen.settings.tab if screen.settings.is_open() else -1
 	if screen is TitleScreen:
 		show_title()
 	else:
