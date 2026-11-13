@@ -541,6 +541,7 @@ func _build_controls() -> Control:
 		var row := _row(list, Lang.t(GameSettings.ACTION_NAMES[action]))
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(BIND_WIDTH, CONTROL_HEIGHT)
+		button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		button.pressed.connect(listen.bind(action))
 		row.add(button)
 		_bind_buttons[action] = button
