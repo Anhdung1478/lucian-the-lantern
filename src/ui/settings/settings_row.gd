@@ -38,7 +38,10 @@ func _init(text: String, description := "") -> void:
 	texts.alignment = BoxContainer.ALIGNMENT_CENTER
 	texts.add_theme_constant_override(&"separation", 0)
 	room.add_child(texts)
-	texts.add_child(UiStyle.label(text, FONT))
+	var name_label := UiStyle.label(text, FONT)
+	# A long label wraps (the row grows) and never pushes the columns.
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	texts.add_child(name_label)
 	if description:
 		var note := UiStyle.note(description)
 		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

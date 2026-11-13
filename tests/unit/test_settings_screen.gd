@@ -320,6 +320,7 @@ func test_a_cards_controls_let_the_mouse_reach_the_card() -> void:
 
 ## Review r2 E2-2: every row of Controls shares one column template.
 func test_every_controls_row_shares_one_column_template() -> void:
+	screen.show_tab(1)
 	await wait_process_frames(3)
 	var keys := {}
 	var thirds := {}
@@ -332,6 +333,30 @@ func test_every_controls_row_shares_one_column_template() -> void:
 		assert_eq(last.size.x, (row.get_child(row.get_child_count() - 1) as Control).custom_minimum_size.x)
 	assert_eq(keys.size(), 1, "one left edge for the key buttons")
 	assert_eq(thirds.size(), 1, "one left edge for the third column")
+
+
+## Review r3 E3-1: in both languages no page is wider than its column, and the
+## Controls header's reset button ends on the page's right edge.
+func test_every_page_fits_its_column_in_both_languages() -> void:
+	var original := Lang.code()
+	for language in ["en", "vi"]:
+		Lang.use(language)
+		var other := SettingsScreen.new()
+		add_child_autofree(other)
+		other.setup(settings)
+		other.open()
+		await wait_process_frames(3)
+		for tab in 4:
+			other.show_tab(tab)
+			await wait_process_frames(2)
+			var page: Control = other._pages[tab]
+			assert_lte(page.get_combined_minimum_size().x, page.size.x + 0.5, "%s page %d min width fits" % [language, tab])
+		other.show_tab(1)
+		await wait_process_frames(2)
+		var page: Control = other._pages[1]
+		var reset: Control = page.get_child(0).get_child(1)
+		assert_lte(reset.global_position.x + reset.size.x, page.global_position.x + page.size.x + 0.5, "%s: reset inside" % language)
+	Lang.use(original)
 
 
 func test_the_panel_and_every_page_fit_the_screen() -> void:

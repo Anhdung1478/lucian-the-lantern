@@ -632,7 +632,10 @@ func _page(tab: int, extra: Control = null) -> VBoxContainer:
 	var title := UiStyle.label(Lang.t(TAB_NAMES[tab]).to_upper(), PAGE_TITLE_FONT, UiStyle.TITLE_COLOR)
 	title.add_theme_font_override(&"font", JourneyMap.text_font(title, 4))
 	texts.add_child(title)
-	texts.add_child(UiStyle.label(Lang.t(TAB_BLURBS[tab]), 16, UiStyle.DIM_COLOR))
+	var blurb := UiStyle.label(Lang.t(TAB_BLURBS[tab]), 16, UiStyle.DIM_COLOR)
+	# Wraps before the reset button instead of pushing it out.
+	blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	texts.add_child(blurb)
 	if extra:
 		extra.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		heading.add_child(extra)
