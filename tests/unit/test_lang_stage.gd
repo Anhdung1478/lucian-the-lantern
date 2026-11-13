@@ -3,9 +3,6 @@ extends GutTest
 ## translation, the screens built with Lang.probe on show no plain text, and
 ## the most visible texts read right.
 
-## Texts that come composed from another part of the game (the Journey's stage
-## names), left alone by the probe.
-const FROM_OTHER_PARTS: Array[String] = ["Act", "The Loss"]
 ## Mouse buttons and keys, as the bindings name them.
 const KEY_NAMES: Array[String] = ["RMB", "LMB"]
 
@@ -72,7 +69,7 @@ func test_the_result_card_after_a_clear_has_no_plain_text() -> void:
 		["Gold earned", "300"], ["Level reached", "6"], ["Gift", LanternGifts.display_name(1)]]
 	var lines: Array[String] = [Lang.t("Stage %s is open") % "1-2", Lang.t("+%d purple essence (first clear)") % 2]
 	result.show_result(true, "2-1", rows, _essences(5, 3, 2), lines, false, true)
-	assert_eq(LangProbe.plain_texts(result, FROM_OTHER_PARTS), [] as Array[String])
+	assert_eq(LangProbe.plain_texts(result), [] as Array[String])
 
 
 func test_the_result_card_after_a_defeat_with_a_recap_has_no_plain_text() -> void:
@@ -86,7 +83,7 @@ func test_the_result_card_after_a_defeat_with_a_recap_has_no_plain_text() -> voi
 	var result := StageResult.new()
 	add_child_autofree(result)
 	result.show_result(false, "2-1", [["Time", "1:05"]], _essences(), [] as Array[String], false, false, EndlessDirector.RUN_OVER, recap)
-	assert_eq(LangProbe.plain_texts(result, FROM_OTHER_PARTS), [] as Array[String])
+	assert_eq(LangProbe.plain_texts(result), [] as Array[String])
 	assert_eq(result.title.text, Lang.mark("RUN OVER"))
 
 
@@ -100,25 +97,25 @@ func test_the_stage_info_and_the_wave_preview_have_no_plain_text() -> void:
 	var preview := WavePreview.new()
 	add_child_autofree(preview)
 	preview.setup(runner)
-	assert_eq(LangProbe.plain_texts(info, FROM_OTHER_PARTS), [] as Array[String], "waiting")
-	assert_eq(LangProbe.plain_texts(preview, FROM_OTHER_PARTS), [] as Array[String], "the next wave")
+	assert_eq(LangProbe.plain_texts(info), [] as Array[String], "waiting")
+	assert_eq(LangProbe.plain_texts(preview), [] as Array[String], "the next wave")
 	runner.skip()
 	for i in 10:
 		runner.tick(WaveRunner.GROUP_GAP)
 	info.refresh()
-	assert_eq(LangProbe.plain_texts(info, FROM_OTHER_PARTS), [] as Array[String], "fighting")
+	assert_eq(LangProbe.plain_texts(info), [] as Array[String], "fighting")
 
 
 func test_the_wave_banner_and_the_modifier_picks_have_no_plain_text() -> void:
 	Lang.probe = true
 	for line in WaveBanner.lines(3) + WaveBanner.lines(5, &"boss", Lang.t("Thresh")) + WaveBanner.lines(4, &"mini_boss", Lang.t("Karthus")):
-		assert_eq(LangProbe.plain_texts(_label(line), FROM_OTHER_PARTS), [] as Array[String], line)
+		assert_eq(LangProbe.plain_texts(_label(line)), [] as Array[String], line)
 	var modifiers := ModifierPick.new([1, 2, EndlessModifiers.NOTHING] as Array[int])
 	add_child_autofree(modifiers)
-	assert_eq(LangProbe.plain_texts(modifiers, FROM_OTHER_PARTS), [] as Array[String], "modifiers")
+	assert_eq(LangProbe.plain_texts(modifiers), [] as Array[String], "modifiers")
 	var gifts := ModifierPick.new([1, 6, 7] as Array[int], true)
 	add_child_autofree(gifts)
-	assert_eq(LangProbe.plain_texts(gifts, FROM_OTHER_PARTS), [] as Array[String], "gifts")
+	assert_eq(LangProbe.plain_texts(gifts), [] as Array[String], "gifts")
 
 
 func _label(text: String) -> Label:
@@ -141,9 +138,9 @@ func test_the_hud_of_a_stage_has_no_plain_text() -> void:
 	stage._tip(&"hook")
 	stage.hud.tips.show_tip(&"trait", EliteTrait.tip(EliteTrait.SWIFT))
 	await wait_process_frames(2)
-	assert_eq(LangProbe.plain_texts(stage.hud, FROM_OTHER_PARTS + KEY_NAMES), [] as Array[String])
+	assert_eq(LangProbe.plain_texts(stage.hud, KEY_NAMES), [] as Array[String])
 	stage.show_result(false)
-	assert_eq(LangProbe.plain_texts(stage.result, FROM_OTHER_PARTS), [] as Array[String], "the result")
+	assert_eq(LangProbe.plain_texts(stage.result), [] as Array[String], "the result")
 
 
 func test_lucians_buffs_and_skill_texts_go_through_lang() -> void:

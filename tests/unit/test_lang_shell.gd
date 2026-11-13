@@ -4,13 +4,6 @@ extends GutTest
 
 const PREFIX := "user://test_lang_shell_save_slot_"
 const SETTINGS_PATH := "user://test_lang_shell_settings.json"
-## Text that comes composed from another part's function.
-const FROM_OTHER_PARTS: Array[String] = [
-	# Resolve.describe: the second line of a difficulty's hover text.
-	"Resolve: each defeat on a stage gives +10% damage dealt and -10% damage taken there, up to 5 times.",
-	"Resolve: each defeat on a stage gives +5% damage dealt and -5% damage taken there, up to 5 times.",
-	"Resolve: each defeat on a stage gives +3% damage dealt and -3% damage taken there, up to 5 times.",
-]
 ## Never translated: the game's name on the title.
 const GAME_NAME: Array[String] = ["LUCIAN", "THE LANTERN"]
 ## The engine's own text: the search field of a dropdown's list.
@@ -72,7 +65,7 @@ func test_the_title_screen_in_all_its_pages_has_no_plain_text() -> void:
 	title.show_difficulty(1)
 	title.notice_label.text = Lang.t("Could not save")
 	title.error_label.text = Lang.t("Could not read slot %d") % 1
-	assert_eq(LangProbe.plain_texts(title, GAME_NAME + FROM_OTHER_PARTS + ENGINE + KEYS), [] as Array[String])
+	assert_eq(LangProbe.plain_texts(title, GAME_NAME + ENGINE + KEYS), [] as Array[String])
 
 
 func test_the_slot_list_with_a_used_a_broken_and_an_empty_slot_has_no_plain_text() -> void:

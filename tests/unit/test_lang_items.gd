@@ -14,9 +14,6 @@ const SCRIPTS: Array[String] = [
 	"res://src/core/merchant_stock.gd", "res://src/core/loot_table.gd", "res://src/core/stat_block.gd",
 	"res://src/core/unit_stats.gd", "res://src/core/energize_charge.gd", "res://src/core/shields.gd",
 ]
-## Pieces other parts' functions hand to these screens: the pop-up's buttons.
-const FROM_OTHER_PARTS: Array[String] = ["Yes", "No", "Cancel"]
-
 var catalog: ItemCatalog
 
 
@@ -148,7 +145,7 @@ func test_the_backpack_with_its_recipes_shows_no_plain_text() -> void:
 	Lang.probe = true
 	var screen := _backpack(false)
 	await wait_physics_frames(3)
-	assert_eq(LangProbe.plain_texts(screen, FROM_OTHER_PARTS), [] as Array[String])
+	assert_eq(LangProbe.plain_texts(screen), [] as Array[String])
 
 
 func test_the_merchant_shows_no_plain_text_on_each_tab() -> void:
@@ -159,9 +156,9 @@ func test_the_merchant_shows_no_plain_text_on_each_tab() -> void:
 	for tab in [ShopPanel.ITEMS_TAB, ShopPanel.POTIONS_TAB, ShopPanel.CRAFT_TAB]:
 		panel.show_tab(tab)
 		await wait_physics_frames(2)
-		assert_eq(LangProbe.plain_texts(panel, FROM_OTHER_PARTS), [] as Array[String], "tab %d" % tab)
+		assert_eq(LangProbe.plain_texts(panel), [] as Array[String], "tab %d" % tab)
 	panel.show_message(Lang.t("Boots can't be sold"))
-	assert_eq(LangProbe.plain_texts(panel, FROM_OTHER_PARTS), [] as Array[String], "a message")
+	assert_eq(LangProbe.plain_texts(panel), [] as Array[String], "a message")
 
 
 func test_the_crafts_notes_and_question_show_no_plain_text() -> void:

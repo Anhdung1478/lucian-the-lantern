@@ -5,13 +5,6 @@ extends GutTest
 
 const PREFIX := "user://test_lang_main_save_slot_"
 const CORE_SCRIPTS: Array[String] = ["journey", "evolution_tree", "tree_node_data", "tree_catalog", "essences", "skin_data", "skins", "wallet"]
-## Text that other parts' functions compose and hand to this part's screens
-## (Resolve's hover note on the Journey panel) and that the shell's slot list
-## puts on the gear menu's page.
-const FROM_OTHER_PARTS: Array[String] = [
-	"Lucian fell here", "times", "Each defeat makes this stage a little easier, up to", "until it is cleared",
-	"Slot", "empty", "current",
-]
 
 var _root: Node
 
@@ -46,7 +39,7 @@ func _scripts() -> Array:
 
 
 func _plain(root: Node) -> Array[String]:
-	return LangProbe.plain_texts(root, FROM_OTHER_PARTS)
+	return LangProbe.plain_texts(root)
 
 
 func _show(node: Node) -> Node:
