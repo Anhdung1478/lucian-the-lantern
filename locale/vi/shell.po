@@ -35,7 +35,7 @@ msgstr "Thoát trò chơi"
 
 #. Title screen: hover note on the disabled Load game button.
 msgid "No saved games yet"
-msgstr "Chưa có ván lưu nào"
+msgstr "Chưa có bản lưu nào"
 
 #. Title screen: heading of the slot page when loading.
 msgid "LOAD GAME"
@@ -59,11 +59,11 @@ msgstr "Không ghi được ô lưu %d. Trò chơi chỉ bắt đầu được k
 
 #. Title screen: pop-up when loading a broken slot. %d is the slot number; the line break is kept.
 msgid "Slot %d's save can't be read, so it can't be loaded.\nYou can only overwrite it with a new game."
-msgstr "Không đọc được ván lưu ở ô %d nên không thể tải.\nBạn chỉ có thể ghi đè bằng một trò chơi mới."
+msgstr "Không đọc được bản lưu ở ô %d nên không thể tải.\nBạn chỉ có thể ghi đè bằng một trò chơi mới."
 
 #. Title screen: pop-up question for a broken slot. %d is the slot number.
 msgid "Slot %d's save can't be read. Overwrite it with a new game?"
-msgstr "Không đọc được ván lưu ở ô %d. Ghi đè bằng một trò chơi mới?"
+msgstr "Không đọc được bản lưu ở ô %d. Ghi đè bằng một trò chơi mới?"
 
 #. Title screen: pop-up question for a used slot. %d is the slot number.
 msgid "Overwrite slot %d? Its progress will be lost."
@@ -103,19 +103,19 @@ msgstr " Tinh chất xanh và cam ×%s."
 
 #. Slot list: a slot's button. %d is the slot number.
 msgid "Slot %d (current)"
-msgstr "Ô %d (hiện tại)"
+msgstr "Ô lưu %d (hiện tại)"
 
 #. Slot list: a slot's button, in red. %d is the slot number.
 msgid "Slot %d · can't be read"
-msgstr "Ô %d · không đọc được"
+msgstr "Ô lưu %d · không đọc được"
 
 #. Slot list: a used slot's button. %d is the slot number, then the play time, then the save date.
 msgid "Slot %d · %s · saved %s"
-msgstr "Ô %d · %s · lưu %s"
+msgstr "Ô lưu %d · %s · lưu lúc %s"
 
 #. Slot list: an empty slot's button. %d is the slot number.
 msgid "Slot %d · empty"
-msgstr "Ô %d · trống"
+msgstr "Ô lưu %d · trống"
 
 #. Play time in the slot list: %d is hours, %02d minutes.
 msgid "%dh %02dm"
@@ -131,15 +131,15 @@ msgstr "HẾT"
 
 #. The End screen: line under the title.
 msgid "Senna is free."
-msgstr "Senna đã được tự do."
+msgstr "Senna đã được giải thoát."
 
 #. The End screen: the play time. %s is hours:minutes:seconds.
 msgid "Story time: %s"
-msgstr "Thời gian cốt truyện: %s"
+msgstr "Thời gian chơi cốt truyện: %s"
 
 #. The End screen: a credit line.
 msgid "Made with Godot 4"
-msgstr "Làm bằng Godot 4"
+msgstr "Được làm bằng Godot 4"
 
 #. The End screen: a credit line.
 msgid "A fan game. League of Legends characters belong to Riot Games."
@@ -199,7 +199,7 @@ msgstr "Rời lượt chơi này? Đợt cao nhất của bạn vẫn được g
 
 #. Game root: pop-up question when leaving Training.
 msgid "Leave Training?"
-msgstr "Rời khỏi Bãi Tập Luyện?"
+msgstr "Rời Luyện Tập?"
 
 #. Game root: pop-up question when leaving a stage.
 msgid "Leave this stage? Essences collected so far are kept."
@@ -231,7 +231,7 @@ msgstr "Âm lượng đổi ngay. Thả thanh trượt ra sẽ phát một âm t
 
 #. Settings: dim line under the Controls page's name.
 msgid "Click a binding, then press a key or click it again with a mouse button."
-msgstr "Bấm vào một phím gán, rồi nhấn một phím hoặc bấm lại vào nó bằng nút chuột."
+msgstr "Nhấp vào một phím gán, rồi nhấn phím mới hoặc nhấp lại bằng một nút chuột."
 
 #. Settings: dim line under the Graphics page's name.
 msgid "The window, the frame rate and how much the effects cost."
@@ -267,7 +267,7 @@ msgstr "Âm lượng hiệu ứng"
 
 #. Settings > Audio: row description.
 msgid "Shots, hits, coins and clicks."
-msgstr "Tiếng bắn, đòn trúng, tiền vàng và tiếng bấm."
+msgstr "Tiếng bắn, đòn trúng, tiền vàng và tiếng nhấp chuột."
 
 #. Settings > Controls: dropdown of a skill's cast mode.
 msgid "Quick cast"
@@ -355,11 +355,11 @@ msgstr "Ô trang bị 6"
 
 #. Settings > Controls: action name.
 msgid "Health potion"
-msgstr "Bình máu"
+msgstr "Bình Máu"
 
 #. Settings > Controls: action name.
 msgid "Mana potion"
-msgstr "Bình năng lượng"
+msgstr "Bình Năng Lượng"
 
 #. Settings > Controls: action name.
 msgid "Stats panel (Ctrl: toggle, hold: more)"
@@ -375,7 +375,7 @@ msgstr "Đưa camera về Lucian"
 
 #. Settings > Controls: a binding button while waiting for a key.
 msgid "Press a key..."
-msgstr "Nhấn một phím..."
+msgstr "Nhấn phím..."
 
 #. Settings > Controls: the reset button at the page's top right.
 msgid "Reset to defaults"
@@ -383,7 +383,7 @@ msgstr "Đặt lại mặc định"
 
 #. Settings > Controls: the long hint under the list.
 msgid "ESC or a click elsewhere cancels a binding. Ctrl + a skill key ranks it up. Quick + indicator casts on release, Normal on left-click; right-click or ESC cancels either. The mouse wheel zooms the camera in a stage."
-msgstr "ESC hoặc bấm ra ngoài sẽ hủy việc gán phím. Ctrl + phím kỹ năng để nâng cấp kỹ năng. Nhanh + chỉ báo tung chiêu khi thả phím, Thường tung khi bấm chuột trái; bấm chuột phải hoặc ESC để hủy cả hai. Con lăn chuột phóng to thu nhỏ camera trong màn chơi."
+msgstr "ESC hoặc nhấp ra ngoài sẽ hủy việc gán phím. Ctrl + phím kỹ năng để nâng bậc kỹ năng. Nhanh + chỉ báo tung chiêu khi thả phím, Thường tung khi nhấp chuột trái; nhấp chuột phải hoặc ESC để hủy cả hai. Con lăn chuột phóng to, thu nhỏ camera trong màn chơi."
 
 #. Settings > Graphics: row name.
 msgid "Window mode"

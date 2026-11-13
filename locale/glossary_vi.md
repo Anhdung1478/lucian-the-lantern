@@ -157,7 +157,7 @@ Rules: champion names stay as they are (Lucian, Senna, Thresh, Akshan, Maokai, E
 | Cheaper Refresh | Làm Mới Rẻ Hơn | own | - |
 | Essence Drops | Tinh Chất Rơi Ra | own | - |
 | Bonus XP | Thêm Kinh Nghiệm | own | - |
-| Stage Gold | Vàng Mỗi Màn | own | - |
+| Stage Gold | Vàng Trong Màn | own | - (the stage's own gold, spent at the merchant) |
 | Evolution Tree | Cây Tiến Hóa | own | - |
 | Essence | Tinh Chất | own | - |
 | Merchant | Thương Nhân | own | - |
@@ -302,12 +302,12 @@ The game uses some pre-2023 passive names; where the current client has a differ
 |---|---|---|---|
 | Crowd control | Khống Chế | likely | web |
 | Stunned | Choáng | official | ddragon (Elise: "làm choáng") |
-| Rooted | Bị trói chân | official | ddragon (Maokai: "trói chân") |
-| Slowed | Bị làm chậm | official | ddragon |
+| Rooted | Trói chân | official | ddragon (Maokai: "trói chân"); the word under the health bar, so short |
+| Slowed | Làm chậm | official | ddragon |
 | Silenced | Bị câm lặng | official | lor ("Câm Lặng") |
 | Knocked up | Bị hất tung | likely | web |
 | Knocked back | Bị đẩy lùi | official | ddragon |
-| Feared | Bị sợ hãi | likely | ddragon (Hecarim: "bỏ chạy tán loạn trong sợ hãi") |
+| Feared | Hoảng sợ | own | ddragon (Hecarim: "bỏ chạy tán loạn trong sợ hãi") |
 | Burning | Thiêu đốt | official | ddragon |
 | Shield | Lá Chắn | official | ddragon |
 | Invulnerable / Untargetable | Không Thể Bị Chỉ Định | official | ddragon (Maokai) |
@@ -321,11 +321,13 @@ The game uses some pre-2023 passive names; where the current client has a differ
 | Resolve (setting) | Quyết Tâm | own | - |
 | Difficulty: Easy / Normal / Hard | Dễ / Thường / Khó | own | - |
 | Endless Mode | Chế Độ Vô Tận | own | - |
+| Endless modifier | Biến Số (Vô Tận) | own | - |
 | Lantern's gift | Món Quà Của Lồng Đèn | own | - |
 | Gift boons: Keen Edge / Quick Hands / Thirst / Second Wind / Focus / Ward / Light Step / Fortune | Lưỡi Sắc / Tay Nhanh / Khát Máu / Hơi Thở Thứ Hai / Tập Trung / Che Chắn / Bước Nhẹ / Vận May | own | - |
 | STAGE CLEARED | HOÀN THÀNH MÀN | own | - |
-| GAME OVER | THẤT BẠI | own | - |
-| Escaped! | Đã chạy thoát! | own | - |
+| DEFEATED | THẤT BẠI | official | the LoL client's end of game |
+| GAME OVER | TRÒ CHƠI KẾT THÚC | own | - |
+| Escaped! | Chạy thoát! | own | - |
 
 ## 10. Skins
 

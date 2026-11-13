@@ -707,7 +707,7 @@ msgstr "Nâng Cấp Trừng Phạt"
 
 #. display_name of data/tree/stage_gold.tres
 msgid "Stage Gold"
-msgstr "Vàng Mỗi Màn"
+msgstr "Vàng Trong Màn"
 
 #. display_name of data/tree/stat_ad.tres
 msgid "Attack Damage"
