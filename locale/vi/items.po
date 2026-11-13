@@ -261,9 +261,9 @@ msgstr "ĐỒ"
 msgid "Items"
 msgstr "Trang Bị"
 
-#. Merchant tab.
+#. Merchant tab (86 px wide, next to the gold: the short word for potions).
 msgid "Potions"
-msgstr "Bình Thuốc"
+msgstr "Thuốc"
 
 #. Merchant tab and the Craft button.
 msgid "Craft"
