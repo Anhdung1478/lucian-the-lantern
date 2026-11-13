@@ -322,18 +322,18 @@ class PriceRow extends HBoxContainer:
 	var _pending := false
 
 	func _init(text: String, amount: Variant, icon: Texture2D, font_size: int) -> void:
-		name = "PriceRow"
+		name = &"PriceRow"
 		set_anchors_preset(Control.PRESET_FULL_RECT)
 		alignment = BoxContainer.ALIGNMENT_CENTER
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_theme_constant_override(&"separation", 0)
 		var words := UiStyle.label(text, font_size)
-		words.name = "Text"
+		words.name = &"Text"
 		words.visible = text != ""
 		add_child(words)
 		_gap(UiStyle.PRICE_GAP, words.visible)
 		var number := CountLabel.new()
-		number.name = "Amount"
+		number.name = &"Amount"
 		number.add_theme_font_size_override(&"font_size", font_size)
 		number.add_theme_color_override(&"font_color", UiStyle.TEXT_COLOR)
 		if amount is int:
@@ -343,7 +343,7 @@ class PriceRow extends HBoxContainer:
 		add_child(number)
 		_gap(UiStyle.PRICE_ICON_GAP, icon != null)
 		var picture := TextureRect.new()
-		picture.name = "Icon"
+		picture.name = &"Icon"
 		picture.texture = icon
 		picture.visible = icon != null
 		picture.custom_minimum_size = Vector2(UiStyle.PRICE_ICON, UiStyle.PRICE_ICON)
