@@ -40,7 +40,7 @@ const ESCAPED_COLOR := Color("d8dde6")
 ## Act 1's tips: id -> [the text, the actions whose keys it names].
 const TIPS := {
 	&"move": ["%s to move. Hold it to keep walking.", [&"move"]],
-	&"attack": ["%s on an enemy to attack it.", [&"attack"]],
+	&"attack": ["%s or %s on an enemy to attack it.", [&"attack", &"move"]],
 	&"attack_move": ["Press %s, then %s: attack the enemy under the cursor, or the weakest one in range.", [&"attack_move", &"attack"]],
 	## The attack_move tip when the setting attack_move_mode is quick.
 	&"attack_move_quick": ["Press %s: attack the enemy under the cursor, or the weakest one in range.", [&"attack_move"]],

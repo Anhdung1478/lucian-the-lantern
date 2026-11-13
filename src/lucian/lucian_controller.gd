@@ -15,6 +15,13 @@ extends Node
 ## left-click once it ends, and a quick cast with indicator let go meanwhile
 ## fires then. Death drops the aim.
 ##
+## Right-click on an enemy attacks it (as left-click does); on a merchant it
+## visits him; on the ground it walks. A right-click that lands on an enemy
+## does not start the hold: the hold re-issues walks toward the cursor, which
+## would overwrite the attack on the next frame. Hold or not, a new right-click
+## on the ground walks and one on an enemy attacks it; dragging off an enemy
+## with the button down does nothing until the next click.
+##
 ## Attack-move has two modes (the setting attack_move_mode): normal, the key
 ## arms it and a left-click gives the order; quick, the key alone gives it at
 ## the cursor. Both are orders, so crowd control does not stop either.
@@ -64,8 +71,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"move"):
 		_set_attack_move_armed(false)
 		var merchant := _merchant_under_cursor()
+		var enemy := lucian.enemy_at(_cursor())
+		_move_held = false
 		if merchant:
 			lucian.command_visit(merchant)
+		elif enemy:
+			lucian.command_attack(enemy)
 		else:
 			_move_held = true
 			_issue_move()

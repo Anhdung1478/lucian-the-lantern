@@ -218,8 +218,8 @@ msgid "%s to move. Hold it to keep walking."
 msgstr "Nhấn %s để di chuyển. Giữ nút để đi liên tục."
 
 #. Act 1 tips on the HUD; %s is a key or mouse button as bound now
-msgid "%s on an enemy to attack it."
-msgstr "Nhấn %s vào kẻ địch để tấn công."
+msgid "%s or %s on an enemy to attack it."
+msgstr "Nhấn %s hoặc %s vào kẻ địch để tấn công."
 
 #. Act 1 tips on the HUD; %s is a key or mouse button as bound now
 msgid "Press %s, then %s: attack the enemy under the cursor, or the weakest one in range."

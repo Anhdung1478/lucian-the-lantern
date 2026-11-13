@@ -206,6 +206,69 @@ func _enemy_under_cursor(away := 300.0) -> Enemy:
 	return enemy
 
 
+func test_right_click_on_an_enemy_attacks_it() -> void:
+	var enemy := _enemy_under_cursor()
+	right_click()
+	assert_eq(lucian._order, Lucian.Order.ATTACK)
+	assert_eq(lucian._target, enemy)
+
+
+func test_right_click_on_the_ground_still_walks() -> void:
+	right_click()
+	assert_eq(lucian._order, Lucian.Order.MOVE)
+	assert_true(controller._move_held)
+
+
+func test_right_click_on_a_merchant_still_visits_him() -> void:
+	var merchant := Merchant.new()
+	merchant.position = lucian.get_global_mouse_position()
+	add_child_autofree(merchant)
+	lucian.global_position = merchant.position + Vector2(600, 0)
+	right_click()
+	assert_eq(lucian._order, Lucian.Order.VISIT)
+
+
+func test_right_click_while_aiming_only_cancels_the_aim() -> void:
+	assert_true(lucian.try_rank_up(Slot.W))
+	GameSettings.instance().set_cast_mode(&"skill_w", "normal")
+	_enemy_under_cursor()
+	_press(&"skill_w")
+	assert_eq(controller.aiming(), &"skill_w")
+	right_click()
+	assert_eq(controller.aiming(), &"")
+	assert_eq(lucian._order, Lucian.Order.NONE, "no attack")
+	assert_false(controller._move_held, "no walk")
+
+
+func test_a_right_click_on_an_enemy_is_not_held_so_nothing_overrides_the_attack() -> void:
+	var enemy := _enemy_under_cursor()
+	right_click()
+	assert_false(controller._move_held)
+	# The cursor moving while the button is still down re-issues nothing.
+	scroll_camera()
+	await wait_physics_frames(3)
+	assert_eq(lucian._order, Lucian.Order.ATTACK)
+	assert_eq(lucian._target, enemy)
+
+
+func test_a_new_right_click_on_the_ground_after_an_attack_walks_again() -> void:
+	_enemy_under_cursor()
+	right_click()
+	Input.action_release(&"move")
+	assert_eq(lucian._order, Lucian.Order.ATTACK)
+	scroll_camera()
+	right_click()
+	assert_eq(lucian._order, Lucian.Order.MOVE)
+	assert_true(controller._move_held)
+
+
+func test_right_click_on_an_enemy_during_a_stun_is_kept() -> void:
+	var enemy := _enemy_under_cursor()
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.3)
+	right_click()
+	assert_eq(lucian._target, enemy)
+
+
 func test_the_attack_move_key_arms_it_in_normal_mode() -> void:
 	var enemy := _enemy_under_cursor()
 	_press(&"attack_move")
