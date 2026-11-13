@@ -60,7 +60,7 @@ func _ready() -> void:
 		pick_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		pick_button.pressed.connect(open_menu.bind(i))
 		UiStyle.style_button(pick_button, 16)
-		# An empty cell's word is a small tag, never edge to edge.
+		# An empty cell's word is a small tag, never edge to edge (two lines when it has two words).
 		pick_button.add_theme_font_size_override(&"font_size", UiStyle.FONT_TAG)
 		holder.add_child(pick_button)
 		picks.append(pick_button)
@@ -128,7 +128,8 @@ func refresh() -> void:
 		var data := SummonerSpells.find(id) if id != &"" and save.tree.level(id) > 0 else null
 		picks[i].icon = data.icon if data else null
 		var locked := i == 1 and not second_open
-		picks[i].text = "" if data or locked else Lang.t("None")
+		picks[i].text = "" if data or locked else Lang.t("None").replace(" ", "
+")
 		picks[i].disabled = locked
 		_chains[i].visible = locked
 		if locked:
