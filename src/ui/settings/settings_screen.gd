@@ -538,7 +538,7 @@ func _build_controls() -> Control:
 			var caption := UiStyle.label(Lang.t(CONTROL_GROUPS[action]), NOTE_FONT, JourneyPanel.CAPTION_COLOR)
 			caption.add_theme_font_override(&"font", JourneyMap.text_font(caption, 3))
 			list.add_child(caption)
-		var row := _row(list, Lang.t(GameSettings.ACTION_NAMES[action]))
+		var row := _row(list, Lang.t(GameSettings.ACTION_NAMES[action]), Lang.t(GameSettings.ACTION_NOTES[action]) if GameSettings.ACTION_NOTES.has(action) else "")
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(BIND_WIDTH, CONTROL_HEIGHT)
 		button.size_flags_vertical = Control.SIZE_SHRINK_CENTER

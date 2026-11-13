@@ -378,8 +378,12 @@ msgid "Mana potion"
 msgstr "Bình Năng Lượng"
 
 #. Settings > Controls: action name.
-msgid "Stats panel (Ctrl: toggle, hold: more)"
-msgstr "Bảng chỉ số (Ctrl: bật/tắt, giữ: xem thêm)"
+msgid "Stats panel"
+msgstr "Bảng chỉ số"
+
+#. Settings > Controls: the note under "Stats panel"
+msgid "Ctrl: toggle, hold: more"
+msgstr "Ctrl: bật/tắt, giữ: xem thêm"
 
 #. Settings > Controls: action name.
 msgid "Camera mode"

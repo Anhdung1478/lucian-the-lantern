@@ -76,8 +76,12 @@ const ACTION_NAMES := {
 	&"item_1": "Item slot 1", &"item_2": "Item slot 2", &"item_3": "Item slot 3",
 	&"item_4": "Item slot 4", &"item_5": "Item slot 5", &"item_6": "Item slot 6",
 	&"potion_hp": "Health potion", &"potion_mp": "Mana potion",
-	&"open_backpack": "Backpack", &"toggle_stats": "Stats panel (Ctrl: toggle, hold: more)", &"toggle_camera": "Camera mode",
+	&"open_backpack": "Backpack", &"toggle_stats": "Stats panel", &"toggle_camera": "Camera mode",
 	&"center_camera": "Center camera on Lucian",
+}
+## A dim line under an action's name in the Controls tab, for the few that need one.
+const ACTION_NOTES := {
+	&"toggle_stats": "Ctrl: toggle, hold: more",
 }
 const MOUSE_LABELS := {
 	MOUSE_BUTTON_LEFT: "LMB", MOUSE_BUTTON_RIGHT: "RMB", MOUSE_BUTTON_MIDDLE: "MMB",
