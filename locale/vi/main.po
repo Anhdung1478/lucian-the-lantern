@@ -63,7 +63,7 @@ msgstr "Về menu chính"
 
 #. gear_menu.gd: hint at the right of the Leave row
 msgid "Title screen"
-msgstr "Màn hình chính"
+msgstr "Màn hình tiêu đề"
 
 #. gear_menu.gd: subtitle of the gear menu. %d is the save slot number, %s the play time such as 1h 23m
 msgid "Slot %d · %s"
@@ -127,7 +127,7 @@ msgstr "VÔ TẬN"
 
 #. journey_panel.gd: text of the Training panel
 msgid "Practice on training dummies with what you have bought in the Evolution Tree and your equipped skin. No essences are earned. Leave from the ESC menu to come back here."
-msgstr "Luyện tập trên hình nộm với những gì bạn đã mua ở Cây Tiến Hóa và trang phục đang mặc. Không nhận tinh chất. Thoát từ menu ESC để quay lại đây."
+msgstr "Luyện tập trên hình nộm với những gì bạn đã mua trong Cây Tiến Hóa và trang phục đang mặc. Không nhận tinh chất. Thoát từ menu ESC để quay lại đây."
 
 #. journey_panel.gd: Start button of the Training panel
 msgid "Start Training"
@@ -163,11 +163,11 @@ msgstr "Chơi lại không có trùm"
 
 #. journey_panel.gd: purple essence a boss gives again. %d is the amount
 msgid "+%d again"
-msgstr "+%d lần sau"
+msgstr "+%d các lần sau"
 
 #. journey_panel.gd: purple essence a boss gives the first time. %d is the amount
 msgid "First kill: +%d"
-msgstr "Hạ lần đầu: +%d"
+msgstr "Hạ gục lần đầu: +%d"
 
 #. journey_panel.gd: status of a stage
 msgid "Cleared"
@@ -191,7 +191,7 @@ msgstr "THỰC HÀNH"
 
 #. journey_panel.gd: small caption over the Endless title
 msgid "WAVES NEVER END"
-msgstr "CÁC ĐỢT KHÔNG BAO GIỜ KẾT THÚC"
+msgstr "CÁC ĐỢT KHÔNG HỒI KẾT"
 
 #. journey_panel.gd: Endless rule. %d is the number of waves
 msgid "A mini boss every %d waves"
@@ -203,7 +203,7 @@ msgstr "Cứ %d đợt có một trùm"
 
 #. journey_panel.gd: Endless rule (a card pick)
 msgid "A modifier to pick after each boss"
-msgstr "Chọn một điều chỉnh sau mỗi trùm"
+msgstr "Chọn một biến số sau mỗi trùm"
 
 #. journey_panel.gd: Endless rule (what the run gives)
 msgid "Blue, orange, and repeat purple"
@@ -215,11 +215,11 @@ msgstr "BẢN ĐỒ"
 
 #. loadout_panel.gd: hint under the heading (fixed width, wraps)
 msgid "Click a key to choose its spell. Spells are bought in the Evolution Tree."
-msgstr "Bấm một phím để chọn phép. Phép được mua ở Cây Tiến Hóa."
+msgstr "Nhấp vào một phím để chọn phép. Phép được mua trong Cây Tiến Hóa."
 
 #. loadout_panel.gd: hover text of the locked F key
 msgid "Buy the 2nd summoner slot in the Evolution Tree"
-msgstr "Mua ô phép bổ trợ thứ hai ở Cây Tiến Hóa"
+msgstr "Mua Ô Phép Bổ Trợ Thứ Hai trong Cây Tiến Hóa"
 
 #. map_thumbnail.gd: caption under the ? of Endless's Random map
 msgid "A map is rolled each run"
@@ -227,7 +227,7 @@ msgstr "Mỗi lượt chơi chọn ngẫu nhiên một bản đồ"
 
 #. spell_menu.gd: shown in the spell menu when no spell is bought
 msgid "Buy spells in the Evolution Tree"
-msgstr "Mua phép bổ trợ ở Cây Tiến Hóa"
+msgstr "Mua phép bổ trợ trong Cây Tiến Hóa"
 
 #. journey.gd: Act 1's name (shown as 'Act 1 · The Loss')
 msgid "The Loss"
@@ -259,7 +259,7 @@ msgstr "Bóng Tối"
 
 #. journey.gd: Act 4's story line
 msgid "Lucian faces his own fear and grief as Dark Lucian."
-msgstr "Lucian đối mặt với nỗi sợ và nỗi đau của chính mình qua Lucian Hắc Ám."
+msgstr "Lucian đối mặt với nỗi sợ và nỗi đau của chính mình, hiện hình thành Lucian Hắc Ám."
 
 #. journey.gd: Act 5's name
 msgid "Shadow Isles"
@@ -267,7 +267,7 @@ msgstr "Quần Đảo Bóng Đêm"
 
 #. journey.gd: Act 5's story line
 msgid "Lucian fights through Maokai, Elise and Karthus."
-msgstr "Lucian chiến đấu xuyên qua Maokai, Elise và Karthus."
+msgstr "Lucian lần lượt vượt qua Maokai, Elise và Karthus."
 
 #. journey.gd: Act 6's name
 msgid "The Lantern"
@@ -279,7 +279,7 @@ msgstr "Lucian đánh bại Thresh và giải thoát Senna."
 
 #. journey.gd: Endless map choice
 msgid "Random"
-msgstr "Ngẫu nhiên"
+msgstr "Ngẫu Nhiên"
 
 #. journey.gd: Endless map choice
 msgid "Mid lane"
@@ -339,7 +339,7 @@ msgstr "%s · Xem thử"
 
 #. skin_purchase_popup.gd: note under the table
 msgid "Buying does not equip it."
-msgstr "Mua xong chưa tự mặc."
+msgstr "Mua xong sẽ không tự động mặc."
 
 #. skin_purchase_popup.gd: title of the purchase card
 msgid "PURCHASE SKIN"
@@ -455,7 +455,7 @@ msgstr "Chọn một nút"
 
 #. node_info_panel.gd: caption over the level list of a node
 msgid "LEVELS"
-msgstr "CẤP"
+msgstr "CÁC CẤP"
 
 #. node_info_panel.gd, tree_page.gd: small caption over a branch's name; also the page header
 msgid "EVOLUTION TREE"
@@ -499,7 +499,7 @@ msgstr "Phép Bổ Trợ"
 
 #. tree_page.gd: blurb under the Skills page title
 msgid "Q, W and E open the passive; their ranks open R."
-msgstr "Q, W và E mở nội tại; bậc của chúng mở R."
+msgstr "Q, W và E mở khóa nội tại; tổng bậc của chúng mở khóa R."
 
 #. tree_page.gd: blurb under the Stats page title
 msgid "Offense, defense and sustain for Lucian himself."
@@ -507,7 +507,7 @@ msgstr "Tấn công, phòng thủ và hồi phục cho chính Lucian."
 
 #. tree_page.gd: blurb under the Backpack page title
 msgid "Equip slots for gear, boots to wear, and cells to carry more."
-msgstr "Ô trang bị cho đồ, giày để mang và thêm ô để chứa nhiều hơn."
+msgstr "Ô trang bị, giày để mang, và thêm ô để chứa nhiều đồ hơn."
 
 #. tree_page.gd: blurb under the Economy page title
 msgid "More gold, XP and essence, and a better merchant."
@@ -539,11 +539,11 @@ msgstr "Hồi %d"
 
 #. tree_page.gd: note on the equip slots plaque
 msgid "Only equipped items give stats."
-msgstr "Chỉ đồ đang trang bị mới cho chỉ số."
+msgstr "Chỉ những món đang trang bị mới cho chỉ số."
 
 #. tree_page.gd: note on the boots plaque
 msgid "Worn on every map."
-msgstr "Mang trên mọi bản đồ."
+msgstr "Được mang ở mọi bản đồ."
 
 #. tree_purchase_popup.gd: note under the table
 msgid "Only Reset tree gives essence back."
@@ -559,11 +559,11 @@ msgstr "MUA NÂNG CẤP"
 
 #. tree_purchase_popup.gd: row key
 msgid "Level"
-msgstr "Cấp độ"
+msgstr "Cấp"
 
 #. tree_purchase_popup.gd: row key (the node's value now and after)
 msgid "Effect"
-msgstr "Hiệu ứng"
+msgstr "Tác dụng"
 
 #. tree_purchase_popup.gd: buy button
 msgid "Buy"
@@ -643,7 +643,7 @@ msgstr "Đã mở khóa"
 
 #. description of data/tree/barrier_upgrade.tres
 msgid "Barrier shields for more."
-msgstr "Lá Chắn che chắn nhiều hơn."
+msgstr "Lá Chắn tạo lá chắn lớn hơn."
 
 #. format of data/tree/barrier_upgrade.tres
 msgid "+{v}% shield"
@@ -659,7 +659,7 @@ msgstr "+{v}% kinh nghiệm"
 
 #. description of data/tree/boots.tres
 msgid "Lucian starts every map in his boots, for [ms]move speed[/ms]. The merchant's Craft tab upgrades them."
-msgstr "Lucian bắt đầu mỗi bản đồ với đôi giày, cho [ms]tốc độ di chuyển[/ms]. Thẻ Chế Tạo của thương nhân sẽ nâng cấp chúng."
+msgstr "Lucian mang giày khi vào mọi bản đồ, tăng [ms]tốc độ di chuyển[/ms]. Nâng cấp giày ở tab Chế Tạo của thương nhân."
 
 #. description of data/tree/clarity.tres
 msgid "Unlocks Clarity as a summoner spell."
@@ -675,7 +675,7 @@ msgstr "+{v}% năng lượng hồi lại"
 
 #. description of data/tree/equip_slots.tres
 msgid "Opens more equip slots; only equipped items give stats."
-msgstr "Mở thêm ô trang bị; chỉ đồ đang trang bị mới cho chỉ số."
+msgstr "Mở thêm ô trang bị; chỉ những món đang trang bị mới cho chỉ số."
 
 #. format of data/tree/equip_slots.tres
 msgid "{v} equip slots"
@@ -723,7 +723,7 @@ msgstr "+{v}% hồi máu"
 
 #. description of data/tree/merchant_stock.tres
 msgid "The merchant offers more items."
-msgstr "Thương nhân bán nhiều món hơn."
+msgstr "Thương nhân bày bán nhiều món hơn."
 
 #. format of data/tree/merchant_stock.tres
 msgid "{v} shop items"
@@ -779,11 +779,11 @@ msgstr "+{v}% sát thương"
 
 #. description of data/tree/stage_gold.tres
 msgid "Enemies give more stage gold."
-msgstr "Kẻ địch cho thêm vàng mỗi màn."
+msgstr "Kẻ địch cho thêm vàng trong màn."
 
 #. format of data/tree/stage_gold.tres
 msgid "+{v}% stage gold"
-msgstr "+{v}% vàng mỗi màn"
+msgstr "+{v}% vàng trong màn"
 
 #. description of data/tree/stat_ad.tres
 msgid "Lucian starts every stage with more [ad]AD[/ad]."
