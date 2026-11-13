@@ -495,6 +495,7 @@ func _add_row(node_id: StringName) -> void:
 func _list_row(node_id: StringName, compact := false) -> Button:
 	var row := Button.new()
 	row.custom_minimum_size = NEAR_ROW if compact else LIST_ROW
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.focus_mode = Control.FOCUS_NONE
 	row.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	for state: StringName in [&"normal", &"hover", &"pressed"]:
