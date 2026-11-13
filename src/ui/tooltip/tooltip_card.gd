@@ -5,7 +5,9 @@ extends RefCounted
 
 const WIDTH := 400.0
 const ICON_SIZE := 48.0
-const BODY_FONT_SIZE := 16
+const BODY_FONT_SIZE := UiStyle.FONT_BODY
+## The line under a card's name ("Fragment", "[Q]").
+const SUB_FONT_SIZE := UiStyle.FONT_NOTE
 const BG_COLOR := Color(0.04, 0.05, 0.07, 0.97)
 const BORDER_COLOR := Color(0.79, 0.64, 0.36)
 const NAME_COLOR := Color("ffe9a8")
@@ -255,7 +257,7 @@ static func _card(icon: Control, title: String, subtitle: String, right_bbcode: 
 	names.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	header.add_child(names)
 	names.add_child(_label(title, 20, NAME_COLOR))
-	names.add_child(_label(subtitle, 14, SUB_COLOR))
+	names.add_child(_label(subtitle, SUB_FONT_SIZE, SUB_COLOR))
 	if right_bbcode != "":
 		var right := _rich(right_bbcode)
 		right.custom_minimum_size.x = 0.0
