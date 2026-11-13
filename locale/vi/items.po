@@ -213,9 +213,9 @@ msgstr "Chỉ có thể trang bị một món xuyên giáp hoặc xuyên kháng 
 msgid "Boots can't be sold"
 msgstr "Giày không thể bán"
 
-#. Hover card of the sell slot. %% is a percent sign.
-msgid "Drop an item here to sell it for 70%% of its cost (Guardian Angel: 40%%)."
-msgstr "Thả món đồ vào đây để bán với giá 70%% giá gốc (Giáp Thiên Thần: 40%%)."
+#. Hover card of the sell slot.
+msgid "Drop an item here to sell it for 70% of its cost (Guardian Angel: 40%)."
+msgstr "Thả món đồ vào đây để bán với giá 70% giá gốc (Giáp Thiên Thần: 40%)."
 
 #. Hover card of a backpack cell whose item sits in a Craft input.
 msgid "In the Craft tab: drag it back here, or right-click its input"
@@ -434,8 +434,8 @@ msgid "Shortens skill cooldowns: 100 haste halves them."
 msgstr "Rút ngắn thời gian hồi kỹ năng: 100 điểm hồi giảm một nửa."
 
 #. Stat card text of Crit Chance.
-msgid "Chance for a basic attack to critically strike for 175%% damage."
-msgstr "Cơ hội để đòn đánh chí mạng, gây 175%% sát thương."
+msgid "Chance for a basic attack to critically strike for 175% damage."
+msgstr "Cơ hội để đòn đánh chí mạng, gây 175% sát thương."
 
 #. Stat card text of Move Speed.
 msgid "Units Lucian moves per second."

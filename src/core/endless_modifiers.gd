@@ -14,7 +14,6 @@ const NOTHING := 6
 const OFFERED := 2
 ## The StageSetup reward multipliers a row can set; 1.0 when it doesn't.
 const REWARDS: Array[StringName] = [&"gold_mult", &"blue_mult", &"orange_mult", &"purple_mult"]
-## (A text keeps "%%" where a "%" and a letter would read as a value.)
 ## Id -> its card's two lines and icon, and what it changes (missing = none):
 ## - enemy_speed: enemies' move speed, at spawn;
 ## - elite_mult: EndlessPlan's elite count;
@@ -24,7 +23,7 @@ const REWARDS: Array[StringName] = [&"gold_mult", &"blue_mult", &"orange_mult", 
 ##   (KillRewards.repeat_purple): the run's rewards.
 const ROWS := {
 	1: {
-		"downside": "Enemies move 20%% faster", "reward": "+30% gold",
+		"downside": "Enemies move 20% faster", "reward": "+30% gold",
 		"icon": "res://assets/art/stats/move_speed.svg",
 		"enemy_speed": 1.2, "gold_mult": 1.3,
 	},
@@ -67,11 +66,11 @@ static func offer(rng: RandomNumberGenerator, current: int) -> Array[int]:
 
 
 static func downside(id: int) -> String:
-	return Lang.t(_row(id).get("downside", "")).replace("%%", "%")
+	return Lang.t(_row(id).get("downside", ""))
 
 
 static func reward(id: int) -> String:
-	return Lang.t(_row(id).get("reward", "")).replace("%%", "%")
+	return Lang.t(_row(id).get("reward", ""))
 
 
 ## Its card's icon; null for Nothing.

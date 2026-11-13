@@ -99,7 +99,7 @@ func _shown() -> ItemData:
 
 func tooltip_content() -> Control:
 	if style == Style.SELL and screen.is_shopping() and not screen.is_dragging():
-		return TooltipCard.note(Lang.t("Drop an item here to sell it for 70%% of its cost (Guardian Angel: 40%%).") % [])
+		return TooltipCard.note(Lang.t("Drop an item here to sell it for 70% of its cost (Guardian Angel: 40%)."))
 	if screen.in_craft(index):
 		return null if screen.is_dragging() else TooltipCard.note(Lang.t("In the Craft tab: drag it back here, or right-click its input"))
 	if is_locked() and style == Style.BACKPACK:

@@ -433,41 +433,41 @@ msgstr "Che Chắn"
 msgid "Fortune"
 msgstr "Vận May"
 
-#. Lantern's gift: the cards' effect lines (the percent goes last so no letter follows it)
+#. Lantern's gift: the cards' effect lines (the stat first, the amount last, on every card)
 msgid "+10% attack damage"
 msgstr "Sức Mạnh Công Kích +10%"
 
-#. Lantern's gift: the cards' effect lines (the percent goes last so no letter follows it)
+#. Lantern's gift: the cards' effect lines (the stat first, the amount last, on every card)
 msgid "+12% attack speed"
 msgstr "Tốc Độ Đánh +12%"
 
-#. Lantern's gift: the cards' effect lines (the percent goes last so no letter follows it)
+#. Lantern's gift: the cards' effect lines (the stat first, the amount last, on every card)
 msgid "+15 ability haste"
 msgstr "+15 Điểm Hồi Kỹ Năng"
 
-#. Lantern's gift: the cards' effect lines (the percent goes last so no letter follows it)
+#. Lantern's gift: the cards' effect lines (the stat first, the amount last, on every card)
 msgid "+150 max health"
 msgstr "+150 Máu tối đa"
 
-#. Lantern's gift: the cards' effect lines (the percent goes last so no letter follows it)
+#. Lantern's gift: the cards' effect lines (the stat first, the amount last, on every card)
 msgid "+6% move speed"
 msgstr "Tốc Độ Di Chuyển +6%"
 
-#. Lantern's gift: the cards' effect lines (the percent goes last so no letter follows it)
-msgid "+6%% omnivamp"
-msgstr "Hút Máu Toàn Phần +6%%"
+#. Lantern's gift: the cards' effect lines (the stat first, the amount last, on every card)
+msgid "+6% omnivamp"
+msgstr "Hút Máu Toàn Phần +6%"
 
-#. Lantern's gift: the cards' effect lines (the percent goes last so no letter follows it)
+#. Lantern's gift: the cards' effect lines (the stat first, the amount last, on every card)
 msgid "+20 armor and +20 magic resist"
 msgstr "+20 Giáp và +20 Kháng Phép"
 
-#. Lantern's gift: the cards' effect lines (the percent goes last so no letter follows it)
+#. Lantern's gift: the cards' effect lines (the stat first, the amount last, on every card)
 msgid "+20% gold from kills"
 msgstr "Vàng từ hạ gục +20%"
 
 #. Endless modifiers: the two lines of a card (downside, then reward)
-msgid "Enemies move 20%% faster"
-msgstr "Kẻ địch di chuyển nhanh hơn 20%%"
+msgid "Enemies move 20% faster"
+msgstr "Kẻ địch di chuyển nhanh hơn 20%"
 
 #. Endless modifiers: the two lines of a card (downside, then reward)
 msgid "+30% gold"
