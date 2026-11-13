@@ -91,6 +91,8 @@ var _message: Label
 var _refresh: Button
 var _undo: Button
 var _message_left := 0.0
+## Whether the message line shows the sell slot's price.
+var _selling := false
 var _first_input: CraftSlot
 var _second_input: CraftSlot
 var _result_slot: CraftSlot
@@ -111,14 +113,14 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override(&"separation", GAP)
 	add_child(box)
-	box.add_child(BagHeading.new("MERCHANT"))
+	box.add_child(BagHeading.new(Lang.t("MERCHANT")))
 
 	var tabs := HBoxContainer.new()
 	tabs.add_theme_constant_override(&"separation", 8)
 	box.add_child(tabs)
 	for i in TAB_NAMES.size():
 		var button := Button.new()
-		button.text = TAB_NAMES[i]
+		button.text = Lang.t(TAB_NAMES[i])
 		button.custom_minimum_size = TAB_SIZE
 		button.pressed.connect(show_tab.bind(i))
 		tabs.add_child(button)
@@ -142,7 +144,7 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	_pages = [items, potion_page, _build_craft_page()]
 	for page in _pages:
 		body.add_child(page)
-	_hint = UiStyle.label(HINTS[0], HINT_FONT, UiStyle.DIM_COLOR)
+	_hint = UiStyle.label(Lang.t(HINTS[0]), HINT_FONT, UiStyle.DIM_COLOR)
 	# Long key names are cut off instead of widening the shop.
 	_hint.clip_text = true
 	_hint.custom_minimum_size.y = HINT_HEIGHT
@@ -157,13 +159,13 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 	bottom.add_theme_constant_override(&"separation", 8)
 	box.add_child(bottom)
 	_undo = Button.new()
-	_undo.text = "Undo sale"
+	_undo.text = Lang.t("Undo sale")
 	_undo.custom_minimum_size = Vector2(130, 40)
 	UiStyle.style_button(_undo, BUTTON_FONT)
 	_undo.pressed.connect(func() -> void: screen.undo_sale())
 	bottom.add_child(_undo)
 	_refresh = Button.new()
-	_refresh.text = "Refresh"
+	_refresh.text = Lang.t("Refresh")
 	_refresh.icon = ShopSlot.COIN
 	_refresh.expand_icon = false
 	_refresh.add_theme_constant_override(&"icon_max_width", 22)
@@ -178,7 +180,7 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData]) -> void:
 
 ## Shows what the open shop charges for a refresh.
 func show_refresh_cost(cost: int) -> void:
-	_refresh.text = "Refresh  %d" % cost
+	_refresh.text = Lang.t("Refresh  %d") % cost
 
 
 ## Switching tabs gives the Craft inputs' items back to the backpack.
@@ -197,9 +199,9 @@ func show_tab(tab: int) -> void:
 ## now, in full ("Mouse 4"): it is a sentence, not a slot label.
 static func hint(tab: int) -> String:
 	if tab != POTIONS_TAB:
-		return HINTS[tab]
+		return Lang.t(HINTS[tab])
 	var settings := GameSettings.instance()
-	return HINTS[tab] % [
+	return Lang.t(HINTS[tab]) % [
 		settings.key_label(Inventory.key_action(Inventory.HP_POTION_CELL)),
 		settings.key_label(Inventory.key_action(Inventory.MP_POTION_CELL)),
 	]
@@ -222,13 +224,14 @@ func current_tab() -> int:
 ## Shows why a purchase, refresh or craft failed, and flashes the slot's
 ## price red.
 func refuse(result: Shop.Result, slot: ShopSlot = null) -> void:
-	show_message(MESSAGES.get(result, ""))
+	show_message(Lang.t(MESSAGES.get(result, "")))
 	if slot:
 		slot.flash_left = MESSAGE_TIME
 
 
 ## A red message for MESSAGE_TIME seconds.
 func show_message(text: String) -> void:
+	_selling = false
 	_message.text = text
 	_message_left = MESSAGE_TIME
 
@@ -285,7 +288,7 @@ func holds(cell: int) -> bool:
 func load_input(target: int, cell: int) -> bool:
 	var input := input_for(target)
 	if not input.load_cell(cell):
-		show_message("Only fragments and boots are crafted")
+		show_message(Lang.t("Only fragments and boots are crafted"))
 		return false
 	var other := _second_input if input == _first_input else _first_input
 	if other.index == cell:
@@ -350,13 +353,15 @@ func _process(delta: float) -> void:
 		_show_craft()
 	# The dragged icon covers the sell slot, so its price shows here too.
 	if screen.sell_refused():
-		_message.text = "Boots can't be sold"
+		_selling = false
+		_message.text = Lang.t("Boots can't be sold")
 		_message.add_theme_color_override(&"font_color", UiStyle.ERROR_COLOR)
 		_message_left = MESSAGE_TIME
 		return
 	var preview := screen.sell_preview()
 	if preview > 0:
-		_message.text = "Sells for %d gold" % preview
+		_selling = true
+		_message.text = Lang.t("Sells for %d gold") % preview
 		_message.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
 		_message_left = 0.0
 		return
@@ -365,7 +370,8 @@ func _process(delta: float) -> void:
 		_message_left -= delta
 		if _message_left <= 0.0:
 			_message.text = ""
-	elif _message.text.begins_with("Sells"):
+	elif _selling:
+		_selling = false
 		_message.text = ""
 
 
@@ -377,7 +383,7 @@ func _show_undo() -> void:
 	if sale.is_empty():
 		_undo.remove_meta(&"hover_text")
 	else:
-		_undo.set_meta(&"hover_text", "Buy back %s for %d gold" % [sale.item.display_name, sale.price])
+		_undo.set_meta(&"hover_text", Lang.t("Buy back %s for %d gold") % [Lang.t(sale.item.display_name), sale.price])
 
 
 ## The Craft tab's note, arrow, fee and Craft button for what is in the
@@ -392,7 +398,7 @@ func _show_craft() -> void:
 	_craft_note.add_theme_color_override(&"font_color", NOTE_COLORS[state])
 	_arrow.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if state == CraftState.READY else UiStyle.DIM_COLOR)
 	_craft_button.disabled = result == null
-	_craft_button.text = CRAFT_WORDS[state]
+	_craft_button.text = Lang.t(CRAFT_WORDS[state])
 	if state == _styled_state:
 		return
 	_styled_state = state
@@ -406,8 +412,8 @@ func _show_craft() -> void:
 ## Tear of the Goddess for 1600 gold?" Only asked when the inputs make
 ## something.
 func craft_question() -> String:
-	return "Craft %s from %s and %s for %d gold?" % [craft_preview().display_name,
-		_first_input.item().display_name, _second_input.item().display_name, craft_fee()]
+	return Lang.t("Craft %s from %s and %s for %d gold?") % [Lang.t(craft_preview().display_name),
+		Lang.t(_first_input.item().display_name), Lang.t(_second_input.item().display_name), craft_fee()]
 
 
 ## The Craft tab's note line for what is in the inputs.
@@ -415,22 +421,22 @@ func craft_note() -> String:
 	var first := _first_input.item()
 	var second := _second_input.item()
 	if first == null and second == null:
-		return "Drag in two fragments, or your boots and a fragment."
+		return Lang.t("Drag in two fragments, or your boots and a fragment.")
 	if first == null or second == null:
 		var one := first if first else second
 		if one.is_boots() and one.boots_tier >= 3:
-			return "%s are fully upgraded." % one.display_name
-		return "Now drag in a fragment."
+			return Lang.t("%s are fully upgraded.") % Lang.t(one.display_name)
+		return Lang.t("Now drag in a fragment.")
 	var result := craft_preview()
 	if result:
-		return "%s + %s → %s" % [first.display_name, second.display_name, result.display_name]
+		return "%s + %s → %s" % [Lang.t(first.display_name), Lang.t(second.display_name), Lang.t(result.display_name)]
 	if first.is_boots() or second.is_boots():
 		var boots := first if first.is_boots() else second
 		if boots.boots_tier >= 3:
-			return "%s are fully upgraded." % boots.display_name
+			return Lang.t("%s are fully upgraded.") % Lang.t(boots.display_name)
 		var other := second if boots == first else first
-		return "%s doesn't upgrade %s." % [other.display_name, boots.display_name]
-	return "No legendary is made from %s and %s." % [first.display_name, second.display_name]
+		return Lang.t("%s doesn't upgrade %s.") % [Lang.t(other.display_name), Lang.t(boots.display_name)]
+	return Lang.t("No legendary is made from %s and %s.") % [Lang.t(first.display_name), Lang.t(second.display_name)]
 
 
 func _column(gap: int) -> VBoxContainer:
@@ -474,13 +480,13 @@ func _build_craft_page() -> VBoxContainer:
 	var fee_row := HBoxContainer.new()
 	fee_row.add_theme_constant_override(&"separation", 6)
 	page.add_child(fee_row)
-	fee_row.add_child(UiStyle.label("Fee", 16, UiStyle.DIM_COLOR))
+	fee_row.add_child(UiStyle.label(Lang.t("Fee"), 16, UiStyle.DIM_COLOR))
 	fee_row.add_child(_coin(20.0))
 	_fee_label = UiStyle.label("–", 18, UiStyle.GOLD_COLOR)
 	_fee_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	fee_row.add_child(_fee_label)
 	_craft_button = Button.new()
-	_craft_button.text = CRAFT_WORDS[CraftState.EMPTY]
+	_craft_button.text = Lang.t(CRAFT_WORDS[CraftState.EMPTY])
 	_craft_button.custom_minimum_size = CRAFT_BUTTON_SIZE
 	UiStyle.style_button(_craft_button, BUTTON_FONT)
 	_craft_button.pressed.connect(func() -> void: screen.craft())

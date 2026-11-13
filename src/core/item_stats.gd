@@ -41,7 +41,7 @@ static func is_percent(key: StringName) -> bool:
 
 ## "+65 Attack Damage" or "+25% Attack Speed".
 static func line(key: StringName, value: float) -> String:
-	return "%s %s" % [amount(key, value), NAMES[key]]
+	return "%s %s" % [amount(key, value), Lang.t(NAMES[key])]
 
 
 ## "+65" or "+25%".

@@ -58,7 +58,7 @@ static func ratio(values: Array[float], _rank: int, stat: String) -> String:
 	var parts: PackedStringArray = []
 	for value in values:
 		parts.append(number(value * 100.0))
-	return color("(+%s%% %s)" % ["/".join(parts), stat], COLORS[stat.to_lower()])
+	return color("(+%s%% %s)" % ["/".join(parts), Lang.t(stat)], COLORS[stat.to_lower()])
 
 
 ## Whole numbers without decimals, others with up to two.

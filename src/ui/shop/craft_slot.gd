@@ -122,7 +122,7 @@ func tooltip_content() -> Control:
 	if shown:
 		return TooltipCard.item(shown, screen.inventory.catalog)
 	if kind == Kind.INPUT:
-		return TooltipCard.note("Drag a fragment or your boots here from the backpack screen")
+		return TooltipCard.note(Lang.t("Drag a fragment or your boots here from the backpack screen"))
 	return null
 
 
@@ -151,7 +151,7 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	var middle := rect.get_center()
 	if kind == Kind.INPUT:
-		draw_string(font, Vector2(0, middle.y + 4.0), "ITEM", HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, PLACEHOLDER_FONT, PLACEHOLDER)
+		draw_string(font, Vector2(0, middle.y + 4.0), Lang.t("ITEM"), HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, PLACEHOLDER_FONT, PLACEHOLDER)
 	elif screen.shop_panel().craft_state() == ShopPanel.CraftState.NO_RECIPE:
 		for side: float in [-1.0, 1.0]:
 			draw_line(middle + Vector2(-CROSS_REACH, -CROSS_REACH * side), middle + Vector2(CROSS_REACH, CROSS_REACH * side), UiStyle.BAD_COLOR, CROSS_WIDTH, true)

@@ -26,10 +26,10 @@ const KIND_NAMES := {
 static func item(shown: ItemData, catalog: ItemCatalog, inventory: Inventory = null) -> Control:
 	var icon := ItemIcon.new(shown)
 	icon.tooltips = false
-	var cost := TooltipText.color("%d gold" % shown.cost, TooltipText.GOLD)
+	var cost := TooltipText.color(Lang.t("%d gold") % shown.cost, TooltipText.GOLD)
 	if shown.is_boots():
-		cost = TooltipText.color("Can't be sold", TooltipText.DIM)
-	var card := _card(icon, shown.display_name, KIND_NAMES[shown.kind], cost)
+		cost = TooltipText.color(Lang.t("Can't be sold"), TooltipText.DIM)
+	var card := _card(icon, Lang.t(shown.display_name), Lang.t(KIND_NAMES[shown.kind]), cost)
 	var stats: PackedStringArray = []
 	for key: StringName in shown.stats:
 		stats.append(StatStyle.item_line(key, shown.stats[key]))
@@ -38,21 +38,21 @@ static func item(shown: ItemData, catalog: ItemCatalog, inventory: Inventory = n
 		_body(card, potion_text(shown))
 	var effects: PackedStringArray = []
 	for effect in shown.effects:
-		var label := "Active — %s (%s s)" % [effect.effect_name, TooltipText.number(effect.cooldown)] \
-			if effect.active else "Passive — %s" % effect.effect_name
-		effects.append("%s: %s" % [TooltipText.color(label, TooltipText.GOLD), TooltipText.colorize(effect.description)])
+		var label := Lang.t("Active — %s (%s s)") % [Lang.t(effect.effect_name), TooltipText.number(effect.cooldown)] \
+			if effect.active else Lang.t("Passive — %s") % Lang.t(effect.effect_name)
+		effects.append("%s: %s" % [TooltipText.color(label, TooltipText.GOLD), TooltipText.colorize(Lang.t(effect.description))])
 	if not effects.is_empty():
 		_separator(card)
 		_body(card, "\n\n".join(effects))
 	var footer := ""
 	if shown.is_fragment():
-		footer = "Craft it with another fragment at the merchant's Craft tab."
+		footer = Lang.t("Craft it with another fragment at the merchant's Craft tab.")
 		var hints := recipe_hints(shown, catalog, inventory)
 		if hints != "":
 			footer = hints
 	elif shown.is_potion():
 		var key := GameSettings.instance().key_label(Inventory.key_action(Inventory.potion_cell(shown)))
-		footer = "Put it in its potion cell and press %s to drink. Stacks up to %d." % [key, shown.max_stack]
+		footer = Lang.t("Put it in its potion cell and press %s to drink. Stacks up to %d.") % [key, shown.max_stack]
 	elif shown.is_boots():
 		footer = boots_footer(shown, catalog)
 	elif catalog and shown.components.size() == 2:
@@ -73,13 +73,13 @@ static func recipe_hints(shown: ItemData, catalog: ItemCatalog, inventory: Inven
 	var lines: PackedStringArray = []
 	for recipe: Dictionary in catalog.builds_into(shown):
 		if inventory.has_item(recipe.partner.id):
-			lines.append("Builds into %s with %s (you have it)" % [recipe.made.display_name, recipe.partner.display_name])
+			lines.append(Lang.t("Builds into %s with %s (you have it)") % [Lang.t(recipe.made.display_name), Lang.t(recipe.partner.display_name)])
 	var shown_lines := lines.slice(0, RECIPE_HINTS)
 	if lines.size() > RECIPE_HINTS:
-		shown_lines.append("+%d more" % (lines.size() - RECIPE_HINTS))
+		shown_lines.append(Lang.t("+%d more") % (lines.size() - RECIPE_HINTS))
 	var upgraded := catalog.boots_upgrade(inventory.boots(), shown)
 	if upgraded != null:
-		shown_lines.append("Upgrades your Boots into %s" % upgraded.display_name)
+		shown_lines.append(Lang.t("Upgrades your Boots into %s") % Lang.t(upgraded.display_name))
 	return "\n".join(shown_lines)
 
 
@@ -90,36 +90,37 @@ static func recipe_footer(shown: ItemData, catalog: ItemCatalog) -> String:
 	var b := catalog.find(shown.components[1])
 	if a == null or b == null:
 		return ""
-	return "Recipe: %s + %s + %d gold at the merchant." % [a.display_name, b.display_name, catalog.craft_fee(a, b)]
+	return Lang.t("Recipe: %s + %s + %d gold at the merchant.") % [Lang.t(a.display_name), Lang.t(b.display_name), catalog.craft_fee(a, b)]
 
 
 ## How `shown` boots upgrade at the merchant's Craft tab, or "Fully upgraded."
 static func boots_footer(shown: ItemData, catalog: ItemCatalog) -> String:
 	if catalog == null or shown.boots_tier >= 3:
-		return "Fully upgraded."
+		return Lang.t("Fully upgraded.")
 	if shown.boots_tier == 1:
 		var lines := catalog.boots().map(func(boots: ItemData) -> StringName: return boots.upgrade_fragment)
 		var others := catalog.fragments().filter(func(fragment: ItemData) -> bool: return not lines.has(fragment.id))
-		var text := "Upgrade at the merchant's Craft tab with a fragment: each one makes its own boots"
 		if others.is_empty():
-			return text + "."
-		return text + " (all but %s)." % ", ".join(others.map(func(fragment: ItemData) -> String: return fragment.display_name))
+			return Lang.t("Upgrade at the merchant's Craft tab with a fragment: each one makes its own boots.")
+		return Lang.t("Upgrade at the merchant's Craft tab with a fragment: each one makes its own boots (all but %s).") % ", ".join(
+			others.map(func(fragment: ItemData) -> String: return Lang.t(fragment.display_name)))
 	for boots in catalog.boots():
 		if boots.upgrade_from == shown.id:
 			var fragment := catalog.find(boots.upgrade_fragment)
-			return "Upgrade at the merchant's Craft tab with a %s (%d gold) into %s." % [
-				fragment.display_name if fragment else String(boots.upgrade_fragment), boots.upgrade_cost, boots.display_name]
-	return "Fully upgraded."
+			return Lang.t("Upgrade at the merchant's Craft tab with a %s (%d gold) into %s.") % [
+				Lang.t(fragment.display_name) if fragment else String(boots.upgrade_fragment), boots.upgrade_cost, Lang.t(boots.display_name)]
+	return Lang.t("Fully upgraded.")
 
 
 ## "Restores 200 HP over 5 s." with the HP / mana colored.
 static func potion_text(shown: ItemData) -> String:
-	var parts: PackedStringArray = []
-	if shown.restore_hp > 0.0:
-		parts.append("[hp]%s HP[/hp]" % TooltipText.number(shown.restore_hp))
+	var time := TooltipText.number(shown.restore_time)
+	if shown.restore_hp > 0.0 and shown.restore_mana > 0.0:
+		return TooltipText.colorize(Lang.t("Restores [hp]%s HP[/hp] and [mana]%s mana[/mana] over [kw]%s s[/kw].") % [
+			TooltipText.number(shown.restore_hp), TooltipText.number(shown.restore_mana), time])
 	if shown.restore_mana > 0.0:
-		parts.append("[mana]%s mana[/mana]" % TooltipText.number(shown.restore_mana))
-	return TooltipText.colorize("Restores %s over [kw]%s s[/kw]." % [" and ".join(parts), TooltipText.number(shown.restore_time)])
+		return TooltipText.colorize(Lang.t("Restores [mana]%s mana[/mana] over [kw]%s s[/kw].") % [TooltipText.number(shown.restore_mana), time])
+	return TooltipText.colorize(Lang.t("Restores [hp]%s HP[/hp] over [kw]%s s[/kw].") % [TooltipText.number(shown.restore_hp), time])
 
 
 ## A skill's card. `skill` is null for the passive.
@@ -128,20 +129,20 @@ static func skill(lucian: Lucian, shown: LucianSkill, icon_texture: Texture2D, k
 	icon.texture = icon_texture
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	if shown == null:
-		var card := _card(icon, "Lightslinger", "Passive", "")
+		var card := _card(icon, Lang.t("Lightslinger"), Lang.t("Passive"), "")
 		_body(card, lucian.passive.describe())
 		return card
 	var data := shown.data
 	var rank := shown.rank()
-	var rank_text := TooltipText.color("Rank %d/%d" % [rank, data.max_rank], TooltipText.TEXT if rank > 0 else TooltipText.DIM)
-	var card := _card(icon, data.display_name, "[%s]" % key, rank_text)
+	var rank_text := TooltipText.color(Lang.t("Rank %d/%d") % [rank, data.max_rank], TooltipText.TEXT if rank > 0 else TooltipText.DIM)
+	var card := _card(icon, Lang.t(data.display_name), "[%s]" % key, rank_text)
 	var locked := lucian.skill_lock_note(shown.slot)
 	if locked != "":
 		_body(card, TooltipText.color(locked, LOCKED_COLOR))
 	var costs: PackedStringArray = []
 	if data.mana_cost.any(func(value: float) -> bool: return value > 0.0):
-		costs.append(TooltipText.color("Cost: ", TooltipText.DIM) + TooltipText.ranked(data.mana_cost, rank) + TooltipText.colorize(" [mana]Mana[/mana]"))
-	costs.append(TooltipText.color("Cooldown: ", TooltipText.DIM) + cooldown_text(lucian, shown))
+		costs.append(TooltipText.color(Lang.t("Cost: "), TooltipText.DIM) + TooltipText.ranked(data.mana_cost, rank) + TooltipText.colorize(" [mana]%s[/mana]" % Lang.t("Mana")))
+	costs.append(TooltipText.color(Lang.t("Cooldown: "), TooltipText.DIM) + cooldown_text(lucian, shown))
 	_body(card, "
 ".join(costs))
 	_separator(card)
@@ -149,7 +150,7 @@ static func skill(lucian: Lucian, shown: LucianSkill, icon_texture: Texture2D, k
 	var bonus := shown.max_rank_bonus()
 	if bonus != "":
 		var reached := shown.is_max_rank()
-		_body(card, TooltipText.color("Rank %d: " % data.max_rank, TooltipText.GOLD if reached else TooltipText.DIM)
+		_body(card, TooltipText.color(Lang.t("Rank %d: ") % data.max_rank, TooltipText.GOLD if reached else TooltipText.DIM)
 			+ TooltipText.color(bonus, TooltipText.TEXT if reached else TooltipText.DIM))
 	return card
 
@@ -163,7 +164,7 @@ static func cooldown_text(lucian: Lucian, shown: LucianSkill) -> String:
 		hasted.append(snappedf(Cooldown.hasted(base, haste), 0.1))
 	var text := TooltipText.ranked(hasted, shown.rank()) + " s"
 	if haste > 0.0:
-		text += TooltipText.color(" (%s ability haste)" % TooltipText.number(haste), TooltipText.DIM)
+		text += TooltipText.color(" " + Lang.t("(%s ability haste)") % TooltipText.number(haste), TooltipText.DIM)
 	return text
 
 
@@ -174,10 +175,10 @@ static func summoner(spell: SummonerData, key: String, cooldown: float, upgrade 
 	var icon := TextureRect.new()
 	icon.texture = spell.icon
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	var card := _card(icon, spell.display_name, "Summoner spell [%s]" % key, "")
-	_body(card, TooltipText.color("Cooldown: ", TooltipText.DIM) + "%s s" % TooltipText.number(cooldown))
+	var card := _card(icon, Lang.t(spell.display_name), Lang.t("Summoner spell [%s]") % key, "")
+	_body(card, TooltipText.color(Lang.t("Cooldown: "), TooltipText.DIM) + "%s s" % TooltipText.number(cooldown))
 	_separator(card)
-	_body(card, TooltipText.colorize(spell.description))
+	_body(card, TooltipText.colorize(Lang.t(spell.description)))
 	if upgrade != "":
 		_body(card, TooltipText.color(upgrade, UPGRADE_COLOR))
 	return card
@@ -188,9 +189,9 @@ static func buff(shown: Dictionary) -> Control:
 	var icon := TextureRect.new()
 	icon.texture = shown.icon
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	var subtitle := "Buff"
+	var subtitle := Lang.t("Buff")
 	if shown.duration > 0.0:
-		subtitle = "%s s left" % TooltipText.number(snappedf(shown.left, 0.1))
+		subtitle = Lang.t("%s s left") % TooltipText.number(snappedf(shown.left, 0.1))
 	var card := _card(icon, shown.name, subtitle, "")
 	_body(card, TooltipText.colorize(shown.text))
 	return card
@@ -202,7 +203,7 @@ static func stat(key: StringName, value: String, breakdown := "") -> Control:
 	var icon := TextureRect.new()
 	icon.texture = StatStyle.icon(key)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	var card := _card(icon, StatStyle.stat_name(key), "Stat", TooltipText.color(value, StatStyle.color(key).to_html(false)))
+	var card := _card(icon, StatStyle.stat_name(key), Lang.t("Stat"), TooltipText.color(value, StatStyle.color(key).to_html(false)))
 	_body(card, breakdown)
 	if breakdown != "":
 		_separator(card)

@@ -56,5 +56,6 @@ func _draw() -> void:
 		draw_arc(Vector2.ZERO, CLICK_RADIUS + 10.0, 0.0, TAU, 64, HOVER_COLOR, 4.0, true)
 	var font := ThemeDB.fallback_font
 	var at := Vector2(-100.0, -96.0)
-	draw_string_outline(font, at, "Merchant", HORIZONTAL_ALIGNMENT_CENTER, 200.0, 20, 6, Color.BLACK)
-	draw_string(font, at, "Merchant", HORIZONTAL_ALIGNMENT_CENTER, 200.0, 20, NAME_COLOR)
+	var title := Lang.t("Merchant")
+	draw_string_outline(font, at, title, HORIZONTAL_ALIGNMENT_CENTER, 200.0, 20, 6, Color.BLACK)
+	draw_string(font, at, title, HORIZONTAL_ALIGNMENT_CENTER, 200.0, 20, NAME_COLOR)

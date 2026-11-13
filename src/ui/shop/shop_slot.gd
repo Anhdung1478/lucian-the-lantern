@@ -78,11 +78,11 @@ func is_sold() -> bool:
 ## The row's first line: the item's name, SOLD or Locked ("" with no shop).
 func title() -> String:
 	if is_locked():
-		return "Locked"
+		return Lang.t("Locked")
 	if is_sold():
-		return "SOLD"
+		return Lang.t("SOLD")
 	var shown := item()
-	return shown.display_name if shown else ""
+	return Lang.t(shown.display_name) if shown else ""
 
 
 ## The key that drinks the potion this row sells, as bound now ("" for an
@@ -101,19 +101,19 @@ func key_text() -> String:
 static func line_parts(shown: ItemData) -> Array[Dictionary]:
 	var parts: Array[Dictionary] = []
 	if shown.is_potion():
-		parts.append(_part("Restores", UiStyle.DIM_COLOR))
+		parts.append(_part(Lang.t("Restores"), UiStyle.DIM_COLOR))
 		if shown.restore_hp > 0.0:
-			parts.append(_part("%s HP" % TooltipText.number(shown.restore_hp), StatStyle.color(&"max_hp")))
+			parts.append(_part(Lang.t("%s HP") % TooltipText.number(shown.restore_hp), StatStyle.color(&"max_hp")))
 		if shown.restore_mana > 0.0:
-			parts.append(_part("%s mana" % TooltipText.number(shown.restore_mana), StatStyle.color(&"max_mana")))
-		parts.append(_part("over %s s" % TooltipText.number(shown.restore_time), UiStyle.DIM_COLOR))
+			parts.append(_part(Lang.t("%s mana") % TooltipText.number(shown.restore_mana), StatStyle.color(&"max_mana")))
+		parts.append(_part(Lang.t("over %s s") % TooltipText.number(shown.restore_time), UiStyle.DIM_COLOR))
 		return parts
 	for key: StringName in shown.stats:
 		parts.append(_part(ItemStats.amount(key, shown.stats[key]), StatStyle.color(key), StatStyle.icon(key)))
 	if shown.stats.size() == 1:
-		parts.append(_part(ItemStats.NAMES[shown.stats.keys()[0]], UiStyle.DIM_COLOR))
+		parts.append(_part(Lang.t(ItemStats.NAMES[shown.stats.keys()[0]]), UiStyle.DIM_COLOR))
 	elif shown.stats.is_empty():
-		parts.append(_part(TooltipCard.KIND_NAMES[shown.kind], UiStyle.DIM_COLOR))
+		parts.append(_part(Lang.t(TooltipCard.KIND_NAMES[shown.kind]), UiStyle.DIM_COLOR))
 	return parts
 
 
@@ -128,7 +128,7 @@ static func _part(text: String, color: Color, icon: Texture2D = null) -> Diction
 
 func tooltip_content() -> Control:
 	if is_locked() and not screen.is_dragging():
-		return TooltipCard.note(LOCKED_NOTE)
+		return TooltipCard.note(Lang.t(LOCKED_NOTE))
 	var shown := item()
 	return TooltipCard.item(shown, screen.inventory.catalog, screen.inventory) if shown and not screen.is_dragging() else null
 
@@ -158,7 +158,7 @@ func _draw() -> void:
 		if is_locked():
 			draw_texture_rect(CHAIN, well.grow(-ItemCell.CHAIN_INSET + 2.0), false, Color(1, 1, 1, ItemCell.CHAIN_ALPHA))
 			draw_string(font, Vector2(text_x, middle - 4.0), title(), HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_FONT, CLOSED_TEXT)
-			draw_string(font, Vector2(text_x, middle + 16.0), LOCKED_NOTE, HORIZONTAL_ALIGNMENT_LEFT, size.x - text_x - PAD, LINE_FONT, UiStyle.DISABLED_FONT)
+			draw_string(font, Vector2(text_x, middle + 16.0), Lang.t(LOCKED_NOTE), HORIZONTAL_ALIGNMENT_LEFT, size.x - text_x - PAD, LINE_FONT, UiStyle.DISABLED_FONT)
 		else:
 			draw_string(font, Vector2(text_x, middle + 6.0), title(), HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_FONT, CLOSED_TEXT)
 		return

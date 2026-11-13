@@ -42,7 +42,7 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 	elif _note_left <= 0.0:
 		_note_left = FULL_NOTE_GAP
-		var note := FloatingText.new("Backpack full", UiStyle.ERROR_COLOR)
+		var note := FloatingText.new(Lang.t("Backpack full"), UiStyle.ERROR_COLOR)
 		note.position = global_position + Vector2(0, -50)
 		get_parent().add_child(note)
 

@@ -57,7 +57,7 @@ const COLORS := {
 }
 ## Stats no item gives.
 const EXTRA_NAMES := {&"regen": "Health / Mana Regen", &"attack_range": "Attack Range"}
-## TooltipText markup.
+## TooltipText markup; a percent sign is written %%.
 const DESCRIPTIONS := {
 	&"ad": "Basic attacks deal this much [phys]physical damage[/phys]. Many skills grow with it.",
 	&"ap": "Makes skills and item effects that scale with Ability Power stronger.",
@@ -65,7 +65,7 @@ const DESCRIPTIONS := {
 	&"mr": "Lowers [magic]magic damage[/magic] taken: 100 magic resist blocks half.",
 	&"attack_speed": "Basic attacks per second (up to 2.5).",
 	&"ability_haste": "Shortens skill cooldowns: 100 haste halves them.",
-	&"crit_chance": "Chance for a basic attack to critically strike for 175% damage.",
+	&"crit_chance": "Chance for a basic attack to critically strike for 175%% damage.",
 	&"move_speed": "Units Lucian moves per second.",
 	&"max_hp": "Lucian's health.",
 	&"max_mana": "Spent to cast skills.",
@@ -92,17 +92,17 @@ static func color(key: StringName) -> Color:
 
 
 static func stat_name(key: StringName) -> String:
-	return ItemStats.NAMES.get(key, EXTRA_NAMES.get(key, String(key)))
+	return Lang.t(ItemStats.NAMES.get(key, EXTRA_NAMES.get(key, String(key))))
 
 
 static func description(key: StringName) -> String:
-	return DESCRIPTIONS.get(_look(key), "")
+	return Lang.t(DESCRIPTIONS.get(_look(key), "")) % []
 
 
 ## An item card stat line: the icon, the amount in the stat's color, then the name.
 static func item_line(key: StringName, value: float) -> String:
 	return "[img=20x20]%s[/img] %s %s" % [icon(key).resource_path,
-		TooltipText.color(ItemStats.amount(key, value), color(key).to_html(false)), ItemStats.NAMES[key]]
+		TooltipText.color(ItemStats.amount(key, value), color(key).to_html(false)), Lang.t(ItemStats.NAMES[key])]
 
 
 ## The key whose icon, color and text `key` uses.

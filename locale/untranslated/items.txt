@@ -1,0 +1,12 @@
+# Texts in the items part (item cards, backpack, merchant) that are deliberately not translated.
+
+# Item_icon.gd: the fragment codes are colour keys of a fallback tile, not player text.
+AS
+AR
+CR
+HP
+MP
+MR
+
+# StatStyle.item_line: the icon, the amount and the stat's name, all values.
+[img=20x20]%s[/img] %s %s

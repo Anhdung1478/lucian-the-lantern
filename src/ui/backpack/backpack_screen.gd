@@ -194,7 +194,7 @@ func craft_confirm() -> ConfirmPopup:
 
 ## The one-penetration rule's notice, naming the penetration item equipped.
 static func pen_limit_text(equipped: ItemData) -> String:
-	return "Only one penetration item can be equipped,\nand %s already is." % equipped.display_name
+	return Lang.t("Only one penetration item can be equipped,\nand %s already is.") % Lang.t(equipped.display_name)
 
 
 ## The shop slot being dragged, or null.
@@ -398,7 +398,7 @@ func _release() -> void:
 				shop.sell(_drag_index)
 				traded.emit(true)
 			else:
-				_shop_panel.show_message("Boots can't be sold")
+				_shop_panel.show_message(Lang.t("Boots can't be sold"))
 				traded.emit(false)
 		elif _target == CRAFT_FIRST or _target == CRAFT_SECOND:
 			if not _shop_panel.load_input(_target, _drag_index):
@@ -462,7 +462,7 @@ func _buy(slot: ShopSlot, cell: int) -> void:
 ## penetration item) in the pop-up, the rest in the shop's red message.
 func _report(result: Shop.Result, slot: ShopSlot = null, blocker: ItemData = null) -> void:
 	if result == Shop.Result.NO_ROOM:
-		_confirm.tell(BACKPACK_FULL)
+		_confirm.tell(Lang.t(BACKPACK_FULL))
 	elif result == Shop.Result.PEN_LIMIT and blocker:
 		_confirm.tell(pen_limit_text(blocker))
 	if result != Shop.Result.OK:
@@ -528,7 +528,7 @@ func _build() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override(&"separation", HEADING_GAP)
 	pack.add_child(box)
-	box.add_child(BagHeading.new("BACKPACK"))
+	box.add_child(BagHeading.new(Lang.t("BACKPACK")))
 	var grid := GridContainer.new()
 	grid.columns = COLUMNS
 	grid.add_theme_constant_override(&"h_separation", CELL_GAP)

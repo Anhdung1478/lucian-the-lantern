@@ -99,20 +99,20 @@ func _shown() -> ItemData:
 
 func tooltip_content() -> Control:
 	if style == Style.SELL and screen.is_shopping() and not screen.is_dragging():
-		return TooltipCard.note("Drop an item here to sell it for 70% of its cost (Guardian Angel: 40%).")
+		return TooltipCard.note(Lang.t("Drop an item here to sell it for 70%% of its cost (Guardian Angel: 40%%).") % [])
 	if screen.in_craft(index):
-		return null if screen.is_dragging() else TooltipCard.note("In the Craft tab: drag it back here, or right-click its input")
+		return null if screen.is_dragging() else TooltipCard.note(Lang.t("In the Craft tab: drag it back here, or right-click its input"))
 	if is_locked() and style == Style.BACKPACK:
-		return TooltipCard.note("Buy Backpack Slots in the Evolution Tree")
+		return TooltipCard.note(Lang.t("Buy Backpack Slots in the Evolution Tree"))
 	var shown := item()
 	if shown == null and not screen.is_dragging():
 		match style:
 			Style.BOOTS:
-				return TooltipCard.note("Buy Boots in the Evolution Tree")
+				return TooltipCard.note(Lang.t("Buy Boots in the Evolution Tree"))
 			Style.POTION:
 				var key := GameSettings.instance().key_label(Inventory.key_action(index))
 				var kind := "Health" if index == Inventory.HP_POTION_CELL else "Mana"
-				return TooltipCard.note("%s potions go here: press %s to drink one" % [kind, key])
+				return TooltipCard.note(Lang.t("%s potions go here: press %s to drink one") % [Lang.t(kind), key])
 	return TooltipCard.item(shown, screen.inventory.catalog) if shown and not screen.is_dragging() else null
 
 
@@ -181,9 +181,9 @@ func _draw_sell(rect: Rect2) -> void:
 	box.set_border_width_all(2)
 	draw_style_box(box, rect)
 	var font := ThemeDB.fallback_font
-	var text := "SELL"
+	var text := Lang.t("SELL")
 	if over:
-		text = "NO" if screen.sell_refused() else "+%d" % screen.sell_preview()
+		text = Lang.t("NO") if screen.sell_refused() else "+%d" % screen.sell_preview()
 	var middle := rect.get_center()
 	draw_texture_rect(COIN, Rect2(middle.x - SELL_COIN * 0.5, middle.y - SELL_COIN - 1.0, SELL_COIN, SELL_COIN), false)
 	var baseline := middle.y + SELL_FONT + 2.0

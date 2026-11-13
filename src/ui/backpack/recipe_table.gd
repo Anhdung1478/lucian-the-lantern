@@ -41,7 +41,7 @@ func setup(catalog: ItemCatalog, held: Inventory = null) -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override(&"separation", 10)
 	add_child(box)
-	box.add_child(BagHeading.new("RECIPES", HEADING_FONT))
+	box.add_child(BagHeading.new(Lang.t("RECIPES"), HEADING_FONT))
 
 	_scroll = ScrollContainer.new()
 	_scroll.theme = UiStyle.theme()
@@ -56,12 +56,12 @@ func setup(catalog: ItemCatalog, held: Inventory = null) -> void:
 	makes.append_array(upgraded_boots(catalog))
 	for made in makes:
 		if made.is_boots() and _boots_heading == null:
-			_boots_heading = BagHeading.new(BOOTS_HEADING, BOOTS_FONT)
+			_boots_heading = BagHeading.new(Lang.t(BOOTS_HEADING), BOOTS_FONT)
 			_list.add_child(_boots_heading)
 		var row := RecipeRow.new(made, catalog)
 		_list.add_child(row)
 		_rows.append(row)
-	box.add_child(UiStyle.label(NOTE, NOTE_FONT, UiStyle.DIM_COLOR))
+	box.add_child(UiStyle.label(Lang.t(NOTE), NOTE_FONT, UiStyle.DIM_COLOR))
 	if inventory:
 		inventory.changed.connect(refresh)
 	refresh()

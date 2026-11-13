@@ -43,7 +43,7 @@ func _init(item: ItemData, catalog: ItemCatalog) -> void:
 		_parts.append(_part(row, parts[part], catalog))
 		_signs.append(_sign(row, "+" if part == 0 else "="))
 	_result = _icon(row, made, catalog)
-	_name = UiStyle.label(made.display_name, NAME_FONT)
+	_name = UiStyle.label(Lang.t(made.display_name), NAME_FONT)
 	_name.custom_minimum_size.x = NAME_WIDTH
 	_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_name.size_flags_vertical = Control.SIZE_SHRINK_CENTER

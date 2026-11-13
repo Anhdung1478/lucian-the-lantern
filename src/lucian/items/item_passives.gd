@@ -444,37 +444,37 @@ func on_damage_dealt(target: Enemy, info: DamageInfo, _final_amount: float) -> v
 func buffs() -> Array[Dictionary]:
 	var found: Array[Dictionary] = []
 	if has_energized():
-		var names := ENERGIZED.filter(has).map(func(id: StringName) -> String: return _items[id].display_name)
+		var names := ENERGIZED.filter(has).map(func(id: StringName) -> String: return Lang.t(_items[id].display_name))
 		found.append(_buff(&"energized", "Energized", ENERGIZED_ICON,
-			"Moving and attacking build charge; dashing builds it twice as fast. At 100 the next basic attack is Energized (%s)." % ", ".join(names),
+			Lang.t("Moving and attacking build charge; dashing builds it twice as fast. At 100 the next basic attack is Energized (%s).") % ", ".join(names),
 			str(int(energize.value)), energize.is_ready()))
 	if has(&"kraken_slayer"):
 		found.append(_buff(&"kraken_slayer", "Bring It Down", _icon(&"kraken_slayer"),
-			"Every third basic attack deals [phys]%d bonus physical damage[/phys]. Next attack: %d of 3." % [KRAKEN_DAMAGE, kraken_hits + 1],
+			Lang.t("Every third basic attack deals [phys]%d bonus physical damage[/phys]. Next attack: %d of 3.") % [KRAKEN_DAMAGE, kraken_hits + 1],
 			str(kraken_hits) if kraken_hits > 0 else "", kraken_hits == 2))
 	if spellblade_ready:
 		found.append(_buff(&"spellblade", "Spellblade", _icon(&"essence_reaver"),
-			"The next basic attack deals bonus [phys]physical damage[/phys] and restores [mana]mana[/mana].", "", true))
+			Lang.t("The next basic attack deals bonus [phys]physical damage[/phys] and restores [mana]mana[/mana]."), "", true))
 	if shojin_stacks > 0:
 		var shojin := _buff(&"spear_of_shojin", "Focused Will", _icon(&"spear_of_shojin"),
-			"Skills deal %d%% more damage." % roundi(SHOJIN_PER_STACK * shojin_stacks * 100.0), str(shojin_stacks), false)
+			Lang.t("Skills deal %d%% more damage.") % roundi(SHOJIN_PER_STACK * shojin_stacks * 100.0), str(shojin_stacks), false)
 		shojin.left = _shojin_left
 		shojin.duration = SHOJIN_DURATION
 		found.append(shojin)
 	if jaksho_stacks > 0:
 		found.append(_buff(&"jaksho_the_protean", "Voidborn Resilience", _icon(&"jaksho_the_protean"),
-			"+%d%% armor and magic resist while in combat." % roundi(JAKSHO_PER_STACK * jaksho_stacks * 100.0),
+			Lang.t("+%d%% armor and magic resist while in combat.") % roundi(JAKSHO_PER_STACK * jaksho_stacks * 100.0),
 			str(jaksho_stacks), jaksho_stacks == JAKSHO_MAX))
 	if has(&"archangels_staff") and mana_charge > 0.0:
 		found.append(_buff(&"archangels_staff", "Mana Charge", _icon(&"archangels_staff"),
-			"+%d max [mana]mana[/mana] from skill hits (up to %d)." % [roundi(mana_charge), MANA_CHARGE_MAX],
+			Lang.t("+%d max [mana]mana[/mana] from skill hits (up to %d).") % [roundi(mana_charge), MANA_CHARGE_MAX],
 			str(roundi(mana_charge)), mana_charge >= MANA_CHARGE_MAX))
 	if has(&"banshees_veil") and lucian.item_cooldown(&"banshees_veil").is_ready():
 		found.append(_buff(&"banshees_veil", "Annul", _icon(&"banshees_veil"),
-			"A spell shield blocks the next enemy skill.", "", true))
+			Lang.t("A spell shield blocks the next enemy skill."), "", true))
 	if has(&"kaenic_rookern"):
 		var magebane := _buff(&"kaenic_rookern", "Magebane", _icon(&"kaenic_rookern"),
-			"A shield against [magic]magic damage[/magic] after %d s without magic damage." % roundi(MAGEBANE_WAIT), "", false)
+			Lang.t("A shield against [magic]magic damage[/magic] after %d s without magic damage.") % roundi(MAGEBANE_WAIT), "", false)
 		if lucian.shields.has(&"magebane"):
 			magebane.count = str(roundi(lucian.shields.amount(&"magebane")))
 			magebane.ready = true
@@ -485,13 +485,13 @@ func buffs() -> Array[Dictionary]:
 	for shield in [[&"lifeline", "Lifeline", &"immortal_shieldbow"], [&"everlasting", "Everlasting", &"fimbulwinter"]]:
 		if lucian.shields.has(shield[0]):
 			var buff := _buff(shield[0], shield[1], _icon(shield[2]),
-				"A shield absorbs damage.", str(roundi(lucian.shields.amount(shield[0]))), true)
+				Lang.t("A shield absorbs damage."), str(roundi(lucian.shields.amount(shield[0]))), true)
 			buff.left = lucian.shields.time_left(shield[0])
 			buff.duration = lucian.shields.duration(shield[0])
 			found.append(buff)
 	if has_slay():
 		found.append(_buff(&"slay", "Slay", _icon(&"immortal_path" if has(&"immortal_path") else &"gluttonous_greaves"),
-			"[hp]+%s%% omnivamp[/hp] from elite, mini boss and boss kills (up to %d)." % [TooltipText.number(SLAY_OMNIVAMP * slay_stacks * 100.0), SLAY_MAX],
+			Lang.t("[hp]+%s%% omnivamp[/hp] from elite, mini boss and boss kills (up to %d).") % [TooltipText.number(SLAY_OMNIVAMP * slay_stacks * 100.0), SLAY_MAX],
 			str(slay_stacks) if slay_stacks > 0 else "", slay_stacks == SLAY_MAX))
 	if not _bleeds.is_empty():
 		var coming := 0.0
@@ -500,19 +500,19 @@ func buffs() -> Array[Dictionary]:
 			coming += entry.rate * entry.left
 			longest = maxf(longest, entry.left)
 		var ignore_pain := _buff(&"deaths_dance", "Ignore Pain", _icon(&"deaths_dance"),
-			"%d%% of damage taken is dealt over %d s instead. This is the damage still to come." % [roundi(IGNORE_PAIN * 100.0), roundi(IGNORE_PAIN_TIME)],
+			Lang.t("%d%% of damage taken is dealt over %d s instead. This is the damage still to come.") % [roundi(IGNORE_PAIN * 100.0), roundi(IGNORE_PAIN_TIME)],
 			str(roundi(coming)), false)
 		ignore_pain.left = longest
 		ignore_pain.duration = IGNORE_PAIN_TIME
 		found.append(ignore_pain)
 	for noxian in [
-		[&"chainlaced_crushers", &"persistence", "Noxian Persistence", "[magic]magic damage[/magic]"],
-		[&"armored_advance", &"endurance", "Noxian Endurance", "[phys]physical damage[/phys]"],
+		[&"chainlaced_crushers", &"persistence", "Noxian Persistence", "Taking [magic]magic damage[/magic] grants a shield against it for %d s."],
+		[&"armored_advance", &"endurance", "Noxian Endurance", "Taking [phys]physical damage[/phys] grants a shield against it for %d s."],
 	]:
 		if not has(noxian[0]):
 			continue
 		var buff := _buff(noxian[1], noxian[2], _icon(noxian[0]),
-			"Taking %s grants a shield against it for %d s." % [noxian[3], roundi(NOXIAN_SHIELD_TIME)], "", false)
+			Lang.t(noxian[3]) % roundi(NOXIAN_SHIELD_TIME), "", false)
 		var cooldown := lucian.item_cooldown(noxian[0])
 		if lucian.shields.has(noxian[1]):
 			buff.count = str(roundi(lucian.shields.amount(noxian[1])))
@@ -703,4 +703,4 @@ func _icon(id: StringName) -> Texture2D:
 
 
 static func _buff(id: StringName, title: String, icon: Texture2D, text: String, count: String, ready: bool) -> Dictionary:
-	return {"id": id, "name": title, "icon": icon, "text": text, "count": count, "left": 0.0, "duration": 0.0, "ready": ready}
+	return {"id": id, "name": Lang.t(title), "icon": icon, "text": text, "count": count, "left": 0.0, "duration": 0.0, "ready": ready}
