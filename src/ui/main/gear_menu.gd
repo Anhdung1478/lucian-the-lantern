@@ -87,6 +87,11 @@ func find_button(text: String) -> Button:
 	for button: Button in page.find_children("*", "Button", true, false):
 		if button.text == text:
 			return button
+	# A slot row is three labels, not text: found by its one-line wording.
+	if _showing_slots:
+		for i in _slot_list.buttons.size():
+			if _slot_list.row_text(i) == text:
+				return _slot_list.buttons[i]
 	return null
 
 
@@ -107,6 +112,8 @@ func _build() -> void:
 	_entry(_menu_page, Lang.t("Leave to main menu"), GameMenu.LEAVE_ICON, MenuEntry.Kind.DANGER, "", leave_requested.emit)
 	_entry(_menu_page, Lang.t("Exit the game"), GameMenu.EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
 	_slot_page = _page()
+	# The title's three-part row, not one centred line.
+	_slot_list.parts = true
 	_slot_list.picked.connect(_copy)
 	_slot_page.add_child(_slot_list)
 	_entry(_slot_page, Lang.t("Back"), BACK_ICON, MenuEntry.Kind.NORMAL, "", _show_menu)

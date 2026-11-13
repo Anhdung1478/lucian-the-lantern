@@ -463,6 +463,16 @@ func test_a_used_slot_leaves_room_around_its_text() -> void:
 	assert_lte(button.get_minimum_size().x + 40.0, SlotList.BUTTON_SIZE.x, _title().slot_list.row_text(1))
 
 
+## Review r2 E2-4: the slot rows and the difficulty buttons are one width.
+func test_the_slot_rows_and_the_difficulty_buttons_share_a_width() -> void:
+	_title().show_slots(false)
+	await wait_process_frames(3)
+	var row_width := _title().slot_list.buttons[0].size.x
+	_title().show_difficulty(1)
+	await wait_process_frames(3)
+	assert_eq(row_width, _title().difficulty_buttons[0].size.x)
+
+
 func _break_slot(n: int) -> void:
 	var save := SaveGame.instance()
 	var file := FileAccess.open(save.path(n), FileAccess.WRITE)

@@ -4,7 +4,7 @@ extends VBoxContainer
 ## "Slot 3 · empty", "Slot 1 (current)" or, in red, "Slot 2 · can't be read"
 ## (SaveGame.slot_broken). The owner decides what a pick does. Used by Save
 ## as copy, Start new game and Load game.
-## With `parts` set (the title's pages) a row is three aligned columns instead
+## With `parts` set (the title's pages and the gear menu's copy list) a row is three aligned columns instead
 ## of one string: "Slot 2" at the left, the play time in the middle, the save
 ## date dim at the right; an empty slot says "Empty" in the middle, greyed.
 ## The button's `text` is then empty; `row_text()` has the one-line wording.
@@ -13,6 +13,10 @@ signal picked(slot: int, used: bool)
 
 ## Wide enough for "Slot 2 · 99h 59m · saved 2026-10-28 14:03" with room around it.
 const BUTTON_SIZE := Vector2(520, 56)
+
+## A parted row's width (420 px on screen): the title's slot pages and the
+## difficulty page share it, so the edges stay still between them.
+const PARTS_WIDTH := 504.0
 
 ## Sizes of the parted row's columns: the slot name, and the date.
 const NAME_WIDTH := 110.0
@@ -24,6 +28,8 @@ var buttons: Array[Button] = []
 var parts := false:
 	set(on):
 		parts = on
+		for button in buttons:
+			button.custom_minimum_size.x = PARTS_WIDTH if on else BUTTON_SIZE.x
 		refresh(_current, _empty_enabled)
 
 var _current := 0
