@@ -333,15 +333,17 @@ func _show_complete() -> void:
 	_fill_gives(false)
 
 
-## What the branch's nodes give: every node (a finished branch), or at rest
-## the bought ones, as many as fit above the action ("+2 more" past that).
+## What the branch's nodes give: every node (a finished branch), or the
+## bought ones other than the node shown, as many as fit above the action
+## ("+2 more" past that).
 func _fill_gives(bought_only: bool) -> void:
 	for child in gives.get_children():
 		gives.remove_child(child)
 		child.free()
 	var shown: Array[TreeNodeData] = []
 	for data in tree.branch_nodes(branch):
-		if not bought_only or tree.level(data.id) > 0:
+		# The node shown above is said there already.
+		if not bought_only or (tree.level(data.id) > 0 and data.id != subject):
 			shown.append(data)
 	if shown.is_empty():
 		return
