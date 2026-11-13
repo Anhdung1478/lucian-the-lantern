@@ -464,6 +464,9 @@ func _fill_rows(group: Dictionary) -> void:
 		icon.material = TreeNodeView.grey_material() if current in [&"open", &"poor"] else null
 		var title: Label = row.get_node(^"Line/Name")
 		title.text = "???" if hidden else Lang.t(tree.node(node_id).display_name)
+		# A small row may clip a long name: the hover card has all of it.
+		if group == near_rows:
+			row.set_meta(&"hover_text", title.text)
 		title.add_theme_color_override(&"font_color", UiStyle.DIM_COLOR if hidden else UiStyle.TEXT_COLOR)
 		var level: Label = row.get_node(^"Line/Level")
 		level.text = "" if hidden else "%d/%d" % [tree.level(node_id), tree.node(node_id).max_level]
