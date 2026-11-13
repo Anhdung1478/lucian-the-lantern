@@ -62,9 +62,9 @@ Minutes for a skilled player's first clear of each act, counting a few deaths, s
 
 | Input | Action |
 |---|---|
-| Right-click | Move (hold to keep following the cursor). A dash (E, Galeforce, Rocketbelt) or Flash drops a move or merchant visit ordered before it, even with the button still held: right-click again, during the dash or after it, to walk on. |
+| Right-click | Move (hold to keep following the cursor). *(V2.1: a right-click on an enemy attacks it, as a left-click does, and does not start the hold. A merchant is still visited and the ground still walked.)* A dash (E, Galeforce, Rocketbelt) or Flash drops a move or merchant visit ordered before it, even with the button still held: right-click again, during the dash or after it, to walk on. |
 | Left-click on enemy | Attack (a Blast Cone too) |
-| A + left-click | Attack what the player means: the enemy under the cursor, else the weakest in range, else the nearest (see below) |
+| A + left-click (Normal mode) | Attack what the player means: the enemy under the cursor, else the weakest in range, else the nearest (see below) |
 | Q / W / E / R | Skills |
 | D / F | Summoner spells |
 | 1–6 | Item actives and potions in equip slots 1–6 |
@@ -100,6 +100,8 @@ Casts with no aim (potions, Ghost, Barrier, Heal, Clarity) and casts that aren't
 2. Else the enemy with the **lowest HP %** within his attack range; on a tie, the nearer one.
 3. Else the **nearest enemy on the map**: he walks to it (around walls) and shoots once in range.
 4. With no enemy at all, he walks to the clicked point.
+
+*(V2.1: Settings > Controls has an Attack-move mode, **Normal** (the default, as above) or **Quick**: with Quick, A alone gives the order at once, at the cursor, with the same target choice and no arming step. Act 1's tip then reads "Press A: attack the enemy under the cursor, or the weakest one in range.")*
 
 It is one target: after that kill Lucian stops and idles. A dead or untargetable enemy is never picked. Act 1's tip reads "Press A, then LMB: attack the enemy under the cursor, or the weakest one in range." (the keys follow the bindings).
 

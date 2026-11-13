@@ -107,7 +107,7 @@ Until 1-1 is cleared, Act 1 is the tutorial:
 - **Q and W are locked** until Act 1 is cleared. Hovering their HUD slots says "Locked: clear Act 1 to unlock it in the Evolution Tree."
 - **Senna** fights beside him.
 - **Senna teaches E at the first break** (before wave 2), in a short scene: the black bars close in, she dashes to the side and back, and says "Dash, then shoot." Lucian learns E at rank 1 for the rest of the stage. The break's countdown waits for the scene; Skip ends it, and he still learns E. Then the tip "E to dash toward the cursor. Your next shot is ready when you land." shows.
-- **Tips** show under the boss bar, one at a time, 7 s each (only while the game runs). Each shows once; later ones wait their turn. The keys follow the bindings.
+- **Tips** show under the boss bar, one at a time, 7 s each (only while the game runs). Each shows once; later ones wait their turn, and a tip waits while a wave banner is showing. The keys follow the bindings.
 - **Losing it is a game over:** the result panel reads **GAME OVER** and its button **Back to title** returns to the title screen. The essences collected are still saved. Once 1-1 is cleared, losing it is a plain DEFEATED that goes back to the main screen.
 
 | Tip | When |

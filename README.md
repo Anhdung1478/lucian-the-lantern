@@ -42,6 +42,7 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 - **Elite traits:** from Act 3 on, and from wave 11 in Endless, each elite comes with one trait: Swift, Armored, Vampiric or Volatile. Its icon is over the health bar, and it pays 25% more gold and XP.
 - **Between waves and after a defeat:** the break shows what the next wave brings, and a defeat shows what hit you most, with a tip.
 - **Look:** from V2.0 the HUD, the backpack, the merchant, the end screens and every map were redrawn in the same look as the title: navy and gold, with the lantern's teal light, soft shadows and small effects (the effects are off on Low quality). The title picture, the Journey map, every enemy and boss, Lucian and his five skins, every item icon and every stat icon were drawn again too, and the Classic skin has its own skill effects.
+- **Motion (V2.1, in progress):** screens, pop-ups, cards and numbers ease in and out instead of popping, and the HUD, backpack, merchant, menus, Settings, title and end screens were laid out again on one set of spacings and type sizes. Attack-move has a Quick mode (A alone), and a right-click on an enemy attacks it.
 - **Music:** a score made in code, one piece per act, that follows the fight: its drums grow with the enemies left, and a boss brings its own layer.
 - **Other:** three save slots, rebindable keys, and three cast modes for each key.
 
@@ -58,9 +59,9 @@ Every key can be changed in **Settings → Controls**.
 
 | Action | Default |
 |---|---|
-| Move | Right mouse button |
-| Attack | Left mouse button |
-| Attack-move | A |
+| Move | Right mouse button (on an enemy it attacks) |
+| Attack | Left mouse button, or right mouse button on an enemy |
+| Attack-move | A, then left-click (Normal) or A alone (Quick); choose in Settings → Controls |
 | Skills | Q, W, E, R |
 | Summoner spells | D, F |
 | Item slots | 1–6 |

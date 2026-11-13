@@ -52,6 +52,7 @@ One Vietnamese term for each English term, in every file. Names of items, skills
 | Modifier / Resolve / the Lantern's gift | Biến số / Quyết Tâm / Món Quà Của Lồng Đèn |
 | Buff / Effect (a tree node's row) | Hiệu ứng / Tác dụng |
 | Cooldown / Cast / Cast time | Hồi chiêu / Tung chiêu / Niệm chiêu |
+| Quick (attack-move mode) / Normal (difficulty and attack-move mode) | Nhanh / Thường |
 | Quick cast / Normal cast / Cast queue | Tung nhanh / Tung thường / Hàng chờ kỹ năng |
 | Skin / Equip / Equipped | Trang phục / Mặc / Đang mặc |
 | Summoner spell / Shield / Stacks | Phép bổ trợ / Lá chắn / Tầng |
