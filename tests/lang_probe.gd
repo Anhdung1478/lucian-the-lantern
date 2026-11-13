@@ -203,7 +203,9 @@ static func _texts_of(node: Node) -> Array[String]:
 	if node is Label:
 		texts.append((node as Label).text)
 	elif node is RichTextLabel:
-		texts.append(RegEx.create_from_string("\\[[^\\]]*\\]").sub((node as RichTextLabel).text, "", true))
+		# An image's path is no text; then every other tag goes.
+		var rich := RegEx.create_from_string("\\[img[^\\]]*\\].*?\\[/img\\]").sub((node as RichTextLabel).text, "", true)
+		texts.append(RegEx.create_from_string("\\[[^\\]]*\\]").sub(rich, "", true))
 	elif node is Button:
 		texts.append((node as Button).text)
 		if node is OptionButton:
