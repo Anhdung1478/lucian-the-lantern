@@ -840,3 +840,87 @@ msgstr "Lucian"
 #. a champion's name stays
 msgid "Senna"
 msgstr "Senna"
+
+#. shared by: items, main
+#. Heading of the backpack plate.
+#. tree_page.gd: plaque caption on the Backpack page
+msgid "BACKPACK"
+msgstr "BA LÔ"
+
+#. shared by: items, main
+#. Recipe table: heading over the boots' recipes.
+#. tree_page.gd: plaque caption on the Backpack page
+msgid "BOOTS"
+msgstr "GIÀY"
+
+#. shared by: items, main
+#. Heading of the merchant plate.
+#. tree_page.gd, node_info_panel.gd: caption of the economy page's second limb
+msgid "MERCHANT"
+msgstr "THƯƠNG NHÂN"
+
+#. shared by: stage, main
+#. Endless: the result's Modifier row with none in effect, and the card that clears the modifier (both lines)
+#. loadout_panel.gd, spell_menu.gd, tree_node_data.gd: no spell chosen; also the value of a node at level 0
+msgid "None"
+msgstr "Không có"
+
+#. shared by: stage, main
+#. Result card: the heads of its three columns, and the empty rewards column
+#. tree_page.gd, node_info_panel.gd: caption of the economy page's first limb
+msgid "REWARDS"
+msgstr "PHẦN THƯỞNG"
+
+#. shared by: stage, main
+#. Stage info under the stage name, wave preview and Endless: %d is a wave or a count, %s a wave's name
+#. journey_node.gd: best wave under the ENDLESS plate. %d is the wave
+msgid "Best %d"
+msgstr "Cao nhất %d"
+
+#. shared by: stage, main
+#. HUD: the stage name when there is none (the sandbox), and a stage's name in Endless; %s is a map's name
+#. journey_node.gd: hover text of the Training place
+msgid "Training"
+msgstr "Luyện Tập"
+
+#. shared by: stage, shell
+#. Resolve: its name (a buff icon, the setting); %s in the next line is that name
+#. Settings > Gameplay: row name.
+msgid "Resolve"
+msgstr "Quyết Tâm"
+
+#. shared by: main, shell
+#. gear_menu.gd: gear menu row
+#. Stage menu: entry.
+msgid "Exit the game"
+msgstr "Thoát trò chơi"
+
+#. shared by: main, shell
+#. gear_menu.gd: title of the gear menu
+#. Stage menu (ESC): the card's title.
+msgid "MENU"
+msgstr "MENU"
+
+#. shared by: main, shell
+#. main_screen.gd: red toast when a save failed
+#. Game root: toast on the main screen or notice on the title after a save failed.
+msgid "Could not save"
+msgstr "Không lưu được"
+
+#. shared by: main, shell
+#. loadout_panel.gd: heading of the D and F spell panel
+#. Settings > Controls: group caption.
+msgid "SUMMONER SPELLS"
+msgstr "PHÉP BỔ TRỢ"
+
+#. shared by: main, shell
+#. skin_preview.gd: preview button, Lucian's basic attack
+#. Settings > Controls: action name.
+msgid "Attack"
+msgstr "Tấn công"
+
+#. shared by: main, shell
+#. tree_page.gd: branch name
+#. Settings > Controls: action name.
+msgid "Backpack"
+msgstr "Ba Lô"

@@ -153,10 +153,6 @@ msgstr "Tiếp tục"
 msgid "OK"
 msgstr "OK"
 
-#. Stage menu (ESC): the card's title.
-msgid "MENU"
-msgstr "MENU"
-
 #. Stage menu: entry.
 msgid "Resume"
 msgstr "Tiếp tục"
@@ -168,10 +164,6 @@ msgstr "Âm thanh, điều khiển, đồ họa"
 #. Stage menu: entry.
 msgid "Leave this stage"
 msgstr "Rời màn này"
-
-#. Stage menu: entry.
-msgid "Exit the game"
-msgstr "Thoát khỏi trò chơi"
 
 #. Stage menu: hover note on the disabled Leave entry.
 msgid "Not available yet"
@@ -212,10 +204,6 @@ msgstr "Rời khỏi Bãi Tập Luyện?"
 #. Game root: pop-up question when leaving a stage.
 msgid "Leave this stage? Essences collected so far are kept."
 msgstr "Rời màn này? Tinh chất đã nhặt vẫn được giữ."
-
-#. Game root: toast on the main screen or notice on the title after a save failed.
-msgid "Could not save"
-msgstr "Không lưu được"
 
 #. Settings: the panel's title.
 msgid "SETTINGS"
@@ -302,10 +290,6 @@ msgid "SKILLS"
 msgstr "KỸ NĂNG"
 
 #. Settings > Controls: group caption.
-msgid "SUMMONER SPELLS"
-msgstr "PHÉP BỔ TRỢ"
-
-#. Settings > Controls: group caption.
 msgid "ITEMS"
 msgstr "TRANG BỊ"
 
@@ -316,10 +300,6 @@ msgstr "GIAO DIỆN"
 #. Settings > Controls: action name.
 msgid "Move"
 msgstr "Di chuyển"
-
-#. Settings > Controls: action name.
-msgid "Attack"
-msgstr "Tấn công"
 
 #. Settings > Controls: action name.
 msgid "Attack-move"
@@ -380,10 +360,6 @@ msgstr "Bình máu"
 #. Settings > Controls: action name.
 msgid "Mana potion"
 msgstr "Bình năng lượng"
-
-#. Settings > Controls: action name.
-msgid "Backpack"
-msgstr "Ba lô"
 
 #. Settings > Controls: action name.
 msgid "Stats panel (Ctrl: toggle, hold: more)"
@@ -476,10 +452,6 @@ msgstr "Hàng chờ kỹ năng"
 #. Settings > Gameplay: row description.
 msgid "A skill, item active or summoner spell pressed during a cast time or a dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept."
 msgstr "Kỹ năng, hiệu ứng kích hoạt của trang bị hoặc phép bổ trợ được nhấn trong lúc đang tung chiêu hoặc đang lướt sẽ được tung ngay khi xong, nhắm vào chỗ đã nhấn phím. Chỉ lần nhấn cuối cùng được giữ lại."
-
-#. Settings > Gameplay: row name.
-msgid "Resolve"
-msgstr "Quyết Tâm"
 
 #. Settings > Gameplay: row description. %d is the most stacks.
 msgid "After each defeat on a stage, Lucian deals more damage and takes less there (up to %d times)."

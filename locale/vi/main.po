@@ -65,14 +65,6 @@ msgstr "Về menu chính"
 msgid "Title screen"
 msgstr "Màn hình chính"
 
-#. gear_menu.gd: gear menu row
-msgid "Exit the game"
-msgstr "Thoát game"
-
-#. gear_menu.gd: title of the gear menu
-msgid "MENU"
-msgstr "MENU"
-
 #. gear_menu.gd: subtitle of the gear menu. %d is the save slot number, %s the play time such as 1h 23m
 msgid "Slot %d · %s"
 msgstr "Ô lưu %d · %s"
@@ -97,10 +89,6 @@ msgstr "Đã lưu vào ô lưu %d"
 msgid "Copied to slot %d"
 msgstr "Đã sao chép vào ô lưu %d"
 
-#. main_screen.gd: red toast when a save failed
-msgid "Could not save"
-msgstr "Không lưu được"
-
 #. journey_map.gd, journey_node.gd: hover text of a place in a locked act. %d is the act to clear first
 msgid "Clear Act %d first"
 msgstr "Hãy hoàn thành Hồi %d trước"
@@ -121,10 +109,6 @@ msgstr "%d đợt + trùm phụ"
 msgid "%d waves"
 msgstr "%d đợt"
 
-#. journey_node.gd: hover text of the Training place
-msgid "Training"
-msgstr "Luyện Tập"
-
 #. journey_node.gd: hover text of the Endless place (2 lines). %d is the best wave
 msgid "Endless\nBest wave: %d"
 msgstr "Vô Tận\nĐợt cao nhất: %d"
@@ -140,10 +124,6 @@ msgstr "LUYỆN TẬP"
 #. journey_node.gd: plate under the Endless place on the map
 msgid "ENDLESS"
 msgstr "VÔ TẬN"
-
-#. journey_node.gd: best wave under the ENDLESS plate. %d is the wave
-msgid "Best %d"
-msgstr "Cao nhất %d"
 
 #. journey_panel.gd: text of the Training panel
 msgid "Practice on training dummies with what you have bought in the Evolution Tree and your equipped skin. No essences are earned. Leave from the ESC menu to come back here."
@@ -233,17 +213,9 @@ msgstr "Xanh, cam và tím lặp lại"
 msgid "MAP"
 msgstr "BẢN ĐỒ"
 
-#. loadout_panel.gd: heading of the D and F spell panel
-msgid "SUMMONER SPELLS"
-msgstr "PHÉP BỔ TRỢ"
-
 #. loadout_panel.gd: hint under the heading (fixed width, wraps)
 msgid "Click a key to choose its spell. Spells are bought in the Evolution Tree."
 msgstr "Bấm một phím để chọn phép. Phép được mua ở Cây Tiến Hóa."
-
-#. loadout_panel.gd, spell_menu.gd, tree_node_data.gd: no spell chosen; also the value of a node at level 0
-msgid "None"
-msgstr "Không có"
 
 #. loadout_panel.gd: hover text of the locked F key
 msgid "Buy the 2nd summoner slot in the Evolution Tree"
@@ -356,10 +328,6 @@ msgstr "Mua  %d"
 #. skin_card.gd: button that opens the preview
 msgid "Preview"
 msgstr "Xem thử"
-
-#. skin_preview.gd: preview button, Lucian's basic attack
-msgid "Attack"
-msgstr "Đánh"
 
 #. skin_preview.gd: preview button, plays every piece in turn
 msgid "▶ All"
@@ -522,10 +490,6 @@ msgid "Stats"
 msgstr "Chỉ Số"
 
 #. tree_page.gd: branch name
-msgid "Backpack"
-msgstr "Ba Lô"
-
-#. tree_page.gd: branch name
 msgid "Economy"
 msgstr "Kinh Tế"
 
@@ -565,14 +529,6 @@ msgstr "PHÒNG THỦ"
 msgid "SUSTAIN"
 msgstr "HỒI PHỤC"
 
-#. tree_page.gd, node_info_panel.gd: caption of the economy page's first limb
-msgid "REWARDS"
-msgstr "PHẦN THƯỞNG"
-
-#. tree_page.gd, node_info_panel.gd: caption of the economy page's second limb
-msgid "MERCHANT"
-msgstr "THƯƠNG NHÂN"
-
 #. tree_page.gd: plaque caption on the Backpack page
 msgid "EQUIP SLOTS"
 msgstr "Ô TRANG BỊ"
@@ -584,14 +540,6 @@ msgstr "Hồi %d"
 #. tree_page.gd: note on the equip slots plaque
 msgid "Only equipped items give stats."
 msgstr "Chỉ đồ đang trang bị mới cho chỉ số."
-
-#. tree_page.gd: plaque caption on the Backpack page
-msgid "BACKPACK"
-msgstr "BA LÔ"
-
-#. tree_page.gd: plaque caption on the Backpack page
-msgid "BOOTS"
-msgstr "GIÀY"
 
 #. tree_page.gd: note on the boots plaque
 msgid "Worn on every map."

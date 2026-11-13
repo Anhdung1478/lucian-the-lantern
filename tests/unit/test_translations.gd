@@ -95,3 +95,19 @@ func test_the_probe_reads_a_scripts_texts() -> void:
 	file.close()
 	assert_eq(LangProbe.literals(path), ["Start new game", "Killed by %s", "Two\nlines here", "Single quoted text"] as Array[String])
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
+func test_every_text_in_the_code_has_a_vietnamese_or_is_listed_as_left_in_english() -> void:
+	var scripts: Array[String] = []
+	for script in LangProbe.scripts_in("res://src"):
+		# The debug tables are for the developer and stay in English; Lang
+		# itself holds a pattern, not a text.
+		if not script.begins_with("res://src/ui/debug/") and script != "res://src/core/lang.gd":
+			scripts.append(script)
+	assert_gt(scripts.size(), 200)
+	assert_eq(LangProbe.missing_in(scripts), [] as Array[String])
+
+
+func test_every_data_text_has_a_vietnamese() -> void:
+	assert_gt(LangProbe.data_texts("res://data").size(), 200)
+	assert_eq(LangProbe.missing_data("res://data"), [] as Array[String])

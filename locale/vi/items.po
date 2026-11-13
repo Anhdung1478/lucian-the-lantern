@@ -9,7 +9,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-
 #. Item card: the kind line under a fragment's name; also a shop row's second line for an item with no stats.
 msgid "Fragment"
 msgstr "Mảnh Ghép"
@@ -214,10 +213,6 @@ msgstr "Chỉ có thể trang bị một món xuyên giáp hoặc xuyên kháng 
 msgid "Boots can't be sold"
 msgstr "Giày không thể bán"
 
-#. Heading of the backpack plate.
-msgid "BACKPACK"
-msgstr "BA LÔ"
-
 #. Hover card of the sell slot. %% is a percent sign.
 msgid "Drop an item here to sell it for 70%% of its cost (Guardian Angel: 40%%)."
 msgstr "Thả món đồ vào đây để bán với giá 70%% giá gốc (Giáp Thiên Thần: 40%%)."
@@ -245,10 +240,6 @@ msgstr "BÁN"
 #. The sell slot's word for an item that can't be sold.
 msgid "NO"
 msgstr "KHÔNG"
-
-#. Recipe table: heading over the boots' recipes.
-msgid "BOOTS"
-msgstr "GIÀY"
 
 #. Recipe table: the note under the list.
 msgid "Lit gold: you hold both parts."
@@ -325,10 +316,6 @@ msgstr "Ô đó đang khóa"
 #. Craft button when the two inputs make nothing.
 msgid "No recipe"
 msgstr "Không có công thức"
-
-#. Heading of the merchant plate.
-msgid "MERCHANT"
-msgstr "THƯƠNG NHÂN"
 
 #. Merchant button that buys back the last sale.
 msgid "Undo sale"

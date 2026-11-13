@@ -22,10 +22,6 @@ msgid "New best: %d wave!"
 msgstr "Kỷ lục mới: %d đợt!"
 
 #. Endless: the result's Modifier row with none in effect, and the card that clears the modifier (both lines)
-msgid "None"
-msgstr "Không có"
-
-#. Endless: the result's Modifier row with none in effect, and the card that clears the modifier (both lines)
 msgid "Nothing"
 msgstr "Không có"
 
@@ -104,10 +100,6 @@ msgstr "Về màn hình tiêu đề"
 #. Result card: the heads of its three columns, and the empty rewards column
 msgid "STATS"
 msgstr "THỐNG KÊ"
-
-#. Result card: the heads of its three columns, and the empty rewards column
-msgid "REWARDS"
-msgstr "PHẦN THƯỞNG"
 
 #. Result card: the heads of its three columns, and the empty rewards column
 msgid "WHAT HIT YOU"
@@ -326,20 +318,12 @@ msgid "Enemies: %d"
 msgstr "Kẻ địch: %d"
 
 #. Stage info under the stage name, wave preview and Endless: %d is a wave or a count, %s a wave's name
-msgid "Best %d"
-msgstr "Cao nhất %d"
-
-#. Stage info under the stage name, wave preview and Endless: %d is a wave or a count, %s a wave's name
 msgid "Next"
 msgstr "Tiếp theo"
 
 #. Stage info: the hover text of the Skip button
 msgid "Start the next wave now. Lucian still gets the health and mana regen of the time skipped."
 msgstr "Bắt đầu đợt tiếp theo ngay. Lucian vẫn được hồi máu và năng lượng của khoảng thời gian bỏ qua."
-
-#. HUD: the stage name when there is none (the sandbox), and a stage's name in Endless; %s is a map's name
-msgid "Training"
-msgstr "Luyện tập"
 
 #. HUD: the stage name when there is none (the sandbox), and a stage's name in Endless; %s is a map's name
 msgid "Endless · %s"
@@ -552,10 +536,6 @@ msgstr "Dễ Nổ"
 #. Elite traits: the name over an elite, and the tip shown the first time one spawns
 msgid "Volatile elites explode where they die: step away."
 msgstr "Tinh anh Dễ Nổ phát nổ tại nơi chúng chết: hãy tránh xa."
-
-#. Resolve: its name (a buff icon, the setting); %s in the next line is that name
-msgid "Resolve"
-msgstr "Quyết Tâm"
 
 #. Resolve: its name (a buff icon, the setting); %s in the next line is that name
 msgid "No %s: a defeat makes no stage easier."
