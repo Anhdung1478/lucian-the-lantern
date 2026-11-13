@@ -65,7 +65,7 @@ func _ready() -> void:
 	add_child(info)
 
 	reset_button = Button.new()
-	reset_button.text = "Reset tree  %d" % EvolutionTree.RESET_COST
+	reset_button.text = Lang.t("Reset tree  %d") % EvolutionTree.RESET_COST
 	reset_button.icon = PURPLE_ICON
 	reset_button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	reset_button.expand_icon = true
@@ -144,9 +144,9 @@ func refresh() -> void:
 	info.refresh()
 	reset_button.disabled = not tree.can_reset(essences)
 	if tree.spent() == Vector2i.ZERO:
-		reset_button.set_meta(&"hover_text", "Nothing to refund: no blue or orange essence spent")
+		reset_button.set_meta(&"hover_text", Lang.t("Nothing to refund: no blue or orange essence spent"))
 	elif reset_button.disabled:
-		reset_button.set_meta(&"hover_text", "Needs %d purple essence" % EvolutionTree.RESET_COST)
+		reset_button.set_meta(&"hover_text", Lang.t("Needs %d purple essence") % EvolutionTree.RESET_COST)
 	elif reset_button.has_meta(&"hover_text"):
 		reset_button.remove_meta(&"hover_text")
 
@@ -184,13 +184,12 @@ func _ask_reset() -> void:
 ## 5 purple essence? 1200 blue and 10 orange essence come back."
 func reset_question() -> String:
 	var refund := tree.spent()
-	var parts: PackedStringArray = []
-	if refund.x > 0:
-		parts.append("%d blue" % refund.x)
+	var cost := EvolutionTree.RESET_COST
+	if refund.x > 0 and refund.y > 0:
+		return Lang.t("Reset the Evolution Tree for %d purple essence? %d blue and %d orange essence come back.") % [cost, refund.x, refund.y]
 	if refund.y > 0:
-		parts.append("%d orange" % refund.y)
-	return "Reset the Evolution Tree for %d purple essence? %s essence %s back." % [
-		EvolutionTree.RESET_COST, " and ".join(parts), "come" if parts.size() > 1 else "comes"]
+		return Lang.t("Reset the Evolution Tree for %d purple essence? %d orange essence comes back.") % [cost, refund.y]
+	return Lang.t("Reset the Evolution Tree for %d purple essence? %d blue essence comes back.") % [cost, refund.x]
 
 
 func _reset() -> void:

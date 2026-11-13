@@ -101,7 +101,7 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	_progress.draw.connect(_draw_progress)
 	_branch_box.add_child(_progress)
 	_branch_box.add_child(JourneyPanel.divider())
-	hint_label = UiStyle.label("Pick a node", 18, UiStyle.DIM_COLOR)
+	hint_label = UiStyle.label(Lang.t("Pick a node"), 18, UiStyle.DIM_COLOR)
 	_branch_box.add_child(hint_label)
 	_list.add_theme_constant_override(&"separation", LIST_GAP)
 	_branch_box.add_child(_list)
@@ -137,7 +137,7 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	requires_label = _wrapped(UiStyle.label("", 19, UiStyle.ERROR_COLOR))
 	_node_box.add_child(requires_label)
 	_node_box.add_child(JourneyPanel.divider())
-	_ladder_caption = UiStyle.label("LEVELS", 16, JourneyPanel.CAPTION_COLOR)
+	_ladder_caption = UiStyle.label(Lang.t("LEVELS"), 16, JourneyPanel.CAPTION_COLOR)
 	_node_box.add_child(_ladder_caption)
 	ladder.add_theme_constant_override(&"separation", 4)
 	_node_box.add_child(ladder)
@@ -177,10 +177,10 @@ func refresh() -> void:
 		_show_node()
 	else:
 		var bought := TreePage.levels(tree, branch)
-		caption_label.text = "EVOLUTION TREE"
-		name_label.text = TreePage.NAMES[branch]
-		blurb_label.text = TreePage.BLURBS[branch]
-		levels_label.text = "Levels bought %d / %d" % [bought.x, bought.y]
+		caption_label.text = Lang.t("EVOLUTION TREE")
+		name_label.text = Lang.t(TreePage.NAMES[branch])
+		blurb_label.text = Lang.t(TreePage.BLURBS[branch])
+		levels_label.text = Lang.t("Levels bought %d / %d") % [bought.x, bought.y]
 		_progress.queue_redraw()
 		_fill_list()
 	queue_redraw()
@@ -190,9 +190,9 @@ func _show_node() -> void:
 	var data := tree.node(id)
 	var level := tree.level(id)
 	var hidden := TreeNodeView.is_hidden(tree, id)
-	caption_label.text = String(TreePage.NAMES[branch]).to_upper()
-	name_label.text = "???" if hidden else data.display_name
-	level_label.text = "LVL %d / %d" % [level, data.max_level]
+	caption_label.text = Lang.t(TreePage.NAMES[branch]).to_upper()
+	name_label.text = "???" if hidden else Lang.t(data.display_name)
+	level_label.text = Lang.t("LVL %d / %d") % [level, data.max_level]
 	if hidden:
 		value_label.text = ""
 		value_label.add_theme_color_override(&"font_color", UiStyle.TEXT_COLOR)
@@ -202,13 +202,13 @@ func _show_node() -> void:
 	else:
 		value_label.text = "%s → %s" % [data.value_text(level), data.value_text(level + 1)]
 		value_label.add_theme_color_override(&"font_color", UiStyle.TEXT_COLOR)
-	description.text = "" if hidden else TooltipText.colorize(data.description)
+	description.text = "" if hidden else TooltipText.colorize(Lang.t(data.description))
 	sum_label.visible = not hidden and not data.level_sum_ids.is_empty()
 	if sum_label.visible:
 		var names: PackedStringArray = []
 		for summed in data.level_sum_ids:
 			names.append(tree.node(summed).short_name())
-		sum_label.text = "%s ranks: %d" % [" + ".join(names), tree.level_sum(id)]
+		sum_label.text = Lang.t("%s ranks: %d") % [" + ".join(names), tree.level_sum(id)]
 		if not tree.is_maxed(id):
 			sum_label.text += " / %d" % data.sum_needed(level)
 	var needs := tree.next_requirement_text(id)
@@ -240,8 +240,8 @@ func _fill_ladder(hidden: bool) -> void:
 		style.bg_color = Color(UiStyle.GOLD_COLOR, 0.1) if i == level else Color(1, 1, 1, 0.025)
 		style.border_color = Color(UiStyle.GOLD_COLOR, 0.55 if i == level else 0.0)
 		var color := UiStyle.TITLE_COLOR if i < level else (UiStyle.TEXT_COLOR if i == level else UiStyle.DIM_COLOR)
-		for part: String in ["Level", "Value"]:
-			(row.get_node("Line/" + part) as Label).add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if part == "Level" and i < level else color)
+		for part: StringName in [&"Level", &"Value"]:
+			(row.get_node("Line/" + part) as Label).add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if part == &"Level" and i < level else color)
 
 
 func _ladder_row(data: TreeNodeData, i: int) -> PanelContainer:
@@ -257,7 +257,7 @@ func _ladder_row(data: TreeNodeData, i: int) -> PanelContainer:
 	line.name = &"Line"
 	line.add_theme_constant_override(&"separation", 8)
 	row.add_child(line)
-	var level := UiStyle.label("Lv %d" % (i + 1), LADDER_FONT - 2)
+	var level := UiStyle.label(Lang.t("Lv %d") % (i + 1), LADDER_FONT - 2)
 	level.name = &"Level"
 	level.custom_minimum_size.x = 44.0
 	line.add_child(level)
@@ -270,7 +270,7 @@ func _ladder_row(data: TreeNodeData, i: int) -> PanelContainer:
 		var amount: int = data.blue[i] if kind == Essences.BLUE else data.orange[i]
 		var text := ""
 		if free:
-			text = "Free" if kind == Essences.BLUE else ""
+			text = Lang.t("Free") if kind == Essences.BLUE else ""
 		elif amount > 0 or kind == Essences.BLUE:
 			text = str(amount)
 		var label := UiStyle.label(text, LADDER_FONT - 1, UiStyle.TEXT_COLOR)
@@ -299,7 +299,7 @@ func _fill_list() -> void:
 		# catalog order.
 		for limb: Dictionary in TreePage.LIMBS.get(branch, []):
 			if limb.has("label"):
-				_list.add_child(UiStyle.label(limb["label"], 14, JourneyPanel.CAPTION_COLOR))
+				_list.add_child(UiStyle.label(Lang.t(limb["label"]), 14, JourneyPanel.CAPTION_COLOR))
 				for node_id: StringName in limb["ids"]:
 					_add_row(node_id)
 		for data in tree.branch_nodes(branch):
@@ -313,7 +313,7 @@ func _fill_list() -> void:
 		icon.texture = null if hidden else tree.node(node_id).icon
 		icon.material = TreeNodeView.grey_material() if current in [&"open", &"poor"] else null
 		var title: Label = row.get_node(^"Line/Name")
-		title.text = "???" if hidden else tree.node(node_id).display_name
+		title.text = "???" if hidden else Lang.t(tree.node(node_id).display_name)
 		title.add_theme_color_override(&"font_color", UiStyle.DIM_COLOR if hidden else UiStyle.TEXT_COLOR)
 		var level: Label = row.get_node(^"Line/Level")
 		level.text = "" if hidden else "%d/%d" % [tree.level(node_id), tree.node(node_id).max_level]

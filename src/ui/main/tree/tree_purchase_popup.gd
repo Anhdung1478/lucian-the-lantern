@@ -63,7 +63,7 @@ func _ready() -> void:
 func refresh() -> void:
 	var data := tree.node(id)
 	var level := tree.level(id)
-	level_label.text = "LVL %d → %d / %d" % [level, level + 1, data.max_level]
+	level_label.text = Lang.t("LVL %d → %d / %d") % [level, level + 1, data.max_level]
 	effect_label.text = "%s → %s" % [data.value_text(level), data.value_text(mini(level + 1, data.max_level))]
 	var price := tree.cost(id)
 	var needs := {Essences.BLUE: price.x, Essences.ORANGE: price.y}
@@ -108,7 +108,7 @@ func _build() -> void:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	backdrop.add_child(center)
-	card = MenuCard.new("BUY UPGRADE", tree.node(id).display_name)
+	card = MenuCard.new(Lang.t("BUY UPGRADE"), Lang.t(tree.node(id).display_name))
 	center.add_child(card)
 	var table := GridContainer.new()
 	table.columns = 2
@@ -117,30 +117,30 @@ func _build() -> void:
 	table.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	card.content.add_child(table)
 	level_label = UiStyle.label("", ROW_FONT, UiStyle.TITLE_COLOR)
-	_row(table, "Level", level_label)
+	_row(table, Lang.t("Level"), level_label)
 	effect_label = UiStyle.label("", ROW_FONT, UiStyle.TEXT_COLOR)
 	effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	effect_label.custom_minimum_size.x = VALUE_WIDTH
-	_row(table, "Effect", effect_label)
-	var price_row: HBoxContainer = _amounts(table, "Price", price_labels)[1]
-	free_label = UiStyle.label("Free", ROW_FONT, UiStyle.TITLE_COLOR)
+	_row(table, Lang.t("Effect"), effect_label)
+	var price_row: HBoxContainer = _amounts(table, Lang.t("Price"), price_labels)[1]
+	free_label = UiStyle.label(Lang.t("Free"), ROW_FONT, UiStyle.TITLE_COLOR)
 	price_row.add_child(free_label)
 	price_row.move_child(free_label, 0)
-	_money_rows.append_array(_amounts(table, "You have", owned_labels))
-	_money_rows.append_array(_amounts(table, "After purchase", after_labels))
-	var note := UiStyle.label(NOTE, 16, UiStyle.DIM_COLOR)
+	_money_rows.append_array(_amounts(table, Lang.t("You have"), owned_labels))
+	_money_rows.append_array(_amounts(table, Lang.t("After purchase"), after_labels))
+	var note := UiStyle.label(Lang.t(NOTE), 16, UiStyle.DIM_COLOR)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.content.add_child(note)
 	var buttons := HBoxContainer.new()
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	buttons.add_theme_constant_override(&"separation", 16)
 	card.content.add_child(buttons)
-	buy_button = MenuEntry.new("Buy", null, MenuEntry.Kind.PRIMARY)
+	buy_button = MenuEntry.new(Lang.t("Buy"), null, MenuEntry.Kind.PRIMARY)
 	buy_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	buy_button.custom_minimum_size.x = BUTTON_WIDTH
 	buy_button.pressed.connect(_buy)
 	buttons.add_child(buy_button)
-	cancel_button = MenuEntry.new("Cancel")
+	cancel_button = MenuEntry.new(Lang.t("Cancel"))
 	cancel_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cancel_button.custom_minimum_size.x = BUTTON_WIDTH * 0.75
 	cancel_button.pressed.connect(close)

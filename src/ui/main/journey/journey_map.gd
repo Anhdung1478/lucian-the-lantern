@@ -260,7 +260,7 @@ func refresh(cleared: Array[String], best: int, portrait: Texture2D) -> void:
 		_fogged[act - 1] = not Journey.is_act_open(act, cleared)
 		_cleared_acts[act - 1] = Journey.act_cleared(act, cleared)
 		if _fogged[act - 1]:
-			regions[act - 1].set_meta(&"hover_text", "Clear Act %d first" % (act - 1))
+			regions[act - 1].set_meta(&"hover_text", Lang.t("Clear Act %d first") % (act - 1))
 		elif regions[act - 1].has_meta(&"hover_text"):
 			regions[act - 1].remove_meta(&"hover_text")
 	lit_stage = ""
@@ -773,8 +773,8 @@ func _draw_overlay() -> void:
 		var at: Vector2 = REGIONS[act]["name_at"]
 		var fogged := _fogged[act]
 		var is_current := act + 1 == current_act
-		var act_line := "ACT %d" % (act + 1)
-		var title := String(Journey.ACTS[act]["name"]).to_upper()
+		var act_line := Lang.t("ACT %d") % (act + 1)
+		var title := Lang.t(Journey.ACTS[act]["name"]).to_upper()
 		var title_color := FOGGED_NAME if fogged else (CURRENT_NAME if is_current else OPEN_NAME)
 		draw_text(_overlay, act_line, at + Vector2(0, ACT_FONT), ACT_FONT, FOGGED_NAME if fogged else ACT_COLOR, false, 3)
 		if _cleared_acts[act]:

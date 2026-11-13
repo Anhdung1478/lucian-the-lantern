@@ -15,7 +15,7 @@ const PULSE_LOW := 0.72
 
 
 func _init() -> void:
-	text = "FREE"
+	text = Lang.t("FREE")
 	size = SIZE
 	custom_minimum_size = SIZE
 	horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

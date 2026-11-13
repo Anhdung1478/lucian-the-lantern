@@ -120,10 +120,10 @@ func show_node(node: JourneyNode, save: SaveGame) -> void:
 	endless_box.visible = node.kind == JourneyNode.ENDLESS
 	match node.kind:
 		JourneyNode.TRAINING:
-			start_button.text = "Start Training"
+			start_button.text = Lang.t("Start Training")
 			_accent = TRAINING_ACCENT
 		JourneyNode.ENDLESS:
-			start_button.text = "Start"
+			start_button.text = Lang.t("Start")
 			_accent = ENDLESS_ACCENT
 		_:
 			_show_stage(node, save)
@@ -133,7 +133,7 @@ func show_node(node: JourneyNode, save: SaveGame) -> void:
 
 ## Endless's best wave.
 func show_best(waves: int) -> void:
-	best_label.text = "Best wave: %d" % waves
+	best_label.text = Lang.t("Best wave: %d") % waves
 
 
 ## The Journey.ENDLESS_MAPS index of the chosen map (0 is Random).
@@ -149,8 +149,8 @@ func portrait_texture() -> Texture2D:
 func _show_stage(node: JourneyNode, save: SaveGame) -> void:
 	var info: Dictionary = Journey.ACTS[node.act - 1]
 	_accent = JourneyMap.REGIONS[node.act - 1]["accent"]
-	act_label.text = "ACT %d · %s" % [node.act, String(info["name"]).to_upper()]
-	title_label.text = "Stage %s" % node.stage_id
+	act_label.text = Lang.t("ACT %d · %s") % [node.act, Lang.t(info["name"]).to_upper()]
+	title_label.text = Lang.t("Stage %s") % node.stage_id
 	# Act 1's stage brings Thresh only on its first play.
 	var no_boss := node.stage_id == StageSetup.TUTORIAL_STAGE and node.cleared
 	boss_row.visible = node.enemy != null and not no_boss
@@ -159,20 +159,20 @@ func _show_stage(node: JourneyNode, save: SaveGame) -> void:
 		_portrait_art = node.enemy.art
 		_portrait_ring = node.ring_color()
 		_portrait.queue_redraw()
-		boss_name_label.text = node.enemy.display_name
-		tag_label.text = "Boss" if node.kind == JourneyNode.BOSS else "Mini boss"
+		boss_name_label.text = Lang.t(node.enemy.display_name)
+		tag_label.text = Lang.t("Boss") if node.kind == JourneyNode.BOSS else Lang.t("Mini boss")
 		_tag_style.bg_color = Color(node.ring_color(), 0.22)
 		_tag_style.border_color = node.ring_color()
 		purple_row.modulate = Color(1, 1, 1, 0.5) if no_boss else Color.WHITE
 		if no_boss:
-			purple_label.text = "No boss on replays"
+			purple_label.text = Lang.t("No boss on replays")
 		elif String(node.enemy.id) in save.bosses:
-			purple_label.text = "+%d again" % node.enemy.purple_repeat
+			purple_label.text = Lang.t("+%d again") % node.enemy.purple_repeat
 		else:
-			purple_label.text = "First kill: +%d" % node.enemy.purple_first
+			purple_label.text = Lang.t("First kill: +%d") % node.enemy.purple_first
 	waves_label.text = node.waves_text
-	story_label.text = info["story"]
-	status_label.text = "Cleared" if node.cleared else "Not cleared yet"
+	story_label.text = Lang.t(info["story"])
+	status_label.text = Lang.t("Cleared") if node.cleared else Lang.t("Not cleared yet")
 	status_label.add_theme_color_override(&"font_color", JourneyNode.CHECK_COLOR if node.cleared else UiStyle.DIM_COLOR)
 	_cleared_mark = node.cleared
 	_status_mark.queue_redraw()
@@ -180,7 +180,7 @@ func _show_stage(node: JourneyNode, save: SaveGame) -> void:
 	resolve_row.visible = stacks > 0
 	resolve_label.text = Resolve.journey_line(stacks, save.difficulty)
 	resolve_row.set_meta(&"hover_text", Resolve.journey_note(save.defeats_on(node.stage_id)))
-	start_button.text = "Start" if Journey.stage_count(node.act) == 1 else "Start stage %d" % node.stage
+	start_button.text = Lang.t("Start") if Journey.stage_count(node.act) == 1 else Lang.t("Start stage %d") % node.stage
 	_show_roster(node.stage_id)
 
 
@@ -201,7 +201,7 @@ func _show_roster(stage_id: String) -> void:
 		var data: EnemyData = load(Stage.ENEMY_PATH % id)
 		var icon := Control.new()
 		icon.custom_minimum_size = Vector2.ONE * ROSTER_ICON
-		icon.set_meta(&"hover_text", data.display_name)
+		icon.set_meta(&"hover_text", Lang.t(data.display_name))
 		icon.draw.connect(_draw_roster_icon.bind(icon, data.art))
 		roster.add_child(icon)
 
@@ -313,7 +313,7 @@ func _build_stage() -> void:
 	enemies.add_theme_constant_override(&"separation", 8)
 	enemies.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tray.add_child(enemies)
-	enemies.add_child(UiStyle.label("ENEMIES", 16, CAPTION_COLOR))
+	enemies.add_child(UiStyle.label(Lang.t("ENEMIES"), 16, CAPTION_COLOR))
 	roster.add_theme_constant_override(&"h_separation", 8)
 	roster.add_theme_constant_override(&"v_separation", 8)
 	roster.custom_minimum_size.x = CONTENT_WIDTH - TRAY_PAD * 2.0
@@ -321,8 +321,8 @@ func _build_stage() -> void:
 
 
 func _build_training() -> void:
-	training_box.add_child(UiStyle.label("PRACTICE", 16, CAPTION_COLOR))
-	training_box.add_child(UiStyle.label("TRAINING", 40, UiStyle.TITLE_COLOR))
+	training_box.add_child(UiStyle.label(Lang.t("PRACTICE"), 16, CAPTION_COLOR))
+	training_box.add_child(UiStyle.label(Lang.t("TRAINING"), 40, UiStyle.TITLE_COLOR))
 	training_box.add_child(divider())
 	var dummy := Control.new()
 	dummy.custom_minimum_size = Vector2(CONTENT_WIDTH, PORTRAIT_SIZE)
@@ -330,33 +330,33 @@ func _build_training() -> void:
 		var middle := Vector2(PORTRAIT_SIZE * 0.5, PORTRAIT_SIZE * 0.5)
 		_draw_round(dummy, JourneyNode.DUMMY_ART, middle, JourneyNode.RIM_COLOR))
 	training_box.add_child(dummy)
-	var text := UiStyle.label(TRAINING_TEXT, 20, UiStyle.TEXT_COLOR)
+	var text := UiStyle.label(Lang.t(TRAINING_TEXT), 20, UiStyle.TEXT_COLOR)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size.x = CONTENT_WIDTH
 	training_box.add_child(text)
 
 
 func _build_endless() -> void:
-	endless_box.add_child(UiStyle.label("WAVES NEVER END", 16, CAPTION_COLOR))
-	endless_box.add_child(UiStyle.label("ENDLESS", 40, UiStyle.TITLE_COLOR))
-	best_label = UiStyle.label("Best wave: 0", 24, UiStyle.GOLD_COLOR)
+	endless_box.add_child(UiStyle.label(Lang.t("WAVES NEVER END"), 16, CAPTION_COLOR))
+	endless_box.add_child(UiStyle.label(Lang.t("ENDLESS"), 40, UiStyle.TITLE_COLOR))
+	best_label = UiStyle.label(Lang.t("Best wave: %d") % 0, 24, UiStyle.GOLD_COLOR)
 	endless_box.add_child(best_label)
 	endless_box.add_child(divider())
 	var rules := VBoxContainer.new()
 	rules.add_theme_constant_override(&"separation", 6)
 	endless_box.add_child(rules)
-	rules.add_child(_icon_row(_icon(SKULL, JourneyNode.MINI_BOSS_COLOR), UiStyle.label("A mini boss every %d waves" % EndlessPlan.MINI_BOSS_EVERY, 18, UiStyle.TEXT_COLOR)))
-	rules.add_child(_icon_row(_icon(SKULL, JourneyNode.BOSS_COLOR), UiStyle.label("A boss every %d waves" % EndlessPlan.BOSS_EVERY, 18, UiStyle.TEXT_COLOR)))
+	rules.add_child(_icon_row(_icon(SKULL, JourneyNode.MINI_BOSS_COLOR), UiStyle.label(Lang.t("A mini boss every %d waves") % EndlessPlan.MINI_BOSS_EVERY, 18, UiStyle.TEXT_COLOR)))
+	rules.add_child(_icon_row(_icon(SKULL, JourneyNode.BOSS_COLOR), UiStyle.label(Lang.t("A boss every %d waves") % EndlessPlan.BOSS_EVERY, 18, UiStyle.TEXT_COLOR)))
 	var card := Control.new()
 	card.custom_minimum_size = Vector2.ONE * ICON_SIZE
 	card.draw.connect(_draw_card_icon.bind(card))
-	rules.add_child(_icon_row(card, UiStyle.label("A modifier to pick after each boss", 18, UiStyle.TEXT_COLOR)))
+	rules.add_child(_icon_row(card, UiStyle.label(Lang.t("A modifier to pick after each boss"), 18, UiStyle.TEXT_COLOR)))
 	var essences := HBoxContainer.new()
 	essences.add_theme_constant_override(&"separation", -8)
 	for icon: Texture2D in [BLUE_ICON, ORANGE_ICON, PURPLE_ICON]:
 		essences.add_child(_icon(icon))
-	rules.add_child(_icon_row(essences, UiStyle.label("Blue, orange, and repeat purple", 18, UiStyle.TEXT_COLOR)))
-	endless_box.add_child(UiStyle.label("MAP", 16, CAPTION_COLOR))
+	rules.add_child(_icon_row(essences, UiStyle.label(Lang.t("Blue, orange, and repeat purple"), 18, UiStyle.TEXT_COLOR)))
+	endless_box.add_child(UiStyle.label(Lang.t("MAP"), 16, CAPTION_COLOR))
 	var chips := HFlowContainer.new()
 	chips.add_theme_constant_override(&"h_separation", 8)
 	chips.add_theme_constant_override(&"v_separation", 8)
@@ -365,7 +365,7 @@ func _build_endless() -> void:
 	var group := ButtonGroup.new()
 	for i in Journey.ENDLESS_MAPS.size():
 		var chip := Button.new()
-		chip.text = Journey.ENDLESS_MAPS[i]
+		chip.text = Lang.t(Journey.ENDLESS_MAPS[i])
 		chip.toggle_mode = true
 		chip.button_group = group
 		chip.button_pressed = i == 0

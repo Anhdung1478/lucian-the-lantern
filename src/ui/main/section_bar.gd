@@ -21,7 +21,7 @@ func _init() -> void:
 	add_theme_constant_override(&"separation", 24)
 	for i in NAMES.size():
 		var button := Button.new()
-		button.text = NAMES[i]
+		button.text = Lang.t(NAMES[i])
 		button.custom_minimum_size = BUTTON_SIZE
 		button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		button.pressed.connect(section_chosen.emit.bind(i))

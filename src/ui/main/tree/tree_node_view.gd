@@ -223,7 +223,7 @@ func is_grey() -> bool:
 
 ## The name under the badge: "???" while hidden.
 func shown_name() -> String:
-	return "???" if state() == &"hidden" else data.display_name
+	return "???" if state() == &"hidden" else Lang.t(data.display_name)
 
 
 ## Everything this view draws (frame, badge and name), in its own coordinates;
@@ -252,7 +252,7 @@ func refresh() -> void:
 	_question.visible = hidden
 	badge.visible = not hidden
 	_pill.visible = not hidden
-	badge.text = "MAX" if current == &"maxed" else "%d/%d" % [tree.level(data.id), data.max_level]
+	badge.text = Lang.t("MAX") if current == &"maxed" else "%d/%d" % [tree.level(data.id), data.max_level]
 	badge.add_theme_color_override(&"font_color", state_color(current) if lit else UiStyle.TEXT_COLOR)
 	_lock.visible = locked()
 	free_badge.visible = tree.is_free(data.id)
@@ -271,7 +271,7 @@ func click() -> void:
 func tooltip_content() -> Control:
 	if state() == &"hidden":
 		return TooltipCard.note("???")
-	return TooltipCard.note("%s\n%s" % [data.display_name, data.value_text(tree.level(data.id))])
+	return TooltipCard.note("%s\n%s" % [Lang.t(data.display_name), data.value_text(tree.level(data.id))])
 
 
 func _gui_input(event: InputEvent) -> void:

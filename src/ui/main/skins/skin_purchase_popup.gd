@@ -83,7 +83,7 @@ func _build() -> void:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	backdrop.add_child(center)
-	card = MenuCard.new("PURCHASE SKIN", skin.display_name)
+	card = MenuCard.new(Lang.t("PURCHASE SKIN"), Lang.t(skin.display_name))
 	center.add_child(card)
 	var body := HBoxContainer.new()
 	body.add_theme_constant_override(&"separation", 28)
@@ -99,26 +99,26 @@ func _build() -> void:
 	table.add_theme_constant_override(&"v_separation", 10)
 	table.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	body.add_child(table)
-	_row(table, "Bonuses", _lines(skin.bonuses, SkinCard.BONUS_COLOR))
-	_row(table, "Weaknesses", _lines(skin.weaknesses, SkinCard.WEAKNESS_COLOR))
-	price_label = _amount(table, "Price", str(skin.cost))
-	owned_label = _amount(table, "You have", "")
-	after_label = _amount(table, "After purchase", "")
-	var note := UiStyle.label(NOTE, 16, UiStyle.DIM_COLOR)
+	_row(table, Lang.t("Bonuses"), _lines(skin.bonuses, SkinCard.BONUS_COLOR))
+	_row(table, Lang.t("Weaknesses"), _lines(skin.weaknesses, SkinCard.WEAKNESS_COLOR))
+	price_label = _amount(table, Lang.t("Price"), str(skin.cost))
+	owned_label = _amount(table, Lang.t("You have"), "")
+	after_label = _amount(table, Lang.t("After purchase"), "")
+	var note := UiStyle.label(Lang.t(NOTE), 16, UiStyle.DIM_COLOR)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.content.add_child(note)
 	var buttons := HBoxContainer.new()
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	buttons.add_theme_constant_override(&"separation", 16)
 	card.content.add_child(buttons)
-	purchase_button = MenuEntry.new("Purchase  %d" % skin.cost, PURPLE_ICON, MenuEntry.Kind.PRIMARY)
+	purchase_button = MenuEntry.new(Lang.t("Purchase  %d") % skin.cost, PURPLE_ICON, MenuEntry.Kind.PRIMARY)
 	purchase_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	purchase_button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	purchase_button.set_icon_color(Color.WHITE)
 	purchase_button.custom_minimum_size.x = BUTTON_WIDTH
 	purchase_button.pressed.connect(_purchase)
 	buttons.add_child(purchase_button)
-	cancel_button = MenuEntry.new("Cancel")
+	cancel_button = MenuEntry.new(Lang.t("Cancel"))
 	cancel_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cancel_button.custom_minimum_size.x = BUTTON_WIDTH * 0.6
 	cancel_button.pressed.connect(close)
@@ -139,7 +139,7 @@ func _lines(lines: PackedStringArray, color: Color) -> VBoxContainer:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override(&"separation", 2)
 	for line in lines if not lines.is_empty() else PackedStringArray(["—"]):
-		var label := UiStyle.label(line, ROW_FONT, color)
+		var label := UiStyle.label(Lang.t(line), ROW_FONT, color)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.custom_minimum_size.x = VALUE_WIDTH
 		box.add_child(label)

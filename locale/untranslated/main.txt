@@ -1,0 +1,7 @@
+# Texts in the main screen's scripts that are not player text, one per line
+# (see common.txt for the format).
+
+# A node class name, for find_children.
+Button
+# A node path inside a level row of the Evolution Tree's info panel.
+Line/

@@ -35,13 +35,13 @@ func refresh(save: SaveGame) -> void:
 	button.icon = null
 	button.add_theme_color_override(&"font_disabled_color", UiStyle.DISABLED_FONT)
 	if equipped:
-		button.text = "Equipped"
+		button.text = Lang.t("Equipped")
 		button.disabled = true
 	elif owned:
-		button.text = "Equip"
+		button.text = Lang.t("Equip")
 		button.disabled = false
 	else:
-		button.text = "Purchase  %d" % skin.cost
+		button.text = Lang.t("Purchase  %d") % skin.cost
 		button.icon = PURPLE_ICON
 		button.disabled = not save.essences.can_afford(0, 0, skin.cost)
 		if button.disabled:
@@ -58,16 +58,16 @@ func _build() -> void:
 	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	frame.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	column.add_child(frame)
-	var name_label := UiStyle.label(skin.display_name, 26, UiStyle.TITLE_COLOR)
+	var name_label := UiStyle.label(Lang.t(skin.display_name), 26, UiStyle.TITLE_COLOR)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(name_label)
 	_lines(column, skin.bonuses, BONUS_COLOR)
 	_lines(column, skin.weaknesses, WEAKNESS_COLOR)
-	var play := UiStyle.label(skin.playstyle, 16, UiStyle.DIM_COLOR)
+	var play := UiStyle.label(Lang.t(skin.playstyle), 16, UiStyle.DIM_COLOR)
 	play.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	play.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(play)
-	preview_button.text = "Preview"
+	preview_button.text = Lang.t("Preview")
 	UiStyle.style_button(preview_button, 18)
 	preview_button.custom_minimum_size = Vector2(0, 40)
 	preview_button.pressed.connect(func() -> void: preview_pressed.emit(skin.id))
@@ -84,7 +84,7 @@ func _build() -> void:
 ## One label per line; "—" when there are none (Classic).
 func _lines(parent: Control, lines: PackedStringArray, color: Color) -> void:
 	for line in lines if not lines.is_empty() else PackedStringArray(["—"]):
-		var label := UiStyle.label(line, 18, color)
+		var label := UiStyle.label(Lang.t(line), 18, color)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		parent.add_child(label)
 

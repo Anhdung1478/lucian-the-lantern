@@ -29,10 +29,10 @@ static func stage_count(act: int) -> int:
 ## "Act 1 · The Loss" for an act of one stage, else "Stage 3-4 · The Jungle":
 ## how the HUD and the Journey map name a stage.
 static func stage_name(act: int, stage: int) -> String:
-	var act_name: String = ACTS[act - 1]["name"]
+	var act_name := Lang.t(ACTS[act - 1]["name"])
 	if stage_count(act) == 1:
-		return "Act %d · %s" % [act, act_name]
-	return "Stage %s · %s" % [stage_id(act, stage), act_name]
+		return Lang.t("Act %d · %s") % [act, act_name]
+	return Lang.t("Stage %s · %s") % [stage_id(act, stage), act_name]
 
 
 static func is_stage_id(id: String) -> bool:

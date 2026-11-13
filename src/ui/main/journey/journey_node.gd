@@ -124,15 +124,15 @@ static func landmark(landmark_kind: StringName) -> JourneyNode:
 ## With `with_boss` off (Act 1's stage replayed: Thresh comes only on its
 ## first play), a boss stage says its waves alone.
 static func waves_line(act_number: int, stage_number: int, with_boss := true) -> String:
-	var text := "%d waves" % Journey.waves(act_number, stage_number)
+	var waves := Journey.waves(act_number, stage_number)
 	match Journey.boss_kind(act_number, stage_number):
 		&"boss":
 			if with_boss:
-				text += " + boss wave"
+				return Lang.t("%d waves + boss wave") % waves
 		&"mini_boss":
 			# The mini boss comes last in the last wave, not in a wave of its own.
-			text += " + mini boss"
-	return text
+			return Lang.t("%d waves + mini boss") % waves
+	return Lang.t("%d waves") % waves
 
 
 func _ready() -> void:
@@ -259,15 +259,14 @@ func _fit() -> void:
 func _hover_text() -> String:
 	match kind:
 		TRAINING:
-			return "Training"
+			return Lang.t("Training")
 		ENDLESS:
-			return "Clear Act %d first" % Journey.ENDLESS_ACT if locked else "Endless\nBest wave: %d" % best
+			return Lang.t("Clear Act %d first") % Journey.ENDLESS_ACT if locked else Lang.t("Endless\nBest wave: %d") % best
 	if fogged:
-		return "Clear Act %d first" % (act - 1)
-	var text := "%s\n%s" % [Journey.stage_name(act, stage), waves_text]
+		return Lang.t("Clear Act %d first") % (act - 1)
 	if locked:
-		text += "\nClear %s first" % Journey.stage_id(act, stage - 1)
-	return text
+		return Lang.t("%s\n%s\nClear %s first") % [Journey.stage_name(act, stage), waves_text, Journey.stage_id(act, stage - 1)]
+	return "%s\n%s" % [Journey.stage_name(act, stage), waves_text]
 
 
 ## Open stages pulse (with Juice on); an open portal swirls.
@@ -398,10 +397,10 @@ func _draw_plate(middle: Vector2, r: float) -> void:
 	draw_style_box(style, rect)
 	match kind:
 		TRAINING:
-			_draw_centered("TRAINING", rect.get_center(), PLATE_FONT, UiStyle.TITLE_COLOR)
+			_draw_centered(Lang.t("TRAINING"), rect.get_center(), PLATE_FONT, UiStyle.TITLE_COLOR)
 		ENDLESS:
-			_draw_centered("ENDLESS", rect.get_center() + Vector2(0, -8), PLATE_FONT, UiStyle.TITLE_COLOR if not locked else UiStyle.DIM_COLOR)
-			_draw_centered("Best %d" % best, rect.get_center() + Vector2(0, 10), BEST_FONT, UiStyle.GOLD_COLOR if not locked else UiStyle.DIM_COLOR)
+			_draw_centered(Lang.t("ENDLESS"), rect.get_center() + Vector2(0, -8), PLATE_FONT, UiStyle.TITLE_COLOR if not locked else UiStyle.DIM_COLOR)
+			_draw_centered(Lang.t("Best %d") % best, rect.get_center() + Vector2(0, 10), BEST_FONT, UiStyle.GOLD_COLOR if not locked else UiStyle.DIM_COLOR)
 		_:
 			_draw_centered(stage_id, rect.get_center(), PLATE_FONT, UiStyle.GOLD_COLOR if cleared else UiStyle.TITLE_COLOR)
 

@@ -136,7 +136,7 @@ func _draw_random() -> void:
 	var mark_width := font.get_string_size("?", HORIZONTAL_ALIGNMENT_LEFT, -1, RANDOM_FONT).x
 	var baseline := middle + Vector2(-mark_width * 0.5, (font.get_ascent(RANDOM_FONT) - font.get_descent(RANDOM_FONT)) * 0.5 - 10.0)
 	draw_string(font, baseline, "?", HORIZONTAL_ALIGNMENT_LEFT, -1, RANDOM_FONT, UiStyle.GOLD_COLOR)
-	var caption := "A map is rolled each run"
+	var caption := Lang.t("A map is rolled each run")
 	var caption_width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, CAPTION_FONT).x
 	draw_string(font, Vector2(middle.x - caption_width * 0.5, SIZE.y - 18.0), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, CAPTION_FONT, UiStyle.DIM_COLOR)
 

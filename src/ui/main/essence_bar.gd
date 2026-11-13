@@ -64,7 +64,7 @@ func amount_label(kind: StringName) -> Label:
 func _item(kind: StringName) -> Control:
 	var info: Dictionary = KINDS[kind]
 	var item := EssenceItem.new()
-	item.card_text = info["text"]
+	item.card_text = Lang.t(info["text"])
 	item.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	item.add_theme_constant_override(&"separation", 8)
 	var icon := TextureRect.new()

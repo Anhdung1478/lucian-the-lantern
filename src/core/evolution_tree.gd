@@ -89,25 +89,26 @@ func requirement_text(id: StringName, at_level: int) -> String:
 	if not _requires_met(data):
 		var names: PackedStringArray = []
 		for required in data.requires:
-			names.append(node(required).display_name)
+			names.append(Lang.t(node(required).display_name))
 		if data.requires_count == 0 or data.requires_count >= names.size():
 			parts.append(_join(names, "and"))
 		elif data.requires_count == 1:
 			parts.append(_join(names, "or"))
 		else:
-			parts.append("any %d of %s" % [data.requires_count, _join(names, "or")])
+			parts.append(Lang.t("any %d of %s") % [data.requires_count, _join(names, "or")])
 	var act := _act_needed(data, at_level)
 	if acts_cleared < act:
-		parts.append("Clear Act %d" % act)
+		parts.append(Lang.t("Clear Act %d") % act)
 	var needed := data.sum_needed(at_level)
 	if level_sum(id) < needed:
 		var names: PackedStringArray = []
 		for summed in data.level_sum_ids:
 			names.append(node(summed).short_name())
-		parts.append("%d level%s in %s (now %d)" % [needed, "" if needed == 1 else "s", " + ".join(names), level_sum(id)])
+		var levels := Lang.t("%d level in %s (now %d)") if needed == 1 else Lang.t("%d levels in %s (now %d)")
+		parts.append(levels % [needed, " + ".join(names), level_sum(id)])
 	if parts.is_empty():
 		return ""
-	return "Requires: " + " and ".join(parts)
+	return Lang.t("Requires: %s") % Lang.t(" and ").join(parts)
 
 
 ## What the next level still needs; "" when maxed or when it is open.
@@ -245,4 +246,5 @@ func _requires_met(data: TreeNodeData) -> bool:
 static func _join(names: PackedStringArray, word: String) -> String:
 	if names.size() == 1:
 		return names[0]
-	return "%s %s %s" % [", ".join(names.slice(0, -1)), word, names[-1]]
+	var format := Lang.t("{list} and {last}") if word == "and" else Lang.t("{list} or {last}")
+	return format.format({"list": ", ".join(names.slice(0, -1)), "last": names[-1]})

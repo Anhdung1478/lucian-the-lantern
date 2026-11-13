@@ -8,3 +8,907 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#. essence_bar.gd: hover card of the blue essence (3 lines)
+msgid "Blue essence\nDrops from every enemy.\nBuys Evolution Tree upgrades."
+msgstr "Tinh Chất Xanh\nRơi ra từ mọi kẻ địch.\nDùng để mua nâng cấp Cây Tiến Hóa."
+
+#. essence_bar.gd: hover card of the orange essence (3 lines)
+msgid "Orange essence\nDrops rarely from enemies, more from elites.\nBuys the better Evolution Tree upgrades, together with blue."
+msgstr "Tinh Chất Cam\nHiếm khi rơi từ kẻ địch, rơi nhiều hơn từ tinh anh.\nCùng với tinh chất xanh, dùng để mua các nâng cấp tốt hơn của Cây Tiến Hóa."
+
+#. essence_bar.gd: hover card of the purple essence (3 lines)
+msgid "Purple essence\nDrops from mini bosses and bosses.\nBuys skins and resets the Evolution Tree."
+msgstr "Tinh Chất Tím\nRơi ra từ trùm phụ và trùm.\nDùng để mua trang phục và đặt lại Cây Tiến Hóa."
+
+#. free_badge.gd: small pill on an Evolution Tree upgrade or tab that costs nothing and is ready to take (48 px wide)
+msgid "FREE"
+msgstr "TẶNG"
+
+#. section_bar.gd: bottom bar button
+msgid "Evolution Tree"
+msgstr "Cây Tiến Hóa"
+
+#. section_bar.gd: bottom bar button
+msgid "Skin Shop"
+msgstr "Cửa Hàng Trang Phục"
+
+#. section_bar.gd: bottom bar button
+msgid "Journey"
+msgstr "Hành Trình"
+
+#. gear_menu.gd: title of the slot list page of the gear menu
+msgid "SAVE AS COPY"
+msgstr "LƯU BẢN SAO"
+
+#. gear_menu.gd: subtitle of the slot list page
+msgid "Pick a slot"
+msgstr "Chọn một ô lưu"
+
+#. gear_menu.gd: gear menu row
+msgid "Save"
+msgstr "Lưu"
+
+#. gear_menu.gd: gear menu row
+msgid "Save as copy"
+msgstr "Lưu bản sao"
+
+#. gear_menu.gd: hint at the right of the Save as copy row
+msgid "To another slot"
+msgstr "Sang ô lưu khác"
+
+#. gear_menu.gd: gear menu row
+msgid "Leave to main menu"
+msgstr "Về menu chính"
+
+#. gear_menu.gd: hint at the right of the Leave row
+msgid "Title screen"
+msgstr "Màn hình chính"
+
+#. gear_menu.gd: gear menu row
+msgid "Exit the game"
+msgstr "Thoát game"
+
+#. gear_menu.gd: title of the gear menu
+msgid "MENU"
+msgstr "MENU"
+
+#. gear_menu.gd: subtitle of the gear menu. %d is the save slot number, %s the play time such as 1h 23m
+msgid "Slot %d · %s"
+msgstr "Ô lưu %d · %s"
+
+#. gear_menu.gd: hint of the Save row. %d is the save slot number
+msgid "Slot %d"
+msgstr "Ô lưu %d"
+
+#. gear_menu.gd: question before overwriting a slot. %d is the slot number
+msgid "Overwrite slot %d?"
+msgstr "Ghi đè ô lưu %d?"
+
+#. main_screen.gd: red toast when Start could not write the save
+msgid "Could not save, so the stage didn't start"
+msgstr "Không lưu được nên màn chơi chưa bắt đầu"
+
+#. main_screen.gd: toast after Save. %d is the slot number
+msgid "Saved to slot %d"
+msgstr "Đã lưu vào ô lưu %d"
+
+#. main_screen.gd: toast after Save as copy. %d is the slot number
+msgid "Copied to slot %d"
+msgstr "Đã sao chép vào ô lưu %d"
+
+#. main_screen.gd: red toast when a save failed
+msgid "Could not save"
+msgstr "Không lưu được"
+
+#. journey_map.gd, journey_node.gd: hover text of a place in a locked act. %d is the act to clear first
+msgid "Clear Act %d first"
+msgstr "Hãy hoàn thành Hồi %d trước"
+
+#. journey_map.gd: act number drawn over its region of the map. %d is the act
+msgid "ACT %d"
+msgstr "HỒI %d"
+
+#. journey_node.gd: waves of a stage with a boss. %d is the number of waves
+msgid "%d waves + boss wave"
+msgstr "%d đợt + đợt trùm"
+
+#. journey_node.gd: waves of a stage with a mini boss. %d is the number of waves
+msgid "%d waves + mini boss"
+msgstr "%d đợt + trùm phụ"
+
+#. journey_node.gd: waves of a stage. %d is the number of waves
+msgid "%d waves"
+msgstr "%d đợt"
+
+#. journey_node.gd: hover text of the Training place
+msgid "Training"
+msgstr "Luyện Tập"
+
+#. journey_node.gd: hover text of the Endless place (2 lines). %d is the best wave
+msgid "Endless\nBest wave: %d"
+msgstr "Vô Tận\nĐợt cao nhất: %d"
+
+#. journey_node.gd: hover text of a locked stage (3 lines). First %s is its name, second its waves, third the stage id to clear first
+msgid "%s\n%s\nClear %s first"
+msgstr "%s\n%s\nHãy hoàn thành %s trước"
+
+#. journey_node.gd: plate under the Training place on the map
+msgid "TRAINING"
+msgstr "LUYỆN TẬP"
+
+#. journey_node.gd: plate under the Endless place on the map
+msgid "ENDLESS"
+msgstr "VÔ TẬN"
+
+#. journey_node.gd: best wave under the ENDLESS plate. %d is the wave
+msgid "Best %d"
+msgstr "Cao nhất %d"
+
+#. journey_panel.gd: text of the Training panel
+msgid "Practice on training dummies with what you have bought in the Evolution Tree and your equipped skin. No essences are earned. Leave from the ESC menu to come back here."
+msgstr "Luyện tập trên hình nộm với những gì bạn đã mua ở Cây Tiến Hóa và trang phục đang mặc. Không nhận tinh chất. Thoát từ menu ESC để quay lại đây."
+
+#. journey_panel.gd: Start button of the Training panel
+msgid "Start Training"
+msgstr "Bắt đầu luyện tập"
+
+#. journey_panel.gd: Start button of Endless and of a one-stage act
+msgid "Start"
+msgstr "Bắt đầu"
+
+#. journey_panel.gd: best wave in the Endless panel. %d is the wave
+msgid "Best wave: %d"
+msgstr "Đợt cao nhất: %d"
+
+#. journey_panel.gd: small caption over a stage's name. %d is the act, %s its name in capitals
+msgid "ACT %d · %s"
+msgstr "HỒI %d · %s"
+
+#. journey_panel.gd: big title of a stage's panel. %s is the stage id such as 3-4
+msgid "Stage %s"
+msgstr "Màn %s"
+
+#. journey_panel.gd: tag of a boss stage
+msgid "Boss"
+msgstr "Trùm"
+
+#. journey_panel.gd: tag of a mini boss stage
+msgid "Mini boss"
+msgstr "Trùm phụ"
+
+#. journey_panel.gd: purple essence line of Act 1's stage once cleared
+msgid "No boss on replays"
+msgstr "Chơi lại không có trùm"
+
+#. journey_panel.gd: purple essence a boss gives again. %d is the amount
+msgid "+%d again"
+msgstr "+%d lần sau"
+
+#. journey_panel.gd: purple essence a boss gives the first time. %d is the amount
+msgid "First kill: +%d"
+msgstr "Hạ lần đầu: +%d"
+
+#. journey_panel.gd: status of a stage
+msgid "Cleared"
+msgstr "Đã hoàn thành"
+
+#. journey_panel.gd: status of a stage
+msgid "Not cleared yet"
+msgstr "Chưa hoàn thành"
+
+#. journey_panel.gd: Start button of a stage. %d is the stage number in its act
+msgid "Start stage %d"
+msgstr "Bắt đầu màn %d"
+
+#. journey_panel.gd: caption over the stage's enemy icons
+msgid "ENEMIES"
+msgstr "KẺ ĐỊCH"
+
+#. journey_panel.gd: small caption over the Training title
+msgid "PRACTICE"
+msgstr "THỰC HÀNH"
+
+#. journey_panel.gd: small caption over the Endless title
+msgid "WAVES NEVER END"
+msgstr "CÁC ĐỢT KHÔNG BAO GIỜ KẾT THÚC"
+
+#. journey_panel.gd: Endless rule. %d is the number of waves
+msgid "A mini boss every %d waves"
+msgstr "Cứ %d đợt có một trùm phụ"
+
+#. journey_panel.gd: Endless rule. %d is the number of waves
+msgid "A boss every %d waves"
+msgstr "Cứ %d đợt có một trùm"
+
+#. journey_panel.gd: Endless rule (a card pick)
+msgid "A modifier to pick after each boss"
+msgstr "Chọn một điều chỉnh sau mỗi trùm"
+
+#. journey_panel.gd: Endless rule (what the run gives)
+msgid "Blue, orange, and repeat purple"
+msgstr "Xanh, cam và tím lặp lại"
+
+#. journey_panel.gd: caption over Endless's map buttons
+msgid "MAP"
+msgstr "BẢN ĐỒ"
+
+#. loadout_panel.gd: heading of the D and F spell panel
+msgid "SUMMONER SPELLS"
+msgstr "PHÉP BỔ TRỢ"
+
+#. loadout_panel.gd: hint under the heading (fixed width, wraps)
+msgid "Click a key to choose its spell. Spells are bought in the Evolution Tree."
+msgstr "Bấm một phím để chọn phép. Phép được mua ở Cây Tiến Hóa."
+
+#. loadout_panel.gd, spell_menu.gd, tree_node_data.gd: no spell chosen; also the value of a node at level 0
+msgid "None"
+msgstr "Không có"
+
+#. loadout_panel.gd: hover text of the locked F key
+msgid "Buy the 2nd summoner slot in the Evolution Tree"
+msgstr "Mua ô phép bổ trợ thứ hai ở Cây Tiến Hóa"
+
+#. map_thumbnail.gd: caption under the ? of Endless's Random map
+msgid "A map is rolled each run"
+msgstr "Mỗi lượt chơi chọn ngẫu nhiên một bản đồ"
+
+#. spell_menu.gd: shown in the spell menu when no spell is bought
+msgid "Buy spells in the Evolution Tree"
+msgstr "Mua phép bổ trợ ở Cây Tiến Hóa"
+
+#. journey.gd: Act 1's name (shown as 'Act 1 · The Loss')
+msgid "The Loss"
+msgstr "Mất Mát"
+
+#. journey.gd: Act 1's story line
+msgid "Lucian and Senna fight together, until Thresh takes her soul."
+msgstr "Lucian và Senna chiến đấu bên nhau, cho đến khi Thresh đoạt lấy linh hồn cô."
+
+#. journey.gd: Act 2's name
+msgid "The Sentinels"
+msgstr "Các Vệ Binh"
+
+#. journey.gd: Act 2's story line
+msgid "Lucian trains with Akshan to prove he's ready to hunt Thresh."
+msgstr "Lucian luyện tập cùng Akshan để chứng tỏ anh đã sẵn sàng săn Thresh."
+
+#. journey.gd: Act 3's name; also an Endless map would read Jungle
+msgid "The Jungle"
+msgstr "Khu Rừng"
+
+#. journey.gd: Act 3's story line
+msgid "Lucian crosses the jungle, facing the drakes and the Elder Dragon."
+msgstr "Lucian băng qua khu rừng, đối đầu các rồng và Rồng Ngàn Tuổi."
+
+#. journey.gd: Act 4's name
+msgid "The Darkness"
+msgstr "Bóng Tối"
+
+#. journey.gd: Act 4's story line
+msgid "Lucian faces his own fear and grief as Dark Lucian."
+msgstr "Lucian đối mặt với nỗi sợ và nỗi đau của chính mình qua Lucian Hắc Ám."
+
+#. journey.gd: Act 5's name
+msgid "Shadow Isles"
+msgstr "Quần Đảo Bóng Đêm"
+
+#. journey.gd: Act 5's story line
+msgid "Lucian fights through Maokai, Elise and Karthus."
+msgstr "Lucian chiến đấu xuyên qua Maokai, Elise và Karthus."
+
+#. journey.gd: Act 6's name
+msgid "The Lantern"
+msgstr "Lồng Đèn"
+
+#. journey.gd: Act 6's story line
+msgid "Lucian defeats Thresh and frees Senna."
+msgstr "Lucian đánh bại Thresh và giải thoát Senna."
+
+#. journey.gd: Endless map choice
+msgid "Random"
+msgstr "Ngẫu nhiên"
+
+#. journey.gd: Endless map choice
+msgid "Mid lane"
+msgstr "Đường Giữa"
+
+#. journey.gd: Endless map choice
+msgid "Training ground"
+msgstr "Bãi Tập Luyện"
+
+#. journey.gd: Endless map choice
+msgid "Jungle"
+msgstr "Khu Rừng"
+
+#. journey.gd: Endless map choice
+msgid "Dark mid lane"
+msgstr "Đường Giữa Bóng Tối"
+
+#. journey.gd: Endless map choice
+msgid "Dead forest"
+msgstr "Rừng Chết"
+
+#. journey.gd: Endless map choice
+msgid "Thresh's domain"
+msgstr "Lãnh Địa Của Thresh"
+
+#. journey.gd: how the HUD and the Journey name an act of one stage. %d is the act, %s its name
+msgid "Act %d · %s"
+msgstr "Hồi %d · %s"
+
+#. journey.gd: how the HUD and the Journey name a stage. First %s is the stage id such as 3-4, second the act's name
+msgid "Stage %s · %s"
+msgstr "Màn %s · %s"
+
+#. skin_card.gd: disabled button of the skin worn
+msgid "Equipped"
+msgstr "Đang mặc"
+
+#. skin_card.gd: button of an owned skin
+msgid "Equip"
+msgstr "Mặc"
+
+#. skin_card.gd, skin_purchase_popup.gd: buy button, then the purple essence icon. %d is the price
+msgid "Purchase  %d"
+msgstr "Mua  %d"
+
+#. skin_card.gd: button that opens the preview
+msgid "Preview"
+msgstr "Xem thử"
+
+#. skin_preview.gd: preview button, Lucian's basic attack
+msgid "Attack"
+msgstr "Đánh"
+
+#. skin_preview.gd: preview button, plays every piece in turn
+msgid "▶ All"
+msgstr "▶ Tất cả"
+
+#. skin_preview.gd: title of the preview. %s is the skin's name
+msgid "%s · Preview"
+msgstr "%s · Xem thử"
+
+#. skin_purchase_popup.gd: note under the table
+msgid "Buying does not equip it."
+msgstr "Mua xong chưa tự mặc."
+
+#. skin_purchase_popup.gd: title of the purchase card
+msgid "PURCHASE SKIN"
+msgstr "MUA TRANG PHỤC"
+
+#. skin_purchase_popup.gd: row key (the green lines)
+msgid "Bonuses"
+msgstr "Ưu điểm"
+
+#. skin_purchase_popup.gd: row key (the red lines)
+msgid "Weaknesses"
+msgstr "Nhược điểm"
+
+#. skin_purchase_popup.gd, tree_purchase_popup.gd: row key
+msgid "Price"
+msgstr "Giá"
+
+#. skin_purchase_popup.gd, tree_purchase_popup.gd: row key (the essence owned)
+msgid "You have"
+msgstr "Bạn có"
+
+#. skin_purchase_popup.gd, tree_purchase_popup.gd: row key (what is left after buying)
+msgid "After purchase"
+msgstr "Sau khi mua"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "+15% AD"
+msgstr "+15% SMCK"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "−15% Attack Speed"
+msgstr "−15% Tốc Độ Đánh"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "+20% Attack Speed"
+msgstr "+20% Tốc Độ Đánh"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "+8% Move Speed"
+msgstr "+8% Tốc Độ Di Chuyển"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "−10% AD"
+msgstr "−10% SMCK"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "+30% W Damage"
+msgstr "+30% Sát Thương W"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "+25 Ability Haste"
+msgstr "+25 Điểm Hồi Kỹ Năng"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "−10% Attack Speed"
+msgstr "−10% Tốc Độ Đánh"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "+15% Lifesteal"
+msgstr "+15% Hút Máu"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "Kills heal 2% max HP"
+msgstr "Hạ gục hồi 2% Máu tối đa"
+
+#. a line of a skin's bonuses (green) or weaknesses (red) on its card and purchase card; AD is Attack Damage
+msgid "−20% max HP"
+msgstr "−20% Máu tối đa"
+
+#. playstyle of a skin, on its card
+msgid "Balanced"
+msgstr "Cân bằng"
+
+#. playstyle of a skin, on its card
+msgid "Slow, heavy shots"
+msgstr "Phát bắn chậm mà nặng"
+
+#. playstyle of a skin, on its card
+msgid "Fast, always moving, faster energized stacks"
+msgstr "Nhanh, luôn di chuyển, tích điện nhanh hơn"
+
+#. playstyle of a skin, on its card
+msgid "Skill-focused, W and R as main damage"
+msgstr "Thiên về kỹ năng, W và R là nguồn sát thương chính"
+
+#. playstyle of a skin, on its card
+msgid "Risky but sustainable"
+msgstr "Mạo hiểm nhưng bền bỉ"
+
+#. cost_bar.gd: cost bar of a node at its top level
+msgid "MAXED"
+msgstr "TỐI ĐA"
+
+#. cost_bar.gd: cost bar of a node that cannot be bought yet
+msgid "LOCKED"
+msgstr "ĐÃ KHÓA"
+
+#. cost_bar.gd, node_info_panel.gd, tree_purchase_popup.gd: price of a level that costs nothing
+msgid "Free"
+msgstr "Miễn phí"
+
+#. forge_bar.gd: hover text of a forge button that cannot be used. %d is the blue essence needed
+msgid "Needs %d blue essence"
+msgstr "Cần %d tinh chất xanh"
+
+#. forge_bar.gd: hover text of a forge button. First %d is the orange essence made, second the blue essence spent
+msgid "Forge %d orange essence from %d blue. This cannot be undone."
+msgstr "Rèn %d tinh chất cam từ %d tinh chất xanh. Không thể hoàn tác."
+
+#. node_info_panel.gd: shown over the node list of a branch
+msgid "Pick a node"
+msgstr "Chọn một nút"
+
+#. node_info_panel.gd: caption over the level list of a node
+msgid "LEVELS"
+msgstr "CẤP"
+
+#. node_info_panel.gd, tree_page.gd: small caption over a branch's name; also the page header
+msgid "EVOLUTION TREE"
+msgstr "CÂY TIẾN HÓA"
+
+#. node_info_panel.gd: levels bought in a branch. First %d is bought, second the total
+msgid "Levels bought %d / %d"
+msgstr "Cấp đã mua %d / %d"
+
+#. node_info_panel.gd: level of the node picked. First %d is bought, second the maximum
+msgid "LVL %d / %d"
+msgstr "CẤP %d / %d"
+
+#. node_info_panel.gd: R's sum of ranks. %s is the skills such as Q + W + E, %d the ranks (then ' / n' follows)
+msgid "%s ranks: %d"
+msgstr "Bậc %s: %d"
+
+#. node_info_panel.gd: a row of the level list (44 px column). %d is the level
+msgid "Lv %d"
+msgstr "Cấp %d"
+
+#. tree_node_view.gd: badge of a node at its top level
+msgid "MAX"
+msgstr "TỐI ĐA"
+
+#. tree_page.gd: branch name (tab, caption, page title)
+msgid "Skills"
+msgstr "Kỹ Năng"
+
+#. tree_page.gd: branch name
+msgid "Stats"
+msgstr "Chỉ Số"
+
+#. tree_page.gd: branch name
+msgid "Backpack"
+msgstr "Ba Lô"
+
+#. tree_page.gd: branch name
+msgid "Economy"
+msgstr "Kinh Tế"
+
+#. tree_page.gd: branch name
+msgid "Summoners"
+msgstr "Phép Bổ Trợ"
+
+#. tree_page.gd: blurb under the Skills page title
+msgid "Q, W and E open the passive; their ranks open R."
+msgstr "Q, W và E mở nội tại; bậc của chúng mở R."
+
+#. tree_page.gd: blurb under the Stats page title
+msgid "Offense, defense and sustain for Lucian himself."
+msgstr "Tấn công, phòng thủ và hồi phục cho chính Lucian."
+
+#. tree_page.gd: blurb under the Backpack page title
+msgid "Equip slots for gear, boots to wear, and cells to carry more."
+msgstr "Ô trang bị cho đồ, giày để mang và thêm ô để chứa nhiều hơn."
+
+#. tree_page.gd: blurb under the Economy page title
+msgid "More gold, XP and essence, and a better merchant."
+msgstr "Thêm vàng, kinh nghiệm và tinh chất, cùng thương nhân tốt hơn."
+
+#. tree_page.gd: blurb under the Summoners page title
+msgid "Summoner spells, their upgrades, a second slot."
+msgstr "Phép bổ trợ, nâng cấp của chúng và ô thứ hai."
+
+#. tree_page.gd, node_info_panel.gd: caption of the stats page's first limb
+msgid "OFFENSE"
+msgstr "TẤN CÔNG"
+
+#. tree_page.gd, node_info_panel.gd: caption of the stats page's second limb
+msgid "DEFENSE"
+msgstr "PHÒNG THỦ"
+
+#. tree_page.gd, node_info_panel.gd: caption of the stats page's third limb
+msgid "SUSTAIN"
+msgstr "HỒI PHỤC"
+
+#. tree_page.gd, node_info_panel.gd: caption of the economy page's first limb
+msgid "REWARDS"
+msgstr "PHẦN THƯỞNG"
+
+#. tree_page.gd, node_info_panel.gd: caption of the economy page's second limb
+msgid "MERCHANT"
+msgstr "THƯƠNG NHÂN"
+
+#. tree_page.gd: plaque caption on the Backpack page
+msgid "EQUIP SLOTS"
+msgstr "Ô TRANG BỊ"
+
+#. tree_page.gd: under a bracket of equip slots; also the act in a requirement. %d is the act
+msgid "Act %d"
+msgstr "Hồi %d"
+
+#. tree_page.gd: note on the equip slots plaque
+msgid "Only equipped items give stats."
+msgstr "Chỉ đồ đang trang bị mới cho chỉ số."
+
+#. tree_page.gd: plaque caption on the Backpack page
+msgid "BACKPACK"
+msgstr "BA LÔ"
+
+#. tree_page.gd: plaque caption on the Backpack page
+msgid "BOOTS"
+msgstr "GIÀY"
+
+#. tree_page.gd: note on the boots plaque
+msgid "Worn on every map."
+msgstr "Mang trên mọi bản đồ."
+
+#. tree_purchase_popup.gd: note under the table
+msgid "Only Reset tree gives essence back."
+msgstr "Chỉ Đặt lại cây mới hoàn lại tinh chất."
+
+#. tree_purchase_popup.gd: level row. Numbers are the level now, the level after buying and the maximum
+msgid "LVL %d → %d / %d"
+msgstr "CẤP %d → %d / %d"
+
+#. tree_purchase_popup.gd: title of the purchase card
+msgid "BUY UPGRADE"
+msgstr "MUA NÂNG CẤP"
+
+#. tree_purchase_popup.gd: row key
+msgid "Level"
+msgstr "Cấp độ"
+
+#. tree_purchase_popup.gd: row key (the node's value now and after)
+msgid "Effect"
+msgstr "Hiệu ứng"
+
+#. tree_purchase_popup.gd: buy button
+msgid "Buy"
+msgstr "Mua"
+
+#. tree_section.gd: Reset tree button (260 px wide, then the purple icon). %d is the price
+msgid "Reset tree  %d"
+msgstr "Đặt lại cây  %d"
+
+#. tree_section.gd: hover text of Reset tree when nothing was spent
+msgid "Nothing to refund: no blue or orange essence spent"
+msgstr "Không có gì để hoàn lại: chưa tiêu tinh chất xanh hay cam"
+
+#. tree_section.gd: hover text of Reset tree when the purple is short. %d is the price
+msgid "Needs %d purple essence"
+msgstr "Cần %d tinh chất tím"
+
+#. tree_section.gd: Reset question. First %d is the purple price, then the blue and the orange essence that come back
+msgid "Reset the Evolution Tree for %d purple essence? %d blue and %d orange essence come back."
+msgstr "Đặt lại Cây Tiến Hóa với %d tinh chất tím? Bạn nhận lại %d tinh chất xanh và %d tinh chất cam."
+
+#. tree_section.gd: Reset question when only orange comes back
+msgid "Reset the Evolution Tree for %d purple essence? %d orange essence comes back."
+msgstr "Đặt lại Cây Tiến Hóa với %d tinh chất tím? Bạn nhận lại %d tinh chất cam."
+
+#. tree_section.gd: Reset question when only blue comes back
+msgid "Reset the Evolution Tree for %d purple essence? %d blue essence comes back."
+msgstr "Đặt lại Cây Tiến Hóa với %d tinh chất tím? Bạn nhận lại %d tinh chất xanh."
+
+#. evolution_tree.gd: requirement of a node. %d is how many, %s the list of nodes
+msgid "any %d of %s"
+msgstr "bất kỳ %d trong %s"
+
+#. evolution_tree.gd: requirement of a node. %d is the act
+msgid "Clear Act %d"
+msgstr "Hoàn thành Hồi %d"
+
+#. evolution_tree.gd: requirement of R. Numbers are the levels needed, %s the skills (Q + W + E), then the levels now
+msgid "%d level in %s (now %d)"
+msgstr "%d cấp ở %s (hiện %d)"
+
+#. evolution_tree.gd: requirement of R, same with more than one level
+msgid "%d levels in %s (now %d)"
+msgstr "%d cấp ở %s (hiện %d)"
+
+#. evolution_tree.gd: what a node still needs. %s is its requirements joined by ' and '
+msgid "Requires: %s"
+msgstr "Yêu cầu: %s"
+
+#. evolution_tree.gd: joins the requirements of a node (spaces kept)
+msgid " and "
+msgstr " và "
+
+#. evolution_tree.gd: a list of nodes of which all are needed. {list} is 'A, B', {last} the last node
+msgid "{list} and {last}"
+msgstr "{list} và {last}"
+
+#. evolution_tree.gd: a list of nodes of which one is enough
+msgid "{list} or {last}"
+msgstr "{list} hoặc {last}"
+
+#. description of data/tree/backpack_slots.tres
+msgid "Opens more cells in the backpack."
+msgstr "Mở thêm ô trong ba lô."
+
+#. format of data/tree/backpack_slots.tres
+msgid "{v} backpack slots"
+msgstr "{v} ô ba lô"
+
+#. description of data/tree/barrier.tres
+msgid "Unlocks Barrier as a summoner spell."
+msgstr "Mở khóa Lá Chắn làm phép bổ trợ."
+
+#. format of data/tree/barrier.tres
+msgid "Unlocked"
+msgstr "Đã mở khóa"
+
+#. description of data/tree/barrier_upgrade.tres
+msgid "Barrier shields for more."
+msgstr "Lá Chắn che chắn nhiều hơn."
+
+#. format of data/tree/barrier_upgrade.tres
+msgid "+{v}% shield"
+msgstr "+{v}% lá chắn"
+
+#. description of data/tree/bonus_xp.tres
+msgid "Enemies give more XP."
+msgstr "Kẻ địch cho thêm kinh nghiệm."
+
+#. format of data/tree/bonus_xp.tres
+msgid "+{v}% XP"
+msgstr "+{v}% kinh nghiệm"
+
+#. description of data/tree/boots.tres
+msgid "Lucian starts every map in his boots, for [ms]move speed[/ms]. The merchant's Craft tab upgrades them."
+msgstr "Lucian bắt đầu mỗi bản đồ với đôi giày, cho [ms]tốc độ di chuyển[/ms]. Thẻ Chế Tạo của thương nhân sẽ nâng cấp chúng."
+
+#. description of data/tree/clarity.tres
+msgid "Unlocks Clarity as a summoner spell."
+msgstr "Mở khóa Minh Mẫn làm phép bổ trợ."
+
+#. description of data/tree/clarity_upgrade.tres
+msgid "Clarity restores more [mana]Mana[/mana]."
+msgstr "Minh Mẫn hồi thêm [mana]Năng Lượng[/mana]."
+
+#. format of data/tree/clarity_upgrade.tres
+msgid "+{v}% mana restored"
+msgstr "+{v}% năng lượng hồi lại"
+
+#. description of data/tree/equip_slots.tres
+msgid "Opens more equip slots; only equipped items give stats."
+msgstr "Mở thêm ô trang bị; chỉ đồ đang trang bị mới cho chỉ số."
+
+#. format of data/tree/equip_slots.tres
+msgid "{v} equip slots"
+msgstr "{v} ô trang bị"
+
+#. description of data/tree/essence_drop.tres
+msgid "Enemies drop more essence."
+msgstr "Kẻ địch rơi thêm tinh chất."
+
+#. format of data/tree/essence_drop.tres
+msgid "+{v}% essence drops"
+msgstr "+{v}% tinh chất rơi ra"
+
+#. description of data/tree/flash.tres
+msgid "Unlocks Flash as a summoner spell."
+msgstr "Mở khóa Tốc Biến làm phép bổ trợ."
+
+#. description of data/tree/flash_upgrade.tres
+msgid "Flash's cooldown is shorter."
+msgstr "Hồi chiêu của Tốc Biến ngắn hơn."
+
+#. format of data/tree/flash_upgrade.tres
+msgid "{v}% cooldown"
+msgstr "{v}% hồi chiêu"
+
+#. description of data/tree/ghost.tres
+msgid "Unlocks Ghost as a summoner spell."
+msgstr "Mở khóa Tốc Hành làm phép bổ trợ."
+
+#. description of data/tree/ghost_upgrade.tres
+msgid "Ghost's cooldown is shorter."
+msgstr "Hồi chiêu của Tốc Hành ngắn hơn."
+
+#. description of data/tree/heal.tres
+msgid "Unlocks Heal as a summoner spell."
+msgstr "Mở khóa Hồi Máu làm phép bổ trợ."
+
+#. description of data/tree/heal_upgrade.tres
+msgid "Heal restores more [hp]Health[/hp]."
+msgstr "Hồi Máu hồi thêm [hp]Máu[/hp]."
+
+#. format of data/tree/heal_upgrade.tres
+msgid "+{v}% healing"
+msgstr "+{v}% hồi máu"
+
+#. description of data/tree/merchant_stock.tres
+msgid "The merchant offers more items."
+msgstr "Thương nhân bán nhiều món hơn."
+
+#. format of data/tree/merchant_stock.tres
+msgid "{v} shop items"
+msgstr "{v} món hàng"
+
+#. description of data/tree/passive.tres
+msgid "Learns the passive."
+msgstr "Học nội tại."
+
+#. format of data/tree/passive.tres
+msgid "Learned"
+msgstr "Đã học"
+
+#. description of data/tree/refresh_cost.tres
+msgid "Refreshing the merchant costs less gold."
+msgstr "Làm mới thương nhân tốn ít vàng hơn."
+
+#. format of data/tree/refresh_cost.tres
+msgid "Refresh: {v} gold"
+msgstr "Làm mới: {v} vàng"
+
+#. description of data/tree/skill_e.tres
+msgid "Buys ranks of E. In a stage, skill points only go into bought ranks."
+msgstr "Mua bậc của E. Trong màn chơi, điểm kỹ năng chỉ cộng được vào các bậc đã mua."
+
+#. format of data/tree/skill_e.tres
+msgid "Rank {v}"
+msgstr "Bậc {v}"
+
+#. description of data/tree/skill_q.tres
+msgid "Buys ranks of Q. In a stage, skill points only go into bought ranks."
+msgstr "Mua bậc của Q. Trong màn chơi, điểm kỹ năng chỉ cộng được vào các bậc đã mua."
+
+#. description of data/tree/skill_r.tres
+msgid "Buys ranks of R. In a stage, skill points only go into bought ranks."
+msgstr "Mua bậc của R. Trong màn chơi, điểm kỹ năng chỉ cộng được vào các bậc đã mua."
+
+#. description of data/tree/skill_w.tres
+msgid "Buys ranks of W. In a stage, skill points only go into bought ranks."
+msgstr "Mua bậc của W. Trong màn chơi, điểm kỹ năng chỉ cộng được vào các bậc đã mua."
+
+#. description of data/tree/smite.tres
+msgid "Unlocks Smite as a summoner spell."
+msgstr "Mở khóa Trừng Phạt làm phép bổ trợ."
+
+#. description of data/tree/smite_upgrade.tres
+msgid "Smite deals more damage."
+msgstr "Trừng Phạt gây thêm sát thương."
+
+#. format of data/tree/smite_upgrade.tres
+msgid "+{v}% damage"
+msgstr "+{v}% sát thương"
+
+#. description of data/tree/stage_gold.tres
+msgid "Enemies give more stage gold."
+msgstr "Kẻ địch cho thêm vàng mỗi màn."
+
+#. format of data/tree/stage_gold.tres
+msgid "+{v}% stage gold"
+msgstr "+{v}% vàng mỗi màn"
+
+#. description of data/tree/stat_ad.tres
+msgid "Lucian starts every stage with more [ad]AD[/ad]."
+msgstr "Lucian bắt đầu mỗi màn với thêm [ad]SMCK[/ad]."
+
+#. format of data/tree/stat_ad.tres
+msgid "+{v} AD"
+msgstr "+{v} SMCK"
+
+#. description of data/tree/stat_ap.tres
+msgid "Lucian starts every stage with more [ap]AP[/ap]."
+msgstr "Lucian bắt đầu mỗi màn với thêm [ap]SMPT[/ap]."
+
+#. format of data/tree/stat_ap.tres
+msgid "+{v} AP"
+msgstr "+{v} SMPT"
+
+#. description of data/tree/stat_armor.tres
+msgid "Lucian starts every stage with more Armor."
+msgstr "Lucian bắt đầu mỗi màn với thêm Giáp."
+
+#. format of data/tree/stat_armor.tres
+msgid "+{v} Armor"
+msgstr "+{v} Giáp"
+
+#. description of data/tree/stat_attack_speed.tres
+msgid "Lucian starts every stage with more Attack Speed."
+msgstr "Lucian bắt đầu mỗi màn với thêm Tốc Độ Đánh."
+
+#. format of data/tree/stat_attack_speed.tres
+msgid "+{v}% Attack Speed"
+msgstr "+{v}% Tốc Độ Đánh"
+
+#. description of data/tree/stat_hp.tres
+msgid "Lucian starts every stage with more [hp]Health[/hp]."
+msgstr "Lucian bắt đầu mỗi màn với thêm [hp]Máu[/hp]."
+
+#. format of data/tree/stat_hp.tres
+msgid "+{v} Health"
+msgstr "+{v} Máu"
+
+#. description of data/tree/stat_hp_regen.tres
+msgid "Lucian recovers [hp]Health[/hp] faster."
+msgstr "Lucian hồi [hp]Máu[/hp] nhanh hơn."
+
+#. format of data/tree/stat_hp_regen.tres
+msgid "+{v}/s Health Regen"
+msgstr "+{v}/s Hồi Máu"
+
+#. description of data/tree/stat_mana.tres
+msgid "Lucian starts every stage with more [mana]Mana[/mana]."
+msgstr "Lucian bắt đầu mỗi màn với thêm [mana]Năng Lượng[/mana]."
+
+#. format of data/tree/stat_mana.tres
+msgid "+{v} Mana"
+msgstr "+{v} Năng Lượng"
+
+#. description of data/tree/stat_mana_regen.tres
+msgid "Lucian recovers [mana]Mana[/mana] faster."
+msgstr "Lucian hồi [mana]Năng Lượng[/mana] nhanh hơn."
+
+#. format of data/tree/stat_mana_regen.tres
+msgid "+{v}/s Mana Regen"
+msgstr "+{v}/s Hồi Năng Lượng"
+
+#. description of data/tree/stat_mr.tres
+msgid "Lucian starts every stage with more Magic Resist."
+msgstr "Lucian bắt đầu mỗi màn với thêm Kháng Phép."
+
+#. format of data/tree/stat_mr.tres
+msgid "+{v} Magic Resist"
+msgstr "+{v} Kháng Phép"
+
+#. description of data/tree/summoner_slot_2.tres
+msgid "Lucian can bring a second summoner spell."
+msgstr "Lucian có thể mang theo phép bổ trợ thứ hai."

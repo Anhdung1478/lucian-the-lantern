@@ -83,13 +83,13 @@ func refresh() -> void:
 	var text := ""
 	var color := UiStyle.GOLD_COLOR
 	if tree.is_maxed(id):
-		text = "MAXED"
+		text = Lang.t("MAXED")
 		color = TreeNodeView.MAXED_COLOR
 	elif not tree.next_level_open(id):
-		text = "LOCKED"
+		text = Lang.t("LOCKED")
 		color = LOCKED_COLOR
 	elif price == Vector2i.ZERO:
-		text = "Free"
+		text = Lang.t("Free")
 	status.text = text
 	status.add_theme_color_override(&"font_color", color)
 	status.visible = text != ""

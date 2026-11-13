@@ -19,7 +19,7 @@ func _init() -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override(&"separation", 10)
 	add_child(column)
-	empty_label = UiStyle.label("Buy spells in the Evolution Tree", 18, UiStyle.DIM_COLOR)
+	empty_label = UiStyle.label(Lang.t("Buy spells in the Evolution Tree"), 18, UiStyle.DIM_COLOR)
 	column.add_child(empty_label)
 	_grid = GridContainer.new()
 	_grid.columns = 3
@@ -27,7 +27,7 @@ func _init() -> void:
 	_grid.add_theme_constant_override(&"v_separation", 8)
 	column.add_child(_grid)
 	var none := Button.new()
-	none.text = "None"
+	none.text = Lang.t("None")
 	none.custom_minimum_size = Vector2(0, 40)
 	UiStyle.style_button(none, 20)
 	none.pressed.connect(pick.bind(&""))
@@ -50,7 +50,7 @@ func open(index: int, tree: EvolutionTree, current: StringName) -> void:
 		button.icon = data.icon
 		button.expand_icon = true
 		button.custom_minimum_size = Vector2(ICON_SIZE, ICON_SIZE)
-		button.set_meta(&"hover_text", data.display_name)
+		button.set_meta(&"hover_text", Lang.t(data.display_name))
 		UiStyle.style_button(button, 16, id == current)
 		button.pressed.connect(pick.bind(id))
 		_grid.add_child(button)

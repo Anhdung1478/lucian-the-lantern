@@ -35,8 +35,8 @@ func _ready() -> void:
 	words.alignment = BoxContainer.ALIGNMENT_CENTER
 	words.add_theme_constant_override(&"separation", 4)
 	row.add_child(words)
-	words.add_child(UiStyle.label("SUMMONER SPELLS", 18, UiStyle.TITLE_COLOR))
-	var hint := UiStyle.label("Click a key to choose its spell. Spells are bought in the Evolution Tree.", 14, UiStyle.DIM_COLOR)
+	words.add_child(UiStyle.label(Lang.t("SUMMONER SPELLS"), 18, UiStyle.TITLE_COLOR))
+	var hint := UiStyle.label(Lang.t("Click a key to choose its spell. Spells are bought in the Evolution Tree."), 14, UiStyle.DIM_COLOR)
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	# The words take what the two keys leave.
 	hint.custom_minimum_size.x = WIDTH - MARGIN * 2.0 - (SPACING + PICK_SIZE) * 2.0
@@ -119,13 +119,13 @@ func refresh() -> void:
 		var data := SummonerSpells.find(id) if id != &"" and save.tree.level(id) > 0 else null
 		picks[i].icon = data.icon if data else null
 		var locked := i == 1 and not second_open
-		picks[i].text = "" if data or locked else "None"
+		picks[i].text = "" if data or locked else Lang.t("None")
 		picks[i].disabled = locked
 		_chains[i].visible = locked
 		if locked:
-			picks[i].set_meta(&"hover_text", "Buy the 2nd summoner slot in the Evolution Tree")
+			picks[i].set_meta(&"hover_text", Lang.t("Buy the 2nd summoner slot in the Evolution Tree"))
 		elif data:
-			picks[i].set_meta(&"hover_text", data.display_name)
+			picks[i].set_meta(&"hover_text", Lang.t(data.display_name))
 		elif picks[i].has_meta(&"hover_text"):
 			picks[i].remove_meta(&"hover_text")
 	if menu.visible and picks[menu.slot].disabled:

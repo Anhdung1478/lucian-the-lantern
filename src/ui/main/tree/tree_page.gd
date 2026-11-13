@@ -436,7 +436,7 @@ func _draw_equip_preview(center: Vector2) -> void:
 	var open := roundi(data.value(level))
 	var next := roundi(data.value(level + 1)) if tree.next_level_open(data.id) else open
 	var all := roundi(data.value(data.max_level))
-	var plaque := _draw_plaque(center, "EQUIP SLOTS", "%d / %d" % [open, all])
+	var plaque := _draw_plaque(center, Lang.t("EQUIP SLOTS"), "%d / %d" % [open, all])
 	var width := all * SLOT_SIZE + (all - 1) * SLOT_GAP
 	var left := Vector2(center.x - width * 0.5, plaque.position.y + 66.0)
 	for i in all:
@@ -458,9 +458,9 @@ func _draw_equip_preview(center: Vector2) -> void:
 			var cleared := tree.is_level_open(EQUIP_ID, i - 1)
 			var color := TreeNodeView.MAXED_COLOR if cleared else JourneyPanel.CAPTION_COLOR
 			draw_polyline(PackedVector2Array([Vector2(from_x + 2, y - 4), Vector2(from_x + 2, y), Vector2(to_x - 2, y), Vector2(to_x - 2, y - 4)]), Color(color, 0.7), 1.5, true)
-			JourneyMap.draw_text(self, "Act %d" % act, Vector2((from_x + to_x) * 0.5, y + 22.0), 16, color, true)
+			JourneyMap.draw_text(self, Lang.t("Act %d") % act, Vector2((from_x + to_x) * 0.5, y + 22.0), 16, color, true)
 		i = last + 1
-	JourneyMap.draw_text(self, "Only equipped items give stats.", Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), 15, UiStyle.DIM_COLOR)
+	JourneyMap.draw_text(self, Lang.t("Only equipped items give stats."), Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), 15, UiStyle.DIM_COLOR)
 
 
 ## Under Backpack Slots: the 9x6 backpack, its open cells lit and the next
@@ -470,7 +470,7 @@ func _draw_backpack_preview(center: Vector2) -> void:
 	var level := tree.level(BACKPACK_ID)
 	var open := roundi(data.value(level))
 	var next := roundi(data.value(level + 1)) if tree.next_level_open(data.id) else open
-	var plaque := _draw_plaque(center, "BACKPACK", "%d / %d" % [open, Inventory.BACKPACK_SIZE])
+	var plaque := _draw_plaque(center, Lang.t("BACKPACK"), "%d / %d" % [open, Inventory.BACKPACK_SIZE])
 	var width := MINI_COLUMNS * MINI_CELL + (MINI_COLUMNS - 1) * MINI_GAP
 	var left := Vector2(center.x - width * 0.5, plaque.position.y + 46.0)
 	for i in Inventory.BACKPACK_SIZE:
@@ -484,7 +484,7 @@ func _draw_boots_preview(center: Vector2) -> void:
 	var data := tree.node(BOOTS_ID)
 	var level := tree.level(BOOTS_ID)
 	var next := level + 1 if tree.next_level_open(data.id) else level
-	var plaque := _draw_plaque(center, "BOOTS", "%d / %d" % [level, data.max_level])
+	var plaque := _draw_plaque(center, Lang.t("BOOTS"), "%d / %d" % [level, data.max_level])
 	for i in data.max_level:
 		var slot_center := Vector2(center.x + (i - (data.max_level - 1) * 0.5) * BOOTS_SPREAD, plaque.position.y + 92.0)
 		var rect := Rect2(slot_center - Vector2.ONE * BOOTS_SLOT * 0.5, Vector2.ONE * BOOTS_SLOT)
@@ -493,7 +493,7 @@ func _draw_boots_preview(center: Vector2) -> void:
 		draw_texture_rect(BOOTS_ICONS[i], rect.grow(-6.0), false, tint)
 		var color := UiStyle.TITLE_COLOR if i < level else UiStyle.DIM_COLOR
 		JourneyMap.draw_text(self, data.value_text(i + 1), Vector2(slot_center.x, rect.end.y + 24.0), 15, color, true)
-	JourneyMap.draw_text(self, "Worn on every map.", Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), 15, UiStyle.DIM_COLOR)
+	JourneyMap.draw_text(self, Lang.t("Worn on every map."), Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), 15, UiStyle.DIM_COLOR)
 
 
 ## One slot of a preview: lit when open, outlined when the next level opens it.
@@ -523,7 +523,7 @@ func _draw_group_captions() -> void:
 		for id: StringName in limb["ids"]:
 			if centers[id].y < top.y:
 				top = centers[id]
-		var text: String = limb["label"]
+		var text := Lang.t(limb["label"])
 		var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, GROUP_FONT).x
 		var baseline := Vector2(top.x - width * 0.5, top.y - TreeNodeView.SIZE * 0.5 - GROUP_LIFT)
 		JourneyMap.draw_text(self, text, baseline, GROUP_FONT, JourneyPanel.CAPTION_COLOR, false, 3)
@@ -533,9 +533,9 @@ func _draw_group_captions() -> void:
 
 
 func _draw_header() -> void:
-	JourneyMap.draw_text(self, "EVOLUTION TREE", HEADER_AT, CAPTION_FONT, JourneyPanel.CAPTION_COLOR, false, 3)
-	JourneyMap.draw_text(self, String(NAMES[branch]).to_upper(), HEADER_AT + Vector2(0, 40), TITLE_FONT, UiStyle.TITLE_COLOR, false, 4)
-	JourneyMap.draw_text(self, BLURBS[branch], HEADER_AT + Vector2(0, 70), BLURB_FONT, UiStyle.DIM_COLOR)
+	JourneyMap.draw_text(self, Lang.t("EVOLUTION TREE"), HEADER_AT, CAPTION_FONT, JourneyPanel.CAPTION_COLOR, false, 3)
+	JourneyMap.draw_text(self, Lang.t(NAMES[branch]).to_upper(), HEADER_AT + Vector2(0, 40), TITLE_FONT, UiStyle.TITLE_COLOR, false, 4)
+	JourneyMap.draw_text(self, Lang.t(BLURBS[branch]), HEADER_AT + Vector2(0, 70), BLURB_FONT, UiStyle.DIM_COLOR)
 
 
 ## A plaque under a node, with a caption and a count; returns its rect.

@@ -62,12 +62,12 @@ func value(level: int) -> float:
 ## reads "None".
 func value_text(level: int) -> String:
 	if not level_texts.is_empty():
-		return level_texts[clampi(level, 0, level_texts.size() - 1)]
+		return Lang.t(level_texts[clampi(level, 0, level_texts.size() - 1)])
 	if level == 0 and value(0) == 0.0:
-		return "None"
+		return Lang.t("None")
 	var shown := value(level) * (100.0 if percent else 1.0)
 	var number := str(roundi(shown)) if is_equal_approx(shown, roundf(shown)) else "%.1f" % shown
-	return format.replace("{v}", number)
+	return Lang.t(format).replace("{v}", number)
 
 
 ## The act needed to buy level `i` + 1 (`i` counts from 0); 0 past the end of `level_acts`.
@@ -82,4 +82,4 @@ func sum_needed(i: int) -> int:
 
 ## "Q" from "Q – Piercing Light": the name up to the first " – ".
 func short_name() -> String:
-	return display_name.split(" – ")[0]
+	return Lang.t(display_name).split(" – ")[0]

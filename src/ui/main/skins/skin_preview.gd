@@ -215,7 +215,7 @@ func _build() -> void:
 
 	var header := HBoxContainer.new()
 	column.add_child(header)
-	var title := UiStyle.label("%s · Preview" % skin.display_name, 26, UiStyle.TITLE_COLOR)
+	var title := UiStyle.label(Lang.t("%s · Preview") % Lang.t(skin.display_name), 26, UiStyle.TITLE_COLOR)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 	close_button.text = "✕"
@@ -242,7 +242,7 @@ func _build() -> void:
 	column.add_child(row)
 	for piece: StringName in PIECES + [&"all"]:
 		var button := Button.new()
-		button.text = LABELS[piece]
+		button.text = Lang.t(LABELS[piece])
 		UiStyle.style_button(button, 20)
 		button.custom_minimum_size = Vector2(130, 48)
 		button.pressed.connect(play_all if piece == &"all" else play.bind(piece))

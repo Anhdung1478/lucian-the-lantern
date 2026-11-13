@@ -55,8 +55,8 @@ func is_showing_slots() -> bool:
 ## The slot list, with "Slot 1 (current)" disabled.
 func show_slots() -> void:
 	_showing_slots = true
-	card.set_title("SAVE AS COPY")
-	card.set_subtitle("Pick a slot")
+	card.set_title(Lang.t("SAVE AS COPY"))
+	card.set_subtitle(Lang.t("Pick a slot"))
 	_menu_page.visible = false
 	_slot_page.visible = true
 	_slot_list.refresh(SaveGame.instance().slot)
@@ -83,16 +83,16 @@ func _build() -> void:
 	backdrop.add_child(center)
 	center.add_child(card)
 	_menu_page = _page()
-	_entry(_menu_page, "Close", CLOSE_ICON, MenuEntry.Kind.PRIMARY, "", close)
-	_save_entry = _entry(_menu_page, "Save", SAVE_ICON, MenuEntry.Kind.NORMAL, "", _save)
-	_entry(_menu_page, "Save as copy", COPY_ICON, MenuEntry.Kind.NORMAL, "To another slot", show_slots)
-	_entry(_menu_page, "Settings", GameMenu.SETTINGS_ICON, MenuEntry.Kind.NORMAL, GameMenu.SETTINGS_HINT, settings_requested.emit)
-	_entry(_menu_page, "Leave to main menu", GameMenu.LEAVE_ICON, MenuEntry.Kind.DANGER, "Title screen", leave_requested.emit)
-	_entry(_menu_page, "Exit the game", GameMenu.EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
+	_entry(_menu_page, Lang.t("Close"), CLOSE_ICON, MenuEntry.Kind.PRIMARY, "", close)
+	_save_entry = _entry(_menu_page, Lang.t("Save"), SAVE_ICON, MenuEntry.Kind.NORMAL, "", _save)
+	_entry(_menu_page, Lang.t("Save as copy"), COPY_ICON, MenuEntry.Kind.NORMAL, Lang.t("To another slot"), show_slots)
+	_entry(_menu_page, Lang.t("Settings"), GameMenu.SETTINGS_ICON, MenuEntry.Kind.NORMAL, Lang.t(GameMenu.SETTINGS_HINT), settings_requested.emit)
+	_entry(_menu_page, Lang.t("Leave to main menu"), GameMenu.LEAVE_ICON, MenuEntry.Kind.DANGER, Lang.t("Title screen"), leave_requested.emit)
+	_entry(_menu_page, Lang.t("Exit the game"), GameMenu.EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
 	_slot_page = _page()
 	_slot_list.picked.connect(_copy)
 	_slot_page.add_child(_slot_list)
-	_entry(_slot_page, "Back", BACK_ICON, MenuEntry.Kind.NORMAL, "", _show_menu)
+	_entry(_slot_page, Lang.t("Back"), BACK_ICON, MenuEntry.Kind.NORMAL, "", _show_menu)
 	_show_menu()
 
 
@@ -107,9 +107,9 @@ func _page() -> VBoxContainer:
 func _show_menu() -> void:
 	_showing_slots = false
 	var save := SaveGame.instance()
-	card.set_title("MENU")
-	card.set_subtitle("Slot %d · %s" % [save.slot, SaveGame.play_time_text(int(save.play_time))])
-	_save_entry.set_hint("Slot %d" % save.slot)
+	card.set_title(Lang.t("MENU"))
+	card.set_subtitle(Lang.t("Slot %d · %s") % [save.slot, SaveGame.play_time_text(int(save.play_time))])
+	_save_entry.set_hint(Lang.t("Slot %d") % save.slot)
 	_menu_page.visible = true
 	_slot_page.visible = false
 	keys.set_buttons(MenuKeys.buttons_in(_menu_page))
@@ -129,7 +129,7 @@ func _save() -> void:
 
 func _copy(slot: int, exists: bool) -> void:
 	if exists and confirm:
-		confirm.ask("Overwrite slot %d?" % slot, _write_copy.bind(slot))
+		confirm.ask(Lang.t("Overwrite slot %d?") % slot, _write_copy.bind(slot))
 	else:
 		_write_copy(slot)
 

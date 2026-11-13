@@ -39,9 +39,9 @@ func refresh() -> void:
 		var short := not essences.can_afford(count * Essences.FORGE_BLUE)
 		button.disabled = short
 		if short:
-			button.set_meta(&"hover_text", "Needs %d blue essence" % (count * Essences.FORGE_BLUE))
+			button.set_meta(&"hover_text", Lang.t("Needs %d blue essence") % (count * Essences.FORGE_BLUE))
 		else:
-			button.set_meta(&"hover_text", "Forge %d orange essence from %d blue. This cannot be undone." % [count, count * Essences.FORGE_BLUE])
+			button.set_meta(&"hover_text", Lang.t("Forge %d orange essence from %d blue. This cannot be undone.") % [count, count * Essences.FORGE_BLUE])
 
 
 func _button(count: int) -> Button:

@@ -198,7 +198,7 @@ func _start_endless(map_choice: int) -> void:
 ## stage doesn't start: a red toast says so and the main screen stays.
 func _request_start(run: StageSetup) -> void:
 	if not SaveGame.instance().save():
-		show_toast(COULD_NOT_START, true)
+		show_toast(Lang.t(COULD_NOT_START), true)
 		Sfx.play(&"error")
 		return
 	start_requested.emit(run)
@@ -231,13 +231,13 @@ func _close_settings() -> void:
 
 
 func _on_saved(ok: bool) -> void:
-	_report(ok, "Saved to slot %d" % SaveGame.instance().slot)
+	_report(ok, Lang.t("Saved to slot %d") % SaveGame.instance().slot)
 
 
 func _on_copied(slot: int, ok: bool) -> void:
-	_report(ok, "Copied to slot %d" % slot)
+	_report(ok, Lang.t("Copied to slot %d") % slot)
 
 
 func _report(ok: bool, text: String) -> void:
-	show_toast(text if ok else "Could not save", not ok)
+	show_toast(text if ok else Lang.t("Could not save"), not ok)
 	Sfx.play(&"coin" if ok else &"error")

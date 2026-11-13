@@ -53,7 +53,7 @@ func _init() -> void:
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(icon)
-		var title := UiStyle.label(TreePage.NAMES[branch], NAME_FONT)
+		var title := UiStyle.label(Lang.t(TreePage.NAMES[branch]), NAME_FONT)
 		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(title)
 		_names.append(title)
