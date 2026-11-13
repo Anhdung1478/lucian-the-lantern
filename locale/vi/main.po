@@ -129,11 +129,7 @@ msgstr "VÔ TẬN"
 msgid "Practice on training dummies with what you have bought in the Evolution Tree and your equipped skin. No essences are earned. Leave from the ESC menu to come back here."
 msgstr "Luyện tập trên hình nộm với những gì bạn đã mua trong Cây Tiến Hóa và trang phục đang mặc. Không nhận tinh chất. Thoát từ menu ESC để quay lại đây."
 
-#. journey_panel.gd: Start button of the Training panel
-msgid "Start Training"
-msgstr "Bắt đầu luyện tập"
-
-#. journey_panel.gd: Start button of Endless and of a one-stage act
+#. journey_panel.gd: Start button of every Journey panel: a stage, Training and Endless
 msgid "Start"
 msgstr "Bắt đầu"
 
@@ -176,10 +172,6 @@ msgstr "Đã hoàn thành"
 #. journey_panel.gd: status of a stage
 msgid "Not cleared yet"
 msgstr "Chưa hoàn thành"
-
-#. journey_panel.gd: Start button of a stage. %d is the stage number in its act
-msgid "Start stage %d"
-msgstr "Bắt đầu màn %d"
 
 #. journey_panel.gd: caption over the stage's enemy icons
 msgid "ENEMIES"

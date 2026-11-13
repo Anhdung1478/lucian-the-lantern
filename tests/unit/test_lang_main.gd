@@ -149,7 +149,7 @@ func test_the_journey_reads_in_vietnamese() -> void:
 	assert_eq(section.panel.act_label.text, "HỒI 3 · KHU RỪNG")
 	assert_eq(section.panel.title_label.text, "Màn 3-1")
 	assert_eq(section.panel.story_label.text, "Lucian băng qua khu rừng, đối đầu các rồng và Rồng Ngàn Tuổi.")
-	assert_eq(section.panel.start_button.text, "Bắt đầu màn 1")
+	assert_eq(section.panel.start_button.text, "Bắt đầu")
 
 
 func test_the_bars_read_in_vietnamese() -> void:

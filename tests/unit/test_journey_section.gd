@@ -476,7 +476,7 @@ func test_picking_a_mini_boss_stage_fills_the_panel() -> void:
 	assert_eq(panel.story_label.text, Journey.ACTS[2]["story"])
 	assert_eq(panel.status_label.text, "Not cleared yet")
 	assert_eq(panel.purple_label.text, "First kill: +5")
-	assert_eq(panel.start_button.text, "Start stage 4")
+	assert_eq(panel.start_button.text, "Start")
 	assert_false(panel.start_button.disabled)
 	assert_false(panel.start_button.has_meta(&"hover_text"))
 	# Beaten once: the panel follows the save.
@@ -495,7 +495,7 @@ func test_picking_a_boss_stage_shows_the_boss() -> void:
 	assert_eq(panel.tag_label.text, "Boss")
 	assert_eq(panel.waves_label.text, "5 waves + boss wave")
 	assert_eq(panel.purple_label.text, "First kill: +10")
-	assert_eq(panel.start_button.text, "Start stage 3")
+	assert_eq(panel.start_button.text, "Start")
 
 
 func test_a_normal_stage_has_no_boss_row() -> void:
@@ -504,7 +504,7 @@ func test_a_normal_stage_has_no_boss_row() -> void:
 	assert_false(section.panel.boss_row.visible)
 	assert_false(section.panel.purple_row.visible)
 	assert_eq(section.panel.waves_label.text, "4 waves")
-	assert_eq(section.panel.start_button.text, "Start stage 1")
+	assert_eq(section.panel.start_button.text, "Start")
 
 
 ## The roster: each enemy of the stage's waves once, in order; the mini boss
@@ -532,7 +532,7 @@ func test_endless_chips_light_only_the_chosen_map() -> void:
 func test_start_training_emits_the_signal() -> void:
 	section.pick(section.map.training)
 	assert_true(section.panel.training_box.visible)
-	assert_eq(section.panel.start_button.text, "Start Training")
+	assert_eq(section.panel.start_button.text, "Start")
 	watch_signals(section)
 	section.panel.start_button.pressed.emit()
 	assert_signal_emitted(section, "start_training")

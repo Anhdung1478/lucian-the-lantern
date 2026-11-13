@@ -152,7 +152,7 @@ func show_node(node: JourneyNode, save: SaveGame) -> void:
 			each.visible = each == box
 	match node.kind:
 		JourneyNode.TRAINING:
-			start_button.text = Lang.t("Start Training")
+			start_button.text = Lang.t("Start")
 			_accent = TRAINING_ACCENT
 		JourneyNode.ENDLESS:
 			start_button.text = Lang.t("Start")
@@ -212,7 +212,7 @@ func _show_stage(node: JourneyNode, save: SaveGame) -> void:
 	resolve_row.visible = stacks > 0
 	resolve_label.text = Resolve.journey_line(stacks, save.difficulty)
 	resolve_row.set_meta(&"hover_text", Resolve.journey_note(save.defeats_on(node.stage_id)))
-	start_button.text = Lang.t("Start") if Journey.stage_count(node.act) == 1 else Lang.t("Start stage %d") % node.stage
+	start_button.text = Lang.t("Start")
 	_show_roster(node.stage_id)
 
 
