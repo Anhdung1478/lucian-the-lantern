@@ -1,10 +1,12 @@
 class_name JourneyPanel
 extends Control
-## The Journey's side panel, opaque beside the map: the picked place and its
-## Start, with the D/F summoner spells at the bottom for every pick.
-## - A stage: its act and id, the boss or mini boss with its purple, the
-##   waves, the act's story, whether it is cleared, its Resolve once it has
-##   beaten Lucian, and its enemies.
+## The Journey's side panel, opaque beside the map: the picked place at the
+## top, then at its foot the D/F summoner spells and Start, last (you pick the
+## spells, then start).
+## - A stage: its act and id, the boss or mini boss, the act's story, then
+##   one block of facts with one icon lane (the boss's first-kill purple, the
+##   waves, whether it is cleared, its Resolve once it has beaten Lucian),
+##   and its enemies right under them.
 ## - Training: what it is.
 ## - Endless: the best wave, the rules, and the map choice with a thumbnail.
 
@@ -17,10 +19,18 @@ const CONTENT_WIDTH := 400.0
 const START_HEIGHT := 64.0
 const LOADOUT_HEIGHT := 114.0
 const GAP := 16.0
-## The stage box's height, from the top margin to just over Start's rule.
+## The stage box's height, from the top margin to just over the spells' rule.
 const BOX_HEIGHT := SIZE.y - PAD * 2.0 - 4.0 - LOADOUT_HEIGHT - START_HEIGHT - GAP * 2.0
+## The fact rows' icon lane (28 px on screen): every fact's text starts at
+## one edge after it.
+const LANE := 34.0
+const LANE_GAP := 12
+## The enemies' box sits this far under the last fact (16 px on screen).
+const ENEMIES_GAP := 19.0
+## Endless's three essences share the lane, overlapping.
+const LANE_ICON := 18.0
 ## Between the rows of a box (Endless's is fuller).
-const ROW_GAP := 12
+const ROW_GAP := UiStyle.GAP
 const ENDLESS_ROW_GAP := 9
 const PORTRAIT_SIZE := 112.0
 const ICON_SIZE := 26.0
@@ -101,13 +111,13 @@ func _init() -> void:
 	_build_stage()
 	_build_training()
 	_build_endless()
-	start_button.position = Vector2(PAD, SIZE.y - PAD - LOADOUT_HEIGHT - GAP - START_HEIGHT)
+	start_button.position = Vector2(PAD, SIZE.y - PAD - START_HEIGHT)
 	start_button.size = Vector2(CONTENT_WIDTH, START_HEIGHT)
 	UiStyle.style_button(start_button, 28, true)
 	start_button.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
 	start_button.pressed.connect(start_pressed.emit)
 	add_child(start_button)
-	loadout.position = Vector2(PAD, SIZE.y - PAD - LOADOUT_HEIGHT)
+	loadout.position = Vector2(PAD, SIZE.y - PAD - START_HEIGHT - GAP - LOADOUT_HEIGHT)
 	loadout.size = Vector2(CONTENT_WIDTH, LOADOUT_HEIGHT)
 	add_child(loadout)
 
@@ -234,8 +244,8 @@ static func draw_top_glow(canvas: CanvasItem, width: float, accent: Color, alpha
 	canvas.draw_texture_rect(_top_glow, Rect2(2, 2, width - 4.0, GLOW_HEIGHT), false, Color(accent, alpha))
 
 
-## The faint gold rule across a panel `width` wide at `y`, over its bottom
-## button.
+## The faint gold rule across a panel `width` wide at `y`, over its foot (the
+## spells and Start here, the cost bar in the tree).
 static func draw_rule(canvas: CanvasItem, y: float, width: float) -> void:
 	canvas.draw_line(Vector2(PAD, y), Vector2(width - PAD, y), Color(UiStyle.BORDER_COLOR, 0.25), 1.0)
 
@@ -243,7 +253,12 @@ static func draw_rule(canvas: CanvasItem, y: float, width: float) -> void:
 func _draw() -> void:
 	draw_style_box(frame_style(), Rect2(Vector2.ZERO, size))
 	draw_top_glow(self, size.x, _accent)
-	draw_rule(self, start_button.position.y - GAP * 0.5, size.x)
+	draw_rule(self, rule_y(), size.x)
+
+
+## Where the faint rule runs, over the spells: the place's rows end above it.
+func rule_y() -> float:
+	return loadout.position.y - GAP * 0.5
 
 
 func _build_stage() -> void:
@@ -278,15 +293,17 @@ func _build_stage() -> void:
 	boss_name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	boss_name_label.custom_minimum_size.x = CONTENT_WIDTH - PORTRAIT_SIZE - 18.0
 	who.add_child(boss_name_label)
+	# The act's story straight under the boss, full width; the facts follow
+	# as one block with one icon lane.
+	story_label = UiStyle.label("", 18, UiStyle.DIM_COLOR)
+	story_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	story_label.custom_minimum_size.x = CONTENT_WIDTH
+	stage_box.add_child(story_label)
 	purple_label = UiStyle.label("", 20, PURPLE_COLOR)
 	purple_row = _icon_row(_icon(PURPLE_ICON), purple_label)
 	stage_box.add_child(purple_row)
 	waves_label = UiStyle.label("", 22, UiStyle.TEXT_COLOR)
 	stage_box.add_child(_icon_row(_icon(SKULL, Color(0.75, 0.77, 0.82)), waves_label))
-	story_label = UiStyle.label("", 18, UiStyle.DIM_COLOR)
-	story_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	story_label.custom_minimum_size.x = CONTENT_WIDTH
-	stage_box.add_child(story_label)
 	status_label = UiStyle.label("", 20, UiStyle.DIM_COLOR)
 	_status_mark.custom_minimum_size = Vector2.ONE * ICON_SIZE
 	_status_mark.draw.connect(_draw_status_mark)
@@ -297,9 +314,10 @@ func _build_stage() -> void:
 	resolve_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	resolve_row = _icon_row(_icon(Resolve.ICON), resolve_label)
 	stage_box.add_child(resolve_row)
-	# The spare height sits above the enemies, which rest on Start's rule.
+	# The enemies belong to the facts: right under them, the spare height
+	# below the box.
 	var spacer := Control.new()
-	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.custom_minimum_size.y = ENEMIES_GAP - ROW_GAP
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stage_box.add_child(spacer)
 	var tray := PanelContainer.new()
@@ -354,10 +372,13 @@ func _build_endless() -> void:
 	card.custom_minimum_size = Vector2.ONE * ICON_SIZE
 	card.draw.connect(_draw_card_icon.bind(card))
 	rules.add_child(_icon_row(card, UiStyle.label(Lang.t("A modifier to pick after each boss"), 18, UiStyle.TEXT_COLOR)))
+	# Three small essences overlapping in the lane, so the text keeps its edge.
 	var essences := HBoxContainer.new()
-	essences.add_theme_constant_override(&"separation", -8)
+	essences.add_theme_constant_override(&"separation", int((LANE - LANE_ICON * 3.0) * 0.5))
 	for icon: Texture2D in [BLUE_ICON, ORANGE_ICON, PURPLE_ICON]:
-		essences.add_child(_icon(icon))
+		var small := _icon(icon)
+		small.custom_minimum_size = Vector2.ONE * LANE_ICON
+		essences.add_child(small)
 	rules.add_child(_icon_row(essences, UiStyle.label(Lang.t("Blue, orange, and repeat purple"), 18, UiStyle.TEXT_COLOR)))
 	endless_box.add_child(UiStyle.label(Lang.t("MAP"), 16, CAPTION_COLOR))
 	var chips := HFlowContainer.new()
@@ -429,12 +450,13 @@ func _icon(texture: Texture2D, tint := Color.WHITE) -> TextureRect:
 	return icon
 
 
-## An icon column (fixed width, so the texts line up) and a label.
+## The icon lane (LANE wide, so every fact's text starts at one edge) and a
+## label.
 func _icon_row(icon: Control, label: Label) -> HBoxContainer:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 12)
+	row.add_theme_constant_override(&"separation", LANE_GAP)
 	var holder := CenterContainer.new()
-	holder.custom_minimum_size = Vector2(ICON_SIZE * 2.2, ICON_SIZE)
+	holder.custom_minimum_size = Vector2(LANE, ICON_SIZE)
 	holder.add_child(icon)
 	row.add_child(holder)
 	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER

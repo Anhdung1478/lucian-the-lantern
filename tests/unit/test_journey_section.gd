@@ -780,25 +780,61 @@ func test_the_endless_panel_starts_on_random() -> void:
 # --- The summoner spells -------------------------------------------------------------
 
 
-func test_the_spells_sit_compact_at_the_bottom_of_the_panel() -> void:
+## Review r1 D1: you pick the spells, then start: Start is last, on the
+## panel's foot, the spells right over it.
+func test_the_spells_sit_compact_over_start_at_the_foot_of_the_panel() -> void:
 	assert_eq(LoadoutPanel.PICK_SIZE, 64.0)
 	assert_eq(section.loadout, section.panel.loadout)
 	var panel_rect := section.panel.get_global_rect()
 	var loadout_rect := section.loadout.get_global_rect()
+	var start_rect := section.panel.start_button.get_global_rect()
 	assert_true(panel_rect.encloses(loadout_rect))
 	assert_gt(loadout_rect.position.y, panel_rect.get_center().y, "in the lower half")
-	assert_lt(section.panel.start_button.get_global_rect().end.y, loadout_rect.position.y, "Start sits above them")
+	assert_lt(loadout_rect.end.y, start_rect.position.y, "Start sits under them")
+	assert_almost_eq(start_rect.end.y, panel_rect.end.y - JourneyPanel.PAD, 0.5, "Start on the panel's foot")
 
 
-func test_the_spell_menu_opens_left_of_the_panel_on_screen() -> void:
+## Review r1 D1: the enemies follow the facts at once (no band between them)
+## and the description comes before the facts (D2).
+func test_the_enemies_sit_under_the_facts_and_the_story_over_them() -> void:
+	section.pick(_node("1-1"))
+	await wait_process_frames(2)
+	var panel := section.panel
+	var box := panel.stage_box
+	var order := box.get_children()
+	assert_lt(order.find(panel.boss_row), order.find(panel.story_label), "the boss, then the story")
+	assert_lt(order.find(panel.story_label), order.find(panel.purple_row), "the story, then the facts")
+	var tray: Control = order[-1]
+	assert_true(tray is PanelContainer, "the enemies' box is last")
+	var last_fact := panel.status_label.get_parent() as Control
+	var gap := tray.get_global_rect().position.y - last_fact.get_global_rect().end.y
+	assert_lt(gap, 40.0, "the enemies sit right under the facts")
+
+
+## Review r1 D2: every fact's text starts at one edge.
+func test_the_facts_share_one_text_edge() -> void:
+	section.pick(_node("1-1"))
+	await wait_process_frames(2)
+	var panel := section.panel
+	var edge := panel.purple_label.get_global_rect().position.x
+	assert_almost_eq(panel.waves_label.get_global_rect().position.x, edge, 0.5)
+	assert_almost_eq(panel.status_label.get_global_rect().position.x, edge, 0.5)
+
+
+## Review r1 D3: the menu opens upward, inside the side panel, over the spells.
+func test_the_spell_menu_opens_upward_inside_the_panel() -> void:
 	_save().tree._levels[&"flash"] = 1
 	_save().tree._levels[&"heal"] = 1
 	_save().tree._levels[&"summoner_slot_2"] = 1
 	_save().tree.changed.emit()
-	section.loadout.open_menu(1)
-	var menu := section.loadout.menu.get_global_rect()
-	assert_lt(menu.end.x, section.panel.get_global_rect().position.x)
-	assert_true(get_viewport().get_visible_rect().encloses(menu), "never off the bottom")
+	for slot in 2:
+		section.loadout.open_menu(slot)
+		var menu := section.loadout.menu.get_global_rect()
+		var loadout_rect := section.loadout.get_global_rect()
+		assert_true(section.panel.get_global_rect().encloses(menu), "inside the panel")
+		assert_almost_eq(menu.end.y, loadout_rect.position.y - LoadoutPanel.MENU_GAP, 0.5, "just over the spells")
+		assert_almost_eq(menu.end.x, loadout_rect.end.x, 0.5, "on the panel's right padding")
+		section.loadout.close_menu()
 
 
 func test_f_is_chained_until_the_second_slot_is_bought() -> void:
@@ -926,15 +962,15 @@ func test_the_resolve_line_follows_the_difficulty_and_the_setting() -> void:
 	assert_eq(panel.resolve_label.text, "Resolve 5 / 5: +50% damage, -50% taken")
 
 
-func test_the_resolve_line_fits_over_start_on_every_stage() -> void:
-	var limit := section.panel.start_button.position.y - JourneyPanel.GAP * 0.5
+func test_the_resolve_line_fits_over_the_spells_on_every_stage() -> void:
+	var limit := section.panel.rule_y()
 	for id in Journey.all_stage_ids(Journey.ACTS.size()):
 		_save().record_defeat(id)
 		section.panel.show_node(_node(id), _save())
 		await wait_process_frames(2)
 		assert_true(section.panel.resolve_row.visible, id)
 		var box := section.panel.stage_box
-		assert_lte(box.position.y + box.get_combined_minimum_size().y, limit, "%s: the stage's rows end over Start" % id)
+		assert_lte(box.position.y + box.get_combined_minimum_size().y, limit, "%s: the stage's rows end over the spells" % id)
 		assert_lte(box.get_combined_minimum_size().x, JourneyPanel.CONTENT_WIDTH, "%s: no row is wider than the panel" % id)
 
 

@@ -213,9 +213,9 @@ msgstr "Xanh, cam và tím lặp lại"
 msgid "MAP"
 msgstr "BẢN ĐỒ"
 
-#. loadout_panel.gd: hint under the heading (fixed width, wraps)
-msgid "Click a key to choose its spell. Spells are bought in the Evolution Tree."
-msgstr "Nhấp vào một phím để chọn phép. Phép được mua trong Cây Tiến Hóa."
+#. loadout_panel.gd: hint under the heading, one line beside the two keys (220 px wide)
+msgid "Click a key to choose its spell."
+msgstr "Nhấp phím để chọn phép."
 
 #. loadout_panel.gd: hover text of the locked F key
 msgid "Buy the 2nd summoner slot in the Evolution Tree"

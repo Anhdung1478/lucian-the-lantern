@@ -1,18 +1,20 @@
 class_name LoadoutPanel
 extends PanelContainer
-## The summoner spells on D and F, compact at the bottom of the Journey's
-## side panel for every pick. A slot opens the SpellMenu, to the left of the
-## panel; a pick goes to SaveGame.set_loadout(), which swaps when the spell
-## was on the other key. F stays chained until the 2nd slot is bought.
+## The summoner spells on D and F, compact at the foot of the Journey's side
+## panel (over Start) for every pick. A slot opens the SpellMenu upward, over
+## the panel's rows and inside the panel; a pick goes to
+## SaveGame.set_loadout(), which swaps when the spell was on the other key. F
+## stays chained until the 2nd slot is bought.
 
 const WIDTH := 400.0
 const PICK_SIZE := 64.0
 ## The panel's inner margin, and the gap between the words and the keys.
 const MARGIN := 12.0
 const SPACING := 14
-## The spell menu's gap from the panel, and from the screen's edges.
-const MENU_GAP := 32.0
-const SCREEN_MARGIN := 8.0
+## The spell menu's gap over this box (8 px on screen), and the side panel's
+## padding it stays inside.
+const MENU_GAP := 10.0
+const PANEL_PAD := JourneyPanel.PAD
 const CHAIN := preload("res://assets/art/ui/chain.svg")
 const KEYS: Array[StringName] = [&"summoner_d", &"summoner_f"]
 
@@ -22,6 +24,9 @@ var menu := SpellMenu.new()
 
 var _key_labels: Array[Label] = []
 var _chains: Array[TextureRect] = []
+## The menu's plain holder, placed on the screen (top level), so the menu can
+## rise into place (a Container would pin it).
+var _menu_holder := Control.new()
 
 
 func _ready() -> void:
@@ -36,10 +41,10 @@ func _ready() -> void:
 	words.add_theme_constant_override(&"separation", 4)
 	row.add_child(words)
 	words.add_child(UiStyle.label(Lang.t("SUMMONER SPELLS"), 18, UiStyle.TITLE_COLOR))
-	var hint := UiStyle.label(Lang.t("Click a key to choose its spell. Spells are bought in the Evolution Tree."), 14, UiStyle.DIM_COLOR)
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# One line; where spells are bought is on the empty menu and F's chain.
 	# The words take what the two keys leave.
-	hint.custom_minimum_size.x = WIDTH - MARGIN * 2.0 - (SPACING + PICK_SIZE) * 2.0
+	var hint := UiStyle.note(Lang.t("Click a key to choose its spell."), UiStyle.DIM_COLOR,
+		WIDTH - MARGIN * 2.0 - (SPACING + PICK_SIZE) * 2.0)
 	words.add_child(hint)
 	for i in 2:
 		var holder := VBoxContainer.new()
@@ -71,10 +76,12 @@ func _ready() -> void:
 		chain.visible = false
 		pick_button.add_child(chain)
 		_chains.append(chain)
-	menu.top_level = true
-	menu.z_index = 10
+	_menu_holder.top_level = true
+	_menu_holder.z_index = 10
+	_menu_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_menu_holder)
 	menu.picked.connect(_on_picked)
-	add_child(menu)
+	_menu_holder.add_child(menu)
 	var save := SaveGame.instance()
 	save.changed.connect(refresh)
 	save.tree.changed.connect(refresh)
@@ -82,29 +89,29 @@ func _ready() -> void:
 	refresh()
 
 
-## Opens the spell menu beside slot `index`; the same slot again closes it.
+## Opens the spell menu for slot `index`; the same slot again closes it. It
+## opens upward: its bottom MENU_GAP over this box, its right edge on the
+## panel's right padding (this box's right edge), never out of the panel.
 func open_menu(index: int) -> void:
 	if picks[index].disabled:
 		return
-	if menu.visible and menu.slot == index:
+	if menu.is_open() and menu.slot == index:
 		close_menu()
 		return
 	var save := SaveGame.instance()
-	menu.open(index, save.tree, save.loadout[index])
-	# Beside the slot, left of the panel so it never covers it; it opens
-	# upward when it would run off the bottom of the screen.
-	var anchor := picks[index].get_global_rect()
-	var screen := get_viewport_rect().grow(-SCREEN_MARGIN)
-	var top := anchor.position.y
-	if top + menu.size.y > screen.end.y:
-		top = anchor.end.y - menu.size.y
-	menu.global_position = Vector2(get_global_rect().position.x - menu.size.x - MENU_GAP, maxf(top, screen.position.y))
+	menu.fill(index, save.tree, save.loadout[index])
+	var box := get_global_rect()
+	var top := box.position.y - MENU_GAP - menu.size.y
+	var panel := get_parent() as Control
+	if panel:
+		top = maxf(top, panel.get_global_rect().position.y + PANEL_PAD)
+	menu.place(Vector2(box.end.x - menu.size.x, top))
 
 
 ## Closes the menu; true when one was open.
 func close_menu() -> bool:
-	var was_open := menu.visible
-	menu.visible = false
+	var was_open := menu.is_open()
+	menu.close()
 	return was_open
 
 
@@ -128,7 +135,7 @@ func refresh() -> void:
 			picks[i].set_meta(&"hover_text", Lang.t(data.display_name))
 		elif picks[i].has_meta(&"hover_text"):
 			picks[i].remove_meta(&"hover_text")
-	if menu.visible and picks[menu.slot].disabled:
+	if menu.is_open() and picks[menu.slot].disabled:
 		close_menu()
 
 
@@ -143,7 +150,7 @@ func _on_picked(id: StringName) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if not menu.visible or not event is InputEventMouseButton:
+	if not menu.is_open() or not event is InputEventMouseButton:
 		return
 	var click := event as InputEventMouseButton
 	if not click.pressed or click.button_index != MOUSE_BUTTON_LEFT:
