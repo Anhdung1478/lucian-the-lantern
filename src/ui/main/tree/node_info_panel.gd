@@ -11,6 +11,9 @@ extends PanelContainer
 ##   next level still needs, a row per level (value and cost; bought ones lit,
 ##   the next one framed) and the CostBar that buys it, at the bottom. A
 ##   hidden node reads "???": its requirement, then the branch's list.
+##   Under the ladder of a known node: the branch's known nodes as small rows
+##   (one column up to NEAR_ONE_COLUMN of them, else two), the open one
+##   marked; a click steps to a neighbour.
 ## The frame stays; its body fades and rises in when the subject changes.
 ##   Icons not bought yet show in greyscale, as on the page.
 
@@ -25,6 +28,14 @@ const LIST_ROW := Vector2(400, 42)
 const LIST_GAP := 4
 const LIST_ICON := 32.0
 const LIST_FONT := UiStyle.FONT_ROW
+## The neighbour list under a picked node's ladder: two columns of small rows.
+const NEAR_ROW := Vector2(196, 31)
+const NEAR_GAP := 8
+## Up to this many known nodes the small rows take the full width.
+const NEAR_ONE_COLUMN := 5
+const NEAR_ROW_GAP := 4
+const NEAR_ICON := 24.0
+const NEAR_FONT := UiStyle.FONT_BODY
 ## The picked node's level ladder: a row's height (34 px pitch on screen) and
 ## fonts.
 const LADDER_ROW := 37.0
@@ -53,6 +64,8 @@ var hint_label: Label
 var more_label: Label
 ## The branch's node list: node id -> its row.
 var rows := {}
+## The same nodes as small rows under a picked node's ladder (known ones only).
+var near_rows := {}
 var level_label: Label
 ## "+8 AD → +12 AD"; only the value, in green, once maxed.
 var value_label: Label
@@ -68,6 +81,8 @@ var cost_bar: CostBar
 
 var _branch_box := VBoxContainer.new()
 var _list := VBoxContainer.new()
+var _near := GridContainer.new()
+var _near_caption: Label
 ## The branch the list was built for.
 var _list_branch: StringName
 ## The "LEVELS" caption over the ladder; both hide for a hidden node.
@@ -177,6 +192,12 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	_node_box.add_child(_ladder_caption)
 	ladder.add_theme_constant_override(&"separation", 4)
 	_node_box.add_child(ladder)
+	_near_caption = UiStyle.label(Lang.t("NODES"), 16, JourneyPanel.CAPTION_COLOR)
+	_node_box.add_child(_near_caption)
+	_near.columns = 2
+	_near.add_theme_constant_override(&"h_separation", NEAR_GAP)
+	_near.add_theme_constant_override(&"v_separation", NEAR_ROW_GAP)
+	_node_box.add_child(_near)
 
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -382,6 +403,10 @@ func _fill_list() -> void:
 			_list.remove_child(child)
 			child.free()
 		rows.clear()
+		for child in _near.get_children():
+			_near.remove_child(child)
+			child.free()
+		near_rows.clear()
 		# Grouped under the page's limb captions (OFFENSE ...), then the rest in
 		# catalog order.
 		for limb: Dictionary in TreePage.LIMBS.get(branch, []):
@@ -392,20 +417,21 @@ func _fill_list() -> void:
 		for data in tree.branch_nodes(branch):
 			if not rows.has(data.id):
 				_add_row(data.id)
-	for node_id: StringName in rows:
-		var row: Button = rows[node_id]
-		var current := TreeNodeView.state_of(tree, essences, node_id)
-		var hidden := current == &"hidden"
-		var icon: TextureRect = row.get_node(^"Line/Icon")
-		icon.texture = null if hidden else tree.node(node_id).icon
-		icon.material = TreeNodeView.grey_material() if current in [&"open", &"poor"] else null
-		var title: Label = row.get_node(^"Line/Name")
-		title.text = "???" if hidden else Lang.t(tree.node(node_id).display_name)
-		title.add_theme_color_override(&"font_color", UiStyle.DIM_COLOR if hidden else UiStyle.TEXT_COLOR)
-		var level: Label = row.get_node(^"Line/Level")
-		level.text = "" if hidden else "%d/%d" % [tree.level(node_id), tree.node(node_id).max_level]
-		level.add_theme_color_override(&"font_color", TreeNodeView.state_color(current) if current in [&"bought", &"maxed"] else UiStyle.DIM_COLOR)
-		row.visible = not hidden
+		for node_id: StringName in rows:
+			near_rows[node_id] = _list_row(node_id, true)
+			_near.add_child(near_rows[node_id])
+	_fill_rows(rows)
+	_fill_rows(near_rows)
+	_mark_open_row()
+	var known := 0
+	for node_id: StringName in near_rows:
+		known += int((near_rows[node_id] as Button).visible)
+	_near.columns = 1 if known <= NEAR_ONE_COLUMN else 2
+	for node_id: StringName in near_rows:
+		(near_rows[node_id] as Button).custom_minimum_size.x = 0.0 if _near.columns == 1 else NEAR_ROW.x
+	var show_near := id != &"" and not TreeNodeView.is_hidden(tree, id)
+	_near_caption.visible = show_near
+	_near.visible = show_near
 	var unknown := 0
 	var caption: Control = null
 	var caption_rows := 0
@@ -426,14 +452,46 @@ func _fill_list() -> void:
 	more_label.text = Lang.t("%d more to discover") % unknown
 
 
+## The rows' icon, name and level, from the tree (hidden nodes show nothing,
+## and have no row in the small list).
+func _fill_rows(group: Dictionary) -> void:
+	for node_id: StringName in group:
+		var row: Button = group[node_id]
+		var current := TreeNodeView.state_of(tree, essences, node_id)
+		var hidden := current == &"hidden"
+		var icon: TextureRect = row.get_node(^"Line/Icon")
+		icon.texture = null if hidden else tree.node(node_id).icon
+		icon.material = TreeNodeView.grey_material() if current in [&"open", &"poor"] else null
+		var title: Label = row.get_node(^"Line/Name")
+		title.text = "???" if hidden else Lang.t(tree.node(node_id).display_name)
+		title.add_theme_color_override(&"font_color", UiStyle.DIM_COLOR if hidden else UiStyle.TEXT_COLOR)
+		var level: Label = row.get_node(^"Line/Level")
+		level.text = "" if hidden else "%d/%d" % [tree.level(node_id), tree.node(node_id).max_level]
+		# The small rows keep their room for the name: a level only once bought,
+		# and not on the open node (its level is above).
+		if group == near_rows and (node_id == id or tree.level(node_id) == 0):
+			level.text = ""
+		level.add_theme_color_override(&"font_color", TreeNodeView.state_color(current) if current in [&"bought", &"maxed"] else UiStyle.DIM_COLOR)
+		row.visible = not hidden
+
+
+## The picked node's small row is framed like the ladder's current level.
+func _mark_open_row() -> void:
+	for node_id: StringName in near_rows:
+		var style := (near_rows[node_id] as Button).get_theme_stylebox(&"normal") as StyleBoxFlat
+		var open: bool = node_id == id
+		style.bg_color = Color(UiStyle.GOLD_COLOR, 0.1) if open else Color(1, 1, 1, 0.03)
+		style.border_color = Color(UiStyle.GOLD_COLOR, 0.55) if open else Color(UiStyle.BORDER_COLOR, 0.0)
+
+
 func _add_row(node_id: StringName) -> void:
 	rows[node_id] = _list_row(node_id)
 	_list.add_child(rows[node_id])
 
 
-func _list_row(node_id: StringName) -> Button:
+func _list_row(node_id: StringName, compact := false) -> Button:
 	var row := Button.new()
-	row.custom_minimum_size = LIST_ROW
+	row.custom_minimum_size = NEAR_ROW if compact else LIST_ROW
 	row.focus_mode = Control.FOCUS_NONE
 	row.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	for state: StringName in [&"normal", &"hover", &"pressed"]:
@@ -449,24 +507,26 @@ func _list_row(node_id: StringName) -> Button:
 	line.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	line.offset_left = 6.0
 	line.offset_right = -12.0
-	line.add_theme_constant_override(&"separation", 10)
+	line.add_theme_constant_override(&"separation", 8 if compact else 10)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(line)
 	var icon := TextureRect.new()
 	icon.name = &"Icon"
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.custom_minimum_size = Vector2.ONE * LIST_ICON
+	icon.custom_minimum_size = Vector2.ONE * (NEAR_ICON if compact else LIST_ICON)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	line.add_child(icon)
 	for part: StringName in [&"Name", &"Level"]:
-		var label := UiStyle.label("", LIST_FONT)
+		var label := UiStyle.label("", NEAR_FONT if compact else LIST_FONT)
 		label.name = part
 		label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		if part == &"Name":
 			label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			label.clip_text = true
+			label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		line.add_child(label)
 	return row
 

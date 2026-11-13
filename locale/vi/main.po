@@ -457,6 +457,10 @@ msgstr "Chọn một nút"
 msgid "LEVELS"
 msgstr "CÁC CẤP"
 
+#. node_info_panel.gd: caption over the branch's node list under a picked node's levels
+msgid "NODES"
+msgstr "CÁC NÚT"
+
 #. node_info_panel.gd, tree_page.gd: small caption over a branch's name; also the page header
 msgid "EVOLUTION TREE"
 msgstr "CÂY TIẾN HÓA"

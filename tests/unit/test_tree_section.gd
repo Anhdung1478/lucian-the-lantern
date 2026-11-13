@@ -411,15 +411,25 @@ func test_hidden_nodes_are_counted_not_listed() -> void:
 	assert_false(info.more_label.visible, "every stat is known")
 
 
-## Review r1 D7: a hidden node's pane shows its requirement, then the list.
-func test_a_hidden_node_shows_the_branch_list_under_its_requirement() -> void:
-	section.select(&"passive")
+## Review r1 D7, r2 D2-1: a known node's pane ends with the branch's known
+## nodes as small rows, the open one marked; a hidden node shows the list.
+func test_every_node_pane_lists_the_branch_with_the_open_node_marked() -> void:
 	var info := section.info
+	section.select(&"passive")
 	assert_true(info.requires_label.is_visible_in_tree())
-	assert_true(info.rows[&"skill_q"].get_parent().is_visible_in_tree(), "the list shows")
+	assert_true(info.rows[&"skill_q"].get_parent().is_visible_in_tree(), "the full list shows under the requirement")
+	assert_false(info.near_rows[&"skill_q"].is_visible_in_tree(), "not the small one")
 	assert_false(info.levels_label.is_visible_in_tree())
 	section.select(&"stat_ad")
-	assert_false(info.rows[&"stat_ad"].is_visible_in_tree(), "a known node shows its ladder instead")
+	assert_true(info.near_rows[&"stat_ad"].is_visible_in_tree())
+	var style := info.near_rows[&"stat_ad"].get_theme_stylebox(&"normal") as StyleBoxFlat
+	assert_gt(style.border_color.a, 0.0, "the open node is framed")
+	var other := info.near_rows[&"stat_ap"].get_theme_stylebox(&"normal") as StyleBoxFlat
+	assert_eq(other.border_color.a, 0.0, "the others are not")
+	var picked: Array[StringName] = []
+	info.node_chosen.connect(func(node_id: StringName) -> void: picked.append(node_id))
+	info.near_rows[&"stat_ap"].pressed.emit()
+	assert_eq(picked, [&"stat_ap"] as Array[StringName], "a small row steps to its node")
 
 
 func test_the_info_column_lists_the_branch_and_a_row_picks_its_node() -> void:
