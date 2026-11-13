@@ -326,8 +326,9 @@ static func _arrive(node: CanvasItem, rise: float, from_scale: float, time: floa
 		return null
 	if not moving:
 		node.modulate.a = 0.0
-		if place:
+		if place and rise != 0.0:
 			node.position.y = home + rise
+		if place and from_scale != 1.0:
 			node.scale = Vector2.ONE * from_scale
 	if place and from_scale != 1.0:
 		_pivot(node)
@@ -338,8 +339,9 @@ static func _arrive(node: CanvasItem, rise: float, from_scale: float, time: floa
 	else:
 		node.visible = true
 	motion.tween_property(node, ^"modulate:a", 1.0, time).set_delay(delay)
-	if place:
+	if place and (rise != 0.0 or moving):
 		motion.tween_property(node, ^"position:y", home, time).set_delay(delay)
+	if place and (from_scale != 1.0 or moving):
 		motion.tween_property(node, ^"scale", Vector2.ONE, time).set_delay(delay)
 	motion.chain().tween_callback(func() -> void: node.remove_meta(HOME_META))
 	return motion
@@ -368,7 +370,8 @@ static func _leave(node: CanvasItem, then: Callable, drop: float, to_scale: floa
 	var motion := _start(node)
 	motion.tween_property(node, ^"modulate:a", 0.0, time)
 	if place:
-		motion.tween_property(node, ^"position:y", home + drop, time)
+		if drop != 0.0:
+			motion.tween_property(node, ^"position:y", home + drop, time)
 		if to_scale != 1.0:
 			_pivot(node)
 			motion.tween_property(node, ^"scale", Vector2.ONE * to_scale, time)
@@ -414,7 +417,9 @@ static func _rest(node: CanvasItem, home := NAN) -> void:
 		return
 	if &"scale" in node:
 		node.set(&"scale", Vector2.ONE)
-	if not is_nan(home):
+	# Only a real change is written: setting position on an anchored Control
+	# whose parent is not laid out yet rewrites its offsets.
+	if not is_nan(home) and not is_equal_approx(node.get(&"position").y, home):
 		node.set_indexed(^"position:y", home)
 
 
