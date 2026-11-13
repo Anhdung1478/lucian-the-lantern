@@ -25,6 +25,8 @@ const KILLED_COLOR := UiStyle.ERROR_COLOR
 const TIP_COLOR := UiStyle.LANTERN_COLOR
 const PANEL_WIDTH := 1040.0
 const BUTTON_SIZE := Vector2(260, 60)
+## Space between a button's text and its edge, at least.
+const BUTTON_PAD := 29.0
 const CLEARED_GLOW := Color(1.0, 0.78, 0.3, 0.22)
 const DEFEATED_GLOW := Color(0.7, 0.05, 0.05, 0.28)
 ## The plate's padding, and the room its column keeps under the medallion.
@@ -596,6 +598,10 @@ func _button(parent: Control, text: String, lit: bool, then: StringName) -> Butt
 	button.text = text
 	button.custom_minimum_size = BUTTON_SIZE
 	UiStyle.style_button(button, 24, lit)
+	# The width of its text plus BUTTON_PAD each side, never under BUTTON_SIZE.
+	var font := button.get_theme_font(&"font")
+	var text_width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 24).x
+	button.custom_minimum_size.x = maxf(BUTTON_SIZE.x, ceilf(text_width) + 2.0 * BUTTON_PAD)
 	button.pressed.connect(func() -> void: chosen.emit(&"title" if game_over and then == &"main" else then))
 	parent.add_child(button)
 	return button
