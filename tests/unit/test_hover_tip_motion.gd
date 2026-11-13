@@ -156,3 +156,18 @@ func test_a_hover_note_can_open_beside() -> void:
 	tip.show_for(plain)
 	tip._position_card()
 	assert_eq(tip.card().position, Vector2(140 + HoverTip.GAP, 300))
+
+
+func test_a_hover_note_can_hang_below_its_button() -> void:
+	UiMotion.renders = false
+	var plain := Control.new()
+	plain.position = Vector2(300, 100)
+	plain.size = Vector2(120, 40)
+	plain.set_meta(&"hover_text", "Below")
+	plain.set_meta(&"hover_place", HoverTip.Place.BELOW)
+	add_child_autofree(plain)
+	tip.show_for(plain)
+	tip._position_card()
+	var card := tip.card()
+	assert_eq(card.position.y, 140.0 + HoverTip.GAP, "GAP under the button")
+	assert_almost_eq(card.position.x + card.size.x * 0.5, 360.0, 1.0, "centred on it")

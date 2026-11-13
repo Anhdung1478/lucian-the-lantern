@@ -1,5 +1,8 @@
 class_name TreeSection
 extends Control
+## "Go to Journey" in the info panel: the branch waits for an act.
+signal journey_requested
+
 ## The Evolution Tree page of the main screen, laid out as the Journey: one
 ## frame of a TreePage per branch (one shown) and the NodeInfoPanel as a
 ## column on its right. The branch switch (BranchTabs) sits over the page's
@@ -75,6 +78,7 @@ func _ready() -> void:
 	info.position = PANEL_RECT.position
 	info.node_chosen.connect(select)
 	info.cost_bar.buy_asked.connect(ask_buy)
+	info.journey_asked.connect(journey_requested.emit)
 	add_child(info)
 
 	utilities.add_theme_constant_override(&"separation", UTILITY_GAP)
@@ -92,6 +96,8 @@ func _ready() -> void:
 	# Off most of the time: then only its dim words, no surface.
 	reset_button.add_theme_stylebox_override(&"disabled", StyleBoxEmpty.new())
 	reset_button.pressed.connect(_ask_reset)
+	# Their notes hang 8 px under the button (the kit's BELOW).
+	reset_button.set_meta(&"hover_place", HoverTip.Place.BELOW)
 	for part: Control in [forge_bar, _hairline(), reset_button]:
 		part.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		utilities.add_child(part)
@@ -145,7 +151,16 @@ func ask_buy(id: StringName) -> void:
 	opened.closed.connect(func() -> void:
 		if purchase == opened:
 			purchase = null)
-	add_child(opened)
+	# Over the whole screen, beside the main screen's Yes / No question, so it
+	# dims and blocks everything outside it (the top bar's forge and Reset
+	# tree, the section bar) as that question does.
+	question_host().add_child(opened)
+
+
+## Where the purchase question goes: the main screen's question's parent
+## (the whole screen), else this section.
+func question_host() -> Node:
+	return confirm.get_parent() if confirm and confirm.get_parent() else self
 
 
 ## Closes the buy question, else clears the pick, if there is one (the main
@@ -235,8 +250,16 @@ func _buy(id: StringName) -> void:
 		return
 	var page: TreePage = pages[tree.node(id).branch]
 	page.lead_in = POPUP_GONE
+	info.hold(POPUP_GONE)
 	if not info.cost_bar.buy():
 		page.lead_in = 0.0
+
+
+## The question lives outside the section: it goes with it.
+func _exit_tree() -> void:
+	if purchase and is_instance_valid(purchase):
+		purchase.queue_free()
+	purchase = null
 
 
 ## A hidden tree closes its question, so it never shows on another page.
@@ -264,5 +287,6 @@ func reset_question() -> String:
 
 func _reset() -> void:
 	pages[branch].lead_in = POPUP_GONE
+	info.hold(POPUP_GONE)
 	if tree.reset(essences):
 		Sfx.play(&"refresh")

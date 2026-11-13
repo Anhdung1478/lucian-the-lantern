@@ -23,6 +23,8 @@ extends PanelContainer
 
 ## Kept for callers that pick from the panel.
 signal node_chosen(id: StringName)
+## "Go to Journey": the branch waits for an act.
+signal journey_asked
 
 const ROW_GAP := 12
 const NAME_FONT := 34
@@ -75,8 +77,12 @@ var value_label: Label
 var description: RichTextLabel
 ## "Requires: …", shown while the next level is closed.
 var requires_label: Label
-## A dim line under a hidden node's requirement.
+## A dim line under a hidden node's requirement (kept; the rule rows say it now).
 var note_label: Label
+## A hidden node's rule, a row per part with met or not ("Clear Act 2: Not yet").
+var rules := VBoxContainer.new()
+## The action of a branch that waits for an act: "Go to Journey".
+var journey_button := Button.new()
 ## The Backpack nodes' preview.
 var preview := Control.new()
 ## "2 of 6 slots open", over the preview.
@@ -91,6 +97,9 @@ var gives := VBoxContainer.new()
 ## frames left before that.
 var _gives_trim := false
 var _trim_wait := 0
+## While a purchase or a reset waits for its question to leave, the panel
+## keeps what it shows (it changes with the page).
+var _held := false
 var cost_bar: CostBar
 
 var _body := Control.new()
@@ -141,6 +150,8 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	_column.add_child(description)
 	requires_label = _wrapped(UiStyle.label("", BODY_FONT, UiStyle.ERROR_COLOR))
 	_column.add_child(requires_label)
+	rules.add_theme_constant_override(&"separation", 6)
+	_column.add_child(rules)
 	note_label = _wrapped(UiStyle.label(Lang.t("Its name and levels show once it opens."), ROW_FONT, UiStyle.DIM_COLOR))
 	_column.add_child(note_label)
 	preview_label = UiStyle.label("", ROW_FONT, UiStyle.TEXT_COLOR)
@@ -166,6 +177,11 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 
 	cost_bar = CostBar.new(tree, essences)
 	_body.add_child(cost_bar)
+	UiStyle.style_button(journey_button, CostBar.FONT_SIZE, true)
+	journey_button.text = Lang.t("Go to Journey")
+	journey_button.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
+	journey_button.pressed.connect(journey_asked.emit)
+	_body.add_child(journey_button)
 	refresh()
 
 
@@ -203,12 +219,26 @@ func rest_subject() -> StringName:
 	return best
 
 
+## Keeps the panel as it is for `seconds` (a question's card leaving), then
+## rereads it, so it changes together with the page; nothing while
+## UiMotion.off().
+func hold(seconds: float) -> void:
+	if UiMotion.off() or not is_inside_tree() or seconds <= 0.0:
+		return
+	_held = true
+	get_tree().create_timer(seconds).timeout.connect(func() -> void:
+		_held = false
+		refresh())
+
+
 ## Rereads the branch or the node from the tree.
 func refresh() -> void:
+	if _held:
+		return
 	subject = id if id != &"" else rest_subject()
 	var complete := subject == &"" and _all_maxed()
 	for part: CanvasItem in [value_label, description, requires_label, note_label, preview_label, preview, _ladder_rule,
-			_ladder_caption, ladder, _waiting_caption, waiting, _gives_caption, gives]:
+			_ladder_caption, ladder, _waiting_caption, waiting, _gives_caption, gives, rules, journey_button]:
 		part.visible = false
 	cost_bar.visible = subject != &""
 	if subject != &"":
@@ -230,10 +260,8 @@ func _show_subject() -> void:
 	_set_text(name_label, Lang.t("Hidden node") if hidden else Lang.t(data.display_name))
 	cost_bar.show_node(subject)
 	if hidden:
-		requires_label.visible = true
-		requires_label.text = tree.requirement_text(subject, 0)
-		note_label.visible = true
-		_fill_waiting(subject)
+		_fill_rules()
+		_fill_gives(true)
 		return
 	value_label.visible = true
 	if tree.is_maxed(subject):
@@ -248,7 +276,8 @@ func _show_subject() -> void:
 	requires_label.visible = needs != ""
 	requires_label.text = needs
 	if subject in [EQUIP_ID, BOOTS_ID, BACKPACK_ID]:
-		preview_label.visible = true
+		# The boots' names are under them already: no line over them.
+		preview_label.visible = subject != BOOTS_ID
 		preview_label.text = _preview_line()
 		preview.visible = true
 		preview.custom_minimum_size.y = _preview_height()
@@ -256,8 +285,7 @@ func _show_subject() -> void:
 	for part: CanvasItem in [_ladder_rule, _ladder_caption, ladder]:
 		part.visible = true
 	_fill_ladder()
-	if id == &"":
-		_fill_gives(true)
+	_fill_gives(true)
 
 
 ## What chose the shown node, as a caption.
@@ -288,6 +316,7 @@ func _show_waiting() -> void:
 	var act := _act_only(skip)
 	if act > 0:
 		title = Lang.t("Clear Act %d") % act
+		journey_button.visible = true
 		value_label.visible = true
 		_set_text(value_label, Lang.t("Opens %d nodes on this branch.") % largest if largest != 1 else Lang.t("Opens 1 node on this branch."))
 		value_label.add_theme_color_override(&"font_color", UiStyle.TEXT_COLOR)
@@ -343,7 +372,7 @@ func _fill_gives(bought_only: bool) -> void:
 		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		title.custom_minimum_size.x = GIVES_NAME_MIN
 		row.add_child(title)
-		var value := UiStyle.label(data.value_text(tree.level(data.id)), ROW_FONT, UiStyle.TEXT_COLOR)
+		var value := UiStyle.label(short_value(data, tree.level(data.id)), ROW_FONT, UiStyle.TEXT_COLOR)
 		value.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(value)
 		gives.add_child(row)
@@ -369,6 +398,16 @@ func _process(_delta: float) -> void:
 		return
 	var tween := UiMotion.tween(gives)
 	tween.tween_property(gives, ^"modulate:a", 1.0, UiMotion.BASE)
+
+
+## What `data` gives at `level`, without the words its name beside it says:
+## the first word alone when it is a number ("+200 Health" -> "+200",
+## "+3/s Health Regen" -> "+3/s"), else all of it ("Rank 3", "Unlocked").
+static func short_value(data: TreeNodeData, level: int) -> String:
+	var text := data.value_text(level)
+	var first := text.split(" ")[0]
+	var digits := RegEx.create_from_string("[0-9]")
+	return first if digits.search(first) else text
 
 
 ## At rest, once laid out: the rows that would reach the action's rule go,
@@ -403,22 +442,76 @@ func _trim_gives() -> void:
 ## for: requirement text (without "Requires: ") -> their ids.
 func _waiting_groups(except: StringName) -> Dictionary:
 	var groups := {}
+	var prefix: String = Lang.t("Requires: %s").split("%s")[0]
 	for data in tree.branch_nodes(branch):
 		if data.id == except or tree.is_maxed(data.id) or tree.next_level_open(data.id):
 			continue
 		var rule := tree.requirement_text(data.id, tree.level(data.id))
+		if rule.begins_with(prefix):
+			rule = rule.substr(prefix.length())
+		# A count alone reads as the tile's tag does ("Any of Q, W, E").
+		if TreeNodeView.RULE_TAGS.has(data.id) and TreeNodeView.rule_tag(tree, data.id) == Lang.t(TreeNodeView.RULE_TAGS[data.id]):
+			rule = Lang.t(TreeNodeView.RULE_TAGS[data.id])
 		if not groups.has(rule):
 			groups[rule] = []
 		groups[rule].append(data.id)
 	return groups
 
 
-## The act in a rule that is only "Requires: Clear Act N"; 0 otherwise.
+## The act in a rule that is only "Clear Act N"; 0 otherwise.
 func _act_only(rule: String) -> int:
 	for act in range(1, 7):
-		if rule == Lang.t("Requires: %s") % (Lang.t("Clear Act %d") % act):
+		if rule == Lang.t("Clear Act %d") % act:
 			return act
 	return 0
+
+
+## A hidden node's rule as rows, each part with met or not: the nodes it
+## needs (bought or not yet), a count ("Any of Q, W, E": 1 / 1), the act
+## (done or not yet) and a level sum ("5 levels in Q + W + E": 4 / 5).
+func _fill_rules() -> void:
+	for child in rules.get_children():
+		rules.remove_child(child)
+		child.free()
+	rules.visible = true
+	var data := tree.node(subject)
+	if data.requires_count == 0:
+		for required in data.requires:
+			var bought := tree.level(required) > 0
+			_rule_row(Lang.t(tree.node(required).display_name), Lang.t("Bought") if bought else Lang.t("Not yet"), bought)
+	else:
+		var met := 0
+		for required in data.requires:
+			met += int(tree.level(required) > 0)
+		var words: String = Lang.t(TreeNodeView.RULE_TAGS[subject]) if TreeNodeView.RULE_TAGS.has(subject) \
+			else Lang.t("any %d of %s") % [data.requires_count, ", ".join(PackedStringArray(data.requires.map(func(r: StringName) -> String: return tree.node(r).short_name())))]
+		_rule_row(words, "%d / %d" % [mini(met, data.requires_count), data.requires_count], met >= data.requires_count)
+	var act := maxi(data.requires_act, data.act_needed(0))
+	if act > 0:
+		var cleared := tree.acts_cleared >= act
+		_rule_row(Lang.t("Clear Act %d") % act, Lang.t("Done") if cleared else Lang.t("Not yet"), cleared)
+	var needed := data.sum_needed(0)
+	if needed > 0:
+		var names: PackedStringArray = []
+		for summed in data.level_sum_ids:
+			names.append(tree.node(summed).short_name())
+		var total := tree.level_sum(subject)
+		_rule_row(Lang.t("%d levels in %s") % [needed, " + ".join(names)], "%d / %d" % [mini(total, needed), needed], total >= needed)
+
+
+func _rule_row(words: String, status: String, met: bool) -> void:
+	var row := HBoxContainer.new()
+	row.custom_minimum_size.y = LADDER_ROW
+	row.add_theme_constant_override(&"separation", 10)
+	var text := _wrapped(UiStyle.label(words, ROW_FONT, UiStyle.TEXT_COLOR))
+	text.custom_minimum_size.x = 0.0
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(text)
+	var state := UiStyle.label(status, ROW_FONT, UiStyle.GOOD_COLOR if met else UiStyle.ERROR_COLOR)
+	state.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(state)
+	rules.add_child(row)
 
 
 ## STILL HIDDEN: a row per rule the branch's other closed nodes wait for.
@@ -662,6 +755,8 @@ func _draw_slot(rect: Rect2, open: bool, next: bool, radius := 6) -> void:
 func _place() -> void:
 	cost_bar.position = Vector2((JourneyPanel.CONTENT_WIDTH - CostBar.SIZE.x) * 0.5, BODY_HEIGHT - CostBar.SIZE.y)
 	cost_bar.size = CostBar.SIZE
+	journey_button.position = cost_bar.position
+	journey_button.size = CostBar.SIZE
 	_column.size = Vector2(JourneyPanel.CONTENT_WIDTH, _column.get_combined_minimum_size().y)
 
 
@@ -712,5 +807,5 @@ func _wrapped(label: Label) -> Label:
 
 func _draw() -> void:
 	JourneyPanel.draw_top_glow(self, size.x, UiStyle.GOLD_COLOR, JourneyPanel.GLOW_ALPHA * 0.7)
-	if cost_bar.visible:
+	if cost_bar.visible or journey_button.visible:
 		JourneyPanel.draw_rule(self, size.y - JourneyPanel.PAD - CostBar.SIZE.y - JourneyPanel.GAP * 0.5, size.x)

@@ -24,19 +24,21 @@ signal chosen(id: StringName)
 const SIZE := 96.0
 const ICON_INSET := 6.0
 const CORNER := 10
-## The level mark: a pip per level, under the tile.
+## The level mark: a pip per level, under the tile, 8 clear of the picked
+## ring's outer edge (RING_OUT under the tile).
 const PIP := 8.0
 const PIP_STEP := 14.0
-const PIP_TOP := 10.0
+const PIP_TOP := 16.0
 ## The name's (or the rule tag's) top, under the tile, the same on every node
 ## of a row; fonts.
-const NAME_TOP := SIZE + 30.0
+const NAME_TOP := SIZE + 42.0
 const NAME_FONT := 17
 const TAG_FONT := 15
 const NAME_LINE := 24.0
-## The FREE pill, in the level mark's place.
-const FREE_TOP := SIZE + 4.0
-## The picked (and hovered) ring: how far out of the tile and how wide.
+## The FREE pill, in the level mark's place (8 clear of the picked ring).
+const FREE_TOP := SIZE + 16.0
+## The picked (and hovered) ring: how far out of the tile its outer edge is,
+## and how wide.
 const RING_OUT := 8.0
 const RING_WIDTH := 2.5
 ## The lock in a lower corner and the hidden tile's lock.
@@ -53,8 +55,10 @@ const CARD_GAP := 14.0
 const LIGHT_TIME := 0.18
 const PIP_TIME := 0.15
 const PIP_DELAY := 0.05
-## A node unveiling as it opens.
-const UNVEIL_TIME := 0.25
+## A node unveiling as it opens: the lock leaves over the first LOCK_SHARE of
+## it, then the icon and the name arrive.
+const UNVEIL_TIME := 0.33
+const LOCK_SHARE := 0.25
 const LOCK := preload("res://assets/art/ui/lock.svg")
 const GREY_SHADER := preload("res://src/ui/hud/grey_icon.gdshader")
 
@@ -365,9 +369,15 @@ func _set_look(light: float, known: float, pips: float) -> void:
 	pips_t = pips
 	_icon.modulate.a = light
 	_icon.visible = light > 0.0
-	_grey_icon.modulate.a = known * (1.0 - light)
+	_grey_icon.modulate.a = _arrive(known) * (1.0 - light)
 	_grey_icon.visible = _grey_icon.modulate.a > 0.0
 	_redraw()
+
+
+## How far the icon and the name have arrived as the node unveils: nothing
+## while the lock leaves, then all of it.
+static func _arrive(known: float) -> float:
+	return clampf((known - LOCK_SHARE) / (1.0 - LOCK_SHARE), 0.0, 1.0)
 
 
 func _kill_play() -> void:
@@ -454,18 +464,18 @@ func _draw() -> void:
 		ring.set_corner_radius_all(CORNER + int(RING_OUT))
 		draw_style_box(ring, tile.grow(RING_OUT))
 	# The level mark: lit pips up to the level, the last one growing in.
-	if not free_badge.visible and known_t > 0.0:
+	if not free_badge.visible and _arrive(known_t) > 0.0:
 		var pips := pip_centers(data.max_level)
 		for i in pips.size():
 			var fill := clampf(pips_t - i, 0.0, 1.0)
-			draw_arc(pips[i], PIP * 0.5 - 0.75, 0.0, TAU, 16, Color(PIP_OFF, PIP_OFF.a * known_t * (1.0 - fill)), 1.5, true)
+			draw_arc(pips[i], PIP * 0.5 - 0.75, 0.0, TAU, 16, Color(PIP_OFF, PIP_OFF.a * _arrive(known_t) * (1.0 - fill)), 1.5, true)
 			if fill > 0.0:
-				draw_circle(pips[i], PIP * 0.5 * lerpf(0.6, 1.0, fill), Color(PIP_LIT, fill * known_t))
+				draw_circle(pips[i], PIP * 0.5 * lerpf(0.6, 1.0, fill), Color(PIP_LIT, fill * _arrive(known_t)))
 	# The name, or the rule tag: they cross over as the node opens.
 	var color := UiStyle.DIM_COLOR if current == &"poor" else UiStyle.TEXT_COLOR
-	_draw_words(Lang.t(data.display_name), NAME_FONT, color, known_t)
+	_draw_words(Lang.t(data.display_name), NAME_FONT, color, _arrive(known_t))
 	if known_t < 1.0:
-		_draw_words(rule_tag(tree, data.id), TAG_FONT, UiStyle.DIM_COLOR, 1.0 - known_t)
+		_draw_words(rule_tag(tree, data.id), TAG_FONT, UiStyle.DIM_COLOR, 1.0 - clampf(known_t / LOCK_SHARE, 0.0, 1.0))
 
 
 func _draw_words(text: String, font_size: int, color: Color, alpha: float) -> void:
@@ -504,8 +514,8 @@ func _draw_over() -> void:
 		edge.border_color = Color(WARM_EDGE, (0.32 if done else 0.75) * light_t)
 		edge.set_border_width_all(1 if done else 2)
 		_over.draw_style_box(edge, tile)
-	if known_t < 1.0:
-		_over.draw_texture_rect(LOCK, Rect2(tile.get_center() - Vector2.ONE * HIDDEN_LOCK * 0.5, Vector2.ONE * HIDDEN_LOCK), false, Color(1, 1, 1, 0.3 * (1.0 - known_t)))
+	if known_t < LOCK_SHARE:
+		_over.draw_texture_rect(LOCK, Rect2(tile.get_center() - Vector2.ONE * HIDDEN_LOCK * 0.5, Vector2.ONE * HIDDEN_LOCK), false, Color(1, 1, 1, 0.3 * (1.0 - known_t / LOCK_SHARE)))
 	if locked():
 		var at := LOCK_LEFT if data.id in LOCK_ON_LEFT else LOCK_RIGHT
 		_over.draw_circle(at, LOCK_RADIUS, Color(0.05, 0.06, 0.08, 0.95))

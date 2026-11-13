@@ -97,6 +97,8 @@ func _button(count: int) -> Button:
 	var button := Button.new()
 	quiet_style(button)
 	button.pressed.connect(func() -> void: _forge(count))
+	# Its note hangs 8 px under it, not on it at the cursor.
+	button.set_meta(&"hover_place", HoverTip.Place.BELOW)
 	var row := HBoxContainer.new()
 	row.name = &"Row"
 	row.set_anchors_preset(Control.PRESET_FULL_RECT)

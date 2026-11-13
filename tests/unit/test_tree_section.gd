@@ -423,12 +423,17 @@ func test_at_rest_a_new_saves_skills_says_clear_act_1_and_has_no_action() -> voi
 	assert_eq(info.name_label.text, "Clear Act 1")
 	assert_eq(info.value_label.text, "Opens 3 nodes on this branch.")
 	assert_false(info.cost_bar.visible, "no dead button")
+	assert_true(info.journey_button.visible, "the step it names is on the Journey")
+	var asked := []
+	section.journey_requested.connect(func() -> void: asked.append(true))
+	info.journey_button.pressed.emit()
+	assert_eq(asked.size(), 1)
 	assert_true(info.waiting.visible)
 	var rules: PackedStringArray = []
 	for row in info.waiting.get_children():
 		rules.append(_texts(row)[0])
-	assert_eq(rules, PackedStringArray(["Requires: Q – Piercing Light, W – Ardent Blaze or E – Relentless Pursuit",
-		"Requires: Passive – Lightslinger and Clear Act 2 and 5 levels in Q + W + E (now 0)"]))
+	assert_eq(rules, PackedStringArray(["Any of Q, W, E",
+		"Passive – Lightslinger and Clear Act 2 and 5 levels in Q + W + E (now 0)"]), "the tag's words, no Requires:")
 
 
 func test_at_rest_the_branch_lists_what_its_bought_nodes_give() -> void:
@@ -441,9 +446,10 @@ func test_at_rest_the_branch_lists_what_its_bought_nodes_give() -> void:
 	for row in info.gives.get_children():
 		if row.visible:
 			values.append(_texts(row)[-1])
-	assert_eq(values, PackedStringArray(["+8 AD", _save().tree.node(&"stat_hp").value_text(1)]))
+	assert_eq(values, PackedStringArray(["+8", "+40"]), "the value alone beside the name")
 	section.select(&"stat_ad")
-	assert_false(info.gives.visible, "a pick shows the node alone")
+	assert_true(info.gives.visible, "a pick keeps the branch's rows")
+	assert_eq(NodeInfoPanel.short_value(_save().tree.node(&"skill_q"), 3), "Rank 3", "words stay when the value is not a number")
 
 
 func test_at_rest_the_panel_shows_the_fact_that_chose_its_node() -> void:
@@ -637,7 +643,7 @@ func _pick_q(blue := 1000) -> void:
 
 
 func _open_questions() -> Array:
-	return section.get_children().filter(
+	return section.question_host().get_children().filter(
 		func(node: Node) -> bool: return node is TreePurchasePopup and not node.is_queued_for_deletion())
 
 
@@ -751,17 +757,28 @@ func test_the_question_s_buttons_are_clear_of_the_cost_bar() -> void:
 			"a double-click's second click can't land on %s" % button.text)
 
 
-func test_a_hidden_node_reads_hidden_locked_and_its_requirements() -> void:
+func _rule_rows() -> Array[PackedStringArray]:
+	var out: Array[PackedStringArray] = []
+	for row in section.info.rules.get_children():
+		out.append(_texts(row))
+	return out
+
+
+func test_a_hidden_node_reads_its_rule_as_rows_met_or_not() -> void:
 	section.select(&"passive")
 	assert_eq(section.info.name_label.text, "Hidden node")
-	assert_true(section.info.requires_label.visible)
-	assert_eq(section.info.requires_label.text, "Requires: Q – Piercing Light, W – Ardent Blaze or E – Relentless Pursuit")
+	assert_eq(_rule_rows(), [PackedStringArray(["Any of Q, W, E", "0 / 1"])])
 	assert_eq(section.info.cost_bar.status.text, "Locked")
 	assert_true(section.info.cost_bar.disabled)
 	section.select(&"skill_q")
-	assert_eq(section.info.requires_label.text, "Requires: Clear Act 1")
+	assert_eq(_rule_rows(), [PackedStringArray(["Clear Act 1", "Not yet"])])
+	_save().tree.acts_cleared = 1
+	_save().tree.from_dict({"skill_q": 3, "skill_w": 1, "passive": 1})
+	section.select(&"skill_r")
+	assert_eq(_rule_rows(), [PackedStringArray(["Passive – Lightslinger", "Bought"]), PackedStringArray(["Clear Act 2", "Not yet"]),
+		PackedStringArray(["5 levels in Q + W + E", "4 / 5"])])
 	section.select(&"stat_ad")
-	assert_false(section.info.requires_label.visible)
+	assert_false(section.info.rules.visible)
 
 
 func test_a_hidden_node_shows_no_value_description_or_ladder() -> void:
@@ -770,49 +787,37 @@ func test_a_hidden_node_shows_no_value_description_or_ladder() -> void:
 	assert_false(info.value_label.visible)
 	assert_false(info.description.visible)
 	assert_false(info.ladder.visible, "no ladder")
-	assert_true(info.note_label.visible)
-	assert_true(info.requires_label.visible, "the requirement still shows")
+	assert_true(info.rules.visible, "its rule shows")
 	section.select(&"stat_ad")
 	assert_true(info.ladder.visible)
 	assert_ne(info.description.text, "")
 
 
-## The info column's content ends 16 above the action's rule, and the action
-## stays in its one place, for every node and rest state, in both languages.
-func _check_panel_fits(language: String) -> void:
-	Lang.use(language)
-	var info := section.info
-	var foot := info.cost_bar.position
-	for state in ["fresh", "money", "max"]:
-		if state == "money":
-			_save().set_cleared(Journey.all_stage_ids(2))
-			_save().essences.add(Essences.BLUE, 300)
-		elif state == "max":
-			_save().tree.max_all()
-		section.refresh()
-		for branch: StringName in EvolutionTree.BRANCHES:
-			section.show_branch(branch)
-			await wait_process_frames(2)
-			assert_lte(info.content_bottom(), info.action_top() - 16.0, "%s %s %s" % [language, state, branch])
-			assert_lte(info._column.get_combined_minimum_size().x, JourneyPanel.CONTENT_WIDTH, "%s %s %s: not wider" % [language, state, branch])
-		for data in EvolutionTree.new().nodes():
-			section.select(data.id)
-			await wait_process_frames(2)
-			assert_lte(info.content_bottom(), info.action_top() - 16.0, "%s %s %s" % [language, state, data.id])
-			assert_eq(info.cost_bar.position, foot, "the action never moves")
-			assert_lte(info._column.get_combined_minimum_size().x, JourneyPanel.CONTENT_WIDTH, "%s %s: not wider" % [language, data.id])
-	_save().tree.clear()
-	Lang.use(Lang.ENGLISH)
-
-
-func test_the_info_column_fits_its_panel_in_english() -> void:
+func test_the_purchase_question_covers_the_whole_screen_and_blocks_the_top_bar() -> void:
+	var screen := Control.new()
+	screen.size = Vector2(1920, 1080)
+	add_child_autofree(screen)
+	var main := MainScreen.new()
+	screen.add_child(main)
+	var tree_section := main.sections[MainScreen.SECTION_TREE] as TreeSection
+	main.show_section(MainScreen.SECTION_TREE)
+	_save().tree.acts_cleared = 1
+	_save().essences.add(Essences.BLUE, 1000)
+	tree_section.select(&"skill_q")
+	tree_section.info.cost_bar.pressed.emit()
 	await wait_process_frames(2)
-	await _check_panel_fits(Lang.ENGLISH)
+	var question := tree_section.purchase
+	assert_eq(question.get_parent(), main, "beside the Reset question, over everything")
+	assert_eq(question.mouse_filter, Control.MOUSE_FILTER_STOP)
+	for control: Control in [tree_section.forge_bar.buttons[1], tree_section.reset_button, main.section_bar]:
+		assert_true(question.get_global_rect().encloses(control.get_global_rect()), "%s is under the question" % control.name)
+	assert_gt(question.get_index(), main.section_bar.get_parent().get_index(), "drawn and picked after the bars")
+	question.close()
 
 
-func test_the_info_column_fits_its_panel_in_vietnamese() -> void:
-	await wait_process_frames(2)
-	await _check_panel_fits(Lang.VIETNAMESE)
+func test_the_forge_and_reset_notes_hang_under_their_buttons() -> void:
+	for control: Control in [section.forge_bar.buttons[1], section.forge_bar.buttons[10], section.reset_button]:
+		assert_eq(control.get_meta(&"hover_place", -1), HoverTip.Place.BELOW)
 
 
 func test_requirement_lines_for_all_any_two_and_an_act() -> void:

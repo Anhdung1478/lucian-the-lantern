@@ -165,6 +165,7 @@ func _build() -> void:
 	add_child(_section_area)
 	var tree_section := TreeSection.new()
 	tree_section.confirm = confirm
+	tree_section.journey_requested.connect(show_section.bind(SECTION_JOURNEY))
 	_section_area.add_child(tree_section)
 	sections.append(tree_section)
 	var skin_shop := SkinShop.new()

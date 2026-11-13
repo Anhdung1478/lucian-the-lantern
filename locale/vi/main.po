@@ -952,3 +952,23 @@ msgstr "Nhận miễn phí"
 #. node_info_panel.gd: caption at rest over what each bought node of the branch gives now
 msgid "THIS BRANCH GIVES"
 msgstr "NHÁNH NÀY CHO"
+
+#. node_info_panel.gd: the action of a branch that waits for an act in the Journey
+msgid "Go to Journey"
+msgstr "Đến Hành Trình"
+
+#. node_info_panel.gd: a hidden node's rule row: a node it needs is bought
+msgid "Bought"
+msgstr "Đã mua"
+
+#. node_info_panel.gd: a hidden node's rule row: not met yet
+msgid "Not yet"
+msgstr "Chưa"
+
+#. node_info_panel.gd: a hidden node's rule row: the act is cleared
+msgid "Done"
+msgstr "Xong"
+
+#. node_info_panel.gd: a hidden node's rule row. %d is the levels needed, %s the skills' keys joined by " + "
+msgid "%d levels in %s"
+msgstr "%d cấp ở %s"

@@ -17,8 +17,9 @@ extends CanvasLayer
 ## UiMotion.off() it shows and goes at once.
 
 ## BESIDE: right of the source, else left of it, else above it, else below.
-## ABOVE: above the source, else below it. CURSOR: at the mouse.
-enum Place { BESIDE, ABOVE, CURSOR }
+## ABOVE: above the source, else below it. CURSOR: at the mouse. BELOW:
+## centred GAP under the source (a button's note), else above it.
+enum Place { BESIDE, ABOVE, CURSOR, BELOW }
 
 const DELAY := 1.0
 const GAP := 8.0
@@ -176,6 +177,10 @@ func _position_card() -> void:
 					at = _above(anchor, size, screen)
 		Place.CURSOR:
 			at = Pointer.on_screen(self) + CURSOR_OFFSET
+		Place.BELOW:
+			at = Vector2(anchor.get_center().x - size.x * 0.5, anchor.end.y + GAP)
+			if at.y + size.y > screen.end.y:
+				at = _above(anchor, size, screen)
 	if _fresh:
 		_fresh = false
 		_fade_in()
