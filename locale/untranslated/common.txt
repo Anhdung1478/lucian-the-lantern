@@ -1,0 +1,8 @@
+# Texts in src/ that are deliberately not translated, one per line, exactly
+# as the code has them (a line break inside a text is written \n). The tests
+# read every .txt file in this folder: every other text a player could read
+# must have a Vietnamese translation. Lines starting with "#" are notes.
+
+# The languages' own names.
+English
+Tiếng Việt

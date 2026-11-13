@@ -13,7 +13,7 @@
   - `stage.po`: the HUD, Lucian, enemies and bosses, tips, scenes, the end card.
   - `main.po`: the Journey, the Evolution Tree, the Skin Shop.
   - `shell.po`: the title, Settings, the menus and the pop-ups.
-- **Not translated:** the game's name on the title, champions' names, key names (Space, LMB), the debug tables, and what is listed in `locale/untranslated.txt`.
+- **Not translated:** the game's name on the title, champions' names, key names (Space, LMB), the debug tables, and what is listed in `locale/untranslated/*.txt`.
 
 ## Rules for code
 
@@ -22,7 +22,7 @@
 3. **A translation keeps the values' order.** If Vietnamese needs another order, use named values: `Lang.t("{item} from {boss}").format({"item": ..., "boss": ...})`.
 4. **Nothing translated is stored or compared.** Saves, ids, dictionary keys and tests of equality use the English or the id. A save loads in any language.
 5. **Text drawn by hand** (`draw_string`) is translated in `_draw` the same way.
-6. **A new text needs its Vietnamese** in the part's `.po` file, or a line in `locale/untranslated.txt`. The tests fail otherwise.
+6. **A new text needs its Vietnamese** in the part's `.po` file, or a line in `locale/untranslated/*.txt`. The tests fail otherwise.
 
 ## Rules for the Vietnamese
 

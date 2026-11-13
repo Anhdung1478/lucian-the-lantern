@@ -10,7 +10,8 @@ extends RefCounted
 ## - values() and tags(): what a translation must keep from its English.
 
 const LOCALE_DIR := "res://locale/vi"
-const UNTRANSLATED := "res://locale/untranslated.txt"
+## One list per part of the game, of texts deliberately left in English.
+const UNTRANSLATED_DIR := "res://locale/untranslated"
 ## The data resources' fields that hold text a player reads.
 const DATA_FIELDS: Array[String] = ["display_name", "description", "effect_name", "playstyle", "format"]
 ## Calls whose texts are for the log, not the player.
@@ -42,12 +43,16 @@ static func known() -> Dictionary:
 	return _known
 
 
-## The texts deliberately left in English (res://locale/untranslated.txt).
+## The texts deliberately left in English: every line of the .txt files in
+## res://locale/untranslated that is not empty or a "#" note.
 static func untranslated() -> Dictionary:
 	if _untranslated.is_empty():
-		for line in FileAccess.get_file_as_string(UNTRANSLATED).split("\n"):
-			if line != "" and not line.begins_with("#"):
-				_untranslated[line.c_unescape()] = true
+		for file in DirAccess.get_files_at(UNTRANSLATED_DIR):
+			if not file.ends_with(".txt"):
+				continue
+			for line in FileAccess.get_file_as_string(UNTRANSLATED_DIR.path_join(file)).split("\n"):
+				if line != "" and not line.begins_with("#"):
+					_untranslated[line.c_unescape()] = true
 	return _untranslated
 
 

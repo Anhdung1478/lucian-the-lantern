@@ -1,8 +1,0 @@
-# Texts in src/ that are deliberately not translated, one per line, exactly
-# as the code has them. tests/unit/test_translations.gd reads this: every
-# other text a player could read must have a Vietnamese translation.
-# Lines starting with "#" are notes.
-
-# The languages' own names.
-English
-Tiếng Việt
