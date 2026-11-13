@@ -60,6 +60,8 @@ func _ready() -> void:
 		pick_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		pick_button.pressed.connect(open_menu.bind(i))
 		UiStyle.style_button(pick_button, 16)
+		# An empty cell's word is a small tag, never edge to edge.
+		pick_button.add_theme_font_size_override(&"font_size", UiStyle.FONT_TAG)
 		holder.add_child(pick_button)
 		picks.append(pick_button)
 		var chain := TextureRect.new()
