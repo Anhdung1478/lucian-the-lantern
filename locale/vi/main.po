@@ -856,3 +856,15 @@ msgstr "+{v} Kháng Phép"
 #. description of data/tree/summoner_slot_2.tres
 msgid "Lucian can bring a second summoner spell."
 msgstr "Lucian có thể mang theo phép bổ trợ thứ hai."
+
+#. forge_bar.gd: the word before the two forge buttons in the top bar (sentence case)
+msgid "Forge"
+msgstr "Rèn"
+
+#. tree_node_view.gd: under a hidden passive node, the rule that opens it (Q, W and E are the skill keys)
+msgid "Any of Q, W, E"
+msgstr "Một trong Q, W, E"
+
+#. tree_node_view.gd: under the hidden Second Summoner Slot, the rule that opens it
+msgid "Any 2 spells"
+msgstr "2 phép bất kỳ"

@@ -31,7 +31,7 @@ const SAVE_PREFIX := "user://screenshot_save_slot_"
 const GAME_SCENARIOS := ["training_setup", "skins_stage", "title", "title_slots", "title_settings", "the_end",
 	"journey_map", "journey_endless", "endless_wave", "endless_boss", "endless_pick", "endless_run_over",
 	"exit_cancel", "tree_icons", "tree_free", "tree_rules", "tree_forge", "backpack_slots",
-	"skin_preview", "tree_boots", "title_difficulty"]
+	"skin_preview", "tree_boots", "title_difficulty", "tree_check"]
 ## Endless map choices (Journey.ENDLESS_MAPS indices) for the Endless scenarios.
 const RANDOM_MAP := 0
 const TRAINING_GROUND := 2
@@ -238,6 +238,8 @@ func _run(scenario: String) -> void:
 			await scenario_main_tree_max()
 		"main_tree_states":
 			await scenario_main_tree_states()
+		"tree_check":
+			await scenario_tree_check()
 		"main_skin_purchase":
 			await scenario_main_skin_purchase()
 		"tree_free":
@@ -1909,9 +1911,47 @@ func scenario_main_tree_max() -> void:
 	await shot("main_tree_max_5_summoners_picked")
 
 
-## V1.2's node states. Stats: done (Health 5/5 with its crest), in progress
-## (Attack Damage 2/5, Armor 1/5) and not bought with a ready ▲ (60 blue buys
-## any level 1). Economy: everything too dear (Stage Gold's level 1 is 100).
+## The tree redesign's checkpoint (review t1, P-8): Skills on a new save (and
+## the top bar with a toast over it), Skills mid-game, Stats with 40 blue
+## (every level too dear; 60 would buy any level 1), Backpack, Economy, then Stats and Summoners maxed.
+func scenario_tree_check() -> void:
+	var save := SaveGame.instance()
+	var tree := save.tree
+	main_screen().show_section(MainScreen.SECTION_TREE)
+	var section := tree_section()
+	await mouse_move(Vector2(960, 1060))
+	await wait(0.3)
+	await shot("tree_check_0_skills_new_save")
+	main_screen().show_toast(Lang.t("Saved to slot %d") % 1)
+	await wait(0.3)
+	await shot("tree_check_1_toast")
+	await wait(2.0)
+	save.set_cleared(Journey.all_stage_ids(1))
+	save.essences.add(Essences.BLUE, 10000)
+	save.essences.add(Essences.ORANGE, 100)
+	for id: StringName in [&"skill_q", &"skill_q", &"skill_w", &"skill_e", &"passive", &"stat_ad", &"stat_ad",
+			&"stat_hp", &"stat_hp", &"stat_hp", &"stat_hp", &"stat_hp", &"stat_armor", &"equip_slots", &"boots",
+			&"stage_gold", &"flash"]:
+		tree.buy(id, save.essences)
+	section.show_branch(&"skills")
+	await wait(0.3)
+	await shot("tree_check_2_skills_mid")
+	# 40 blue: every level 1 (50 blue) too dear.
+	save.essences.set_amount(Essences.BLUE, 40)
+	for branch: StringName in [&"stats", &"backpack", &"economy"]:
+		section.show_branch(branch)
+		await wait(0.3)
+		await shot("tree_check_%d_%s" % [3 + [&"stats", &"backpack", &"economy"].find(branch), branch])
+	tree.max_all()
+	for branch: StringName in [&"stats", &"summoners"]:
+		section.show_branch(branch)
+		await wait(0.3)
+		await shot("tree_check_%d_%s_maxed" % [6 + [&"stats", &"summoners"].find(branch), branch])
+
+
+## The node states. Stats: done (Health 5/5), in progress (Attack Damage 2/5,
+## Armor 1/5) and not bought (60 blue buys any level 1, the first wears the
+## next step's gold). Economy: everything too dear (Stage Gold's level 1 is 100).
 ## Skills: R's lock. Summoners: Ghost free. Backpack: Equip Slots' lock.
 func scenario_main_tree_states() -> void:
 	var save := SaveGame.instance()
@@ -1927,10 +1967,10 @@ func scenario_main_tree_states() -> void:
 	var section := tree_section()
 	var views := section.views
 	await mouse_move(Vector2(960, 1060))
-	print("Health (expect maxed true MAX): ", views[&"stat_hp"].state(), " ", views[&"stat_hp"].crest.visible, " ", views[&"stat_hp"].badge.text)
-	print("Attack Damage (expect bought false 2/5): ", views[&"stat_ad"].state(), " ", views[&"stat_ad"].is_grey(), " ", views[&"stat_ad"].badge.text)
-	print("Ability Power ready, grey (expect true true): ", views[&"stat_ap"].ready_chip.visible, " ", views[&"stat_ap"].is_grey())
-	print("Stage Gold ready (expect false, 60 < 100): ", views[&"stage_gold"].ready_chip.visible)
+	print("Health (expect maxed true): ", views[&"stat_hp"].state(), " ", views[&"stat_hp"].is_lit())
+	print("Attack Damage (expect bought false): ", views[&"stat_ad"].state(), " ", views[&"stat_ad"].is_grey())
+	print("Ability Power open, grey (expect open true): ", views[&"stat_ap"].state(), " ", views[&"stat_ap"].is_grey())
+	print("Stage Gold (expect poor, 60 < 100): ", views[&"stage_gold"].state())
 	print("R locked, Ghost free (expect true true): ", views[&"skill_r"].locked(), " ", views[&"ghost"].free_badge.visible)
 	for branch: StringName in [&"stats", &"economy", &"skills", &"summoners", &"backpack"]:
 		section.show_branch(branch)

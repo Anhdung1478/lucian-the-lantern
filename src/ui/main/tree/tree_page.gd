@@ -1,96 +1,58 @@
 class_name TreePage
 extends Control
-## One branch of the Evolution Tree on a page of its own, drawn as a living
-## tree in a night grove (TreeArt): a gnarled trunk rises from roots at the
-## bottom centre, boughs reach every node through leafy canopies, a lantern on
-## each bough lights once its node is bought, and gold light climbs to the
-## bought nodes. Requirement links wind along the boughs as vines (dim, then
-## gold once the node that needs them is bought), and the branch's name and
-## blurb sit top left.
-## A node's `grid` is its (column, row up from the ground) on this page: the
-## page centres the branch's columns, and its rows from the ground (row 0) to
-## the top one. A node on the centre column sits on the trunk.
-## A node with a level sum (R) wears a segmented ring, one segment per rank of
-## the sum, marked where each of its levels opens. The Backpack page hangs a
-## preview under each node: the equip slots with their acts, and the 9x6
-## backpack with its open cells lit. It redraws on refresh() only; the motes
-## and the climbing light move on a small layer of their own.
+## One branch of the Evolution Tree on a page of its own: a tree at night
+## (TreeArt) whose lanterns are the branch's nodes (TreeNodeView). The page
+## is the Journey map's size and frame; the branch switch (BranchTabs) sits
+## over its top band, so nothing of the tree comes within CLEAR_TOP of it.
+## - Each node stands where LAYOUT puts it (its data `grid` is the fallback).
+## - LIMBS groups the nodes: a group shares one bough into the crown, and a
+##   labelled group (OFFENSE, REWARDS...) carries its caption over its top
+##   node. Nodes on the page's middle line stand on the trunk.
+## - A link is drawn only where a node needs another one outright (its
+##   `requires` with no count): dim until the needed node has a level, then
+##   gold. Counted rules are said at the node (TreeNodeView's rule tag), and
+##   a level sum is the node's ring (R: one track, one arc, ticks at 5, 9, 13).
+## It redraws on refresh() only; nothing on it moves at rest.
 
-const SIZE := Vector2(1416, 840)
-## One grid cell, in pixels.
-const CELL := Vector2(180, 150)
-## The branch's rows (0 to the top one) are centred on this line.
-const MIDDLE_Y := 420.0
+const SIZE := JourneyMap.SIZE
 ## Where the trunk meets the ground.
-const GROUND_Y := 772.0
+const GROUND_Y := 850.0
 ## The trunk: its width at the roots (before TreeArt's flare) and at its top.
 const TRUNK_ROOT := 76.0
-const TRUNK_TIP := 28.0
-## A limb leaves the trunk this far below its node, and never closer to the
-## ground than LIMB_GROUND; where a node on the trunk is, it leaves from
-## behind that node instead.
-const LIMB_DROP := 96.0
-const LIMB_GROUND := 52.0
+const TRUNK_TIP := 26.0
 const CURVE_STEPS := 28
-## Vines: one wave's length, its height, the line's width, the gap between
-## leaves.
-const VINE_WAVE := 34.0
-const VINE_AMP := 4.0
-const VINE_WIDTH := 2.5
-const VINE_LEAF_STEP := 36.0
+## The branch switch's band over the page's top, and the line nothing of the
+## tree crosses (48 under the switch: 40 px on screen).
+const SWITCH_RECT := Rect2(24, 20, 1368, 56)
+const CLEAR_TOP := 124.0
+const KEEP_CLEAR: Array[Rect2] = [Rect2(0, 0, 1416, CLEAR_TOP)]
+## A name wraps past this width (two lines at most).
+const NAME_MAX := 180.0
+## Links: their width, and how far they stop short of the nodes they join.
+const LINK_WIDTH := 3.0
+const LINK_GAP := 10.0
+const LINK_DIM := Color("3b4b54")
+const LINK_LIT := Color(1.0, 0.81, 0.35, 0.85)
 ## The ring of a node with a level sum: radius, thickness, the open gap at the
-## bottom (radians) and the font of its marks.
+## bottom (radians), its ticks and the font of its numbers.
 const RING_RADIUS := 80.0
-const RING_WIDTH := 8.0
+const RING_WIDTH := 6.0
 const RING_GAP := PI * 0.8
-const RING_FONT := 15
-## The header, top left: its box and fonts.
-const HEADER_RECT := Rect2(24, 18, 480, 112)
-const HEADER_AT := Vector2(40, 46)
-const CAPTION_FONT := 15
-const TITLE_FONT := 32
-const BLURB_FONT := 18
-## Where the page's art stays clear: the header, and the top-right corner
-## where TreeSection puts Reset tree (x 1132–1392, y 24–76 on the page).
-const KEEP_CLEAR: Array[Rect2] = [HEADER_RECT, Rect2(1096, 0, 320, 100)]
-## A limb's caption (OFFENSE, REWARDS...) over its top node.
-const GROUP_FONT := 17
-const GROUP_LIFT := 26.0
-## The previews' notes and labels (the acts, the boots, the plaque's note).
-const PREVIEW_NOTE := UiStyle.FONT_BODY
-## The Backpack page's previews: the plaque under each node and its cells.
-const PLAQUE_TOP := 104.0
-const PLAQUE_SIZE := Vector2(340, 214)
-const SLOT_SIZE := 42.0
-const SLOT_GAP := 8.0
-const MINI_CELL := 22.0
-const MINI_GAP := 4.0
-const MINI_COLUMNS := BackpackScreen.COLUMNS
-const EQUIP_ID := &"equip_slots"
-const BACKPACK_ID := &"backpack_slots"
-const BOOTS_ID := &"boots"
-## The Boots plaque's two boots, one per level, and their slots.
-const BOOTS_ICONS: Array[Texture2D] = [
-	preload("res://assets/art/items/boots_of_speed.svg"),
-	preload("res://assets/art/items/slightly_magical_boots.svg"),
-]
-const BOOTS_SLOT := 64.0
-const BOOTS_SPREAD := 160.0
-## Light motes drifting up: how many, how fast.
-const MOTES := 28
-const MOTE_SPEED := 9.0
+const RING_TICK := 10.0
+const RING_FONT := 16
+const RING_TRACK := Color("1d2a30")
+## A group's caption over its top node: its font and its lift over the tile.
+const GROUP_FONT := 16
+const GROUP_LIFT := 28.0
 
 const LIGHT := MainBackdrop.GROVE_LIGHT
-const VINE_DIM := Color(0.3, 0.4, 0.35, 0.75)
-const VINE_LIT := UiStyle.GOLD_COLOR
-const RING_DIM := Color(0.22, 0.27, 0.3)
-const PLAQUE_COLOR := Color(0.035, 0.05, 0.06, 0.94)
 
-## The branches' names, blurbs and tab icons.
+## The branches' names (the switch shows them).
 const NAMES := {
 	&"skills": "Skills", &"stats": "Stats", &"backpack": "Backpack",
 	&"economy": "Economy", &"summoners": "Summoners",
 }
+## Kept for the info column's summary until it is rebuilt.
 const BLURBS := {
 	&"skills": "Q, W and E open the passive; their ranks open R.",
 	&"stats": "Offense, defense and sustain for Lucian himself.",
@@ -105,12 +67,37 @@ const ICONS := {
 	&"economy": preload("res://assets/art/tree/stage_gold.svg"),
 	&"summoners": preload("res://assets/art/summoners/flash.svg"),
 }
-## Per branch, its limbs: each a chain of node ids from the trunk outward,
-## with an optional caption. A node in no chain grows from the trunk alone.
+## Each node's centre on its page. Groups stand as clusters on their own
+## bough; a column on the middle line stands on the trunk.
+const LAYOUT := {
+	&"skills": {
+		&"skill_q": Vector2(300, 660), &"skill_w": Vector2(708, 720), &"skill_e": Vector2(1116, 660),
+		&"passive": Vector2(708, 510), &"skill_r": Vector2(708, 300),
+	},
+	&"stats": {
+		&"stat_hp": Vector2(708, 700), &"stat_armor": Vector2(708, 510), &"stat_mr": Vector2(708, 320),
+		&"stat_ad": Vector2(330, 640), &"stat_ap": Vector2(220, 440), &"stat_attack_speed": Vector2(440, 440),
+		&"stat_mana": Vector2(1086, 640), &"stat_hp_regen": Vector2(976, 440), &"stat_mana_regen": Vector2(1196, 440),
+	},
+	&"backpack": {
+		&"equip_slots": Vector2(440, 560), &"boots": Vector2(708, 420), &"backpack_slots": Vector2(976, 560),
+	},
+	&"economy": {
+		&"stage_gold": Vector2(330, 640), &"bonus_xp": Vector2(220, 440), &"essence_drop": Vector2(440, 440),
+		&"merchant_stock": Vector2(1010, 600), &"refresh_cost": Vector2(1170, 420),
+	},
+	&"summoners": {
+		&"flash": Vector2(178, 700), &"ghost": Vector2(378, 700), &"barrier": Vector2(578, 700),
+		&"heal": Vector2(838, 700), &"clarity": Vector2(1038, 700), &"smite": Vector2(1238, 700),
+		&"flash_upgrade": Vector2(178, 490), &"ghost_upgrade": Vector2(378, 490), &"barrier_upgrade": Vector2(578, 490),
+		&"heal_upgrade": Vector2(838, 490), &"clarity_upgrade": Vector2(1038, 490), &"smite_upgrade": Vector2(1238, 490),
+		&"summoner_slot_2": Vector2(708, 290),
+	},
+}
+## Per branch, its groups of nodes, each sharing a bough, with an optional
+## caption. A node in no group stands alone (on the trunk, or on a bough of
+## its own).
 const LIMBS := {
-	&"skills": [
-		{"ids": [&"skill_w", &"passive", &"skill_r"]},
-	],
 	&"stats": [
 		{"label": "OFFENSE", "ids": [&"stat_ad", &"stat_ap", &"stat_attack_speed"]},
 		{"label": "DEFENSE", "ids": [&"stat_hp", &"stat_armor", &"stat_mr"]},
@@ -129,7 +116,6 @@ const LIMBS := {
 		{"ids": [&"smite", &"smite_upgrade"]},
 	],
 }
-const LOCK := preload("res://assets/art/ui/lock.svg")
 
 var branch: StringName
 var tree: EvolutionTree
@@ -137,22 +123,20 @@ var tree: EvolutionTree
 var views := {}
 ## Node id -> the node's centre on the page.
 var centers := {}
-## Node id -> the node it grows from (&"" for the trunk), parents first.
-var parents := {}
-## Node id -> true when it sits on the trunk.
+## Node id -> true when it stands on the trunk.
 var on_trunk := {}
-## Node id -> its limb's points, from where it leaves the trunk or its parent
-## to the node (none for a node on the trunk).
-var limbs := {}
+## The groups that grow off the trunk: {"ids", "label" (maybe ""), "anchor"
+## (where its bough ends in the crown)}.
+var groups: Array[Dictionary] = []
+## Each group's bough, from inside the trunk out to its anchor.
+var boughs: Array[PackedVector2Array] = []
+## The links: {"from" (the node needed), "to" (the node that needs it),
+## "points" (the line, from `from` to `to`)}.
+var links: Array[Dictionary] = []
 ## Where the trunk ends at the top.
 var trunk_top := 0.0
 ## The page's scenery and its tree.
 var art: TreeArt
-
-var _motes := Control.new()
-## Per mote: its x, y and a phase in 0..1.
-var _mote_seeds: Array[Vector3] = []
-var _time := 0.0
 
 
 func _init(branch_id: StringName, evolution_tree: EvolutionTree, essences: Essences) -> void:
@@ -163,32 +147,12 @@ func _init(branch_id: StringName, evolution_tree: EvolutionTree, essences: Essen
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_layout()
 	art = TreeArt.new(self)
-	_motes.size = SIZE
-	_motes.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_motes.draw.connect(_draw_motes)
-	add_child(_motes)
-	var seeds := rng(90)
-	for i in MOTES:
-		_mote_seeds.append(Vector3(seeds.randf_range(20.0, SIZE.x - 20.0), seeds.randf_range(0.0, SIZE.y), seeds.randf()))
 	for data in tree.branch_nodes(branch):
 		var view := TreeNodeView.new(data, tree, essences)
 		view.position = centers[data.id] - Vector2.ONE * TreeNodeView.SIZE * 0.5
 		add_child(view)
 		views[data.id] = view
 
-
-func _ready() -> void:
-	set_process(is_visible_in_tree())
-
-
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_VISIBILITY_CHANGED and is_inside_tree():
-		set_process(is_visible_in_tree())
-
-
-func _process(delta: float) -> void:
-	_time += delta
-	_motes.queue_redraw()
 
 
 ## Levels bought in `branch` and its levels in all, as (bought, all).
@@ -199,12 +163,8 @@ static func levels(evolution_tree: EvolutionTree, branch_id: StringName) -> Vect
 	return count
 
 
-## The plaque hung under a Backpack node at `center`.
-static func plaque_rect(center: Vector2) -> Rect2:
-	return Rect2(Vector2(center.x - PLAQUE_SIZE.x * 0.5, center.y + PLAQUE_TOP), PLAQUE_SIZE)
-
-
-## Redraws the views, the tree, the vines and the previews from the tree.
+## Redraws the views, the links and the ring from the tree (a link's ends
+## follow the names, which change as nodes open).
 func refresh() -> void:
 	for view: TreeNodeView in views.values():
 		view.refresh()
@@ -219,73 +179,16 @@ func rng(salt: int) -> RandomNumberGenerator:
 	return made
 
 
-# --- Layout ---------------------------------------------------------------------------
-
-
-func _layout() -> void:
-	var nodes := tree.branch_nodes(branch)
-	var columns := Vector2(INF, -INF)
-	var top_row := 0.0
-	for data in nodes:
-		columns = Vector2(minf(columns.x, data.grid.x), maxf(columns.y, data.grid.x))
-		top_row = maxf(top_row, data.grid.y)
-	var middle := Vector2((columns.x + columns.y) * 0.5, top_row * 0.5)
-	for data in nodes:
-		centers[data.id] = Vector2(SIZE.x * 0.5 + (data.grid.x - middle.x) * CELL.x, MIDDLE_Y - (data.grid.y - middle.y) * CELL.y)
-	for limb: Dictionary in LIMBS.get(branch, []):
-		var ids: Array = limb["ids"]
-		for i in ids.size():
-			parents[ids[i]] = ids[i - 1] if i > 0 else &""
-	for data in nodes:
-		if not parents.has(data.id):
-			parents[data.id] = &""
-	trunk_top = GROUND_Y - LIMB_GROUND
-	for id: StringName in parents:
-		var parent: StringName = parents[id]
-		on_trunk[id] = absf(centers[id].x - SIZE.x * 0.5) < 1.0 and (parent == &"" or on_trunk[parent])
-		if on_trunk[id]:
-			trunk_top = minf(trunk_top, centers[id].y)
-	for id: StringName in parents:
-		if not on_trunk[id] and parents[id] == &"":
-			trunk_top = minf(trunk_top, _attach_y(id))
-	for id: StringName in parents:
-		if on_trunk[id]:
-			continue
-		var parent: StringName = parents[id]
-		var from: Vector2
-		if parent != &"":
-			from = centers[parent]
-		else:
-			# From the trunk's own side, so boughs going left and right never cross.
-			var y := _attach_y(id)
-			from = Vector2(SIZE.x * 0.5 + signf(centers[id].x - SIZE.x * 0.5) * trunk_width(y) * 0.3, y)
-		limbs[id] = _limb_curve(from, centers[id])
-
-
-## Where node `id`'s limb leaves the trunk: LIMB_DROP under the node, or
-## from behind a node on the trunk that would sit there (its name included).
-func _attach_y(id: StringName) -> float:
-	var y := minf(centers[id].y + LIMB_DROP, GROUND_Y - LIMB_GROUND)
-	for other: StringName in on_trunk:
-		var center: Vector2 = centers[other]
-		if on_trunk[other] and y > center.y - TreeNodeView.SIZE * 0.5 and y < center.y + TreeNodeView.SIZE:
-			return center.y + TreeNodeView.SIZE * 0.2
-	return y
+## Node `id`'s footprint (tile, level mark and name) on the page.
+func footprint(id: StringName) -> Rect2:
+	var view: TreeNodeView = views[id]
+	var own := view.footprint()
+	return Rect2(view.position + own.position, own.size)
 
 
 ## The trunk's width at height `y` (TreeArt adds the root flare).
 func trunk_width(y: float) -> float:
-	return lerpf(TRUNK_ROOT, TRUNK_TIP, inverse_lerp(GROUND_Y, trunk_top, y))
-
-
-## A limb from `from` out to `to`, arching like a bough: it rises from the
-## trunk, bends outward and comes into the node from the inner side; a node
-## straight above gets a straight limb.
-func _limb_curve(from: Vector2, to: Vector2) -> PackedVector2Array:
-	var d := to - from
-	var c1 := from + Vector2(d.x * 0.2, d.y * 0.6 - absf(d.x) * 0.22)
-	var c2 := to - Vector2(d.x * 0.45, absf(d.x) * 0.12)
-	return bezier(from, c1, c2, to)
+	return lerpf(TRUNK_ROOT, TRUNK_TIP, clampf(inverse_lerp(GROUND_Y, trunk_top, y), 0.0, 1.0))
 
 
 static func bezier(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) -> PackedVector2Array:
@@ -297,225 +200,142 @@ static func bezier(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) -> Packed
 	return points
 
 
-## Points from node `id` down its limbs to the trunk (the last point is on the
-## trunk), or only down to `stop` when that is on the way.
-func stem(id: StringName, stop := &"") -> PackedVector2Array:
-	var points := PackedVector2Array([centers[id]])
-	var at := id
-	while at != stop and not on_trunk[at]:
-		var limb: PackedVector2Array = limbs[at]
-		for i in range(limb.size() - 2, -1, -1):
-			points.append(limb[i])
-		at = parents[at]
-		if at == &"":
-			return points
-	if at != stop and stop != &"":
-		# Both on the trunk.
-		points.append(centers[stop])
-	return points
+# --- Layout ---------------------------------------------------------------------------
 
 
-## Inside a node's frame, badge or name.
-func near_node(at: Vector2) -> bool:
+func _layout() -> void:
+	var nodes := tree.branch_nodes(branch)
+	var placed: Dictionary = LAYOUT.get(branch, {})
+	var middle := SIZE.x * 0.5
+	for data in nodes:
+		centers[data.id] = placed.get(data.id, Vector2(middle + (data.grid.x - 2.5) * 180.0, 700.0 - data.grid.y * 170.0))
+		on_trunk[data.id] = absf(centers[data.id].x - middle) < 1.0
+	# The groups off the trunk: the listed ones, then each lone node.
+	var grouped := {}
+	for limb: Dictionary in LIMBS.get(branch, []):
+		var ids: Array[StringName] = []
+		for id: StringName in limb["ids"]:
+			grouped[id] = true
+			if not on_trunk.get(id, false):
+				ids.append(id)
+		if not ids.is_empty():
+			groups.append({"ids": ids, "label": limb.get("label", "")})
+	for data in nodes:
+		if not grouped.has(data.id) and not on_trunk[data.id]:
+			groups.append({"ids": [data.id], "label": ""})
+	trunk_top = GROUND_Y - 60.0
+	for id: StringName in on_trunk:
+		if on_trunk[id]:
+			trunk_top = minf(trunk_top, centers[id].y)
+	for group in groups:
+		var anchor := Vector2.ZERO
+		var lowest := Vector2(0, -INF)
+		var column := true
+		for id: StringName in group["ids"]:
+			anchor += centers[id]
+			column = column and absf(centers[id].x - centers[group["ids"][0]].x) < 1.0
+			if centers[id].y > lowest.y:
+				lowest = centers[id]
+		anchor /= group["ids"].size()
+		# A lone node's (or a column's) bough ends behind its lowest tile; a
+		# cluster's in the crown among its nodes.
+		if group["ids"].size() == 1 or column:
+			anchor = lowest + Vector2(0, 30)
+		else:
+			anchor.y += 40.0
+		group["anchor"] = anchor
+		group["attach"] = minf(anchor.y + 130.0, GROUND_Y - 70.0)
+	var no_trunk_node := trunk_top >= GROUND_Y - 60.0
+	if no_trunk_node:
+		for group in groups:
+			trunk_top = minf(trunk_top, group["attach"] - 70.0)
+	for group in groups:
+		var anchor: Vector2 = group["anchor"]
+		var y: float = group["attach"]
+		var side := signf(anchor.x - middle)
+		var from := Vector2(middle + side * trunk_width(y) * 0.25, y)
+		var d := anchor - from
+		boughs.append(bezier(from, from + Vector2(d.x * 0.25, d.y * 0.7 - absf(d.x) * 0.2), anchor - Vector2(d.x * 0.4, absf(d.x) * 0.1), anchor))
+
+
+## The links, from the needed node's tile to the footprint of the node that
+## needs it (its name's size as it reads now).
+func _lay_links() -> void:
+	links.clear()
 	for id: StringName in centers:
-		var center: Vector2 = centers[id]
-		if Rect2(center - Vector2(CELL.x * 0.5 - 4.0, 60.0), Vector2(CELL.x - 8.0, 156.0)).has_point(at):
-			return true
-	return false
+		var data := tree.node(id)
+		if data.requires_count != 0:
+			continue
+		for required in data.requires:
+			if not centers.has(required):
+				continue
+			var from := _tile(required)
+			var to := footprint(id)
+			var points := PackedVector2Array()
+			if to.end.y < from.position.y:
+				# The usual case: the node that needs it stands above.
+				var x: float = centers[required].x
+				points.append(Vector2(x, from.position.y - LINK_GAP))
+				points.append(Vector2(x, to.end.y + LINK_GAP))
+			else:
+				var a: Vector2 = centers[required]
+				var b: Vector2 = centers[id]
+				var along := (b - a).normalized()
+				points.append(a + along * (TreeNodeView.SIZE * 0.5 + LINK_GAP))
+				points.append(b - along * (TreeNodeView.SIZE * 0.5 + LINK_GAP))
+			links.append({"from": required, "to": id, "points": points})
 
 
-func _grows_from(id: StringName, ancestor: StringName) -> bool:
-	var at: StringName = parents[id]
-	while at != &"":
-		if at == ancestor:
-			return true
-		at = parents[at]
-	return false
-
-
-## The vine from node `id` to `required`, along the limbs and the trunk.
-func _vine_path(id: StringName, required: StringName) -> PackedVector2Array:
-	if _grows_from(id, required) or (on_trunk[id] and on_trunk[required]):
-		return stem(id, required)
-	var path := stem(id)
-	var back := stem(required)
-	back.reverse()
-	path.append_array(back)
-	return path
+func _tile(id: StringName) -> Rect2:
+	return Rect2(centers[id] - Vector2.ONE * TreeNodeView.SIZE * 0.5, Vector2.ONE * TreeNodeView.SIZE)
 
 
 # --- Drawing -----------------------------------------------------------------------
 
 
 func _draw() -> void:
+	_lay_links()
 	art.draw_back(self)
-	art.draw_tree(self, tree)
-	_draw_vines()
+	art.draw_tree(self)
+	for link in links:
+		var lit := tree.level(link["from"]) > 0
+		draw_polyline(link["points"], LINK_LIT if lit else LINK_DIM, LINK_WIDTH, true)
 	for id: StringName in centers:
 		if not tree.node(id).level_sum_ids.is_empty():
 			_draw_ring(id)
-	if views.has(EQUIP_ID):
-		_draw_equip_preview(centers[EQUIP_ID])
-	if views.has(BACKPACK_ID):
-		_draw_backpack_preview(centers[BACKPACK_ID])
-	if views.has(BOOTS_ID):
-		_draw_boots_preview(centers[BOOTS_ID])
 	_draw_group_captions()
-	_draw_header()
 	# The Journey map's frame, open on the right where the info column stands.
 	JourneyMap.draw_frame(self, SIZE)
 
 
-func _draw_vines() -> void:
-	var phase := 0.0
-	for id: StringName in centers:
-		var data := tree.node(id)
-		for required in data.requires:
-			if centers.has(required):
-				_draw_vine(_vine_path(id, required), tree.level(id) > 0, phase)
-				phase += 1.3
-
-
-## A vine winding along `path`, with small leaves; gold when `lit`.
-func _draw_vine(path: PackedVector2Array, lit: bool, phase: float) -> void:
-	var points := TreeArt.resample(path, 5.0)
-	var count := points.size()
-	if count < 2:
-		return
-	var wavy := PackedVector2Array()
-	var normals := PackedVector2Array()
-	for i in count:
-		var along := (points[mini(i + 1, count - 1)] - points[maxi(i - 1, 0)]).normalized()
-		normals.append(along.orthogonal())
-		wavy.append(points[i] + normals[i] * sin(i * 5.0 / VINE_WAVE * TAU + phase) * VINE_AMP)
-	var color := VINE_LIT if lit else VINE_DIM
-	if lit:
-		draw_polyline(wavy, Color(LIGHT, 0.16), VINE_WIDTH + 7.0, true)
-	draw_polyline(wavy, color, VINE_WIDTH, true)
-	var every := int(VINE_LEAF_STEP / 5.0)
-	for i in range(every, count - every, every):
-		var side := 1.0 if (i / every) % 2 == 0 else -1.0
-		var along := normals[i].orthogonal() * -1.0
-		TreeArt.draw_leaf(self, wavy[i], (along + normals[i] * side * 1.2).angle(), 10.0, color.darkened(0.1))
-
-
-## The segmented ring of node `id`'s level sum: one segment per rank,
-## lit up to the current total, with a mark where each level opens.
+## Node `id`'s level sum as a ring: one dark track and one gold arc up to the
+## sum, a tick and its number where each level opens.
 func _draw_ring(id: StringName) -> void:
 	var data := tree.node(id)
 	var center: Vector2 = centers[id]
 	var marks := data.level_sums
-	var ticks: int = marks[-1]
+	var top: int = marks[-1]
 	var total := tree.level_sum(id)
 	var start := PI * 0.5 + RING_GAP * 0.5
-	var step := (TAU - RING_GAP) / ticks
-	var lit := minf(float(total) / ticks, 1.0)
-	draw_texture_rect(JourneyMap.glow(), Rect2(center - Vector2.ONE * RING_RADIUS * 1.6, Vector2.ONE * RING_RADIUS * 3.2), false, Color(LIGHT, 0.06 + 0.16 * lit))
-	draw_arc(center, RING_RADIUS, start, start + TAU - RING_GAP, 64, Color(0, 0, 0, 0.55), RING_WIDTH + 5.0, true)
-	for k in ticks:
-		var from := start + k * step + 0.035
-		var color := UiStyle.GOLD_COLOR if k < total else RING_DIM
-		draw_arc(center, RING_RADIUS, from, start + (k + 1) * step - 0.035, 8, color, RING_WIDTH, true)
+	var sweep := TAU - RING_GAP
+	draw_arc(center, RING_RADIUS, start, start + sweep, 64, RING_TRACK, RING_WIDTH, true)
+	var share := clampf(float(total) / top, 0.0, 1.0)
+	if share > 0.0:
+		draw_arc(center, RING_RADIUS, start, start + sweep * share, maxi(4, int(64 * share)), UiStyle.GOLD_COLOR, RING_WIDTH, true)
+		for end: float in [start, start + sweep * share]:
+			draw_circle(center + Vector2.from_angle(end) * RING_RADIUS, RING_WIDTH * 0.5, UiStyle.GOLD_COLOR)
 	var font := get_theme_default_font()
 	for mark: int in marks:
-		var direction := Vector2.from_angle(start + mark * step)
+		var direction := Vector2.from_angle(start + sweep * mark / top)
 		var reached := total >= mark
-		var color := UiStyle.TITLE_COLOR if reached else UiStyle.DIM_COLOR
-		var tip := center + direction * (RING_RADIUS + RING_WIDTH * 0.5 + 2.0)
-		var across := direction.orthogonal() * 5.0
-		draw_colored_polygon(PackedVector2Array([tip, tip + direction * 7.0 + across, tip + direction * 14.0, tip + direction * 7.0 - across]),
-			UiStyle.GOLD_COLOR if reached else RING_DIM.lightened(0.3))
-		var label_at := center + direction * (RING_RADIUS + 30.0)
-		JourneyMap.draw_text(self, str(mark), label_at + Vector2(0, font.get_ascent(RING_FONT) * 0.4), RING_FONT, color, true)
+		var inner := center + direction * (RING_RADIUS - RING_WIDTH * 0.5 - 2.0)
+		draw_line(inner, inner + direction * RING_TICK, UiStyle.TITLE_COLOR if reached else UiStyle.DIM_COLOR, 2.0, true)
+		var label_at := center + direction * (RING_RADIUS + 22.0)
+		JourneyMap.draw_text(self, str(mark), label_at + Vector2(0, font.get_ascent(RING_FONT) * 0.4), RING_FONT,
+			UiStyle.TITLE_COLOR if reached else UiStyle.DIM_COLOR, true)
 
 
-## Under Equip Slots: the six equip slots, open ones lit, the next level's
-## slot outlined when it is open to buy, the others locked, and the act each
-## one needs.
-func _draw_equip_preview(center: Vector2) -> void:
-	var data := tree.node(EQUIP_ID)
-	var level := tree.level(EQUIP_ID)
-	var open := roundi(data.value(level))
-	var next := roundi(data.value(level + 1)) if tree.next_level_open(data.id) else open
-	var all := roundi(data.value(data.max_level))
-	var plaque := _draw_plaque(center, Lang.t("EQUIP SLOTS"), "%d / %d" % [open, all])
-	var width := all * SLOT_SIZE + (all - 1) * SLOT_GAP
-	var left := Vector2(center.x - width * 0.5, plaque.position.y + 66.0)
-	for i in all:
-		var rect := Rect2(left + Vector2(i * (SLOT_SIZE + SLOT_GAP), 0), Vector2.ONE * SLOT_SIZE)
-		_draw_slot(rect, i < open, i >= open and i < next)
-		if i >= next:
-			draw_texture_rect(LOCK, Rect2(rect.get_center() - Vector2.ONE * 10.0, Vector2.ONE * 20.0), false, Color(1, 1, 1, 0.75))
-	# The act each slot's level needs, under a bracket per act.
-	var i := 1
-	while i < all:
-		var act := data.act_needed(i - 1)
-		var last := i
-		while last + 1 < all and data.act_needed(last) == act:
-			last += 1
-		if act > 0:
-			var from_x := left.x + i * (SLOT_SIZE + SLOT_GAP)
-			var to_x := left.x + last * (SLOT_SIZE + SLOT_GAP) + SLOT_SIZE
-			var y := left.y + SLOT_SIZE + 10.0
-			var cleared := tree.is_level_open(EQUIP_ID, i - 1)
-			var color := TreeNodeView.MAXED_COLOR if cleared else JourneyPanel.CAPTION_COLOR
-			draw_polyline(PackedVector2Array([Vector2(from_x + 2, y - 4), Vector2(from_x + 2, y), Vector2(to_x - 2, y), Vector2(to_x - 2, y - 4)]), Color(color, 0.7), 1.5, true)
-			JourneyMap.draw_text(self, Lang.t("Act %d") % act, Vector2((from_x + to_x) * 0.5, y + 22.0), PREVIEW_NOTE, color, true)
-		i = last + 1
-	JourneyMap.draw_text(self, Lang.t("Only equipped items give stats."), Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), PREVIEW_NOTE, UiStyle.DIM_COLOR)
-
-
-## Under Backpack Slots: the 9x6 backpack, its open cells lit and the next
-## level's cells outlined when it is open to buy.
-func _draw_backpack_preview(center: Vector2) -> void:
-	var data := tree.node(BACKPACK_ID)
-	var level := tree.level(BACKPACK_ID)
-	var open := roundi(data.value(level))
-	var next := roundi(data.value(level + 1)) if tree.next_level_open(data.id) else open
-	var plaque := _draw_plaque(center, Lang.t("BACKPACK"), "%d / %d" % [open, Inventory.BACKPACK_SIZE])
-	var width := MINI_COLUMNS * MINI_CELL + (MINI_COLUMNS - 1) * MINI_GAP
-	var left := Vector2(center.x - width * 0.5, plaque.position.y + 46.0)
-	for i in Inventory.BACKPACK_SIZE:
-		var at := left + Vector2(i % MINI_COLUMNS, i / MINI_COLUMNS) * (MINI_CELL + MINI_GAP)
-		_draw_slot(Rect2(at, Vector2.ONE * MINI_CELL), i < open, i >= open and i < next, 4)
-
-
-## Under Boots: Boots of Speed and Slightly Magical Boots, each lit once its
-## level is bought and outlined when it is the next level open to buy.
-func _draw_boots_preview(center: Vector2) -> void:
-	var data := tree.node(BOOTS_ID)
-	var level := tree.level(BOOTS_ID)
-	var next := level + 1 if tree.next_level_open(data.id) else level
-	var plaque := _draw_plaque(center, Lang.t("BOOTS"), "%d / %d" % [level, data.max_level])
-	for i in data.max_level:
-		var slot_center := Vector2(center.x + (i - (data.max_level - 1) * 0.5) * BOOTS_SPREAD, plaque.position.y + 92.0)
-		var rect := Rect2(slot_center - Vector2.ONE * BOOTS_SLOT * 0.5, Vector2.ONE * BOOTS_SLOT)
-		_draw_slot(rect, i < level, i >= level and i < next)
-		var tint := Color.WHITE if i < level else Color(1, 1, 1, 0.3)
-		draw_texture_rect(BOOTS_ICONS[i], rect.grow(-6.0), false, tint)
-		var color := UiStyle.TITLE_COLOR if i < level else UiStyle.DIM_COLOR
-		JourneyMap.draw_text(self, data.value_text(i + 1), Vector2(slot_center.x, rect.end.y + 24.0), PREVIEW_NOTE, color, true)
-	JourneyMap.draw_text(self, Lang.t("Worn on every map."), Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), PREVIEW_NOTE, UiStyle.DIM_COLOR)
-
-
-## One slot of a preview: lit when open, outlined when the next level opens it.
-func _draw_slot(rect: Rect2, open: bool, next: bool, radius := 6) -> void:
-	var style := StyleBoxFlat.new()
-	style.set_corner_radius_all(radius)
-	style.set_border_width_all(2)
-	if open:
-		style.bg_color = Color(UiStyle.GOLD_COLOR, 0.32)
-		style.border_color = UiStyle.GOLD_COLOR
-	elif next:
-		style.bg_color = Color(UiStyle.GOLD_COLOR, 0.07)
-		style.border_color = Color(UiStyle.GOLD_COLOR, 0.45)
-	else:
-		style.bg_color = Color(1, 1, 1, 0.03)
-		style.border_color = Color(1, 1, 1, 0.1)
-	draw_style_box(style, rect)
-
-
-## Each captioned limb's name over its top node, between two small diamonds.
+## Each labelled group's caption over its top node, between two small diamonds.
 func _draw_group_captions() -> void:
 	var font := JourneyMap.text_font(self, 3)
 	for limb: Dictionary in LIMBS.get(branch, []):
@@ -530,33 +350,5 @@ func _draw_group_captions() -> void:
 		var baseline := Vector2(top.x - width * 0.5, top.y - TreeNodeView.SIZE * 0.5 - GROUP_LIFT)
 		JourneyMap.draw_text(self, text, baseline, GROUP_FONT, JourneyPanel.CAPTION_COLOR, false, 3)
 		for side: float in [-1.0, 1.0]:
-			var at := Vector2(top.x + side * (width * 0.5 + 16.0), baseline.y - GROUP_FONT * 0.35)
+			var at := Vector2(top.x + side * (width * 0.5 + 14.0), baseline.y - GROUP_FONT * 0.35)
 			draw_colored_polygon(PackedVector2Array([at + Vector2(0, -4), at + Vector2(4, 0), at + Vector2(0, 4), at + Vector2(-4, 0)]), JourneyPanel.CAPTION_COLOR)
-
-
-func _draw_header() -> void:
-	JourneyMap.draw_text(self, Lang.t("EVOLUTION TREE"), HEADER_AT, CAPTION_FONT, JourneyPanel.CAPTION_COLOR, false, 3)
-	JourneyMap.draw_text(self, Lang.t(NAMES[branch]).to_upper(), HEADER_AT + Vector2(0, 40), TITLE_FONT, UiStyle.TITLE_COLOR, false, 4)
-	JourneyMap.draw_text(self, Lang.t(BLURBS[branch]), HEADER_AT + Vector2(0, 70), BLURB_FONT, UiStyle.DIM_COLOR)
-
-
-## A plaque under a node, with a caption and a count; returns its rect.
-func _draw_plaque(center: Vector2, caption: String, count: String) -> Rect2:
-	var rect := plaque_rect(center)
-	var style := UiStyle.panel(PLAQUE_COLOR, Color(UiStyle.BORDER_COLOR, 0.55), 2, 0.0, 10)
-	style.shadow_color = Color(0, 0, 0, 0.5)
-	style.shadow_size = 10
-	draw_style_box(style, rect)
-	JourneyMap.draw_text(self, caption, rect.position + Vector2(20.0, 30.0), 15, JourneyPanel.CAPTION_COLOR, false, 3)
-	var width := JourneyMap.text_font(self).get_string_size(count, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
-	JourneyMap.draw_text(self, count, rect.position + Vector2(PLAQUE_SIZE.x - 20.0 - width, 31.0), 18, UiStyle.TITLE_COLOR)
-	return rect
-
-
-func _draw_motes() -> void:
-	var height := GROUND_Y + 20.0
-	for mote in _mote_seeds:
-		var speed := MOTE_SPEED * (0.6 + mote.z)
-		var at := Vector2(mote.x + sin(_time * 0.5 + mote.z * 9.0) * 14.0, fposmod(mote.y - _time * speed, height))
-		MainBackdrop.draw_mote(_motes, at, LIGHT, 0.35 + 0.3 * sin(_time * 1.3 + mote.z * 20.0))
-	art.draw_flow(_motes, tree, _time)

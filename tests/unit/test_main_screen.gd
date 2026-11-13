@@ -397,13 +397,18 @@ func test_settings_stops_every_section_until_it_closes() -> void:
 	assert_true(main.sections[MainScreen.SECTION_JOURNEY].can_process())
 
 
-func test_under_settings_the_journey_and_the_tree_neither_move_nor_redraw() -> void:
+func test_under_settings_the_journey_neither_moves_nor_redraws_and_the_tree_holds_still() -> void:
 	var stage := (main.sections[MainScreen.SECTION_JOURNEY] as JourneySection).map.node_for("1-1")
 	var tree := main.sections[MainScreen.SECTION_TREE] as TreeSection
 	var page: TreePage = tree.pages[tree.branch]
 	await _check_settings_freezes("the Journey's 1-1", stage, stage)
 	main.show_section(MainScreen.SECTION_TREE)
-	await _check_settings_freezes("the Tree's motes", page, page._motes)
+	# The tree's page has no ambient motion at all: it never redraws at rest.
+	await wait_process_frames(2)
+	watch_signals(page)
+	await wait_process_frames(3)
+	assert_signal_emit_count(page, "draw", 0, "the tree's page holds still")
+	assert_false(page.is_processing())
 
 
 ## While Settings is open, `node`'s clock stands still and `canvas` is not

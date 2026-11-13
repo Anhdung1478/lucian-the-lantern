@@ -1,23 +1,29 @@
 class_name TreeSection
 extends Control
-## The Evolution Tree page of the main screen: one TreePage per branch, with
-## the BranchTabs under them to switch pages, Reset tree at the top right of
-## the page with the ForgeBar beside it, and the NodeInfoPanel as a column on
-## the right (as the Journey's map and panel). It opens on the first branch with a free upgrade, otherwise
-## on Skills. The cost bar asks first (TreePurchasePopup). Buying, forging and
-## resetting change the save in memory only; nothing here writes a file.
+## The Evolution Tree page of the main screen, laid out as the Journey: one
+## frame of a TreePage per branch (one shown) and the NodeInfoPanel as a
+## column on its right. The branch switch (BranchTabs) sits over the page's
+## top band, inside the frame. The forge and Reset tree are quiet utilities at
+## the top bar's right end, over the info column (shown with this section only). At rest
+## the page's next step wears gold: a free level, else the cheapest one that
+## can be bought now (next_step()). It opens on the first branch with a free
+## upgrade, otherwise on Skills. The cost bar asks first (TreePurchasePopup).
+## Buying, forging and resetting change the save in memory only; nothing here
+## writes a file.
 
-## In this section (the content area, y 72–992 on screen): the pages, the tabs
-## hanging under them, and the info column right of both.
+## In this section (the content area, y 72–992 on screen): the pages and the
+## info column right of them, the Journey's map and panel rects.
 const PAGE_RECT := Rect2(Vector2(32, 8), TreePage.SIZE)
-const TABS_RECT := Rect2(PAGE_RECT.position.x, 848, PAGE_RECT.size.x, BranchTabs.HEIGHT)
+## The switch, inside the page's top band.
+const TABS_RECT := Rect2(PAGE_RECT.position + Vector2(40, 22), Vector2(1336, BranchTabs.HEIGHT))
 const PANEL_RECT := Rect2(Vector2(1448, 8), JourneyPanel.SIZE)
-const MARGIN := 24.0
-## How far in from the page's sides the tabs start.
-const TABS_INSET := 24.0
-const RESET_SIZE := Vector2(260, 52)
-## The forge sits left of Reset tree, clear of the tree's top and the header.
-const FORGE_GAP := 20.0
+## The utilities in the top bar (above this section), 16 under the screen's
+## top, their right end over the info column's: clear of the main screen's
+## toast, which is centred in the top bar and never reaches x 1300.
+const UTILITIES_RIGHT := 1888.0
+const UTILITIES_TOP := 16.0 - MainScreen.TOP_BAR
+const UTILITY_GAP := 18
+const RESET_FONT := 18
 const PURPLE_ICON := preload("res://assets/art/ui/essence_purple.svg")
 
 ## Branch -> its TreePage.
@@ -30,6 +36,8 @@ var reset_button: Button
 ## Inside Reset tree: the words, the price and the purple icon, as one group.
 var reset_price: HBoxContainer
 var forge_bar: ForgeBar
+## The forge and Reset tree, with a hairline before each.
+var utilities := HBoxContainer.new()
 ## The main screen's Yes / No pop-up, set before the section is added.
 var confirm: ConfirmPopup
 ## The open "buy this level?" question, or null.
@@ -55,8 +63,8 @@ func _ready() -> void:
 			views[id] = page.views[id]
 			page.views[id].chosen.connect(select)
 
-	tabs.position = TABS_RECT.position + Vector2(TABS_INSET, 0)
-	tabs.size = TABS_RECT.size - Vector2(TABS_INSET * 2.0, 0)
+	tabs.position = TABS_RECT.position
+	tabs.size = TABS_RECT.size
 	tabs.branch_chosen.connect(show_branch)
 	add_child(tabs)
 
@@ -66,18 +74,24 @@ func _ready() -> void:
 	info.cost_bar.buy_asked.connect(ask_buy)
 	add_child(info)
 
-	reset_button = Button.new()
-	reset_button.position = PAGE_RECT.position + Vector2(PAGE_RECT.size.x - MARGIN - RESET_SIZE.x, MARGIN)
-	reset_button.size = RESET_SIZE
-	UiStyle.style_button(reset_button, 22)
-	reset_price = UiStyle.price_row(Lang.t("Reset tree"), EvolutionTree.RESET_COST, PURPLE_ICON, 22)
-	reset_button.add_child(reset_price)
-	reset_button.pressed.connect(_ask_reset)
-	add_child(reset_button)
-
+	utilities.add_theme_constant_override(&"separation", UTILITY_GAP)
+	utilities.alignment = BoxContainer.ALIGNMENT_END
+	utilities.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	utilities.position = Vector2(UTILITIES_RIGHT, UTILITIES_TOP)
+	utilities.resized.connect(func() -> void: utilities.position.x = UTILITIES_RIGHT - utilities.size.x)
+	add_child(utilities)
 	forge_bar = ForgeBar.new(essences)
-	forge_bar.position = reset_button.position - Vector2(FORGE_GAP + ForgeBar.SIZE.x, 0)
-	add_child(forge_bar)
+	reset_button = Button.new()
+	ForgeBar.quiet_style(reset_button, RESET_FONT)
+	reset_price = UiStyle.price_row(Lang.t("Reset tree"), EvolutionTree.RESET_COST, PURPLE_ICON, RESET_FONT)
+	reset_button.add_child(reset_price)
+	reset_button.custom_minimum_size = Vector2(reset_price.get_combined_minimum_size().x + ForgeBar.PAD * 2.0, ForgeBar.HEIGHT)
+	# Off most of the time: then only its dim words, no surface.
+	reset_button.add_theme_stylebox_override(&"disabled", StyleBoxEmpty.new())
+	reset_button.pressed.connect(_ask_reset)
+	for part: Control in [forge_bar, _hairline(), reset_button]:
+		part.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		utilities.add_child(part)
 
 	tree.changed.connect(refresh)
 	essences.changed.connect(refresh)
@@ -99,6 +113,7 @@ func show_branch(branch_id: StringName) -> void:
 	tabs.select(branch_id)
 	_clear_pick()
 	info.show_branch(branch_id)
+	_mark_next()
 
 
 ## Picks node `id`: its page shows, it gets the white outline and the info
@@ -110,6 +125,7 @@ func select(id: StringName) -> void:
 	for view: TreeNodeView in views.values():
 		view.selected = view.data.id == id
 	info.show_node(id)
+	_mark_next()
 
 
 ## Asks before buying node `id`'s next level (the cost bar's click), closing
@@ -136,6 +152,7 @@ func close_popup() -> bool:
 		return false
 	_clear_pick()
 	info.show_branch(branch)
+	_mark_next()
 	return true
 
 
@@ -152,6 +169,45 @@ func refresh() -> void:
 		reset_button.set_meta(&"hover_text", Lang.t("Needs %d purple essence") % EvolutionTree.RESET_COST)
 	elif reset_button.has_meta(&"hover_text"):
 		reset_button.remove_meta(&"hover_text")
+	_mark_next()
+
+
+## The next step on `branch_id`'s page: a free level first, else the cheapest
+## level that can be bought now (blue plus orange at the forge's rate; the
+## first in catalog order on a tie); &"" when nothing can be bought or claimed.
+static func next_step(evolution_tree: EvolutionTree, owned: Essences, branch_id: StringName) -> StringName:
+	var free := evolution_tree.free_ids(branch_id)
+	if not free.is_empty():
+		return free[0]
+	var best: StringName = &""
+	var best_cost := INF
+	for data in evolution_tree.branch_nodes(branch_id):
+		if not evolution_tree.can_buy(data.id, owned):
+			continue
+		var price := evolution_tree.cost(data.id)
+		var weight := price.x + price.y * float(Essences.FORGE_BLUE)
+		if weight < best_cost:
+			best_cost = weight
+			best = data.id
+	return best
+
+
+## Gold on the shown page's next step while nothing is picked.
+func _mark_next() -> void:
+	if info == null or branch == &"":
+		return
+	var marked: StringName = &"" if info.id != &"" else next_step(tree, essences, branch)
+	for view: TreeNodeView in views.values():
+		view.next = view.data.id == marked
+
+
+## A short upright hairline between the top bar's groups.
+func _hairline() -> Control:
+	var line := Control.new()
+	line.custom_minimum_size = Vector2(1, 28)
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	line.draw.connect(func() -> void: line.draw_rect(Rect2(Vector2.ZERO, line.size), Color(UiStyle.BORDER_COLOR, 0.35)))
+	return line
 
 
 ## The first branch with a free upgrade, else the first branch.

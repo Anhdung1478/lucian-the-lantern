@@ -93,14 +93,9 @@ func test_35_views_across_5_pages_and_one_page_shows() -> void:
 	assert_eq(shown, 1)
 
 
-func test_only_the_page_on_screen_animates() -> void:
-	assert_true(section.pages[&"skills"].is_processing())
-	assert_false(section.pages[&"stats"].is_processing())
-	_tab(&"stats").pressed.emit()
-	assert_false(section.pages[&"skills"].is_processing())
-	assert_true(section.pages[&"stats"].is_processing())
-	section.visible = false
-	assert_false(section.pages[&"stats"].is_processing(), "another section is shown")
+func test_no_page_moves_at_rest() -> void:
+	for branch: StringName in EvolutionTree.BRANCHES:
+		assert_false(section.pages[branch].is_processing(), str(branch))
 
 
 func test_the_tabs_switch_pages_and_light_the_chosen_one() -> void:
@@ -110,19 +105,65 @@ func test_the_tabs_switch_pages_and_light_the_chosen_one() -> void:
 		assert_eq(section.tabs.selected, branch)
 		for other: StringName in EvolutionTree.BRANCHES:
 			assert_eq(section.pages[other].visible, other == branch, "%s on %s" % [other, branch])
-			var border := (_tab(other).get_theme_stylebox(&"normal") as StyleBoxFlat).border_color
-			# The chosen tab's own rest box is clear: the sliding highlight lights it.
-			assert_eq(border.a == 0.0, other == branch, "%s lit on %s" % [other, branch])
-		assert_eq(section.tabs.highlight.target, _tab(branch), "the highlight is on %s" % branch)
+			var name_color: Color = section.tabs._names[EvolutionTree.BRANCHES.find(other)].get_theme_color(&"font_color")
+			assert_eq(name_color == UiStyle.TITLE_COLOR, other == branch, "%s lit on %s" % [other, branch])
+		assert_eq(section.tabs.highlight.target, _tab(branch), "the rule is under %s" % branch)
 
 
 func test_the_tabs_read_their_levels_bought() -> void:
-	assert_eq(section.tabs.counts[0].text, "0 / 19")
-	assert_eq(section.tabs.counts[1].text, "0 / 45")
+	assert_eq(section.tabs.counts[0].text, "0/19")
+	assert_eq(section.tabs.counts[1].text, "0/45")
 	_buy(&"stat_ad", 2)
 	_buy(&"stat_hp")
-	assert_eq(section.tabs.counts[1].text, "3 / 45")
-	assert_eq(section.tabs.counts[4].text, "0 / 25")
+	assert_eq(section.tabs.counts[1].text, "3/45")
+	assert_eq(section.tabs.counts[4].text, "0/25")
+
+
+func test_the_switch_is_inside_the_page_and_lighter_than_buttons() -> void:
+	var page_rect := Rect2(TreeSection.PAGE_RECT.position, TreePage.SIZE)
+	assert_true(page_rect.encloses(Rect2(section.tabs.position, section.tabs.size)), "inside the frame")
+	for button in section.tabs.buttons:
+		assert_true(button.get_theme_stylebox(&"normal") is StyleBoxEmpty, "no box")
+	assert_true(section.tabs.highlight.style is StyleBoxFlat)
+	assert_eq((section.tabs.highlight.style as StyleBoxFlat).bg_color.a, 0.0, "a rule, not a fill")
+
+
+func test_the_switch_fits_in_vietnamese_with_two_free_pills_and_the_largest_counts() -> void:
+	Lang.use(Lang.VIETNAMESE)
+	var tabs := BranchTabs.new()
+	add_child_autofree(tabs)
+	_save().tree.max_all()
+	tabs.refresh(_save().tree)
+	for i in tabs.free_badges.size():
+		tabs.free_badges[i].visible = i in [0, 4]
+	await wait_process_frames(2)
+	var width := tabs.get_combined_minimum_size().x
+	Lang.use(Lang.ENGLISH)
+	assert_lt(width, TreeSection.TABS_RECT.size.x, "the switch's row fits its band")
+
+
+func test_the_page_and_panel_are_journeys_frame() -> void:
+	assert_eq(TreeSection.PAGE_RECT, Rect2(Vector2(32, 8), JourneyMap.SIZE))
+	assert_eq(TreeSection.PANEL_RECT.position.y, TreeSection.PAGE_RECT.position.y)
+	assert_eq(TreeSection.PANEL_RECT.size.y, TreeSection.PAGE_RECT.size.y)
+
+
+func test_the_utilities_sit_in_the_top_bar_clear_of_the_page_and_the_toast() -> void:
+	await wait_process_frames(2)
+	var rect := Rect2(section.utilities.position, section.utilities.size)
+	assert_lt(rect.end.y, 0.0, "above the section: in the top bar")
+	assert_gt(rect.position.y, -MainScreen.TOP_BAR, "inside the top bar")
+	assert_almost_eq(rect.end.x, TreeSection.UTILITIES_RIGHT, 1.0, "its right end over the info column's")
+	# The longest toast, in either language, centred in the top bar.
+	for language: String in [Lang.ENGLISH, Lang.VIETNAMESE]:
+		Lang.use(language)
+		var font := section.get_theme_default_font()
+		var toast := font.get_string_size(Lang.t(MainScreen.COULD_NOT_START), HORIZONTAL_ALIGNMENT_LEFT, -1, MainScreen.TOAST_FONT).x + UiStyle.INSET * 2.0
+		assert_gt(rect.position.x, 960.0 + toast * 0.5 + 16.0, "%s: clear of the centred toast" % language)
+	Lang.use(Lang.ENGLISH)
+	assert_true(section.forge_bar.is_ancestor_of(section.forge_bar.buttons[1]))
+	assert_true(section.utilities.is_ancestor_of(section.reset_button))
+	assert_eq(section.forge_bar.word.text, "Forge")
 
 
 func test_a_new_save_opens_on_skills() -> void:
@@ -143,14 +184,41 @@ func test_the_tree_opens_on_the_first_branch_with_a_free_upgrade() -> void:
 	assert_eq(_new_section().branch, &"skills", "nothing free: Skills")
 
 
-func test_no_two_nodes_crowd_each_other_on_a_page() -> void:
-	# Maxed, so every name shows.
-	_save().tree.max_all()
+## Every node's footprint (tile, pips, name) on every page at least 10 (8 px)
+## from every other, inside the page and under the switch's band; no link
+## crosses another node.
+func _check_layout(language: String) -> void:
+	Lang.use(language)
+	var built := _new_section()
 	for branch: StringName in EvolutionTree.BRANCHES:
-		var ids: Array = section.pages[branch].views.keys()
+		var page: TreePage = built.pages[branch]
+		page.refresh()
+		page._lay_links()
+		var ids: Array = page.views.keys()
 		for i in ids.size():
+			var drawn := page.footprint(ids[i])
+			assert_true(Rect2(Vector2.ZERO, TreePage.SIZE).grow(-24.0).encloses(drawn), "%s %s %s" % [language, ids[i], drawn])
+			assert_gt(drawn.position.y, TreePage.CLEAR_TOP, "%s %s under the switch" % [language, ids[i]])
 			for j in range(i + 1, ids.size()):
-				assert_false(_drawn(section.views[ids[i]]).intersects(_drawn(section.views[ids[j]])), "%s and %s" % [ids[i], ids[j]])
+				assert_false(drawn.grow(10.0).intersects(page.footprint(ids[j])), "%s: %s and %s" % [language, ids[i], ids[j]])
+		for link in page.links:
+			var points: PackedVector2Array = link["points"]
+			var line := Rect2(points[0], Vector2.ZERO).expand(points[-1])
+			for id: StringName in ids:
+				if id != link["to"] and id != link["from"]:
+					assert_false(line.intersects(page.footprint(id)), "%s: the link %s-%s crosses %s" % [language, link["from"], link["to"], id])
+	Lang.use(Lang.ENGLISH)
+
+
+func test_no_two_nodes_crowd_each_other_in_either_language() -> void:
+	# Maxed, so every name shows; then a new save, so every rule tag shows.
+	for pass_number in 2:
+		if pass_number == 0:
+			_save().tree.max_all()
+		else:
+			_save().tree.clear()
+		_check_layout(Lang.ENGLISH)
+		_check_layout(Lang.VIETNAMESE)
 
 
 func test_every_view_stays_inside_its_page_at_1920x1080() -> void:
@@ -162,114 +230,106 @@ func test_every_view_stays_inside_its_page_at_1920x1080() -> void:
 	screen.add_child(main)
 	var tree_section := main.sections[MainScreen.SECTION_TREE] as TreeSection
 	main.show_section(MainScreen.SECTION_TREE)
-	var reset := tree_section.reset_button.get_global_rect()
 	for branch: StringName in EvolutionTree.BRANCHES:
 		tree_section.show_branch(branch)
 		var page: TreePage = tree_section.pages[branch]
 		var page_rect := page.get_global_rect()
 		assert_true(Rect2(Vector2.ZERO, screen.size).encloses(page_rect), str(page_rect))
-		assert_true(page_rect.encloses(reset), "Reset tree is on the page")
-		var forge := tree_section.forge_bar.get_global_rect()
-		assert_true(page_rect.encloses(forge), "the forge is on every page")
-		assert_false(forge.intersects(reset), "the forge is beside Reset tree")
-		assert_false(forge.intersects(Rect2(page_rect.position + TreePage.HEADER_RECT.position, TreePage.HEADER_RECT.size)), "clear of the header")
 		assert_false(page_rect.intersects(tree_section.info.get_global_rect()), "beside the info column")
-		assert_false(page_rect.intersects(tree_section.tabs.get_global_rect()), "above the tabs")
-		var header := Rect2(page_rect.position + TreePage.HEADER_RECT.position, TreePage.HEADER_RECT.size)
+		assert_false(page_rect.intersects(tree_section.utilities.get_global_rect()), "the utilities are off the page")
+		var tabs := tree_section.tabs.get_global_rect()
 		for view: TreeNodeView in page.views.values():
-			var drawn := _drawn(view)
+			var drawn := page.footprint(view.data.id)
 			drawn.position += page_rect.position
 			assert_true(page_rect.grow(-8.0).encloses(drawn), "%s %s" % [view.data.id, drawn])
-			assert_false(drawn.intersects(reset), "%s under Reset tree" % view.data.id)
-			assert_false(drawn.intersects(header), "%s under the header" % view.data.id)
+			assert_gt(drawn.position.y - tabs.end.y, 40.0, "%s clear of the switch" % view.data.id)
 
 
 # --- Nodes ----------------------------------------------------------------------------
 
 
-func test_a_node_is_grey_in_silver_then_gold_then_green_with_a_crest() -> void:
+func test_a_node_is_grey_then_lit_then_calm() -> void:
 	var view: TreeNodeView = section.views[&"stat_ad"]
 	assert_eq(view.state(), &"poor")
 	assert_true(view.is_grey(), "not bought: greyscale")
-	assert_eq(TreeNodeView.state_color(&"poor"), TreeNodeView.SILVER_COLOR)
-	assert_eq(TreeNodeView.state_color(&"open"), TreeNodeView.SILVER_COLOR)
-	assert_eq(TreeNodeView.border_width(&"open"), TreeNodeView.THIN_BORDER)
+	assert_false(view.is_lit())
 	_buy(&"stat_ad", 2)
 	assert_false(view.is_grey(), "in progress: full colour")
-	assert_eq(TreeNodeView.state_color(view.state()), UiStyle.GOLD_COLOR)
-	assert_eq(TreeNodeView.border_width(view.state()), TreeNodeView.BORDER)
-	assert_false(view.crest.visible)
-	assert_eq(view.badge.text, "2/5")
+	assert_true(view.is_lit())
 	_buy(&"stat_ad", 3)
 	assert_eq(view.state(), &"maxed")
-	assert_eq(TreeNodeView.state_color(view.state()), TreeNodeView.MAXED_COLOR)
-	assert_true(view.crest.visible)
-	assert_eq(view.badge.text, "MAX")
+	assert_true(view.is_lit())
 
 
-func test_the_ready_arrow_shows_while_the_next_level_can_be_bought() -> void:
-	var view: TreeNodeView = section.views[&"stat_ad"]
-	assert_false(view.ready_chip.visible, "too dear")
-	_save().essences.add(Essences.BLUE, 50)
-	assert_true(view.ready_chip.visible, "50 blue buys level 1")
-	assert_true(_save().tree.buy(&"stat_ad", _save().essences))
-	assert_false(view.ready_chip.visible, "level 2 costs 100")
-	_save().tree.max_all()
-	assert_false(view.ready_chip.visible, "maxed")
-	assert_false(section.views[&"skill_r"].ready_chip.visible, "hidden")
+func test_one_level_mark_a_pip_per_level_none_for_one_level() -> void:
+	assert_eq(TreeNodeView.pip_centers(1).size(), 0)
+	for count in range(2, 8):
+		var pips := TreeNodeView.pip_centers(count)
+		assert_eq(pips.size(), count)
+		assert_gt(pips[0].x - TreeNodeView.PIP * 0.5, 0.0, "inside the tile's width")
+		assert_lt(pips[-1].x + TreeNodeView.PIP * 0.5, TreeNodeView.SIZE)
+		assert_gt(pips[0].y - TreeNodeView.PIP * 0.5, TreeNodeView.SIZE, "under the tile")
+		assert_lt(pips[0].y + TreeNodeView.PIP * 0.5 + 8.0, TreeNodeView.NAME_TOP, "8 clear of the name")
 
 
-func test_the_chips_stay_off_every_other_nodes_drawing() -> void:
-	# First with essences to spare (the arrows), then maxed (the crests and every name).
-	_save().essences.add(Essences.BLUE, 100000)
-	_save().essences.add(Essences.ORANGE, 1000)
-	for pass_number in 2:
-		if pass_number == 1:
-			_save().tree.max_all()
-		var chips_seen := 0
-		for branch: StringName in EvolutionTree.BRANCHES:
-			var ids: Array = section.pages[branch].views.keys()
-			for id in ids:
-				var view: TreeNodeView = section.views[id]
-				for chip: Control in [view.ready_chip, view.crest]:
-					if not chip.visible:
-						continue
-					chips_seen += 1
-					var rect := Rect2(view.position + chip.position, chip.size)
-					for other in ids:
-						if other != id:
-							assert_false(rect.intersects(_drawn(section.views[other])), "%s chip on %s" % [id, other])
-		assert_gt(chips_seen, 0, "pass %d showed chips" % pass_number)
-
-
-func test_a_free_upgrade_shows_free_and_not_the_arrow() -> void:
+func test_a_free_upgrade_shows_free_in_the_level_marks_place() -> void:
 	_save().set_cleared(Journey.all_stage_ids(1))
 	var ghost: TreeNodeView = section.views[&"ghost"]
 	assert_true(ghost.free_badge.visible)
-	assert_false(ghost.ready_chip.visible)
+	assert_lt(ghost.free_badge.position.y + FreeBadge.SIZE.y, TreeNodeView.NAME_TOP, "above the name")
+	assert_gt(ghost.free_badge.position.y, TreeNodeView.SIZE, "under the tile")
 
 
-func test_the_level_bar_has_a_segment_per_level_inside_the_badge() -> void:
-	for count in range(1, 8):
-		var segments := TreeNodeView.segment_rects(count)
-		assert_eq(segments.size(), count)
-		for i in count:
-			assert_true(Rect2(Vector2.ZERO, TreeNodeView.BADGE_SIZE).encloses(segments[i]), "%d of %d" % [i, count])
-			if i > 0:
-				assert_gt(segments[i].position.x, segments[i - 1].end.x, "a gap between segments")
+func test_the_next_step_is_free_first_then_the_cheapest_you_can_buy_else_none() -> void:
+	var tree := _save().tree
+	var essences := _save().essences
+	assert_eq(TreeSection.next_step(tree, essences, &"stats"), &"", "nothing can be bought")
+	essences.add(Essences.BLUE, 60)
+	assert_eq(TreeSection.next_step(tree, essences, &"stats"), &"stat_ad", "level 1s cost 50: the first")
+	assert_true(tree.buy(&"stat_ad", essences))
+	essences.add(Essences.BLUE, 100)
+	assert_eq(TreeSection.next_step(tree, essences, &"stats"), &"stat_ap", "AD's next is 100, AP's 50")
+	_save().set_cleared(Journey.all_stage_ids(1))
+	assert_eq(TreeSection.next_step(tree, essences, &"summoners"), &"ghost", "a free level first")
 
 
-func test_the_info_column_greys_what_is_not_bought() -> void:
+func test_only_the_next_step_wears_gold_and_only_at_rest() -> void:
+	_save().essences.add(Essences.BLUE, 60)
 	section.show_branch(&"stats")
-	var info := section.info
-	var icon: TextureRect = info.rows[&"stat_ad"].get_node(^"Line/Icon")
-	assert_not_null(icon.material, "not bought")
-	_buy(&"stat_ad")
-	assert_null(icon.material, "bought")
-	section.select(&"stat_ap")
-	assert_not_null(info._portrait.material, "Ability Power is not bought")
-	section.select(&"stat_ad")
-	assert_null(info._portrait.material)
+	var gold := section.views.values().filter(func(view: TreeNodeView) -> bool: return view.next)
+	assert_eq(gold.size(), 1)
+	assert_eq(gold[0].data.id, &"stat_ad")
+	section.select(&"stat_hp")
+	assert_false(section.views.values().any(func(view: TreeNodeView) -> bool: return view.next), "a pick takes over")
+	section.close_popup()
+	assert_true(section.views[&"stat_ad"].next, "back at rest")
+	_save().essences.set_amount(Essences.BLUE, 0)
+	assert_false(section.views[&"stat_ad"].next, "nothing to act on: no gold")
+
+
+func test_a_hidden_node_says_what_opens_it_where_its_name_goes() -> void:
+	assert_eq(section.views[&"skill_q"].shown_name(), "Clear Act 1")
+	assert_eq(section.views[&"passive"].shown_name(), "Any of Q, W, E")
+	assert_eq(section.views[&"skill_r"].shown_name(), "Clear Act 2")
+	assert_eq(section.views[&"summoner_slot_2"].shown_name(), "Any 2 spells")
+	assert_eq(section.views[&"flash_upgrade"].shown_name(), "", "the link to Flash says it")
+	_save().set_cleared(Journey.all_stage_ids(1))
+	assert_eq(section.views[&"skill_q"].shown_name(), "Q – Piercing Light")
+
+
+func test_links_only_for_all_of_requirements_lit_by_the_needed_node() -> void:
+	var skills: TreePage = section.pages[&"skills"]
+	var summoners: TreePage = section.pages[&"summoners"]
+	skills._lay_links()
+	summoners._lay_links()
+	assert_eq(skills.links.size(), 1)
+	assert_eq([skills.links[0]["from"], skills.links[0]["to"]], [&"passive", &"skill_r"])
+	assert_eq(summoners.links.size(), 6)
+	for branch: StringName in [&"stats", &"backpack", &"economy"]:
+		section.pages[branch]._lay_links()
+		assert_eq(section.pages[branch].links.size(), 0, str(branch))
+	for link in summoners.links:
+		assert_eq(link["to"], StringName(String(link["from"]) + "_upgrade"))
 
 
 func test_a_new_save_hides_q_w_e_and_the_passive() -> void:
@@ -287,20 +347,10 @@ func test_clearing_act_1_opens_q_and_w_and_puts_e_at_level_1() -> void:
 	assert_eq(_save().essences.amount(Essences.BLUE), 0, "E's first level is free")
 
 
-func test_the_badge_reads_the_level_and_hidden_nodes_have_none() -> void:
-	_buy(&"stat_ad", 2)
-	assert_eq(section.views[&"stat_ad"].badge.text, "2/5")
-	assert_eq(section.views[&"stat_ap"].badge.text, "0/5")
-	assert_false(section.views[&"passive"].badge.visible)
-	assert_false(section.views[&"skill_q"].badge.visible, "hidden until Act 1 is cleared")
-
-
-func test_nodes_are_96_px_with_a_larger_badge() -> void:
+func test_nodes_are_96_px() -> void:
 	var view: TreeNodeView = section.views[&"stat_ad"]
 	assert_eq(TreeNodeView.SIZE, 96.0)
-	assert_eq(view.size.x, 96.0)
-	assert_true(view.badge.size.x > 40.0 and view.badge.size.y > 19.0, str(view.badge.size))
-	assert_eq(view.badge.get_theme_font_size(&"font_size"), TreeNodeView.BADGE_FONT)
+	assert_eq(view.size, Vector2(96, 96))
 
 
 func test_a_bought_node_whose_next_level_is_closed_shows_the_lock() -> void:
@@ -330,7 +380,9 @@ func test_hover_card_shows_the_name_and_current_value() -> void:
 	var card: Control = section.views[&"stat_ad"].tooltip_content()
 	assert_eq(_texts(card), PackedStringArray(["+8 AD"]), "review r1 D9: the name is under the node already")
 	card.free()
-	assert_null(section.views[&"passive"].tooltip_content(), "a hidden node has nothing to add")
+	card = section.views[&"passive"].tooltip_content()
+	assert_eq(_texts(card), PackedStringArray([_save().tree.requirement_text(&"passive", 0)]), "a hidden node says what opens it")
+	card.free()
 	var view: TreeNodeView = section.views[&"stat_ad"]
 	var frame := view.get_global_transform() * Rect2(Vector2.ZERO, Vector2.ONE * TreeNodeView.SIZE)
 	assert_almost_eq(view.tooltip_anchor().end.x + HoverTip.GAP, frame.end.x + TreeNodeView.CARD_GAP, 0.01, "12 px off the frame")
@@ -797,7 +849,7 @@ func test_reset_asks_first_and_yes_refunds_every_node() -> void:
 		assert_eq(_save().tree.level(data.id), 0, str(data.id))
 	assert_eq(_state(&"skill_q"), &"open")
 	assert_eq(section.info.level_label.text, "LVL 0 / 5")
-	assert_eq(section.tabs.counts[1].text, "0 / 45")
+	assert_eq(section.tabs.counts[1].text, "0/45")
 	assert_true(section.reset_button.disabled)
 
 
@@ -933,18 +985,12 @@ func test_the_badge_ignores_the_mouse() -> void:
 	assert_eq(section.views[&"ghost"].free_badge.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 
 
-func test_the_free_badge_pulses_only_while_it_shows() -> void:
+func test_the_free_badge_holds_still() -> void:
 	var shown := FreeBadge.new()
 	add_child_autofree(shown)
-	assert_true(shown.is_processing(), "visible when it enters the tree")
-	shown.hide()
-	assert_false(shown.is_processing(), "hidden")
-	shown.show()
-	assert_true(shown.is_processing(), "shown again")
-	var hidden := FreeBadge.new()
-	hidden.visible = false
-	add_child_autofree(hidden)
-	assert_false(hidden.is_processing(), "hidden when it enters the tree")
+	await wait_process_frames(3)
+	assert_false(shown.is_processing())
+	assert_eq(shown.modulate.a, 1.0)
 
 
 func test_forge_buttons_forge_one_and_ten_and_the_amounts_update() -> void:

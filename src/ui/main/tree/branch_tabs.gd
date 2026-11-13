@@ -1,120 +1,135 @@
 class_name BranchTabs
 extends HBoxContainer
-## The Evolution Tree's branch tabs, a strip under the pages: Skills, Stats,
-## Backpack, Economy and Summoners, each with its icon, name and levels bought
-## ("3 / 19"). The tabs hang from the page's bottom edge; the chosen one is
-## lit gold by a highlight that slides from tab to tab (SlideHighlight), its
-## name and count easing to gold. The counts count as levels are bought.
+## The Evolution Tree's branch switch, over the top of the page inside its
+## frame: Skills, Stats, Backpack, Economy and Summoners as a row of Lantern
+## headings, each its name in spaced capitals and its levels bought ("3/19"),
+## with a FREE pill while the branch has a free upgrade. The lit one is the
+## page's title (pale gold); a gold rule under it slides to the next one
+## (SlideHighlight). No boxes and no fills: lighter than the section bar.
+## The names ease between dim, hovered and lit; the counts count.
 
 signal branch_chosen(branch: StringName)
 
-const HEIGHT := 64.0
-const TAB_HEIGHT := 56.0
-const ICON_SIZE := 34.0
-const NAME_FONT := 21
-const COUNT_FONT := 17
-const GAP := 12
-## The FREE badge's distance from a tab's top-right corner; it straddles the tab's top edge.
-const BADGE_MARGIN := Vector2(8, -10)
+const HEIGHT := 50.0
+const NAME_FONT := 20
+const COUNT_FONT := 16
+## Between two items, and inside one (name, count, pill).
+const GAP := 44
+const INNER_GAP := 10
+const SPACING := 3
+## The rule under the lit item.
+const RULE_WIDTH := 2
 
-## One tab per EvolutionTree.BRANCHES entry, in that order.
+## One item per EvolutionTree.BRANCHES entry, in that order.
 var buttons: Array[Button] = []
-## Each tab's levels bought, "3 / 19".
+## Each item's levels bought, "3/19".
 var counts: Array[CountLabel] = []
-## The chosen tab's fill, sliding between tabs.
+## The gold rule under the lit item, sliding between them.
 var highlight: SlideHighlight
-## The lit tab's branch.
+## The lit item's branch.
 var selected: StringName
-
-## Each tab's FREE badge, shown while its branch has a free upgrade.
+## Each item's FREE pill, shown while its branch has a free upgrade.
 var free_badges: Array[FreeBadge] = []
 
 var _names: Array[Label] = []
+var _rows: Array[HBoxContainer] = []
+var _hovered := {}
 var _tints := {}
 
 
 func _init() -> void:
 	add_theme_constant_override(&"separation", GAP)
-	var lit_box := UiStyle.button_style(&"normal", true)
-	_shape(lit_box)
-	highlight = SlideHighlight.under(self, lit_box)
+	var rule := StyleBoxFlat.new()
+	rule.bg_color = Color(0, 0, 0, 0)
+	rule.border_color = UiStyle.GOLD_COLOR
+	rule.border_width_bottom = RULE_WIDTH
+	highlight = SlideHighlight.under(self, rule)
 	for branch: StringName in EvolutionTree.BRANCHES:
 		var button := Button.new()
-		button.custom_minimum_size.y = TAB_HEIGHT
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.custom_minimum_size.y = HEIGHT
+		button.focus_mode = Control.FOCUS_NONE
+		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		button.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		for state: StringName in [&"normal", &"hover", &"pressed", &"disabled", &"focus"]:
+			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+		UiStyle.add_click(button)
 		button.pressed.connect(branch_chosen.emit.bind(branch))
+		button.mouse_entered.connect(_hover.bind(button, true))
+		button.mouse_exited.connect(_hover.bind(button, false))
 		add_child(button)
 		buttons.append(button)
-		UiStyle.style_button(button, NAME_FONT)
-		for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
-			_shape(button.get_theme_stylebox(state) as StyleBoxFlat)
-		# An unchosen tab keeps its own rest box; the chosen one's turns clear
-		# so the highlight under it shows (select()).
 		var row := HBoxContainer.new()
 		row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		row.alignment = BoxContainer.ALIGNMENT_CENTER
-		row.add_theme_constant_override(&"separation", 10)
+		row.add_theme_constant_override(&"separation", INNER_GAP)
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.minimum_size_changed.connect(_fit.bind(button, row))
 		button.add_child(row)
-		var icon := TextureRect.new()
-		icon.texture = TreePage.ICONS[branch]
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.custom_minimum_size = Vector2.ONE * ICON_SIZE
-		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		row.add_child(icon)
-		var title := UiStyle.label(Lang.t(TreePage.NAMES[branch]), NAME_FONT)
+		_rows.append(row)
+		var title := UiStyle.label(Lang.t(TreePage.NAMES[branch]), NAME_FONT, UiStyle.DIM_COLOR)
+		title.uppercase = true
+		title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(title)
 		_names.append(title)
 		var count := CountLabel.new()
 		count.add_theme_font_size_override(&"font_size", COUNT_FONT)
 		count.add_theme_color_override(&"font_color", UiStyle.DIM_COLOR)
+		count.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(count)
 		counts.append(count)
 		var free := FreeBadge.new()
-		free.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-		free.offset_left = -FreeBadge.SIZE.x - BADGE_MARGIN.x
-		free.offset_right = -BADGE_MARGIN.x
-		free.offset_top = BADGE_MARGIN.y
-		free.offset_bottom = BADGE_MARGIN.y + FreeBadge.SIZE.y
+		free.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		free.visible = false
-		button.add_child(free)
+		row.add_child(free)
 		free_badges.append(free)
 	select(EvolutionTree.BRANCHES[0])
 
 
-## Lights `branch`'s tab and dims the others: the highlight slides to it
-## and the names and counts ease. Does not emit.
+func _ready() -> void:
+	# The capitals spread out; the label's font is only known in the tree.
+	for title in _names:
+		var spaced := FontVariation.new()
+		spaced.base_font = title.get_theme_font(&"font")
+		spaced.spacing_glyph = SPACING
+		title.add_theme_font_override(&"font", spaced)
+	for i in buttons.size():
+		_fit(buttons[i], _rows[i])
+
+
+## Lights `branch`'s item and dims the others: the rule slides to it and the
+## names and counts ease. Does not emit.
 func select(branch: StringName) -> void:
 	selected = branch
 	for i in buttons.size():
-		var lit := EvolutionTree.BRANCHES[i] == branch
-		UiStyle.set_selected(buttons[i], lit, not lit)
-		_tint(_names[i], UiStyle.TITLE_COLOR if lit else UiStyle.TEXT_COLOR)
-		_tint(counts[i], UiStyle.GOLD_COLOR if lit else UiStyle.DIM_COLOR)
+		_retint(i)
 	highlight.follow(buttons[EvolutionTree.BRANCHES.find(branch)])
 
 
-## Rereads each tab's levels bought.
+## Rereads each item's levels bought and FREE pill.
 func refresh(tree: EvolutionTree) -> void:
 	for i in buttons.size():
 		var bought := TreePage.levels(tree, EvolutionTree.BRANCHES[i])
-		counts[i].formatter = func(v: int) -> String: return "%d / %d" % [v, bought.y]
+		counts[i].formatter = func(v: int) -> String: return "%d/%d" % [v, bought.y]
 		counts[i].set_value(bought.x)
 		free_badges[i].visible = tree.has_free(EvolutionTree.BRANCHES[i])
 
 
-## A tab's box: hanging from the page, so no top rim and round at the foot.
-static func _shape(style: StyleBoxFlat) -> void:
-	style.border_width_top = 0
-	style.corner_radius_top_left = 0
-	style.corner_radius_top_right = 0
-	style.corner_radius_bottom_left = 12
-	style.corner_radius_bottom_right = 12
+## The row's width (the button takes it).
+func _fit(button: Button, row: HBoxContainer) -> void:
+	button.custom_minimum_size.x = row.get_combined_minimum_size().x
+
+
+func _hover(button: Button, on: bool) -> void:
+	_hovered[button] = on
+	_retint(buttons.find(button))
+
+
+func _retint(i: int) -> void:
+	var lit := EvolutionTree.BRANCHES[i] == selected
+	var hovered: bool = _hovered.get(buttons[i], false)
+	_tint(_names[i], UiStyle.TITLE_COLOR if lit else (UiStyle.TEXT_COLOR if hovered else UiStyle.DIM_COLOR))
+	_tint(counts[i], UiStyle.GOLD_COLOR if lit else UiStyle.DIM_COLOR)
 
 
 ## Eases `label`'s font colour to `color` over UiMotion.FAST.
