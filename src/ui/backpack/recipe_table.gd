@@ -17,7 +17,6 @@ const HEADING_FONT := 18
 const BOOTS_HEADING := "BOOTS"
 const BOOTS_FONT := 15
 const NOTE := "Lit gold: you hold both parts."
-const NOTE_FONT := 13
 
 var inventory: Inventory
 
@@ -61,7 +60,7 @@ func setup(catalog: ItemCatalog, held: Inventory = null) -> void:
 		var row := RecipeRow.new(made, catalog)
 		_list.add_child(row)
 		_rows.append(row)
-	box.add_child(UiStyle.label(Lang.t(NOTE), NOTE_FONT, UiStyle.DIM_COLOR))
+	box.add_child(UiStyle.note(Lang.t(NOTE)))
 	if inventory:
 		inventory.changed.connect(refresh)
 	refresh()

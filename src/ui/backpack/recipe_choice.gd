@@ -3,7 +3,8 @@ extends Control
 ## One cell of a recipe line that takes either of several items: the two
 ## starting boots of a second-tier boots line, which make the same boots. The
 ## items share one dark well, stepping down its diagonal, and each has its
-## own card. The rim is the first item's kind, gold while `lit`.
+## own card. The rim is the first item's kind, gold while `lit` (unless
+## `show_lit` is off).
 
 ## Each item's side, as a share of the room inside the well.
 const SHARE := 0.6
@@ -13,6 +14,7 @@ var lit := false:
 	set(value):
 		lit = value
 		queue_redraw()
+var show_lit := true
 
 
 func _init(options: Array[ItemData], catalog: ItemCatalog) -> void:
@@ -29,7 +31,7 @@ func _notification(what: int) -> void:
 
 
 func _draw() -> void:
-	draw_style_box(UiStyle.cell_style(UiStyle.item_rim(icons[0].item), lit, ItemIcon.FRAME_RADIUS), Rect2(Vector2.ZERO, size))
+	draw_style_box(UiStyle.cell_style(UiStyle.item_rim(icons[0].item), lit and show_lit, ItemIcon.FRAME_RADIUS), Rect2(Vector2.ZERO, size))
 
 
 ## The items from the well's top-left corner to its bottom-right one.

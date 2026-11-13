@@ -244,3 +244,17 @@ func _first_id(row: RecipeRow) -> StringName:
 	var part: Control = row._parts[0]
 	return (part as RecipeChoice).icons[0].item.id if part is RecipeChoice else (part as ItemIcon).item.id
 
+
+
+func test_a_lit_line_is_raised_with_a_gold_name_and_keeps_its_rims() -> void:
+	give(&"sword")
+	give(&"rod")
+	var gunblade: RecipeRow = table.rows()[0]
+	var box := gunblade.get_theme_stylebox(&"panel") as StyleBoxFlat
+	assert_eq(box.bg_color, UiStyle.SURFACE_RAISED, "a raised fill")
+	assert_eq(box.border_width_left, 0, "no frame")
+	assert_eq(gunblade._name.get_theme_color(&"font_color"), UiStyle.GOLD_COLOR)
+	assert_false(gunblade._result.show_lit, "the cells keep their kind's rim")
+	assert_eq(box.content_margin_right, float(UiStyle.INSET), "the name keeps its inset")
+	var plain: RecipeRow = table.rows()[1]
+	assert_eq((plain.get_theme_stylebox(&"panel") as StyleBoxFlat).bg_color.a, 0.0)

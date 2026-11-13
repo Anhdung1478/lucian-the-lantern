@@ -3,7 +3,8 @@ extends Control
 ## Draws an item's icon. Items without an icon yet get a colored tile with
 ## their code. Hovering shows the item card when `tooltips` is on. When
 ## `framed`, the icon sits in a dark well whose rim follows the item
-## (UiStyle.item_rim) and is gold while `lit`.
+## (UiStyle.item_rim) and is gold while `lit` (unless `show_lit` is off: the
+## recipe lines keep every rim its kind's colour).
 
 ## Tile colors by fragment code; legendaries use LEGENDARY_COLOR.
 const CODE_COLORS := {
@@ -41,6 +42,7 @@ var lit := false:
 	set(value):
 		lit = value
 		queue_redraw()
+var show_lit := true
 
 
 func _init(icon_item: ItemData = null, item_catalog: ItemCatalog = null) -> void:
@@ -56,7 +58,7 @@ func tooltip_content() -> Control:
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, size)
 	if framed:
-		draw_style_box(UiStyle.cell_style(UiStyle.item_rim(item), lit, FRAME_RADIUS), rect)
+		draw_style_box(UiStyle.cell_style(UiStyle.item_rim(item), lit and show_lit, FRAME_RADIUS), rect)
 		rect = rect.grow(-FRAME_INSET)
 	draw_item(self, item, rect)
 
