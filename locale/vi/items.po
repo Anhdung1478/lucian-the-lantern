@@ -39,11 +39,11 @@ msgstr "Nội Tại — %s"
 
 #. Item card footer of a fragment.
 msgid "Craft it with another fragment at the merchant's Craft tab."
-msgstr "Ghép với một mảnh ghép khác ở tab Chế Tạo của thương nhân."
+msgstr "Chế tạo cùng một mảnh ghép khác ở tab Chế Tạo của thương nhân."
 
 #. Item card footer of a potion. %s is the key bound to the potion, %d the stack size.
 msgid "Put it in its potion cell and press %s to drink. Stacks up to %d."
-msgstr "Đặt vào ô bình thuốc của nó và nhấn %s để uống. Xếp chồng tối đa %d."
+msgstr "Đặt vào ô bình thuốc rồi nhấn %s để uống. Xếp chồng tối đa %d."
 
 #. Shop card footer, one line per recipe. First %s is the legendary made, second the partner the player holds.
 msgid "Builds into %s with %s (you have it)"
@@ -51,7 +51,7 @@ msgstr "Ghép thành %s cùng %s (bạn đang có)"
 
 #. Shop card footer: how many more recipes are not listed.
 msgid "+%d more"
-msgstr "+%d nữa"
+msgstr "+%d khác"
 
 #. Shop card footer: %s is the boots the worn pair upgrades into.
 msgid "Upgrades your Boots into %s"
@@ -155,7 +155,7 @@ msgstr "Di chuyển và đánh sẽ tích điện; lướt tích nhanh gấp đ�
 
 #. HUD buff card text of Kraken Slayer. Damage, then the number of the next attack.
 msgid "Every third basic attack deals [phys]%d bonus physical damage[/phys]. Next attack: %d of 3."
-msgstr "Cứ ba đòn đánh thì đòn thứ ba gây [phys]%d sát thương vật lý cộng thêm[/phys]. Đòn kế tiếp: %d trên 3."
+msgstr "Mỗi đòn đánh thứ ba gây [phys]%d sát thương vật lý cộng thêm[/phys]. Đòn kế tiếp: %d/3."
 
 #. HUD buff card text of Spellblade.
 msgid "The next basic attack deals bonus [phys]physical damage[/phys] and restores [mana]mana[/mana]."
@@ -191,15 +191,15 @@ msgstr "[hp]+%s%% hút máu toàn phần[/hp] từ việc hạ tinh anh, trùm p
 
 #. HUD buff card text of Ignore Pain. Percent delayed, seconds.
 msgid "%d%% of damage taken is dealt over %d s instead. This is the damage still to come."
-msgstr "%d%% sát thương nhận vào được chia ra nhận trong %d s. Đây là phần sát thương còn lại."
+msgstr "%d%% sát thương nhận vào được dồn lại và nhận dần trong %d s. Đây là phần sát thương còn chờ."
 
 #. HUD buff card text of Noxian Persistence. %d is the seconds.
 msgid "Taking [magic]magic damage[/magic] grants a shield against it for %d s."
-msgstr "Khi nhận [magic]sát thương phép[/magic], nhận lá chắn chống nó trong %d s."
+msgstr "Khi chịu [magic]sát thương phép[/magic], nhận lá chắn chống sát thương phép trong %d s."
 
 #. HUD buff card text of Noxian Endurance. %d is the seconds.
 msgid "Taking [phys]physical damage[/phys] grants a shield against it for %d s."
-msgstr "Khi nhận [phys]sát thương vật lý[/phys], nhận lá chắn chống nó trong %d s."
+msgstr "Khi chịu [phys]sát thương vật lý[/phys], nhận lá chắn chống sát thương vật lý trong %d s."
 
 #. Pop-up when a bought item has no room.
 msgid "Your backpack is full."
@@ -207,11 +207,11 @@ msgstr "Ba lô của bạn đã đầy."
 
 #. Pop-up of the one-penetration rule. %s is the penetration item already equipped.
 msgid "Only one penetration item can be equipped,\nand %s already is."
-msgstr "Chỉ có thể trang bị một món xuyên giáp hoặc xuyên kháng phép,\nvà %s đã được trang bị."
+msgstr "Chỉ được trang bị một món xuyên giáp hoặc xuyên kháng phép,\nmà %s đang được trang bị."
 
 #. Merchant message line when boots are dragged to the sell slot.
 msgid "Boots can't be sold"
-msgstr "Giày không thể bán"
+msgstr "Không thể bán giày"
 
 #. Hover card of the sell slot.
 msgid "Drop an item here to sell it for 70% of its cost (Guardian Angel: 40%)."
@@ -229,9 +229,9 @@ msgstr "Mua Ô Ba Lô trong Cây Tiến Hóa"
 msgid "Buy Boots in the Evolution Tree"
 msgstr "Mua Giày trong Cây Tiến Hóa"
 
-#. Hover card of an empty potion cell. First %s is Health or Mana, second the key.
+#. Hover card of an empty potion cell. First %s is Health or Mana (making the potion's name), second the key.
 msgid "%s potions go here: press %s to drink one"
-msgstr "Bình thuốc %s đặt ở đây: nhấn %s để uống một bình"
+msgstr "Bình %s đặt ở đây: nhấn %s để uống một bình"
 
 #. The sell slot's word.
 msgid "SELL"
@@ -299,15 +299,15 @@ msgstr "Không còn gì để làm mới"
 
 #. Merchant red message.
 msgid "Those don't craft into anything"
-msgstr "Hai món này không ghép được thành gì"
+msgstr "Hai món này không chế tạo ra được gì"
 
 #. Merchant red message.
 msgid "That item can't go there"
-msgstr "Món đồ đó không thể đặt vào đó"
+msgstr "Không thể đặt món đồ đó vào đây"
 
 #. Merchant red message.
 msgid "No sale to undo"
-msgstr "Không có giao dịch bán để hoàn tác"
+msgstr "Chưa bán gì để hoàn tác"
 
 #. Merchant red message.
 msgid "That slot is locked"
@@ -319,7 +319,7 @@ msgstr "Không có công thức"
 
 #. Merchant button that buys back the last sale.
 msgid "Undo sale"
-msgstr "Hoàn tác bán"
+msgstr "Hủy bán"
 
 #. Merchant button that rerolls the stock.
 msgid "Refresh"
@@ -415,7 +415,7 @@ msgstr "Đòn đánh gây chừng này [phys]sát thương vật lý[/phys]. Nhi
 
 #. Stat card text of Ability Power.
 msgid "Makes skills and item effects that scale with Ability Power stronger."
-msgstr "Làm mạnh hơn các kỹ năng và hiệu ứng trang bị tăng theo Sức Mạnh Phép Thuật."
+msgstr "Cường hóa các kỹ năng và hiệu ứng trang bị tăng theo Sức Mạnh Phép Thuật."
 
 #. Stat card text of Armor.
 msgid "Lowers [phys]physical damage[/phys] taken: 100 armor blocks half."
@@ -431,11 +431,11 @@ msgstr "Số đòn đánh mỗi giây (tối đa 2.5)."
 
 #. Stat card text of Ability Haste.
 msgid "Shortens skill cooldowns: 100 haste halves them."
-msgstr "Rút ngắn thời gian hồi kỹ năng: 100 điểm hồi giảm một nửa."
+msgstr "Rút ngắn thời gian hồi chiêu của kỹ năng: 100 điểm giảm một nửa."
 
 #. Stat card text of Crit Chance.
 msgid "Chance for a basic attack to critically strike for 175% damage."
-msgstr "Cơ hội để đòn đánh chí mạng, gây 175% sát thương."
+msgstr "Tỉ lệ đòn đánh chí mạng, gây 175% sát thương."
 
 #. Stat card text of Move Speed.
 msgid "Units Lucian moves per second."
@@ -455,15 +455,15 @@ msgstr "[hp]Máu[/hp] / [mana]năng lượng[/mana] hồi lại mỗi giây."
 
 #. Stat card text of Heal and Shield Power.
 msgid "Makes heals and shields on Lucian stronger."
-msgstr "Làm hồi máu và lá chắn lên Lucian mạnh hơn."
+msgstr "Tăng hiệu quả hồi máu và lá chắn Lucian nhận được."
 
 #. Stat card text of Armor Penetration.
 msgid "Ignores this share of the target's armor."
-msgstr "Bỏ qua phần giáp này của mục tiêu."
+msgstr "Bỏ qua tỉ lệ giáp này của mục tiêu."
 
 #. Stat card text of Magic Penetration.
 msgid "Ignores this share of the target's magic resist."
-msgstr "Bỏ qua phần kháng phép này của mục tiêu."
+msgstr "Bỏ qua tỉ lệ kháng phép này của mục tiêu."
 
 #. Stat card text of flat Magic Penetration.
 msgid "Ignores this much of the target's magic resist, after the percent penetration."
@@ -471,27 +471,27 @@ msgstr "Bỏ qua chừng này kháng phép của mục tiêu, sau khi tính xuy�
 
 #. Stat card text of Life Steal.
 msgid "Basic attacks heal Lucian for this share of their damage."
-msgstr "Đòn đánh hồi máu cho Lucian bằng phần này của sát thương."
+msgstr "Đòn đánh hồi máu cho Lucian theo tỉ lệ này của sát thương gây ra."
 
 #. Stat card text of Omnivamp.
 msgid "All damage heals Lucian for this share of it."
-msgstr "Mọi sát thương hồi máu cho Lucian bằng phần này của nó."
+msgstr "Mọi sát thương gây ra hồi máu cho Lucian theo tỉ lệ này."
 
 #. Stat card text of Attack Range.
 msgid "How far basic attacks reach."
-msgstr "Đòn đánh với được bao xa."
+msgstr "Tầm xa của đòn đánh."
 
 #. Stat card text of Tenacity.
 msgid "Shortens crowd control on Lucian."
-msgstr "Rút ngắn thời gian khống chế lên Lucian."
+msgstr "Rút ngắn thời gian Lucian bị khống chế."
 
 #. Stat card text of Slow Resist.
 msgid "Weakens slows on Lucian by this share."
-msgstr "Làm yếu hiệu ứng làm chậm lên Lucian đi phần này."
+msgstr "Giảm hiệu quả làm chậm lên Lucian theo tỉ lệ này."
 
 #. Stat card text of Summoner Spell Haste.
 msgid "Shortens summoner spell cooldowns: 100 haste halves them."
-msgstr "Rút ngắn thời gian hồi phép bổ trợ: 100 điểm hồi giảm một nửa."
+msgstr "Rút ngắn thời gian hồi chiêu của phép bổ trợ: 100 điểm giảm một nửa."
 
 #. description of the effect Plating in data/items (armored_advance, plated_steelcaps), shown on the item card
 msgid "Enemy basic attacks deal 10% less damage. Burns don't count."
@@ -531,7 +531,7 @@ msgstr "Nhận [ap]Sức Mạnh Phép Thuật bằng 2% năng lượng tối đa
 
 #. description of the effect Mana Charge in data/items (archangels_staff), shown on the item card
 msgid "Hitting an enemy with a skill grants [mana]3 max mana[/mana], up to [mana]360[/mana]."
-msgstr "Kỹ năng trúng kẻ địch được [mana]3 năng lượng tối đa[/mana], tối đa [mana]360[/mana]."
+msgstr "Kỹ năng trúng kẻ địch cho thêm [mana]3 năng lượng tối đa[/mana], tối đa [mana]360[/mana]."
 
 #. description of the effect Annul in data/items (banshees_veil), shown on the item card
 msgid "Grants a spell shield that blocks the next enemy skill. It comes back 40 s after it breaks."
@@ -543,7 +543,7 @@ msgstr "Gây sát thương vật lý làm giảm 5% giáp của mục tiêu tron
 
 #. description of the effect Fervor in data/items (black_cleaver), shown on the item card
 msgid "Damaging an enemy grants [ms]20 move speed[/ms] for 2 s."
-msgstr "Gây sát thương cho kẻ địch được [ms]20 tốc độ di chuyển[/ms] trong 2 s."
+msgstr "Gây sát thương lên kẻ địch sẽ nhận [ms]20 tốc độ di chuyển[/ms] trong 2 s."
 
 #. description of the effect Ichorshield in data/items (bloodthirster), shown on the item card
 msgid "Healing from life steal above full health becomes a [hp]shield[/hp] that absorbs up to [hp]300 damage[/hp]."
@@ -603,7 +603,7 @@ msgstr "Sau 15 s không nhận sát thương phép, nhận [magic]lá chắn ch�
 
 #. description of the effect Bring It Down in data/items (kraken_slayer), shown on the item card
 msgid "Every third basic attack deals [phys]140 bonus physical damage[/phys], up to 50% more against enemies with low health."
-msgstr "Cứ ba đòn đánh thì đòn thứ ba gây [phys]140 sát thương vật lý cộng thêm[/phys], tối đa thêm 50% lên kẻ địch ít máu."
+msgstr "Mỗi đòn đánh thứ ba gây [phys]140 sát thương vật lý cộng thêm[/phys], tăng tới 50% lên kẻ địch ít máu."
 
 #. description of the effect Giant Slayer in data/items (lord_dominiks_regards), shown on the item card
 msgid "Deal up to [phys]15% more damage[/phys] to enemies with more max health than Lucian."
@@ -639,7 +639,7 @@ msgstr "Đòn đánh gây thêm [magic]15 (+20% SMPT) sát thương phép[/magic
 
 #. description of the effect Transcendence in data/items (navori_flickerblade), shown on the item card
 msgid "Basic attacks lower the remaining cooldowns of Q, W and E by 12%."
-msgstr "Đòn đánh giảm 12% thời gian hồi còn lại của Q, W và E."
+msgstr "Đòn đánh giảm 12% thời gian hồi chiêu còn lại của Q, W và E."
 
 #. description of the effect Magical Opus in data/items (rabadons_deathcap), shown on the item card
 msgid "Increases Lucian's total [ap]Ability Power by 30%[/ap]."
