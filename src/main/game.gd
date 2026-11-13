@@ -94,7 +94,7 @@ func show_title() -> void:
 func ask_to_exit() -> void:
 	if prompt.is_open():
 		return
-	prompt.confirm("Exit the game?", "Exit", quit_game)
+	prompt.confirm(Lang.t("Exit the game?"), Lang.t("Exit"), quit_game)
 
 
 ## Leave to main menu: "Save before leaving?" Yes saves and No doesn't, then
@@ -102,12 +102,12 @@ func ask_to_exit() -> void:
 func ask_to_leave() -> void:
 	if prompt.is_open():
 		return
-	prompt.ask_or_cancel("Save before leaving?", _leave.bind(true), _leave.bind(false))
+	prompt.ask_or_cancel(Lang.t("Save before leaving?"), _leave.bind(true), _leave.bind(false))
 
 
 func _leave(save: bool) -> void:
 	if save and not _save():
-		prompt.ask("Could not save. Leave anyway?", show_title, Callable(), false)
+		prompt.ask(Lang.t("Could not save. Leave anyway?"), show_title, Callable(), false)
 		return
 	show_title()
 
@@ -138,16 +138,16 @@ func start_stage(run: StageSetup) -> void:
 func ask_to_leave_stage(stage: Stage) -> void:
 	if prompt.is_open():
 		return
-	prompt.confirm(_leave_stage_question(), "Leave", stage.leave)
+	prompt.confirm(_leave_stage_question(), Lang.t("Leave"), stage.leave)
 
 
 ## What Leave this stage asks (Endless: leave the run; Training earns no essences).
 func _leave_stage_question() -> String:
 	if _run.endless:
-		return "Leave this run? Your best wave is kept."
+		return Lang.t("Leave this run? Your best wave is kept.")
 	if _run.act == 0:
-		return "Leave Training?"
-	return "Leave this stage? Essences collected so far are kept."
+		return Lang.t("Leave Training?")
+	return Lang.t("Leave this stage? Essences collected so far are kept.")
 
 
 ## "Save before leaving?": Yes saves to the current slot (inside a stage
@@ -159,12 +159,12 @@ func ask_to_quit() -> void:
 		return
 	_was_paused = get_tree().paused
 	get_tree().paused = true
-	prompt.ask_or_cancel("Save before leaving?", _quit.bind(true), _quit.bind(false), _keep_playing)
+	prompt.ask_or_cancel(Lang.t("Save before leaving?"), _quit.bind(true), _quit.bind(false), _keep_playing)
 
 
 func _quit(save: bool) -> void:
 	if save and not _save():
-		prompt.ask("Could not save. Quit anyway?", quit_game, _keep_playing, false)
+		prompt.ask(Lang.t("Could not save. Quit anyway?"), quit_game, _keep_playing, false)
 		return
 	quit_game.call()
 
@@ -269,9 +269,9 @@ func _show_the_end(then: StringName, saved: bool) -> void:
 
 func _report_save_failed() -> void:
 	if screen is MainScreen:
-		(screen as MainScreen).show_toast("Could not save", true)
+		(screen as MainScreen).show_toast(Lang.t("Could not save"), true)
 	elif screen is TitleScreen:
-		(screen as TitleScreen).notice_label.text = "Could not save"
+		(screen as TitleScreen).notice_label.text = Lang.t("Could not save")
 
 
 ## The old screen goes at once; the prompt stays last so it gets input first.

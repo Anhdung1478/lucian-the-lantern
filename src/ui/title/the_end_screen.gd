@@ -59,20 +59,20 @@ func _build() -> void:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.anchor_left = CARD_FROM
 	add_child(center)
-	var card := MenuCard.new("THE END", "Senna is free.")
+	var card := MenuCard.new(Lang.t("THE END"), Lang.t("Senna is free."))
 	card.title_label.add_theme_font_size_override(&"font_size", TITLE_FONT)
 	card.subtitle_label.add_theme_font_size_override(&"font_size", SUBTITLE_FONT)
 	card.subtitle_label.add_theme_color_override(&"font_color", FREE_COLOR)
 	center.add_child(card)
 	var column := card.content
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
-	time_label.text = "Story time: %s" % story_time(SaveGame.instance().play_time)
+	time_label.text = Lang.t("Story time: %s") % story_time(SaveGame.instance().play_time)
 	column.add_child(_centered(time_label))
 	for line in CREDITS:
-		var credit := _centered(UiStyle.label(line, 20, UiStyle.DIM_COLOR))
+		var credit := _centered(UiStyle.label(Lang.t(line), 20, UiStyle.DIM_COLOR))
 		credit_labels.append(credit)
 		column.add_child(credit)
-	continue_button.text = "Continue"
+	continue_button.text = Lang.t("Continue")
 	continue_button.custom_minimum_size = BUTTON_SIZE
 	UiStyle.style_button(continue_button, 26)
 	continue_button.pressed.connect(continue_pressed.emit)

@@ -1,0 +1,77 @@
+# Texts in the title, Settings, the menus and the pop-ups left in English on purpose.
+
+# The game's name on the title and in the credits.
+LUCIAN
+THE LANTERN
+Lucian: The Lantern
+
+# A node type's name, not shown.
+Button
+
+# Audio bus names.
+Master
+Music
+SFX
+
+# Key names (a key is shown as the keyboard prints it) and their short forms for the HUD's tight cells.
+Backspace
+Bcksp
+Space
+Spc
+Escape
+Esc
+Enter
+Ent
+Delete
+Del
+Insert
+Ins
+PageUp
+PgUp
+PageDown
+PgDn
+CapsLock
+Caps
+Up
+Down
+Dn
+Left
+Lt
+Right
+Rt
+QuoteLeft
+BracketLeft
+BracketRight
+BackSlash
+Slash
+Kp 
+Kp Multiply
+Kp Divide
+Kp Subtract
+Kp Add
+Kp Period
+Kp Enter
+Num 
+Num*
+Num/
+Num-
+Num+
+Num.
+NumEn
+
+# Mouse buttons: shown as on the mouse, long and short forms alike.
+LMB
+RMB
+MMB
+Mouse 4
+Mouse 5
+Mouse %d
+Wheel up
+Wheel down
+M4
+M5
+WhU
+WhD
+
+# The graphics setting's name.
+VSync

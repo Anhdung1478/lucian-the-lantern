@@ -250,7 +250,7 @@ func play_time_of(of_slot: int) -> int:
 ## "1h 23m", or "23m" under an hour.
 static func play_time_text(seconds: int) -> String:
 	var minutes := seconds / 60
-	return "%dh %02dm" % [minutes / 60, minutes % 60] if minutes >= 60 else "%dm" % minutes
+	return Lang.t("%dh %02dm") % [minutes / 60, minutes % 60] if minutes >= 60 else Lang.t("%dm") % minutes
 
 
 ## Debug: replaces the cleared stages (unknown ids are dropped). A cleared

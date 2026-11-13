@@ -66,7 +66,7 @@ func show_menu() -> void:
 	error_label.text = ""
 	load_button.disabled = not SaveGame.instance().any_slot_exists()
 	if load_button.disabled:
-		load_button.set_meta(&"hover_text", "No saved games yet")
+		load_button.set_meta(&"hover_text", Lang.t("No saved games yet"))
 	elif load_button.has_meta(&"hover_text"):
 		load_button.remove_meta(&"hover_text")
 	keys.set_buttons(MenuKeys.buttons_in(_menu))
@@ -78,7 +78,7 @@ func show_slots(loading: bool) -> void:
 	_loading = loading
 	error_label.text = ""
 	notice_label.text = ""
-	_slots_title.text = "LOAD GAME" if loading else "START NEW GAME"
+	_slots_title.text = Lang.t("LOAD GAME") if loading else Lang.t("START NEW GAME")
 	slot_list.refresh(0, not loading)
 	_menu.visible = false
 	_difficulty_page.visible = false
@@ -136,16 +136,16 @@ func _input(event: InputEvent) -> void:
 func _on_picked(slot: int, used: bool) -> void:
 	var broken := used and SaveGame.instance().slot_broken(slot)
 	if _loading and broken:
-		confirm.confirm(BROKEN_LOAD % slot, "New game", show_difficulty.bind(slot))
+		confirm.confirm(Lang.t(BROKEN_LOAD) % slot, Lang.t("New game"), show_difficulty.bind(slot))
 	elif _loading:
 		if SaveGame.instance().load_slot(slot):
 			game_loaded.emit()
 		else:
-			error_label.text = "Could not read slot %d" % slot
+			error_label.text = Lang.t("Could not read slot %d") % slot
 	elif broken:
-		confirm.ask(BROKEN_OVERWRITE % slot, show_difficulty.bind(slot))
+		confirm.ask(Lang.t(BROKEN_OVERWRITE) % slot, show_difficulty.bind(slot))
 	elif used:
-		confirm.ask("Overwrite slot %d? Its progress will be lost." % slot, show_difficulty.bind(slot))
+		confirm.ask(Lang.t("Overwrite slot %d? Its progress will be lost.") % slot, show_difficulty.bind(slot))
 	else:
 		show_difficulty(slot)
 
@@ -157,7 +157,7 @@ func _start_new(level: int) -> void:
 	if SaveGame.instance().start_new(_new_slot, level):
 		new_game_started.emit()
 	else:
-		notice_label.text = COULD_NOT_START % _new_slot
+		notice_label.text = Lang.t(COULD_NOT_START) % _new_slot
 		Sfx.play(&"error")
 
 
@@ -187,10 +187,10 @@ func _build() -> void:
 	_menu = VBoxContainer.new()
 	_menu.add_theme_constant_override(&"separation", 14)
 	column.add_child(_menu)
-	_button(_menu, "Start new game", show_slots.bind(false))
-	load_button = _button(_menu, "Load game", show_slots.bind(true))
-	_button(_menu, "Settings", _open_settings)
-	_button(_menu, "Exit game", exit_requested.emit)
+	_button(_menu, Lang.t("Start new game"), show_slots.bind(false))
+	load_button = _button(_menu, Lang.t("Load game"), show_slots.bind(true))
+	_button(_menu, Lang.t("Settings"), _open_settings)
+	_button(_menu, Lang.t("Exit game"), exit_requested.emit)
 	_slots_page = VBoxContainer.new()
 	_slots_page.add_theme_constant_override(&"separation", 14)
 	column.add_child(_slots_page)
@@ -200,7 +200,7 @@ func _build() -> void:
 	slot_list.picked.connect(_on_picked)
 	_slots_page.add_child(slot_list)
 	_slots_page.add_child(error_label)
-	_button(_slots_page, "Back", show_menu)
+	_button(_slots_page, Lang.t("Back"), show_menu)
 	_build_difficulty_page()
 	language_picker.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, LANGUAGE_MARGIN)
 	language_picker.grow_horizontal = Control.GROW_DIRECTION_BEGIN
@@ -218,21 +218,21 @@ func _build_difficulty_page() -> void:
 	_difficulty_page = VBoxContainer.new()
 	_difficulty_page.add_theme_constant_override(&"separation", 14)
 	column.add_child(_difficulty_page)
-	var heading := UiStyle.label("CHOOSE DIFFICULTY", 28, UiStyle.TITLE_COLOR)
+	var heading := UiStyle.label(Lang.t("CHOOSE DIFFICULTY"), 28, UiStyle.TITLE_COLOR)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_difficulty_page.add_child(heading)
-	var note := UiStyle.label("Enemy HP and damage. It can't be changed later.", 18, UiStyle.DIM_COLOR)
+	var note := UiStyle.label(Lang.t("Enemy HP and damage. It can't be changed later."), 18, UiStyle.DIM_COLOR)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size.x = BUTTON_SIZE.x
 	_difficulty_page.add_child(note)
 	for level in Difficulty.LEVELS:
-		var button := _button(_difficulty_page, "%s   %s" % [Difficulty.name_of(level), Difficulty.scale_text(level)], _start_new.bind(level))
+		var button := _button(_difficulty_page, "%s   %s" % [Lang.t(Difficulty.name_of(level)), Difficulty.scale_text(level)], _start_new.bind(level))
 		button.set_meta(&"hover_text", Difficulty.describe(level))
 		if level == Difficulty.NORMAL:
 			button.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
 		difficulty_buttons.append(button)
-	_button(_difficulty_page, "Back", show_slots.bind(false))
+	_button(_difficulty_page, Lang.t("Back"), show_slots.bind(false))
 	_difficulty_page.visible = false
 
 

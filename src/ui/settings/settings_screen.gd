@@ -146,7 +146,7 @@ func listen(action: StringName) -> void:
 	_stop_listening()
 	_listening = action
 	var button: Button = _bind_buttons[action]
-	button.text = "Press a key..."
+	button.text = Lang.t("Press a key...")
 	UiStyle.style_button(button, BIND_FONT, true)
 	# The click that started listening must not bind itself.
 	_listen_frame = Engine.get_process_frames()
@@ -218,7 +218,8 @@ func _refresh_bindings() -> void:
 
 
 func _cast_mode_picker(action: StringName) -> OptionButton:
-	var option := _dropdown(CAST_MODE_LABELS, CAST_WIDTH)
+	var labels: Array = CAST_MODE_LABELS.map(func(label: String) -> String: return Lang.t(label))
+	var option := _dropdown(labels, CAST_WIDTH)
 	option.select(GameSettings.CAST_MODES.find(settings.cast_mode(action)))
 	option.item_selected.connect(func(index: int) -> void: settings.set_cast_mode(action, GameSettings.CAST_MODES[index]))
 	_cast_modes[action] = option
@@ -275,7 +276,7 @@ func _build() -> void:
 	bottom.alignment = BoxContainer.ALIGNMENT_END
 	side.add_child(bottom)
 	var back := Button.new()
-	back.text = "Back"
+	back.text = Lang.t("Back")
 	back.custom_minimum_size = BACK_SIZE
 	UiStyle.style_button(back, 22, true)
 	back.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
@@ -287,7 +288,7 @@ func _build() -> void:
 func _header() -> Control:
 	var header := VBoxContainer.new()
 	header.add_theme_constant_override(&"separation", 4)
-	var title := UiStyle.label("SETTINGS", TITLE_FONT, UiStyle.TITLE_COLOR)
+	var title := UiStyle.label(Lang.t("SETTINGS"), TITLE_FONT, UiStyle.TITLE_COLOR)
 	title.add_theme_font_override(&"font", JourneyMap.text_font(title, 5))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	header.add_child(title)
@@ -311,7 +312,7 @@ func _rail() -> Control:
 	rail.add_child(tabs)
 	for i in TAB_NAMES.size():
 		var button := Button.new()
-		button.text = TAB_NAMES[i]
+		button.text = Lang.t(TAB_NAMES[i])
 		button.icon = TAB_ICONS[i]
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.custom_minimum_size.y = TAB_HEIGHT
@@ -323,7 +324,7 @@ func _rail() -> Control:
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	tabs.add_child(spacer)
-	var note := UiStyle.label("Every change applies at once and is saved.", NOTE_FONT, UiStyle.DIM_COLOR)
+	var note := UiStyle.label(Lang.t("Every change applies at once and is saved."), NOTE_FONT, UiStyle.DIM_COLOR)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	note.custom_minimum_size.x = RAIL_WIDTH - 24.0
@@ -372,7 +373,7 @@ func _build_audio() -> Control:
 	var page := _page(0)
 	for volume: Array in VOLUMES:
 		var key: StringName = volume[1]
-		var row := _row(page, volume[0], volume[2])
+		var row := _row(page, Lang.t(volume[0]), Lang.t(volume[2]))
 		var slider := HSlider.new()
 		slider.min_value = 0
 		slider.max_value = 100
@@ -415,7 +416,7 @@ func _end_drag() -> void:
 
 func _build_controls() -> Control:
 	var reset := Button.new()
-	reset.text = "Reset to defaults"
+	reset.text = Lang.t("Reset to defaults")
 	reset.custom_minimum_size = Vector2(200, 40)
 	UiStyle.style_button(reset, 16)
 	reset.pressed.connect(func() -> void:
@@ -435,10 +436,10 @@ func _build_controls() -> Control:
 	inset.add_child(list)
 	for action in GameSettings.REBINDABLE:
 		if CONTROL_GROUPS.has(action):
-			var caption := UiStyle.label(CONTROL_GROUPS[action], NOTE_FONT, JourneyPanel.CAPTION_COLOR)
+			var caption := UiStyle.label(Lang.t(CONTROL_GROUPS[action]), NOTE_FONT, JourneyPanel.CAPTION_COLOR)
 			caption.add_theme_font_override(&"font", JourneyMap.text_font(caption, 3))
 			list.add_child(caption)
-		var row := _row(list, GameSettings.ACTION_NAMES[action])
+		var row := _row(list, Lang.t(GameSettings.ACTION_NAMES[action]))
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(BIND_WIDTH, CONTROL_HEIGHT)
 		button.pressed.connect(listen.bind(action))
@@ -452,7 +453,7 @@ func _build_controls() -> Control:
 			gap.custom_minimum_size.x = CAST_WIDTH
 			row.add(gap)
 	_refresh_bindings()
-	var hint := UiStyle.label(CONTROLS_HINT, NOTE_FONT, UiStyle.DIM_COLOR)
+	var hint := UiStyle.label(Lang.t(CONTROLS_HINT), NOTE_FONT, UiStyle.DIM_COLOR)
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	page.add_child(hint)
 	return page
@@ -460,13 +461,13 @@ func _build_controls() -> Control:
 
 func _build_graphics() -> Control:
 	var page := _page(2)
-	_option(page, "Window mode", &"window_mode", ["Windowed", "Borderless fullscreen", "Fullscreen"], GameSettings.WINDOW_MODES)
+	_option(page, Lang.t("Window mode"), &"window_mode", [Lang.t("Windowed"), Lang.t("Borderless fullscreen"), Lang.t("Fullscreen")], GameSettings.WINDOW_MODES)
 	_resolution = _build_resolution(page)
-	_toggle(page, "VSync", &"vsync")
-	_option(page, "FPS cap", &"max_fps", ["30", "60", "120", "144", "Unlimited"], GameSettings.FPS_CAPS)
-	_option(page, "Quality", &"quality", ["Low", "Medium", "High"], GameSettings.QUALITIES,
-		"Low turns off anti-aliasing, dash trails and muzzle flashes; Medium uses 2x anti-aliasing.")
-	_toggle(page, "Show FPS", &"show_fps")
+	_toggle(page, Lang.t("VSync"), &"vsync")
+	_option(page, Lang.t("FPS cap"), &"max_fps", ["30", "60", "120", "144", Lang.t("Unlimited")], GameSettings.FPS_CAPS)
+	_option(page, Lang.t("Quality"), &"quality", [Lang.t("Low"), Lang.t("Medium"), Lang.t("High")], GameSettings.QUALITIES,
+		Lang.t("Low turns off anti-aliasing, dash trails and muzzle flashes; Medium uses 2x anti-aliasing."))
+	_toggle(page, Lang.t("Show FPS"), &"show_fps")
 	return page
 
 
@@ -480,9 +481,9 @@ func _build_resolution(page: Control) -> OptionButton:
 	for size: String in GameSettings.RESOLUTIONS:
 		var parsed := GameSettings.parse_resolution(size)
 		too_big.append(not headless and (parsed.x > biggest.x or parsed.y > biggest.y))
-		labels.append(size.replace("x", " × ") + (" (too big)" if too_big.back() else ""))
-	var option := _option(page, "Resolution", &"resolution", labels, GameSettings.RESOLUTIONS,
-		"Borderless and fullscreen use the screen's resolution.")
+		labels.append(size.replace("x", " × ") + (Lang.t(" (too big)") if too_big.back() else ""))
+	var option := _option(page, Lang.t("Resolution"), &"resolution", labels, GameSettings.RESOLUTIONS,
+		Lang.t("Borderless and fullscreen use the screen's resolution."))
 	for i in too_big.size():
 		option.set_item_disabled(i, too_big[i])
 	option.disabled = settings.get_value(&"window_mode") != "windowed"
@@ -497,10 +498,10 @@ func _build_gameplay() -> Control:
 	var language := _option(page, Lang.t("Language"), &"language", names, Lang.CODES,
 		Lang.t(LANGUAGE_LOCKED_NOTE if language_locked else LANGUAGE_NOTE))
 	language.disabled = language_locked
-	_toggle(page, "Cast queue", &"queue_casts",
-		"A skill, item active or summoner spell pressed during a cast time or a dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept.")
-	_toggle(page, "Resolve", Resolve.SETTING,
-		"After each defeat on a stage, Lucian deals more damage and takes less there (up to %d times)." % Resolve.MAX_STACKS)
+	_toggle(page, Lang.t("Cast queue"), &"queue_casts",
+		Lang.t("A skill, item active or summoner spell pressed during a cast time or a dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept."))
+	_toggle(page, Lang.t("Resolve"), Resolve.SETTING,
+		Lang.t("After each defeat on a stage, Lucian deals more damage and takes less there (up to %d times).") % Resolve.MAX_STACKS)
 	return page
 
 
@@ -516,10 +517,10 @@ func _page(tab: int, extra: Control = null) -> VBoxContainer:
 	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	texts.add_theme_constant_override(&"separation", 2)
 	heading.add_child(texts)
-	var title := UiStyle.label(String(TAB_NAMES[tab]).to_upper(), PAGE_TITLE_FONT, UiStyle.TITLE_COLOR)
+	var title := UiStyle.label(Lang.t(TAB_NAMES[tab]).to_upper(), PAGE_TITLE_FONT, UiStyle.TITLE_COLOR)
 	title.add_theme_font_override(&"font", JourneyMap.text_font(title, 4))
 	texts.add_child(title)
-	texts.add_child(UiStyle.label(TAB_BLURBS[tab], 16, UiStyle.DIM_COLOR))
+	texts.add_child(UiStyle.label(Lang.t(TAB_BLURBS[tab]), 16, UiStyle.DIM_COLOR))
 	if extra:
 		extra.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		heading.add_child(extra)

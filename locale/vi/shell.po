@@ -20,3 +20,467 @@ msgstr "Ngôn ngữ của văn bản trong trò chơi. Màn hình sẽ được 
 #. Settings > Gameplay: under the Language row while a stage is being played.
 msgid "Not during a stage: change it on the title screen or the main screen."
 msgstr "Không đổi được khi đang trong màn chơi: hãy đổi ở màn hình tiêu đề hoặc màn hình chính."
+
+#. Title screen menu button.
+msgid "Start new game"
+msgstr "Bắt đầu trò chơi mới"
+
+#. Title screen menu button.
+msgid "Load game"
+msgstr "Tải trò chơi"
+
+#. Title screen menu button.
+msgid "Exit game"
+msgstr "Thoát trò chơi"
+
+#. Title screen: hover note on the disabled Load game button.
+msgid "No saved games yet"
+msgstr "Chưa có ván lưu nào"
+
+#. Title screen: heading of the slot page when loading.
+msgid "LOAD GAME"
+msgstr "TẢI TRÒ CHƠI"
+
+#. Title screen: heading of the slot page when starting a new game.
+msgid "START NEW GAME"
+msgstr "BẮT ĐẦU TRÒ CHƠI MỚI"
+
+#. Title screen: the pop-up button that starts a new game in a broken slot.
+msgid "New game"
+msgstr "Trò chơi mới"
+
+#. Title screen: red line when a slot could not be read. %d is the slot number.
+msgid "Could not read slot %d"
+msgstr "Không đọc được ô lưu %d"
+
+#. Title screen: red notice on the difficulty page. %d is the slot number.
+msgid "Could not write slot %d. The game can't start until it can save."
+msgstr "Không ghi được ô lưu %d. Trò chơi chỉ bắt đầu được khi lưu được."
+
+#. Title screen: pop-up when loading a broken slot. %d is the slot number; the line break is kept.
+msgid "Slot %d's save can't be read, so it can't be loaded.\nYou can only overwrite it with a new game."
+msgstr "Không đọc được ván lưu ở ô %d nên không thể tải.\nBạn chỉ có thể ghi đè bằng một trò chơi mới."
+
+#. Title screen: pop-up question for a broken slot. %d is the slot number.
+msgid "Slot %d's save can't be read. Overwrite it with a new game?"
+msgstr "Không đọc được ván lưu ở ô %d. Ghi đè bằng một trò chơi mới?"
+
+#. Title screen: pop-up question for a used slot. %d is the slot number.
+msgid "Overwrite slot %d? Its progress will be lost."
+msgstr "Ghi đè ô %d? Tiến trình trong đó sẽ mất."
+
+#. Title screen: heading of the difficulty page.
+msgid "CHOOSE DIFFICULTY"
+msgstr "CHỌN ĐỘ KHÓ"
+
+#. Title screen: line under the difficulty heading.
+msgid "Enemy HP and damage. It can't be changed later."
+msgstr "Máu và sát thương của kẻ địch. Không đổi được về sau."
+
+#. Difficulty name on a button of the difficulty page.
+msgid "Easy"
+msgstr "Dễ"
+
+#. Difficulty name on a button of the difficulty page.
+msgid "Normal"
+msgstr "Thường"
+
+#. Difficulty name on a button of the difficulty page.
+msgid "Hard"
+msgstr "Khó"
+
+#. Difficulty name on a button of the difficulty page.
+msgid "Extreme"
+msgstr "Cực khó"
+
+#. Difficulty page: hover text, first line. Both %d are the same percentage.
+msgid "Enemies have %d%% HP and deal %d%% damage."
+msgstr "Kẻ địch có %d%% máu và gây %d%% sát thương."
+
+#. Difficulty page: hover text, appended to the first line (note the leading space). %s is the essence multiplier, e.g. 1.2.
+msgid " Blue and orange essence ×%s."
+msgstr " Tinh chất xanh và cam ×%s."
+
+#. Slot list: a slot's button. %d is the slot number.
+msgid "Slot %d (current)"
+msgstr "Ô %d (hiện tại)"
+
+#. Slot list: a slot's button, in red. %d is the slot number.
+msgid "Slot %d · can't be read"
+msgstr "Ô %d · không đọc được"
+
+#. Slot list: a used slot's button. %d is the slot number, then the play time, then the save date.
+msgid "Slot %d · %s · saved %s"
+msgstr "Ô %d · %s · lưu %s"
+
+#. Slot list: an empty slot's button. %d is the slot number.
+msgid "Slot %d · empty"
+msgstr "Ô %d · trống"
+
+#. Play time in the slot list: %d is hours, %02d minutes.
+msgid "%dh %02dm"
+msgstr "%dg %02dp"
+
+#. Play time in the slot list when under an hour: %d is minutes.
+msgid "%dm"
+msgstr "%dp"
+
+#. The End screen: the big title.
+msgid "THE END"
+msgstr "HẾT"
+
+#. The End screen: line under the title.
+msgid "Senna is free."
+msgstr "Senna đã được tự do."
+
+#. The End screen: the play time. %s is hours:minutes:seconds.
+msgid "Story time: %s"
+msgstr "Thời gian cốt truyện: %s"
+
+#. The End screen: a credit line.
+msgid "Made with Godot 4"
+msgstr "Làm bằng Godot 4"
+
+#. The End screen: a credit line.
+msgid "A fan game. League of Legends characters belong to Riot Games."
+msgstr "Trò chơi của người hâm mộ. Các nhân vật Liên Minh Huyền Thoại thuộc về Riot Games."
+
+#. The End screen: the button.
+msgid "Continue"
+msgstr "Tiếp tục"
+
+#. Pop-up: the OK button of a notice.
+msgid "OK"
+msgstr "OK"
+
+#. Stage menu (ESC): the card's title.
+msgid "MENU"
+msgstr "MENU"
+
+#. Stage menu: entry.
+msgid "Resume"
+msgstr "Tiếp tục"
+
+#. Stage menu: the dim note on the Settings entry.
+msgid "Audio, controls, graphics"
+msgstr "Âm thanh, điều khiển, đồ họa"
+
+#. Stage menu: entry.
+msgid "Leave this stage"
+msgstr "Rời màn này"
+
+#. Stage menu: entry.
+msgid "Exit the game"
+msgstr "Thoát khỏi trò chơi"
+
+#. Stage menu: hover note on the disabled Leave entry.
+msgid "Not available yet"
+msgstr "Chưa dùng được"
+
+#. Game root: pop-up question on the title screen and the stage menu.
+msgid "Exit the game?"
+msgstr "Thoát khỏi trò chơi?"
+
+#. Game root: the confirm button of the exit question.
+msgid "Exit"
+msgstr "Thoát"
+
+#. Game root: pop-up question (Yes / No / Cancel).
+msgid "Save before leaving?"
+msgstr "Lưu trước khi rời đi?"
+
+#. Game root: pop-up question when saving failed on the way to the title.
+msgid "Could not save. Leave anyway?"
+msgstr "Không lưu được. Vẫn rời đi?"
+
+#. Game root: pop-up question when saving failed on the way out of the game.
+msgid "Could not save. Quit anyway?"
+msgstr "Không lưu được. Vẫn thoát?"
+
+#. Game root: the confirm button of the leave-stage question.
+msgid "Leave"
+msgstr "Rời đi"
+
+#. Game root: pop-up question when leaving Endless.
+msgid "Leave this run? Your best wave is kept."
+msgstr "Rời lượt chơi này? Đợt cao nhất của bạn vẫn được giữ."
+
+#. Game root: pop-up question when leaving Training.
+msgid "Leave Training?"
+msgstr "Rời khỏi Bãi Tập Luyện?"
+
+#. Game root: pop-up question when leaving a stage.
+msgid "Leave this stage? Essences collected so far are kept."
+msgstr "Rời màn này? Tinh chất đã nhặt vẫn được giữ."
+
+#. Game root: toast on the main screen or notice on the title after a save failed.
+msgid "Could not save"
+msgstr "Không lưu được"
+
+#. Settings: the panel's title.
+msgid "SETTINGS"
+msgstr "CÀI ĐẶT"
+
+#. Settings: tab name (shown in capitals over the page).
+msgid "Audio"
+msgstr "Âm thanh"
+
+#. Settings: tab name.
+msgid "Controls"
+msgstr "Điều khiển"
+
+#. Settings: tab name.
+msgid "Graphics"
+msgstr "Đồ họa"
+
+#. Settings: tab name.
+msgid "Gameplay"
+msgstr "Lối chơi"
+
+#. Settings: dim line under the Audio page's name.
+msgid "Volumes change at once. Letting go of a slider plays a test sound."
+msgstr "Âm lượng đổi ngay. Thả thanh trượt ra sẽ phát một âm thử."
+
+#. Settings: dim line under the Controls page's name.
+msgid "Click a binding, then press a key or click it again with a mouse button."
+msgstr "Bấm vào một phím gán, rồi nhấn một phím hoặc bấm lại vào nó bằng nút chuột."
+
+#. Settings: dim line under the Graphics page's name.
+msgid "The window, the frame rate and how much the effects cost."
+msgstr "Cửa sổ, tốc độ khung hình và độ nặng của hiệu ứng."
+
+#. Settings: dim line under the Gameplay page's name.
+msgid "How Lucian takes your orders, and what a defeat gives him."
+msgstr "Cách Lucian nhận lệnh của bạn, và thất bại mang lại gì cho anh."
+
+#. Settings: note at the bottom of the tab rail.
+msgid "Every change applies at once and is saved."
+msgstr "Mọi thay đổi có hiệu lực ngay và được lưu lại."
+
+#. Settings > Audio: row name.
+msgid "Master volume"
+msgstr "Âm lượng tổng"
+
+#. Settings > Audio: row description.
+msgid "Every sound in the game."
+msgstr "Mọi âm thanh trong trò chơi."
+
+#. Settings > Audio: row name.
+msgid "Music volume"
+msgstr "Âm lượng nhạc"
+
+#. Settings > Audio: row description.
+msgid "Each act's score, which follows the fight."
+msgstr "Nhạc của mỗi hồi, đổi theo trận đánh."
+
+#. Settings > Audio: row name.
+msgid "Sound effects volume"
+msgstr "Âm lượng hiệu ứng"
+
+#. Settings > Audio: row description.
+msgid "Shots, hits, coins and clicks."
+msgstr "Tiếng bắn, đòn trúng, tiền vàng và tiếng bấm."
+
+#. Settings > Controls: dropdown of a skill's cast mode.
+msgid "Quick cast"
+msgstr "Tung nhanh"
+
+#. Settings > Controls: dropdown of a skill's cast mode.
+msgid "Quick + indicator"
+msgstr "Nhanh + chỉ báo"
+
+#. Settings > Controls: dropdown of a skill's cast mode.
+msgid "Normal cast"
+msgstr "Tung thường"
+
+#. Settings > Controls: group caption.
+msgid "MOVE AND ATTACK"
+msgstr "DI CHUYỂN VÀ TẤN CÔNG"
+
+#. Settings > Controls: group caption.
+msgid "SKILLS"
+msgstr "KỸ NĂNG"
+
+#. Settings > Controls: group caption.
+msgid "SUMMONER SPELLS"
+msgstr "PHÉP BỔ TRỢ"
+
+#. Settings > Controls: group caption.
+msgid "ITEMS"
+msgstr "TRANG BỊ"
+
+#. Settings > Controls: group caption.
+msgid "INTERFACE"
+msgstr "GIAO DIỆN"
+
+#. Settings > Controls: action name.
+msgid "Move"
+msgstr "Di chuyển"
+
+#. Settings > Controls: action name.
+msgid "Attack"
+msgstr "Tấn công"
+
+#. Settings > Controls: action name.
+msgid "Attack-move"
+msgstr "Tấn công di chuyển"
+
+#. Settings > Controls: action name (Q is the key's usual letter).
+msgid "Skill Q"
+msgstr "Kỹ năng Q"
+
+#. Settings > Controls: action name.
+msgid "Skill W"
+msgstr "Kỹ năng W"
+
+#. Settings > Controls: action name.
+msgid "Skill E"
+msgstr "Kỹ năng E"
+
+#. Settings > Controls: action name.
+msgid "Skill R"
+msgstr "Kỹ năng R"
+
+#. Settings > Controls: action name.
+msgid "Summoner spell 1"
+msgstr "Phép bổ trợ 1"
+
+#. Settings > Controls: action name.
+msgid "Summoner spell 2"
+msgstr "Phép bổ trợ 2"
+
+#. Settings > Controls: action name.
+msgid "Item slot 1"
+msgstr "Ô trang bị 1"
+
+#. Settings > Controls: action name.
+msgid "Item slot 2"
+msgstr "Ô trang bị 2"
+
+#. Settings > Controls: action name.
+msgid "Item slot 3"
+msgstr "Ô trang bị 3"
+
+#. Settings > Controls: action name.
+msgid "Item slot 4"
+msgstr "Ô trang bị 4"
+
+#. Settings > Controls: action name.
+msgid "Item slot 5"
+msgstr "Ô trang bị 5"
+
+#. Settings > Controls: action name.
+msgid "Item slot 6"
+msgstr "Ô trang bị 6"
+
+#. Settings > Controls: action name.
+msgid "Health potion"
+msgstr "Bình máu"
+
+#. Settings > Controls: action name.
+msgid "Mana potion"
+msgstr "Bình năng lượng"
+
+#. Settings > Controls: action name.
+msgid "Backpack"
+msgstr "Ba lô"
+
+#. Settings > Controls: action name.
+msgid "Stats panel (Ctrl: toggle, hold: more)"
+msgstr "Bảng chỉ số (Ctrl: bật/tắt, giữ: xem thêm)"
+
+#. Settings > Controls: action name.
+msgid "Camera mode"
+msgstr "Chế độ camera"
+
+#. Settings > Controls: action name.
+msgid "Center camera on Lucian"
+msgstr "Đưa camera về Lucian"
+
+#. Settings > Controls: a binding button while waiting for a key.
+msgid "Press a key..."
+msgstr "Nhấn một phím..."
+
+#. Settings > Controls: the reset button at the page's top right.
+msgid "Reset to defaults"
+msgstr "Đặt lại mặc định"
+
+#. Settings > Controls: the long hint under the list.
+msgid "ESC or a click elsewhere cancels a binding. Ctrl + a skill key ranks it up. Quick + indicator casts on release, Normal on left-click; right-click or ESC cancels either. The mouse wheel zooms the camera in a stage."
+msgstr "ESC hoặc bấm ra ngoài sẽ hủy việc gán phím. Ctrl + phím kỹ năng để nâng cấp kỹ năng. Nhanh + chỉ báo tung chiêu khi thả phím, Thường tung khi bấm chuột trái; bấm chuột phải hoặc ESC để hủy cả hai. Con lăn chuột phóng to thu nhỏ camera trong màn chơi."
+
+#. Settings > Graphics: row name.
+msgid "Window mode"
+msgstr "Chế độ cửa sổ"
+
+#. Settings > Graphics: dropdown of the window mode.
+msgid "Windowed"
+msgstr "Cửa sổ"
+
+#. Settings > Graphics: dropdown of the window mode.
+msgid "Borderless fullscreen"
+msgstr "Toàn màn hình không viền"
+
+#. Settings > Graphics: dropdown of the window mode.
+msgid "Fullscreen"
+msgstr "Toàn màn hình"
+
+#. Settings > Graphics: row name.
+msgid "Resolution"
+msgstr "Độ phân giải"
+
+#. Settings > Graphics: row description.
+msgid "Borderless and fullscreen use the screen's resolution."
+msgstr "Chế độ không viền và toàn màn hình dùng độ phân giải của màn hình."
+
+#. Settings > Graphics: a resolution too big for this screen, appended to its size (note the leading space).
+msgid " (too big)"
+msgstr " (quá lớn)"
+
+#. Settings > Graphics: row name.
+msgid "FPS cap"
+msgstr "Giới hạn FPS"
+
+#. Settings > Graphics: dropdown of the FPS cap, next to 30, 60, 120, 144.
+msgid "Unlimited"
+msgstr "Không giới hạn"
+
+#. Settings > Graphics: row name.
+msgid "Quality"
+msgstr "Chất lượng"
+
+#. Settings > Graphics: dropdown of the quality.
+msgid "Low"
+msgstr "Thấp"
+
+#. Settings > Graphics: dropdown of the quality.
+msgid "Medium"
+msgstr "Trung bình"
+
+#. Settings > Graphics: dropdown of the quality.
+msgid "High"
+msgstr "Cao"
+
+#. Settings > Graphics: row description of Quality.
+msgid "Low turns off anti-aliasing, dash trails and muzzle flashes; Medium uses 2x anti-aliasing."
+msgstr "Thấp tắt khử răng cưa, vệt lướt và tia lửa nòng súng; Trung bình dùng khử răng cưa 2x."
+
+#. Settings > Graphics: row name.
+msgid "Show FPS"
+msgstr "Hiện FPS"
+
+#. Settings > Gameplay: row name.
+msgid "Cast queue"
+msgstr "Hàng chờ kỹ năng"
+
+#. Settings > Gameplay: row description.
+msgid "A skill, item active or summoner spell pressed during a cast time or a dash is cast as soon as it ends, aimed where the key was pressed. Only the latest press is kept."
+msgstr "Kỹ năng, hiệu ứng kích hoạt của trang bị hoặc phép bổ trợ được nhấn trong lúc đang tung chiêu hoặc đang lướt sẽ được tung ngay khi xong, nhắm vào chỗ đã nhấn phím. Chỉ lần nhấn cuối cùng được giữ lại."
+
+#. Settings > Gameplay: row name.
+msgid "Resolve"
+msgstr "Quyết Tâm"
+
+#. Settings > Gameplay: row description. %d is the most stacks.
+msgid "After each defeat on a stage, Lucian deals more damage and takes less there (up to %d times)."
+msgstr "Sau mỗi lần thất bại ở một màn, Lucian gây thêm sát thương và nhận ít hơn ở màn đó (tối đa %d lần)."

@@ -37,13 +37,13 @@ func refresh(current := 0, empty_enabled := true) -> void:
 		var broken := used and n != current and save.slot_broken(n)
 		_mark_broken(button, broken)
 		if n == current:
-			button.text = "Slot %d (current)" % n
+			button.text = Lang.t("Slot %d (current)") % n
 		elif broken:
-			button.text = "Slot %d · can't be read" % n
+			button.text = Lang.t("Slot %d · can't be read") % n
 		elif used:
-			button.text = "Slot %d · %s · saved %s" % [n, SaveGame.play_time_text(save.play_time_of(n)), save.saved_at(n).substr(0, 16)]
+			button.text = Lang.t("Slot %d · %s · saved %s") % [n, SaveGame.play_time_text(save.play_time_of(n)), save.saved_at(n).substr(0, 16)]
 		else:
-			button.text = "Slot %d · empty" % n
+			button.text = Lang.t("Slot %d · empty") % n
 		button.disabled = n == current or (not used and not empty_enabled)
 
 

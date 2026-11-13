@@ -55,9 +55,9 @@ func _build() -> void:
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override(&"separation", 16)
 	box.add_child(row)
-	_yes = _button(row, "Yes", answer.bind(true))
-	_no = _button(row, "No", answer.bind(false))
-	_cancel = _button(row, "Cancel", cancel)
+	_yes = _button(row, Lang.t("Yes"), answer.bind(true))
+	_no = _button(row, Lang.t("No"), answer.bind(false))
+	_cancel = _button(row, Lang.t("Cancel"), cancel)
 	_keys.set_buttons(MenuKeys.buttons_in(row))
 
 
@@ -74,7 +74,7 @@ func _button(row: HBoxContainer, text: String, action: Callable) -> Button:
 ## Yes / No: Overwrite, Reset tree, "Could not save…". ESC answers No when
 ## `escape_means_no`, else does nothing.
 func ask(text: String, on_yes: Callable, on_no := Callable(), escape_means_no := true) -> void:
-	_open(text, "Yes", true, false)
+	_open(text, Lang.t("Yes"), true, false)
 	_on_yes = on_yes
 	_on_no = on_no
 	_escape_means_no = escape_means_no
@@ -83,7 +83,7 @@ func ask(text: String, on_yes: Callable, on_no := Callable(), escape_means_no :=
 ## Yes / No / Cancel: "Save before leaving?". The Cancel button and ESC call
 ## `on_cancel`.
 func ask_or_cancel(text: String, on_yes: Callable, on_no: Callable, on_cancel := Callable()) -> void:
-	_open(text, "Yes", true, true)
+	_open(text, Lang.t("Yes"), true, true)
 	_on_yes = on_yes
 	_on_no = on_no
 	_on_cancel = on_cancel
@@ -100,7 +100,7 @@ func confirm(text: String, action_label: String, on_action: Callable, on_cancel 
 ## OK alone: "Your backpack is full." OK, Enter and ESC close it, then call
 ## `on_ok`.
 func tell(text: String, on_ok := Callable()) -> void:
-	_open(text, "OK", false, false)
+	_open(text, Lang.t("OK"), false, false)
 	_on_yes = on_ok
 
 

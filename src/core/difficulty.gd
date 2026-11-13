@@ -56,9 +56,9 @@ static func scale_text(level: int) -> String:
 ## then what the level does to Resolve on a second line (Resolve.describe).
 static func describe(level: int) -> String:
 	var percent := roundi(scale(level) * 100.0)
-	var text := "Enemies have %d%% HP and deal %d%% damage." % [percent, percent]
+	var text := Lang.t("Enemies have %d%% HP and deal %d%% damage.") % [percent, percent]
 	if essence_scale(level) != 1.0:
-		text += " Blue and orange essence ×%s." % String.num(essence_scale(level), 1)
+		text += Lang.t(" Blue and orange essence ×%s.") % String.num(essence_scale(level), 1)
 	return "%s\n%s" % [text, Resolve.describe(level)]
 
 

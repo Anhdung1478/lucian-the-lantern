@@ -19,7 +19,7 @@ const SETTINGS_ICON := preload("res://assets/art/ui/menu_settings.svg")
 const LEAVE_ICON := preload("res://assets/art/ui/menu_leave.svg")
 const EXIT_ICON := preload("res://assets/art/ui/menu_exit.svg")
 
-var card := MenuCard.new("MENU")
+var card := MenuCard.new(Lang.t("MENU"))
 ## Arrow keys and Enter on the entries.
 var keys := MenuKeys.new()
 
@@ -43,7 +43,7 @@ func set_leave_enabled(enabled: bool) -> void:
 	if enabled:
 		_leave.enable()
 	else:
-		_leave.disable(NOT_AVAILABLE)
+		_leave.disable(Lang.t(NOT_AVAILABLE))
 
 
 func _build() -> void:
@@ -53,10 +53,10 @@ func _build() -> void:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	backdrop.add_child(center)
 	center.add_child(card)
-	_entry("Resume", RESUME_ICON, MenuEntry.Kind.PRIMARY, "", resume_requested.emit)
-	_entry("Settings", SETTINGS_ICON, MenuEntry.Kind.NORMAL, SETTINGS_HINT, settings_requested.emit)
-	_leave = _entry("Leave this stage", LEAVE_ICON, MenuEntry.Kind.DANGER, "", leave_requested.emit)
-	_entry("Exit the game", EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
+	_entry(Lang.t("Resume"), RESUME_ICON, MenuEntry.Kind.PRIMARY, "", resume_requested.emit)
+	_entry(Lang.t("Settings"), SETTINGS_ICON, MenuEntry.Kind.NORMAL, Lang.t(SETTINGS_HINT), settings_requested.emit)
+	_leave = _entry(Lang.t("Leave this stage"), LEAVE_ICON, MenuEntry.Kind.DANGER, "", leave_requested.emit)
+	_entry(Lang.t("Exit the game"), EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
 	keys.set_buttons(MenuKeys.buttons_in(card.content))
 	visibility_changed.connect(keys.clear)
 
