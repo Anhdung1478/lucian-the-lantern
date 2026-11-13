@@ -2911,8 +2911,14 @@ func finish(unit: EnemyUnit) -> void:
 ## so Damage dealt shows his hits.
 func scenario_act3_result() -> void:
 	var game := game_stage()
-	for i in 3:
+	# The drake is in 3-2's last wave (the sixth): five waves go first, and the
+	# Lantern's gift after the third holds the break until a card is picked.
+	for i in game.runner.total_waves() - 1:
 		await clear_wave()
+		await wait(0.3)
+		if game.gifts and game.gifts.pick:
+			game.gifts.pick.cards[0].pressed.emit()
+			await wait(0.3)
 	game.skip_break()
 	await wait_for_spawns()
 	flush_tips()
@@ -2922,7 +2928,7 @@ func scenario_act3_result() -> void:
 	await shoot_for(drake, 5.0)
 	await kill_wave()
 	await wait(0.6)
-	print("result (expect STAGE CLEARED): ", game.result.title.text, "  waves (expect 4 / 4): ", game.runner.waves_done(), " / ", game.runner.total_waves())
+	print("result (expect STAGE CLEARED): ", game.result.title.text, "  waves (expect all): ", game.runner.waves_done(), " / ", game.runner.total_waves())
 	print("reward lines (expect +5 purple … first kill, Stage 3-3 is open): ", game.reward_lines)
 	print("stats (expect Damage dealt > 0): ", result_rows())
 	print("buttons (expect retry, next and main): ", game.result.retry_button.visible, " ", game.result.next_button.visible, " ", game.result.main_button.text)
