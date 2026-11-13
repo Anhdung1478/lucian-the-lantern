@@ -335,7 +335,7 @@ msgstr "Chỉ chế tạo được mảnh ghép và giày"
 
 #. Merchant message line while dragging an item over the sell slot. %d is the gold.
 msgid "Sells for %d gold"
-msgstr "Bán được %d vàng"
+msgstr "Bán được %d vàng"
 
 #. Potions tab row, under the price: how many of this potion Lucian holds in its potion cell, over the most one cell stacks.
 msgid "Carrying %d / %d"

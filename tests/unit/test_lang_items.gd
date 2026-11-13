@@ -203,7 +203,7 @@ func test_the_vietnamese_item_card_names_the_stats_and_the_passive() -> void:
 func test_the_vietnamese_texts_with_values_keep_their_values() -> void:
 	Lang.use(Lang.VIETNAMESE)
 	assert_eq(Lang.t("%d gold") % 1100, "1100 vàng")
-	assert_eq(Lang.t("Sells for %d gold") % 770, "Bán được 770 vàng")
+	assert_eq(Lang.t("Sells for %d gold") % 770, "Bán được 770 vàng")
 	assert_eq(ItemStats.line(&"attack_speed", 0.25), "+25% Tốc Độ Đánh")
 	assert_eq(StatStyle.stat_name(&"armor"), "Giáp")
 	assert_eq(TooltipText.plain(TooltipCard.potion_text(catalog.find(&"hp_potion"))), "Hồi 200 Máu trong 5 s.")
