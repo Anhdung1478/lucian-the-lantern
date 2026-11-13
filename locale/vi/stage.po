@@ -35,7 +35,7 @@ msgstr "Số đợt vượt qua"
 
 #. Result card: row names of the stats column (their values come next to them)
 msgid "Modifier"
-msgstr "Thay đổi"
+msgstr "Biến số"
 
 #. Result card: row names of the stats column (their values come next to them)
 msgid "Time"
@@ -63,7 +63,7 @@ msgstr "Vàng kiếm được"
 
 #. Result card: row names of the stats column (their values come next to them)
 msgid "Level reached"
-msgstr "Cấp độ đạt được"
+msgstr "Cấp đạt được"
 
 #. Result card: row names of the stats column (their values come next to them)
 msgid "Gift"
@@ -75,11 +75,11 @@ msgstr "HOÀN THÀNH MÀN"
 
 #. Result card: the title, by outcome (the title is shown in capitals)
 msgid "GAME OVER"
-msgstr "THẤT BẠI"
+msgstr "TRÒ CHƠI KẾT THÚC"
 
 #. Result card: the title, by outcome (the title is shown in capitals)
 msgid "DEFEATED"
-msgstr "BẠI TRẬN"
+msgstr "THẤT BẠI"
 
 #. Result card: the buttons
 msgid "Retry"
@@ -139,7 +139,7 @@ msgstr "+%d tinh chất tím (%s, hạ gục lại)"
 
 #. Result card: reward lines after a first clear; %s is a stage like 1-2, %d an act number
 msgid "Stage %s is open"
-msgstr "Đã mở màn %s"
+msgstr "Đã mở Màn %s"
 
 #. Result card: reward lines after a first clear; %s is a stage like 1-2, %d an act number
 msgid "Act %d is open"
@@ -151,7 +151,7 @@ msgstr "Câu chuyện đã hoàn tất"
 
 #. Result card: reward lines after a first clear; %s is a stage like 1-2, %d an act number
 msgid "Senna is free"
-msgstr "Senna đã được tự do"
+msgstr "Senna đã được giải thoát"
 
 #. Result card: Act 1's reward lines after Thresh is beaten the first time
 msgid "Lucian takes Senna's gun: two guns from now on"
@@ -167,7 +167,7 @@ msgstr "Có thể mua Q – Tia Sáng Xuyên Thấu và W – Tia Sáng Rực Ch
 
 #. Result card: Act 1's reward lines after Thresh is beaten the first time
 msgid "Ghost is free to claim in the Evolution Tree"
-msgstr "Nhận miễn phí Tốc Hành trong Cây Tiến Hóa"
+msgstr "Có thể nhận miễn phí Tốc Hành trong Cây Tiến Hóa"
 
 #. Result card: the recap under WHAT HIT YOU; %s is the enemy's or source's name
 msgid "Killed by %s"
@@ -179,7 +179,7 @@ msgstr "Bị lửa của %s thiêu chết"
 
 #. Result card: the recap under WHAT HIT YOU; %s is the enemy's or source's name
 msgid "You can afford an upgrade in the Evolution Tree."
-msgstr "Bạn đủ tài nguyên để nâng cấp trong Cây Tiến Hóa."
+msgstr "Bạn đủ tinh chất để mua một nâng cấp trong Cây Tiến Hóa."
 
 #. Result card: the recap under WHAT HIT YOU; %s is the enemy's or source's name
 msgid "Burning ground"
@@ -195,11 +195,11 @@ msgstr "Kẻ địch đánh xa: né sang bên giữa các phát bắn, hoặc ti
 
 #. Result card: the recap's tip, by what hurt most
 msgid "Melee enemies: shoot, step back, shoot again. They can't hit what they can't reach."
-msgstr "Kẻ địch cận chiến: bắn, lùi lại, rồi bắn tiếp. Chúng không đánh được thứ chúng không với tới."
+msgstr "Kẻ địch cận chiến: bắn, lùi lại, rồi bắn tiếp. Không với tới bạn thì chúng không đánh được."
 
 #. Result card: the recap's tip, by what hurt most
 msgid "Red marks on the ground show where a hit will land. Step out before they fill."
-msgstr "Vệt đỏ trên mặt đất báo nơi đòn đánh sẽ rơi xuống. Hãy bước ra trước khi chúng đầy."
+msgstr "Vệt đỏ trên mặt đất báo nơi đòn đánh sẽ rơi xuống. Hãy bước ra trước khi vệt đỏ lấp đầy."
 
 #. Result card: the recap's tip, by what hurt most
 msgid "Elites hit hard. Kill the small ones around them first, then keep your distance."
@@ -215,11 +215,11 @@ msgstr "Mặt đất cháy gây sát thương liên tục khi bạn đứng trê
 
 #. Act 1 tips on the HUD; %s is a key or mouse button as bound now
 msgid "%s to move. Hold it to keep walking."
-msgstr "%s để di chuyển. Giữ nút để đi liên tục."
+msgstr "Nhấn %s để di chuyển. Giữ nút để đi liên tục."
 
 #. Act 1 tips on the HUD; %s is a key or mouse button as bound now
 msgid "%s on an enemy to attack it."
-msgstr "%s vào kẻ địch để tấn công."
+msgstr "Nhấn %s vào kẻ địch để tấn công."
 
 #. Act 1 tips on the HUD; %s is a key or mouse button as bound now
 msgid "Press %s, then %s: attack the enemy under the cursor, or the weakest one in range."
@@ -231,11 +231,11 @@ msgstr "Vòng tròn đỏ báo nơi đạn pháo sẽ rơi xuống. Hãy bước
 
 #. Act 1 tips on the HUD; %s is a key or mouse button as bound now
 msgid "%s on the merchant to buy items with your gold."
-msgstr "%s vào thương nhân để mua trang bị bằng vàng."
+msgstr "Nhấn %s vào thương nhân để mua trang bị bằng vàng."
 
 #. Act 1 tips on the HUD; %s is a key or mouse button as bound now
 msgid "%s to dash toward the cursor. Your next shot is ready when you land."
-msgstr "%s để lướt về phía con trỏ. Phát bắn kế tiếp sẵn sàng ngay khi bạn tiếp đất."
+msgstr "Nhấn %s để lướt về phía con trỏ. Phát bắn kế tiếp sẵn sàng ngay khi bạn tiếp đất."
 
 #. Act 1 tips on the HUD; %s is a key or mouse button as bound now
 msgid "Thresh's hook flies along the red line. Move sideways!"
@@ -243,7 +243,7 @@ msgstr "Móc của Thresh bay dọc theo đường đỏ. Hãy né sang một b�
 
 #. Cutscenes: Senna's lessons (Act 1's break) and the scenes with Thresh; the speaker's name is shown above
 msgid "It ends here."
-msgstr "Kết thúc ở đây."
+msgstr "Mọi chuyện kết thúc tại đây."
 
 #. Cutscenes: Senna's lessons (Act 1's break) and the scenes with Thresh; the speaker's name is shown above
 msgid "Lucian… you came."
@@ -251,7 +251,7 @@ msgstr "Lucian… anh đã đến."
 
 #. Cutscenes: Senna's lessons (Act 1's break) and the scenes with Thresh; the speaker's name is shown above
 msgid "Always."
-msgstr "Luôn luôn."
+msgstr "Anh luôn đến mà."
 
 #. Cutscenes: Senna's lessons (Act 1's break) and the scenes with Thresh; the speaker's name is shown above
 msgid "Thresh's hook is slow, but you can't dodge it standing still. Watch my feet."
@@ -267,7 +267,7 @@ msgstr "Lucian học được Truy Cùng Diệt Tận. Nhấn %s để lướt v
 
 #. Cutscenes: Senna's lessons (Act 1's break) and the scenes with Thresh; the speaker's name is shown above
 msgid "Such a bright soul... it will make a fine light."
-msgstr "Một linh hồn sáng rực thế này... sẽ làm nên một ngọn đèn tuyệt vời."
+msgstr "Linh hồn rực sáng thế này... sẽ thành một ngọn đèn tuyệt hảo."
 
 #. Cutscenes: Senna's lessons (Act 1's break) and the scenes with Thresh; the speaker's name is shown above
 msgid "SENNA!"
@@ -279,7 +279,7 @@ msgstr "Ánh sáng của ngươi giờ là của ta."
 
 #. Cutscenes: Senna's lessons (Act 1's break) and the scenes with Thresh; the speaker's name is shown above
 msgid "Lucian takes up Senna's gun."
-msgstr "Lucian nhặt lấy khẩu súng của Senna."
+msgstr "Lucian cầm lấy khẩu súng của Senna."
 
 #. Wave banner: the big word over the name; %d is the wave
 msgid "WAVE %d"
@@ -323,7 +323,7 @@ msgstr "Tiếp theo"
 
 #. Stage info: the hover text of the Skip button
 msgid "Start the next wave now. Lucian still gets the health and mana regen of the time skipped."
-msgstr "Bắt đầu đợt tiếp theo ngay. Lucian vẫn được hồi máu và năng lượng của khoảng thời gian bỏ qua."
+msgstr "Bắt đầu đợt tiếp theo ngay. Lucian vẫn được hồi máu và năng lượng cho khoảng thời gian bỏ qua."
 
 #. HUD: the stage name when there is none (the sandbox), and a stage's name in Endless; %s is a map's name
 msgid "Endless · %s"
@@ -331,11 +331,11 @@ msgstr "Vô Tận · %s"
 
 #. HUD: hover text of the gold cell; and the name of the Endless modifier's buff icon
 msgid "Stage gold: spend it at the merchant. Resets every stage."
-msgstr "Vàng của màn chơi: tiêu ở chỗ thương nhân. Đặt lại sau mỗi màn."
+msgstr "Vàng trong màn: tiêu ở thương nhân. Đặt lại sau mỗi màn."
 
 #. HUD: hover text of the gold cell; and the name of the Endless modifier's buff icon
 msgid "Endless modifier"
-msgstr "Thay đổi Vô Tận"
+msgstr "Biến Số Vô Tận"
 
 #. HUD: the stats panel's hover card; %s is a number (the regen line has a health and a mana line)
 msgid "Health %s\nMana %s"
@@ -351,7 +351,7 @@ msgstr "%s cộng thêm"
 
 #. HUD: the summoner slots' hover card when empty
 msgid "Locked: buy the 2nd summoner slot in the Evolution Tree."
-msgstr "Đã khóa: mua ô phép bổ trợ thứ hai trong Cây Tiến Hóa."
+msgstr "Đã khóa: mua Ô Phép Bổ Trợ Thứ Hai trong Cây Tiến Hóa."
 
 #. HUD: the summoner slots' hover card when empty
 msgid "No spell: pick one in Journey before starting."
@@ -359,15 +359,15 @@ msgstr "Chưa có phép: hãy chọn trong Hành Trình trước khi bắt đầ
 
 #. HUD: the Upgraded line of a summoner spell's hover card; %d is a percent
 msgid "Upgraded: %d%% shorter cooldown"
-msgstr "Nâng cấp: giảm %d%% thời gian hồi"
+msgstr "Đã nâng cấp: giảm %d%% thời gian hồi chiêu"
 
 #. HUD: the Upgraded line of a summoner spell's hover card; %d is a percent
 msgid "Upgraded: %d%% stronger"
-msgstr "Nâng cấp: mạnh hơn %d%%"
+msgstr "Đã nâng cấp: mạnh hơn %d%%"
 
 #. HUD: titles of the pick screens (Endless modifier, the Lantern's gift)
 msgid "CHOOSE A MODIFIER"
-msgstr "CHỌN MỘT THAY ĐỔI"
+msgstr "CHỌN MỘT BIẾN SỐ"
 
 #. HUD: titles of the pick screens (Endless modifier, the Lantern's gift)
 msgid "THE LANTERN'S GIFT"
@@ -375,11 +375,11 @@ msgstr "MÓN QUÀ CỦA LỒNG ĐÈN"
 
 #. Floating words over units and Lucian
 msgid "Escaped!"
-msgstr "Đã chạy thoát!"
+msgstr "Chạy thoát!"
 
 #. Floating words over units and Lucian
 msgid "Broken!"
-msgstr "Bị phá!"
+msgstr "Bị phá vỡ!"
 
 #. Floating words over units and Lucian
 msgid "Interrupted!"
@@ -559,7 +559,7 @@ msgstr "%s %d / %d: +%d%% sát thương, -%d%% nhận vào"
 
 #. Resolve: the Journey line's hover text, on two lines; %s is how often (once, 3 times), %d the most stacks
 msgid "Lucian fell here %s.\nEach defeat makes this stage a little easier, up to %d times, until it is cleared."
-msgstr "Lucian đã gục ở đây %s.\nMỗi lần thất bại làm màn này dễ hơn một chút, tối đa %d lần, cho đến khi vượt qua."
+msgstr "Lucian đã gục ở đây %s.\nMỗi lần thất bại làm màn này dễ hơn một chút, tối đa %d lần, cho đến khi hoàn thành màn."
 
 #. Resolve: how often Lucian fell; %d is the count
 msgid "once"
@@ -579,7 +579,7 @@ msgstr "Không thể di chuyển, tấn công hay dùng kỹ năng."
 
 #. Lucian: the word under his health bar and the buff icon's name and hover text, by crowd control
 msgid "Feared"
-msgstr "Bị sợ hãi"
+msgstr "Hoảng sợ"
 
 #. Lucian: the word under his health bar and the buff icon's name and hover text, by crowd control
 msgid "Running away in fear. Can't attack or cast."
@@ -587,7 +587,7 @@ msgstr "Hoảng sợ bỏ chạy. Không thể tấn công hay dùng kỹ năng.
 
 #. Lucian: the word under his health bar and the buff icon's name and hover text, by crowd control
 msgid "Rooted"
-msgstr "Bị trói chân"
+msgstr "Trói chân"
 
 #. Lucian: the word under his health bar and the buff icon's name and hover text, by crowd control
 msgid "Can't walk, dash or Flash. Attacks and other skills still work."
@@ -643,7 +643,7 @@ msgstr "[ms]+%d tốc độ di chuyển[/ms] từ Giày Xịn, được giữ l�
 
 #. Lucian: buff icons' names and hover texts (move speed, slows, burns, shields); %d and %s are numbers
 msgid "Slowed"
-msgstr "Bị làm chậm"
+msgstr "Làm chậm"
 
 #. Lucian: buff icons' names and hover texts (move speed, slows, burns, shields); %d and %s are numbers
 msgid "[ms]-%d%% move speed[/ms]."
@@ -671,7 +671,7 @@ msgstr "+%d [mana]hồi năng lượng[/mana] mỗi giây và +%d điểm hồi 
 
 #. Jungle buffs: the buff icons' names and hover texts; the values are numbers
 msgid "+%d [hp]health regen[/hp] per second. Basic attacks burn for [true]%d true damage[/true] per second for %d s, and basic attacks and skills slow by %d%% for %s s."
-msgstr "+%d [hp]hồi máu[/hp] mỗi giây. Đòn đánh thiêu đốt gây [true]%d sát thương chuẩn[/true] mỗi giây trong %d giây, và đòn đánh cùng kỹ năng làm chậm %d%% trong %s giây."
+msgstr "+%d [hp]hồi máu[/hp] mỗi giây. Đòn đánh thiêu đốt gây [true]%d sát thương chuẩn[/true] mỗi giây trong %d s, đòn đánh và kỹ năng làm chậm %d%% trong %s s."
 
 #. Lucian's skills: the words that end a damage figure in a skill's hover card
 msgid "[phys]physical damage[/phys]"
@@ -687,11 +687,11 @@ msgstr "[true]sát thương chuẩn[/true]"
 
 #. Lucian's passive, Lightslinger: its hover card; %d is a percent, %s seconds
 msgid "After using a skill, Lucian's next basic attack fires a second shot from his other gun for [ad]%d%% AD[/ad] [phys]physical damage[/phys]. The second shot can critically strike. Each Lightslinger shot that hits lowers [kw]Relentless Pursuit[/kw]'s cooldown by [kw]%s s[/kw]."
-msgstr "Sau khi dùng kỹ năng, đòn đánh thường kế tiếp của Lucian bắn thêm một phát từ khẩu súng còn lại, gây [ad]%d%% SMCK[/ad] [phys]sát thương vật lý[/phys]. Phát bắn thứ hai có thể chí mạng. Mỗi phát Xạ Thủ Ánh Sáng trúng đích giảm [kw]%s giây[/kw] thời gian hồi của [kw]Truy Cùng Diệt Tận[/kw]."
+msgstr "Sau khi dùng kỹ năng, đòn đánh kế tiếp của Lucian bắn thêm một phát từ khẩu súng còn lại, gây [ad]%d%% SMCK[/ad] [phys]sát thương vật lý[/phys]. Phát bắn thứ hai có thể chí mạng. Mỗi phát Xạ Thủ Ánh Sáng trúng đích giảm [kw]%s s[/kw] thời gian hồi chiêu của [kw]Truy Cùng Diệt Tận[/kw]."
 
 #. Lucian's W, Ardent Blaze: its hover card and its max-rank line; values are damage, seconds, move speed
 msgid "Lucian fires a missile that bursts in a cross on the first enemy hit or at max range, dealing %s and marking enemies for [kw]%s s[/kw]. Lucian's other hits on a marked enemy grant him %s [ms]move speed[/ms] for [kw]%s s[/kw]."
-msgstr "Lucian bắn một viên đạn nổ thành hình chữ thập khi trúng kẻ địch đầu tiên hoặc ở tầm xa tối đa, gây %s và đánh dấu kẻ địch trong [kw]%s giây[/kw]. Các đòn khác của Lucian trúng kẻ địch bị đánh dấu giúp anh nhận %s [ms]tốc độ di chuyển[/ms] trong [kw]%s giây[/kw]."
+msgstr "Lucian bắn một viên đạn nổ thành hình chữ thập khi trúng kẻ địch đầu tiên hoặc ở tầm xa tối đa, gây %s và đánh dấu kẻ địch trong [kw]%s s[/kw]. Các đòn khác của Lucian trúng kẻ địch bị đánh dấu cho anh %s [ms]tốc độ di chuyển[/ms] trong [kw]%s s[/kw]."
 
 #. Lucian's W, Ardent Blaze: its hover card and its max-rank line; values are damage, seconds, move speed
 msgid "The cross is %d%% bigger."
@@ -699,7 +699,7 @@ msgstr "Hình chữ thập lớn hơn %d%%."
 
 #. Lucian's Q, Piercing Light: its hover card and its max-rank line; values are seconds, damage, sizes
 msgid "After a [kw]%s s[/kw] cast, Lucian fires a piercing beam of light toward the cursor, dealing %s to every enemy in a line."
-msgstr "Sau [kw]%s giây[/kw] niệm chiêu, Lucian bắn một tia sáng xuyên thấu về phía con trỏ, gây %s cho mọi kẻ địch trên đường thẳng."
+msgstr "Sau [kw]%s s[/kw] niệm chiêu, Lucian bắn một tia sáng xuyên thấu về phía con trỏ, gây %s lên mọi kẻ địch trên đường thẳng."
 
 #. Lucian's Q, Piercing Light: its hover card and its max-rank line; values are seconds, damage, sizes
 msgid "The beam grows from %d × %d to %d × %d units."
@@ -707,15 +707,15 @@ msgstr "Tia sáng tăng từ %d × %d lên %d × %d đơn vị."
 
 #. Lucian's E, Relentless Pursuit: its hover card and its max-rank line; the value is the distance
 msgid "Lucian dashes toward the cursor, up to [kw]%d[/kw] units, passing through enemies, and resets his basic attack timer. [kw]Lightslinger[/kw] hits lower this cooldown."
-msgstr "Lucian lướt về phía con trỏ tối đa [kw]%d[/kw] đơn vị, xuyên qua kẻ địch và làm mới thời gian đòn đánh thường. Các đòn [kw]Xạ Thủ Ánh Sáng[/kw] trúng đích giảm thời gian hồi của kỹ năng này."
+msgstr "Lucian lướt về phía con trỏ tối đa [kw]%d[/kw] đơn vị, xuyên qua kẻ địch và đặt lại nhịp đánh. Các phát [kw]Xạ Thủ Ánh Sáng[/kw] trúng đích giảm thời gian hồi chiêu của kỹ năng này."
 
 #. Lucian's E, Relentless Pursuit: its hover card and its max-rank line; the value is the distance
 msgid "Killing an enemy lowers this cooldown by 1 s."
-msgstr "Hạ gục kẻ địch giảm 1 giây thời gian hồi của kỹ năng này."
+msgstr "Hạ gục kẻ địch giảm 1 s thời gian hồi chiêu của kỹ năng này."
 
 #. Lucian's R, The Culling: its hover card and its max-rank line; values are shots, seconds, damage, percents
 msgid "Lucian fires [kw]%d[/kw] shots in one direction over [kw]%s s[/kw], each dealing %s to the first enemy hit. He can move and use Relentless Pursuit while firing, but cannot attack or use Q or W. Press R again to stop early."
-msgstr "Lucian bắn [kw]%d[/kw] phát đạn theo một hướng trong [kw]%s giây[/kw], mỗi phát gây %s cho kẻ địch đầu tiên trúng đạn. Anh có thể di chuyển và dùng Truy Cùng Diệt Tận khi đang bắn, nhưng không thể đánh thường hay dùng Q hoặc W. Nhấn R lần nữa để dừng sớm."
+msgstr "Lucian bắn [kw]%d[/kw] phát đạn theo một hướng trong [kw]%s s[/kw], mỗi phát gây %s lên kẻ địch đầu tiên trúng đạn. Anh có thể di chuyển và dùng Truy Cùng Diệt Tận khi đang bắn, nhưng không thể đánh hay dùng Q, W. Nhấn R lần nữa để dừng sớm."
 
 #. Lucian's R, The Culling: its hover card and its max-rank line; values are shots, seconds, damage, percents
 msgid "Shots pierce, dealing %d%% less damage for each enemy already hit (down to %d%%)."
@@ -723,7 +723,7 @@ msgstr "Đạn xuyên qua, mỗi kẻ địch đã trúng làm giảm %d%% sát 
 
 #. Summoner spells' descriptions (data/summoners), in the spell's hover card
 msgid "Gain a shield of [kw]95 (+18 per level)[/kw] for [kw]2.5 s[/kw]. Heal and shield power makes it stronger."
-msgstr "Nhận một lá chắn [kw]95 (+18 mỗi cấp)[/kw] trong [kw]2.5 giây[/kw]. Sức Mạnh Lá Chắn và Hồi Máu làm nó mạnh hơn."
+msgstr "Nhận một lá chắn [kw]95 (+18 mỗi cấp)[/kw] trong [kw]2.5 s[/kw]. Sức Mạnh Lá Chắn và Hồi Máu làm lá chắn mạnh hơn."
 
 #. Summoner spells' descriptions (data/summoners), in the spell's hover card
 msgid "Restore [mana]50% of max mana[/mana]."
@@ -735,12 +735,12 @@ msgstr "Dịch chuyển tối đa [kw]400[/kw] đơn vị về phía con trỏ. 
 
 #. Summoner spells' descriptions (data/summoners), in the spell's hover card
 msgid "Gain [ms]40% move speed[/ms] and pass through enemies for [kw]6 s[/kw]."
-msgstr "Nhận [ms]40% tốc độ di chuyển[/ms] và xuyên qua kẻ địch trong [kw]6 giây[/kw]."
+msgstr "Nhận [ms]40% tốc độ di chuyển[/ms] và xuyên qua kẻ địch trong [kw]6 s[/kw]."
 
 #. Summoner spells' descriptions (data/summoners), in the spell's hover card
 msgid "Restore [hp]80 (+15 per level) health[/hp] and gain [ms]30% move speed[/ms] that fades over 1 s."
-msgstr "Hồi [hp]80 (+15 mỗi cấp) máu[/hp] và nhận [ms]30% tốc độ di chuyển[/ms] giảm dần trong 1 giây."
+msgstr "Hồi [hp]80 (+15 mỗi cấp) máu[/hp] và nhận [ms]30% tốc độ di chuyển[/ms] giảm dần trong 1 s."
 
 #. Summoner spells' descriptions (data/summoners), in the spell's hover card
 msgid "Deal [true]450 true damage[/true] to the enemy nearest the cursor within [kw]500[/kw] units. If it kills, restore [hp]2.5% max health[/hp], and an elite it kills is [kw]3×[/kw] as likely to drop orange essence."
-msgstr "Gây [true]450 sát thương chuẩn[/true] lên kẻ địch gần con trỏ nhất trong phạm vi [kw]500[/kw] đơn vị. Nếu hạ gục, hồi [hp]2.5% máu tối đa[/hp], và tinh anh bị hạ gục có khả năng rơi tinh chất cam cao gấp [kw]3×[/kw]."
+msgstr "Gây [true]450 sát thương chuẩn[/true] lên kẻ địch gần con trỏ nhất trong phạm vi [kw]500[/kw] đơn vị. Nếu hạ gục, hồi [hp]2.5% máu tối đa[/hp]; tinh anh bị hạ gục sẽ có tỉ lệ rơi tinh chất cam [kw]3×[/kw]."
