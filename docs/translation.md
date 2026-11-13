@@ -33,6 +33,33 @@
 - **Length:** the interface was laid out for English. Keep a translation near its English's length; where it cannot be, say so and the layout is widened.
 - **A comment** (`#.`) above each entry says where the text shows and what each value is.
 
+## Terms
+
+One Vietnamese term for each English term, in every file. Names of items, skills, spells, enemies and stats are in `locale/glossary_vi.md` and `locale/vi/common.po`.
+
+| English | Vietnamese |
+|---|---|
+| Wave / Stage / Act | Đợt / Màn ("Màn 3-4") / Hồi |
+| Boss / Mini boss / Elite | Trùm / Trùm phụ / Tinh anh |
+| Save slot / a save | Ô lưu / Bản lưu |
+| Item slot or cell | Ô |
+| Item (equipment) / any object in the bag | Trang bị / Món đồ |
+| Rank (of a skill) / Level | Bậc / Cấp |
+| Craft / Fragment / Legendary / Potion | Chế tạo / Mảnh ghép / Huyền Thoại / Bình thuốc |
+| Merchant / Backpack | Thương nhân / Ba lô |
+| Evolution Tree / Essence | Cây Tiến Hóa / Tinh chất (xanh, cam, tím) |
+| Journey / Training / Endless | Hành Trình / Luyện Tập / Vô Tận |
+| Modifier / Resolve / the Lantern's gift | Biến số / Quyết Tâm / Món Quà Của Lồng Đèn |
+| Buff / Effect (a tree node's row) | Hiệu ứng / Tác dụng |
+| Cooldown / Cast / Cast time | Hồi chiêu / Tung chiêu / Niệm chiêu |
+| Quick cast / Normal cast / Cast queue | Tung nhanh / Tung thường / Hàng chờ kỹ năng |
+| Skin / Equip / Equipped | Trang phục / Mặc / Đang mặc |
+| Summoner spell / Shield / Stacks | Phép bổ trợ / Lá chắn / Tầng |
+| Basic attack / On-hit / Kill | Đòn đánh / Khi đánh trúng / Hạ gục |
+| Clear a stage / Clear a wave / Defeat | Hoàn thành / Vượt qua / Thất bại |
+| Click / Press / seconds | Nhấp / Nhấn / s ("mỗi giây" for "per second") |
+| AD / AP | SMCK / SMPT |
+
 ## Tests
 
 - `tests/unit/test_lang.gd`: the setting, the picker, the rebuild.

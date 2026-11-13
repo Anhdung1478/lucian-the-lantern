@@ -9,10 +9,11 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 ## Download and play
 
 1. Open the [latest release](https://github.com/Anhdung1478/lucian-the-lantern/releases/latest).
-2. Download `LucianTheLantern-v2.0.0-windows-x64.zip`.
+2. Download `LucianTheLantern-v2.0.1-windows-x64.zip`.
 3. Unzip it anywhere and run `LucianTheLantern.exe`.
 
 - Needs Windows 10 or 11, 64-bit.
+- **Languages:** English and Vietnamese (Tiếng Việt). Pick one at the title screen's top right, or in **Settings → Gameplay**.
 - The game is not code-signed, so Windows SmartScreen may warn the first time. Choose **More info → Run anyway**.
 - Saves and settings live in `%APPDATA%\lucian_the_lantern`.
 
@@ -95,6 +96,7 @@ godot --headless --path . --export-release "Windows Desktop" build/windows/Lucia
 | `src/` | Game code: core rules, Lucian, enemies and bosses, stages, UI |
 | `data/` | Resources: enemies, items, skins, Evolution Tree nodes, waves |
 | `assets/` | SVG art |
+| `locale/` | The Vietnamese texts (gettext files) and the name glossary; see `docs/translation.md` |
 | `tests/` | Unit tests and the screenshot tool |
 | `docs/` | Design docs, per-phase plans and reports with screenshots |
 
