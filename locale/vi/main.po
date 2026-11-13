@@ -321,9 +321,9 @@ msgstr "Đang mặc"
 msgid "Equip"
 msgstr "Mặc"
 
-#. skin_card.gd, skin_purchase_popup.gd: buy button, then the purple essence icon. %d is the price
-msgid "Purchase  %d"
-msgstr "Mua  %d"
+#. skin_card.gd, skin_purchase_popup.gd: buy button's word, followed by the price and the purple essence icon
+msgid "Purchase"
+msgstr "Mua"
 
 #. skin_card.gd: button that opens the preview
 msgid "Preview"
@@ -429,13 +429,13 @@ msgstr "Thiên về kỹ năng, W và R là nguồn sát thương chính"
 msgid "Risky but sustainable"
 msgstr "Mạo hiểm nhưng bền bỉ"
 
-#. cost_bar.gd: cost bar of a node at its top level
-msgid "MAXED"
-msgstr "TỐI ĐA"
+#. cost_bar.gd: cost bar of a node at its top level (sentence case)
+msgid "Maxed"
+msgstr "Tối đa"
 
-#. cost_bar.gd: cost bar of a node that cannot be bought yet
-msgid "LOCKED"
-msgstr "ĐÃ KHÓA"
+#. node_info_panel.gd: last line of a branch's node list, counting the hidden nodes. %d is how many
+msgid "%d more to discover"
+msgstr "Còn %d nút chưa khám phá"
 
 #. cost_bar.gd, node_info_panel.gd, tree_purchase_popup.gd: price of a level that costs nothing
 msgid "Free"
@@ -537,9 +537,9 @@ msgstr "Ô TRANG BỊ"
 msgid "Act %d"
 msgstr "Hồi %d"
 
-#. tree_page.gd: note on the equip slots plaque
+#. tree_page.gd: note on the equip slots plaque (296 px wide at 14 px type)
 msgid "Only equipped items give stats."
-msgstr "Chỉ những món đang trang bị mới cho chỉ số."
+msgstr "Chỉ đồ đang trang bị cho chỉ số."
 
 #. tree_page.gd: note on the boots plaque
 msgid "Worn on every map."
@@ -569,9 +569,9 @@ msgstr "Tác dụng"
 msgid "Buy"
 msgstr "Mua"
 
-#. tree_section.gd: Reset tree button (260 px wide, then the purple icon). %d is the price
-msgid "Reset tree  %d"
-msgstr "Đặt lại cây  %d"
+#. tree_section.gd: Reset tree button's words (260 px wide), followed by the price and the purple icon
+msgid "Reset tree"
+msgstr "Đặt lại cây"
 
 #. tree_section.gd: hover text of Reset tree when nothing was spent
 msgid "Nothing to refund: no blue or orange essence spent"

@@ -3,7 +3,8 @@ extends HBoxContainer
 ## The Evolution Tree's branch tabs, a strip under the pages: Skills, Stats,
 ## Backpack, Economy and Summoners, each with its icon, name and levels bought
 ## ("3 / 19"). The tabs hang from the page's bottom edge; the chosen one is
-## lit gold.
+## lit gold by a highlight that slides from tab to tab (SlideHighlight), its
+## name and count easing to gold. The counts count as levels are bought.
 
 signal branch_chosen(branch: StringName)
 
@@ -19,7 +20,9 @@ const BADGE_MARGIN := Vector2(8, -10)
 ## One tab per EvolutionTree.BRANCHES entry, in that order.
 var buttons: Array[Button] = []
 ## Each tab's levels bought, "3 / 19".
-var counts: Array[Label] = []
+var counts: Array[CountLabel] = []
+## The chosen tab's fill, sliding between tabs.
+var highlight: SlideHighlight
 ## The lit tab's branch.
 var selected: StringName
 
@@ -27,10 +30,14 @@ var selected: StringName
 var free_badges: Array[FreeBadge] = []
 
 var _names: Array[Label] = []
+var _tints := {}
 
 
 func _init() -> void:
 	add_theme_constant_override(&"separation", GAP)
+	var lit_box := UiStyle.button_style(&"normal", true)
+	_shape(lit_box)
+	highlight = SlideHighlight.under(self, lit_box)
 	for branch: StringName in EvolutionTree.BRANCHES:
 		var button := Button.new()
 		button.custom_minimum_size.y = TAB_HEIGHT
@@ -39,6 +46,11 @@ func _init() -> void:
 		button.pressed.connect(branch_chosen.emit.bind(branch))
 		add_child(button)
 		buttons.append(button)
+		UiStyle.style_button(button, NAME_FONT)
+		for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
+			_shape(button.get_theme_stylebox(state) as StyleBoxFlat)
+		# An unchosen tab keeps its own rest box; the chosen one's turns clear
+		# so the highlight under it shows (select()).
 		var row := HBoxContainer.new()
 		row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -57,7 +69,9 @@ func _init() -> void:
 		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(title)
 		_names.append(title)
-		var count := UiStyle.label("", COUNT_FONT, UiStyle.DIM_COLOR)
+		var count := CountLabel.new()
+		count.add_theme_font_size_override(&"font_size", COUNT_FONT)
+		count.add_theme_color_override(&"font_color", UiStyle.DIM_COLOR)
 		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(count)
 		counts.append(count)
@@ -73,26 +87,45 @@ func _init() -> void:
 	select(EvolutionTree.BRANCHES[0])
 
 
-## Lights `branch`'s tab and dims the others. Does not emit.
+## Lights `branch`'s tab and dims the others: the highlight slides to it
+## and the names and counts ease. Does not emit.
 func select(branch: StringName) -> void:
 	selected = branch
 	for i in buttons.size():
 		var lit := EvolutionTree.BRANCHES[i] == branch
-		UiStyle.style_button(buttons[i], NAME_FONT, lit)
-		for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
-			var style := buttons[i].get_theme_stylebox(state) as StyleBoxFlat
-			style.border_width_top = 0
-			style.corner_radius_top_left = 0
-			style.corner_radius_top_right = 0
-			style.corner_radius_bottom_left = 12
-			style.corner_radius_bottom_right = 12
-		_names[i].add_theme_color_override(&"font_color", UiStyle.TITLE_COLOR if lit else UiStyle.TEXT_COLOR)
-		counts[i].add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if lit else UiStyle.DIM_COLOR)
+		UiStyle.set_selected(buttons[i], lit, not lit)
+		_tint(_names[i], UiStyle.TITLE_COLOR if lit else UiStyle.TEXT_COLOR)
+		_tint(counts[i], UiStyle.GOLD_COLOR if lit else UiStyle.DIM_COLOR)
+	highlight.follow(buttons[EvolutionTree.BRANCHES.find(branch)])
 
 
 ## Rereads each tab's levels bought.
 func refresh(tree: EvolutionTree) -> void:
 	for i in buttons.size():
 		var bought := TreePage.levels(tree, EvolutionTree.BRANCHES[i])
-		counts[i].text = "%d / %d" % [bought.x, bought.y]
+		counts[i].formatter = func(v: int) -> String: return "%d / %d" % [v, bought.y]
+		counts[i].set_value(bought.x)
 		free_badges[i].visible = tree.has_free(EvolutionTree.BRANCHES[i])
+
+
+## A tab's box: hanging from the page, so no top rim and round at the foot.
+static func _shape(style: StyleBoxFlat) -> void:
+	style.border_width_top = 0
+	style.corner_radius_top_left = 0
+	style.corner_radius_top_right = 0
+	style.corner_radius_bottom_left = 12
+	style.corner_radius_bottom_right = 12
+
+
+## Eases `label`'s font colour to `color` over UiMotion.FAST.
+func _tint(label: Label, color: Color) -> void:
+	var running: Tween = _tints.get(label)
+	if running and running.is_valid():
+		running.kill()
+	var from := label.get_theme_color(&"font_color")
+	if UiMotion.off() or not is_inside_tree() or from == color:
+		label.add_theme_color_override(&"font_color", color)
+		return
+	var tint := UiMotion.tween(label)
+	tint.tween_method(func(c: Color) -> void: label.add_theme_color_override(&"font_color", c), from, color, UiMotion.FAST)
+	_tints[label] = tint

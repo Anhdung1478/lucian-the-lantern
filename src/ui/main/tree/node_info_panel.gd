@@ -2,13 +2,16 @@ class_name NodeInfoPanel
 extends PanelContainer
 ## The Evolution Tree's info column, right of the pages and always shown, in
 ## the Journey panel's look.
-## - Nothing picked: the branch shown, its name, blurb, levels bought, "Pick a
-##   node" and a row per node (icon, name, level; a click picks it).
+## - Nothing picked: the branch's levels bought as the lead (its name and
+##   blurb are on the page's art, so not here), "Pick a node" and a row per
+##   node it knows (icon, name, level; a click picks it), then one dim line
+##   for the hidden ones ("7 more to discover").
 ## - A node picked: its branch, name and icon, "LVL 2 / 5", its value now and
 ##   at the next level, what it does, R's "Q + W + E ranks: 7 / 9", what its
 ##   next level still needs, a row per level (value and cost; bought ones lit,
 ##   the next one framed) and the CostBar that buys it, at the bottom. A
-##   hidden node reads "???".
+##   hidden node reads "???": its requirement, then the branch's list.
+## The frame stays; its body fades and rises in when the subject changes.
 ##   Icons not bought yet show in greyscale, as on the page.
 
 ## A row of the branch's node list was clicked.
@@ -18,13 +21,17 @@ const PORTRAIT_SIZE := 96.0
 const PROGRESS_HEIGHT := 10.0
 const ROW_GAP := 12
 ## The branch's node list: a row's height, its icon and fonts.
-const LIST_ROW := Vector2(400, 34)
+const LIST_ROW := Vector2(400, 42)
 const LIST_GAP := 4
-const LIST_ICON := 28.0
-const LIST_FONT := 18
-## The picked node's level ladder: a row's height and fonts.
-const LADDER_ROW := 30.0
-const LADDER_FONT := 18
+const LIST_ICON := 32.0
+const LIST_FONT := UiStyle.FONT_ROW
+## The picked node's level ladder: a row's height (34 px pitch on screen) and
+## fonts.
+const LADDER_ROW := 37.0
+const LADDER_FONT := UiStyle.FONT_ROW
+const LADDER_SMALL := UiStyle.FONT_BODY
+## The body's rise as the subject changes (6 px on screen).
+const TURN_RISE := 7.0
 const COST_ICON := 20.0
 
 ## The node shown, &"" with nothing picked.
@@ -38,10 +45,12 @@ var caption_label: Label
 ## The branch's or the node's name.
 var name_label: Label
 var blurb_label: Label
-## "Levels bought 3 / 19".
-var levels_label: Label
+## "Levels bought 3 / 19": the branch's lead (counts as it changes).
+var levels_label: CountLabel
 ## "Pick a node".
 var hint_label: Label
+## "7 more to discover", under the known nodes while some are hidden.
+var more_label: Label
 ## The branch's node list: node id -> its row.
 var rows := {}
 var level_label: Label
@@ -68,6 +77,17 @@ var _ladder_id: StringName
 var _node_box := VBoxContainer.new()
 var _portrait := Control.new()
 var _progress := Control.new()
+## The share of the branch bought that the bar shows (eases to the new one).
+var _progress_shown := -1.0
+var _progress_tween: Tween
+## Holds the column on a plain Control, so the body can rise as it enters.
+var _body := Control.new()
+var _column := VBoxContainer.new()
+## The rule under the node's name, and the one over its ladder.
+var _top_rule: Control
+var _ladder_rule: Control
+## What the body shows: the branch, or the node id.
+var _subject: StringName
 
 
 func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
@@ -82,20 +102,31 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	style.content_margin_top = JourneyPanel.PAD + 4.0
 	add_theme_stylebox_override(&"panel", style)
 
-	var column := VBoxContainer.new()
+	_body.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_body.resized.connect(_fit_column)
+	add_child(_body)
+	# Sized by hand, not anchored: the body's entrance moves it, and moving an
+	# anchored node would rewrite its offsets.
+	var column := _column
 	column.add_theme_constant_override(&"separation", ROW_GAP)
-	add_child(column)
+	column.minimum_size_changed.connect(_fit_column, CONNECT_DEFERRED)
+	_body.add_child(column)
 	caption_label = UiStyle.label("", 16, JourneyPanel.CAPTION_COLOR)
 	column.add_child(caption_label)
 	name_label = _wrapped(UiStyle.label("", 34, UiStyle.TITLE_COLOR))
 	column.add_child(name_label)
-	column.add_child(JourneyPanel.divider())
+	_top_rule = JourneyPanel.divider()
+	column.add_child(_top_rule)
 
 	_branch_box.add_theme_constant_override(&"separation", ROW_GAP)
 	column.add_child(_branch_box)
+	# The branch's name and blurb are on the page's art: kept, not shown.
 	blurb_label = _wrapped(UiStyle.label("", 20, UiStyle.TEXT_COLOR))
+	blurb_label.visible = false
 	_branch_box.add_child(blurb_label)
-	levels_label = UiStyle.label("", 22, UiStyle.GOLD_COLOR)
+	levels_label = CountLabel.new()
+	levels_label.add_theme_font_size_override(&"font_size", UiStyle.FONT_LEAD)
+	levels_label.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
 	_branch_box.add_child(levels_label)
 	_progress.custom_minimum_size = Vector2(JourneyPanel.CONTENT_WIDTH, PROGRESS_HEIGHT)
 	_progress.draw.connect(_draw_progress)
@@ -105,9 +136,13 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	_branch_box.add_child(hint_label)
 	_list.add_theme_constant_override(&"separation", LIST_GAP)
 	_branch_box.add_child(_list)
+	more_label = UiStyle.label("", LIST_FONT, UiStyle.DIM_COLOR)
+	_branch_box.add_child(more_label)
 
 	_node_box.add_theme_constant_override(&"separation", ROW_GAP)
 	column.add_child(_node_box)
+	# Before the branch's list: a hidden node shows its requirement, then it.
+	column.move_child(_node_box, _branch_box.get_index())
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override(&"separation", 18)
 	_node_box.add_child(top)
@@ -136,7 +171,8 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	_node_box.add_child(sum_label)
 	requires_label = _wrapped(UiStyle.label("", 19, UiStyle.ERROR_COLOR))
 	_node_box.add_child(requires_label)
-	_node_box.add_child(JourneyPanel.divider())
+	_ladder_rule = JourneyPanel.divider()
+	_node_box.add_child(_ladder_rule)
 	_ladder_caption = UiStyle.label(Lang.t("LEVELS"), 16, JourneyPanel.CAPTION_COLOR)
 	_node_box.add_child(_ladder_caption)
 	ladder.add_theme_constant_override(&"separation", 4)
@@ -157,6 +193,7 @@ func show_branch(branch_id: StringName) -> void:
 	branch = branch_id
 	id = &""
 	refresh()
+	_turn_to(branch_id)
 
 
 ## Shows node `node_id` (and its branch).
@@ -165,25 +202,68 @@ func show_node(node_id: StringName) -> void:
 	branch = tree.node(id).branch
 	cost_bar.show_node(id)
 	refresh()
+	_turn_to(node_id)
 
 
 ## Rereads the branch or the node from the tree.
 func refresh() -> void:
 	var picked := id != &""
-	_branch_box.visible = not picked
+	var hidden := picked and TreeNodeView.is_hidden(tree, id)
+	# A hidden node's requirement, then the branch's list under it.
+	_branch_box.visible = not picked or hidden
 	_node_box.visible = picked
 	cost_bar.visible = picked
-	if picked:
-		_show_node()
-	else:
-		var bought := TreePage.levels(tree, branch)
+	for part: CanvasItem in [caption_label, name_label, _top_rule]:
+		part.visible = picked
+	for part: CanvasItem in [levels_label, _progress, hint_label]:
+		part.visible = not picked
+	var bought := TreePage.levels(tree, branch)
+	var new_branch := _list_branch != branch
+	if not picked:
 		caption_label.text = Lang.t("EVOLUTION TREE")
 		name_label.text = Lang.t(TreePage.NAMES[branch])
-		blurb_label.text = Lang.t(TreePage.BLURBS[branch])
-		levels_label.text = Lang.t("Levels bought %d / %d") % [bought.x, bought.y]
-		_progress.queue_redraw()
-		_fill_list()
+	blurb_label.text = Lang.t(TreePage.BLURBS[branch])
+	levels_label.formatter = func(v: int) -> String: return Lang.t("Levels bought %d / %d") % [v, bought.y]
+	levels_label.set_value(bought.x, new_branch)
+	_ease_progress(float(bought.x) / maxf(bought.y, 1.0), new_branch)
+	_fill_list()
+	if picked:
+		_show_node()
 	queue_redraw()
+
+
+## The column takes the body's size (its height may not shrink under its
+## content; a wrapped label too wide for a moment never keeps it wide).
+func _fit_column() -> void:
+	_column.size = _body.size
+
+
+## The body fades and rises in when it shows a new subject (a branch or a
+## node); a refresh of the same one stays still.
+func _turn_to(subject: StringName) -> void:
+	if subject == _subject:
+		return
+	var first := _subject == &""
+	_subject = subject
+	if not first:
+		UiMotion.enter(_column, TURN_RISE, UiMotion.BASE)
+
+
+## The levels bar eases to `share` (snaps for a new branch).
+func _ease_progress(share: float, snap: bool) -> void:
+	if _progress_tween and _progress_tween.is_valid():
+		_progress_tween.kill()
+	if snap or _progress_shown < 0.0 or UiMotion.off() or not is_inside_tree():
+		_progress_shown = share
+		_progress.queue_redraw()
+		return
+	_progress_tween = UiMotion.tween(self)
+	_progress_tween.tween_method(_set_progress, _progress_shown, share, UiMotion.BASE)
+
+
+func _set_progress(share: float) -> void:
+	_progress_shown = share
+	_progress.queue_redraw()
 
 
 func _show_node() -> void:
@@ -193,6 +273,7 @@ func _show_node() -> void:
 	caption_label.text = Lang.t(TreePage.NAMES[branch]).to_upper()
 	name_label.text = "???" if hidden else Lang.t(data.display_name)
 	level_label.text = Lang.t("LVL %d / %d") % [level, data.max_level]
+	_ladder_rule.visible = not hidden
 	if hidden:
 		value_label.text = ""
 		value_label.add_theme_color_override(&"font_color", UiStyle.TEXT_COLOR)
@@ -257,13 +338,17 @@ func _ladder_row(data: TreeNodeData, i: int) -> PanelContainer:
 	line.name = &"Line"
 	line.add_theme_constant_override(&"separation", 8)
 	row.add_child(line)
-	var level := UiStyle.label(Lang.t("Lv %d") % (i + 1), LADDER_FONT - 2)
+	var level := UiStyle.label(Lang.t("Lv %d") % (i + 1), LADDER_SMALL)
 	level.name = &"Level"
-	level.custom_minimum_size.x = 44.0
+	level.custom_minimum_size.x = 52.0
 	line.add_child(level)
 	var value := UiStyle.label(data.value_text(i + 1), LADDER_FONT)
 	value.name = &"Value"
 	value.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# A long value ("Slightly Magical Boots") wraps inside the row, so the
+	# column never grows past the panel.
+	value.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	line.add_child(value)
 	var free := data.blue[i] == 0 and data.orange[i] == 0
 	for kind: StringName in [Essences.BLUE, Essences.ORANGE]:
@@ -273,7 +358,7 @@ func _ladder_row(data: TreeNodeData, i: int) -> PanelContainer:
 			text = Lang.t("Free") if kind == Essences.BLUE else ""
 		elif amount > 0 or kind == Essences.BLUE:
 			text = str(amount)
-		var label := UiStyle.label(text, LADDER_FONT - 1, UiStyle.TEXT_COLOR)
+		var label := UiStyle.label(text, LADDER_SMALL, UiStyle.TEXT_COLOR)
 		label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		line.add_child(label)
 		var icon := TextureRect.new()
@@ -288,6 +373,8 @@ func _ladder_row(data: TreeNodeData, i: int) -> PanelContainer:
 
 
 ## The branch's rows, built when the branch changes and reread every time.
+## Hidden nodes have no row on show: one dim line counts them instead, and a
+## caption over only hidden nodes hides too.
 func _fill_list() -> void:
 	if _list_branch != branch:
 		_list_branch = branch
@@ -299,7 +386,7 @@ func _fill_list() -> void:
 		# catalog order.
 		for limb: Dictionary in TreePage.LIMBS.get(branch, []):
 			if limb.has("label"):
-				_list.add_child(UiStyle.label(Lang.t(limb["label"]), 14, JourneyPanel.CAPTION_COLOR))
+				_list.add_child(UiStyle.label(Lang.t(limb["label"]), UiStyle.FONT_NOTE, JourneyPanel.CAPTION_COLOR))
 				for node_id: StringName in limb["ids"]:
 					_add_row(node_id)
 		for data in tree.branch_nodes(branch):
@@ -318,6 +405,25 @@ func _fill_list() -> void:
 		var level: Label = row.get_node(^"Line/Level")
 		level.text = "" if hidden else "%d/%d" % [tree.level(node_id), tree.node(node_id).max_level]
 		level.add_theme_color_override(&"font_color", TreeNodeView.state_color(current) if current in [&"bought", &"maxed"] else UiStyle.DIM_COLOR)
+		row.visible = not hidden
+	var unknown := 0
+	var caption: Control = null
+	var caption_rows := 0
+	for child: Control in _list.get_children():
+		if child is Button:
+			if child.visible:
+				caption_rows += 1
+			else:
+				unknown += 1
+			continue
+		if caption:
+			caption.visible = caption_rows > 0
+		caption = child
+		caption_rows = 0
+	if caption:
+		caption.visible = caption_rows > 0
+	more_label.visible = unknown > 0
+	more_label.text = Lang.t("%d more to discover") % unknown
 
 
 func _add_row(node_id: StringName) -> void:
@@ -380,16 +486,15 @@ func _draw() -> void:
 
 ## The levels bought as a gold bar.
 func _draw_progress() -> void:
-	var bought := TreePage.levels(tree, branch)
 	var rect := Rect2(Vector2.ZERO, _progress.size)
 	var back := StyleBoxFlat.new()
 	back.bg_color = Color(1, 1, 1, 0.06)
 	back.set_corner_radius_all(5)
 	_progress.draw_style_box(back, rect)
-	if bought.x > 0:
+	if _progress_shown > 0.0:
 		var fill := back.duplicate() as StyleBoxFlat
 		fill.bg_color = UiStyle.GOLD_COLOR
-		rect.size.x = maxf(rect.size.x * bought.x / bought.y, PROGRESS_HEIGHT)
+		rect.size.x = maxf(rect.size.x * _progress_shown, PROGRESS_HEIGHT)
 		_progress.draw_style_box(fill, rect)
 
 

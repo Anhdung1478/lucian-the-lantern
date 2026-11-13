@@ -6,7 +6,8 @@ extends Control
 ## after buying. Buy emits `confirmed` once and closes, and is off while the
 ## level can't be bought; Cancel or ESC (TreeSection.close_popup) closes it.
 ## It buys nothing itself and saves nothing. The cost bar's click opens it,
-## so the second click of a double-click lands on it and buys nothing.
+## so the second click of a double-click lands on it and buys nothing. It
+## opens and closes with UiMotion's overlay motion; `closed` fires at once.
 
 signal confirmed(id: StringName)
 signal closed
@@ -15,7 +16,7 @@ signal closed
 const KEY_WIDTH := 170.0
 const VALUE_WIDTH := 300.0
 const ROW_FONT := 19
-const KEY_FONT := 16
+const KEY_FONT := UiStyle.FONT_BODY
 const ICON_SIZE := 22.0
 const BUTTON_WIDTH := 240.0
 const NOTE := "Only Reset tree gives essence back."
@@ -41,6 +42,9 @@ var after_labels := {}
 
 ## The You have and After purchase rows (keys and values), hidden when free.
 var _money_rows: Array[Control] = []
+var _backdrop := MenuBackdrop.new()
+var _center := CenterContainer.new()
+var _closing := false
 
 
 func _init(evolution_tree: EvolutionTree = null, node_id := &"", owned: Essences = null) -> void:
@@ -56,6 +60,7 @@ func _ready() -> void:
 	_build()
 	essences.changed.connect(refresh)
 	refresh()
+	UiMotion.open_overlay(_backdrop, _center)
 
 
 ## Rereads the level, the price and the essence owned: the table and Buy
@@ -84,27 +89,34 @@ func refresh() -> void:
 	buy_button.disabled = not tree.can_buy(id, essences)
 
 
-## Closes and frees it.
+## Closes it (at once for the tree) and frees it once it has faded.
 func close() -> void:
-	if is_queued_for_deletion():
+	if _closing or is_queued_for_deletion():
 		return
+	_closing = true
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	closed.emit()
-	queue_free()
+	UiMotion.close_overlay(_backdrop, _center, queue_free)
+
+
+## True from close() on, while it fades.
+func is_closing() -> bool:
+	return _closing
 
 
 ## Once: a second press in the same frame finds it closing.
 func _buy() -> void:
-	if buy_button.disabled or is_queued_for_deletion():
+	if buy_button.disabled or _closing or is_queued_for_deletion():
 		return
 	confirmed.emit(id)
 	close()
 
 
 func _build() -> void:
-	var backdrop := MenuBackdrop.new()
+	var backdrop := _backdrop
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(backdrop)
-	var center := CenterContainer.new()
+	var center := _center
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	backdrop.add_child(center)
@@ -128,7 +140,7 @@ func _build() -> void:
 	price_row.move_child(free_label, 0)
 	_money_rows.append_array(_amounts(table, Lang.t("You have"), owned_labels))
 	_money_rows.append_array(_amounts(table, Lang.t("After purchase"), after_labels))
-	var note := UiStyle.label(Lang.t(NOTE), 16, UiStyle.DIM_COLOR)
+	var note := UiStyle.label(Lang.t(NOTE), UiStyle.FONT_BODY, UiStyle.DIM_COLOR)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.content.add_child(note)
 	var buttons := HBoxContainer.new()

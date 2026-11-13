@@ -111,7 +111,9 @@ func test_the_tabs_switch_pages_and_light_the_chosen_one() -> void:
 		for other: StringName in EvolutionTree.BRANCHES:
 			assert_eq(section.pages[other].visible, other == branch, "%s on %s" % [other, branch])
 			var border := (_tab(other).get_theme_stylebox(&"normal") as StyleBoxFlat).border_color
-			assert_eq(border == UiStyle.BORDER_COLOR, other == branch, "%s lit on %s" % [other, branch])
+			# The chosen tab's own rest box is clear: the sliding highlight lights it.
+			assert_eq(border.a == 0.0, other == branch, "%s lit on %s" % [other, branch])
+		assert_eq(section.tabs.highlight.target, _tab(branch), "the highlight is on %s" % branch)
 
 
 func test_the_tabs_read_their_levels_bought() -> void:
@@ -320,17 +322,18 @@ func test_a_node_with_a_level_is_never_hidden() -> void:
 	assert_eq(_state(&"skill_e"), &"maxed")
 	section.select(&"skill_e")
 	assert_eq(section.info.name_label.text, "E – Relentless Pursuit")
-	assert_eq(section.info.cost_bar.status.text, "MAXED")
+	assert_eq(section.info.cost_bar.status.text, "Maxed")
 
 
 func test_hover_card_shows_the_name_and_current_value() -> void:
 	_buy(&"stat_ad", 2)
 	var card: Control = section.views[&"stat_ad"].tooltip_content()
-	assert_eq(_texts(card), PackedStringArray(["Attack Damage\n+8 AD"]))
+	assert_eq(_texts(card), PackedStringArray(["+8 AD"]), "review r1 D9: the name is under the node already")
 	card.free()
-	card = section.views[&"passive"].tooltip_content()
-	assert_eq(_texts(card), PackedStringArray(["???"]))
-	card.free()
+	assert_null(section.views[&"passive"].tooltip_content(), "a hidden node has nothing to add")
+	var view: TreeNodeView = section.views[&"stat_ad"]
+	var frame := view.get_global_transform() * Rect2(Vector2.ZERO, Vector2.ONE * TreeNodeView.SIZE)
+	assert_almost_eq(view.tooltip_anchor().end.x + HoverTip.GAP, frame.end.x + TreeNodeView.CARD_GAP, 0.01, "12 px off the frame")
 
 
 func test_a_left_press_on_a_view_picks_it() -> void:
@@ -374,6 +377,49 @@ func test_the_info_column_sums_up_the_branch_with_nothing_picked() -> void:
 	_tab(&"stats").pressed.emit()
 	assert_eq(info.name_label.text, "Stats")
 	assert_eq(info.levels_label.text, "Levels bought 2 / 45")
+
+
+## Review r1 D4: the branch's kicker, name and blurb are on the page's art;
+## the panel's resting state leads with the levels bought.
+func test_the_resting_panel_leads_with_the_levels_bought() -> void:
+	var info := section.info
+	for part: CanvasItem in [info.caption_label, info.name_label, info.blurb_label]:
+		assert_false(part.is_visible_in_tree(), "said once, on the art")
+	assert_true(info.levels_label.is_visible_in_tree())
+	assert_eq(info.levels_label.get_theme_font_size(&"font_size"), UiStyle.FONT_LEAD)
+	section.select(&"stat_ad")
+	assert_true(info.name_label.is_visible_in_tree(), "a picked node shows its name")
+	assert_false(info.levels_label.is_visible_in_tree())
+
+
+## Review r1 D8: hidden nodes are counted on one dim line, not listed as "???".
+func test_hidden_nodes_are_counted_not_listed() -> void:
+	var info := section.info
+	_tab(&"summoners").pressed.emit()
+	var hidden := 0
+	for node_id: StringName in info.rows:
+		var row: Control = info.rows[node_id]
+		if TreeNodeView.is_hidden(_save().tree, node_id):
+			hidden += 1
+			assert_false(row.visible, "%s has no row on show" % node_id)
+		else:
+			assert_true(row.visible, node_id)
+	assert_gt(hidden, 0)
+	assert_true(info.more_label.is_visible_in_tree())
+	assert_eq(info.more_label.text, "%d more to discover" % hidden)
+	_tab(&"stats").pressed.emit()
+	assert_false(info.more_label.visible, "every stat is known")
+
+
+## Review r1 D7: a hidden node's pane shows its requirement, then the list.
+func test_a_hidden_node_shows_the_branch_list_under_its_requirement() -> void:
+	section.select(&"passive")
+	var info := section.info
+	assert_true(info.requires_label.is_visible_in_tree())
+	assert_true(info.rows[&"skill_q"].get_parent().is_visible_in_tree(), "the list shows")
+	assert_false(info.levels_label.is_visible_in_tree())
+	section.select(&"stat_ad")
+	assert_false(info.rows[&"stat_ad"].is_visible_in_tree(), "a known node shows its ladder instead")
 
 
 func test_the_info_column_lists_the_branch_and_a_row_picks_its_node() -> void:
@@ -460,7 +506,7 @@ func test_five_buys_max_q_and_the_bar_reads_maxed() -> void:
 	for i in 5:
 		assert_true(section.info.cost_bar.buy())
 	assert_eq(_state(&"skill_q"), &"maxed")
-	assert_eq(section.info.cost_bar.status.text, "MAXED")
+	assert_eq(section.info.cost_bar.status.text, "Maxed")
 	assert_true(section.info.cost_bar.status.visible)
 	assert_true(section.info.cost_bar.disabled)
 	assert_false(section.info.cost_bar.buy())
@@ -483,7 +529,12 @@ func test_the_cost_bar_shows_owned_against_cost_red_when_short() -> void:
 	assert_false(bar.amount_label(Essences.ORANGE).get_parent().visible, "no orange needed")
 	assert_almost_eq(bar.fill(), 0.6, 0.001)
 	assert_true(bar.disabled)
+	assert_false(bar.verb.visible, "short: the red amount is the message")
 	assert_false(bar.buy())
+	_save().essences.add(Essences.BLUE, 20)
+	assert_true(bar.verb.visible, "Buy leads once it can be bought")
+	assert_eq(bar.verb.text, "Buy")
+	assert_eq(bar.amount_label(Essences.BLUE).text, "50 / 50")
 
 
 func test_the_fill_is_the_smallest_share_over_the_kinds_needed() -> void:
@@ -639,7 +690,7 @@ func test_a_hidden_node_reads_unknown_locked_and_its_requirements() -> void:
 	assert_eq(section.info.name_label.text, "???")
 	assert_true(section.info.requires_label.visible)
 	assert_eq(section.info.requires_label.text, "Requires: Q – Piercing Light, W – Ardent Blaze or E – Relentless Pursuit")
-	assert_eq(section.info.cost_bar.status.text, "LOCKED")
+	assert_eq(section.info.cost_bar.status.text, "Locked")
 	assert_true(section.info.cost_bar.disabled)
 	section.select(&"skill_q")
 	assert_eq(section.info.requires_label.text, "Requires: Clear Act 1")
@@ -905,6 +956,15 @@ func test_forge_buttons_forge_one_and_ten_and_the_amounts_update() -> void:
 func test_forge_is_disabled_and_says_what_it_needs_when_blue_is_short() -> void:
 	var one: Button = section.forge_bar.buttons[1]
 	var ten: Button = section.forge_bar.buttons[10]
+	_save().essences.set_amount(Essences.BLUE, Essences.FORGE_BLUE)
+	# Review r1 D13: an off forge's amounts and icons dim with it.
+	for part in ten.get_node(^"Row").get_children():
+		if part is Label:
+			assert_eq(part.get_theme_color(&"font_color"), UiStyle.DISABLED_FONT, "off: %s" % part.text)
+	for part in one.get_node(^"Row").get_children():
+		if part is Label:
+			assert_eq(part.get_theme_color(&"font_color"), UiStyle.TEXT_COLOR, "on: %s" % part.text)
+	_save().essences.set_amount(Essences.BLUE, 0)
 	assert_true(one.disabled)
 	assert_eq(one.get_meta(&"hover_text", ""), "Needs 120 blue essence")
 	assert_eq(ten.get_meta(&"hover_text", ""), "Needs 1200 blue essence")
@@ -959,3 +1019,18 @@ func test_a_forge_is_kept_by_the_next_save_and_writes_no_file_itself() -> void:
 	assert_true(_save().load_slot(1))
 	assert_eq(_save().essences.amount(Essences.ORANGE), 1)
 	assert_eq(_save().essences.amount(Essences.BLUE), 120)
+
+
+## Review r1 D7: the bigger ladder rows still fit: no node's panel is wider
+## or taller than the column (the cost bar stays on the panel's foot).
+func test_every_node_fits_the_info_column() -> void:
+	_save().tree.max_all()
+	var room := section.info.size - Vector2.ONE * JourneyPanel.PAD * 2.0
+	for branch_id: StringName in EvolutionTree.BRANCHES:
+		for data in _save().tree.branch_nodes(branch_id):
+			section.select(data.id)
+			# Wrapped labels know their height once laid out.
+			await wait_process_frames(2)
+			var need := section.info._column.get_combined_minimum_size()
+			assert_lte(need.x, JourneyPanel.CONTENT_WIDTH, "%s: not wider than the panel" % data.id)
+			assert_lte(need.y, room.y, "%s: not taller than the panel" % data.id)

@@ -2,9 +2,11 @@ class_name CostBar
 extends Button
 ## The buy button of the node info panel. It shows the essence owned against
 ## the next level's cost for each kind needed ("120 / 350", red when short)
-## over a fill of how much of it is there. A click asks first (buy_asked:
+## over a fill of how much of it is there; when the level can be bought the
+## verb leads ("Buy  9000 / 200"). A click asks first (buy_asked:
 ## TreeSection opens a TreePurchasePopup), so a double-click buys one level.
-## A maxed node reads MAXED, a hidden one LOCKED, a cost of 0 Free.
+## A maxed node reads Maxed, a hidden one Locked, a cost of 0 Free. The
+## amounts count and the fill eases when the essences change.
 
 ## The bar was clicked: ask before buying node `id`'s next level.
 signal buy_asked(id: StringName)
@@ -24,11 +26,19 @@ const ICONS := {
 var id: StringName
 var tree: EvolutionTree
 var essences: Essences
-## MAXED, LOCKED or Free; hidden while the amounts show.
+## Maxed, Locked or Free; hidden while the amounts show.
 var status: Label
+## "Buy", leading the amounts while the level can be bought.
+var verb: Label
 
 var _row: HBoxContainer
+var _verb_gap := Control.new()
 var _amounts := {}
+## The fill drawn now (eases to fill()).
+var _fill_shown := -1.0
+var _fill_tween: Tween
+## The node the fill was last drawn for (a new node snaps it).
+var _fill_id: StringName
 
 
 func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
@@ -40,14 +50,24 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 	_row = HBoxContainer.new()
 	_row.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_row.add_theme_constant_override(&"separation", 28)
+	_row.add_theme_constant_override(&"separation", 0)
 	_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_row)
+	verb = UiStyle.label(Lang.t("Buy"), FONT_SIZE, UiStyle.TITLE_COLOR)
+	verb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_row.add_child(verb)
+	_verb_gap.custom_minimum_size.x = UiStyle.GAP_L
+	_verb_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_row.add_child(_verb_gap)
+	var items := HBoxContainer.new()
+	items.add_theme_constant_override(&"separation", 28)
+	items.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_row.add_child(items)
 	for kind: StringName in ICONS:
 		var item := HBoxContainer.new()
 		item.add_theme_constant_override(&"separation", 8)
 		item.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_row.add_child(item)
+		items.add_child(item)
 		var icon := TextureRect.new()
 		icon.texture = ICONS[kind]
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -56,7 +76,8 @@ func _init(evolution_tree: EvolutionTree, owned: Essences) -> void:
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		item.add_child(icon)
-		var amount := UiStyle.label("", FONT_SIZE)
+		var amount := CountLabel.new()
+		amount.add_theme_font_size_override(&"font_size", FONT_SIZE)
 		amount.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		item.add_child(amount)
 		_amounts[kind] = amount
@@ -83,10 +104,10 @@ func refresh() -> void:
 	var text := ""
 	var color := UiStyle.GOLD_COLOR
 	if tree.is_maxed(id):
-		text = Lang.t("MAXED")
+		text = Lang.t("Maxed")
 		color = TreeNodeView.MAXED_COLOR
 	elif not tree.next_level_open(id):
-		text = Lang.t("LOCKED")
+		text = Lang.t("Locked")
 		color = LOCKED_COLOR
 	elif price == Vector2i.ZERO:
 		text = Lang.t("Free")
@@ -94,13 +115,38 @@ func refresh() -> void:
 	status.add_theme_color_override(&"font_color", color)
 	status.visible = text != ""
 	_row.visible = text == ""
+	# Short of essence the red amount is the message; otherwise the verb leads.
+	verb.visible = not disabled
+	_verb_gap.visible = not disabled
 	var needs := {Essences.BLUE: price.x, Essences.ORANGE: price.y}
+	var new_node := _fill_id != id
 	for kind: StringName in _amounts:
-		var label: Label = _amounts[kind]
+		var label: CountLabel = _amounts[kind]
 		var owned := essences.amount(kind)
-		label.get_parent().visible = needs[kind] > 0
-		label.text = "%d / %d" % [owned, needs[kind]]
-		label.add_theme_color_override(&"font_color", UiStyle.ERROR_COLOR if owned < needs[kind] else UiStyle.TEXT_COLOR)
+		var need: int = needs[kind]
+		label.get_parent().visible = need > 0
+		label.formatter = func(v: int) -> String: return "%d / %d" % [v, need]
+		label.set_value(owned, new_node)
+		label.add_theme_color_override(&"font_color", UiStyle.ERROR_COLOR if owned < need else UiStyle.TEXT_COLOR)
+	_ease_fill(new_node)
+	queue_redraw()
+
+
+## The fill eases to the share owned over UiMotion.BASE (a new node snaps).
+func _ease_fill(snap: bool) -> void:
+	_fill_id = id
+	var target := fill()
+	if _fill_tween and _fill_tween.is_valid():
+		_fill_tween.kill()
+	if snap or _fill_shown < 0.0 or UiMotion.off() or not is_inside_tree():
+		_fill_shown = target
+		return
+	_fill_tween = UiMotion.tween(self)
+	_fill_tween.tween_method(_set_fill, _fill_shown, target, UiMotion.BASE)
+
+
+func _set_fill(share: float) -> void:
+	_fill_shown = share
 	queue_redraw()
 
 
@@ -140,5 +186,5 @@ func _draw() -> void:
 	elif not tree.next_level_open(id):
 		color = Color(LOCKED_COLOR, 0.12)
 	var inner := Rect2(Vector2.ONE * INSET, size - Vector2.ONE * INSET * 2.0)
-	inner.size.x *= fill()
+	inner.size.x *= clampf(_fill_shown, 0.0, 1.0)
 	draw_rect(inner, color)

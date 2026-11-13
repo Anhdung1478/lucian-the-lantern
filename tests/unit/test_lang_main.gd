@@ -182,4 +182,5 @@ func test_the_tree_reads_in_vietnamese() -> void:
 	var question := section.reset_question()
 	assert_true(question.contains("Đặt lại Cây Tiến Hóa với 5 tinh chất tím?"), question)
 	assert_true(question.contains("%d tinh chất xanh" % spent.x), question)
-	assert_eq(section.reset_button.text, "Đặt lại cây  5")
+	assert_eq(UiStyle.price_text(section.reset_price).text, "Đặt lại cây")
+	assert_eq(UiStyle.price_amount(section.reset_price).final_text(), "5")

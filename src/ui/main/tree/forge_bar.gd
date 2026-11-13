@@ -3,7 +3,8 @@ extends HBoxContainer
 ## The essence forge, at the top of the Evolution Tree page beside Reset tree:
 ## two buttons that turn blue essence into orange ("120 blue -> 1 orange" and
 ## "1200 blue -> 10 orange"). A button is off, with a hover card saying why,
-## while the blue is short. A forge cannot be undone, and it changes the
+## while the blue is short: its amounts and arrow turn DISABLED_FONT and its
+## icons dim, so an off forge never reads as on. A forge cannot be undone, and it changes the
 ## essences in memory only, as a purchase does (the next save keeps it).
 
 const SIZE := Vector2(412, 52)
@@ -11,6 +12,8 @@ const COUNTS: Array[int] = [1, 10]
 const FONT_SIZE := 20
 const ICON_SIZE := 26.0
 const GAP := 8
+## An off button's icons.
+const ICON_OFF := Color(1, 1, 1, 0.4)
 const BLUE_ICON := preload("res://assets/art/ui/essence_blue.svg")
 const ORANGE_ICON := preload("res://assets/art/ui/essence_orange.svg")
 
@@ -38,10 +41,21 @@ func refresh() -> void:
 		var button: Button = buttons[count]
 		var short := not essences.can_afford(count * Essences.FORGE_BLUE)
 		button.disabled = short
+		_dim(button, short)
 		if short:
 			button.set_meta(&"hover_text", Lang.t("Needs %d blue essence") % (count * Essences.FORGE_BLUE))
 		else:
 			button.set_meta(&"hover_text", Lang.t("Forge %d orange essence from %d blue. This cannot be undone.") % [count, count * Essences.FORGE_BLUE])
+
+
+## The row inside `button` takes its off look (the button's own disabled
+## colour does not reach its children).
+func _dim(button: Button, off: bool) -> void:
+	for part in button.get_node(^"Row").get_children():
+		if part is Label:
+			part.add_theme_color_override(&"font_color", UiStyle.DISABLED_FONT if off else UiStyle.TEXT_COLOR)
+		elif part is TextureRect:
+			part.modulate = ICON_OFF if off else Color.WHITE
 
 
 func _button(count: int) -> Button:
@@ -51,6 +65,7 @@ func _button(count: int) -> Button:
 	UiStyle.style_button(button, FONT_SIZE)
 	button.pressed.connect(func() -> void: _forge(count))
 	var row := HBoxContainer.new()
+	row.name = &"Row"
 	row.set_anchors_preset(Control.PRESET_FULL_RECT)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override(&"separation", GAP)

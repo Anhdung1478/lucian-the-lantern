@@ -56,6 +56,8 @@ const KEEP_CLEAR: Array[Rect2] = [HEADER_RECT, Rect2(1096, 0, 320, 100)]
 ## A limb's caption (OFFENSE, REWARDS...) over its top node.
 const GROUP_FONT := 17
 const GROUP_LIFT := 26.0
+## The previews' notes and labels (the acts, the boots, the plaque's note).
+const PREVIEW_NOTE := UiStyle.FONT_BODY
 ## The Backpack page's previews: the plaque under each node and its cells.
 const PLAQUE_TOP := 104.0
 const PLAQUE_SIZE := Vector2(340, 214)
@@ -458,9 +460,9 @@ func _draw_equip_preview(center: Vector2) -> void:
 			var cleared := tree.is_level_open(EQUIP_ID, i - 1)
 			var color := TreeNodeView.MAXED_COLOR if cleared else JourneyPanel.CAPTION_COLOR
 			draw_polyline(PackedVector2Array([Vector2(from_x + 2, y - 4), Vector2(from_x + 2, y), Vector2(to_x - 2, y), Vector2(to_x - 2, y - 4)]), Color(color, 0.7), 1.5, true)
-			JourneyMap.draw_text(self, Lang.t("Act %d") % act, Vector2((from_x + to_x) * 0.5, y + 22.0), 16, color, true)
+			JourneyMap.draw_text(self, Lang.t("Act %d") % act, Vector2((from_x + to_x) * 0.5, y + 22.0), PREVIEW_NOTE, color, true)
 		i = last + 1
-	JourneyMap.draw_text(self, Lang.t("Only equipped items give stats."), Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), 15, UiStyle.DIM_COLOR)
+	JourneyMap.draw_text(self, Lang.t("Only equipped items give stats."), Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), PREVIEW_NOTE, UiStyle.DIM_COLOR)
 
 
 ## Under Backpack Slots: the 9x6 backpack, its open cells lit and the next
@@ -492,8 +494,8 @@ func _draw_boots_preview(center: Vector2) -> void:
 		var tint := Color.WHITE if i < level else Color(1, 1, 1, 0.3)
 		draw_texture_rect(BOOTS_ICONS[i], rect.grow(-6.0), false, tint)
 		var color := UiStyle.TITLE_COLOR if i < level else UiStyle.DIM_COLOR
-		JourneyMap.draw_text(self, data.value_text(i + 1), Vector2(slot_center.x, rect.end.y + 24.0), 15, color, true)
-	JourneyMap.draw_text(self, Lang.t("Worn on every map."), Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), 15, UiStyle.DIM_COLOR)
+		JourneyMap.draw_text(self, data.value_text(i + 1), Vector2(slot_center.x, rect.end.y + 24.0), PREVIEW_NOTE, color, true)
+	JourneyMap.draw_text(self, Lang.t("Worn on every map."), Vector2(plaque.position.x + 22.0, plaque.end.y - 20.0), PREVIEW_NOTE, UiStyle.DIM_COLOR)
 
 
 ## One slot of a preview: lit when open, outlined when the next level opens it.

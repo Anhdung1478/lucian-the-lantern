@@ -13,7 +13,8 @@ extends Control
 ## A gold ▲ at the top-left says the next level can be bought now (FREE
 ## shows at the top-right instead when it costs nothing); a lock at the
 ## bottom-right says a bought node's next level is closed. A left press
-## picks it.
+## picks it. The hover and selected outlines ease in and out; a bought level
+## gives the node a short bump (bump()).
 
 signal chosen(id: StringName)
 
@@ -51,6 +52,12 @@ const READY_AT := Vector2(2.0, 9.0)
 const CREST_AT := Vector2(SIZE - 2.0, 9.0)
 ## The FREE badge at the top-right corner: how far it pokes past the frame.
 const FREE_POKE := Vector2(10.0, 10.0)
+## The hover card starts this far from the frame (12 px on screen, with
+## HoverTip's own gap).
+const CARD_GAP := 14.0
+## bump(): how big it grows and for how long, there and back.
+const BUMP_SCALE := 1.08
+const BUMP_TIME := 0.3
 const LOCK := preload("res://assets/art/ui/lock.svg")
 const GREY_SHADER := preload("res://src/ui/hud/grey_icon.gdshader")
 const HIDDEN_COLOR := Color("2a2f3a")
@@ -70,11 +77,17 @@ static var _grey: ShaderMaterial
 var data: TreeNodeData
 var tree: EvolutionTree
 var essences: Essences
-## Drawn with an extra white outline.
+## Drawn with an extra white outline (it eases in and out).
 var selected := false:
 	set(value):
+		if selected == value:
+			return
 		selected = value
-		queue_redraw()
+		_ease_selected()
+## 0 at rest, 1 hovered (UiMotion.lit).
+var lit_t := 0.0
+## How much of the selected outline shows (eases to `selected`).
+var selected_t := 0.0
 ## The level's number ("2/5", "MAX"); not shown on a hidden node.
 var badge: Label
 ## At the top-right corner while the next level is free.
@@ -91,6 +104,8 @@ var _pill := Control.new()
 ## Over the icon, so it is a child of its own.
 var _lock := Control.new()
 var _hovered := false
+var _select_tween: Tween
+var _bump: Tween
 
 
 func _init(node_data: TreeNodeData, evolution_tree: EvolutionTree, owned: Essences) -> void:
@@ -267,11 +282,32 @@ func click() -> void:
 	chosen.emit(data.id)
 
 
-## The hover card: the name and what the node gives now.
+## The hover card: what the node gives now (its name is under it already).
+## A hidden node has nothing more to say.
 func tooltip_content() -> Control:
 	if state() == &"hidden":
-		return TooltipCard.note("???")
-	return TooltipCard.note("%s\n%s" % [Lang.t(data.display_name), data.value_text(tree.level(data.id))])
+		return null
+	return TooltipCard.note(data.value_text(tree.level(data.id)))
+
+
+## The card measures from the frame (not the name under it), CARD_GAP off.
+func tooltip_anchor() -> Rect2:
+	var frame := get_global_transform() * Rect2(Vector2.ZERO, Vector2.ONE * SIZE)
+	return frame.grow(CARD_GAP - HoverTip.GAP)
+
+
+## A level was bought: the node grows to BUMP_SCALE and back over BUMP_TIME
+## (nothing while UiMotion.off()).
+func bump() -> void:
+	if _bump and _bump.is_valid():
+		_bump.kill()
+	scale = Vector2.ONE
+	if UiMotion.off() or not is_inside_tree():
+		return
+	pivot_offset = Vector2.ONE * SIZE * 0.5
+	_bump = UiMotion.tween(self)
+	_bump.tween_property(self, ^"scale", Vector2.ONE * BUMP_SCALE, BUMP_TIME * 0.4)
+	_bump.tween_property(self, ^"scale", Vector2.ONE, BUMP_TIME * 0.6).set_ease(Tween.EASE_IN_OUT)
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -284,6 +320,22 @@ func _gui_input(event: InputEvent) -> void:
 
 func _set_hovered(on: bool) -> void:
 	_hovered = on
+	UiMotion.lit(self, on)
+
+
+func _ease_selected() -> void:
+	if _select_tween and _select_tween.is_valid():
+		_select_tween.kill()
+	var target := 1.0 if selected else 0.0
+	if UiMotion.off() or not is_inside_tree():
+		_set_selected_t(target)
+		return
+	_select_tween = UiMotion.tween(self)
+	_select_tween.tween_method(_set_selected_t, selected_t, target, UiMotion.FAST)
+
+
+func _set_selected_t(t: float) -> void:
+	selected_t = t
 	queue_redraw()
 
 
@@ -310,11 +362,13 @@ func _draw() -> void:
 		frame.shadow_size = 8
 		frame.shadow_offset = Vector2(0, 4)
 	draw_style_box(frame, Rect2(0, 0, SIZE, SIZE))
-	if selected or _hovered:
+	# The selected outline over the hover one, each eased by its own value.
+	var hover_a := 0.45 * lit_t * (1.0 - selected_t)
+	if selected_t > 0.0 or hover_a > 0.0:
 		var outline := StyleBoxFlat.new()
 		outline.draw_center = false
-		outline.border_color = Color.WHITE if selected else Color(1, 1, 1, 0.45)
-		outline.set_border_width_all(3 if selected else 2)
+		outline.border_color = Color(1, 1, 1, maxf(selected_t, hover_a))
+		outline.set_border_width_all(3 if selected_t >= 0.5 else 2)
 		outline.set_corner_radius_all(CORNER + 4)
 		draw_style_box(outline, Rect2(-6, -6, SIZE + 12, SIZE + 12))
 	var plate := _name_plate()

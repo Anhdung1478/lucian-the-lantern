@@ -27,6 +27,8 @@ var views := {}
 var tabs := BranchTabs.new()
 var info: NodeInfoPanel
 var reset_button: Button
+## Inside Reset tree: the words, the price and the purple icon, as one group.
+var reset_price: HBoxContainer
 var forge_bar: ForgeBar
 ## The main screen's Yes / No pop-up, set before the section is added.
 var confirm: ConfirmPopup
@@ -65,14 +67,11 @@ func _ready() -> void:
 	add_child(info)
 
 	reset_button = Button.new()
-	reset_button.text = Lang.t("Reset tree  %d") % EvolutionTree.RESET_COST
-	reset_button.icon = PURPLE_ICON
-	reset_button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	reset_button.expand_icon = true
-	reset_button.add_theme_constant_override(&"icon_max_width", 30)
 	reset_button.position = PAGE_RECT.position + Vector2(PAGE_RECT.size.x - MARGIN - RESET_SIZE.x, MARGIN)
 	reset_button.size = RESET_SIZE
 	UiStyle.style_button(reset_button, 22)
+	reset_price = UiStyle.price_row(Lang.t("Reset tree"), EvolutionTree.RESET_COST, PURPLE_ICON, 22)
+	reset_button.add_child(reset_price)
 	reset_button.pressed.connect(_ask_reset)
 	add_child(reset_button)
 
@@ -88,11 +87,15 @@ func _ready() -> void:
 
 
 ## Shows `branch_id`'s page and lights its tab; the pick is cleared, so the
-## info column sums up that branch.
+## info column sums up that branch. The old page crossfades to the new one
+## and the tab's highlight slides.
 func show_branch(branch_id: StringName) -> void:
+	var old: TreePage = pages.get(branch)
 	branch = branch_id
 	for id: StringName in pages:
-		pages[id].visible = id == branch_id
+		if id != branch_id and pages[id] != old:
+			pages[id].visible = false
+	UiMotion.swap_body(old if old and old.visible else null, pages[branch_id])
 	tabs.select(branch_id)
 	_clear_pick()
 	info.show_branch(branch_id)
@@ -165,8 +168,8 @@ func _clear_pick() -> void:
 
 
 func _buy(id: StringName) -> void:
-	if info.cost_bar.id == id:
-		info.cost_bar.buy()
+	if info.cost_bar.id == id and info.cost_bar.buy():
+		views[id].bump()
 
 
 ## A hidden tree closes its question, so it never shows on another page.
