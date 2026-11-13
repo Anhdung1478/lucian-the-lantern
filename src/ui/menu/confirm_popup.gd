@@ -120,7 +120,12 @@ func tell(text: String, on_ok := Callable()) -> void:
 func _open(text: String, yes_label: String, with_no: bool, with_cancel: bool) -> void:
 	_message.text = text
 	_message.custom_minimum_size.x = _wrap_width(text)
+	# Every label is set on each question: Game's prompt outlives a language
+	# change (only the screens are built again), so labels set once at build
+	# would stay in the old language.
 	_yes.text = yes_label
+	_no.text = Lang.t("No")
+	_cancel.text = Lang.t("Cancel")
 	_no.visible = with_no
 	_cancel.visible = with_cancel
 	_on_yes = Callable()

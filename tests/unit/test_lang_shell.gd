@@ -125,6 +125,22 @@ func test_the_pop_up_has_no_plain_button_in_any_form() -> void:
 		assert_eq(LangProbe.plain_texts(popup), [] as Array[String], "form %d" % form)
 
 
+## Game's prompt is built once and outlives a language change: every button
+## takes the language in use when it asks, not the one it was built in.
+func test_a_pop_up_built_in_vietnamese_asks_in_english_after_a_switch() -> void:
+	Lang.use(Lang.VIETNAMESE)
+	var popup := ConfirmPopup.new()
+	add_child_autofree(popup)
+	Lang.use(Lang.ENGLISH)
+	popup.ask_or_cancel(Lang.t("Save before leaving?"), Callable(), Callable())
+	assert_eq([popup._yes.text, popup._no.text, popup._cancel.text], ["Yes", "No", "Cancel"])
+	popup.dismiss()
+	Lang.use(Lang.VIETNAMESE)
+	popup.ask_or_cancel(Lang.t("Save before leaving?"), Callable(), Callable())
+	assert_eq([popup._yes.text, popup._no.text, popup._cancel.text], [Lang.t("Yes"), Lang.t("No"), Lang.t("Cancel")])
+	assert_ne(popup._no.text, "No", "the Vietnamese is used")
+
+
 func test_the_end_screen_has_no_plain_text() -> void:
 	Lang.probe = true
 	SaveGame.instance().start_new(1, Difficulty.NORMAL)
