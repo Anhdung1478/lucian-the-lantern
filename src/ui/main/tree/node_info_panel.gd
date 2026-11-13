@@ -336,7 +336,7 @@ func _fill_gives(bought_only: bool) -> void:
 		icon.custom_minimum_size = Vector2.ONE * GIVES_ICON
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(icon)
-		var title := UiStyle.label(data.short_name(), ROW_FONT, UiStyle.DIM_COLOR)
+		var title := UiStyle.label(TreeNodeView.glued(data.short_name()), ROW_FONT, UiStyle.DIM_COLOR)
 		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		# A long name wraps beside a long value; the row never grows past the column.

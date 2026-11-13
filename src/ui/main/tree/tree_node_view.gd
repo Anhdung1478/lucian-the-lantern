@@ -82,7 +82,7 @@ const RULE_TAGS := {
 	&"summoner_slot_2": "Any 2 spells",
 }
 ## Word pairs a name never breaks between (Vietnamese compounds).
-const KEEP_TOGETHER: Array[String] = ["Năng Lượng", "Bổ Trợ", "Thứ Hai", "Cơ Bản", "Nâng Cấp", "Xạ Thủ", "Ánh Sáng", "Tia Sáng"]
+const KEEP_TOGETHER: Array[String] = ["Năng Lượng", "Bổ Trợ", "Thứ Hai", "Cơ Bản", "Nâng Cấp", "Xạ Thủ", "Ánh Sáng", "Tia Sáng", "Minh Mẫn"]
 
 ## Shared by every greyscale icon (grey_material()).
 static var _grey: ShaderMaterial
@@ -204,6 +204,14 @@ static func rule_tag(evolution_tree: EvolutionTree, id: StringName) -> String:
 		if met < node_data.requires_count:
 			parts.append(Lang.t(RULE_TAGS.get(id, "")))
 	return " · ".join(parts)
+
+
+## `text` with the spaces inside its KEEP_TOGETHER pairs made no-break, so a
+## label that wraps it never breaks a compound.
+static func glued(text: String) -> String:
+	for pair in KEEP_TOGETHER:
+		text = text.replace(pair, pair.replace(" ", "\u00a0"))
+	return text
 
 
 ## The level mark's pips for `count` levels, in the view's coordinates (none
@@ -406,15 +414,12 @@ func _lines(text: String, font_size: int) -> PackedStringArray:
 	var font := _font()
 	if font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= TreePage.NAME_MAX:
 		return PackedStringArray([text])
-	var glued := text
-	for pair in KEEP_TOGETHER:
-		glued = glued.replace(pair, pair.replace(" ", " "))
-	var words := glued.split(" ")
+	var words := glued(text).split(" ")
 	var best := PackedStringArray([text])
 	var best_width := INF
 	for cut in range(1, words.size()):
-		var first := " ".join(words.slice(0, cut)).replace(" ", " ")
-		var second := " ".join(words.slice(cut)).replace(" ", " ")
+		var first := " ".join(words.slice(0, cut)).replace("\u00a0", " ")
+		var second := " ".join(words.slice(cut)).replace("\u00a0", " ")
 		var wider := maxf(font.get_string_size(first, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x,
 			font.get_string_size(second, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
 		if wider < best_width:
