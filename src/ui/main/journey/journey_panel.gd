@@ -29,6 +29,8 @@ const LANE_GAP := 12
 const ENEMIES_GAP := 19.0
 ## Endless's three essences share the lane, overlapping.
 const LANE_ICON := 18.0
+## The body's rise as a new place comes in (6 px on screen).
+const TURN_RISE := 7.0
 ## Between the rows of a box (Endless's is fuller).
 const ROW_GAP := UiStyle.GAP
 const ENDLESS_ROW_GAP := 9
@@ -84,6 +86,8 @@ var roster := HFlowContainer.new()
 
 var _choice := 0
 var _accent := TRAINING_ACCENT
+## The place shown, so a refresh of the same one stays still.
+var _shown_node: JourneyNode
 var _portrait := Control.new()
 var _portrait_art: Texture2D
 var _portrait_ring := Color.WHITE
@@ -123,11 +127,29 @@ func _init() -> void:
 
 
 ## Fills the panel for `node` (a place from JourneyMap); `save` gives the
-## bosses already paid their first-time purple.
+## bosses already paid their first-time purple. The frame, the spells and
+## Start stay; for a new place the body fades and rises in (another kind of
+## place: its box swaps in for the old one).
 func show_node(node: JourneyNode, save: SaveGame) -> void:
-	stage_box.visible = node.is_stage()
-	training_box.visible = node.kind == JourneyNode.TRAINING
-	endless_box.visible = node.kind == JourneyNode.ENDLESS
+	var box := stage_box
+	if node.kind == JourneyNode.TRAINING:
+		box = training_box
+	elif node.kind == JourneyNode.ENDLESS:
+		box = endless_box
+	var old: VBoxContainer = null
+	for each: VBoxContainer in [stage_box, training_box, endless_box]:
+		if each.visible and each != box:
+			old = each
+	var turned := _shown_node != null and _shown_node != node
+	_shown_node = node
+	if turned and old:
+		UiMotion.swap_body(old, box)
+	elif turned:
+		UiMotion.enter(box, TURN_RISE, UiMotion.BASE)
+	else:
+		for each: VBoxContainer in [stage_box, training_box, endless_box]:
+			UiMotion.finish(each)
+			each.visible = each == box
 	match node.kind:
 		JourneyNode.TRAINING:
 			start_button.text = Lang.t("Start Training")

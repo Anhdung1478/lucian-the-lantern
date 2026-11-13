@@ -88,8 +88,15 @@ var best := 0
 ## The medallion's center, in the map.
 var center := Vector2.ZERO
 
+## 0 at rest, 1 hovered (UiMotion.lit): the hover ring eases in and out.
+var lit_t := 0.0
+## How much of the selection (the ring and its glow) shows: it fades out on
+## the node left and in on the node picked, over UiMotion.FAST.
+var selected_t := 0.0
+
 var _time := 0.0
 var _hovered := false
+var _select_tween: Tween
 
 
 ## The place for a stage: its kind, waves and (for a boss or mini boss) its
@@ -226,9 +233,22 @@ func has_laurel() -> bool:
 
 
 func set_selected(on: bool) -> void:
-	if selected != on:
-		selected = on
-		queue_redraw()
+	if selected == on:
+		return
+	selected = on
+	if _select_tween and _select_tween.is_valid():
+		_select_tween.kill()
+	var target := 1.0 if on else 0.0
+	if UiMotion.off() or not is_inside_tree():
+		_set_selected_t(target)
+		return
+	_select_tween = UiMotion.tween(self)
+	_select_tween.tween_method(_set_selected_t, selected_t, target, UiMotion.FAST)
+
+
+func _set_selected_t(t: float) -> void:
+	selected_t = t
+	queue_redraw()
 
 
 ## Endless: the best wave under the portal.
@@ -289,7 +309,7 @@ func _sync_process() -> void:
 
 func _set_hovered(on: bool) -> void:
 	_hovered = on
-	queue_redraw()
+	UiMotion.lit(self, on and not locked)
 
 
 func _draw() -> void:
@@ -300,10 +320,11 @@ func _draw() -> void:
 	else:
 		_draw_medallion(middle, r)
 	# The outline goes under the plate and the badges, so they stay readable.
-	if selected:
-		draw_arc(middle, r + 6.0, 0.0, TAU, 64, SELECT_COLOR, 3.0, true)
-	elif _hovered and not locked:
-		draw_arc(middle, r + 5.0, 0.0, TAU, 64, Color(1, 1, 1, 0.6), 2.0, true)
+	var hover_a := 0.6 * lit_t * (1.0 - selected_t)
+	if hover_a > 0.0:
+		draw_arc(middle, r + 5.0, 0.0, TAU, 64, Color(1, 1, 1, hover_a), 2.0, true)
+	if selected_t > 0.0:
+		draw_arc(middle, r + 6.0, 0.0, TAU, 64, Color(SELECT_COLOR, SELECT_COLOR.a * selected_t), 3.0, true)
 	if PLATE_WIDTHS.has(kind):
 		_draw_plate(middle, r)
 	if cleared:
@@ -331,8 +352,8 @@ func _draw_medallion(middle: Vector2, r: float) -> void:
 				draw_arc(middle, r + 3.0 + PULSE_GROWTH * t, 0.0, TAU, 64, Color(UiStyle.TITLE_COLOR, 0.7 * (1.0 - t)), 2.5, true)
 		else:
 			draw_arc(middle, r + 3.0 + PULSE_GROWTH * 0.55, 0.0, TAU, 64, Color(UiStyle.TITLE_COLOR, 0.25), 2.0, true)
-	if selected:
-		draw_texture_rect(glow, Rect2(middle - Vector2.ONE * r * 1.7, Vector2.ONE * r * 3.4), false, Color(1, 1, 1, 0.14))
+	if selected_t > 0.0:
+		draw_texture_rect(glow, Rect2(middle - Vector2.ONE * r * 1.7, Vector2.ONE * r * 3.4), false, Color(1, 1, 1, 0.14 * selected_t))
 	draw_circle(middle + Vector2(0, 4), r + 1.0, Color(0, 0, 0, 0.55))
 	var ring := ring_color()
 	if cleared and kind != NORMAL:
