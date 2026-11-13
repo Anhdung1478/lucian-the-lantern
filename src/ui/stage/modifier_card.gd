@@ -44,6 +44,8 @@ var _face := Control.new()
 ## 0 as the card arrives (below its place, unseen), 1 at rest.
 var _arrival := 1.0
 var _arrive_tween: Tween
+## The text box, refitted when the card enters the tree (its theme's font).
+var _lines: VBoxContainer
 
 
 func _init(modifier := EndlessModifiers.NOTHING, is_gift := false) -> void:
@@ -77,8 +79,57 @@ func _init(modifier := EndlessModifiers.NOTHING, is_gift := false) -> void:
 		rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		lines.add_child(rule)
 		lines.add_child(_line(LanternGifts.text(id) if gift else EndlessModifiers.reward(id), ModifierPick.REWARD_COLOR))
+	_lines = lines
 	mouse_entered.connect(set_lit.bind(true))
 	mouse_exited.connect(set_lit.bind(false))
+
+
+func _ready() -> void:
+	fit_lines()
+
+
+## The room the text has: the card's height under the medallion, less its margin.
+func lines_room() -> Vector2:
+	return Vector2(SIZE.x - 2.0 * MARGIN, SIZE.y - MARGIN - (MEDALLION + Ornament.RING + LINES_GAP))
+
+
+## The height the text block takes at `font_size` with `gap` between lines,
+## measured with the labels' font (a line wraps at the box's width).
+func lines_height(font_size: int, gap: int) -> float:
+	var total := 0.0
+	var count := 0
+	for child in _lines.get_children():
+		count += 1
+		var label := child as Label
+		if label == null:
+			total += child.custom_minimum_size.y
+			continue
+		var font := label.get_theme_font(&"font")
+		var wrapped := font.get_multiline_string_size(label.text, HORIZONTAL_ALIGNMENT_CENTER, lines_room().x, font_size, -1, TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE)
+		var rows := maxi(1, roundi(wrapped.y / font.get_height(font_size)))
+		total += wrapped.y + rows * float(label.get_theme_constant(&"line_spacing"))
+	return total + gap * maxi(count - 1, 0)
+
+
+## Makes the text fit its box: the gap between lines tightens first, then the
+## lines' font steps down (never under FONT_NOTE) until the block fits.
+func fit_lines() -> void:
+	if _lines == null:
+		return
+	var room := lines_room().y
+	var gap := LINE_GAP
+	var size := LINE_FONT
+	while lines_height(size, gap) > room:
+		if gap > UiStyle.GAP_S:
+			gap = UiStyle.GAP_S
+		elif size > UiStyle.FONT_NOTE:
+			size -= 1
+		else:
+			break
+	_lines.add_theme_constant_override(&"separation", gap)
+	for child in _lines.get_children():
+		if child is Label:
+			child.add_theme_font_size_override(&"font_size", size)
 
 
 ## The card that clears the modifier: one dim line, no rule.

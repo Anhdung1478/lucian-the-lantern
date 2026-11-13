@@ -156,3 +156,22 @@ func test_a_click_leaves_through_a_layer_of_its_own() -> void:
 	await wait_seconds(ModifierPick.HOLD + ModifierPick.LEAVE_FADE + 0.3)
 	assert_eq(get_tree().root.get_child_count(), layers, "and it is gone")
 	UiMotion.renders = false
+
+
+## Every offer's text fits its card, in English and in Vietnamese.
+func test_every_offers_text_fits_its_card_in_both_languages() -> void:
+	var original := Lang.code()
+	for language in [Lang.ENGLISH, Lang.VIETNAMESE]:
+		Lang.use(language)
+		var cards: Array[ModifierCard] = []
+		for id in range(1, EndlessModifiers.NOTHING):
+			cards.append(ModifierCard.new(id))
+		for id in range(1, LanternGifts.COUNT + 1):
+			cards.append(ModifierCard.new(id, true))
+		for card in cards:
+			add_child_autofree(card)
+			var gap: int = card._lines.get_theme_constant(&"separation")
+			var size: int = (card._lines.get_child(0) as Label).get_theme_font_size(&"font_size")
+			assert_lte(card.lines_height(size, gap), card.lines_room().y + 0.5, "%s card %d id %d" % [language, 1 if card.gift else 0, card.id])
+			assert_gte(size, UiStyle.FONT_NOTE)
+	Lang.use(original)
