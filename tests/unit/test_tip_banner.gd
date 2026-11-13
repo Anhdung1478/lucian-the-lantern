@@ -76,3 +76,17 @@ func test_it_shrinks_to_a_shorter_tip_around_the_same_center() -> void:
 	assert_eq(tips.label.text, "A short tip.")
 	assert_lt(tips.size.x, wide)
 	assert_almost_eq(tips.get_global_rect().get_center().x, center, 1.0)
+
+
+## A new tip waits while `held` says so (the HUD: a wave's banner is up).
+func test_a_new_tip_waits_while_it_is_held() -> void:
+	var tips := _tips()
+	var banner_up := [true]
+	tips.held = func() -> bool: return banner_up[0]
+	tips.show_tip(&"one", "One.")
+	tips._process(0.0)
+	assert_false(tips.visible, "it waits for the banner")
+	banner_up[0] = false
+	tips._process(0.0)
+	assert_true(tips.visible)
+	assert_eq(tips.label.text, "One.")

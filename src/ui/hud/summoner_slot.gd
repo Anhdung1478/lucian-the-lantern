@@ -2,7 +2,8 @@ class_name SummonerSlot
 extends Control
 ## One summoner spell on the HUD, right of the skills, in a dark cell: its
 ## icon, cooldown sweep and seconds, and its key in the corner tab. The rim
-## turns gold while the mouse is on the icon; hover it for the spell's card.
+## eases to gold while the mouse is on the icon; hover it for the spell's
+## card, above the bar.
 
 const SIZE := 48.0
 const CHAIN := preload("res://assets/art/ui/chain.svg")
@@ -12,8 +13,14 @@ var lucian: Lucian
 ## 0 = D, 1 = F.
 var slot := 0
 
-## The mouse is on the icon: its rim is gold.
-var _hovered := false
+## How far the rim has eased to gold (UiMotion.lit).
+var lit_t := 0.0
+
+## The mouse is on the icon: its rim eases to gold.
+var _hovered := false:
+	set(value):
+		_hovered = value
+		UiMotion.lit(self, value)
 
 
 func _init(target: Lucian, summoner_slot: int) -> void:
@@ -44,6 +51,11 @@ func tooltip_place() -> HoverTip.Place:
 	return HoverTip.Place.ABOVE
 
 
+## The card hangs above the bar, over this cell.
+func tooltip_anchor() -> Rect2:
+	return HudCell.tip_anchor(self, _icon_rect())
+
+
 func _process(_delta: float) -> void:
 	queue_redraw()
 
@@ -56,7 +68,7 @@ func _has_point(point: Vector2) -> bool:
 func _draw() -> void:
 	var rect := _icon_rect()
 	var spell := lucian.summoners.spell_in(slot)
-	HudCell.draw_box(self, rect, UiStyle.CELL_BORDER, _hovered)
+	HudCell.draw_box(self, rect, UiStyle.CELL_BORDER, lit_t)
 	if spell == null:
 		if slot >= lucian.summoners.open_slots:
 			draw_texture_rect(CHAIN, rect.grow(-8.0), false, Color(1, 1, 1, 0.85))

@@ -6,7 +6,8 @@ extends Plate
 ## mini boss has a gold rim and its name. Endless rolls a wave's enemies when
 ## it starts, so it only says "Mini boss wave" or "Boss wave", and nothing
 ## before a normal one. Hovering an icon names the enemy. Only hover, never
-## a click.
+## a click. It comes down into place and leaves the same way (UiMotion);
+## `shown` turns at once.
 
 const PAD := 10.0
 const LINE_GAP := 4
@@ -22,6 +23,8 @@ var runner: WaveRunner
 var suppressed := false
 ## The enemy cells now shown, one per row.
 var cells: Array[Control] = []
+## It is on show (or coming); false at once when it starts to leave.
+var shown := false
 
 var _heading := HudHeading.new()
 var _row := HBoxContainer.new()
@@ -33,6 +36,7 @@ func _init() -> void:
 	super(PAD, false)
 	opacity = Hud.PLATE_OPACITY
 	_heading.label.text = Lang.t("Next")
+	visible = false
 
 
 func _ready() -> void:
@@ -63,9 +67,20 @@ func refresh() -> void:
 	var kind := &"" if runner == null else runner.next_kind()
 	var held := runner is EndlessRunner and (runner as EndlessRunner).held
 	var text := _wave_text(kind) if ids.is_empty() else ""
-	visible = not suppressed and not held and (not ids.is_empty() or text != "")
-	if not visible:
-		return
+	var wanted := not suppressed and not held and (not ids.is_empty() or text != "")
+	if wanted != shown:
+		shown = wanted
+		if wanted:
+			_fill(ids, text)
+			UiMotion.enter(self, -UiMotion.RISE)
+		else:
+			UiMotion.exit(self, Callable(), -UiMotion.DROP)
+	if wanted:
+		_fill(ids, text)
+
+
+## Builds the row for `ids` (or `text`), unless it shows them already.
+func _fill(ids: Array, text: String) -> void:
 	var key: Variant = [ids, text]
 	if key == _shown:
 		return

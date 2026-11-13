@@ -3,7 +3,8 @@ extends Plate
 ## Lucian's stats as icon + value cells, two per row, like LoL's stats panel,
 ## on a plain plate.
 ## A value with a bonus over Lucian's level alone shows in yellow, and its
-## hover card breaks it down. The HUD has two: MAIN (Ctrl + the stats key
+## hover card (above the panel) breaks it down. A value that changes glows
+## gold for a moment. The HUD has two: MAIN (Ctrl + the stats key
 ## toggles it) and EXTRA (shown while the stats key is held). Set `keys`
 ## before adding it to the tree.
 
@@ -27,6 +28,8 @@ var _cells: Array[StatCell] = []
 func _init() -> void:
 	super(PAD, false)
 	opacity = Hud.PLATE_OPACITY
+	# Its cells' cards hang above it.
+	set_meta(HudCell.TIP_PLATE, true)
 
 
 func _ready() -> void:

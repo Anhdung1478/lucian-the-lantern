@@ -28,18 +28,31 @@ const GOLD_PAD := 10.0
 const MANA_TOP := Color("5b9cf0")
 const MANA_BOTTOM := Color("2a5cb8")
 const MANA_GHOST := Color("c4d9ff")
-## The boss bar sits under the stage info; so does the next-wave preview, which
-## shows only in a break, when there is no boss bar.
+## The top stack, each plate UiStyle.STACK under the one above it: the stage
+## info, then the boss bar or (in a break, when there is no boss bar) the
+## next-wave preview, then the tips. BOSS_BAR_TOP is about where the boss bar
+## and the preview come; TIPS_TOP is the lowest a tip's top gets (the wave
+## banner keeps clear of it).
 const BOSS_BAR_TOP := 92.0
-## The tips sit under the boss bar.
-const TIPS_TOP := 180.0
+const TIPS_TOP := 190.0
+## The stage info and the preview share one width when theirs differ by less
+## than this (24 px on screen).
+const SAME_WIDTH := 29.0
+## How fast the tips follow a plate above them that comes or goes (of the
+## distance left, per second).
+const TIPS_FOLLOW := 14.0
 const TIP_MARGIN := 14.0
 ## Space between the buff icons and the bottom panel.
 const BUFF_GAP := 8.0
 ## Space between R and the summoner spells.
 const SUMMONER_GAP := 10.0
-## Between the two potion cells in the gear column.
-const GEAR_GAP := 6
+## Between the item cells, the two potion cells and the boots (6 px on screen).
+const GEAR_GAP := 7
+## The level badge on a level up: it grows to LEVEL_POP and back over LEVEL_POP_TIME.
+const LEVEL_POP := 1.2
+const LEVEL_POP_TIME := 0.3
+## The gold: room for five digits, 8 px after the coin.
+const GOLD_DIGITS := "99999"
 ## Endless's modifier in the buff row: its id and name. No timer; its card
 ## gives both lines.
 const MODIFIER_ROW := &"endless_modifier"
@@ -63,7 +76,7 @@ var wave_preview := WavePreview.new()
 var vignette := LowHealthVignette.new()
 var radar := Radar.new()
 
-var _gold_label: Label
+var _gold_label: CountLabel
 var _essence_pairs := {}
 var _fps_label: Label
 var _buff_bar := BuffBar.new()
@@ -71,6 +84,9 @@ var _skill_slots: Array[SkillSlot] = []
 ## The modifier row of the modifier shown, built once per modifier (it loads an icon).
 var _modifier_shown := EndlessModifiers.NONE
 var _modifier_row := {}
+## The level the badge shows, to mark a level up.
+var _level_shown := 0
+var _level_pop: Tween
 
 @onready var bottom_panel: Plate = %BottomPanel
 @onready var portrait: HudPortrait = %Portrait
@@ -79,6 +95,10 @@ var _modifier_row := {}
 @onready var item_grid: GridContainer = %ItemGrid
 ## Beside item_grid (not in it): the two potion cells and the boots.
 @onready var gear_column: VBoxContainer = %GearColumn
+## Holds item_grid and gear_column: two rows of cells, centred on the span
+## from the skill cells' top to the mana bar's bottom.
+@onready var gear_block: MarginContainer = %GearBlock
+@onready var gear_row: HBoxContainer = %Gear
 @onready var level_label: Label = %LevelLabel
 @onready var xp_bar: ProgressBar = %XpBar
 @onready var hp_bar: HudBar = %HpBar
@@ -124,8 +144,9 @@ func setup(target: Lucian, stage_wallet: Wallet, stage_node: Stage = null) -> vo
 		var potion_slot := HudItemSlot.new(target.inventory, cell)
 		potion_slot.lucian = target
 		potions.add_child(potion_slot)
+	# Under the left potion, on its edge.
 	var boots_slot := HudItemSlot.new(target.inventory, Inventory.BOOTS_CELL)
-	boots_slot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	boots_slot.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	gear_column.add_child(boots_slot)
 	settings.changed.connect(_on_setting_changed)
 
@@ -135,6 +156,18 @@ func _ready() -> void:
 	bottom_panel.pad = BAR_PAD
 	bottom_panel.opacity = PLATE_OPACITY
 	bottom_panel.resized.connect(_place_stats_panel)
+	# Cards from the bar hang above it, and above the buff row when it shows.
+	bottom_panel.set_meta(HudCell.TIP_PLATE, _buff_bar)
+	# The stats cards hang above their panel, left of the bar.
+	for panel: StatsPanel in [stats_panel, extra_stats]:
+		panel.set_meta(HudCell.TIP_CLEAR, bottom_panel)
+	# Two rows of cells whatever the number of open slots, rows filled from
+	# the top: the first item row and the potions share one top edge.
+	gear_block.add_theme_constant_override(&"margin_top", int(SkillSlot.PLUS_HEIGHT))
+	gear_row.custom_minimum_size.y = HudItemSlot.SIZE * 2.0 + GEAR_GAP
+	item_grid.add_theme_constant_override(&"h_separation", GEAR_GAP)
+	item_grid.add_theme_constant_override(&"v_separation", GEAR_GAP)
+	gear_column.add_theme_constant_override(&"separation", GEAR_GAP)
 	extra_stats.keys = StatsPanel.EXTRA
 	extra_stats.visible = false
 	extra_stats.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
@@ -150,8 +183,8 @@ func _ready() -> void:
 	mana_bar.fill_bottom = MANA_BOTTOM
 	mana_bar.ghost_color = MANA_GHOST
 	mana_bar.ticks = false
-	hp_regen_label = _regen_label(hp_bar, 13)
-	mana_regen_label = _regen_label(mana_bar, 11)
+	hp_regen_label = _regen_label(hp_bar, UiStyle.FONT_NOTE)
+	mana_regen_label = _regen_label(mana_bar, UiStyle.FONT_NOTE)
 	_build_gold()
 	_fps_label = UiStyle.label("", 16, UiStyle.DIM_COLOR)
 	_fps_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
@@ -177,6 +210,10 @@ func _process(_delta: float) -> void:
 	wave_preview.suppressed = stage != null and stage.result.visible
 	var progress := lucian.progress
 	level_label.text = str(progress.level)
+	if progress.level != _level_shown:
+		if _level_shown > 0 and progress.level > _level_shown:
+			_pop_level_badge()
+		_level_shown = progress.level
 	var xp_needed := progress.xp_for_next()
 	xp_bar.value = float(progress.xp) / xp_needed if xp_needed > 0 else 1.0
 	var stats := lucian.stats
@@ -203,7 +240,8 @@ func _process(_delta: float) -> void:
 		for node: Control in _essence_pairs[kind]:
 			node.visible = count > 0
 		if count > 0:
-			(_essence_pairs[kind][1] as Label).text = str(count)
+			(_essence_pairs[kind][1] as CountLabel).set_value(count)
+	_place_top_stack(_delta)
 
 
 ## The range of the HUD slot `control` is in (a control opts in with
@@ -293,7 +331,21 @@ func _regen_label(bar: HudBar, font_size: int) -> Label:
 
 
 func _show_gold(gold: int) -> void:
-	_gold_label.text = str(gold)
+	_gold_label.set_value(gold)
+
+
+## The level badge grows a little and settles back (not with low effects).
+func _pop_level_badge() -> void:
+	var badge := level_label.get_parent() as Control
+	if _level_pop and _level_pop.is_valid():
+		_level_pop.kill()
+	badge.pivot_offset = badge.size * 0.5
+	badge.scale = Vector2.ONE
+	if UiMotion.off():
+		return
+	_level_pop = UiMotion.tween(badge)
+	_level_pop.tween_property(badge, ^"scale", Vector2.ONE * LEVEL_POP, LEVEL_POP_TIME * 0.4)
+	_level_pop.tween_property(badge, ^"scale", Vector2.ONE, LEVEL_POP_TIME * 0.6).set_ease(Tween.EASE_IN_OUT)
 
 
 ## Top right: a coin and the stage gold, on a plain plate.
@@ -308,7 +360,7 @@ func _build_gold() -> void:
 	panel.mouse_filter = Control.MOUSE_FILTER_PASS
 	$Root.add_child(panel)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 8)
+	row.add_theme_constant_override(&"separation", UiStyle.GAP)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(row)
 	var coin := TextureRect.new()
@@ -317,24 +369,29 @@ func _build_gold() -> void:
 	coin.custom_minimum_size = Vector2(32, 32)
 	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(coin)
-	_gold_label = Label.new()
-	_gold_label.text = "0"
-	_gold_label.custom_minimum_size.x = 72
-	_gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	# Counts to a new amount, green on a gain and red on a spend, in a slot
+	# wide enough for five digits so the plate never moves.
+	_gold_label = CountLabel.new()
+	_gold_label.flash = true
+	_gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_gold_label.add_theme_font_size_override(&"font_size", 24)
 	_gold_label.add_theme_color_override(&"font_color", GOLD_COLOR)
 	_gold_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(_gold_label)
+	_gold_label.reserve(GOLD_DIGITS)
 	for kind: StringName in Stage.ESSENCE_ICONS:
 		var gap := Control.new()
-		gap.custom_minimum_size.x = 8
+		gap.custom_minimum_size.x = UiStyle.GAP_S
 		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var icon := TextureRect.new()
 		icon.texture = Stage.ESSENCE_ICONS[kind]
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.custom_minimum_size = Vector2(26, 26)
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var amount := UiStyle.label("0", 22, Stage.ESSENCE_COLORS[kind])
+		var amount := CountLabel.new()
+		amount.flash = true
+		amount.add_theme_font_size_override(&"font_size", 22)
+		amount.add_theme_color_override(&"font_color", Stage.ESSENCE_COLORS[kind])
 		amount.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		for node: Control in [gap, icon, amount]:
 			node.visible = false
@@ -368,7 +425,42 @@ func _build_stage_info() -> void:
 	tips.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	tips.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	tips.offset_top = TIPS_TOP
+	# A new tip waits while a wave's banner is up.
+	tips.held = func() -> bool: return stage != null and is_instance_valid(stage.wave_banner) and stage.wave_banner.visible
 	$Root.add_child(radar)
+
+
+## The top stack: the boss bar or the preview UiStyle.STACK under the stage
+## info, the tips STACK under the lowest plate on show (easing there when one
+## above comes or goes). The stage info and the preview share one width when
+## theirs are close, so their edges line up.
+func _place_top_stack(delta: float) -> void:
+	var preview_on := wave_preview.shown
+	var width := 0.0
+	if preview_on:
+		var info_width := stage_info.get_minimum_size().x
+		var preview_width := wave_preview.get_minimum_size().x
+		if absf(info_width - preview_width) < SAME_WIDTH:
+			width = maxf(info_width, preview_width)
+	if stage_info.custom_minimum_size.x != width:
+		stage_info.custom_minimum_size.x = width
+	if wave_preview.custom_minimum_size.x != width:
+		wave_preview.custom_minimum_size.x = width
+	var below := stage_info.offset_top + stage_info.get_combined_minimum_size().y + UiStyle.STACK
+	for plate: Control in [boss_bar, wave_preview]:
+		if not UiMotion.is_moving(plate):
+			plate.offset_top = below
+	var tips_top := below
+	if boss_bar.shown:
+		tips_top += boss_bar.get_combined_minimum_size().y + UiStyle.STACK
+	elif preview_on:
+		tips_top += wave_preview.get_combined_minimum_size().y + UiStyle.STACK
+	if UiMotion.is_moving(tips):
+		return
+	if not tips.visible or UiMotion.off() or absf(tips.offset_top - tips_top) < 0.5:
+		tips.offset_top = tips_top
+	else:
+		tips.offset_top = lerpf(tips.offset_top, tips_top, minf(1.0, TIPS_FOLLOW * delta))
 
 
 ## Bottom right, MARGIN in from the corner, at the size its map gives it

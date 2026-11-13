@@ -138,9 +138,9 @@ func test_a_tip_shows_once_and_later_tips_wait_their_turn() -> void:
 	tips._process(TipBanner.TIME - 1.0)
 	assert_eq(tips.label.text, "Move", "the next tip waits")
 	tips._process(1.0)
-	assert_false(tips.visible)
+	assert_true(tips.visible, "the next tip takes the plate on show")
+	assert_eq(tips.label.text, "Attack")
 	tips._process(0.0)
-	assert_true(tips.visible)
 	assert_eq(tips.label.text, "Attack")
 	tips._process(TipBanner.TIME)
 	tips._process(0.0)
@@ -198,6 +198,11 @@ func test_the_tutorial_tips_come_with_what_they_teach() -> void:
 	stage.runner.tick(0.1)
 	tips._process(TipBanner.TIME)
 	tips._process(0.0)
+	assert_true(stage.wave_banner.visible, "the boss's banner")
+	assert_false(tips.visible, "the hook's tip waits for the banner to go")
+	stage.wave_banner._process(WaveBanner.FADE + WaveBanner.TIME + WaveBanner.FADE)
+	tips._process(0.0)
+	assert_true(tips.visible)
 	assert_string_contains(tips.label.text, "Thresh's hook")
 
 

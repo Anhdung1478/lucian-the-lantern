@@ -387,7 +387,8 @@ func test_the_portrait_shows_the_level_and_the_xp() -> void:
 
 
 ## The bottom bar covers no more of the fight than it did before the
-## Lantern look (176 px).
+## Lantern look (176 px), plus the 10 the V2.1 round gave the mana text, the
+## "+" ring's gap over its cell and the rank diamonds (review r1 A9, A12, A13).
 func test_the_bottom_bar_is_no_taller_than_before() -> void:
 	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
 	add_child_autofree(lucian)
@@ -395,7 +396,7 @@ func test_the_bottom_bar_is_no_taller_than_before() -> void:
 	add_child_autofree(hud)
 	hud.setup(lucian, Wallet.new())
 	await wait_process_frames(2)
-	assert_lte(hud.bottom_panel.size.y, 176.0)
+	assert_lte(hud.bottom_panel.size.y, 186.0)
 
 
 func test_fps_sits_top_left() -> void:
@@ -457,3 +458,65 @@ func test_the_vignette_follows_lucian_and_the_setting() -> void:
 	vignette.show_health(lucian)
 	assert_false(vignette.visible)
 	Juice.renders = false
+
+
+## Review r1 A1, A2, A5: the item cells and the gear column form two rows of
+## 53 cells whatever the open slots, the first item row on the potions' top
+## edge, the boots under the left potion.
+func test_the_item_cells_and_the_potions_share_the_top_row() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	hud.setup(lucian, Wallet.new())
+	await wait_process_frames(2)
+	var first := hud.item_grid.get_child(0) as HudItemSlot
+	var gear := hud.gear_slots()
+	assert_eq(first.size, Vector2.ONE * HudItemSlot.SIZE)
+	assert_almost_eq(first.get_global_rect().position.y, gear[0].get_global_rect().position.y, 0.5, "one top edge")
+	assert_almost_eq(gear[2].get_global_rect().position.x, gear[0].get_global_rect().position.x, 0.5, "boots under the left potion")
+
+
+## Review r1 A3: a cell's card hangs above the bar, centred on the cell.
+func test_a_cells_card_hangs_above_the_bar() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	hud.setup(lucian, Wallet.new())
+	await wait_process_frames(2)
+	var cell := hud.item_grid.get_child(0) as HudItemSlot
+	var anchor := cell.tooltip_anchor()
+	var bar_top := hud.bottom_panel.get_global_rect().position.y
+	assert_almost_eq(anchor.position.y - HoverTip.GAP, bar_top - HudCell.TIP_GAP, 0.5)
+	assert_almost_eq(anchor.get_center().x, cell.get_global_rect().get_center().x, 0.5)
+	var stat := hud.stats_panel.find_children("*", "StatCell", true, false)[0] as StatCell
+	assert_lt(stat.tooltip_anchor().end.x, hud.bottom_panel.get_global_rect().position.x, "stats cards stay left of the bar")
+
+
+## Review r1 A6, A14: the gold counts in a five-digit slot right after the coin.
+func test_the_gold_counts_in_a_slot_after_the_coin() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	var wallet := Wallet.new()
+	hud.setup(lucian, wallet)
+	wallet.add(250)
+	assert_is(hud._gold_label, CountLabel)
+	assert_eq(hud._gold_label.final_text(), "250")
+	assert_eq(hud._gold_label.horizontal_alignment, HORIZONTAL_ALIGNMENT_LEFT)
+
+
+## Review r1 A11: a skill not bought shows its lock and no "+".
+func test_a_skill_not_bought_has_no_plus() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var ui := SkillSlot.new()
+	ui.setup(lucian, lucian.skills[ChampionProgress.Slot.W], null, "W")
+	add_child_autofree(ui)
+	lucian.progress.set_level(3)
+	lucian.progress.bought[ChampionProgress.Slot.W] = 0
+	await wait_process_frames(1)
+	assert_true(ui._lock.visible)
+	assert_false(ui._plus.visible)

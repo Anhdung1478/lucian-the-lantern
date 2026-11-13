@@ -1,15 +1,18 @@
 class_name SkillSlot
 extends Control
 ## One skill on the HUD, in a dark cell: its icon, cooldown sweep and
-## seconds, mana cost, its key in the corner tab, rank diamonds under it, the
-## "+" button over it and a lock while it isn't bought. A slot without a
-## skill is the passive, drawn smaller. The cell's rim turns gold while the
-## mouse is on the slot; hovering shows the skill's card above it.
+## seconds, mana cost (a tab top left), its key (a tab bottom right), rank
+## diamonds under it, the "+" button over it and a lock while it isn't bought
+## (then no "+": the lock says it). A slot without a skill is the passive,
+## drawn smaller. The cell's rim eases to gold while the mouse is on the slot;
+## hovering shows the skill's card above the bar.
 
 const ICON_SIZE := 64.0
 ## 70% of a skill icon.
 const PASSIVE_SIZE := 45.0
-const PLUS_HEIGHT := 24.0
+## The band over the cell for the "+": its ring (PLUS_RADIUS + 1 out from
+## its centre) ends 7 (6 px on screen) above the cell.
+const PLUS_HEIGHT := 29.0
 const PLUS_RADIUS := 10.0
 const PLUS_FILL := Color(0.07, 0.08, 0.11, 0.92)
 const PLUS_HOVER := Color("fff1c2")
@@ -17,10 +20,16 @@ const PLUS_HOVER := Color("fff1c2")
 const PLUS_GREY := Color(0.45, 0.47, 0.52)
 ## The soft light behind a "+" that can be pressed.
 const PLUS_GLOW := 0.35
-const DOTS_HEIGHT := 12.0
-## A rank diamond: its half-width and the step from one to the next.
-const DIAMOND := 4.0
-const DIAMOND_STEP := 11.0
+## The band under the cell for the rank diamonds: DOTS_GAP, then a diamond.
+const DOTS_HEIGHT := 14.0
+const DOTS_GAP := 5.0
+## A rank diamond: its half-width and the step from one to the next (about
+## 4 px between two on screen).
+const DIAMOND := 4.5
+const DIAMOND_STEP := 13.5
+## The small lock beside a grey "+" whose next rank isn't bought.
+const PLUS_LOCK := 16.0
+const COST_COLOR := Color("8fb8ff")
 const SWEEP_COLOR := Color(0, 0, 0, 0.68)
 const DOT_ON := Color("ffcf5a")
 const DOT_OFF := Color(0.2, 0.22, 0.27)
@@ -47,8 +56,13 @@ var _icon_size := ICON_SIZE
 var _grey := ShaderMaterial.new()
 ## The next rank isn't bought yet: the grey "+" gets a lock.
 var _plus_locked := false
-## The mouse is on the slot: its rim is gold.
-var _hovered := false
+## How far the rim has eased to gold (UiMotion.lit).
+var lit_t := 0.0
+## The mouse is on the slot: its rim eases to gold.
+var _hovered := false:
+	set(value):
+		_hovered = value
+		UiMotion.lit(self, value)
 
 
 ## `icon_size` is smaller than ICON_SIZE for the passive, which then sits
@@ -95,8 +109,10 @@ func setup(target: Lucian, slot_skill: LucianSkill, icon: Texture2D, key: String
 	_place(_lock, Rect2(cell.get_center() - Vector2(16, 16), Vector2(32, 32)))
 
 	_cooldown_label = _label(cell, 24, HORIZONTAL_ALIGNMENT_CENTER, VERTICAL_ALIGNMENT_CENTER)
-	_cost_label = _label(cell.grow(-4), 13, HORIZONTAL_ALIGNMENT_LEFT, VERTICAL_ALIGNMENT_TOP)
-	_cost_label.add_theme_color_override(&"font_color", Color("8fb8ff"))
+	# Its text is drawn in the cell's top-left tab (_draw_overlay).
+	_cost_label = _label(cell.grow(-4), UiStyle.FONT_TAG, HORIZONTAL_ALIGNMENT_LEFT, VERTICAL_ALIGNMENT_TOP)
+	_cost_label.add_theme_color_override(&"font_color", COST_COLOR)
+	_cost_label.visible = false
 
 
 ## Shows a new key after rebinding.
@@ -123,9 +139,10 @@ func _process(_delta: float) -> void:
 	var remaining := skill.cooldown.remaining
 	_lock.visible = progress.bought[skill.slot] == 0
 	# With a point to spend, every unmaxed skill shows its "+": gold when it
-	# can rank up, grey (and locked if the rank isn't bought) when not. No
-	# rank-ups while paused, same as Ctrl + key.
-	_plus.visible = progress.skill_points() > 0 and not progress.is_maxed(skill.slot) and not get_tree().paused
+	# can rank up, grey (and locked if the rank isn't bought) when not. A skill
+	# not bought at all has its lock on the cell and no "+". No rank-ups while
+	# paused, same as Ctrl + key.
+	_plus.visible = progress.skill_points() > 0 and not progress.is_maxed(skill.slot) and not get_tree().paused 		and not _lock.visible
 	_plus.disabled = not progress.can_rank_up(skill.slot)
 	_plus_locked = not progress.next_rank_bought(skill.slot)
 	_plus.queue_redraw()
@@ -166,20 +183,25 @@ func tooltip_place() -> HoverTip.Place:
 	return HoverTip.Place.ABOVE
 
 
+## The card hangs above the bar, over this cell.
+func tooltip_anchor() -> Rect2:
+	return HudCell.tip_anchor(self, _cell_rect())
+
+
 ## The cell behind the icon, and a skill's rank diamonds under it: gold for
 ## each rank learned.
 func _draw() -> void:
-	HudCell.draw_box(self, _cell_rect(), UiStyle.CELL_BORDER, _hovered)
+	HudCell.draw_box(self, _cell_rect(), UiStyle.CELL_BORDER, lit_t)
 	if skill == null:
 		return
 	var count := skill.data.max_rank
-	var first := Vector2((ICON_SIZE - (count - 1) * DIAMOND_STEP) * 0.5, PLUS_HEIGHT + ICON_SIZE + DOTS_HEIGHT * 0.5 + 1.0)
+	var first := Vector2((ICON_SIZE - (count - 1) * DIAMOND_STEP) * 0.5, PLUS_HEIGHT + ICON_SIZE + DOTS_GAP + DIAMOND)
 	for i in count:
 		draw_colored_polygon(Plate.diamond(first + Vector2(i * DIAMOND_STEP, 0), DIAMOND), DOT_ON if i < skill.rank() else DOT_OFF)
 
 
-## Over the icon: the cooldown sweep (or the charged passive's gold ring) and
-## the key's tab.
+## Over the icon: the cooldown sweep (or the charged passive's gold ring), the
+## mana cost's tab and the key's tab.
 func _draw_overlay() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(_icon_size, _icon_size))
 	if skill:
@@ -193,6 +215,7 @@ func _draw_overlay() -> void:
 		ring.draw_center = false
 		ring.set_border_width_all(CHARGED_WIDTH)
 		_overlay.draw_style_box(ring, rect)
+	HudCell.draw_tab(_overlay, rect, _cost_label.text, CORNER_TOP_LEFT, COST_COLOR)
 	HudCell.draw_key(_overlay, rect, _key)
 
 
@@ -217,7 +240,7 @@ func _draw_plus() -> void:
 	_plus.draw_line(center - Vector2(arm, 0), center + Vector2(arm, 0), mark, 3.0, true)
 	_plus.draw_line(center - Vector2(0, arm), center + Vector2(0, arm), mark, 3.0, true)
 	if _plus.disabled and _plus_locked:
-		_plus.draw_texture_rect(LOCK_TEXTURE, Rect2(center + Vector2(PLUS_RADIUS - 2.0, -2.0), Vector2(14, 14)), false)
+		_plus.draw_texture_rect(LOCK_TEXTURE, Rect2(center + Vector2(PLUS_RADIUS - 3.0, -PLUS_LOCK * 0.5), Vector2.ONE * PLUS_LOCK), false)
 
 
 ## Dark area of a square cooldown sweep: the last `fraction` of a clockwise

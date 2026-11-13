@@ -6,7 +6,8 @@ extends Plate
 ## left; before a wave, "Wave 2 in 0:17" and Skip. Endless has no last wave
 ## and so no pips: "Wave 23", "Mini boss wave" or "Boss wave", and a dim
 ## "Best 22" at the row's end. Training shows only its name. Only the Skip
-## button takes clicks.
+## button takes clicks. Going from a break to a wave and back, the row
+## crossfades (ROW_OUT, then ROW_IN).
 
 signal skip_pressed
 
@@ -23,6 +24,9 @@ const SKIP_FONT_SIZE := 16
 const SKIP_MARGIN := 2.0
 ## The room between the plate's frame and the lines.
 const PAD := 10.0
+## The row's crossfade between a break and a wave: out, then in.
+const ROW_OUT := 0.08
+const ROW_IN := 0.15
 
 var runner: WaveRunner
 var name_label: Label
@@ -37,6 +41,10 @@ var best_label := UiStyle.label("", BEST_FONT_SIZE, UiStyle.DIM_COLOR)
 var _heading := HudHeading.new()
 ## Everything under the heading; Training has none.
 var _row := HBoxContainer.new()
+## The row shows a break (the countdown and Skip); it trails the runner while
+## the row crossfades.
+var _row_waiting := false
+var _row_fade: Tween
 
 
 func _init() -> void:
@@ -92,6 +100,9 @@ func _process(_delta: float) -> void:
 
 func refresh() -> void:
 	var waiting := runner != null and runner.is_waiting()
+	if waiting != _row_waiting:
+		_turn_row(waiting)
+	waiting = _row_waiting
 	var endless := runner is EndlessRunner
 	# Endless's break after a boss wave waits for the modifier pick: no
 	# countdown, no Skip.
@@ -116,6 +127,24 @@ func refresh() -> void:
 	else:
 		wave_label.text = _endless_wave(runner.wave) if endless else (Lang.t("Boss wave") if runner.is_boss_wave() else Lang.t("Wave %d/%d") % [runner.wave, runner.wave_count()])
 		enemies_label.text = Lang.t("Enemies: %d") % runner.alive()
+
+
+## The row goes over to a break (`waiting`) or a wave: at once while
+## UiMotion.off(), else it fades out, changes and fades back in.
+func _turn_row(waiting: bool) -> void:
+	if _row_fade and _row_fade.is_valid():
+		if _row_fade.is_running():
+			return
+	if UiMotion.off() or not is_inside_tree() or not _row.is_visible_in_tree():
+		_row_waiting = waiting
+		_row.modulate.a = 1.0
+		return
+	_row_fade = UiMotion.tween(_row)
+	_row_fade.tween_property(_row, ^"modulate:a", 0.0, ROW_OUT)
+	_row_fade.tween_callback(func() -> void:
+		_row_waiting = runner != null and runner.is_waiting()
+		refresh())
+	_row_fade.tween_property(_row, ^"modulate:a", 1.0, ROW_IN)
 
 
 ## Endless's name for wave `w`: no "/ N", since none is the last.

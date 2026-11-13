@@ -4,14 +4,20 @@ extends Control
 ## plate: its name, and its Boss.phase_label() after it (Act 6's Thresh:
 ## "Phase 1", "Phase 2"), as a heading in spaced capitals over a wide red
 ## health bar (a HudBar with Lucian's gradient and ghost damage, no ticks). It finds
-## the unit itself (a boss before a mini boss).
+## the unit itself (a boss before a mini boss). It comes down into place and
+## leaves the same way (UiMotion); `shown` turns at once. A channel that
+## damage breaks makes room for its bar under the health bar, easing open.
 
 ## The health bar.
 const SIZE := Vector2(600, 22)
 const FILL_TOP := Color("e0524a")
 const FILL_BOTTOM := Color("9c241f")
-## The room between the plate's frame and what it holds.
+## The room between the plate's frame and what it holds: at the sides, over
+## the heading and under the last bar (12 px on screen from the inner gold
+## line to the heading's letters, and from the bar to that line).
 const PAD := 14.0
+const PAD_TOP := 15.0
+const PAD_BOTTOM := 20.0
 const HEADING_HEIGHT := 20.0
 const HEADING_GAP := 4.0
 ## The break bar under the health bar while the boss channels something that
@@ -27,6 +33,12 @@ var boss: EnemyUnit
 var phase_text := ""
 ## The boss's Boss.channel() as of the last frame; {} when it has none.
 var channel := {}
+## It is on show (or coming); false at once when it starts to leave.
+var shown := false
+## How far the break bar's room is open (0 to 1).
+var break_t := 0.0
+## The channel the break bar shows (the last one while its room closes).
+var _drawn_channel := {}
 
 var _heading := HudHeading.new()
 var _bar := HudBar.new()
@@ -35,16 +47,15 @@ var _text := UiStyle.label("", TEXT_SIZE, Color.WHITE)
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# The plate always has room for the break bar, so it never changes height.
-	custom_minimum_size = Vector2(SIZE.x + PAD * 2.0, PAD * 2.0 + HEADING_HEIGHT + HEADING_GAP + SIZE.y + BREAK_GAP + BREAK_HEIGHT)
+	_size_to_break()
 	visible = false
-	_heading.position = Vector2(PAD, PAD)
+	_heading.position = Vector2(PAD, PAD_TOP)
 	_heading.size = Vector2(SIZE.x, HEADING_HEIGHT)
 	add_child(_heading)
 	_bar.fill_top = FILL_TOP
 	_bar.fill_bottom = FILL_BOTTOM
 	_bar.ticks = false
-	_bar.position = Vector2(PAD, PAD + HEADING_HEIGHT + HEADING_GAP)
+	_bar.position = Vector2(PAD, PAD_TOP + HEADING_HEIGHT + HEADING_GAP)
 	_bar.size = SIZE
 	add_child(_bar)
 	_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -58,7 +69,7 @@ func _ready() -> void:
 
 ## Keeps the unit it holds while it lives, even untargetable (out of the
 ## enemies group), except that a boss takes the bar from a mini boss.
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	var held := is_instance_valid(boss) and boss.is_alive()
 	var before := boss
 	if not (held and boss.data.kind == &"boss"):
@@ -67,16 +78,31 @@ func _process(_delta: float) -> void:
 			found = _find(&"mini_boss")
 		if found or not held:
 			boss = found
-	visible = boss != null
+	if (boss != null) != shown:
+		shown = boss != null
+		if shown:
+			UiMotion.enter(self, -UiMotion.RISE)
+		else:
+			UiMotion.exit(self, Callable(), -UiMotion.DROP)
+	if boss == null:
+		# Leaving: it keeps showing what it showed.
+		return
 	channel = (boss as Boss).channel() if boss is Boss else {}
 	phase_text = (boss as Boss).phase_label() if boss is Boss else ""
-	if boss != null:
-		_heading.label.text = Lang.t(boss.data.display_name) + ("   " + phase_text if phase_text != "" else "")
-		# A new boss starts with no ghost.
-		if boss != before:
-			_bar.reset(boss.hp, boss.max_hp)
-		_bar.show_amount(boss.hp, boss.max_hp)
-		_text.text = "%d / %d" % [roundi(boss.hp), roundi(boss.max_hp)]
+	_heading.label.text = Lang.t(boss.data.display_name) + ("   " + phase_text if phase_text != "" else "")
+	# A new boss starts with no ghost and no break bar.
+	if boss != before:
+		_bar.reset(boss.hp, boss.max_hp)
+		break_t = 0.0
+		_size_to_break()
+	_bar.show_amount(boss.hp, boss.max_hp)
+	_text.text = "%d / %d" % [roundi(boss.hp), roundi(boss.max_hp)]
+	if not channel.is_empty():
+		_drawn_channel = channel
+	var open := 0.0 if channel.is_empty() else 1.0
+	if break_t != open:
+		break_t = open if UiMotion.off() else move_toward(break_t, open, delta / UiMotion.BASE)
+		_size_to_break()
 	queue_redraw()
 
 
@@ -87,15 +113,22 @@ func _find(kind: StringName) -> EnemyUnit:
 	return null
 
 
+## The plate's height: the health bar, and as much of the break bar's room
+## as is open.
+func _size_to_break() -> void:
+	custom_minimum_size = Vector2(SIZE.x + PAD * 2.0, PAD_TOP + HEADING_HEIGHT + HEADING_GAP + SIZE.y + PAD_BOTTOM
+		+ roundf((BREAK_GAP + BREAK_HEIGHT) * ease(break_t, -2.0)))
+	size.y = custom_minimum_size.y
+
+
 func _draw() -> void:
-	if boss == null:
-		return
 	Plate.draw_on(self, Rect2(Vector2.ZERO, size), 10.0, true, Hud.PLATE_OPACITY)
-	if channel.is_empty():
+	if _drawn_channel.is_empty() or break_t <= 0.0:
 		return
 	var thin := Rect2(PAD, _bar.position.y + SIZE.y + BREAK_GAP, SIZE.x, BREAK_HEIGHT)
 	var well := StyleBoxFlat.new()
-	well.bg_color = BREAK_WELL
+	well.bg_color = Color(BREAK_WELL, BREAK_WELL.a * break_t)
 	well.set_corner_radius_all(HudBar.RADIUS)
 	draw_style_box(well, thin)
-	draw_rect(Rect2(thin.position, Vector2(SIZE.x * clampf(channel.done / channel.need, 0.0, 1.0), BREAK_HEIGHT)), BREAK_FILL)
+	var done := clampf(_drawn_channel.done / _drawn_channel.need, 0.0, 1.0)
+	draw_rect(Rect2(thin.position, Vector2(SIZE.x * done, BREAK_HEIGHT)), Color(BREAK_FILL, break_t))
