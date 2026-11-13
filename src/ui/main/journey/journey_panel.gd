@@ -292,6 +292,9 @@ func _build_stage() -> void:
 	_status_mark.draw.connect(_draw_status_mark)
 	stage_box.add_child(_icon_row(_status_mark, status_label))
 	resolve_label = UiStyle.label("", RESOLVE_FONT, UiStyle.GOOD_COLOR)
+	# A longer language's line wraps inside the panel.
+	resolve_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	resolve_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	resolve_row = _icon_row(_icon(Resolve.ICON), resolve_label)
 	stage_box.add_child(resolve_row)
 	# The spare height sits above the enemies, which rest on Start's rule.

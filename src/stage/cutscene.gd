@@ -18,6 +18,11 @@ signal _step_ended
 const LAYER := 38
 const BAR_HEIGHT := 120.0
 const CAPTION_TIME := 3.5
+## The speaker and the caption start this far into the bottom bar; a caption
+## that wraps to a second line (a longer language) starts higher, so both
+## lines stay on the bar.
+const LINES_TOP := 16.0
+const LINES_TOP_WRAPPED := 4.0
 ## Props are drawn over the units.
 const PROPS_Z := 20
 
@@ -27,6 +32,8 @@ var skip_button := Button.new()
 
 var _speaker := UiStyle.label("", 22, UiStyle.GOLD_COLOR)
 var _caption := UiStyle.label("", 26, UiStyle.TEXT_COLOR)
+## The speaker over the caption, on the bottom bar.
+var _lines := VBoxContainer.new()
 ## The scene's own things in the world (a chain, a glow); they go with it.
 var _props := Node2D.new()
 var _tweens: Array[Tween] = []
@@ -48,9 +55,9 @@ func _ready() -> void:
 		bar.offset_bottom = BAR_HEIGHT if top else 0.0
 		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(bar)
-	var text := VBoxContainer.new()
+	var text := _lines
 	text.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	text.offset_top = -BAR_HEIGHT + 16.0
+	text.offset_top = -BAR_HEIGHT + LINES_TOP
 	text.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_speaker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -97,6 +104,7 @@ func caption(who: String, text: String) -> void:
 		return
 	_speaker.text = who
 	_caption.text = text
+	_lines.offset_top = -BAR_HEIGHT + (LINES_TOP_WRAPPED if _caption.get_line_count() > 1 else LINES_TOP)
 	var timer := animate()
 	timer.tween_interval(CAPTION_TIME)
 	_in_caption = true

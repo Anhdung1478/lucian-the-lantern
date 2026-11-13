@@ -555,7 +555,7 @@ msgstr "%s %d / %d: +%d%% sát thương, -%d%% sát thương nhận ở lần th
 
 #. Resolve: the DEFEATED card's line and the Journey's line; %s its name, then the stacks, the most, the percents
 msgid "%s %d / %d: +%d%% damage, -%d%% taken"
-msgstr "%s %d / %d: +%d%% sát thương, -%d%% nhận vào"
+msgstr "%s %d / %d: +%d%% sát thương, -%d%% sát thương nhận"
 
 #. Resolve: the Journey line's hover text, on two lines; %s is how often (once, 3 times), %d the most stacks
 msgid "Lucian fell here %s.\nEach defeat makes this stage a little easier, up to %d times, until it is cleared."

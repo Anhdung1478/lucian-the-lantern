@@ -1567,7 +1567,8 @@ func main_debug() -> MainDebugTable:
 func find_buttons(node: Node, text: String) -> Array[Button]:
 	var found: Array[Button] = []
 	for child in node.find_children("*", "Button", true, false):
-		if (child as Button).text == text:
+		# The text as the code writes it, or as the language in use shows it.
+		if (child as Button).text == text or (child as Button).text == Lang.t(text):
 			found.append(child)
 	return found
 
@@ -2013,24 +2014,24 @@ func scenario_main_gear() -> void:
 	var save := SaveGame.instance()
 	main.gear.open()
 	await wait(0.2)
-	var leave := main.gear.find_button("Leave to main menu")
+	var leave := main.gear.find_button(Lang.t("Leave to main menu"))
 	print("Leave to main menu enabled (expect true): ", not leave.disabled)
 	await shot("main_gear_0_menu")
-	await mouse_move(control_center(main.gear.find_button("Save")))
+	await mouse_move(control_center(main.gear.find_button(Lang.t("Save"))))
 	await wait(0.2)
 	await shot("main_gear_0_hover_save")
-	await mouse_move(control_center(main.gear.find_button("Exit the game")))
+	await mouse_move(control_center(main.gear.find_button(Lang.t("Exit the game"))))
 	await wait(0.2)
 	await shot("main_gear_0_hover_exit")
 	await mouse_move(Vector2(960, 1060))
-	main.gear.find_button("Save").pressed.emit()
+	main.gear.find_button(Lang.t("Save")).pressed.emit()
 	await wait(0.1)
 	print("Save: slot 1 written (expect true), toast (expect Saved to slot 1): ",
 		FileAccess.file_exists(save.path(1)), " ", main.toast_text())
 	await shot("main_gear_1_toast")
 	main.gear.open()
 	main.gear.show_slots()
-	main.gear.find_button("Slot 2 · empty").pressed.emit()
+	main.gear.find_button(Lang.t("Slot %d · empty") % 2).pressed.emit()
 	print("copied to an empty slot 2 without asking (expect false true): ", main.confirm.is_open(), " ",
 		save.slot_exists(2), "  toast: ", main.toast_text())
 	main.gear.open()
@@ -2044,7 +2045,7 @@ func scenario_main_gear() -> void:
 	await shot("main_gear_3_overwrite")
 	main.confirm.answer(false)
 	main.gear.open()
-	main.gear.find_button("Exit the game").pressed.emit()
+	main.gear.find_button(Lang.t("Exit the game")).pressed.emit()
 	await wait(0.2)
 	print("Exit asks to save (expect true): ", game_root.prompt.is_open())
 	await shot("main_gear_4_save_prompt")
@@ -4521,7 +4522,7 @@ func scenario_exit_cancel() -> void:
 	var main := main_screen()
 	var prompt := game_root.prompt
 	main.gear.open()
-	main.gear.find_button("Leave to main menu").pressed.emit()
+	main.gear.find_button(Lang.t("Leave to main menu")).pressed.emit()
 	await wait(0.2)
 	print("Leave to main menu: ", prompt_text())
 	await shot("exit_cancel_0_leave_to_menu")
@@ -4530,7 +4531,7 @@ func scenario_exit_cancel() -> void:
 	print("Cancel: prompt, gear menu, main screen (expect false true true): ", prompt.is_open(), " ", main.gear.visible, " ",
 		game_root.screen is MainScreen)
 	await shot("exit_cancel_1_leave_cancelled")
-	main.gear.find_button("Exit the game").pressed.emit()
+	main.gear.find_button(Lang.t("Exit the game")).pressed.emit()
 	await wait(0.2)
 	print("Exit the game: ", prompt_text(), "  paused (expect true): ", paused)
 	await press_key(KEY_ESCAPE, true)
@@ -4577,7 +4578,7 @@ func scenario_exit_cancel() -> void:
 	game_root.show_title()
 	await wait(0.3)
 	var title := game_root.screen as TitleScreen
-	title.find_button("Exit game").pressed.emit()
+	title.find_button(Lang.t("Exit game")).pressed.emit()
 	await wait(0.2)
 	print("title Exit game: ", prompt_text())
 	await shot("exit_cancel_6_title_exit")

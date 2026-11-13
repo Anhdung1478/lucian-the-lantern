@@ -231,7 +231,7 @@ msgstr "Âm lượng đổi ngay. Thả thanh trượt ra sẽ phát một âm t
 
 #. Settings: dim line under the Controls page's name.
 msgid "Click a binding, then press a key or click it again with a mouse button."
-msgstr "Nhấp vào một phím gán, rồi nhấn phím mới hoặc nhấp lại bằng một nút chuột."
+msgstr "Nhấp một phím gán rồi nhấn phím mới, hoặc nhấp lại bằng nút chuột."
 
 #. Settings: dim line under the Graphics page's name.
 msgid "The window, the frame rate and how much the effects cost."
@@ -383,7 +383,7 @@ msgstr "Đặt lại mặc định"
 
 #. Settings > Controls: the long hint under the list.
 msgid "ESC or a click elsewhere cancels a binding. Ctrl + a skill key ranks it up. Quick + indicator casts on release, Normal on left-click; right-click or ESC cancels either. The mouse wheel zooms the camera in a stage."
-msgstr "ESC hoặc nhấp ra ngoài sẽ hủy việc gán phím. Ctrl + phím kỹ năng để nâng bậc kỹ năng. Nhanh + chỉ báo tung chiêu khi thả phím, Thường tung khi nhấp chuột trái; nhấp chuột phải hoặc ESC để hủy cả hai. Con lăn chuột phóng to, thu nhỏ camera trong màn chơi."
+msgstr "ESC hoặc nhấp ra ngoài: hủy gán phím. Ctrl + phím kỹ năng: nâng bậc. Nhanh + chỉ báo tung khi thả phím, Thường tung khi nhấp chuột trái; chuột phải hoặc ESC hủy. Con lăn chuột: thu phóng camera trong màn."
 
 #. Settings > Graphics: row name.
 msgid "Window mode"

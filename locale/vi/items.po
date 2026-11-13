@@ -39,7 +39,7 @@ msgstr "Nội Tại — %s"
 
 #. Item card footer of a fragment.
 msgid "Craft it with another fragment at the merchant's Craft tab."
-msgstr "Chế tạo cùng một mảnh ghép khác ở tab Chế Tạo của thương nhân."
+msgstr "Chế tạo cùng một mảnh ghép khác ở thẻ Chế Tạo của thương nhân."
 
 #. Item card footer of a potion. %s is the key bound to the potion, %d the stack size.
 msgid "Put it in its potion cell and press %s to drink. Stacks up to %d."
@@ -67,15 +67,15 @@ msgstr "Đã nâng cấp tối đa."
 
 #. Tier 1 boots card footer.
 msgid "Upgrade at the merchant's Craft tab with a fragment: each one makes its own boots."
-msgstr "Nâng cấp ở tab Chế Tạo của thương nhân bằng một mảnh ghép: mỗi mảnh cho một đôi giày riêng."
+msgstr "Nâng cấp ở thẻ Chế Tạo của thương nhân bằng một mảnh ghép: mỗi mảnh cho một đôi giày riêng."
 
 #. Tier 1 boots card footer. %s lists the fragments that make no boots.
 msgid "Upgrade at the merchant's Craft tab with a fragment: each one makes its own boots (all but %s)."
-msgstr "Nâng cấp ở tab Chế Tạo của thương nhân bằng một mảnh ghép: mỗi mảnh cho một đôi giày riêng (trừ %s)."
+msgstr "Nâng cấp ở thẻ Chế Tạo của thương nhân bằng một mảnh ghép: mỗi mảnh cho một đôi giày riêng (trừ %s)."
 
 #. Tier 2 boots card footer. The fragment, the fee, the boots made.
 msgid "Upgrade at the merchant's Craft tab with a %s (%d gold) into %s."
-msgstr "Nâng cấp ở tab Chế Tạo của thương nhân bằng %s (%d vàng) thành %s."
+msgstr "Nâng cấp ở thẻ Chế Tạo của thương nhân bằng %s (%d vàng) thành %s."
 
 #. Potion text. HP restored, mana restored, seconds.
 msgid "Restores [hp]%s HP[/hp] and [mana]%s mana[/mana] over [kw]%s s[/kw]."
@@ -219,7 +219,7 @@ msgstr "Thả món đồ vào đây để bán với giá 70% giá gốc (Giáp 
 
 #. Hover card of a backpack cell whose item sits in a Craft input.
 msgid "In the Craft tab: drag it back here, or right-click its input"
-msgstr "Đang ở tab Chế Tạo: kéo về đây, hoặc nhấp chuột phải vào ô của nó"
+msgstr "Đang ở thẻ Chế Tạo: kéo về đây, hoặc nhấp chuột phải vào ô của nó"
 
 #. Hover card of a locked backpack cell.
 msgid "Buy Backpack Slots in the Evolution Tree"

@@ -187,7 +187,7 @@ func test_the_most_visible_texts_in_vietnamese() -> void:
 
 func test_a_text_with_values_keeps_them_in_vietnamese() -> void:
 	Lang.use(Lang.VIETNAMESE)
-	assert_eq(Lang.t("%s %d / %d: +%d%% damage, -%d%% taken") % ["Quyết Tâm", 3, 5, 30, 30], "Quyết Tâm 3 / 5: +30% sát thương, -30% nhận vào")
+	assert_eq(Lang.t("%s %d / %d: +%d%% damage, -%d%% taken") % ["Quyết Tâm", 3, 5, 30, 30], "Quyết Tâm 3 / 5: +30% sát thương, -30% sát thương nhận")
 	assert_eq(Lang.t("Killed by %s") % "Lính Cận Chiến", "Bị Lính Cận Chiến hạ gục")
 	assert_eq(Lang.t("+%d purple essence (%s, first kill)") % [3, "Thresh"], "+3 tinh chất tím (Thresh, lần đầu hạ gục)")
 

@@ -659,7 +659,7 @@ msgstr "+{v}% kinh nghiệm"
 
 #. description of data/tree/boots.tres
 msgid "Lucian starts every map in his boots, for [ms]move speed[/ms]. The merchant's Craft tab upgrades them."
-msgstr "Lucian mang giày khi vào mọi bản đồ, tăng [ms]tốc độ di chuyển[/ms]. Nâng cấp giày ở tab Chế Tạo của thương nhân."
+msgstr "Lucian mang giày khi vào mọi bản đồ, tăng [ms]tốc độ di chuyển[/ms]. Nâng cấp giày ở thẻ Chế Tạo của thương nhân."
 
 #. description of data/tree/clarity.tres
 msgid "Unlocks Clarity as a summoner spell."
