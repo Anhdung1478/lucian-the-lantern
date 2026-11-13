@@ -318,6 +318,22 @@ func test_a_cards_controls_let_the_mouse_reach_the_card() -> void:
 		assert_eq(control.mouse_filter, Control.MOUSE_FILTER_PASS, control.get_class())
 
 
+## Review r2 E2-2: every row of Controls shares one column template.
+func test_every_controls_row_shares_one_column_template() -> void:
+	await wait_process_frames(3)
+	var keys := {}
+	var thirds := {}
+	for action in GameSettings.REBINDABLE:
+		var button: Button = screen._bind_buttons[action]
+		keys[snappedf(button.global_position.x, 0.5)] = true
+		var row := button.get_parent()
+		var last := row.get_child(row.get_child_count() - 1) as Control
+		thirds[snappedf(last.global_position.x, 0.5)] = true
+		assert_eq(last.size.x, (row.get_child(row.get_child_count() - 1) as Control).custom_minimum_size.x)
+	assert_eq(keys.size(), 1, "one left edge for the key buttons")
+	assert_eq(thirds.size(), 1, "one left edge for the third column")
+
+
 func test_the_panel_and_every_page_fit_the_screen() -> void:
 	await wait_process_frames(2)
 	var panel := screen._panel

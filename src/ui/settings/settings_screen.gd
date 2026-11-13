@@ -530,6 +530,9 @@ func _build_controls() -> Control:
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override(&"separation", CARD_GAP)
 	inset.add_child(list)
+	# The third column's controls (the dropdowns and the gaps that stand in for
+	# them), one width for every row of the page.
+	var third: Array[Control] = []
 	for action in GameSettings.REBINDABLE:
 		if CONTROL_GROUPS.has(action):
 			var caption := UiStyle.label(Lang.t(CONTROL_GROUPS[action]), NOTE_FONT, JourneyPanel.CAPTION_COLOR)
@@ -542,19 +545,30 @@ func _build_controls() -> Control:
 		row.add(button)
 		_bind_buttons[action] = button
 		if GameSettings.CASTABLE.has(action):
-			row.add(_cast_mode_picker(action))
+			third.append(row.add(_cast_mode_picker(action)))
 		elif action == &"attack_move":
-			row.add(_attack_move_mode_picker())
+			third.append(row.add(_attack_move_mode_picker()))
 		else:
 			# Keeps the bindings in one column.
 			var gap := Control.new()
-			gap.custom_minimum_size.x = CAST_WIDTH
-			row.add(gap)
+			third.append(row.add(gap))
+	_fit_third_column.call_deferred(third)
 	_refresh_bindings()
 	var hint := UiStyle.note(Lang.t(CONTROLS_HINT))
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	page.add_child(hint)
 	return page
+
+
+## One width for the third column: the widest dropdown's (its theme and font
+## only apply once it is in the tree, hence deferred).
+func _fit_third_column(third: Array[Control]) -> void:
+	var column := CAST_WIDTH
+	for control in third:
+		control.custom_minimum_size.x = 0.0
+		column = maxf(column, control.get_combined_minimum_size().x)
+	for control in third:
+		control.custom_minimum_size.x = column
 
 
 func _build_graphics() -> Control:
