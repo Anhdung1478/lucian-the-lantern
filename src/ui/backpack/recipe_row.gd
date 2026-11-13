@@ -11,14 +11,13 @@ extends PanelContainer
 
 const ICON_SIZE := 40.0
 ## Between the cells; the name keeps twice that from the result. The signs
-## sit closer to their cells (SIGN_GAP, less than none: a sign has room of
-## its own): the room goes to the names.
+## have SIGN_GAP of air each side (the cells never touch a sign).
 const GAP := 5
-const SIGN_GAP := -1
+const SIGN_GAP := 4
 ## Around the line (its right side keeps UiStyle.INSET from the name).
 const PAD := 4.0
 const PAD_Y := 6.0
-const SIGN_FONT := 16
+const SIGN_FONT := UiStyle.FONT_TAG
 const NAME_FONT := UiStyle.FONT_NOTE
 ## Room for a long name on two lines ("Lord Dominik's / Regards").
 const NAME_WIDTH := 112.0
