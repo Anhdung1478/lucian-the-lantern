@@ -40,7 +40,7 @@ func _play() -> void:
 	await pan_to((thresh.global_position + senna.global_position) * 0.5)
 	if skipped:
 		return
-	await caption("Thresh", "Such a bright soul... it will make a fine light.")
+	await caption("Thresh", Lang.t("Such a bright soul... it will make a fine light."))
 	if skipped:
 		return
 	# The hook flies to Senna.
@@ -58,7 +58,7 @@ func _play() -> void:
 	await step(throw)
 	if skipped:
 		return
-	await caption("Lucian", "SENNA!")
+	await caption("Lucian", Lang.t("SENNA!"))
 	if skipped:
 		return
 	# Pulled in on the chain, she falls.
@@ -89,7 +89,7 @@ func _play() -> void:
 	glow.draw.connect(_draw_glow.bind(glow))
 	thresh.visuals.add_child(glow)
 	animate().tween_property(glow, "modulate:a", 1.0, LANTERN_LIGHT_TIME)
-	await caption("Thresh", "Your light is mine now.")
+	await caption("Thresh", Lang.t("Your light is mine now."))
 	if skipped:
 		return
 	# He sinks into the river.
@@ -120,7 +120,7 @@ func _play() -> void:
 		return
 	# Her gun in his other hand: two guns from now on.
 	lucian.one_gun = false
-	await caption("", "Lucian takes up Senna's gun.")
+	await caption("", Lang.t("Lucian takes up Senna's gun."))
 
 
 func _draw_soul(soul: Node2D) -> void:

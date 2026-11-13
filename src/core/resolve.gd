@@ -54,9 +54,9 @@ static func percent(count: int, difficulty: int) -> int:
 static func describe(difficulty: int) -> String:
 	var share := percent(1, difficulty)
 	if share <= 0:
-		return "No %s: a defeat makes no stage easier." % NAME
-	return "%s: each defeat on a stage gives +%d%% damage dealt and -%d%% damage taken there, up to %d times." % [
-		NAME, share, share, MAX_STACKS]
+		return Lang.t("No %s: a defeat makes no stage easier.") % Lang.t(NAME)
+	return Lang.t("%s: each defeat on a stage gives +%d%% damage dealt and -%d%% damage taken there, up to %d times.") % [
+		Lang.t(NAME), share, share, MAX_STACKS]
 
 
 ## The buff row's entry for `count` stacks after `defeats` defeats on the
@@ -65,8 +65,8 @@ static func describe(difficulty: int) -> String:
 ## times."
 static func buff(count: int, defeats: int, difficulty: int) -> Dictionary:
 	var share := percent(count, difficulty)
-	var text := "[kw]+%d%% damage dealt[/kw], [kw]-%d%% damage taken[/kw]. You fell here %s." % [share, share, _times(defeats)]
-	return {"id": BUFF, "name": NAME, "icon": ICON, "text": TooltipText.colorize(text), "count": str(count),
+	var text := Lang.t("[kw]+%d%% damage dealt[/kw], [kw]-%d%% damage taken[/kw]. You fell here %s.") % [share, share, _times(defeats)]
+	return {"id": BUFF, "name": Lang.t(NAME), "icon": ICON, "text": TooltipText.colorize(text), "count": str(count),
 		"left": 0.0, "duration": 0.0, "ready": false}
 
 
@@ -76,7 +76,7 @@ static func defeat_line(count: int, difficulty: int) -> String:
 	if count <= 0:
 		return ""
 	var share := percent(count, difficulty)
-	return "%s %d / %d: +%d%% damage, -%d%% damage taken on your next try" % [NAME, count, MAX_STACKS, share, share]
+	return Lang.t("%s %d / %d: +%d%% damage, -%d%% damage taken on your next try") % [Lang.t(NAME), count, MAX_STACKS, share, share]
 
 
 ## The Journey's line for a stage with `count` stacks: "Resolve 3 / 5: +30%
@@ -85,16 +85,16 @@ static func journey_line(count: int, difficulty: int) -> String:
 	if count <= 0:
 		return ""
 	var share := percent(count, difficulty)
-	return "%s %d / %d: +%d%% damage, -%d%% taken" % [NAME, count, MAX_STACKS, share, share]
+	return Lang.t("%s %d / %d: +%d%% damage, -%d%% taken") % [Lang.t(NAME), count, MAX_STACKS, share, share]
 
 
 ## The Journey line's hover text, after `defeats` defeats on the stage, on
 ## two lines.
 static func journey_note(defeats: int) -> String:
-	return "Lucian fell here %s.\nEach defeat makes this stage a little easier, up to %d times, until it is cleared." % [
+	return Lang.t("Lucian fell here %s.\nEach defeat makes this stage a little easier, up to %d times, until it is cleared.") % [
 		_times(defeats), MAX_STACKS]
 
 
 ## "once", "3 times".
 static func _times(count: int) -> String:
-	return "once" if count == 1 else "%d times" % count
+	return Lang.t("once") if count == 1 else Lang.t("%d times") % count

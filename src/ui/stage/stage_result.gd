@@ -64,7 +64,11 @@ const STAT_ICONS := {
 	"Gold earned": preload("res://assets/art/ui/gold.svg"),
 }
 const ESSENCE_ICON := 32.0
-const ESSENCE_LINE := "+%d %s essence"
+const ESSENCE_LINES := {
+	Essences.BLUE: "+%d blue essence",
+	Essences.ORANGE: "+%d orange essence",
+	Essences.PURPLE: "+%d purple essence",
+}
 ## The essences count up from 0 for this long (the final numbers at once
 ## with low effects), fast at first.
 const COUNT_TIME := 0.6
@@ -123,11 +127,11 @@ func show_result(is_cleared: bool, stage_name: String, stats: Array, collected: 
 	cleared = is_cleared
 	game_over = is_game_over and not is_cleared
 	if title_text != "":
-		title.text = title_text
+		title.text = Lang.t(title_text)
 	elif cleared:
-		title.text = "STAGE CLEARED"
+		title.text = Lang.t("STAGE CLEARED")
 	else:
-		title.text = "GAME OVER" if game_over else "DEFEATED"
+		title.text = Lang.t("GAME OVER" if game_over else "DEFEATED")
 	title.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR if cleared else UiStyle.ERROR_COLOR)
 	_gradient.colors = PackedColorArray([_glow_color(), Color(0, 0, 0, 0)])
 	_crest.queue_redraw()
@@ -135,7 +139,7 @@ func show_result(is_cleared: bool, stage_name: String, stats: Array, collected: 
 	_stage_label.text = stage_name
 	retry_button.visible = not game_over
 	next_button.visible = cleared and can_next
-	main_button.text = "Back to title" if game_over else "Main screen"
+	main_button.text = Lang.t("Back to title" if game_over else "Main screen")
 	_fill_stats(stats)
 	_fill_rewards(collected, rewards)
 	_fill_recap({} if cleared else recap)
@@ -157,7 +161,7 @@ func _fill_stats(stats: Array) -> void:
 ## well. The row draws the well and, in the name's left margin, its icon.
 func _stat_row(text: String, value: String) -> HBoxContainer:
 	var row := HBoxContainer.new()
-	var name_label := UiStyle.label(text, ROW_FONT, UiStyle.TEXT_COLOR)
+	var name_label := UiStyle.label(Lang.t(text), ROW_FONT, UiStyle.TEXT_COLOR)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.add_theme_stylebox_override(&"normal", _row_margin(STAT_ICON_ROOM, 0.0))
 	var value_label := UiStyle.label(value, ROW_FONT, UiStyle.TITLE_COLOR)
@@ -210,7 +214,7 @@ func _fill_rewards(collected: Dictionary, rewards: Array[String]) -> void:
 		_essence_labels[kind] = label
 		_amounts[kind] = collected[kind]
 	if _amounts.is_empty():
-		_rewards.add_child(UiStyle.label("No essences", ROW_FONT, UiStyle.DIM_COLOR))
+		_rewards.add_child(UiStyle.label(Lang.t("No essences"), ROW_FONT, UiStyle.DIM_COLOR))
 	for line in rewards:
 		_rewards.add_child(_reward_line(line))
 	_count_left = 0.0 if GameSettings.instance().low_effects() else COUNT_TIME
@@ -221,7 +225,7 @@ func _fill_rewards(collected: Dictionary, rewards: Array[String]) -> void:
 ## Each essence row reads `share` (0–1) of its amount.
 func _show_essences(share: float) -> void:
 	for kind: StringName in _essence_labels:
-		(_essence_labels[kind] as Label).text = ESSENCE_LINE % [roundi(_amounts[kind] * share), kind]
+		(_essence_labels[kind] as Label).text = Lang.t(ESSENCE_LINES[kind]) % roundi(_amounts[kind] * share)
 
 
 ## What hit Lucian: who struck the last blow, the shares of the damage and
@@ -305,19 +309,19 @@ func _build() -> void:
 	var columns := HBoxContainer.new()
 	columns.add_theme_constant_override(&"separation", 22)
 	column.add_child(columns)
-	_stats = _section(columns, "STATS")
+	_stats = _section(columns, Lang.t("STATS"))
 	columns.add_child(Ornament.divider(true))
-	_rewards = _section(columns, "REWARDS")
-	_recap = _section(column, "WHAT HIT YOU")
+	_rewards = _section(columns, Lang.t("REWARDS"))
+	_recap = _section(column, Lang.t("WHAT HIT YOU"))
 	_recap_section = _recap.get_parent()
 	column.add_child(Ornament.divider())
 	var buttons := HBoxContainer.new()
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	buttons.add_theme_constant_override(&"separation", 30)
 	column.add_child(buttons)
-	retry_button = _button(buttons, "Retry", false, &"retry")
-	next_button = _button(buttons, "Next stage", false, &"next")
-	main_button = _button(buttons, "Main screen", true, &"main")
+	retry_button = _button(buttons, Lang.t("Retry"), false, &"retry")
+	next_button = _button(buttons, Lang.t("Next stage"), false, &"next")
+	main_button = _button(buttons, Lang.t("Main screen"), true, &"main")
 
 
 ## The lantern in its medallion on the middle of the plate's top edge (PAD

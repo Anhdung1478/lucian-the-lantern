@@ -90,7 +90,7 @@ var _modifier_row := {}
 func setup(target: Lucian, stage_wallet: Wallet, stage_node: Stage = null) -> void:
 	lucian = target
 	stage = stage_node
-	stage_info.setup(stage.run.display_name if stage else "Training", stage.runner if stage else null)
+	stage_info.setup(Lang.t(stage.run.display_name) if stage else Lang.t("Training"), stage.runner if stage else null)
 	if stage:
 		stage_info.skip_pressed.connect(stage.skip_break)
 		wave_preview.setup(stage.runner)
@@ -233,7 +233,7 @@ func _buffs() -> Array[Dictionary]:
 static func modifier_buff(id: int) -> Dictionary:
 	var downside := TooltipText.color(EndlessModifiers.downside(id), ModifierPick.DOWNSIDE_COLOR.to_html(false))
 	var reward := TooltipText.color(EndlessModifiers.reward(id), ModifierPick.REWARD_COLOR.to_html(false))
-	return {"id": MODIFIER_ROW, "name": MODIFIER_NAME, "icon": EndlessModifiers.icon(id), "text": "%s\n%s" % [downside, reward],
+	return {"id": MODIFIER_ROW, "name": Lang.t(MODIFIER_NAME), "icon": EndlessModifiers.icon(id), "text": "%s\n%s" % [downside, reward],
 		"count": "", "left": 0.0, "duration": 0.0, "ready": false}
 
 
@@ -304,7 +304,7 @@ func _build_gold() -> void:
 	panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	panel.offset_right = -MARGIN
 	panel.offset_top = MARGIN
-	panel.set_meta(&"hover_text", "Stage gold: spend it at the merchant. Resets every stage.")
+	panel.set_meta(&"hover_text", Lang.t("Stage gold: spend it at the merchant. Resets every stage."))
 	panel.mouse_filter = Control.MOUSE_FILTER_PASS
 	$Root.add_child(panel)
 	var row := HBoxContainer.new()

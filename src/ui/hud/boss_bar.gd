@@ -71,7 +71,7 @@ func _process(_delta: float) -> void:
 	channel = (boss as Boss).channel() if boss is Boss else {}
 	phase_text = (boss as Boss).phase_label() if boss is Boss else ""
 	if boss != null:
-		_heading.label.text = boss.data.display_name + ("   " + phase_text if phase_text != "" else "")
+		_heading.label.text = Lang.t(boss.data.display_name) + ("   " + phase_text if phase_text != "" else "")
 		# A new boss starts with no ghost.
 		if boss != before:
 			_bar.reset(boss.hp, boss.max_hp)

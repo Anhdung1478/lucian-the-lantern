@@ -108,7 +108,7 @@ static func icon(id: StringName) -> Texture2D:
 
 
 static func tip(id: StringName) -> String:
-	return TRAITS[id].tip
+	return Lang.t(TRAITS[id].tip)
 
 
 static func color(id: StringName) -> Color:

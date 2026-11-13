@@ -63,9 +63,9 @@ func damage_text() -> String:
 	if not data.ap_ratio.is_empty():
 		text += " " + TooltipText.ratio(data.ap_ratio, r, "AP")
 	var words: String = {
-		DamageInfo.Type.PHYSICAL: "[phys]physical damage[/phys]",
-		DamageInfo.Type.MAGIC: "[magic]magic damage[/magic]",
-		DamageInfo.Type.TRUE: "[true]true damage[/true]",
+		DamageInfo.Type.PHYSICAL: Lang.t("[phys]physical damage[/phys]"),
+		DamageInfo.Type.MAGIC: Lang.t("[magic]magic damage[/magic]"),
+		DamageInfo.Type.TRUE: Lang.t("[true]true damage[/true]"),
 	}[data.damage_type]
 	return text + " " + TooltipText.colorize(words)
 

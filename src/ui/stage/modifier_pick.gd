@@ -54,7 +54,7 @@ func _build() -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override(&"separation", TITLE_GAP)
 	center.add_child(column)
-	var title := UiStyle.label(GIFT_TITLE if gifts else TITLE, TITLE_FONT, UiStyle.TITLE_COLOR)
+	var title := UiStyle.label(Lang.t(GIFT_TITLE if gifts else TITLE), TITLE_FONT, UiStyle.TITLE_COLOR)
 	Ornament.space_out(title, TITLE_SPACING)
 	column.add_child(Ornament.between_rules(title, TITLE_RULE))
 	var row := HBoxContainer.new()

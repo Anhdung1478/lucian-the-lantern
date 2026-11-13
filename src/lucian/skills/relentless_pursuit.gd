@@ -25,11 +25,10 @@ func cast_range() -> CastRange:
 
 
 func describe() -> String:
-	return TooltipText.colorize(
-		"Lucian dashes toward the cursor, up to [kw]%d[/kw] units, passing through enemies, and resets his basic attack timer. "
-		+ "[kw]Lightslinger[/kw] hits lower this cooldown."
-	) % max_distance
+	return TooltipText.colorize(Lang.t(
+		"Lucian dashes toward the cursor, up to [kw]%d[/kw] units, passing through enemies, and resets his basic attack timer. [kw]Lightslinger[/kw] hits lower this cooldown."
+	)) % max_distance
 
 
 func max_rank_bonus() -> String:
-	return "Killing an enemy lowers this cooldown by 1 s."
+	return Lang.t("Killing an enemy lowers this cooldown by 1 s.")

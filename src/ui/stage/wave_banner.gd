@@ -78,10 +78,10 @@ func _ready() -> void:
 static func lines(number: int, lead_kind := &"", lead_name := "") -> PackedStringArray:
 	match lead_kind:
 		&"boss":
-			return PackedStringArray([BOSS, lead_name])
+			return PackedStringArray([Lang.t(BOSS), lead_name])
 		&"mini_boss":
-			return PackedStringArray([MINI_BOSS, lead_name])
-	return PackedStringArray([WAVE % number])
+			return PackedStringArray([Lang.t(MINI_BOSS), lead_name])
+	return PackedStringArray([Lang.t(WAVE) % number])
 
 
 ## The boss or mini boss that the wave `wave_runner` just started brings, or
@@ -136,7 +136,7 @@ func announce(number: int, lead_kind := &"", lead_name := "") -> void:
 func _on_wave_started(number: int) -> void:
 	var data := lead(runner, stage_id)
 	if data:
-		announce(number, data.kind, data.display_name)
+		announce(number, data.kind, Lang.t(data.display_name))
 	else:
 		announce(number)
 

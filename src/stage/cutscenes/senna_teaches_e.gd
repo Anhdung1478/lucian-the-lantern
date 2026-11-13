@@ -16,7 +16,7 @@ func _play() -> void:
 	await pan_to((senna.global_position + lucian.global_position) * 0.5)
 	if skipped:
 		return
-	await caption("Senna", "Thresh's hook is slow, but you can't dodge it standing still. Watch my feet.")
+	await caption("Senna", Lang.t("Thresh's hook is slow, but you can't dodge it standing still. Watch my feet."))
 	if skipped:
 		return
 	var start := senna.global_position
@@ -30,10 +30,10 @@ func _play() -> void:
 	await _dash(senna, start)
 	if skipped:
 		return
-	await caption("Senna", "Dash, then shoot. Your next shot is ready the moment you land.")
+	await caption("Senna", Lang.t("Dash, then shoot. Your next shot is ready the moment you land."))
 	if skipped:
 		return
-	await caption("", "Lucian learns Relentless Pursuit. Press %s to dash toward the cursor." % GameSettings.instance().key_label(&"skill_e"))
+	await caption("", Lang.t("Lucian learns Relentless Pursuit. Press %s to dash toward the cursor.") % GameSettings.instance().key_label(&"skill_e"))
 
 
 ## Senna dashes to `to`, a light trail growing behind her.

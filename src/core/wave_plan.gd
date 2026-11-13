@@ -330,7 +330,7 @@ static func preview_rows(ids: Array) -> Array[Dictionary]:
 	for id: StringName in ids:
 		if not by_id.has(id):
 			var data: EnemyData = load(Stage.ENEMY_PATH % id)
-			by_id[id] = {"id": id, "name": data.display_name, "count": 0, "boss": data.is_boss_kind(), "art": data.art}
+			by_id[id] = {"id": id, "name": Lang.t(data.display_name), "count": 0, "boss": data.is_boss_kind(), "art": data.art}
 			rows.append(by_id[id])
 		by_id[id].count += 1
 	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.boss and not b.boss)

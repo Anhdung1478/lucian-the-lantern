@@ -132,7 +132,7 @@ func _ready() -> void:
 
 
 func phase_label() -> String:
-	return "Phase %d" % phase
+	return Lang.t("Phase %d") % phase
 
 
 ## The RISE_TIME after he rises: no damage taken, nothing done.

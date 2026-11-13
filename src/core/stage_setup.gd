@@ -139,7 +139,7 @@ static func for_endless(save: SaveGame, choice: int, rng: RandomNumberGenerator)
 	setup.act = place.x
 	setup.stage = place.y
 	setup.stage_id = EndlessPlan.STAGE_ID
-	setup.display_name = "Endless · %s" % EndlessPlan.map_name(map)
+	setup.display_name = Lang.t("Endless · %s") % EndlessPlan.map_name(map)
 	setup.boss = &""
 	setup.acts_cleared = Journey.acts_cleared(save.cleared)
 	return setup

@@ -33,7 +33,7 @@ func _init(new_level: int) -> void:
 
 func _ready() -> void:
 	_ring = not GameSettings.instance().low_effects()
-	var text := FloatingText.new("Level %d" % level, COLOR)
+	var text := FloatingText.new(Lang.t("Level %d") % level, COLOR)
 	text.position = Vector2(0, -TEXT_HEIGHT)
 	add_child(text)
 

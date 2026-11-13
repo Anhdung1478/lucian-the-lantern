@@ -250,7 +250,7 @@ static func map_for(choice: int) -> Vector2i:
 
 
 static func map_name(choice: int) -> String:
-	return Journey.ENDLESS_MAPS[choice]
+	return Lang.t(Journey.ENDLESS_MAPS[choice])
 
 
 ## The map played for `choice`: itself, or for RANDOM (or an unknown choice)

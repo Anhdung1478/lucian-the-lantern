@@ -12,7 +12,8 @@ extends Node
 ## The result's title: a run only ends when Lucian falls.
 const RUN_OVER := "RUN OVER"
 ## The result's green line, when the run beat the best it started with.
-const NEW_BEST := "New best: %d %s!"
+const NEW_BEST := "New best: %d waves!"
+const NEW_BEST_ONE := "New best: %d wave!"
 ## The Modifier row with none in effect (none picked yet, or Nothing).
 const NO_MODIFIER := "None"
 ## A milestone's banner and result line: the wave, its blue and orange.
@@ -83,9 +84,9 @@ func choose(id: int) -> void:
 func add_result(rows: Array, lines: Array[String]) -> void:
 	var waves := runner.waves_cleared
 	rows.push_front(["Waves cleared", str(waves)])
-	rows.append(["Modifier", NO_MODIFIER if modifier == EndlessModifiers.NONE else EndlessModifiers.downside(modifier)])
+	rows.append(["Modifier", Lang.t(NO_MODIFIER) if modifier == EndlessModifiers.NONE else EndlessModifiers.downside(modifier)])
 	if waves > start_best:
-		lines.append(NEW_BEST % [waves, "wave" if waves == 1 else "waves"])
+		lines.append(Lang.t(NEW_BEST_ONE if waves == 1 else NEW_BEST) % waves)
 
 
 ## Debug: the next boss wave comes next. An open pick closes and a held break
@@ -116,10 +117,10 @@ func _pay_milestone(waves: int) -> void:
 	var pay := EndlessPlan.milestone(waves)
 	if pay == Vector2i.ZERO or not SaveGame.instance().claim_endless_milestone(waves):
 		return
-	var text := MILESTONE % [waves, pay.x, pay.y]
+	var text := Lang.t(MILESTONE) % [waves, pay.x, pay.y]
 	stage.add_essences(pay.x, pay.y, 0, stage.lucian.global_position)
 	stage.reward_lines.append(text)
-	stage.hud.tips.show_tip(StringName(text), text)
+	stage.hud.tips.show_tip(StringName(MILESTONE % [waves, pay.x, pay.y]), text)
 
 
 ## Deferred: the boss's death can come in a shot's physics callback.

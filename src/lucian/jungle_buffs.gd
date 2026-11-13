@@ -39,7 +39,7 @@ static func bonus(id: StringName) -> Dictionary:
 
 ## The buff row's name: Blue's, else Red's.
 static func display_name(id: StringName) -> String:
-	return "Crest of Insight" if id == BLUE else "Crest of Cinders"
+	return Lang.t("Crest of Insight" if id == BLUE else "Crest of Cinders")
 
 
 ## The buff row's icon: Blue's, else Red's.
@@ -50,9 +50,8 @@ static func icon(id: StringName) -> Texture2D:
 ## The buff row's hover text.
 static func text(id: StringName) -> String:
 	if id == BLUE:
-		return TooltipText.colorize("+%d [mana]mana regen[/mana] per second and +%d ability haste." % [
+		return TooltipText.colorize(Lang.t("+%d [mana]mana regen[/mana] per second and +%d ability haste.") % [
 			roundi(BLUE_BONUS[&"mana_regen"]), roundi(BLUE_BONUS[&"ability_haste"])])
-	return TooltipText.colorize(("+%d [hp]health regen[/hp] per second. Basic attacks burn for [true]%d true damage[/true] "
-		+ "per second for %d s, and basic attacks and skills slow by %d%% for %s s.") % [
+	return TooltipText.colorize(Lang.t("+%d [hp]health regen[/hp] per second. Basic attacks burn for [true]%d true damage[/true] per second for %d s, and basic attacks and skills slow by %d%% for %s s.") % [
 			roundi(RED_BONUS[&"hp_regen"]), roundi(RED_BURN), roundi(RED_BURN_TIME), roundi(RED_SLOW * 100.0),
 			TooltipText.number(RED_SLOW_TIME)])

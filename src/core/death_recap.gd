@@ -33,7 +33,7 @@ static func build(stats: StageStats, tree: EvolutionTree, essences: Essences) ->
 		"killed": _killed(stats),
 		"shares": _shares(stats, top),
 		"tip": _tip(top[0]),
-		"tree": TREE_LINE if _can_buy_any(tree, essences) else "",
+		"tree": Lang.t(TREE_LINE) if _can_buy_any(tree, essences) else "",
 	}
 
 
@@ -49,8 +49,8 @@ static func _ranked(taken: Dictionary) -> Array[StringName]:
 static func _killed(stats: StageStats) -> String:
 	var who := _name(stats.last_hit_by)
 	if stats.last_hit_with == DamageOverTime.SOURCE and _enemy(stats.last_hit_by):
-		return KILLED_BY_BURN % who
-	return KILLED % KILLED_NAMES.get(stats.last_hit_by, who)
+		return Lang.t(KILLED_BY_BURN) % who
+	return Lang.t(KILLED) % Lang.t(KILLED_NAMES.get(stats.last_hit_by, who))
 
 
 static func _shares(stats: StageStats, top: Array[StringName]) -> Array[String]:
@@ -63,14 +63,14 @@ static func _shares(stats: StageStats, top: Array[StringName]) -> Array[String]:
 static func _tip(id: StringName) -> String:
 	var data := _enemy(id)
 	if data == null:
-		return TIP_BURN
+		return Lang.t(TIP_BURN)
 	if data.is_boss_kind():
-		return TIP_BOSS
+		return Lang.t(TIP_BOSS)
 	if data.behavior in MARKED:
-		return TIP_MARKS
+		return Lang.t(TIP_MARKS)
 	if data.kind == &"elite":
-		return TIP_ELITE
-	return TIP_RANGED if data.behavior in RANGED else TIP_MELEE
+		return Lang.t(TIP_ELITE)
+	return Lang.t(TIP_RANGED if data.behavior in RANGED else TIP_MELEE)
 
 
 ## Some open node the save can pay for: the tree's own can_buy, as the cost
@@ -82,8 +82,8 @@ static func _can_buy_any(tree: EvolutionTree, essences: Essences) -> bool:
 static func _name(id: StringName) -> String:
 	var data := _enemy(id)
 	if data:
-		return data.display_name
-	return SOURCE_NAMES.get(id, String(id).replace("_", " ").capitalize())
+		return Lang.t(data.display_name)
+	return Lang.t(SOURCE_NAMES.get(id, String(id).replace("_", " ").capitalize()))
 
 
 ## The enemy with this id, or null when it is no enemy.

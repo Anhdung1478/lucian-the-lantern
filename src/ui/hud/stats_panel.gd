@@ -69,12 +69,12 @@ static func has_bonus(target: Lucian, key: StringName) -> bool:
 ## line for health and one for mana.
 static func breakdown(target: Lucian, key: StringName) -> String:
 	if key == &"regen":
-		return "Health %s\nMana %s" % [breakdown(target, &"hp_regen"), breakdown(target, &"mana_regen")]
+		return Lang.t("Health %s\nMana %s") % [breakdown(target, &"hp_regen"), breakdown(target, &"mana_regen")]
 	var amounts := _amounts(target, key)
-	var text := "%s base" % _format(key, amounts.x)
+	var text := Lang.t("%s base") % _format(key, amounts.x)
 	if has_bonus(target, key):
 		var sign := "+" if amounts.y >= amounts.x else "−"
-		text += " %s %s" % [sign, TooltipText.color("%s bonus" % _format(key, absf(amounts.y - amounts.x)), StatCell.BONUS_COLOR.to_html(false))]
+		text += " %s %s" % [sign, TooltipText.color(Lang.t("%s bonus") % _format(key, absf(amounts.y - amounts.x)), StatCell.BONUS_COLOR.to_html(false))]
 	return text
 
 

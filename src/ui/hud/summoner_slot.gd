@@ -32,10 +32,10 @@ func hover_range() -> CastRange:
 
 func tooltip_content() -> Control:
 	if slot >= lucian.summoners.open_slots:
-		return TooltipCard.note("Locked: buy the 2nd summoner slot in the Evolution Tree.")
+		return TooltipCard.note(Lang.t("Locked: buy the 2nd summoner slot in the Evolution Tree."))
 	var spell := lucian.summoners.spell_in(slot)
 	if spell == null:
-		return TooltipCard.note("No spell: pick one in Journey before starting.")
+		return TooltipCard.note(Lang.t("No spell: pick one in Journey before starting."))
 	var summoners := lucian.summoners
 	return TooltipCard.summoner(spell, _key(), summoners.cooldown_of(spell), summoners.upgrade_text(spell.id))
 

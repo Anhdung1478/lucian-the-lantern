@@ -32,7 +32,7 @@ var _shown: Variant = null
 func _init() -> void:
 	super(PAD, false)
 	opacity = Hud.PLATE_OPACITY
-	_heading.label.text = "Next"
+	_heading.label.text = Lang.t("Next")
 
 
 func _ready() -> void:
@@ -84,9 +84,9 @@ func refresh() -> void:
 func _wave_text(kind: StringName) -> String:
 	match kind:
 		&"boss":
-			return BOSS_WAVE_TEXT
+			return Lang.t(BOSS_WAVE_TEXT)
 		&"mini_boss":
-			return MINI_BOSS_WAVE_TEXT
+			return Lang.t(MINI_BOSS_WAVE_TEXT)
 	return ""
 
 

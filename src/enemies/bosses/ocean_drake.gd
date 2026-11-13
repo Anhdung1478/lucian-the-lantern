@@ -137,7 +137,7 @@ func _interrupt() -> void:
 	_mist_damage = 0.0
 	_daze_left = DAZE_TIME
 	busy_left = DAZE_TIME
-	var note := FloatingText.new("Interrupted!", INTERRUPTED_COLOR)
+	var note := FloatingText.new(Lang.t("Interrupted!"), INTERRUPTED_COLOR)
 	note.position = global_position + INTERRUPTED_AT
 	warning_parent.add_child(note)
 	queue_redraw()

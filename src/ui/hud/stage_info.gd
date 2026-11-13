@@ -61,7 +61,7 @@ func _ready() -> void:
 	for label in [wave_label, enemies_label, timer_label]:
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_row.add_child(label)
-	skip_button.text = "Skip"
+	skip_button.text = Lang.t("Skip")
 	skip_button.custom_minimum_size = SKIP_SIZE
 	skip_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	UiStyle.style_button(skip_button, SKIP_FONT_SIZE)
@@ -69,7 +69,7 @@ func _ready() -> void:
 		var box := skip_button.get_theme_stylebox(state)
 		box.content_margin_top = SKIP_MARGIN
 		box.content_margin_bottom = SKIP_MARGIN
-	skip_button.set_meta(&"hover_text", "Start the next wave now. Lucian still gets the health and mana regen of the time skipped.")
+	skip_button.set_meta(&"hover_text", Lang.t("Start the next wave now. Lucian still gets the health and mana regen of the time skipped."))
 	skip_button.pressed.connect(skip_pressed.emit)
 	_row.add_child(skip_button)
 	# As tall with Skip as without, so the plate never changes its height.
@@ -106,22 +106,22 @@ func refresh() -> void:
 	if runner == null:
 		return
 	if endless:
-		best_label.text = "Best %d" % SaveGame.instance().endless_best
+		best_label.text = Lang.t("Best %d") % SaveGame.instance().endless_best
 	else:
 		pips.show_waves(runner.total_waves(), runner.boss != &"", runner.wave, runner.state == WaveRunner.State.FIGHT)
 	if waiting:
 		var next := runner.wave + 1
-		var what := _endless_wave(next) if endless else ("Boss wave" if next > runner.wave_count() else "Wave %d" % next)
-		timer_label.text = "%s in %s" % [what, StageResult.clock(runner.countdown())]
+		var what := _endless_wave(next) if endless else (Lang.t("Boss wave") if next > runner.wave_count() else Lang.t("Wave %d") % next)
+		timer_label.text = Lang.t("%s in %s") % [what, StageResult.clock(runner.countdown())]
 	else:
-		wave_label.text = _endless_wave(runner.wave) if endless else ("Boss wave" if runner.is_boss_wave() else "Wave %d/%d" % [runner.wave, runner.wave_count()])
-		enemies_label.text = "Enemies: %d" % runner.alive()
+		wave_label.text = _endless_wave(runner.wave) if endless else (Lang.t("Boss wave") if runner.is_boss_wave() else Lang.t("Wave %d/%d") % [runner.wave, runner.wave_count()])
+		enemies_label.text = Lang.t("Enemies: %d") % runner.alive()
 
 
 ## Endless's name for wave `w`: no "/ N", since none is the last.
 func _endless_wave(w: int) -> String:
 	if EndlessPlan.is_boss_wave(w):
-		return "Boss wave"
+		return Lang.t("Boss wave")
 	if EndlessPlan.is_mini_boss_wave(w):
-		return "Mini boss wave"
-	return "Wave %d" % w
+		return Lang.t("Mini boss wave")
+	return Lang.t("Wave %d") % w

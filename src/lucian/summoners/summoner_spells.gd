@@ -81,8 +81,8 @@ func upgrade_text(id: StringName) -> String:
 	if value == 0.0:
 		return ""
 	if id in COOLDOWN_UPGRADES:
-		return "Upgraded: %d%% shorter cooldown" % roundi(-value * 100.0)
-	return "Upgraded: %d%% stronger" % roundi(value * 100.0)
+		return Lang.t("Upgraded: %d%% shorter cooldown") % roundi(-value * 100.0)
+	return Lang.t("Upgraded: %d%% stronger") % roundi(value * 100.0)
 
 
 ## Multiplier on the effect of a spell with a strength upgrade.

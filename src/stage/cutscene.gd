@@ -60,7 +60,7 @@ func _ready() -> void:
 	_caption.custom_minimum_size.x = 1100.0
 	text.add_child(_caption)
 	add_child(text)
-	skip_button.text = "Skip"
+	skip_button.text = Lang.t("Skip")
 	skip_button.custom_minimum_size = Vector2(120, 44)
 	UiStyle.style_button(skip_button, 20)
 	skip_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)

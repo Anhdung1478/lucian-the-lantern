@@ -118,5 +118,5 @@ static func tick_marks(max_hp: float) -> PackedVector2Array:
 func _cc_word() -> String:
 	for kind: CrowdControl.Kind in Lucian.CC_DEBUFFS:
 		if lucian.has_cc(kind):
-			return Lucian.CC_DEBUFFS[kind].name
+			return Lang.t(Lucian.CC_DEBUFFS[kind].name)
 	return ""

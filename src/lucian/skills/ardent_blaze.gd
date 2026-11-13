@@ -42,15 +42,14 @@ func cast_range() -> CastRange:
 
 
 func describe() -> String:
-	return TooltipText.colorize(
-		"Lucian fires a missile that bursts in a cross on the first enemy hit or at max range, dealing %s and marking enemies for [kw]%s s[/kw]. "
-		+ "Lucian's other hits on a marked enemy grant him %s [ms]move speed[/ms] for [kw]%s s[/kw]."
-	) % [damage_text(), TooltipText.number(mark_duration), TooltipText.ranked(move_speed_bonus, rank()),
+	return TooltipText.colorize(Lang.t(
+		"Lucian fires a missile that bursts in a cross on the first enemy hit or at max range, dealing %s and marking enemies for [kw]%s s[/kw]. Lucian's other hits on a marked enemy grant him %s [ms]move speed[/ms] for [kw]%s s[/kw]."
+	)) % [damage_text(), TooltipText.number(mark_duration), TooltipText.ranked(move_speed_bonus, rank()),
 		TooltipText.number(move_speed_duration)]
 
 
 func max_rank_bonus() -> String:
-	return "The cross is %d%% bigger." % roundi((max_rank_scale - 1.0) * 100.0)
+	return Lang.t("The cross is %d%% bigger.") % roundi((max_rank_scale - 1.0) * 100.0)
 
 
 func current_move_speed_bonus() -> float:

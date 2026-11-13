@@ -65,7 +65,7 @@ func _play() -> void:
 	await pan_to(ground)
 	if skipped:
 		return
-	await caption("Lucian", "It ends here.")
+	await caption("Lucian", Lang.t("It ends here."))
 	if skipped:
 		return
 	# One bright shot from Lucian to the lantern.
@@ -136,10 +136,10 @@ func _play() -> void:
 	await step(rise)
 	if skipped:
 		return
-	await caption("Senna", "Lucian… you came.")
+	await caption("Senna", Lang.t("Lucian… you came."))
 	if skipped:
 		return
-	await caption("Lucian", "Always.")
+	await caption("Lucian", Lang.t("Always."))
 	if skipped:
 		return
 	# A fade to white.

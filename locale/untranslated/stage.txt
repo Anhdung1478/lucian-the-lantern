@@ -1,0 +1,31 @@
+# Texts in the stage part's scripts that a player never reads, or that stay as they are.
+
+# Node names, found by name in the scene tree.
+Controller
+Arena
+Walls
+Chasm
+Ambience
+Navigation
+Depths
+Mist
+ItemPassives
+ItemActives
+SummonerSpells
+RangeIndicator
+HealthBar
+# A class name searched for in the tree.
+HudItemSlot
+
+# An export hint of a data field (shown in the editor only).
+Same as the hit:-1
+Physical:0
+Magic:1
+True:2
+
+# The debug FPS counter, shown only when the player turns it on, and read as the abbreviation.
+FPS %d
+
+# Abbreviations of the stats, written the same in Vietnamese.
+AD
+AP

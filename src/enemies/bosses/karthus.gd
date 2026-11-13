@@ -257,7 +257,7 @@ func _break() -> void:
 	_channel_damage = 0.0
 	busy_left = RECOVER
 	_spend_thresholds()
-	var note := FloatingText.new("Broken!", BROKEN_COLOR)
+	var note := FloatingText.new(Lang.t("Broken!"), BROKEN_COLOR)
 	note.position = global_position + BROKEN_AT
 	warning_parent.add_child(note)
 	queue_redraw()

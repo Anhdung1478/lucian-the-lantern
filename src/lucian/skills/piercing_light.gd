@@ -37,13 +37,13 @@ func cancel() -> void:
 
 
 func describe() -> String:
-	return TooltipText.colorize(
+	return TooltipText.colorize(Lang.t(
 		"After a [kw]%s s[/kw] cast, Lucian fires a piercing beam of light toward the cursor, dealing %s to every enemy in a line."
-	) % [TooltipText.number(cast_time), damage_text()]
+	)) % [TooltipText.number(cast_time), damage_text()]
 
 
 func max_rank_bonus() -> String:
-	return "The beam grows from %d × %d to %d × %d units." % [length, width, max_rank_length, max_rank_width]
+	return Lang.t("The beam grows from %d × %d to %d × %d units.") % [length, width, max_rank_length, max_rank_width]
 
 
 func _physics_process(delta: float) -> void:

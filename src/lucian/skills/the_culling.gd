@@ -47,14 +47,13 @@ func cast_range() -> CastRange:
 
 
 func describe() -> String:
-	return TooltipText.colorize(
-		"Lucian fires [kw]%d[/kw] shots in one direction over [kw]%s s[/kw], each dealing %s to the first enemy hit. "
-		+ "He can move and use Relentless Pursuit while firing, but cannot attack or use Q or W. Press R again to stop early."
-	) % [shots, TooltipText.number(duration), damage_text()]
+	return TooltipText.colorize(Lang.t(
+		"Lucian fires [kw]%d[/kw] shots in one direction over [kw]%s s[/kw], each dealing %s to the first enemy hit. He can move and use Relentless Pursuit while firing, but cannot attack or use Q or W. Press R again to stop early."
+	)) % [shots, TooltipText.number(duration), damage_text()]
 
 
 func max_rank_bonus() -> String:
-	return "Shots pierce, dealing %d%% less damage for each enemy already hit (down to %d%%)." % [
+	return Lang.t("Shots pierce, dealing %d%% less damage for each enemy already hit (down to %d%%).") % [
 		roundi(pierce_falloff * 100.0), roundi(pierce_minimum * 100.0)]
 
 

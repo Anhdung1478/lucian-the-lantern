@@ -570,10 +570,10 @@ func skill_lock_note(slot: ChampionProgress.Slot) -> String:
 	if tutorial:
 		match slot:
 			ChampionProgress.Slot.Q, ChampionProgress.Slot.W:
-				return "Locked: clear Act 1 to unlock it in the Evolution Tree."
+				return Lang.t("Locked: clear Act 1 to unlock it in the Evolution Tree.")
 			ChampionProgress.Slot.E:
-				return "Locked: Senna teaches it at the first break."
-	return "Locked: buy it in the Evolution Tree."
+				return Lang.t("Locked: Senna teaches it at the first break.")
+	return Lang.t("Locked: buy it in the Evolution Tree.")
 
 
 ## The skin's body, or its one-gun body while Lucian has only his own gun.
@@ -1160,53 +1160,55 @@ func buffs() -> Array[Dictionary]:
 		for potion in item_catalog.potions():
 			var drinks := restores.count(potion.id)
 			if drinks > 0:
-				found.append({"id": potion.id, "name": potion.display_name, "icon": potion.icon,
+				found.append({"id": potion.id, "name": Lang.t(potion.display_name), "icon": potion.icon,
 					"text": TooltipCard.potion_text(potion), "count": str(drinks) if drinks > 1 else "",
 					"left": restores.time_left(potion.id), "duration": restores.duration(potion.id), "ready": false})
 	for id: StringName in _stat_buffs:
 		var stat_buff: Dictionary = _stat_buffs[id]
 		var jungle := JungleBuffs.is_jungle_buff(id)
-		found.append({"id": id, "name": JungleBuffs.display_name(id) if jungle else String(id).capitalize(),
-			"icon": JungleBuffs.icon(id) if jungle else null, "text": JungleBuffs.text(id) if jungle else "Raised stats.",
+		found.append({"id": id, "name": JungleBuffs.display_name(id) if jungle else Lang.t(String(id).capitalize()),
+			"icon": JungleBuffs.icon(id) if jungle else null, "text": JungleBuffs.text(id) if jungle else Lang.t("Raised stats."),
 			"count": "", "left": stat_buff.left, "duration": stat_buff.duration, "ready": false})
 	for id: StringName in _speed_buffs:
 		var buff: Dictionary = _speed_buffs[id]
-		var text := "+%d move speed" % roundi(buff.flat) if buff.flat > 0.0 else "+%d%% move speed" % roundi(buff.pct * 100.0)
-		if buff.fade:
-			text += ", fading"
-		found.append({"id": id, "name": SPEED_BUFF_NAMES.get(id, "Move speed"), "icon": MOVE_SPEED_ICON,
-			"text": TooltipText.colorize("[ms]%s[/ms]." % text), "count": "", "left": buff.left,
+		var flat: bool = buff.flat > 0.0
+		var text := Lang.t(("[ms]+%d move speed, fading[/ms]." if flat else "[ms]+%d%% move speed, fading[/ms].") if buff.fade
+				else ("[ms]+%d move speed[/ms]." if flat else "[ms]+%d%% move speed[/ms].")) % (roundi(buff.flat) if flat else roundi(buff.pct * 100.0))
+		found.append({"id": id, "name": Lang.t(SPEED_BUFF_NAMES.get(id, "Move speed")), "icon": MOVE_SPEED_ICON,
+			"text": TooltipText.colorize(text), "count": "", "left": buff.left,
 			"duration": buff.duration, "ready": false})
 	if shield > 0.0:
-		found.append({"id": &"ichorshield", "name": "Ichorshield", "icon": SHIELD_ICON,
-			"text": "A shield from Bloodthirster's life steal past full health. Absorbs %d damage." % roundi(shield),
+		found.append({"id": &"ichorshield", "name": Lang.t("Ichorshield"), "icon": SHIELD_ICON,
+			"text": Lang.t("A shield from Bloodthirster's life steal past full health. Absorbs %d damage.") % roundi(shield),
 			"count": str(roundi(shield)), "left": 0.0, "duration": 0.0, "ready": false})
 	if barrier > 0.0:
-		found.append({"id": &"barrier", "name": "Barrier", "icon": SummonerSpells.find(&"barrier").icon,
-			"text": "A shield that absorbs %d damage." % roundi(barrier),
+		found.append({"id": &"barrier", "name": Lang.t("Barrier"), "icon": SummonerSpells.find(&"barrier").icon,
+			"text": Lang.t("A shield that absorbs %d damage.") % roundi(barrier),
 			"count": str(roundi(barrier)), "left": shields.time_left(&"barrier"),
 			"duration": shields.duration(&"barrier"), "ready": false})
 	if has_slightly_quicker():
 		var magical := item_catalog.find(&"slightly_magical_boots") if item_catalog else null
-		found.append({"id": &"slightly_quicker", "name": "Slightly Quicker", "icon": magical.icon if magical else MOVE_SPEED_ICON,
-			"text": TooltipText.colorize("[ms]+%d move speed[/ms] from Slightly Magical Boots, kept by every boot upgraded from them." % roundi(SLIGHTLY_QUICKER)),
+		found.append({"id": &"slightly_quicker", "name": Lang.t("Slightly Quicker"), "icon": magical.icon if magical else MOVE_SPEED_ICON,
+			"text": TooltipText.colorize(Lang.t("[ms]+%d move speed[/ms] from Slightly Magical Boots, kept by every boot upgraded from them.") % roundi(SLIGHTLY_QUICKER)),
 			"count": "", "left": 0.0, "duration": 0.0, "ready": false})
 	found.append_array(passives.buffs())
 	var strongest := _strongest_slow()
 	if strongest != &"":
 		var slow: Dictionary = _slows[strongest]
-		found.append({"id": SLOWED, "name": "Slowed", "icon": SLOW_ICON,
-			"text": TooltipText.colorize("[ms]-%d%% move speed[/ms]." % roundi(slow_amount() * 100.0)), "count": "",
+		found.append({"id": SLOWED, "name": Lang.t("Slowed"), "icon": SLOW_ICON,
+			"text": TooltipText.colorize(Lang.t("[ms]-%d%% move speed[/ms].") % roundi(slow_amount() * 100.0)), "count": "",
 			"left": slow.left, "duration": slow.duration, "ready": false})
 	for kind: CrowdControl.Kind in CC_DEBUFFS:
 		if _cc.has(kind):
 			var row: Dictionary = CC_DEBUFFS[kind].duplicate()
+			row.name = Lang.t(row.name)
+			row.text = Lang.t(row.text)
 			row.merge({"count": "", "left": _cc.time_left(kind), "duration": _cc.duration(kind), "ready": false})
 			found.append(row)
 	if not _burns.is_empty():
 		var longest := _burns.longest()
-		found.append({"id": BURNING, "name": "Burning", "icon": BURN_ICON,
-			"text": "Taking %s damage per second." % TooltipText.number(snappedf(_burns.total_dps(), 0.1)), "count": "",
+		found.append({"id": BURNING, "name": Lang.t("Burning"), "icon": BURN_ICON,
+			"text": Lang.t("Taking %s damage per second.") % TooltipText.number(snappedf(_burns.total_dps(), 0.1)), "count": "",
 			"left": _burns.time_left(longest), "duration": _burns.duration(longest), "ready": false})
 	return found
 

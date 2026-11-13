@@ -12,6 +12,7 @@ const COUNT := 8
 const OFFERED := 3
 ## Stages with fewer waves have no gift (Act 1's tutorial).
 const MIN_WAVES := 4
+## (A text keeps "%%" where a "%" and a letter would read as a value.)
 ## The buff row's id and name, and its hover text: the gift's name, then its
 ## effect.
 const BUFF := &"lantern_gift"
@@ -43,7 +44,7 @@ const ROWS := {
 		"icon": "res://assets/art/stats/move_speed.svg", "scale": {&"move_speed": 1.06},
 	},
 	6: {
-		"name": "Thirst", "text": "+6% omnivamp",
+		"name": "Thirst", "text": "+6%% omnivamp",
 		"icon": "res://assets/art/stats/omnivamp.svg", "flat": {&"omnivamp": 0.06},
 	},
 	7: {
@@ -74,11 +75,11 @@ static func offer(rng: RandomNumberGenerator) -> Array[int]:
 
 
 static func display_name(id: int) -> String:
-	return _row(id).get("name", "")
+	return Lang.t(_row(id).get("name", ""))
 
 
 static func text(id: int) -> String:
-	return _row(id).get("text", "")
+	return Lang.t(_row(id).get("text", "")).replace("%%", "%")
 
 
 static func icon(id: int) -> Texture2D:
@@ -102,8 +103,8 @@ static func flat(id: int) -> Dictionary[StringName, float]:
 
 ## Gift `id`'s buff row for the HUD: its icon, no timer, its card's text.
 static func buff(id: int) -> Dictionary:
-	return {"id": BUFF, "name": BUFF_NAME, "icon": icon(id),
-		"text": TEXT % [display_name(id), text(id)], "count": "", "left": 0.0, "duration": 0.0, "ready": false}
+	return {"id": BUFF, "name": Lang.t(BUFF_NAME), "icon": icon(id),
+		"text": Lang.t(TEXT) % [display_name(id), text(id)], "count": "", "left": 0.0, "duration": 0.0, "ready": false}
 
 
 static func gold_mult(id: int) -> float:

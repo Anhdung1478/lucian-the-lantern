@@ -19,10 +19,9 @@ var _second_shot_in := 0.0
 
 
 func describe() -> String:
-	return TooltipText.colorize(
-		"After using a skill, Lucian's next basic attack fires a second shot from his other gun for [ad]%d%% AD[/ad] [phys]physical damage[/phys]. "
-		+ "The second shot can critically strike. Each Lightslinger shot that hits lowers [kw]Relentless Pursuit[/kw]'s cooldown by [kw]%s s[/kw]."
-	) % [roundi(second_shot_ratio * 100.0), TooltipText.number(e_cooldown_reduction)]
+	return TooltipText.colorize(Lang.t(
+		"After using a skill, Lucian's next basic attack fires a second shot from his other gun for [ad]%d%% AD[/ad] [phys]physical damage[/phys]. The second shot can critically strike. Each Lightslinger shot that hits lowers [kw]Relentless Pursuit[/kw]'s cooldown by [kw]%s s[/kw]."
+	)) % [roundi(second_shot_ratio * 100.0), TooltipText.number(e_cooldown_reduction)]
 
 
 func charge() -> void:

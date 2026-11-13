@@ -148,7 +148,7 @@ func _ready() -> void:
 	# Alone, nobody would act on Leave.
 	screens.menu.set_leave_enabled(not _runs_alone())
 	screens.menu.exit_requested.connect(_exit)
-	screens.menu.set_subtitle(run.display_name)
+	screens.menu.set_subtitle(Lang.t(run.display_name))
 	if confine_mouse:
 		Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	camera.setup(lucian, arena.get_bounds().grow(StageMap.WALL_THICKNESS))
@@ -291,7 +291,7 @@ func show_result(is_cleared: bool) -> void:
 	var next := Journey.next_stage(run.act, run.stage) if run.act > 0 and not endless else Vector2i.ZERO
 	var can_next := is_cleared and next != Vector2i.ZERO and WavePlan.has_stage(Journey.stage_id(next.x, next.y))
 	# Losing the tutorial (Act 1 before its first clear) is a game over.
-	result.show_result(is_cleared, run.display_name, rows, collected, reward_lines, not is_cleared and run.tutorial, can_next,
+	result.show_result(is_cleared, Lang.t(run.display_name), rows, collected, reward_lines, not is_cleared and run.tutorial, can_next,
 			EndlessDirector.RUN_OVER if endless else "", _recap())
 	get_tree().paused = true
 
@@ -591,14 +591,14 @@ func _on_cleared() -> void:
 		var purple := save.award_boss(String(run.boss), data.purple_first, data.purple_repeat)
 		if purple > 0:
 			add_essences(0, 0, purple, lucian.global_position)
-			reward_lines.append("+%d purple essence (%s)" % [purple, "first clear" if first_time else "repeat"])
+			reward_lines.append(Lang.t("+%d purple essence (first clear)" if first_time else "+%d purple essence (repeat)") % purple)
 	if not run.stage_id in save.cleared:
 		if run.stage < Journey.stage_count(run.act):
-			reward_lines.append("Stage %s is open" % Journey.stage_id(run.act, run.stage + 1))
+			reward_lines.append(Lang.t("Stage %s is open") % Journey.stage_id(run.act, run.stage + 1))
 		elif run.act < Journey.ACTS.size():
-			reward_lines.append("Act %d is open" % (run.act + 1))
+			reward_lines.append(Lang.t("Act %d is open") % (run.act + 1))
 		else:
-			reward_lines.append("The story is complete")
+			reward_lines.append(Lang.t("The story is complete"))
 	show_result(true)
 
 
@@ -694,7 +694,7 @@ func _tip(id: StringName) -> void:
 	var keys := []
 	for action: StringName in TIPS[id][1]:
 		keys.append(GameSettings.instance().key_label(action))
-	hud.tips.show_tip(id, TIPS[id][0] % keys)
+	hud.tips.show_tip(id, Lang.t(TIPS[id][0]) % keys)
 
 
 ## An Act 1 Thresh at half HP. The boss wave's: the fight stops and the
@@ -715,7 +715,8 @@ func _on_thresh_phase_ended(thresh: Thresh) -> void:
 ## Act 1's Thresh is beaten for this act: Senna's lessons, and he and
 ## Senna leave the map (his rewards: _thresh_leaves).
 func _on_cutscene_done() -> void:
-	reward_lines.append_array(ACT_1_REWARDS)
+	for line in ACT_1_REWARDS:
+		reward_lines.append(Lang.t(line))
 	# He has her gun now (the scene gives it to him; a skip still does).
 	lucian.one_gun = false
 	if is_instance_valid(senna):
@@ -755,7 +756,7 @@ func _on_thresh_fell(thresh: ThreshFinal) -> void:
 ## With him gone already, the stage still ends (its purple comes in _on_cleared).
 func _on_ending_done() -> void:
 	cutscene = null
-	reward_lines.append("Senna is free")
+	reward_lines.append(Lang.t("Senna is free"))
 	if is_instance_valid(boss_unit):
 		_thresh_leaves(boss_unit)
 	elif runner:
@@ -865,7 +866,7 @@ func _award_mini_boss(data: EnemyData) -> void:
 	var purple := save.award_boss(String(data.id), data.purple_first, data.purple_repeat)
 	if purple > 0:
 		add_essences(0, 0, purple, lucian.global_position)
-		reward_lines.append("+%d purple essence (%s, %s)" % [purple, data.display_name, "first kill" if first_time else "repeat"])
+		reward_lines.append(Lang.t("+%d purple essence (%s, first kill)" if first_time else "+%d purple essence (%s, repeat)") % [purple, Lang.t(data.display_name)])
 
 
 ## An enemy got away: its note ("Escaped!", none after a vanish) and it is
@@ -873,7 +874,7 @@ func _award_mini_boss(data: EnemyData) -> void:
 ## `enemy_died` (the kill count and the tutorial).
 func _on_enemy_escaped(unit: EnemyUnit) -> void:
 	if unit.escape_note != "":
-		var note := FloatingText.new(unit.escape_note, ESCAPED_COLOR)
+		var note := FloatingText.new(Lang.t(unit.escape_note), ESCAPED_COLOR)
 		note.position = unit.global_position + Vector2(0, -unit.radius - 40.0)
 		damage_numbers.add_child(note)
 	_summon_gone(unit)
