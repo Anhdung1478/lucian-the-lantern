@@ -30,9 +30,18 @@ From V2.0 every stage screen follows one style, the title's and the Journey's: d
 - **Headings** are spaced capitals in pale gold, with a short gold rule and a diamond where there is room.
 - **Cells** (items, skills, spells) are dark wells with a thin rim that follows the item's kind and turns gold on hover or when chosen.
 - **Buttons** use `UiStyle.style_button`.
-- **Motion** is short and soft: fades and slides of 0.1 to 0.25 s. Nothing blinks. Low quality (`GameSettings.low_effects()`) turns the extras off.
+- **Motion** is short and soft: fades and slides of 0.1 to 0.25 s. Nothing blinks. Low quality (`GameSettings.low_effects()`) turns the extras off. *(V2.1: nothing pops: a screen, a pop-up, a card or a plate fades and slides in and out. Numbers count to their new value. A hover or a chosen look eases in about 0.12 s. A story moment, such as a result or the end, arrives in staggered beats. With Low quality the same end state shows at once.)*
 - **The battlefield** is drawn in code, like the Journey's map: soft shapes, layered tints, a light from the top-left, shadows that ground every wall and unit, and small things that move. Hitboxes, walls and paths never changed. The kit is `MapArt` (`src/stage/maps/map_art.gd`, the drawing helpers every map's `_draw` uses) and `MapAmbience` (`map_ambience.gd`, the slow fireflies, glints and dust; off on Low quality). See the game design doc §12/§13.
 - **Readability first.** Enemies, red warnings and Lucian stay the clearest things on screen.
+
+### The UI kit (V2.1)
+V2.1 added a small kit that every screen uses, so motion, spacing and type are the same everywhere.
+- **`UiMotion`** (`src/ui/ui_motion.gd`; the manual is at its top): `enter`, `exit`, `pop_in`, `pop_out`, `stagger`, `swap_body`, `open_overlay`, `close_overlay` and `lit`. Its tokens are `FAST` (0.12 s), `BASE`, `EXIT`, `STORY`, `STAGGER` and `RISE`. `UiMotion.off()` is true in headless runs, on Low quality and for screenshots, and then every call lands on its end state at once. A node's position is written only when it moves.
+- **`CountLabel`** (`src/ui/count_label.gd`): a label that counts to its value. It reserves the width of its widest text, can flash green on a gain and red on a spend, and gives its final text for tests.
+- **`SlideHighlight`** (`src/ui/slide_highlight.gd`): an optional track behind a row of tabs, with a highlight that slides to the chosen tab.
+- **`UiStyle` tokens and helpers:** the `FONT_*` sizes, the `GAP*`, `INSET` and `STACK` spacings and `SURFACE_RAISED`. `set_selected(button, on)` gives the chosen look, `cell_style_t` is a cell that eases between its rim and the lit one, `price_row` is a name, a coin and an amount as one group, and `note()` is a dim wrapped label. `MenuBackdrop.strength` fades the blurred backdrop in and out.
+- **`HoverTip`** (`src/ui/tooltip/hover_tip.gd`): a control may add `tooltip_anchor()` and the card hangs from that rectangle instead of the control's own; `hover_place` puts it beside the anchor and falls back above when there is no room. A card fades in with a small rise (0.1 s) and fades out (0.08 s); `is_showing()` turns false at once.
+- **Type on a card:** the line under a name is `FONT_NOTE`, the body `FONT_BODY`.
 
 ---
 
@@ -62,6 +71,13 @@ From V2.0 every stage screen follows one style, the title's and the Journey's: d
 - **Cells:** skill, summoner, item, potion and boots cells are dark wells with a rim by item kind (fragment, legendary, boots, potion). *(V2.0: the 59 item icons were drawn again and have no frame or background of their own any more: each is its object alone, drawn large on a soft aura in its color, so the cell's rim is the only frame. A fragment is plain; a legendary carries one glowing part and a few sparkles; an upgraded boot is its base boot made richer.)* The key label sits in a small tab at the cell's corner. Rank dots are small gold diamonds.
 - **Low health:** below 30% health a soft red vignette pulses at the screen's edges (`LowHealthVignette`, one pulse every 2.4 s). It grows as health falls, is gone at 30% or more, when Lucian is dead and on Low quality, and never takes the mouse.
 
+**Built in V2.1 (the HUD's order; the rules are as above):**
+- **Cells:** item, potion and boots cells are 53 code units (44 px) with 7 gaps, in two rows centred on the skill-to-mana span. The first item row shares the potions' top edge, and the boots sit under the left potion. With one item row and no boots, the health and mana bars run to the bar's right inset. The bottom bar is about 186 code units tall (it was 176).
+- **Corner tabs:** the mana cost sits in a small dark tab at the top left, the key at the bottom right, and a potion's stack count at the top left.
+- **"+" buttons:** a skill not yet bought shows only its lock. The ring sits 6 px above the cell.
+- **Cards** from the bar hang 8 px above it (and above the buff row when it has icons), centred on the cell. The stat cards hang above the stats panel, left of the bar.
+- **Gold:** a coin, then the amount in a slot of its digits plus one, counting: green on a gain, red on a spend.
+
 ### Buff icons (above the skill bar)
 - **Very small icons** (36 px) in a row just above the HUD panel, starting over the portrait, like LoL.
 - Shows: Blue / Red buff (with timer), current Endless modifier, status effects (slow, stun, burn, etc.).
@@ -80,6 +96,8 @@ From V2.0 every stage screen follows one style, the title's and the Journey's: d
 - A shield (Ichorshield and Barrier together) shows as a white segment after the HP on Lucian's HP bar, and as "(+N)" in its text.
 - With **Rapid Firecannon** equipped and the Energized charge full, a light-blue ring shows its longer attack range until the Energized shot lands.
 - **Built in Phase 9: the Endless modifier row.** In an Endless run with a modifier, its icon comes first in the row and never moves: `stats/move_speed` (#1), `ui/essence_orange` (#2), `stats/max_hp` (#3), `stats/ad` (#4) or `ui/skull` (#5). It has no sweep and no number. Its hover card reads "Endless modifier", then the downside in red and the reward in green ("−10% max HP", "+15% blue"). There is no row before the first pick or after Nothing.
+
+**Buff icons, V2.1:** the stack count sits in a dark tab at the bottom right. A new icon fades and grows in; a leaving one fades out before its place closes.
 
 ### Stats panel (left of the portrait)
 - Like LoL's: each stat is its **icon + value**, two per row. Main panel: AD | AP, Armor | MR, Attack speed | Ability haste, Crit | Move speed.
@@ -160,6 +178,11 @@ Godot names the key "Backspace" (not "BackSpace"), so that is the full name Sett
 - **The next-wave preview** (`WavePreview`, R2): before wave 1 and in every break, a plain plate in the boss bar's place shows **NEXT** and each enemy type of the next wave as a 34 px icon in a dark cell with "×N" beside it, in spawn order. A boss or mini boss comes first, with a gold rim and its name. Hovering an icon names the enemy. It only takes hover, never a click. Endless rolls a wave's enemies when the wave starts, so it only says "Mini boss wave" or "Boss wave" (nothing before an ordinary one). It is hidden during a wave, on the end screen, while the modifier pick is open, and in Training. It reads `WaveRunner.next_ids()` and `next_kind()`; `WavePlan.preview_rows()` groups the ids.
 - **The wave banner** (`WaveBanner`): at each wave's start, "WAVE 3" in spaced capitals between gold rules on a dark band that fades out at its ends. A wave with a mini boss reads **MINI BOSS** over its name. The boss wave reads **BOSS** over the boss's name, larger and in red. It slides in and fades for 0.2 s, stays 1.6 s, and fades out. It sits at `Hud.TIPS_TOP + 70` (`TIPS_TOP` is 180, under the tips), runs only while the game does, hides with the HUD and never takes input.
 
+**Built in V2.1:**
+- The top is one stack with 8 px between its parts: the stage info, then the boss bar or the next-wave preview, then the tip. The stage info and the preview share a width when they are within 24 px of each other.
+- Each plate drops into place when it appears and leaves the same way. A tip that follows another crossfades in place.
+- A new tip waits while a wave banner is up. The banner rises a little as it fades out.
+
 ### Top right – Loot
 - Stage gold: a coin and the amount, in the HUD panel style (Phase 3).
 - Essences collected in this stage (blue, orange, purple).
@@ -202,6 +225,8 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 - The time only runs while the game does. A replay has no tips.
 - *(V1.5.0)* The same banner shows Endless's milestones, the first time a save wins wave 10, 20, 30 or 40: "Wave 10 won for the first time: +300 blue and +5 orange essence" (game design doc §14).
 - *(V2.0)* The tip banner is a plain plate with a gold diamond before the text. It sits at `Hud.TIPS_TOP` (180), under the boss bar and the next-wave preview.
+
+*(V2.1: a tip waits while a wave banner is showing, and a following tip crossfades. The attack tip reads "%s or %s on an enemy to attack it." (left and right button). With attack-move set to Quick, the attack-move tip reads "Press %s: attack the enemy under the cursor, or the weakest one in range.")*
 
 ### On the battlefield
 - **Lucian's HP bar** above his head: green, with his shields as a white segment after the HP.
@@ -287,6 +312,8 @@ Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the 
 
 **Built in V2.0:** the sketch above is the old look. Now `TheEndScreen` shows **the title's scene** (Lucian and Senna, Thresh hidden, the chain lying broken and the lantern's green gone from the two figures) under a dawn tint, and an ornate card stands on the right (centred in the part right of 36% of the width, so it never covers Lucian's arm or Senna). The card holds THE END, "Senna is free.", the story time and the credits, with **Continue** under them. The texts, ESC and the continue targets are as above.
 
+**Built in V2.1:** the End arrives in staggered beats and its credits come as one group. Captions: the speaker and the line are centred as a pair, and one caption crossfades into the next.
+
 ### Stage result: the end screen
 *(Phase 6 had a 560 px panel with one Continue button over the HUD. Phase 7 replaced it with this full-screen summary.)*
 
@@ -369,6 +396,12 @@ Built in Phase 8. Shown by `Game` on the **first clear of 6-5 only**, after the 
 - **Buttons:** **Retry** (a new run on the same map choice; Random rolls again) and **Main screen** (the Journey on Endless, with the run's map still chosen). There is no Next. *(V1.5.0: Main screen opens the Journey on the latest open stage, or Training once every stage is cleared. The map choice is still saved.)*
 - With the longest Modifier text ("Bosses and mini bosses +25% max HP") the panel grows to about 1074 px wide.
 
+**Built in V2.1 (the result):**
+- The result arrives in beats and its numbers count.
+- After a clear, the essences are a row of large counts that spans the REWARDS column.
+- After a defeat with a recap, the right column is WHAT HIT YOU and the essences move into the stats. When an Endless run is over, the right side is WHAT HIT YOU, then REWARDS with the counts. Endless's lead stat, "Waves cleared", is large and gold.
+- Names in the rows use the text colour.
+
 ### Endless: the modifier pick (`ModifierPick`)
 Built in Phase 9. After each Endless boss wave (10, 20, …) the break waits for a pick.
 
@@ -392,6 +425,8 @@ Built in Phase 9. After each Endless boss wave (10, 20, …) the break waits for
 **The Lantern's gift (V2.0):** the story's pick is this same panel (`ModifierPick`, `ModifierCard`) with the modifier-pick layout and a different title and cards. The title reads **THE LANTERN'S GIFT**. The three cards are boons: the boon's stat icon in the medallion, its **name in gold** over a rule and its **effect in green** ("Keen Edge" over "+10% attack damage"). The game is paused, the backpack and the menu are closed, ESC and P do nothing, and only the first click counts; a click plays `buff`, closes the panel and lets the break count down in full. It opens on the break after half the stage's waves (game design doc §3; the boons are in §14).
 
 **Built in V2.0 (`ModifierPick`, `ModifierCard`):** the title reads **CHOOSE A MODIFIER** in spaced capitals between gold rules, over three ornate cards (320 × 250). Each card has the modifier's icon in a medallion on its top edge (Nothing has a diamond), the downside in red over a rule and the reward in green. A hovered card **lifts** 10 px and its rim turns gold with a soft light (on Low quality only the rim changes). The button keeps its place, so the mouse never falls off a lifted card. The layer, the backdrop, the pause and the pick are as above. *(V2.0: a modifier or gift pick also closes the Settings page if it is open.)*
+
+**Built in V2.1 (the pick):** the card text is top-aligned. The Nothing card reads "No modifier", centred. The text always fits its card: the line gap closes first, then the font steps down. Hover eases in.
 
 ### Cutscenes
 - Black bars (120 px) at the top and bottom; the HUD hides.
@@ -525,6 +560,12 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 - **The recipe table** is a plate headed RECIPES. Each line names its legendary after "[fragment] + [fragment] = [legendary]". A recipe whose two fragments Lucian holds is **lit gold** (a gold wash and a thin gold frame) and comes first, so what can be crafted shows without scrolling; a held fragment has a gold rim. A boots line is lit while Lucian wears the boots it takes and holds its fragment; the boots he wears count as held. A note under the list reads "Lit gold: you hold both parts." (`RecipeTable`, `RecipeRow`, `RecipeChoice`).
 - **Fade-in:** the backpack and the shop fade in over 0.12 s (not on Low quality).
 
+### Built in V2.1
+- **One strip** under the backpack, on its 9 columns: equip slots 1 to 6, the boots, potion 7, potion 8. The strip's rule is gone; the note of an empty strip cell opens above the strip.
+- **The sell slot** is in the merchant's foot, not under the backpack.
+- **Locked cells** show no chain. A line under the grid counts the open cells: "5 of 54 cells open. Buy Backpack Slots in the Evolution Tree."
+- **Recipes:** a lit recipe is a raised row with a gold name; names keep their inset and reach the floor of the plate.
+
 ---
 
 ## 3. Merchant's shop
@@ -616,6 +657,11 @@ If the two items are not a valid recipe, no pop-up appears and they swap.
 
 The result cell is gold once the craft can be paid for, shows a red cross when the two inputs make nothing, and a faint "?" until both are in (`CraftSlot`).
 
+### Built in V2.1
+- **The merchant** is as tall as the backpack column and fills its tabs. Its foot holds the sell slot, the message, **Undo sale** and **Refresh** (its text is `ShopPanel.refresh_text()`). The tabs share one track (`SlideHighlight`). The coin hugs the gold. The hint is last on each page.
+- **Potions** rows are larger and show "Carrying n / m".
+- **Craft** names only the result under its cells.
+
 ---
 
 ## 4. Menu (ESC)
@@ -646,6 +692,8 @@ The result cell is gold once the craft can be paid for, shows a red cross when t
   - **Leave this stage** and **Exit the game** turn red on hover. The other rows turn gold, with a bar at the left.
   - The Yes / No pop-ups use the same card.
 
+**Built in V2.1:** the menu, its pop-ups and Settings open and close with the overlay motion (`UiMotion.open_overlay`). A menu row hides its hint when there is no room for it. The gear menu's slot page is the title's (see §7).
+
 ## 5. Settings (from the ESC menu)
 
 - Replaces the menu while open; **Back** or ESC returns to it. The game stays paused.
@@ -655,7 +703,7 @@ The result cell is gold once the craft can be paid for, shows a red cross when t
 | Tab | Contents |
 |---|---|
 | Audio | Master, Music and Sound effects volume (0–100). Releasing a slider plays a test sound. *(V1.4.3: a slider applies live while it is dragged and is saved once, when let go; a wheel or key step is saved at once.)* ~~No music yet.~~ *(V1.5.0: the Music slider sets the score, §8.)* |
-| Controls | Every rebindable action with its key or mouse button (including Center camera, Space). Click one, then press a key or mouse button; ESC cancels. A double-click doesn't bind the left button (the second press is ignored); a separate later click still does. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound *(V1.5.0: F3 + Q works only in a debug build; in the released game it does nothing)*; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. Each skill, summoner and item key also has a **cast mode** picker: Quick cast, Quick + indicator, Normal cast (Reset to defaults sets them back to Quick cast). *(V2.0: the hint under the list also says that the mouse wheel zooms the camera in a stage; the wheel is not in the list and can't be rebound.)* |
+| Controls | Every rebindable action with its key or mouse button (including Center camera, Space). *(V2.1: and the Attack-move mode, Normal or Quick.)* Click one, then press a key or mouse button; ESC cancels. A double-click doesn't bind the left button (the second press is ignored); a separate later click still does. A key already used by another action swaps the two. **Reset to defaults.** ESC (menu) and F3 + Q (debug) can't be rebound *(V1.5.0: F3 + Q works only in a debug build; in the released game it does nothing)*; Ctrl + a skill key still ranks the skill up, and Ctrl + the stats key toggles the stats panel. Each skill, summoner and item key also has a **cast mode** picker: Quick cast, Quick + indicator, Normal cast (Reset to defaults sets them back to Quick cast). *(V2.0: the hint under the list also says that the mouse wheel zooms the camera in a stage; the wheel is not in the list and can't be rebound.)* |
 | Graphics | Window mode (windowed, borderless fullscreen, fullscreen), Resolution (1280×720, 1366×768, 1600×900, 1920×1080, 2560×1440, 3840×2160; sizes too big for a window on this screen, title bar included, are greyed out and marked "too big"; sets and centers the window, greyed out in borderless/fullscreen; *V1.3.1:* only at launch and when changed here, so starting a stage leaves a maximized or resized window alone), VSync, FPS cap (30/60/120/144/unlimited), Quality (Low: no anti-aliasing, no dash trails, muzzle flashes or summoner spell effects (Flash sparks, Ghost afterimages, Barrier bubble, Heal and Clarity bursts); Medium: 2× MSAA; High: 4× MSAA), Show FPS. |
 | Gameplay | Cast queue (on by default; see the game design doc §2). It was called Skill queue before V1.4.2. *(V2.0: and Resolve, on by default.)* *(V2.0.1: and, first on the tab, **Language**: English or Tiếng Việt. Choosing one builds the title or the main screen again in it at once, with Settings open on the same tab. In a stage the row is greyed out, with a note: a stage keeps the language it started in. See `docs/translation.md`.)* |
 
@@ -684,6 +732,11 @@ The result cell is gold once the craft can be paid for, shows a red cross when t
 - **switches:** a gold track with a check when on, a dark track with a steel knob when off;
 - **scroll bars:** thin, with a gold handle;
 - **separators:** a thin gold line.
+
+### Built in V2.1
+- Settings sits on the blurred backdrop. Its pages swap with a crossfade, and the tab rail's highlight slides. Setting rows are fills without borders.
+- **Controls** has one column template for every row, so the keys, the dropdowns and the Reset button line up.
+- **Attack-move mode:** the Attack-move row carries a dropdown, **Normal** or **Quick**, in the column the cast-mode dropdowns use. Normal is the default: A arms it and a left-click gives the order. Quick: A alone gives the order at the cursor. The setting is `attack_move_mode`; **Reset to defaults** puts it back to Normal.
 
 ---
 
@@ -747,6 +800,11 @@ The game opens here (built in Phase 6).
   - a soft dark shade behind the column, so the buttons read.
 - **What moves:** three bands of ground mist, green mist on Thresh's side, the lantern's glow pulse, 11 souls rising from the lantern with fading trails *(V2.0: it was nine)*, Thresh's eyes flickering, Senna's shimmer and her teal motes, lights running along the chain, the pulse of the relic core, and a gold glint on Lucian's muzzle. *(V2.0: all of it is off on Low quality, and applies at once when the setting changes. The still art is a few meshes, drawn once when the title opens.)*
 - On a wider screen, Lucian and Senna keep to the left edge and Thresh to the right; only the middle widens. Nothing here takes the mouse, so every button works as before.
+
+### Built in V2.1
+- **The logo is pinned**; the page under it is a fixed slot, so the menu, the slot list and the difficulty page never move it.
+- **Slot rows** have three parts, name, play time and date, and are 504 units wide, on the title and in the gear menu alike. The slot and difficulty pages are one width.
+- The **difficulty tip** opens beside the button column. Headings are spaced capitals between rules. On a first visit the parts stagger in. Menu rows ease their hover.
 
 ## 8. Sounds
 

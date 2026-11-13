@@ -277,6 +277,11 @@ A node with a level is never hidden (this only matters after the debug table's M
 
 ---
 
+### Built in V2.1
+- **Sections** swap with a crossfade, the section bar's highlight slides, and the essence counts count.
+- **The tree's side panel** rests on "Levels bought". Hidden nodes are counted ("%d more to discover"), not listed. A known node's panel ends with a NODES list of the branch's known nodes (one column up to 5, else two; the open node is framed; a click steps to it). The buy bar reads "Buy ...". Maxed and Locked are in sentence case.
+- The gear menu and the toast move in the same way; the toast sits on a small plate.
+
 ## Section 2 – Skin Shop
 
 A **full-screen** section showing every skin, including **Classic Lucian**.
@@ -368,6 +373,9 @@ A **full-screen** section showing every skin, including **Classic Lucian**.
 - **The Preview and the purchase pop-up** replace each other.
 
 ---
+
+### Built in V2.1
+The skin preview uses the menus' backdrop and a plate; the price buttons are one centred group, and Classic shows no dashes.
 
 ## Section 3 – Journey
 
@@ -527,3 +535,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 *(V1.5.0: rules 1 and 2 are gone, so the Journey always opens on the latest open stage, the first open one not yet cleared (3), or on Training once every stage is cleared (4). That holds after a story stage, after Training, after Endless and on a loaded slot. After the tutorial it is 2-1, since Act 1 has one stage, so a new player's first Start goes on instead of playing 1-1 again. Switching between the Tree, the Skin Shop and the Journey keeps the player's pick. The Endless map choice is still saved, so picking the portal shows it.)*
 
 A pick that becomes locked (the debug table) falls back the same way. Nothing here saves.
+
+### Built in V2.1
+- The Journey panel reads top to bottom: the facts, ENEMIES, then the spells and Start at its foot. The spell menu opens upward inside the panel.
+- The panel's body turns over when the place changes, and the selection ring fades between places.
