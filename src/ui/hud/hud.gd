@@ -52,8 +52,9 @@ const GEAR_GAP := 7
 ## The level badge on a level up: it grows to LEVEL_POP and back over LEVEL_POP_TIME.
 const LEVEL_POP := 1.2
 const LEVEL_POP_TIME := 0.3
-## The gold: room for five digits, 8 px after the coin.
-const GOLD_DIGITS := "99999"
+## Between the four groups of the gold plate (coin and gold, then each
+## essence): the same distance everywhere.
+const GOLD_GROUP_GAP := 28
 ## Endless's modifier in the buff row: its id and name. No timer; its card
 ## gives both lines.
 const MODIFIER_ROW := &"endless_modifier"
@@ -86,6 +87,8 @@ var _skill_slots: Array[SkillSlot] = []
 var _modifier_shown := EndlessModifiers.NONE
 var _modifier_row := {}
 ## The level the badge shows, to mark a level up.
+var _bars_extend := 0.0
+var _bars_tween: Tween
 var _level_shown := 0
 var _level_pop: Tween
 
@@ -243,6 +246,33 @@ func _process(_delta: float) -> void:
 		if count > 0:
 			(_essence_pairs[kind][1] as CountLabel).set_value(count)
 	_place_top_stack(_delta)
+	_fit_bars()
+
+
+## While the item block is one row with no boots, the bars run on to the
+## bar's right inset, under the items; otherwise they keep their width.
+func _fit_bars() -> void:
+	var open := 0
+	for slot in item_grid.get_children():
+		if (slot as Control).visible:
+			open += 1
+	var lone := open <= item_grid.columns and lucian.inventory.item_at(Inventory.BOOTS_CELL) == null
+	var want := 0.0
+	if lone:
+		want = maxf(gear_block.global_position.x + gear_block.size.x - (hp_bar.global_position.x + hp_bar.size.x), 0.0)
+	if is_equal_approx(want, _bars_extend):
+		return
+	_bars_extend = want
+	if _bars_tween and _bars_tween.is_valid():
+		_bars_tween.kill()
+	if UiMotion.off():
+		hp_bar.extend = want
+		mana_bar.extend = want
+		return
+	_bars_tween = UiMotion.tween(self)
+	_bars_tween.set_parallel(true)
+	for bar: HudBar in [hp_bar, mana_bar]:
+		_bars_tween.tween_property(bar, ^"extend", want, UiMotion.BASE).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 
 
 ## The range of the HUD slot `control` is in (a control opts in with
@@ -333,6 +363,14 @@ func _regen_label(bar: HudBar, font_size: int) -> Label:
 
 func _show_gold(gold: int) -> void:
 	_gold_label.set_value(gold)
+	_reserve_gold(gold)
+
+
+## Room for the digits shown plus one, so the plate hugs the number (it is
+## anchored right and grows leftward) and moves only when a digit is gained.
+func _reserve_gold(gold: int) -> void:
+	_gold_label.custom_minimum_size.x = 0.0
+	_gold_label.reserve("9".repeat(str(maxi(gold, 0)).length() + 1))
 
 
 ## The level badge grows a little and settles back (not with low effects).
@@ -371,7 +409,7 @@ func _build_gold() -> void:
 	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(coin)
 	# Counts to a new amount, green on a gain and red on a spend, in a slot
-	# wide enough for five digits so the plate never moves.
+	# as wide as its digits plus one.
 	_gold_label = CountLabel.new()
 	_gold_label.flash = true
 	_gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -379,10 +417,10 @@ func _build_gold() -> void:
 	_gold_label.add_theme_color_override(&"font_color", GOLD_COLOR)
 	_gold_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(_gold_label)
-	_gold_label.reserve(GOLD_DIGITS)
+	_reserve_gold(wallet.gold if wallet else 0)
 	for kind: StringName in Stage.ESSENCE_ICONS:
 		var gap := Control.new()
-		gap.custom_minimum_size.x = UiStyle.GAP_S
+		gap.custom_minimum_size.x = GOLD_GROUP_GAP - 2 * UiStyle.GAP
 		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var icon := TextureRect.new()
 		icon.texture = Stage.ESSENCE_ICONS[kind]

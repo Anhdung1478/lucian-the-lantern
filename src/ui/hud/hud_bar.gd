@@ -36,6 +36,17 @@ var ticks := true
 var amount := 0.0
 var max_amount := 1.0
 var shield := 0.0
+## How far the bar runs past its own right edge (the HUD lets the bars run
+## under a lone item row). The labels inside follow.
+var extend := 0.0:
+	set(v):
+		if is_equal_approx(v, extend):
+			return
+		for child in get_children():
+			if child is Label:
+				(child as Label).offset_right += v - extend
+		extend = v
+		queue_redraw()
 
 ## The amount the ghost chunk reaches up to, and how fast it drains per second.
 var _ghost := 0.0
@@ -99,7 +110,7 @@ static func tick_step(max_amount: float, width: float) -> float:
 
 
 func _draw() -> void:
-	var rect := Rect2(Vector2.ZERO, size)
+	var rect := Rect2(Vector2.ZERO, size + Vector2(extend, 0.0))
 	var well := StyleBoxFlat.new()
 	well.bg_color = WELL
 	well.set_corner_radius_all(RADIUS)

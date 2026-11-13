@@ -508,6 +508,40 @@ func test_the_gold_counts_in_a_slot_after_the_coin() -> void:
 	assert_eq(hud._gold_label.horizontal_alignment, HORIZONTAL_ALIGNMENT_LEFT)
 
 
+## Review r2 A2-1: the gold's slot is its digits plus one, and grows with them.
+func test_the_gold_slot_is_the_digits_plus_one() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	var wallet := Wallet.new()
+	hud.setup(lucian, wallet)
+	var empty: float = hud._gold_label.custom_minimum_size.x
+	wallet.add(250)
+	var three: float = hud._gold_label.custom_minimum_size.x
+	assert_gt(three, empty, "a digit more, a wider slot")
+	wallet.add(100000)
+	assert_gt(hud._gold_label.custom_minimum_size.x, three)
+
+
+## Review r2 A2-2: with one item row and no boots, the bars run to the bar's
+## right inset; a second row or boots bring them back.
+func test_the_bars_run_under_a_lone_item_row() -> void:
+	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
+	add_child_autofree(lucian)
+	var hud: Hud = load("res://src/ui/hud/hud.tscn").instantiate()
+	add_child_autofree(hud)
+	lucian.inventory.unlocked_equip = 1
+	hud.setup(lucian, Wallet.new())
+	lucian.inventory.remove(Inventory.BOOTS_CELL)
+	await wait_process_frames(3)
+	assert_gt(hud.hp_bar.extend, 0.0, "one row, no boots")
+	assert_eq(hud.mana_bar.extend, hud.hp_bar.extend)
+	lucian.inventory.set_boots(lucian.item_catalog.boots()[0])
+	await wait_process_frames(3)
+	assert_eq(hud.hp_bar.extend, 0.0, "boots under the potion")
+
+
 ## Review r1 A11: a skill not bought shows its lock and no "+".
 func test_a_skill_not_bought_has_no_plus() -> void:
 	var lucian: Lucian = load("res://src/lucian/lucian.tscn").instantiate()
