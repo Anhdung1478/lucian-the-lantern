@@ -26,6 +26,3 @@ True:2
 # The debug FPS counter, shown only when the player turns it on, and read as the abbreviation.
 FPS %d
 
-# Abbreviations of the stats, written the same in Vietnamese.
-AD
-AP

@@ -168,7 +168,7 @@ func test_lucians_buffs_and_skill_texts_go_through_lang() -> void:
 		texts.append(skill.describe() + skill.max_rank_bonus())
 		texts.append(lucian.skill_lock_note(skill.slot))
 	for text in texts:
-		assert_eq(LangProbe.plain_texts(_label(TooltipText.plain(text)), ["AD", "AP"]), [] as Array[String], text)
+		assert_eq(LangProbe.plain_texts(_label(TooltipText.plain(text))), [] as Array[String], text)
 
 
 func test_the_most_visible_texts_in_vietnamese() -> void:

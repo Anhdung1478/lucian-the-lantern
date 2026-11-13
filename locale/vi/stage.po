@@ -491,7 +491,7 @@ msgstr "Tinh chất xanh +15%"
 
 #. Endless modifiers: the two lines of a card (downside, then reward)
 msgid "−5% AD"
-msgstr "AD −5%"
+msgstr "SMCK −5%"
 
 #. Endless modifiers: the two lines of a card (downside, then reward)
 msgid "+10% gold"
@@ -687,7 +687,7 @@ msgstr "[true]sát thương chuẩn[/true]"
 
 #. Lucian's passive, Lightslinger: its hover card; %d is a percent, %s seconds
 msgid "After using a skill, Lucian's next basic attack fires a second shot from his other gun for [ad]%d%% AD[/ad] [phys]physical damage[/phys]. The second shot can critically strike. Each Lightslinger shot that hits lowers [kw]Relentless Pursuit[/kw]'s cooldown by [kw]%s s[/kw]."
-msgstr "Sau khi dùng kỹ năng, đòn đánh thường kế tiếp của Lucian bắn thêm một phát từ khẩu súng còn lại, gây [ad]%d%% AD[/ad] [phys]sát thương vật lý[/phys]. Phát bắn thứ hai có thể chí mạng. Mỗi phát Xạ Thủ Ánh Sáng trúng đích giảm [kw]%s giây[/kw] thời gian hồi của [kw]Truy Cùng Diệt Tận[/kw]."
+msgstr "Sau khi dùng kỹ năng, đòn đánh thường kế tiếp của Lucian bắn thêm một phát từ khẩu súng còn lại, gây [ad]%d%% SMCK[/ad] [phys]sát thương vật lý[/phys]. Phát bắn thứ hai có thể chí mạng. Mỗi phát Xạ Thủ Ánh Sáng trúng đích giảm [kw]%s giây[/kw] thời gian hồi của [kw]Truy Cùng Diệt Tận[/kw]."
 
 #. Lucian's W, Ardent Blaze: its hover card and its max-rank line; values are damage, seconds, move speed
 msgid "Lucian fires a missile that bursts in a cross on the first enemy hit or at max range, dealing %s and marking enemies for [kw]%s s[/kw]. Lucian's other hits on a marked enemy grant him %s [ms]move speed[/ms] for [kw]%s s[/kw]."
