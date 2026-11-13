@@ -68,6 +68,7 @@ func test_a_marked_text_keeps_its_values_and_its_tags() -> void:
 	assert_eq(Lang.mark("Wave %d/%d"), "Ｗａｖｅ %d/%d")
 	assert_eq(Lang.mark("%.1f s, %s and 100%%"), "%.1f ｓ, %s ａｎｄ 100%%")
 	assert_eq(Lang.mark("{name} hits"), "{name} ｈｉｔｓ")
+	assert_eq(Lang.mark("+{v}% shield"), "+{v}% ｓｈｉｅｌｄ", "a percent sign before a word is no value")
 	assert_eq(Lang.mark("[color=#ffcf5a]Gold[/color]"), "[color=#ffcf5a]Ｇｏｌｄ[/color]")
 	assert_eq(Lang.mark("[img=16]res://a/b.svg[/img] Armor"), "[img=16]res://a/b.svg[/img] Ａｒｍｏｒ")
 	assert_eq(Lang.mark(Lang.mark("Wave %d")), Lang.mark("Wave %d"), "marking twice changes nothing")

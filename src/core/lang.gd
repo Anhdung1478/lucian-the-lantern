@@ -25,7 +25,7 @@ const NAMES := {ENGLISH: "English", VIETNAMESE: "Tiếng Việt"}
 
 ## What mark() leaves alone: a format's values (%d, %.1f, %s, %%), {named}
 ## values, and BBCode tags with an image's path.
-const KEPT := "%[-+ 0]*\\d*(?:\\.\\d+)?[sdfcxXov%]|\\{[A-Za-z_0-9]*\\}|\\[img[^\\]]*\\].*?\\[/img\\]|\\[[^\\]]*\\]"
+const KEPT := "%[-+0]*\\d*(?:\\.\\d+)?[sdfcxXov%]|\\{[A-Za-z_0-9]*\\}|\\[img[^\\]]*\\].*?\\[/img\\]|\\[[^\\]]*\\]"
 ## How far a marked letter sits from its plain one: the fullwidth forms.
 const MARK_SHIFT := 0xFF21 - 0x41
 

@@ -70,6 +70,7 @@ func test_no_text_is_translated_two_ways() -> void:
 
 func test_the_probes_values_and_tags() -> void:
 	assert_eq(LangProbe.values("Wave %d/%d of %s, 100%% in %.1f s for {name}"), ["%d", "%d", "%s", "%.1f", "{name}"] as Array[String])
+	assert_eq(LangProbe.values("+{v}% shield and {v}% damage"), ["{v}", "{v}"] as Array[String], "a percent sign before a word is no value")
 	assert_eq(LangProbe.tags("[color=#fff]a[/color] [b]c[/b]"), ["[/b]", "[/color]", "[b]", "[color=#fff]"] as Array[String])
 
 

@@ -178,7 +178,7 @@ static func plain_texts(root: Node, allowed: Array = []) -> Array[String]:
 ## its {named} ones, sorted. A translation must have the same.
 static func values(text: String) -> Array[String]:
 	var found: Array[String] = []
-	var regex := RegEx.create_from_string("%[-+ 0]*\\d*(?:\\.\\d+)?[sdfcxXov%]")
+	var regex := RegEx.create_from_string("%[-+0]*\\d*(?:\\.\\d+)?[sdfcxXov%]")
 	for result in regex.search_all(text):
 		if result.get_string() != "%%":
 			found.append(result.get_string())
