@@ -594,3 +594,77 @@ func test_esc_in_the_slot_list_over_a_pop_up_goes_back_first() -> void:
 	assert_false(main.gear.is_showing_slots(), "back to the menu page")
 	assert_true(main.gear.visible)
 	assert_not_null(shop.purchase)
+
+
+# --- Motion (review r1 D15, D16, D18, D21) -----------------------------------------
+
+
+## Runs `body` with the motion on (as in a real window), then puts it back.
+func _with_motion() -> void:
+	UiMotion.renders = true
+	await wait_process_frames(1)
+
+
+func test_a_section_swaps_while_the_bars_stay() -> void:
+	var renders := UiMotion.renders
+	await _with_motion()
+	main.show_section(MainScreen.SECTION_TREE)
+	var tree: Control = main.sections[MainScreen.SECTION_TREE]
+	var journey: Control = main.sections[MainScreen.SECTION_JOURNEY]
+	assert_true(tree.visible, "the new section shows at once")
+	assert_true(journey.visible, "the old one fades out first")
+	assert_true(main.section_bar.highlight.is_sliding(), "the section bar's highlight slides")
+	await wait_seconds(UiMotion.SWAP_IN + 0.1)
+	assert_false(journey.visible)
+	assert_eq(tree.modulate.a, 1.0)
+	assert_eq(main.section_bar.highlight.target, main.section_bar._buttons[MainScreen.SECTION_TREE])
+	UiMotion.renders = renders
+
+
+func test_the_gear_menu_closes_at_once_and_fades_after() -> void:
+	var renders := UiMotion.renders
+	await _with_motion()
+	main.gear.open()
+	assert_true(main.gear.is_open())
+	await wait_seconds(UiMotion.BASE + 0.1)
+	main.gear.close()
+	assert_false(main.gear.is_open(), "closed for the logic at once")
+	assert_true(main.gear.visible, "the look trails")
+	await wait_seconds(UiMotion.EXIT + 0.1)
+	assert_false(main.gear.visible)
+	UiMotion.renders = renders
+
+
+func test_the_gear_menu_pages_swap_inside_one_card_that_eases_its_height() -> void:
+	var renders := UiMotion.renders
+	await _with_motion()
+	main.gear.open()
+	await wait_seconds(UiMotion.BASE + 0.1)
+	var menu_height: float = main.gear._pages.custom_minimum_size.y
+	main.gear.show_slots()
+	assert_true(main.gear.is_showing_slots())
+	assert_almost_eq(main.gear._pages.custom_minimum_size.y, menu_height, 1.0, "the card starts at the menu page's height")
+	await wait_seconds(UiMotion.BASE + 0.1)
+	assert_almost_eq(main.gear._pages.custom_minimum_size.y, main.gear._slot_page.get_combined_minimum_size().y, 0.5, "and ends at the slot page's")
+	assert_false(main.gear._menu_page.visible)
+	UiMotion.renders = renders
+
+
+func test_the_essences_count_and_flash() -> void:
+	var renders := UiMotion.renders
+	await _with_motion()
+	var blue := main.essence_bar.amount_label(Essences.BLUE)
+	SaveGame.instance().essences.add(Essences.BLUE, 500)
+	assert_true(blue.is_counting(), "it counts instead of jumping")
+	assert_eq(blue.final_text(), "500")
+	await wait_seconds(CountLabel.COUNT_MAX + 0.1)
+	assert_eq(blue.text, "500")
+	UiMotion.renders = renders
+
+
+func test_the_toast_sits_on_a_plate_and_leaves() -> void:
+	main.show_toast("Saved to slot 1")
+	assert_true(main._toast_plate.visible)
+	assert_true(main._toast_plate is Plate)
+	assert_eq(main._toast.get_parent(), main._toast_plate)
+	assert_eq(main.toast_text(), "Saved to slot 1")

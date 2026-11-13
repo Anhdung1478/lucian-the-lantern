@@ -1,7 +1,8 @@
 class_name SectionBar
 extends HBoxContainer
 ## The bottom bar: Evolution Tree, Skin Shop and Journey. The chosen one
-## stays lit.
+## stays lit: its own rest box turns clear and a highlight under it slides
+## from button to button (SlideHighlight).
 
 signal section_chosen(index: int)
 
@@ -11,6 +12,8 @@ const BUTTON_SIZE := Vector2(280, 60)
 const BADGE_MARGIN := Vector2(8, 4)
 
 var selected := -1
+## The chosen button's lit fill, sliding between buttons.
+var highlight: SlideHighlight
 var _buttons: Array[Button] = []
 ## One FREE badge per button, hidden until `set_badge`.
 var badges: Array[FreeBadge] = []
@@ -19,6 +22,7 @@ var badges: Array[FreeBadge] = []
 func _init() -> void:
 	alignment = BoxContainer.ALIGNMENT_CENTER
 	add_theme_constant_override(&"separation", 24)
+	highlight = SlideHighlight.under(self)
 	for i in NAMES.size():
 		var button := Button.new()
 		button.text = Lang.t(NAMES[i])
@@ -39,11 +43,13 @@ func _init() -> void:
 		badges.append(free)
 
 
-## Lights `index` and dims the others. Does not emit.
+## Lights `index` and dims the others (eased; the highlight slides). Does
+## not emit.
 func select(index: int) -> void:
 	selected = index
 	for i in _buttons.size():
-		UiStyle.style_button(_buttons[i], 24, i == index)
+		UiStyle.set_selected(_buttons[i], i == index, i != index)
+	highlight.follow(_buttons[index])
 
 
 ## Shows or hides button `index`'s FREE badge.

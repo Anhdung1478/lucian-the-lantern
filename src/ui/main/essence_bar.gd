@@ -2,7 +2,8 @@ class_name EssenceBar
 extends HBoxContainer
 ## The top bar's left side: the gear button, then blue, orange and purple
 ## essence (icon and amount). Each essence has a hover card saying where it
-## drops and what it buys.
+## drops and what it buys. The amounts count to a new value, tinting green
+## on a gain and red on a spend (CountLabel).
 
 signal gear_pressed
 
@@ -57,7 +58,7 @@ func setup(source: Essences) -> void:
 
 
 ## The amount label of one essence.
-func amount_label(kind: StringName) -> Label:
+func amount_label(kind: StringName) -> CountLabel:
 	return _amounts[kind]
 
 
@@ -74,7 +75,10 @@ func _item(kind: StringName) -> Control:
 	icon.custom_minimum_size = Vector2(ICON_SIZE, ICON_SIZE)
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	item.add_child(icon)
-	var amount := UiStyle.label("0", AMOUNT_SIZE, info["color"])
+	var amount := CountLabel.new()
+	amount.add_theme_font_size_override(&"font_size", AMOUNT_SIZE)
+	amount.add_theme_color_override(&"font_color", info["color"])
+	amount.flash = true
 	amount.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	item.add_child(amount)
 	_amounts[kind] = amount
@@ -83,7 +87,13 @@ func _item(kind: StringName) -> Control:
 
 func _refresh() -> void:
 	for kind: StringName in Essences.KINDS:
-		_amounts[kind].text = str(essences.amount(kind))
+		var amount: CountLabel = _amounts[kind]
+		var to := essences.amount(kind)
+		# Room for the wider of the two ends, so its neighbours stay still
+		# while it counts, and no wider than that.
+		amount.custom_minimum_size.x = 0.0
+		amount.reserve(str(maxi(amount.value, to)))
+		amount.set_value(to)
 
 
 ## One essence's icon and amount; the hover tip asks it for its card.
