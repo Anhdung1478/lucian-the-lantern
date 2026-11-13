@@ -135,6 +135,10 @@ func test_the_hud_of_a_stage_has_no_plain_text() -> void:
 	stage.lucian.invulnerable = true
 	stage._tip(&"move")
 	stage._tip(&"attack_move")
+	stage._tip(&"attack")
+	GameSettings.instance().set_value(&"attack_move_mode", "quick")
+	stage._tip(&"attack_move")
+	GameSettings.instance().set_value(&"attack_move_mode", "normal")
 	stage._tip(&"hook")
 	stage.hud.tips.show_tip(&"trait", EliteTrait.tip(EliteTrait.SWIFT))
 	await wait_process_frames(2)

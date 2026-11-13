@@ -42,6 +42,8 @@ const TIPS := {
 	&"move": ["%s to move. Hold it to keep walking.", [&"move"]],
 	&"attack": ["%s on an enemy to attack it.", [&"attack"]],
 	&"attack_move": ["Press %s, then %s: attack the enemy under the cursor, or the weakest one in range.", [&"attack_move", &"attack"]],
+	## The attack_move tip when the setting attack_move_mode is quick.
+	&"attack_move_quick": ["Press %s: attack the enemy under the cursor, or the weakest one in range.", [&"attack_move"]],
 	&"siege": ["A red circle marks where a shell will land. Step out of it!", []],
 	&"merchant": ["%s on the merchant to buy items with your gold.", [&"move"]],
 	&"dash": ["%s to dash toward the cursor. Your next shot is ready when you land.", [&"skill_e"]],
@@ -691,6 +693,8 @@ func _add_senna() -> void:
 
 ## A tip from TIPS, with the keys as bound now.
 func _tip(id: StringName) -> void:
+	if id == &"attack_move" and GameSettings.instance().get_value(&"attack_move_mode") == "quick":
+		id = &"attack_move_quick"
 	var keys := []
 	for action: StringName in TIPS[id][1]:
 		keys.append(GameSettings.instance().key_label(action))

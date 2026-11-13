@@ -68,6 +68,8 @@ const VOLUMES := [
 	["Sound effects volume", &"sfx_volume", "Shots, hits, coins and clicks."],
 ]
 const CAST_MODE_LABELS := ["Quick cast", "Quick + indicator", "Normal cast"]
+## The attack-move picker's choices, in GameSettings.ATTACK_MOVE_MODES order.
+const ATTACK_MOVE_LABELS := ["Normal", "Quick"]
 ## The Controls list's captions, each over its group's first action.
 const CONTROL_GROUPS := {
 	&"move": "MOVE AND ATTACK", &"skill_q": "SKILLS", &"summoner_d": "SUMMONER SPELLS",
@@ -93,6 +95,7 @@ var _pages: Array[Control] = []
 var _bind_buttons := {}
 ## Castable action -> its cast mode picker.
 var _cast_modes := {}
+var _attack_move_picker: OptionButton
 ## Greyed out unless the window mode is windowed.
 var _resolution: OptionButton
 ## The action waiting for a new key, or &"".
@@ -194,6 +197,8 @@ func _on_changed(key: StringName) -> void:
 		&"bindings":
 			_refresh_bindings()
 			settings.apply_input()
+		&"attack_move_mode":
+			_attack_move_picker.select(GameSettings.ATTACK_MOVE_MODES.find(settings.get_value(&"attack_move_mode")))
 		&"cast_modes":
 			for action: StringName in _cast_modes:
 				_cast_modes[action].select(GameSettings.CAST_MODES.find(settings.cast_mode(action)))
@@ -224,6 +229,15 @@ func _cast_mode_picker(action: StringName) -> OptionButton:
 	option.item_selected.connect(func(index: int) -> void: settings.set_cast_mode(action, GameSettings.CAST_MODES[index]))
 	_cast_modes[action] = option
 	return option
+
+
+## The attack-move key's mode picker, in the column the cast modes use.
+func _attack_move_mode_picker() -> OptionButton:
+	var labels: Array = ATTACK_MOVE_LABELS.map(func(label: String) -> String: return Lang.t(label))
+	_attack_move_picker = _dropdown(labels, CAST_WIDTH)
+	_attack_move_picker.select(GameSettings.ATTACK_MOVE_MODES.find(settings.get_value(&"attack_move_mode")))
+	_attack_move_picker.item_selected.connect(func(index: int) -> void: settings.set_value(&"attack_move_mode", GameSettings.ATTACK_MOVE_MODES[index]))
+	return _attack_move_picker
 
 
 func _build() -> void:
@@ -421,7 +435,8 @@ func _build_controls() -> Control:
 	UiStyle.style_button(reset, 16)
 	reset.pressed.connect(func() -> void:
 		settings.reset_bindings()
-		settings.set_value(&"cast_modes", {}))
+		settings.set_value(&"cast_modes", {})
+		settings.set_value(&"attack_move_mode", "normal"))
 	var page := _page(1, reset)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -447,6 +462,8 @@ func _build_controls() -> Control:
 		_bind_buttons[action] = button
 		if GameSettings.CASTABLE.has(action):
 			row.add(_cast_mode_picker(action))
+		elif action == &"attack_move":
+			row.add(_attack_move_mode_picker())
 		else:
 			# Keeps the bindings in one column.
 			var gap := Control.new()

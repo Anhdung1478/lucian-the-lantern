@@ -28,6 +28,7 @@ func after_each() -> void:
 	Input.action_release(&"move")
 	get_viewport().canvas_transform = Transform2D.IDENTITY
 	GameSettings.instance().set_value(&"cast_modes", {})
+	GameSettings.instance().set_value(&"attack_move_mode", "normal")
 
 
 func right_click() -> void:
@@ -192,3 +193,61 @@ func test_an_empty_potion_cell_key_does_nothing() -> void:
 	assert_eq(lucian.inventory.count_at(Inventory.HP_POTION_CELL), 3, "7's cell is left alone")
 	assert_false(GameSettings.CASTABLE.has(&"potion_hp"), "no cast mode")
 	assert_true(GameSettings.REBINDABLE.has(&"potion_mp"))
+
+
+## An enemy under the real mouse, `away` px from Lucian.
+func _enemy_under_cursor(away := 300.0) -> Enemy:
+	var enemy := Enemy.new()
+	enemy.radius = 20.0
+	enemy.max_hp = 5000.0
+	enemy.position = lucian.get_global_mouse_position()
+	add_child_autofree(enemy)
+	lucian.global_position = enemy.position + Vector2(away, 0)
+	return enemy
+
+
+func test_the_attack_move_key_arms_it_in_normal_mode() -> void:
+	var enemy := _enemy_under_cursor()
+	_press(&"attack_move")
+	assert_eq(lucian._order, Lucian.Order.NONE, "nothing yet")
+	assert_true(controller._attack_move_armed)
+	left_click()
+	assert_eq(lucian._target, enemy)
+	assert_false(controller._attack_move_armed)
+
+
+func test_the_attack_move_key_alone_gives_the_order_in_quick_mode() -> void:
+	GameSettings.instance().set_value(&"attack_move_mode", "quick")
+	var enemy := _enemy_under_cursor()
+	_press(&"attack_move")
+	assert_false(controller._attack_move_armed, "never armed")
+	assert_eq(lucian._order, Lucian.Order.ATTACK)
+	assert_eq(lucian._target, enemy)
+
+
+func test_quick_attack_move_without_enemies_walks_to_the_cursor() -> void:
+	GameSettings.instance().set_value(&"attack_move_mode", "quick")
+	_press(&"attack_move")
+	assert_eq(lucian._order, Lucian.Order.MOVE)
+
+
+func test_quick_attack_move_is_kept_during_a_stun_and_cancels_an_aim() -> void:
+	GameSettings.instance().set_value(&"attack_move_mode", "quick")
+	assert_true(lucian.try_rank_up(Slot.W))
+	GameSettings.instance().set_cast_mode(&"skill_w", "normal")
+	var enemy := _enemy_under_cursor()
+	_press(&"skill_w")
+	assert_eq(controller.aiming(), &"skill_w")
+	lucian.add_cc(CrowdControl.Kind.STUN, 0.3)
+	_press(&"attack_move")
+	assert_eq(controller.aiming(), &"", "the aim is dropped")
+	assert_eq(lucian._target, enemy, "the order is kept")
+
+
+func test_quick_attack_move_does_nothing_when_dead() -> void:
+	GameSettings.instance().set_value(&"attack_move_mode", "quick")
+	_enemy_under_cursor()
+	lucian.dead = true
+	_press(&"attack_move")
+	assert_eq(lucian._order, Lucian.Order.NONE)
+	lucian.dead = false

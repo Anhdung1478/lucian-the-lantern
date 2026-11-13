@@ -35,6 +35,9 @@ const DEFAULTS := {
 	## Key (action name) -> "indicator" or "normal". Keys not listed use quick
 	## cast. See CAST_MODES.
 	&"cast_modes": {},
+	## "normal": the attack-move key arms it and a left-click gives the order.
+	## "quick": the key alone gives it, at the cursor. See ATTACK_MOVE_MODES.
+	&"attack_move_mode": "normal",
 	## The stage camera's view (StageCamera.SETTING): 1.0 is the plain one,
 	## less is wider. The mouse wheel sets it; no Settings row does.
 	&"camera_zoom": 1.0,
@@ -48,6 +51,8 @@ const FPS_CAPS := [30, 60, 120, 144, 0]
 ## "quick" casts on press. "indicator" shows the range while the key is held
 ## and casts on release. "normal" shows it on press and casts on left-click.
 const CAST_MODES := ["quick", "indicator", "normal"]
+## The attack-move key's modes (the setting attack_move_mode).
+const ATTACK_MOVE_MODES := ["normal", "quick"]
 ## Keys that cast toward the cursor, each with its own cast mode.
 const CASTABLE: Array[StringName] = [
 	&"skill_q", &"skill_w", &"skill_e", &"skill_r",
@@ -410,6 +415,8 @@ func _load() -> void:
 			if name == &"resolution" and not RESOLUTIONS.has(value):
 				continue
 			if name == &"language" and not Lang.CODES.has(value):
+				continue
+			if name == &"attack_move_mode" and not ATTACK_MOVE_MODES.has(value):
 				continue
 			if typeof(value) == typeof(DEFAULTS[name]):
 				_values[name] = value

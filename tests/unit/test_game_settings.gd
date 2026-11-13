@@ -319,6 +319,19 @@ func test_unknown_cast_modes_and_keys_are_dropped() -> void:
 	assert_eq(loaded.get_value(&"cast_modes"), {"skill_q": "normal"})
 
 
+func test_attack_move_mode_defaults_to_normal_and_is_saved() -> void:
+	assert_eq(settings.get_value(&"attack_move_mode"), "normal")
+	settings.set_value(&"attack_move_mode", "quick")
+	assert_eq(GameSettings.new(PATH).get_value(&"attack_move_mode"), "quick")
+
+
+func test_a_bad_attack_move_mode_is_dropped_on_load() -> void:
+	var file := FileAccess.open(PATH, FileAccess.WRITE)
+	file.store_string(JSON.stringify({"version": 1, "values": {"attack_move_mode": "sideways"}}))
+	file.close()
+	assert_eq(GameSettings.new(PATH).get_value(&"attack_move_mode"), "normal")
+
+
 ## R1: Resolve is a setting, on by default.
 func test_resolve_is_on_by_default_and_is_saved() -> void:
 	assert_eq(Resolve.SETTING, &"resolve")

@@ -14,6 +14,10 @@ extends Node
 ## ends. An aim already shown waits it out too: a normal cast still needs its
 ## left-click once it ends, and a quick cast with indicator let go meanwhile
 ## fires then. Death drops the aim.
+##
+## Attack-move has two modes (the setting attack_move_mode): normal, the key
+## arms it and a left-click gives the order; quick, the key alone gives it at
+## the cursor. Both are orders, so crowd control does not stop either.
 
 ## Holding move re-issues the order once the cursor has moved this far.
 const REISSUE_DISTANCE := 8.0
@@ -67,7 +71,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			_issue_move()
 	elif event.is_action_pressed(&"attack_move"):
 		cancel_aim()
-		_set_attack_move_armed(true)
+		if GameSettings.instance().get_value(&"attack_move_mode") == "quick":
+			_set_attack_move_armed(false)
+			lucian.command_attack_move(_cursor())
+		else:
+			_set_attack_move_armed(true)
 	elif event.is_action_pressed(&"attack"):
 		if _attack_move_armed:
 			lucian.command_attack_move(_cursor())

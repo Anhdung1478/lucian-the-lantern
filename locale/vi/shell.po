@@ -81,7 +81,7 @@ msgstr "Máu và sát thương của kẻ địch. Không đổi được về s
 msgid "Easy"
 msgstr "Dễ"
 
-#. Difficulty name on a button of the difficulty page.
+#. Difficulty name on a button of the difficulty page; also the Controls choice of attack-move that needs a click after its key.
 msgid "Normal"
 msgstr "Thường"
 
@@ -280,6 +280,10 @@ msgstr "Nhanh + chỉ báo"
 #. Settings > Controls: dropdown of a skill's cast mode.
 msgid "Normal cast"
 msgstr "Tung thường"
+
+#. Settings > Controls: dropdown of the attack-move key's mode (the key alone gives the order).
+msgid "Quick"
+msgstr "Nhanh"
 
 #. Settings > Controls: group caption.
 msgid "MOVE AND ATTACK"

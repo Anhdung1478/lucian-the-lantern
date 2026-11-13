@@ -226,6 +226,10 @@ msgid "Press %s, then %s: attack the enemy under the cursor, or the weakest one 
 msgstr "Nhấn %s rồi %s: đánh kẻ địch dưới con trỏ, hoặc kẻ yếu nhất trong tầm."
 
 #. Act 1 tips on the HUD; %s is a key or mouse button as bound now
+msgid "Press %s: attack the enemy under the cursor, or the weakest one in range."
+msgstr "Nhấn %s: đánh kẻ địch dưới con trỏ, hoặc kẻ yếu nhất trong tầm."
+
+#. Act 1 tips on the HUD; %s is a key or mouse button as bound now
 msgid "A red circle marks where a shell will land. Step out of it!"
 msgstr "Vòng tròn đỏ báo nơi đạn pháo sẽ rơi xuống. Hãy bước ra khỏi đó!"
 
