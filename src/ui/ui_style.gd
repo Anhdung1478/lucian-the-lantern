@@ -2,7 +2,9 @@ class_name UiStyle
 extends RefCounted
 ## Shared look of the menu-style screens: dark navy panels with a gold border
 ## and buttons that light up gold on hover. theme() gives the same look to
-## Godot's own widgets (sliders, dropdowns, switches, scroll bars).
+## Godot's own widgets (sliders, dropdowns, switches, scroll bars). The type
+## and space tokens below are the only sizes to use; the motion kit's manual
+## is at the top of ui_motion.gd.
 
 const PANEL_COLOR := Color(0.06, 0.075, 0.1, 0.96)
 const BORDER_COLOR := Color(0.79, 0.64, 0.36)
@@ -28,6 +30,34 @@ const RIM_FRAGMENT := Color("8ea2b8")
 const RIM_LEGENDARY := Color("e0b04c")
 const RIM_BOOTS := Color("5fc7a8")
 const RIM_POTION := Color("c9706a")
+## A lighter navy for a hovered or chosen surface: depth by surface, not glow.
+const SURFACE_RAISED := Color(0.10, 0.125, 0.17)
+
+## Type sizes, in code units (screen px at 1600x900 in brackets). FONT_TAG
+## (11.7 px) only for key tabs and stack counts inside cells; FONT_NOTE (12.5
+## px) is the smallest note anywhere; FONT_BODY (14 px) the smallest body
+## text; FONT_ROW (16.7 px) a row's name; FONT_LEAD (20 px) a panel's lead.
+const FONT_TAG := 14
+const FONT_NOTE := 15
+const FONT_BODY := 17
+const FONT_ROW := 20
+const FONT_LEAD := 24
+## A note's line spacing: the font's own height plus this gives a line height
+## of 1.6 at FONT_NOTE (the floor is 1.3). It is Godot's default; never less.
+const NOTE_LINE_SPACING := 3
+## Space, in code units: GAP_S (5 px) inside a group, GAP (8 px) between
+## neighbours, GAP_L (12 px) between groups, INSET (12 px) the least distance
+## from words to the edge of their box, STACK (8 px) between stacked plates.
+const GAP_S := 6
+const GAP := 10
+const GAP_L := 14
+const INSET := 14
+const STACK := 10
+## price_row(): text to amount, amount to icon, and the icon's size.
+const PRICE_GAP := 10
+const PRICE_ICON_GAP := 7
+const PRICE_ICON := 24.0
+
 ## A styled button's soft click, quiet under the game's sounds.
 const CLICK_DB := -10.0
 ## Set on a button once its click is connected, so a restyle adds no second.
@@ -94,7 +124,9 @@ static func add_click(button: BaseButton) -> void:
 
 
 ## Applies the button look and its click. `selected` keeps it lit, e.g. the
-## open tab.
+## open tab. The hover look eases in and out over UiMotion.FAST (ButtonLook);
+## pressed stays immediate. Restyling (calling it again) is fine; to move the
+## selection with an eased look use set_selected().
 static func style_button(button: Button, font_size := 22, selected := false) -> void:
 	add_click(button)
 	button.focus_mode = Control.FOCUS_NONE
@@ -104,16 +136,58 @@ static func style_button(button: Button, font_size := 22, selected := false) -> 
 	button.add_theme_color_override(&"font_color", TITLE_COLOR if selected else TEXT_COLOR)
 	button.add_theme_color_override(&"font_hover_color", TITLE_COLOR)
 	button.add_theme_color_override(&"font_disabled_color", DISABLED_FONT)
+	ButtonLook.of(button).adopt()
+
+
+## Moves a styled button in or out of the selected look, easing its fill and
+## font colour over UiMotion.FAST instead of restyling it (at once while
+## UiMotion.off()). `fill` false: the rest fill turns clear and only the font
+## eases (a tab under a SlideHighlight). A button never styled is styled.
+static func set_selected(button: Button, on: bool, fill := true) -> void:
+	if not button.has_meta(ButtonLook.META):
+		style_button(button, button.get_theme_font_size(&"font_size"), on)
+		if not fill:
+			ButtonLook.of(button).select(on, false)
+		return
+	ButtonLook.of(button).select(on, fill)
 
 
 ## A cell's box: a dark well with a thin rim (gold when `lit`).
 static func cell_style(rim := CELL_BORDER, lit := false, radius := 4) -> StyleBoxFlat:
+	return cell_style_t(rim, 1.0 if lit else 0.0, radius)
+
+
+## A cell's box part way to lit (UiMotion.lit's `lit_t`, 0 to 1): the rim
+## goes from `rim` to gold and from 1 to 2 wide (2 from halfway).
+static func cell_style_t(rim := CELL_BORDER, lit_t := 0.0, radius := 4) -> StyleBoxFlat:
+	var t := clampf(lit_t, 0.0, 1.0)
 	var style := StyleBoxFlat.new()
 	style.bg_color = CELL_COLOR
-	style.border_color = GOLD_COLOR if lit else rim
-	style.set_border_width_all(2 if lit else 1)
+	style.border_color = rim.lerp(GOLD_COLOR, t)
+	style.set_border_width_all(2 if t >= 0.5 else 1)
 	style.set_corner_radius_all(radius)
 	return style
+
+
+## A price inside a button, as one centred group: `text`, GAP, `amount`, a
+## small gap, `icon` (PRICE_ICON high): "Purchase 25 [essence]". Add it as the
+## button's child and leave button.text empty; it fills the button and
+## centres itself, its labels take the button's font colour as it changes
+## (hover, pressed, disabled) and its icon dims with a disabled button. Give
+## the button a custom_minimum_size at least the row's. The amount is a
+## CountLabel (price_amount()); `text` may be "" for an amount alone.
+static func price_row(text: String, amount: Variant, icon: Texture2D, font_size := FONT_ROW) -> HBoxContainer:
+	return PriceRow.new(text, amount, icon, font_size)
+
+
+## A price_row's amount, to set_value() or read.
+static func price_amount(row: Control) -> CountLabel:
+	return row.get_node(^"Amount") as CountLabel
+
+
+## A price_row's words.
+static func price_text(row: Control) -> Label:
+	return row.get_node(^"Text") as Label
 
 
 ## The rim colour for the item in a cell (CELL_BORDER for an empty one).
@@ -134,6 +208,16 @@ static func label(text: String, font_size := 18, color := TEXT_COLOR) -> Label:
 	result.text = text
 	result.add_theme_font_size_override(&"font_size", font_size)
 	result.add_theme_color_override(&"font_color", color)
+	return result
+
+
+## A small note: FONT_NOTE in `color`, wrapping at `width` when given.
+static func note(text: String, color := DIM_COLOR, width := 0.0) -> Label:
+	var result := label(text, FONT_NOTE, color)
+	result.add_theme_constant_override(&"line_spacing", NOTE_LINE_SPACING)
+	if width > 0.0:
+		result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		result.custom_minimum_size.x = width
 	return result
 
 
@@ -228,3 +312,229 @@ static func _field_colors(type: StringName) -> void:
 	_theme.set_color(&"font_color", type, TEXT_COLOR)
 	_theme.set_color(&"font_hover_color", type, TITLE_COLOR)
 	_theme.set_color(&"font_disabled_color", type, DISABLED_FONT)
+
+
+## price_row(): text, amount and icon as one centred group filling its
+## parent; inside a button it follows the button's state (the font colour for
+## what the button draws now, a dimmed icon when disabled).
+class PriceRow extends HBoxContainer:
+	var _button: Button
+	var _pending := false
+
+	func _init(text: String, amount: Variant, icon: Texture2D, font_size: int) -> void:
+		name = "PriceRow"
+		set_anchors_preset(Control.PRESET_FULL_RECT)
+		alignment = BoxContainer.ALIGNMENT_CENTER
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_theme_constant_override(&"separation", 0)
+		var words := UiStyle.label(text, font_size)
+		words.name = "Text"
+		words.visible = text != ""
+		add_child(words)
+		_gap(UiStyle.PRICE_GAP, words.visible)
+		var number := CountLabel.new()
+		number.name = "Amount"
+		number.add_theme_font_size_override(&"font_size", font_size)
+		number.add_theme_color_override(&"font_color", UiStyle.TEXT_COLOR)
+		if amount is int:
+			number.set_value(amount, true)
+		else:
+			number.formatter = func(_v: int) -> String: return str(amount)
+		add_child(number)
+		_gap(UiStyle.PRICE_ICON_GAP, icon != null)
+		var picture := TextureRect.new()
+		picture.name = "Icon"
+		picture.texture = icon
+		picture.visible = icon != null
+		picture.custom_minimum_size = Vector2(UiStyle.PRICE_ICON, UiStyle.PRICE_ICON)
+		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		picture.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		add_child(picture)
+		for part: Control in get_children():
+			part.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		for part: Label in [words, number]:
+			part.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+	func _gap(width: float, shown: bool) -> void:
+		var gap := Control.new()
+		gap.custom_minimum_size.x = width
+		gap.visible = shown
+		add_child(gap)
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_PARENTED:
+			_button = get_parent() as Button
+			if _button:
+				_button.draw.connect(_queue_sync)
+				_sync()
+		elif what == NOTIFICATION_UNPARENTED:
+			if _button and is_instance_valid(_button) and _button.draw.is_connected(_queue_sync):
+				_button.draw.disconnect(_queue_sync)
+			_button = null
+
+	## The button redraws on every change of state; the colours follow.
+	func _queue_sync() -> void:
+		if not _pending:
+			_pending = true
+			_sync.call_deferred()
+
+	func _sync() -> void:
+		_pending = false
+		if _button == null or not is_instance_valid(_button):
+			return
+		var color: Color
+		match _button.get_draw_mode():
+			BaseButton.DRAW_DISABLED:
+				color = _button.get_theme_color(&"font_disabled_color")
+			BaseButton.DRAW_HOVER:
+				color = _button.get_theme_color(&"font_hover_color")
+			BaseButton.DRAW_PRESSED, BaseButton.DRAW_HOVER_PRESSED:
+				color = _button.get_theme_color(&"font_pressed_color")
+			_:
+				color = _button.get_theme_color(&"font_color")
+		for part: Label in [get_node(^"Text"), get_node(^"Amount")]:
+			if part.get_theme_color(&"font_color") != color:
+				part.add_theme_color_override(&"font_color", color)
+		(get_node(^"Icon") as CanvasItem).modulate = Color(1, 1, 1, 0.45) if _button.disabled else Color.WHITE
+
+
+## A styled button's eased looks (style_button, set_selected). Its rest and
+## hover boxes stay two StyleBoxFlats with their usual colours whenever no
+## ease runs; while one runs both carry the in-between colours, so the look
+## moves smoothly whichever box the button draws. Pressed stays immediate. A
+## box restyled in place (shape, margins, colours) is read again at the start
+## of each ease. A button lit by MenuKeys (its rest box set to its hover box)
+## is left to MenuKeys.
+class ButtonLook extends RefCounted:
+	const META := &"ui_button_look"
+
+	var button: Button
+	## The boxes style_button gave it, which the eases drive.
+	var normal: StyleBoxFlat
+	var hover: StyleBoxFlat
+	## 0 at rest, 1 hovered.
+	var hover_t := 0.0
+	var rest_bg := Color()
+	var rest_border := Color()
+	var peak_bg := Color()
+	var peak_border := Color()
+	var _hover_tween: Tween
+	var _select_tween: Tween
+
+	static func of(target: Button) -> ButtonLook:
+		if target.has_meta(META):
+			return target.get_meta(META)
+		var look := ButtonLook.new()
+		look.button = target
+		target.set_meta(META, look)
+		target.mouse_entered.connect(look._on_hover.bind(true))
+		target.mouse_exited.connect(look._on_hover.bind(false))
+		return look
+
+	## style_button gave the button new boxes: drive those from now on.
+	func adopt() -> void:
+		_kill(_select_tween)
+		_select_tween = null
+		_kill(_hover_tween)
+		_hover_tween = null
+		normal = _box(&"normal")
+		hover = _box(&"hover")
+		hover_t = 1.0 if button.is_inside_tree() and button.is_hovered() else 0.0
+
+	## True while the hover or selected look is easing.
+	func is_easing() -> bool:
+		return _running(_hover_tween) or _running(_select_tween)
+
+	func select(on: bool, fill: bool) -> void:
+		_kill(_select_tween)
+		_select_tween = null
+		if not _boxes_ok():
+			return
+		var goal := UiStyle.button_style(&"normal", on)
+		var goal_bg := goal.bg_color if fill else Color(goal.bg_color, 0.0)
+		var goal_border := goal.border_color if fill else Color(goal.border_color, 0.0)
+		var goal_font := UiStyle.TITLE_COLOR if on else UiStyle.TEXT_COLOR
+		if not _running(_hover_tween):
+			_snapshot()
+		var step := _apply_select.bind(rest_bg, rest_border, button.get_theme_color(&"font_color"), goal_bg, goal_border,
+			goal_font)
+		if UiMotion.off() or not button.is_inside_tree():
+			step.call(1.0)
+			return
+		_select_tween = UiMotion.tween(button)
+		_select_tween.tween_method(step, 0.0, 1.0, UiMotion.FAST)
+
+	func _on_hover(inside: bool) -> void:
+		var target := 1.0 if inside else 0.0
+		var keys_lit := hover != null and _box(&"normal") == hover
+		if not _boxes_ok() or keys_lit or button.disabled or not button.is_inside_tree() or UiMotion.off():
+			_settle_hover()
+			hover_t = target
+			return
+		if not _running(_hover_tween):
+			_snapshot()
+		_kill(_hover_tween)
+		# Both boxes take the look on show now, so the box the button switches
+		# to this frame starts from it (no one-frame flash).
+		_apply_hover(hover_t)
+		_hover_tween = UiMotion.tween(button)
+		_hover_tween.tween_method(_apply_hover, hover_t, target, UiMotion.FAST)
+		_hover_tween.tween_callback(_settle_hover)
+
+	func _apply_hover(t: float) -> void:
+		hover_t = t
+		var bg := rest_bg.lerp(peak_bg, t)
+		var border := rest_border.lerp(peak_border, t)
+		for box: StyleBoxFlat in [normal, hover]:
+			box.bg_color = bg
+			box.border_color = border
+
+	## Ends a hover ease: the rest box back to its rest colours, the hover box
+	## to its hover ones.
+	func _settle_hover() -> void:
+		if _hover_tween == null:
+			return
+		_kill(_hover_tween)
+		_hover_tween = null
+		if _boxes_ok():
+			normal.bg_color = rest_bg
+			normal.border_color = rest_border
+			hover.bg_color = peak_bg
+			hover.border_color = peak_border
+
+	func _apply_select(u: float, from_bg: Color, from_border: Color, from_font: Color, to_bg: Color, to_border: Color,
+			to_font: Color) -> void:
+		rest_bg = from_bg.lerp(to_bg, u)
+		rest_border = from_border.lerp(to_border, u)
+		button.add_theme_color_override(&"font_color", from_font.lerp(to_font, u))
+		if _running(_hover_tween):
+			_apply_hover(hover_t)
+		else:
+			normal.bg_color = rest_bg
+			normal.border_color = rest_border
+
+	func _snapshot() -> void:
+		rest_bg = normal.bg_color
+		rest_border = normal.border_color
+		peak_bg = hover.bg_color
+		peak_border = hover.border_color
+
+	## The boxes are still the ones style_button gave (or MenuKeys lit it).
+	func _boxes_ok() -> bool:
+		if normal == null or hover == null or _box(&"hover") != hover:
+			return false
+		var shown := _box(&"normal")
+		return shown == normal or shown == hover
+
+	func _box(state: StringName) -> StyleBoxFlat:
+		if not button.has_theme_stylebox_override(state):
+			return null
+		return button.get_theme_stylebox(state) as StyleBoxFlat
+
+	static func _running(tween: Tween) -> bool:
+		return tween != null and tween.is_valid() and tween.is_running()
+
+	static func _kill(tween: Tween) -> void:
+		if tween != null and tween.is_valid():
+			tween.kill()
