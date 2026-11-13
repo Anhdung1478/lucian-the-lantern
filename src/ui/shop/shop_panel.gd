@@ -245,7 +245,11 @@ func setup(owner_screen: BackpackScreen, potions: Array[ItemData], sell_cell: Co
 	_refresh = Button.new()
 	_refresh.set_anchors_preset(Control.PRESET_FULL_RECT)
 	UiStyle.style_button(_refresh, BUTTON_FONT)
-	_refresh.add_child(UiStyle.price_row(Lang.t("Refresh"), 0, ShopSlot.COIN, BUTTON_FONT))
+	var refresh_row := UiStyle.price_row(Lang.t("Refresh"), 0, ShopSlot.COIN, BUTTON_FONT)
+	UiStyle.price_amount(refresh_row).reserve("999")
+	_refresh.add_child(refresh_row)
+	# The button hugs its words and price with INSET each side (never under REFRESH_SIZE).
+	refresh_slot.custom_minimum_size.x = maxf(REFRESH_SIZE.x, refresh_row.get_combined_minimum_size().x + 2.0 * UiStyle.INSET)
 	_refresh.pressed.connect(func() -> void: screen.refresh_shop())
 	refresh_slot.add_child(_refresh)
 	screen.inventory.changed.connect(_recheck_inputs)
