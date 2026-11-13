@@ -110,32 +110,35 @@ The player's essences (blue, orange, purple) are shown in the **top-left** corne
 
 ## Section 1 – Evolution Tree
 
-Reference: a node-graph tree with icons in square frames connected by lines (see the screenshot the design was based on).
+*(V2.1: the screen was redesigned. This top part describes the screen now; the "Built in ..." sections below are its history. Where they speak of tabs under the page, plaques, a NODES list or a pulsing FREE badge, they describe an older screen.)*
 
 ### Layout
-- **One big map shown as a forest:** no separate pages for skills, stats, equipment, summoners and economy. Every branch lives on the same canvas, each growing from its own roots. *(Phase 10: one page per branch, with tabs. See "Built in Phase 10".)*
-- Each upgrade is a **square node with an icon**. Lines connect a node to its requirements.
-- The player can **drag to move** around the map and **zoom** with the mouse wheel. *(Phase 10: no panning or zoom; each page fits the screen.)*
-- Essences in the top-left.
-- **Reset tree** button (costs 5 purple, refunds all blue and orange).
-- *(V2.0)* **The forge** (`ForgeBar`, a child of `TreeSection`) sits left of Reset tree on every branch page, 20 px clear of it: two buttons, **120 [blue] → 1 [orange]** and **1200 [blue] → 10 [orange]**, with the essence icons. A button forges that much orange from blue at once, with the coin sound, and the essences bar updates. It is greyed out while the blue is short, with the hover "Needs 120 blue essence" ("Needs 1200 blue essence"); when it is lit the hover reads "Forge 1 orange essence from 120 blue. This cannot be undone." ("Forge 10 orange essence from 1200 blue. ..."). There is no confirm. The forge changes the essences in memory only, like a purchase: the next Save, Start or Yes keeps it. A tree reset does not give the blue back, and forged orange stays (game design doc §9, §11).
+- **The page** is 1416 × 904 at x 32–1448, y 80–984, the Journey map's size. The page and the info panel on its right are one frame. One page per branch: Skills, Stats, Backpack, Economy and Summoners. No panning, no zoom; each page is laid out by hand (a positions table in the tree code).
+- **The top band of the page** holds the branch switch: the branch names in spaced capitals, each with "bought / all" counts, and a sliding gold rule under the open one. No icons, no boxes. The old three-line header (EVOLUTION TREE, branch, blurb) is gone.
+- **The top bar** keeps the essences at the left. At the right end, on the tree section only, sit the **Forge** and **Reset tree** as quiet buttons. The Forge is the word "Forge" and two buttons, **120 [blue] → 1 [orange]** and **1200 [blue] → 10 [orange]** (`ForgeBar`). A button forges that much orange from blue at once, with the coin sound. It is dim while the blue is short, with the note "Needs 120 blue essence" ("Needs 1200 blue essence"); when it is lit the note reads "Forge 1 orange essence from 120 blue. This cannot be undone." ("Forge 10 orange essence from 1200 blue. ..."). There is no confirm. The forge changes the essences in memory only, like a purchase: the next Save, Start or Yes keeps it. A tree reset does not give the blue back, and forged orange stays (game design doc §9, §11). **Reset tree** (costs 5 purple, refunds all blue and orange) is plain dim text while it cannot be used. The notes of these buttons sit beside the group in the top bar, so they cover nothing of the panel.
+- **Art:** a dark tree in the Journey map's greens with a teal rim, lit by a moon glow from outside the page. No moon, mushrooms, lanterns, vines or motes; nothing moves at rest.
+- **Links** are drawn only for outright requirements: the passive to R, each spell to its upgrade. A link is dim until the node it needs has a level, then gold. R's ring is one track and one arc, with ticks at 5, 9 and 13 levels. Groups show as clusters with a caption over each.
+- **The Backpack page** has no plaques: the equip slot, the boots and the cell previews show in the panel, with their node.
+- **ESC** clears the picked node, and the panel returns to the branch's next step.
 
 ### Node states
+A node is a tile, pips for its level and its name.
 | State | Look |
 |---|---|
-| Hidden (requirements not met) | Dark frame with a **"?"** |
-| Available, can afford | Normal frame |
-| Available, can't afford | **Red** frame |
-| Bought (more levels left) | Lit frame, line to it becomes bright |
-| Maxed | **Green** frame |
+| Hidden (requirements not met) | Dark glass, a lock, and its rule tag in place of the name |
+| Open | Greyscale icon in a silver rim; dimmed while it costs too much |
+| Lit (bought) | Colour, with warm light and a warm edge; quieter once maxed |
+- **FREE** replaces the pips on a level that costs nothing (the badge does not pulse). A lock sits in a lower corner of a node that can't be bought yet.
+- The **next step** of a branch has a gold rim and light. The **picked** node has a pale ring.
 
 ### Node info panel
-Clicking a node opens a panel (bottom-right, like the reference): *(Phase 10: a column on the right that is always shown.)*
-- **Name** of the upgrade
-- **Current value → next value** (e.g. `+40% → +60%`)
-- **Short description**
-- **Level:** e.g. `LVL 2 / 5`
-- **Cost bar:** shows owned essence against the cost, and works as the **buy button** *(V1.3.1: it asks first; see "Built in V1.3.1")*
+The panel is on the right, always shown. It rests on the branch's next step; clicking a node picks it.
+- **Nothing picked, a purchase to point at:** a caption (FREE TO CLAIM, CHEAPEST UPGRADE or SAVING FOR), the node as if it were picked, then THIS BRANCH GIVES. Bright gold marks only what the player can act on now: a free level, or the cheapest level that can be bought now.
+- **Nothing open:** NEXT STEP, "Clear Act N" and what the other nodes wait for, ending in a gold **Go to Journey**.
+- **A finished branch:** BRANCH COMPLETE and a row per node.
+- **A node picked:** the group caption, the name, now → next, the description, a red requirement line, the Backpack preview where it applies, then the levels (the next level's row reads "Next": its price is on the action), then THIS BRANCH GIVES. The action reads "Buy <price>" *(it asks first; see "Built in V1.3.1")*, "Claim for free", "Maxed" or "Locked".
+- **A hidden node** lists its rule parts as rows marked met or not ("Clear Act 2: Not yet", "5 levels in Q + W + E: 4 / 5").
+- **THIS BRANCH GIVES** shows values only ("+200", "+15%") and leaves out the node the panel shows already.
 
 ### Built in Phase 5
 
@@ -279,7 +282,9 @@ A node with a level is never hidden (this only matters after the debug table's M
 
 ### Built in V2.1
 - **Sections** swap with a crossfade, the section bar's highlight slides, and the essence counts count.
-- **The tree's side panel** rests on "Levels bought". Hidden nodes are counted ("%d more to discover"), not listed. A known node's panel ends with a NODES list of the branch's known nodes (one column up to 5, else two; the open node is framed; a click steps to it). The buy bar reads "Buy ...". Maxed and Locked are in sentence case.
+- **The Evolution Tree was redesigned** (the user's request; see the top of this section for the screen as it is now, and `implementation/v2.1.0.md`). The tabs under the page, the plaques, the NODES list, the portrait, "LVL 2 / 5" and "owned / cost" are gone; the FREE badge no longer pulses.
+- **The Buy question** covers the whole screen, with the same dim and blur as the Reset question. Before, the top bar's Forge and Reset tree could be clicked under it (a bug, fixed).
+- **Motion:** a purchase plays after the question's card has left. The node lights (0.18 s) and its pip fills; light runs along a link it satisfies (0.45 s); the node it opens unveils (lock first, then icon, pips, name). The panel changes together with the node, and a second purchase picks up mid-way. A reset unlights the page top to bottom within 0.5 s. A branch switch crossfades the page and the panel's content. On Low effects and headless, the end state comes at once.
 - The gear menu and the toast move in the same way; the toast sits on a small plate.
 
 ## Section 2 – Skin Shop
@@ -422,7 +427,7 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
 ### Built in Phase 6
 **Acts 1 and 2 start.**
 - **Picking a stage:** a click on an open card picks it; a gold outline marks it. A locked card can't be picked. The page opens on the first open stage not cleared yet, else the last open one. *(V1.5.0: the Journey opens on the first open stage not cleared in the whole game, else Training; see "Which place opens".)*
-- **Start** plays the picked stage: "Start" for a one-stage act, "Start stage 2" otherwise. The stage is built from the save like Training, plus its waves, map and boss. Act 1's first play is the tutorial (`act1_the_loss.md`).
+- **Start** plays the picked stage: "Start" for every stage. *(V2.1: it read "Start stage 2" in an act of several stages, which did not say which act; the panel's heading names the act and the stage.)* The stage is built from the save like Training, plus its waves, map and boss. Act 1's first play is the tutorial (`act1_the_loss.md`).
 - **Acts 3–6:** the cards can be picked, but Start stays disabled ("Act 3 comes in a later phase"). Endless's Start is still disabled. *(Acts 3–4 start since Phase 7, Acts 5–6 since Phase 8, Endless since Phase 9.)*
 - **Which tab opens:**
   - after a stage (Continue on its result, or Leave this stage), the act just played;
@@ -515,8 +520,8 @@ Only **Training** can be started; acts and Endless are shown and unlock as desig
   - "Cleared" (green, with a check) or "Not cleared yet".
   - *(V2.0)* **Resolve:** while the stage has Resolve stacks, a green line with the Resolve icon under the status: "Resolve 3 / 5: +30% damage, -30% taken" (the share follows the difficulty: 10% a stack on Easy and Normal, 5% on Hard, 3% on Extreme). Hovering it says "Lucian fell here 3 times." and "Each defeat makes this stage a little easier, up to 5 times, until it is cleared." There is no line with no stacks, on a cleared stage, with the Gameplay setting off or on Extreme. Game design doc §3.
   - **ENEMIES:** a 44 px round icon for each of the stage's enemies, once each, in wave order (the mini boss is in the portrait). Each icon's hover is its name. *(V2.0: the icons are 52 px and sit in a dark tray anchored above Start.)*
-  - **Start:** "Start" for Act 1's one stage, else "Start stage 4".
-- **Training:** "PRACTICE", "TRAINING", the dummy, the text (as before) and **Start Training**.
+  - **Start:** **"Start"** ("Bắt đầu") for every node: a stage, Training and Endless. The panel's heading names the act and the stage.
+- **Training:** "PRACTICE", "TRAINING", the dummy, the text (as before) and **Start** *(V2.1: it read "Start Training")*.
 - **Endless:**
   - "WAVES NEVER END", "ENDLESS" and "Best wave: 22" in gold.
   - Four rules with icons: "A mini boss every 5 waves", "A boss every 10 waves", "A modifier to pick after each boss", "Blue, orange, and repeat purple".
