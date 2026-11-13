@@ -18,8 +18,11 @@ extends CanvasLayer
 
 ## BESIDE: right of the source, else left of it, else above it, else below.
 ## ABOVE: above the source, else below it. CURSOR: at the mouse. BELOW:
-## centred GAP under the source (a button's note), else above it.
-enum Place { BESIDE, ABOVE, CURSOR, BELOW }
+## centred GAP under the source (a button's note), else above it. LEFT: GAP
+## left of the source, centred on it, else right of it.
+## A note's source may set the meta "hover_anchor" (a Control): its rect is
+## then measured instead of the source's (a group of buttons in a bar).
+enum Place { BESIDE, ABOVE, CURSOR, BELOW, LEFT }
 
 const DELAY := 1.0
 const GAP := 8.0
@@ -165,6 +168,10 @@ func _position_card() -> void:
 	var size := _card.get_combined_minimum_size()
 	var screen := get_viewport().get_visible_rect().grow(-MARGIN)
 	var anchor: Rect2 = _source.tooltip_anchor() if _source.has_method(&"tooltip_anchor") else _source.get_global_rect()
+	if not _source.has_method(&"tooltip_anchor") and _source.has_meta(&"hover_anchor"):
+		var group: Variant = _source.get_meta(&"hover_anchor")
+		if group is Control and is_instance_valid(group):
+			anchor = (group as Control).get_global_rect()
 	var at: Vector2
 	match _place:
 		Place.ABOVE:
@@ -177,6 +184,10 @@ func _position_card() -> void:
 					at = _above(anchor, size, screen)
 		Place.CURSOR:
 			at = Pointer.on_screen(self) + CURSOR_OFFSET
+		Place.LEFT:
+			at = Vector2(anchor.position.x - GAP - size.x, anchor.get_center().y - size.y * 0.5)
+			if at.x < screen.position.x:
+				at.x = anchor.end.x + GAP
 		Place.BELOW:
 			at = Vector2(anchor.get_center().x - size.x * 0.5, anchor.end.y + GAP)
 			if at.y + size.y > screen.end.y:

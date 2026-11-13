@@ -403,10 +403,13 @@ func _process(_delta: float) -> void:
 
 
 ## What `data` gives at `level`, without the words its name beside it says:
-## the first word alone when it is a number ("+200 Health" -> "+200",
-## "+3/s Health Regen" -> "+3/s"), else all of it ("Rank 3", "Unlocked").
+## past a label ("Refresh: 50 gold" -> "50 gold"), else the first word alone
+## when it is a number ("+200 Health" -> "+200", "+3/s Health Regen" ->
+## "+3/s"), else all of it ("Rank 3", "Unlocked").
 static func short_value(data: TreeNodeData, level: int) -> String:
 	var text := data.value_text(level)
+	if ": " in text:
+		return text.split(": ", true, 1)[1]
 	var first := text.split(" ")[0]
 	var digits := RegEx.create_from_string("[0-9]")
 	return first if digits.search(first) else text

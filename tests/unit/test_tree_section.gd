@@ -450,6 +450,7 @@ func test_at_rest_the_branch_lists_what_its_bought_nodes_give() -> void:
 	section.select(&"stat_ad")
 	assert_true(info.gives.visible, "a pick keeps the branch's rows")
 	assert_eq(NodeInfoPanel.short_value(_save().tree.node(&"skill_q"), 3), "Rank 3", "words stay when the value is not a number")
+	assert_eq(NodeInfoPanel.short_value(_save().tree.node(&"refresh_cost"), 2), "50 gold", "a label goes, its value stays")
 
 
 func test_at_rest_the_panel_shows_the_fact_that_chose_its_node() -> void:
@@ -815,9 +816,10 @@ func test_the_purchase_question_covers_the_whole_screen_and_blocks_the_top_bar()
 	question.close()
 
 
-func test_the_forge_and_reset_notes_hang_under_their_buttons() -> void:
+func test_the_forge_and_reset_notes_open_left_of_their_group_in_the_top_bar() -> void:
 	for control: Control in [section.forge_bar.buttons[1], section.forge_bar.buttons[10], section.reset_button]:
-		assert_eq(control.get_meta(&"hover_place", -1), HoverTip.Place.BELOW)
+		assert_eq(control.get_meta(&"hover_place", -1), HoverTip.Place.LEFT)
+		assert_eq(control.get_meta(&"hover_anchor"), section.utilities, "measured from the whole group")
 
 
 func test_requirement_lines_for_all_any_two_and_an_act() -> void:

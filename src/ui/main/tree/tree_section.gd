@@ -96,11 +96,14 @@ func _ready() -> void:
 	# Off most of the time: then only its dim words, no surface.
 	reset_button.add_theme_stylebox_override(&"disabled", StyleBoxEmpty.new())
 	reset_button.pressed.connect(_ask_reset)
-	# Their notes hang 8 px under the button (the kit's BELOW).
-	reset_button.set_meta(&"hover_place", HoverTip.Place.BELOW)
 	for part: Control in [forge_bar, _hairline(), reset_button]:
 		part.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		utilities.add_child(part)
+	# Their notes open left of the group, in the top bar's empty middle, so
+	# they cover nothing (the kit's LEFT, measured from the whole group).
+	for control: Control in [forge_bar.buttons[1], forge_bar.buttons[10], reset_button]:
+		control.set_meta(&"hover_place", HoverTip.Place.LEFT)
+		control.set_meta(&"hover_anchor", utilities)
 
 	tree.changed.connect(refresh)
 	essences.changed.connect(refresh)

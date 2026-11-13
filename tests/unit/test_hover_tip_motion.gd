@@ -171,3 +171,23 @@ func test_a_hover_note_can_hang_below_its_button() -> void:
 	var card := tip.card()
 	assert_eq(card.position.y, 140.0 + HoverTip.GAP, "GAP under the button")
 	assert_almost_eq(card.position.x + card.size.x * 0.5, 360.0, 1.0, "centred on it")
+
+
+func test_a_hover_note_can_open_left_of_its_group() -> void:
+	UiMotion.renders = false
+	var group := Control.new()
+	group.position = Vector2(600, 20)
+	group.size = Vector2(300, 40)
+	add_child_autofree(group)
+	var button := Control.new()
+	button.position = Vector2(700, 20)
+	button.size = Vector2(100, 40)
+	button.set_meta(&"hover_text", "Left")
+	button.set_meta(&"hover_place", HoverTip.Place.LEFT)
+	button.set_meta(&"hover_anchor", group)
+	add_child_autofree(button)
+	tip.show_for(button)
+	tip._position_card()
+	var card := tip.card()
+	assert_almost_eq(card.position.x + card.size.x, 600.0 - HoverTip.GAP, 1.0, "GAP left of the group, not of the button")
+	assert_almost_eq(card.position.y + card.size.y * 0.5, 40.0, 1.0, "centred on it")
