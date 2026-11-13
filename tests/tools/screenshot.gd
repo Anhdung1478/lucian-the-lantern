@@ -2132,7 +2132,7 @@ func scenario_training_setup() -> void:
 	(stage as Stage)._open_shop((stage as Stage).merchant)
 	await wait(0.3)
 	var panel := (stage as Stage).screens.backpack.shop_panel()
-	print("shop open (expect true), refresh button (expect Refresh  50): ", (stage as Stage).screens.is_shopping(), " ", panel._refresh.text)
+	print("shop open (expect true), refresh button (expect Refresh 50): ", (stage as Stage).screens.is_shopping(), " ", panel.refresh_text())
 	await shot("training_setup_6_shop_refresh")
 
 
