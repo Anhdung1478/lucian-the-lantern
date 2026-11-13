@@ -27,6 +27,22 @@ func _remove_files() -> void:
 				DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 
 
+## What a price button reads: its price row's words and amount, while shown.
+func _price(button: Button) -> String:
+	var row := button.get_node_or_null(^"PriceRow") as Control
+	if row == null or not row.visible:
+		return button.text
+	return "%s %s" % [UiStyle.price_text(row).text, UiStyle.price_amount(row).final_text()]
+
+
+## Review r1 D10: Classic shows no coloured dash for a bonus or weakness it
+## does not have; its note follows its name.
+func test_classic_has_no_dashes() -> void:
+	var classic := _card(SaveGame.CLASSIC)
+	for label: Label in classic.find_children("*", "Label", true, false):
+		assert_ne(label.text, "—")
+
+
 func _card(id: StringName) -> SkinCard:
 	for card in shop.cards:
 		if card.skin.id == id:
@@ -42,7 +58,8 @@ func test_new_save_shows_classic_equipped_and_others_to_buy() -> void:
 	for card in shop.cards:
 		if card.skin.id == SaveGame.CLASSIC:
 			continue
-		assert_true(card.button.text.begins_with("Purchase"), card.skin.id)
+		assert_eq(_price(card.button), "Purchase %d" % card.skin.cost, card.skin.id)
+		assert_eq(card.button.text, "", "the price row reads it")
 		assert_true(card.button.disabled, card.skin.id)
 
 
@@ -102,7 +119,7 @@ func test_cancel_and_esc_spend_nothing() -> void:
 	assert_null(shop.purchase)
 	assert_eq(_purple(), 25)
 	assert_false(&"high_noon" in SaveGame.instance().owned_skins)
-	assert_eq(noon.button.text, "Purchase  25")
+	assert_eq(_price(noon.button), "Purchase 25")
 
 
 func test_the_table_shows_the_price_what_you_have_and_what_is_left() -> void:
@@ -114,7 +131,7 @@ func test_the_table_shows_the_price_what_you_have_and_what_is_left() -> void:
 	assert_eq(popup.price_label.text, "30")
 	assert_eq(popup.owned_label.text, "75")
 	assert_eq(popup.after_label.text, "45")
-	assert_eq(popup.purchase_button.text, "Purchase  30")
+	assert_eq(_price(popup.purchase_button), "Purchase 30")
 
 
 func test_purchase_is_off_while_the_price_cant_be_paid() -> void:

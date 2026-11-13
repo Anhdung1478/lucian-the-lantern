@@ -4,9 +4,11 @@ extends Control
 ## over the blurred shop. The skin's portrait stands in its accent's light
 ## beside a table of its bonuses, its weaknesses, its price, the purple
 ## essence owned and what is left after buying. A note says buying does not
-## equip it. Purchase emits `confirmed` and closes, and is off while the
-## price can't be paid; Cancel or ESC (SkinShop.close_popup) closes it. It
-## buys nothing itself and saves nothing.
+## equip it. Purchase ("Purchase 25 [purple]" as one centred group) emits
+## `confirmed` and closes, and is off while the price can't be paid; Cancel
+## or ESC (SkinShop.close_popup) closes it. It buys nothing itself and saves
+## nothing. It opens and closes with UiMotion's overlay motion; `closed`
+## fires at once.
 
 signal confirmed(id: StringName)
 signal closed
@@ -17,7 +19,7 @@ const PORTRAIT_INSET := 8.0
 const KEY_WIDTH := 150.0
 const VALUE_WIDTH := 240.0
 const ROW_FONT := 19
-const KEY_FONT := 16
+const KEY_FONT := UiStyle.FONT_BODY
 const ICON_SIZE := 22.0
 const BUTTON_WIDTH := 300.0
 const NOTE := "Buying does not equip it."
@@ -32,8 +34,13 @@ var cancel_button: MenuEntry
 var price_label: Label
 var owned_label: Label
 var after_label: Label
+## Inside Purchase: the word, the price and the icon.
+var price_row: HBoxContainer
 
 var _portrait := Control.new()
+var _backdrop := MenuBackdrop.new()
+var _center := CenterContainer.new()
+var _closing := false
 
 
 func _init(skin_data: SkinData = null, owned: Essences = null) -> void:
@@ -48,6 +55,7 @@ func _ready() -> void:
 	_build()
 	essences.changed.connect(refresh)
 	refresh()
+	UiMotion.open_overlay(_backdrop, _center)
 
 
 ## Rereads the purple owned: the table and Purchase follow it.
@@ -60,26 +68,33 @@ func refresh() -> void:
 	purchase_button.disabled = short
 
 
-## Closes and frees it.
+## Closes it (at once for the shop) and frees it once it has faded.
 func close() -> void:
-	if is_queued_for_deletion():
+	if _closing or is_queued_for_deletion():
 		return
+	_closing = true
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	closed.emit()
-	queue_free()
+	UiMotion.close_overlay(_backdrop, _center, queue_free)
+
+
+## True from close() on, while it fades.
+func is_closing() -> bool:
+	return _closing
 
 
 func _purchase() -> void:
-	if purchase_button.disabled:
+	if purchase_button.disabled or _closing:
 		return
 	confirmed.emit(skin.id)
 	close()
 
 
 func _build() -> void:
-	var backdrop := MenuBackdrop.new()
+	var backdrop := _backdrop
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(backdrop)
-	var center := CenterContainer.new()
+	var center := _center
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	backdrop.add_child(center)
@@ -104,18 +119,17 @@ func _build() -> void:
 	price_label = _amount(table, Lang.t("Price"), str(skin.cost))
 	owned_label = _amount(table, Lang.t("You have"), "")
 	after_label = _amount(table, Lang.t("After purchase"), "")
-	var note := UiStyle.label(Lang.t(NOTE), 16, UiStyle.DIM_COLOR)
+	var note := UiStyle.label(Lang.t(NOTE), UiStyle.FONT_BODY, UiStyle.DIM_COLOR)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.content.add_child(note)
 	var buttons := HBoxContainer.new()
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	buttons.add_theme_constant_override(&"separation", 16)
 	card.content.add_child(buttons)
-	purchase_button = MenuEntry.new(Lang.t("Purchase  %d") % skin.cost, PURPLE_ICON, MenuEntry.Kind.PRIMARY)
-	purchase_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
-	purchase_button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	purchase_button.set_icon_color(Color.WHITE)
+	purchase_button = MenuEntry.new("", null, MenuEntry.Kind.PRIMARY)
 	purchase_button.custom_minimum_size.x = BUTTON_WIDTH
+	price_row = UiStyle.price_row(Lang.t("Purchase"), skin.cost, PURPLE_ICON, MenuEntry.FONT)
+	purchase_button.add_child(price_row)
 	purchase_button.pressed.connect(_purchase)
 	buttons.add_child(purchase_button)
 	cancel_button = MenuEntry.new(Lang.t("Cancel"))
@@ -134,11 +148,14 @@ func _row(table: GridContainer, key: String, value: Control) -> void:
 	table.add_child(value)
 
 
-## One label per line, in `color`; "—" when there are none (Classic).
+## One label per line, in `color`; a dim "—" when there are none (it is
+## neither a gain nor a loss).
 func _lines(lines: PackedStringArray, color: Color) -> VBoxContainer:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override(&"separation", 2)
-	for line in lines if not lines.is_empty() else PackedStringArray(["—"]):
+	if lines.is_empty():
+		box.add_child(UiStyle.label("—", ROW_FONT, UiStyle.DIM_COLOR))
+	for line in lines:
 		var label := UiStyle.label(Lang.t(line), ROW_FONT, color)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.custom_minimum_size.x = VALUE_WIDTH

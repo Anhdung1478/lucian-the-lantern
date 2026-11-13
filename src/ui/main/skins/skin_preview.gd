@@ -5,11 +5,15 @@ extends Control
 ## the skin's SkinFx at game size and with its sounds. ▶ All loops them and
 ## starts on opening; a skill's button plays only that one. It deals no
 ## damage and saves nothing. It stands still while covered (set_covered). ✕ or ESC (SkinShop.close_popup) closes it and
-## frees everything it spawned.
+## frees everything it spawned. It is the shop's other pop-up, so it looks
+## like one: the menus' blurred, dimmed MenuBackdrop and an ornate Plate,
+## opening and closing with UiMotion's overlay motion (`closed` at once).
 
 signal closed
 
 const PANEL_SIZE := Vector2(1200, 680)
+## The plate's padding, as the old panel's.
+const PANEL_PAD := 24.0
 const STAGE_SIZE := Vector2(1140, 500)
 const LUCIAN_AT := Vector2(220, 250)
 const DUMMY_AT := Vector2(920, 250)
@@ -54,6 +58,9 @@ var _fx: SkinFx
 var _tween: Tween
 var _gun := 0
 var _trail: DashTrail
+var _backdrop := MenuBackdrop.new()
+var _center := CenterContainer.new()
+var _closing := false
 
 
 func _init(skin_data: SkinData = null) -> void:
@@ -65,6 +72,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build()
 	play_all()
+	UiMotion.open_overlay(_backdrop, _center)
 
 
 ## Plays one piece (&"q", &"w", &"e", &"r" or &"attack"), stopping ▶ All.
@@ -90,13 +98,21 @@ func set_covered(on: bool) -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED if on else Node.PROCESS_MODE_INHERIT
 
 
-## Closes the preview and frees everything it spawned.
+## Closes the preview (at once for the shop) and frees everything it
+## spawned once it has faded.
 func close() -> void:
-	if is_queued_for_deletion():
+	if _closing or is_queued_for_deletion():
 		return
+	_closing = true
 	_stop()
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	closed.emit()
-	queue_free()
+	UiMotion.close_overlay(_backdrop, _center, queue_free)
+
+
+## True from close() on, while it fades.
+func is_closing() -> bool:
+	return _closing
 
 
 func _process(_delta: float) -> void:
@@ -196,19 +212,14 @@ func _stop() -> void:
 func _build() -> void:
 	# Clicks outside the panel stop here.
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	var backdrop := ColorRect.new()
-	backdrop.color = Color(0, 0, 0, 0.55)
-	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
-	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(backdrop)
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(center)
-	var panel := PanelContainer.new()
+	_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_backdrop)
+	_center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_backdrop.add_child(_center)
+	var panel := Plate.new(PANEL_PAD)
 	panel.custom_minimum_size = PANEL_SIZE
-	panel.add_theme_stylebox_override(&"panel", UiStyle.panel(UiStyle.PANEL_COLOR, UiStyle.BORDER_COLOR, 2, 24.0))
-	center.add_child(panel)
+	_center.add_child(panel)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override(&"separation", 14)
 	panel.add_child(column)

@@ -38,6 +38,15 @@ func _open(id: StringName) -> SkinPreview:
 	return shop.preview
 
 
+## Review r1 D6: the preview is a pop-up like the purchase one: the menus'
+## blur and dim behind an ornate plate.
+func test_the_preview_sits_on_the_menus_backdrop_and_a_plate() -> void:
+	var preview := _open(&"high_noon")
+	assert_true(preview.get_child(0) is MenuBackdrop)
+	assert_eq(preview.find_children("*", "Plate", true, false).size(), 1)
+	assert_eq(preview.find_children("*", "ColorRect", true, false).filter(func(node: Node) -> bool: return not node.get_parent() is MenuBackdrop).size(), 0, "no flat dim of its own")
+
+
 func _effects(preview: SkinPreview, type: Variant) -> Array:
 	return preview.effects.get_children().filter(func(node: Node) -> bool:
 		return is_instance_of(node, type) and not node.is_queued_for_deletion())
