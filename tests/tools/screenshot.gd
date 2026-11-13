@@ -85,6 +85,8 @@ func _initialize() -> void:
 	# cursor: the game leaves the window alone, and reads a pretend mouse.
 	Stage.confine_mouse = false
 	GameSettings.owns_window = false
+	# Every UI motion lands at once, so no frame is caught mid-fade.
+	UiMotion.instant = true
 	Pointer.pretend = Vector2(960, 540)
 	if OS.get_environment("SCREENSHOT_OFFSCREEN") != "":
 		DisplayServer.window_set_position(OFFSCREEN_AT)

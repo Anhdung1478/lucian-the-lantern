@@ -25,5 +25,6 @@ void fragment() {
 	}
 	vec3 color = sum / total * (1.0 - darken);
 	float edge = smoothstep(0.3, 0.9, length((UV - vec2(0.5)) * vec2(1.3, 1.0)));
-	COLOR = vec4(color * (1.0 - vignette * edge), 1.0);
+	// COLOR.a carries the rect's modulate: MenuBackdrop.strength fades it.
+	COLOR = vec4(color * (1.0 - vignette * edge), COLOR.a);
 }
