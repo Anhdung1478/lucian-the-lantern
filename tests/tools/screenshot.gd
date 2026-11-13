@@ -2836,6 +2836,7 @@ func scenario_camera_zoom() -> void:
 		stand(&"siege_minion", open_ground(at + offset))
 	game.camera.mode = StageCamera.Mode.FOLLOW
 	await wait(0.6)
+	flush_tips()
 	var radar := game.hud.radar
 	var names := ["plain", "wide", "close"]
 	var notches := [0, -3, 7]

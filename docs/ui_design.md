@@ -195,7 +195,7 @@ An untargetable enemy (the Elder Dragon in the air, Dark Lucian mid-dash) leaves
 
 *(V2.0: the radar is a plate with a gold diamond at each corner of its frame. The dots are as above.)*
 
-*(V2.0: a pale frame on the radar, under the dots, marks the part of the map the camera shows. It moves with the camera, grows and shrinks with the zoom (the mouse wheel, game design doc §2) and stops at the radar's edge.)*
+*(V2.0: a pale frame on the radar, under the dots, marks the part of the map the camera shows. It moves with the camera, grows and shrinks with the zoom (the mouse wheel, game design doc §2) and stops just inside the radar's gold line.)*
 
 ### Act 1 tips
 - On Act 1's first play, tips show one at a time under the boss bar, in a gold-bordered panel, 7 s each. The list is in `act1_the_loss.md`.

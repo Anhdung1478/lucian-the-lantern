@@ -211,10 +211,11 @@ func test_the_radar_frames_the_view_and_cuts_it_at_its_edge() -> void:
 	add_child_autofree(radar)
 	radar.setup(Rect2(0, 0, 5200, 3200), null)
 	assert_eq(radar.view_frame(Rect2(1640, 1060, 1920, 1080)), Rect2(82, 53, 96, 54))
-	# The camera shows the wall past the map's corner; the frame stops at the plate.
+	# The camera shows the wall past the map's corner; the frame stops just
+	# inside the plate, clear of its gold line.
 	var corner := radar.view_frame(Rect2(-64, -64, 1920, 1080))
-	assert_almost_eq(corner.position, Vector2.ZERO, Vector2.ONE * 0.01)
-	assert_almost_eq(corner.size, Vector2(92.8, 50.8), Vector2.ONE * 0.01)
+	assert_almost_eq(corner.position, Vector2.ONE * Radar.VIEW_INSET, Vector2.ONE * 0.01)
+	assert_almost_eq(corner.end, Vector2(92.8, 50.8), Vector2.ONE * 0.01)
 	assert_false(radar.view_frame(Rect2(9000, 9000, 1920, 1080)).has_area(), "a view off the map has no frame")
 
 

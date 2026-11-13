@@ -25,6 +25,8 @@ const MERCHANT_COLOR := Color("ffcf5a")
 const VIEW_COLOR := Color(1, 1, 1, 0.8)
 const VIEW_FILL := Color(1, 1, 1, 0.05)
 const VIEW_WIDTH := 1.5
+## The frame stays this far inside the plate, clear of its gold line.
+const VIEW_INSET := 2.0
 
 var bounds := Rect2(0, 0, 4800, 2700)
 var lucian: Lucian
@@ -52,10 +54,11 @@ static func view_rect(canvas: Transform2D, screen: Vector2) -> Rect2:
 	return canvas.affine_inverse() * Rect2(Vector2.ZERO, screen)
 
 
-## Where the view `seen` (in world units) sits on the radar, cut at the
-## plate's edge. No area when none of it is over the map.
+## Where the view `seen` (in world units) sits on the radar, cut just inside
+## the plate's edge. No area when none of it is over the map.
 func view_frame(seen: Rect2) -> Rect2:
-	return Rect2(to_radar(seen.position), seen.size / bounds.size * size).intersection(Rect2(Vector2.ZERO, size))
+	var inside := Rect2(Vector2.ZERO, size).grow(-VIEW_INSET)
+	return Rect2(to_radar(seen.position), seen.size / bounds.size * size).intersection(inside)
 
 
 static func dot_size(kind: StringName) -> float:
