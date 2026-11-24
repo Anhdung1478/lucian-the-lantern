@@ -1,85 +1,121 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
-  <!-- Thresh, the Chain Warden, seen from above, facing +X. As on the title screen: a dark green-black hooded jailer
-       with a pale moonlit rim, green eyes in the hood, spiked pauldrons, a tattered robe trailing behind. His chain
-       sickle is in his left hand (y < 0), its chain looped back over that shoulder; the green soul lantern hangs from
-       his right hand (y > 0), lighting him from below. -->
+  <!-- Thresh, the Chain Warden, top-down facing +X. Designed for high contrast even at 0.5x Phase 2 shade:
+       bright burning emerald soul-flame skull crown & streaming spectral flame-dreadlocks, heavy jagged dark-iron
+       pauldrons with bright silver-bone rims, glowing green soul-ribcage slits across upper back, tattered shadow
+       coat flaring behind, huge bright-edged curved Death Sentence Scythe arcing out on his left (-Y/+X), and a
+       blazing luminous emerald Caged Lantern extended clearly on his right (+Y/+X). -->
   <defs>
-    <radialGradient id="halo">
-      <stop offset="0" stop-color="#9dffc8" stop-opacity="0.7"/>
-      <stop offset="0.45" stop-color="#4dff9a" stop-opacity="0.28"/>
-      <stop offset="1" stop-color="#2fbf74" stop-opacity="0"/>
+    <linearGradient id="th_coat" x1="1" y1="0" x2="0" y2="0.2">
+      <stop offset="0" stop-color="#131f1b"/>
+      <stop offset="0.55" stop-color="#0b1411"/>
+      <stop offset="1" stop-color="#060b09"/>
+    </linearGradient>
+    <linearGradient id="th_iron" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#354a42"/>
+      <stop offset="0.45" stop-color="#1c2924"/>
+      <stop offset="1" stop-color="#0e1613"/>
+    </linearGradient>
+    <linearGradient id="th_blade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#76c49e"/>
+      <stop offset="0.5" stop-color="#33594a"/>
+      <stop offset="1" stop-color="#162620"/>
+    </linearGradient>
+    <linearGradient id="th_flame" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#7ef2b2"/>
+      <stop offset="0.45" stop-color="#26a868"/>
+      <stop offset="1" stop-color="#0c4d2f"/>
+    </linearGradient>
+    <radialGradient id="th_lantern_halo">
+      <stop offset="0" stop-color="#88f2b8" stop-opacity="0.6"/>
+      <stop offset="0.45" stop-color="#28b86a" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#126b3c" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="core">
+    <radialGradient id="th_soul_core">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.45" stop-color="#c8ffdc"/>
-      <stop offset="1" stop-color="#4dd98a"/>
+      <stop offset="0.45" stop-color="#b8ffd8"/>
+      <stop offset="1" stop-color="#2ee682"/>
     </radialGradient>
-    <radialGradient id="eye">
-      <stop offset="0" stop-color="#7dffb8" stop-opacity="0.75"/>
-      <stop offset="1" stop-color="#4dff9a" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="robe" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#22322b"/>
-      <stop offset="1" stop-color="#121a16"/>
-    </linearGradient>
-    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#e6f6ec"/>
-      <stop offset="1" stop-color="#8fb8a2"/>
-    </linearGradient>
   </defs>
   <g transform="translate(60 60)">
-    <!-- tattered robe, trailing behind him -->
-    <path d="M 6 -31 Q -14 -42 -32 -41 L -37 -48 L -41 -36 L -51 -33 L -46 -23 L -56 -15 L -48 -6 L -57 2 L -48 9 L -55 19 L -44 25 L -45 37 L -33 37 Q -14 43 6 31 Z" fill="url(#robe)" stroke="#1a1d24" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M 6 -31 Q -14 -42 -32 -41 L -37 -48 L -41 -36 L -51 -33 L -46 -23 L -56 -15 L -48 -6 L -57 2 L -48 9 L -55 19 L -44 25 L -45 37 L -33 37 Q -14 43 6 31" fill="none" stroke="#b6d3cc" stroke-width="2" stroke-linejoin="round" opacity="0.8"/>
-    <!-- folds of the robe -->
-    <path d="M -8 -30 Q -26 -30 -42 -22 M -12 -14 Q -30 -12 -46 -10 M -12 14 Q -30 12 -44 14 M -8 30 Q -24 32 -40 30" fill="none" stroke="#0b110e" stroke-width="3" stroke-linecap="round"/>
-    <path d="M -10 -22 Q -28 -21 -44 -16 M -12 0 L -50 2 M -10 22 Q -26 22 -44 21" fill="none" stroke="#33493f" stroke-width="2.2" stroke-linecap="round"/>
-    <!-- the sickle's chain, looped back over his left shoulder -->
-    <path d="M 22 -34 Q 4 -54 -20 -48 Q -38 -43 -36 -27 Q -35 -18 -24 -16" fill="none" stroke="#1a1d24" stroke-width="6.5" stroke-linecap="round"/>
-    <path d="M 22 -34 Q 4 -54 -20 -48 Q -38 -43 -36 -27 Q -35 -18 -24 -16" fill="none" stroke="#8fe3b0" stroke-width="3" stroke-dasharray="4.5 2.5" stroke-linecap="butt"/>
-    <!-- arms -->
-    <path d="M 2 -24 L 22 -33 M 2 24 L 21 32" stroke="#1a1d24" stroke-width="12" stroke-linecap="round"/>
-    <path d="M 2 -24 L 22 -33 M 2 24 L 21 32" stroke="#22302a" stroke-width="7.5" stroke-linecap="round"/>
-    <path d="M 6 -28.5 L 20 -35" stroke="#b6d3cc" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-    <!-- torso -->
-    <ellipse cx="0" cy="0" rx="17" ry="29" fill="#1b2721" stroke="#1a1d24" stroke-width="3.5"/>
-    <path d="M -9 -22 Q -14 0 -9 22" fill="none" stroke="#33493f" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- the lantern's light falling on his right side -->
-    <circle cx="35" cy="35" r="24" fill="url(#halo)"/>
-    <!-- spiked pauldrons -->
-    <g stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round">
-      <path d="M -8 -31 L -24 -44 L -3 -36 Z M 0 -36 L -4 -55 L 8 -37 Z M 9 -34 L 18 -50 L 16 -31 Z" fill="#6f9282"/>
-      <path d="M -8 31 L -24 44 L -3 36 Z M 0 36 L -4 55 L 8 37 Z M 9 34 L 18 50 L 16 31 Z" fill="#6f9282"/>
-      <ellipse cx="1" cy="-25" rx="15" ry="11" fill="#2d4237"/>
-      <ellipse cx="1" cy="25" rx="15" ry="11" fill="#2d4237"/>
-    </g>
-    <path d="M -3 -42 L -3 -51 M 13 -40 L 16 -46 M -12 -37 L -19 -42 M -3 42 L -3 51 M 13 40 L 16 46 M -12 37 L -19 42" stroke="#d8efe4" stroke-width="2" stroke-linecap="round"/>
-    <path d="M -11 -28 Q -4 -35 8 -34 M -11 28 Q -4 35 8 34" fill="none" stroke="#b6d3cc" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-    <path d="M -8 -29 Q 2 -34 13 -30 M -8 29 Q 2 34 13 30" fill="none" stroke="#5f8573" stroke-width="2.2" stroke-linecap="round"/>
-    <!-- hood, its point trailing back -->
-    <path d="M 20 -8 Q 17 -18 3 -19 Q -11 -19 -18 -10 Q -22 -5 -31 0 Q -22 5 -18 10 Q -11 19 3 19 Q 17 18 20 8 Z" fill="#17221d" stroke="#1a1d24" stroke-width="3.5" stroke-linejoin="round"/>
-    <path d="M -16 -9 Q -10 -16.5 3 -16.5 Q 13 -16 16.5 -9 M -16 9 Q -10 16.5 3 16.5 Q 13 16 16.5 9" fill="none" stroke="#c4ddd5" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
-    <path d="M -18 -2 Q -6 -6 6 -5 M -18 2 Q -6 6 6 5" fill="none" stroke="#263a31" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- the dark of the hood's opening, green eyes in it -->
-    <path d="M 9 -11 Q 21 -9 21 0 Q 21 9 9 11 Q 13 0 9 -11 Z" fill="#050807"/>
-    <circle cx="16" cy="-4" r="5.5" fill="url(#eye)"/>
-    <circle cx="16" cy="4" r="5.5" fill="url(#eye)"/>
-    <circle cx="16" cy="-4" r="2.2" fill="#e6fff0"/>
-    <circle cx="16" cy="4" r="2.2" fill="#e6fff0"/>
-    <!-- the chain sickle, forward in his left hand: a haft, then a curved green-steel blade -->
-    <path d="M 20 -35 L 44 -27" stroke="#1a1d24" stroke-width="6.5" stroke-linecap="round"/>
-    <path d="M 20 -35 L 44 -27" stroke="#5e6e64" stroke-width="3" stroke-linecap="round"/>
-    <path d="M 41 -31 Q 58 -30 55 -9 Q 50 -21 37 -22 Z" fill="url(#steel)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M 45 -27 Q 53 -24 53 -14" fill="none" stroke="#4dff9a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
-    <circle cx="22" cy="-34" r="4.5" fill="#26352e" stroke="#1a1d24" stroke-width="2"/>
-    <!-- the soul lantern, on a short chain from his right hand -->
-    <path d="M 22 33 L 31 32" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
-    <path d="M 22 33 L 31 32" stroke="#8fe3b0" stroke-width="2.2" stroke-dasharray="2.5 1.5"/>
-    <circle cx="21" cy="32" r="4.5" fill="#26352e" stroke="#1a1d24" stroke-width="2"/>
-    <path d="M 35 25 L 42 28 L 45 35 L 42 42 L 35 45 L 28 42 L 25 35 L 28 28 Z" fill="#1f2d26" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <circle cx="35" cy="35" r="6.5" fill="url(#core)"/>
-    <path d="M 35 27.5 L 35 42.5 M 27.5 35 L 42.5 35" stroke="#1f2d26" stroke-width="2" opacity="0.85"/>
-    <path d="M 28 28 L 35 25 L 42 28" fill="none" stroke="#b6d3cc" stroke-width="2" stroke-linejoin="round" opacity="0.8"/>
-    <circle cx="35" cy="35" r="2.6" fill="#ffffff"/>
+    <!-- tattered shadow coat flaring behind (-X) with high-contrast ghostly silver-seafoam rims -->
+    <path d="M 4 -29 Q -14 -41 -33 -39 L -41 -44 L -40 -32 L -51 -28 L -45 -18 L -55 -10 L -46 -2 L -56 7 L -46 15 L -52 25 L -41 29 L -42 40 L -30 37 Q -12 42 4 29 Z" fill="url(#th_coat)" stroke="#14171f" stroke-width="2.1" stroke-linejoin="round"/>
+    <!-- subtle silver-seafoam frayed coat rims -->
+    <path d="M 2 -28 Q -14 -39 -32 -37.5 L -39 -42 L -38.5 -31.5 L -48.5 -27.5 L -43 -18 L -52.5 -10 L -44 -2 L -53.5 7 L -44 15 L -49.5 24.5 L -39.5 28.5 L -40 38 L -29.5 35.5 Q -12 40 2 28" fill="none" stroke="#4f7365" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- coat folds & eerie green under-glow -->
+    <path d="M -10 -26 Q -26 -28 -42 -21 M -12 -11 Q -28 -11 -44 -8 M -12 11 Q -28 11 -44 12 M -10 26 Q -25 29 -40 26" fill="none" stroke="#080e0c" stroke-width="2" stroke-linecap="round"/>
+    <path d="M -14 -18 Q -28 -18 -43 -14 M -14 0 L -47 2 M -14 18 Q -28 19 -43 18" fill="none" stroke="#2c473e" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- heavy spectral chain coiled from left shoulder to the Death Sentence Scythe -->
+    <path d="M 18 -34 Q 2 -52 -20 -46 Q -36 -40 -33 -24 Q -30 -15 -20 -13" fill="none" stroke="#14171f" stroke-width="5.6" stroke-linecap="round"/>
+    <path d="M 18 -34 Q 2 -52 -20 -46 Q -36 -40 -33 -24 Q -30 -15 -20 -13" fill="none" stroke="#4a8568" stroke-width="2.4" stroke-dasharray="4.5 2.5"/>
+
+    <!-- blazing emerald lantern light halo on right side (+X, +Y) -->
+    <circle cx="38" cy="34" r="16" fill="url(#th_lantern_halo)"/>
+
+    <!-- arms reaching out to Scythe (-Y) and Caged Lantern (+Y) -->
+    <path d="M 2 -23 L 22 -32 M 2 23 L 21 31" stroke="#14171f" stroke-width="10.5" stroke-linecap="round"/>
+    <path d="M 2 -23 L 22 -32 M 2 23 L 21 31" stroke="#365047" stroke-width="6.8" stroke-linecap="round"/>
+    <path d="M 5 -26 L 19 -33.5 M 5 26 L 19 33.5" stroke="#a6ccb9" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- upper torso & glowing green soul-ribcage slits across upper back/shoulders -->
+    <ellipse cx="0" cy="0" rx="17" ry="27" fill="#14211c" stroke="#14171f" stroke-width="2.1"/>
+    <!-- glowing soul-ribcage slits -->
+    <path d="M -12 -14 Q -4 -11 2 -13 M -14 -7 Q -5 -5 3 -7 M -14 7 Q -5 5 3 7 M -12 14 Q -4 11 2 13" fill="none" stroke="#2ec474" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M -11 -14 Q -4 -11 1 -13 M -13 -7 Q -5 -5 2 -7 M -13 7 Q -5 5 2 7 M -11 14 Q -4 11 1 13" fill="none" stroke="#98f5c4" stroke-width="1.0" stroke-linecap="round"/>
+    <!-- pale bone spine clasps -->
+    <path d="M -12 -17 L -12 17" stroke="#537565" stroke-width="2.0" stroke-linecap="round"/>
+
+    <!-- heavy jagged dark-iron pauldrons with bright silver-bone rims -->
+    <!-- left pauldron (-Y) -->
+    <path d="M -10 -29 L -25 -42 L -3 -34 Z M -1 -33 L -4 -51 L 8 -34 Z M 8 -31 L 19 -46 L 15 -28 Z" fill="#465e54" stroke="#14171f" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M -14 -24 Q -6 -37 10 -34 Q 18 -30 16 -20 Q 8 -14 -4 -15 Q -12 -16 -14 -24 Z" fill="url(#th_iron)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M -11 -25 Q -4 -34 9 -32 Q 14 -29 14 -23" fill="none" stroke="#7da393" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M -8 -21 Q 2 -25 11 -22" fill="none" stroke="#45d98a" stroke-width="1.4" stroke-linecap="round"/>
+
+    <!-- right pauldron (+Y) -->
+    <path d="M -10 29 L -25 42 L -3 34 Z M -1 33 L -4 51 L 8 34 Z M 8 31 L 19 46 L 15 28 Z" fill="#3a5248" stroke="#14171f" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M -14 24 Q -6 37 10 34 Q 18 30 16 20 Q 8 14 -4 15 Q -12 16 -14 24 Z" fill="url(#th_iron)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M -11 25 Q -4 34 9 32 Q 14 29 14 23" fill="none" stroke="#719686" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M -8 21 Q 2 25 11 22" fill="none" stroke="#45d98a" stroke-width="1.4" stroke-linecap="round"/>
+
+    <!-- HUGE bright-edged curved Death Sentence Scythe arcing out on his left/upper side (+X, -Y) -->
+    <path d="M 16 -30 L 42 -42" stroke="#14171f" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 16 -30 L 42 -42" stroke="#4f6b5e" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="22" cy="-32.5" r="4.6" fill="#273831" stroke="#14171f" stroke-width="1.8"/>
+    <!-- wicked crescent scythe blade with inner hook -->
+    <path d="M 38 -44 Q 56 -47 57 -26 Q 56 -11 45 -5 Q 48 -17 44 -26 Q 40 -34 32 -37 Z" fill="url(#th_blade)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- blazing luminous emerald-white razor edge -->
+    <path d="M 41 -43 Q 54 -44 55.5 -26 Q 54.5 -14 47 -8" fill="none" stroke="#36cf80" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 44 -42 Q 53.5 -42 54.5 -26 Q 53.5 -16 48 -10" fill="none" stroke="#c8ffe2" stroke-width="1.0" stroke-linecap="round"/>
+    <!-- inner hook barb -->
+    <path d="M 43 -25 L 36 -22 L 42 -19 Z" fill="#d8f5e5" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+
+    <!-- blazing luminous emerald Caged Lantern extended clearly on his right/lower side (+X, +Y) -->
+    <path d="M 21 31 L 31 33" stroke="#14171f" stroke-width="4.6" stroke-linecap="round"/>
+    <path d="M 21 31 L 31 33" stroke="#b8f5d4" stroke-width="2" stroke-dasharray="2.5 1.5"/>
+    <circle cx="21" cy="31" r="4.6" fill="#486358" stroke="#14171f" stroke-width="1.8"/>
+    <!-- octagonal iron lantern cage -->
+    <path d="M 38 22 L 47 26 L 50 34 L 47 42 L 38 46 L 29 42 L 26 34 L 29 26 Z" fill="#2c423a" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="38" cy="34" r="9.5" fill="url(#th_soul_core)"/>
+    <!-- silver-iron cage bars -->
+    <path d="M 38 23 L 38 45 M 27 34 L 49 34 M 31 27 L 45 41 M 45 27 L 31 41" stroke="#1f302a" stroke-width="2" opacity="0.85"/>
+    <path d="M 29 26 L 38 22 L 47 26 L 50 34" fill="none" stroke="#d4f2e4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="38" cy="34" r="3.6" fill="#ffffff"/>
+
+    <!-- streaming spectral emerald flame-dreadlocks & burning skull crown at center-front -->
+    <circle cx="8" cy="0" r="13" fill="url(#th_lantern_halo)" opacity="0.55"/>
+    <!-- streaming flame dreadlocks flowing back (-X) -->
+    <path d="M 6 -12 Q -10 -20 -26 -14 Q -16 -10 -30 -6 Q -18 -2 -33 0 Q -18 2 -30 6 Q -16 10 -26 14 Q -10 20 6 12 Z" fill="url(#th_flame)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M 5 -7 Q -8 -12 -20 -8 Q -12 -4 -24 0 Q -12 4 -20 8 Q -8 12 5 7 Z" fill="#3cd185"/>
+    <!-- iron collar-jaw framing skull -->
+    <path d="M -2 -14 Q 10 -17 19 -10 L 23 -4 L 23 4 L 19 10 Q 10 17 -2 14 Q -8 8 -8 0 Q -8 -8 -2 -14 Z" fill="#13211c" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- ghostly emerald-bone skull crown -->
+    <path d="M 2 -10 Q 12 -13 20 -7 Q 25 -3 25 0 Q 25 3 20 7 Q 12 13 2 10 Q -3 5 -3 0 Q -3 -5 2 -10 Z" fill="#4fbf84" stroke="#14171f" stroke-width="1.9" stroke-linejoin="round"/>
+    <path d="M 4 -8 Q 12 -10 18 -5" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+    <!-- fierce dark sockets with blazing white-emerald eyes -->
+    <path d="M 14 -7 L 22 -4.5 L 15 -2 Z M 14 7 L 22 4.5 L 15 2 Z" fill="#0b1a13" stroke="#14171f" stroke-width="1.1" stroke-linejoin="round"/>
+    <circle cx="17.5" cy="-4.5" r="2.1" fill="#ffffff"/>
+    <circle cx="17.5" cy="4.5" r="2.1" fill="#ffffff"/>
+    <path d="M 21.5 -2 L 23 0 L 21.5 2" fill="none" stroke="#14171f" stroke-width="1.4" stroke-linecap="round"/>
   </g>
 </svg>

@@ -1,36 +1,118 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112">
-  <!-- Super Minion: crimson horned armored brute from above, glowing runes, two gauntlets forward (+X). -->
+  <!-- Super Minion: mighty Crimson Juggernaut from above facing +X, sweeping gold-trimmed crimson cape (-X), broad horned crimson-and-gold war-pauldrons, dark iron war-hood over glowing yellow visor eyes, two colossal gauntlets/siege-hammers clenched forward (+X) with glowing golden cores. -->
+  <defs>
+    <linearGradient id="sm-cape" x1="0.8" y1="0.1" x2="0.1" y2="0.9">
+      <stop offset="0" stop-color="#c62c30"/>
+      <stop offset="0.55" stop-color="#871920"/>
+      <stop offset="1" stop-color="#4a0e14"/>
+    </linearGradient>
+    <linearGradient id="sm-crimson" x1="0.15" y1="0.05" x2="0.85" y2="0.95">
+      <stop offset="0" stop-color="#e34542"/>
+      <stop offset="0.5" stop-color="#a82428"/>
+      <stop offset="1" stop-color="#5e1218"/>
+    </linearGradient>
+    <linearGradient id="sm-gold" x1="0.15" y1="0.05" x2="0.85" y2="0.95">
+      <stop offset="0" stop-color="#ffe282"/>
+      <stop offset="0.5" stop-color="#d99d34"/>
+      <stop offset="1" stop-color="#7c5216"/>
+    </linearGradient>
+    <linearGradient id="sm-steel" x1="0.15" y1="0.05" x2="0.85" y2="0.95">
+      <stop offset="0" stop-color="#9aa4b8"/>
+      <stop offset="0.5" stop-color="#586073"/>
+      <stop offset="1" stop-color="#272c38"/>
+    </linearGradient>
+    <linearGradient id="sm-hood" x1="0.1" y1="0.1" x2="0.9" y2="0.9">
+      <stop offset="0" stop-color="#5a6173"/>
+      <stop offset="0.5" stop-color="#2e3340"/>
+      <stop offset="1" stop-color="#161922"/>
+    </linearGradient>
+    <radialGradient id="sm-core-glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fffce0"/>
+      <stop offset="0.45" stop-color="#ffd242"/>
+      <stop offset="0.8" stop-color="#ff8c1a" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#ff6a00" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
   <g transform="translate(56 56)">
-    
-    <!-- arms and gauntlets -->
-    <path d="M -2 -28 L 28 -19" stroke="#1a1d24" stroke-width="18" stroke-linecap="round"/>
-    <path d="M -2 -28 L 28 -19" stroke="#6e1e22" stroke-width="12" stroke-linecap="round"/>
-    <circle cx="32" cy="-19" r="10.5" fill="#6b7080" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M 40 -25 L 46 -22 L 41 -20 M 40 -13 L 46 -16 L 41 -18" fill="#e6eaf0" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M 27 -24 Q 32 -28 37 -24" fill="none" stroke="#9aa0b0" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M -2 28 L 28 19" stroke="#1a1d24" stroke-width="18" stroke-linecap="round"/>
-    <path d="M -2 28 L 28 19" stroke="#6e1e22" stroke-width="12" stroke-linecap="round"/>
-    <circle cx="32" cy="19" r="10.5" fill="#6b7080" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M 40 13 L 46 16 L 41 18 M 40 25 L 46 22 L 41 20" fill="#e6eaf0" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M 27 14 Q 32 10 37 14" fill="none" stroke="#9aa0b0" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- armored torso -->
-    <ellipse cx="-4" cy="0" rx="20" ry="30" fill="#a83232" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M -17 -19 Q -23 0 -17 19 M -7 -24 L -7 24" fill="none" stroke="#6e1e22" stroke-width="3" stroke-linecap="round"/>
-    <path d="M -14 -9 L -5 0 L -14 9 M -3 -13 L 7 0 L -3 13" fill="none" stroke="#ffcf4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- pauldrons with spikes -->
-    <path d="M -9 -33 L -22 -41 L -16 -27 Z M -9 33 L -22 41 L -16 27 Z" fill="#a9afbc" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="-2" cy="-28" r="12" fill="#d03a3a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="-2" cy="28" r="12" fill="#d03a3a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="-2" cy="-28" r="6" fill="none" stroke="#f2c14e" stroke-width="2.5"/>
-    <circle cx="-2" cy="28" r="6" fill="none" stroke="#f2c14e" stroke-width="2.5"/>
-    <!-- horns and helmet -->
-    <path d="M 2 -11 Q 12 -27 30 -26 Q 20 -19 14 -9 Z" fill="#e9e2cf" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M 2 11 Q 12 27 30 26 Q 20 19 14 9 Z" fill="#e9e2cf" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="5" cy="0" r="14" fill="#6e1e22" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M -9 0 L 10 0" stroke="#1a1d24" stroke-width="8" stroke-linecap="round"/>
-    <path d="M -9 0 L 10 0" stroke="#ff5a4a" stroke-width="3.5" stroke-linecap="round"/>
-    <path d="M 12 -6 L 19 -2.5 L 19 2.5 L 12 6 Z" fill="#ffcf4a" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M -3 -11 Q 4 -15 11 -11" fill="none" stroke="#ff9a8a" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-    <circle cx="0" cy="-5" r="3.5" fill="#ffffff" opacity="0.28"/>
+    <!-- Heavy sweeping crimson cape hem billowing behind (-X) -->
+    <path d="M -14 -24 C -28 -27, -42 -24, -49 -15 L -44 -7 L -51 0 L -44 7 L -49 15 C -42 24, -28 27, -14 24 Z" fill="url(#sm-cape)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- Gold cape trim along trailing edge & cloth fold shadows -->
+    <path d="M -46 -13 L -41 -6 L -47 0 L -41 6 L -46 13" fill="none" stroke="url(#sm-gold)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -20 -15 Q -33 -14 -43 -10 M -18 0 L -43 0 M -20 15 Q -33 14 -43 10" fill="none" stroke="#420c12" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+    <path d="M -22 -18 Q -34 -18 -42 -14" fill="none" stroke="#e35450" stroke-width="1.5" stroke-linecap="round" opacity="0.65"/>
+
+    <!-- Armored forearms connecting shoulders to siege-gauntlets -->
+    <path d="M 2 -28 L 28 -25 L 28 -14 L 4 -15 Z" fill="url(#sm-steel)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 2 28 L 28 25 L 28 14 L 4 15 Z" fill="url(#sm-steel)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+
+    <!-- MASSIVE ARMORED SIEGE-GAUNTLETS / HAMMERS clenched forward (+X) -->
+    <!-- Upper gauntlet -->
+    <g transform="translate(34 -20)">
+      <path d="M -10 -10 L 6 -12 L 14 -6 L 14 7 L 6 11 L -10 9 Z" fill="url(#sm-steel)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+      <!-- Crimson & gold fist plating -->
+      <path d="M -6 -8 L 5 -9 L 10 -4 L 10 4 L 5 8 L -6 7 Z" fill="url(#sm-crimson)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <!-- Knuckle siege-spikes -->
+      <path d="M 13 -7 L 19 -5 L 14 -2 Z M 14 2 L 19 5 L 13 7 Z" fill="url(#sm-gold)" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- Glowing golden power core -->
+      <circle cx="1" cy="-0.5" r="7.5" fill="url(#sm-core-glow)"/>
+      <polygon points="-2.5,-0.5 1,-4 4.5,-0.5 1,3" fill="#fff6b8" stroke="#c97a16" stroke-width="1.2"/>
+    </g>
+    <!-- Lower gauntlet -->
+    <g transform="translate(34 20)">
+      <path d="M -10 -9 L 6 -11 L 14 -7 L 14 6 L 6 12 L -10 10 Z" fill="url(#sm-steel)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M -6 -7 L 5 -8 L 10 -4 L 10 4 L 5 9 L -6 8 Z" fill="url(#sm-crimson)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M 13 -7 L 19 -5 L 14 -2 Z M 14 2 L 19 5 L 13 7 Z" fill="url(#sm-gold)" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="1" cy="0.5" r="7.5" fill="url(#sm-core-glow)"/>
+      <polygon points="-2.5,0.5 1,-3 4.5,0.5 1,4" fill="#fff6b8" stroke="#c97a16" stroke-width="1.2"/>
+    </g>
+
+    <!-- Broad armored juggernaut cuirass torso -->
+    <path d="M -21 -22 L -6 -32 L 13 -26 L 19 -12 L 19 12 L 13 26 L -6 32 L -21 22 L -24 0 Z" fill="url(#sm-crimson)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- Gold chest/back harness bands -->
+    <path d="M -17 -19 L 4 -10 L 4 10 L -17 19" fill="none" stroke="url(#sm-gold)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -16 0 L -5 0" stroke="url(#sm-gold)" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="-11" cy="0" r="3.4" fill="#ffe270" stroke="#14171f" stroke-width="1.5"/>
+
+    <!-- MASSIVE FORGED HORNED WAR-PAULDRONS -->
+    <!-- Left/Top pauldron -->
+    <g>
+      <!-- Sweeping forged pauldron horn -->
+      <path d="M -4 -36 C -1 -45, 11 -49, 24 -44 C 15 -41, 10 -36, 9 -30 Z" fill="url(#sm-gold)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M -18 -20 C -20 -34, -8 -41, 6 -38 C 16 -35, 19 -24, 13 -16 C 4 -13, -10 -14, -18 -20 Z" fill="url(#sm-crimson)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+      <!-- Gold trim arch & steel bevel -->
+      <path d="M -14 -24 C -13 -33, -4 -36, 6 -34 C 12 -32, 14 -25, 10 -20" fill="none" stroke="url(#sm-gold)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M -11 -26 Q -2 -33 7 -30" fill="none" stroke="#ff9a8e" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+      <circle cx="-11" cy="-21" r="1.8" fill="#ffe082" stroke="#14171f" stroke-width="1"/>
+      <circle cx="8" cy="-21" r="1.8" fill="#ffe082" stroke="#14171f" stroke-width="1"/>
+    </g>
+    <!-- Right/Bottom pauldron -->
+    <g>
+      <path d="M -4 36 C -1 45, 11 49, 24 44 C 15 41, 10 36, 9 30 Z" fill="url(#sm-gold)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M -18 20 C -20 34, -8 41, 6 38 C 16 35, 19 24, 13 16 C 4 13, -10 14, -18 20 Z" fill="url(#sm-crimson)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M -14 24 C -13 33, -4 36, 6 34 C 12 32, 14 25, 10 20" fill="none" stroke="url(#sm-gold)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="-11" cy="21" r="1.8" fill="#ffe082" stroke="#14171f" stroke-width="1"/>
+      <circle cx="8" cy="21" r="1.8" fill="#ffe082" stroke="#14171f" stroke-width="1"/>
+    </g>
+
+    <!-- DARK IRON WAR-HOOD over glowing yellow visor eyes -->
+    <g>
+      <!-- Hood outer mantle -->
+      <path d="M -11 -11 C -5 -18, 9 -18, 19 -10 L 25 0 L 19 10 C 9 18, -5 18, -11 11 C -15 5, -15 -5, -11 -11 Z" fill="url(#sm-hood)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+      <!-- Gold crown ridge along top of war-hood -->
+      <path d="M -11 0 L 20 0" stroke="url(#sm-gold)" stroke-width="3.6" stroke-linecap="round"/>
+      <path d="M -7 -9 Q 4 -14 15 -8" fill="none" stroke="#8a95ab" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+      <!-- Deep dark visor face cavity -->
+      <path d="M 11 -9 L 22 -5 L 23.5 0 L 22 5 L 11 9 Q 15 0 11 -9 Z" fill="#0d0f14" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- Glowing yellow visor eyes -->
+      <circle cx="17.5" cy="-3.6" r="4" fill="url(#sm-core-glow)"/>
+      <circle cx="17.5" cy="3.6" r="4" fill="url(#sm-core-glow)"/>
+      <path d="M 14.8 -5.4 L 20.4 -3.2 L 16.5 -2 Z" fill="#ffe866"/>
+      <path d="M 14.8 5.4 L 20.4 3.2 L 16.5 2 Z" fill="#ffe866"/>
+      <circle cx="18" cy="-3.5" r="0.9" fill="#ffffff"/>
+      <circle cx="18" cy="3.5" r="0.9" fill="#ffffff"/>
+      <!-- Peaked iron brow rim -->
+      <path d="M 12 -11 L 24 0 L 12 11" fill="none" stroke="url(#sm-gold)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
   </g>
 </svg>

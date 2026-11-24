@@ -1,17 +1,101 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Lightslinger: two relic pistols firing rays of light -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#fffbe8"/><stop offset="0.5" stop-color="#ffe9a8" stop-opacity="0.8"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient>
-    <g id="gun">
-      <path d="M 27 -1.5 L 80 -1.5" stroke="#ffcf5a" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
-      <path d="M 27 -1.5 L 80 -1.5" stroke="#fffbe8" stroke-width="2.6" stroke-linecap="round"/>
-      <path d="M -5 -6 L 24 -6 L 26 -4 L 26 1 L 9 1 L 7 4 L 2.5 4 L 0.5 14 L -7 14 L -5 3 Z" fill="#2b2f38" stroke="#c9a45c" stroke-width="1.3" stroke-linejoin="round"/>
-      <path d="M -3 -3.6 L 22 -3.6" stroke="#c9a45c" stroke-width="1"/>
-      <path d="M 3 4 C 3 7 7 7 8 1" fill="none" stroke="#c9a45c" stroke-width="1"/>
-      <circle cx="1.5" cy="-1" r="1.7" fill="#fffbe8"/>
-      <circle cx="27" cy="-1.5" r="5" fill="url(#glow)"/>
-    </g>
+  <!-- Lightslinger: Twin Sentinel Relic Pistols (Lucian's silver-gold pistol + Senna's gunmetal-teal relic gun) firing twin gleaming light bursts -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd86b" stop-opacity="0.48"/>
+      <stop offset="0.52" stop-color="#3cd8d0" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#1b6e78" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="silver" x1="0" y1="-8" x2="26" y2="6" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.48" stop-color="#dce4f0"/>
+      <stop offset="1" stop-color="#8996ab"/>
+    </linearGradient>
+    <linearGradient id="goldtrim" x1="0" y1="-8" x2="26" y2="6" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0b3"/>
+      <stop offset="0.5" stop-color="#e5ae3e"/>
+      <stop offset="1" stop-color="#9c6118"/>
+    </linearGradient>
+    <linearGradient id="gunmetal" x1="0" y1="-8" x2="26" y2="6" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6e7b8f"/>
+      <stop offset="0.5" stop-color="#3a4354"/>
+      <stop offset="1" stop-color="#1d232e"/>
+    </linearGradient>
+    <linearGradient id="goldbeam" x1="25" y1="0" x2="54" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffdf0"/>
+      <stop offset="0.45" stop-color="#ffcf54"/>
+      <stop offset="1" stop-color="#ff991f" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="tealbeam" x1="25" y1="0" x2="54" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#effffe"/>
+      <stop offset="0.45" stop-color="#48f0e2"/>
+      <stop offset="1" stop-color="#149e9a" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="goldflare" cx="27" cy="-2" r="9.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.38" stop-color="#ffe27a" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ff9e22" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="tealflare" cx="27" cy="-2" r="9.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.38" stop-color="#66fff2" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#14a8a4" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <use href="#gun" transform="translate(9 27) rotate(-30) scale(0.85)"/>
-  <use href="#gun" transform="translate(20 47) rotate(-30) scale(0.85)"/>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+
+  <!-- Upper Pistol: Lucian's silver-gold Sentinel Relic Pistol firing warm gold burst -->
+  <g transform="translate(15 28) rotate(-32) scale(0.95)">
+    <!-- Twin gold light burst beam -->
+    <path d="M 25 -6 L 54 -2 L 25 2 Z" fill="url(#goldbeam)" opacity="0.85"/>
+    <path d="M 26 -3.4 L 49 -2 L 26 -0.6 Z" fill="#fffef2"/>
+    <circle cx="27" cy="-2" r="9.5" fill="url(#goldflare)"/>
+    <path d="M 27 -9.5 L 28.4 -3.4 L 35.5 -2 L 28.4 -0.6 L 27 5.5 L 25.6 -0.6 L 20.5 -2 L 25.6 -3.4 Z" fill="#fffbe6"/>
+    <!-- Grip -->
+    <path d="M -5 1 L 3 1 L 0 12.5 L -7.5 11.5 Z" fill="#542c1a" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+    <path d="M -4.2 3.6 L 0.5 4.2 M -5 7.4 L -0.4 8" stroke="#2c140a" stroke-width="1.3" stroke-linecap="round"/>
+    <!-- Trigger guard -->
+    <path d="M 2 2 C 2.5 6.8 8 6.8 9 1.5" fill="none" stroke="#1a1d24" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M 2 2 C 2.5 6.8 8 6.8 9 1.5" fill="none" stroke="#e5ae3e" stroke-width="1.3" stroke-linecap="round"/>
+    <!-- Main silver-gold relic barrel -->
+    <path d="M -6 -6.2 L 21 -6.2 L 26 -3.5 L 25 1.8 L 9.5 1.8 L 6 3.2 L -5.5 3.2 L -8.2 -1.2 Z" fill="url(#silver)" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+    <!-- Gold upper rail & muzzle collar -->
+    <path d="M -4 -6.2 L 20.5 -6.2 L 24.5 -3.6 L 19 -3.6 L -4 -3.6 Z" fill="url(#goldtrim)"/>
+    <path d="M 20.5 -5.2 L 20.5 1.4" stroke="#1a1d24" stroke-width="1.5"/>
+    <!-- Glowing golden lightstone core -->
+    <path d="M 2 -2.2 L 16.5 -2.2 L 18 -0.6 L 16.5 0.6 L 2 0.6 Z" fill="#ffe680" stroke="#9c6118" stroke-width="0.9"/>
+    <path d="M 3.5 -0.8 L 15.5 -0.8" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Specular metallic highlight -->
+    <path d="M -3.5 -4.9 L 17.5 -4.9" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+  </g>
+
+  <!-- Lower Pistol: Senna's darker gunmetal-and-teal Relic Gun firing radiant teal burst -->
+  <g transform="translate(22 46) rotate(-32) scale(0.95)">
+    <!-- Radiant teal light burst beam -->
+    <path d="M 25 -6 L 54 -2 L 25 2 Z" fill="url(#tealbeam)" opacity="0.88"/>
+    <path d="M 26 -3.4 L 49 -2 L 26 -0.6 Z" fill="#f0ffff"/>
+    <circle cx="27" cy="-2" r="9.5" fill="url(#tealflare)"/>
+    <path d="M 27 -9.5 L 28.4 -3.4 L 35.5 -2 L 28.4 -0.6 L 27 5.5 L 25.6 -0.6 L 20.5 -2 L 25.6 -3.4 Z" fill="#ebffff"/>
+    <!-- Grip -->
+    <path d="M -5 1 L 3 1 L 0 12.5 L -7.5 11.5 Z" fill="#1e2430" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+    <path d="M -4.2 3.8 L 0.5 4.4 M -5 7.4 L -0.4 8" stroke="#4d5a70" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Trigger guard -->
+    <path d="M 2 2 C 2.5 6.8 8 6.8 9 1.5" fill="none" stroke="#1a1d24" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M 2 2 C 2.5 6.8 8 6.8 9 1.5" fill="none" stroke="#76c7c4" stroke-width="1.3" stroke-linecap="round"/>
+    <!-- Main gunmetal relic body -->
+    <path d="M -6.5 -6.2 L 21.5 -6.2 L 26.2 -3.4 L 24.8 1.8 L 9.5 1.8 L 6 3.2 L -5.5 3.2 L -8.4 -1.2 Z" fill="url(#gunmetal)" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+    <!-- Dark bronze-silver upper rail -->
+    <path d="M -4 -6.2 L 21 -6.2 L 24.5 -3.6 L 19 -3.6 L -4 -3.6 Z" fill="#8b9ab0" opacity="0.45"/>
+    <path d="M 20.5 -5.2 L 20.5 1.4" stroke="#1a1d24" stroke-width="1.5"/>
+    <!-- Glowing teal relic core -->
+    <path d="M 1.5 -2.2 L 16.5 -2.2 L 18 -0.6 L 16.5 0.6 L 1.5 0.6 Z" fill="#4cf5e6" stroke="#146368" stroke-width="0.9"/>
+    <path d="M 3.5 -0.8 L 15.5 -0.8" stroke="#ebffff" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Metallic moonlight highlight -->
+    <path d="M -3.5 -4.9 L 17.5 -4.9" stroke="#d9e8ff" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+  </g>
+
+  <!-- Crisp twin energy sparkles -->
+  <path d="M 55 8 L 56.1 10.6 L 58.7 11.7 L 56.1 12.8 L 55 15.4 L 53.9 12.8 L 51.3 11.7 L 53.9 10.6 Z" fill="#fff4c4"/>
+  <path d="M 56 32 L 56.9 34.1 L 59 35 L 56.9 35.9 L 56 38 L 55.1 35.9 L 53 35 L 55.1 34.1 Z" fill="#9efff6"/>
+  <path d="M 10 15 L 10.8 16.8 L 12.6 17.6 L 10.8 18.4 L 10 20.2 L 9.2 18.4 L 7.4 17.6 L 9.2 16.8 Z" fill="#ffe285"/>
 </svg>

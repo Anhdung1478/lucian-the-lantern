@@ -1,63 +1,228 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="176" height="176" viewBox="0 0 176 176">
-  <!-- Merchant, top-down: a hooded trader sitting behind a patterned rug stall with his wares, a big strapped pack on his back, a hanging lantern at his side. Center of the image = center of his body. -->
+  <!-- Traveling Merchant Stall (top-down / high-angle 3/4 view facing south +Y, centered around 88,88): cozy crimson-and-gold woven rug & wooden counter, top-down wares, warm brass camp lantern, hooded Merchant with wooden leather-strapped backpack. -->
   <defs>
-    <linearGradient id="rug" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9c3228"/><stop offset="1" stop-color="#5a1714"/></linearGradient>
-    <radialGradient id="cloak" cx="0.45" cy="0.4"><stop offset="0" stop-color="#6f58a0"/><stop offset="1" stop-color="#2c2244"/></radialGradient>
-    <radialGradient id="hood" cx="0.4" cy="0.35"><stop offset="0" stop-color="#9a7850"/><stop offset="1" stop-color="#4a3420"/></radialGradient>
-    <linearGradient id="pack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b88850"/><stop offset="1" stop-color="#6a4622"/></linearGradient>
-    <radialGradient id="lamp" cx="0.5" cy="0.5"><stop offset="0" stop-color="#ffe28a" stop-opacity="0.9"/><stop offset="1" stop-color="#ffb03a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="mRug" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#a82c2c"/>
+      <stop offset="0.55" stop-color="#761b1e"/>
+      <stop offset="1" stop-color="#450e12"/>
+    </linearGradient>
+    <linearGradient id="mWood" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#8c5a34"/>
+      <stop offset="0.5" stop-color="#613b20"/>
+      <stop offset="1" stop-color="#3c2211"/>
+    </linearGradient>
+    <linearGradient id="mWoodLip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b2c16"/>
+      <stop offset="1" stop-color="#29160a"/>
+    </linearGradient>
+    <linearGradient id="mGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe58f"/>
+      <stop offset="0.5" stop-color="#d49b35"/>
+      <stop offset="1" stop-color="#7a5114"/>
+    </linearGradient>
+    <linearGradient id="mPackWood" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#9e6c3d"/>
+      <stop offset="0.55" stop-color="#6b4423"/>
+      <stop offset="1" stop-color="#422813"/>
+    </linearGradient>
+    <linearGradient id="mLeather" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5e3a20"/>
+      <stop offset="1" stop-color="#2e1b0d"/>
+    </linearGradient>
+    <radialGradient id="mCloak" cx="0.35" cy="0.32" r="0.72">
+      <stop offset="0" stop-color="#96343c"/>
+      <stop offset="0.55" stop-color="#611e28"/>
+      <stop offset="1" stop-color="#300f18"/>
+    </radialGradient>
+    <radialGradient id="mHood" cx="0.35" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#b88450"/>
+      <stop offset="0.6" stop-color="#7c532e"/>
+      <stop offset="1" stop-color="#402815"/>
+    </radialGradient>
+    <radialGradient id="mLanternPool" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe694" stop-opacity="0.68"/>
+      <stop offset="0.45" stop-color="#ffaa38" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ff8814" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mHpGlass" cx="0.35" cy="0.32" r="0.68">
+      <stop offset="0" stop-color="#ff6e75"/>
+      <stop offset="0.55" stop-color="#c9182b"/>
+      <stop offset="1" stop-color="#5e0914"/>
+    </radialGradient>
+    <radialGradient id="mMpGlass" cx="0.35" cy="0.32" r="0.68">
+      <stop offset="0" stop-color="#7cc4ff"/>
+      <stop offset="0.55" stop-color="#1e68d6"/>
+      <stop offset="1" stop-color="#0d2c6b"/>
+    </radialGradient>
+    <linearGradient id="mChestLid" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#874824"/>
+      <stop offset="0.55" stop-color="#592b13"/>
+      <stop offset="1" stop-color="#331608"/>
+    </linearGradient>
+    <linearGradient id="mScroll" x1="0" y1="0" x2="1" y2="0.2">
+      <stop offset="0" stop-color="#f7ecd0"/>
+      <stop offset="0.65" stop-color="#d9c69a"/>
+      <stop offset="1" stop-color="#a89368"/>
+    </linearGradient>
   </defs>
-  <!-- rug in front (below) of him -->
-  <rect x="22" y="92" width="132" height="70" rx="8" fill="url(#rug)" stroke="#2a0c0a" stroke-width="3"/>
-  <rect x="30" y="99" width="116" height="56" rx="5" fill="none" stroke="#e0b04a" stroke-width="2.4"/>
-  <path d="M 88 104 L 110 127 L 88 150 L 66 127 Z" fill="none" stroke="#e0b04a" stroke-width="2.2"/>
-  <path d="M 88 114 L 100 127 L 88 140 L 76 127 Z" fill="#c8902e" opacity="0.7"/>
-  <path d="M 30 104 L 40 104 M 30 150 L 40 150 M 136 104 L 146 104 M 136 150 L 146 150" stroke="#e0b04a" stroke-width="2.4" stroke-linecap="round"/>
-  <path d="M 26 162 l 0 7 M 36 162 l 0 7 M 46 162 l 0 7 M 56 162 l 0 7 M 120 162 l 0 7 M 130 162 l 0 7 M 140 162 l 0 7 M 150 162 l 0 7" stroke="#e0b04a" stroke-width="2.6" stroke-linecap="round"/>
-  <path d="M 28 94 L 148 94" stroke="#d65a46" stroke-width="2" opacity="0.7"/>
-  <!-- pack behind him, strapped -->
-  <rect x="56" y="8" width="64" height="42" rx="10" fill="url(#pack)" stroke="#2e1c0a" stroke-width="3"/>
-  <path d="M 62 22 L 114 22" stroke="#4a2e12" stroke-width="3"/>
-  <path d="M 70 12 L 70 48 M 106 12 L 106 48" stroke="#4a2e12" stroke-width="3" opacity="0.8"/>
-  <rect x="82" y="15" width="12" height="13" rx="2" fill="#e6c25a" stroke="#2e1c0a" stroke-width="2"/>
-  <path d="M 62 14 Q 88 9 114 14" fill="none" stroke="#e0b880" stroke-width="2.4" stroke-linecap="round" opacity="0.8"/>
-  <!-- bedroll on the pack -->
-  <rect x="120" y="22" width="14" height="30" rx="6" fill="#7a8a5a" stroke="#2e3a1a" stroke-width="2.6"/>
-  <path d="M 123 30 L 131 30 M 123 40 L 131 40" stroke="#2e3a1a" stroke-width="2.2"/>
-  <!-- hanging lantern at his side -->
-  <circle cx="30" cy="68" r="16" fill="url(#lamp)"/>
-  <rect x="24" y="61" width="12" height="14" rx="3" fill="#ffd45a" stroke="#3a2406" stroke-width="2.6"/>
-  <path d="M 24 68 L 36 68 M 30 61 L 30 75" stroke="#3a2406" stroke-width="1.8"/>
-  <!-- body: cloak and shoulders -->
-  <ellipse cx="88" cy="70" rx="40" ry="28" fill="url(#cloak)" stroke="#140f22" stroke-width="3"/>
-  <path d="M 62 56 Q 88 46 114 56" fill="none" stroke="#a894dc" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/>
-  <path d="M 60 82 C 70 92 106 92 116 82" fill="none" stroke="#8a74c0" stroke-width="2.4" opacity="0.7"/>
-  <path d="M 66 64 L 72 78 M 110 64 L 104 78" stroke="#2c2244" stroke-width="2.4" stroke-linecap="round"/>
-  <!-- arms resting forward -->
-  <ellipse cx="56" cy="86" rx="11" ry="9" fill="#4c3c74" stroke="#140f22" stroke-width="2.5"/>
-  <ellipse cx="120" cy="86" rx="11" ry="9" fill="#4c3c74" stroke="#140f22" stroke-width="2.5"/>
-  <circle cx="58" cy="93" r="5" fill="#d4a47c" stroke="#3a2410" stroke-width="1.8"/>
-  <circle cx="118" cy="93" r="5" fill="#d4a47c" stroke="#3a2410" stroke-width="1.8"/>
-  <!-- hood, opening toward the rug -->
-  <circle cx="88" cy="64" r="22" fill="url(#hood)" stroke="#24160a" stroke-width="3"/>
-  <ellipse cx="88" cy="74" rx="12" ry="9" fill="#1a1008"/>
-  <path d="M 79 78 Q 88 90 97 78 Q 88 82 79 78 Z" fill="#c8b8a0"/>
-  <circle cx="83" cy="73" r="2" fill="#ffcf5a"/>
-  <circle cx="93" cy="73" r="2" fill="#ffcf5a"/>
-  <path d="M 72 52 C 78 46 92 44 100 50" fill="none" stroke="#c8a070" stroke-width="2.8" stroke-linecap="round" opacity="0.85"/>
-  <!-- wares on the rug -->
-  <circle cx="48" cy="128" r="9" fill="#d4182a" stroke="#2a0608" stroke-width="2.4"/>
-  <rect x="45" y="114" width="6" height="6" rx="1" fill="#b07a44" stroke="#2a0608" stroke-width="1.4"/>
-  <circle cx="45" cy="125" r="2.4" fill="#ffd0c8"/>
-  <rect x="117" y="118" width="16" height="22" rx="3" fill="#2a7ae8" stroke="#08101e" stroke-width="2.4"/>
-  <rect x="121" y="112" width="8" height="7" rx="1" fill="#c8d2e0" stroke="#08101e" stroke-width="1.4"/>
-  <path d="M 121 123 L 121 135" stroke="#bfe4ff" stroke-width="2" stroke-linecap="round"/>
-  <rect x="74" y="132" width="28" height="18" rx="3" fill="#c8902e" stroke="#3a2406" stroke-width="2.4"/>
-  <path d="M 74 139 L 102 139" stroke="#3a2406" stroke-width="2"/>
-  <rect x="85" y="136" width="6" height="7" rx="1" fill="#fff1c2" stroke="#3a2406" stroke-width="1.2"/>
-  <circle cx="64" cy="146" r="4.5" fill="#f2b938" stroke="#5a3a06" stroke-width="1.6"/>
-  <circle cx="70" cy="150" r="4.5" fill="#f2b938" stroke="#5a3a06" stroke-width="1.6"/>
-  <circle cx="110" cy="148" r="4.5" fill="#f2b938" stroke="#5a3a06" stroke-width="1.6"/>
-  <rect x="136" y="128" width="12" height="22" rx="5" fill="#e8dcb8" stroke="#3a2a10" stroke-width="2.2"/>
-  <path d="M 136 134 L 148 134 M 136 144 L 148 144" stroke="#a8362a" stroke-width="2.4"/>
+
+  <!-- Richly woven crimson-and-gold camp rug seen from above -->
+  <g>
+    <!-- Gold rug fringes along front and back edges -->
+    <path d="M 24 158 L 24 166 M 32 158 L 32 166 M 40 158 L 40 166 M 48 158 L 48 166 M 56 158 L 56 166 M 64 158 L 64 166 M 72 158 L 72 166 M 80 158 L 80 166 M 88 158 L 88 166 M 96 158 L 96 166 M 104 158 L 104 166 M 112 158 L 112 166 M 120 158 L 120 166 M 128 158 L 128 166 M 136 158 L 136 166 M 144 158 L 144 166 M 152 158 L 152 166" stroke="#d9a644" stroke-width="2" stroke-linecap="round"/>
+    <!-- Rug body -->
+    <rect x="18" y="84" width="140" height="75" rx="7" fill="url(#mRug)" stroke="#14171f" stroke-width="2"/>
+    <!-- Ornate gold woven border & corners -->
+    <rect x="24" y="90" width="128" height="63" rx="4" fill="none" stroke="url(#mGold)" stroke-width="2"/>
+    <rect x="28" y="94" width="120" height="55" rx="2" fill="none" stroke="#4f1216" stroke-width="1.2"/>
+    <!-- Center medallion peeking under/around counter -->
+    <polygon points="88,144 102,152 88,158 74,152" fill="#d49b35" opacity="0.65"/>
+    <path d="M 25 148 L 34 152 M 151 148 L 142 152" stroke="#f0c869" stroke-width="1.6" stroke-linecap="round"/>
+  </g>
+
+  <!-- Packed wooden leather-strapped traveling backpack behind shoulders (top) -->
+  <g>
+    <!-- Coiled hemp rope strapped to left side of pack -->
+    <ellipse cx="47" cy="36" rx="9" ry="12" fill="#b89862" stroke="#14171f" stroke-width="1.8"/>
+    <ellipse cx="47" cy="36" rx="5.2" ry="7.5" fill="none" stroke="#6e532b" stroke-width="1.6"/>
+    <ellipse cx="47" cy="36" rx="2.4" ry="3.6" fill="#423019"/>
+
+    <!-- Rolled olive-tan bedroll strapped to right side of pack -->
+    <rect x="118" y="21" width="15" height="31" rx="6.5" fill="#6a784c" stroke="#14171f" stroke-width="1.8"/>
+    <path d="M 121 24 C 122 30, 122 44, 121 49" stroke="#9eb078" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+    <path d="M 118 29 L 133 29 M 118 43 L 133 43" stroke="#332010" stroke-width="2.4"/>
+
+    <!-- Main wooden-framed leather pack -->
+    <rect x="53" y="13" width="70" height="41" rx="8" fill="url(#mPackWood)" stroke="#14171f" stroke-width="2"/>
+    <!-- Wood slats & top-left bevel -->
+    <path d="M 55 24 L 121 24 M 55 37 L 121 37" stroke="#3d2310" stroke-width="1.4" opacity="0.7"/>
+    <path d="M 58 17 L 116 17" stroke="#d4a674" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+    <!-- Leather straps & brass buckles -->
+    <rect x="65" y="13" width="8" height="41" fill="url(#mLeather)" stroke="#14171f" stroke-width="1.4"/>
+    <rect x="103" y="13" width="8" height="41" fill="url(#mLeather)" stroke="#14171f" stroke-width="1.4"/>
+    <rect x="64" y="26" width="10" height="8" rx="1.5" fill="url(#mGold)" stroke="#14171f" stroke-width="1.3"/>
+    <rect x="102" y="26" width="10" height="8" rx="1.5" fill="url(#mGold)" stroke="#14171f" stroke-width="1.3"/>
+    <!-- Center leather satchel flap -->
+    <path d="M 76 15 L 100 15 L 98 34 Q 88 38 78 34 Z" fill="#704424" stroke="#14171f" stroke-width="1.5"/>
+    <circle cx="88" cy="31" r="2.6" fill="url(#mGold)" stroke="#14171f" stroke-width="1.1"/>
+  </g>
+
+  <!-- Low wooden peddler's display counter table (high-angle top-down) -->
+  <g>
+    <!-- Front vertical lip (gives 3/4 top-down thickness) -->
+    <rect x="27" y="136" width="122" height="12" rx="3" fill="url(#mWoodLip)" stroke="#14171f" stroke-width="1.9"/>
+    <!-- Counter tabletop planks -->
+    <rect x="26" y="95" width="124" height="45" rx="4" fill="url(#mWood)" stroke="#14171f" stroke-width="2"/>
+    <!-- Plank seams & wood grain highlights -->
+    <path d="M 28 110 L 148 110 M 28 125 L 148 125" stroke="#361f10" stroke-width="1.3" opacity="0.75"/>
+    <path d="M 32 99 L 142 99" stroke="#ba8454" stroke-width="1.6" stroke-linecap="round" opacity="0.55"/>
+    <!-- Corner brass brackets -->
+    <path d="M 27 104 L 27 96 L 36 96 M 149 104 L 149 96 L 140 96 M 27 131 L 27 139 L 36 139 M 149 131 L 149 139 L 140 139" fill="none" stroke="url(#mGold)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Decorative crimson runner cloth draped down center of counter -->
+    <rect x="69" y="96" width="38" height="47" rx="2" fill="#821d23" stroke="#14171f" stroke-width="1.4"/>
+    <path d="M 73 97 L 73 142 M 103 97 L 103 142" stroke="#e0b24c" stroke-width="1.4"/>
+  </g>
+
+  <!-- Hooded Traveling Merchant seen from above behind the counter -->
+  <g>
+    <!-- Broad warm crimson-burgundy mantle & shoulders -->
+    <path d="M 46 66 C 46 47, 65 40, 88 40 C 111 40, 130 47, 130 66 C 130 82, 114 91, 88 91 C 62 91, 46 82, 46 66 Z" fill="url(#mCloak)" stroke="#14171f" stroke-width="2"/>
+    <!-- Gold embroidered mantle hem & shoulder folds -->
+    <path d="M 52 62 C 62 50, 114 50, 124 62" fill="none" stroke="#c96569" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+    <path d="M 53 77 C 66 87, 110 87, 123 77" fill="none" stroke="url(#mGold)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 63 58 L 69 78 M 113 58 L 107 78" stroke="#2c0d14" stroke-width="1.8" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- Arms resting naturally forward on the counter edge -->
+    <path d="M 53 74 C 50 83, 53 91, 61 95" fill="none" stroke="#14171f" stroke-width="12" stroke-linecap="round"/>
+    <path d="M 53 74 C 50 83, 53 91, 61 95" fill="none" stroke="#6c222c" stroke-width="8.2" stroke-linecap="round"/>
+    <path d="M 123 74 C 126 83, 123 91, 115 95" fill="none" stroke="#14171f" stroke-width="12" stroke-linecap="round"/>
+    <path d="M 123 74 C 126 83, 123 91, 115 95" fill="none" stroke="#6c222c" stroke-width="8.2" stroke-linecap="round"/>
+    <!-- Gold sleeve cuffs & welcoming hands -->
+    <path d="M 55 89 L 63 92 M 121 89 L 113 92" stroke="url(#mGold)" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="62" cy="96" r="4.8" fill="#d9a57e" stroke="#14171f" stroke-width="1.6"/>
+    <circle cx="114" cy="96" r="4.8" fill="#d9a57e" stroke="#14171f" stroke-width="1.6"/>
+
+    <!-- Draped leather traveler's hood (opening southward toward +Y) -->
+    <path d="M 66 64 C 66 47, 76 40, 88 40 C 100 40, 110 47, 110 64 C 110 76, 101 84, 88 85 C 75 84, 66 76, 66 64 Z" fill="url(#mHood)" stroke="#14171f" stroke-width="2"/>
+    <!-- Top-left hood ridge highlight & stitched center seam -->
+    <path d="M 88 41 L 88 54" stroke="#452a16" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 71 54 C 75 46, 84 44, 92 45" fill="none" stroke="#dfb07c" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    <!-- Deep cozy shadow under hood brim -->
+    <path d="M 74 71 C 77 65, 99 65, 102 71 C 101 80, 95 84, 88 84 C 81 84, 75 80, 74 71 Z" fill="#17100c"/>
+    <!-- Neat silver-white merchant beard peeking forward -->
+    <path d="M 79 79 C 83 86, 93 86, 97 79 C 93 81, 83 81, 79 79 Z" fill="#d8cbb8" stroke="#14171f" stroke-width="1.2"/>
+    <!-- Warm inviting golden eye glints inside hood shadow -->
+    <path d="M 80.5 73.5 L 84.5 73.5 M 91.5 73.5 L 95.5 73.5" stroke="#ffcf5c" stroke-width="2" stroke-linecap="round"/>
+    <!-- Gold rim along hood opening -->
+    <path d="M 71 71 C 75 63, 101 63, 105 71" fill="none" stroke="url(#mGold)" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+
+  <!-- Neatly arranged top-down wares on the counter -->
+  <g>
+    <!-- 1. Gleaming Gold-Banded Treasure Chest (center) -->
+    <g>
+      <rect x="73" y="106" width="30" height="22" rx="3.5" fill="url(#mChestLid)" stroke="#14171f" stroke-width="1.8"/>
+      <!-- Curved lid highlight & gold iron straps -->
+      <path d="M 75 112 L 101 112" stroke="#b57145" stroke-width="1.8" opacity="0.7"/>
+      <rect x="78" y="106" width="4" height="22" fill="url(#mGold)" stroke="#14171f" stroke-width="1.1"/>
+      <rect x="94" y="106" width="4" height="22" fill="url(#mGold)" stroke="#14171f" stroke-width="1.1"/>
+      <path d="M 73 121 L 103 121" stroke="#14171f" stroke-width="1.8"/>
+      <!-- Glowing gold seam & ornate lock clasp -->
+      <path d="M 82 121 L 94 121" stroke="#ffe582" stroke-width="1.4"/>
+      <rect x="85.5" y="118.5" width="5" height="6.5" rx="1" fill="#ffdf78" stroke="#14171f" stroke-width="1.2"/>
+    </g>
+
+    <!-- 2. Red HP Potion Vial (left-center, seen from above) -->
+    <g>
+      <circle cx="51" cy="117" r="8.5" fill="url(#mHpGlass)" stroke="#14171f" stroke-width="1.7"/>
+      <ellipse cx="48.5" cy="113.5" rx="3.2" ry="1.8" transform="rotate(-25 48.5 113.5)" fill="#ffc9cc" opacity="0.85"/>
+      <!-- Top-down vial neck & cork -->
+      <circle cx="51" cy="114.5" r="3.4" fill="#d9b8a0" stroke="#14171f" stroke-width="1.2"/>
+      <circle cx="51" cy="114.5" r="2" fill="#9c6a3e"/>
+    </g>
+
+    <!-- 3. Blue MP Potion Vial (right-center, seen from above) -->
+    <g>
+      <polygon points="111,109 121,109 124,116 121,125 111,125 108,116" fill="url(#mMpGlass)" stroke="#14171f" stroke-width="1.7" stroke-linejoin="round"/>
+      <path d="M 111 112 L 114 121" stroke="#bfe6ff" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
+      <circle cx="116" cy="114.5" r="3.2" fill="#c7d5e6" stroke="#14171f" stroke-width="1.2"/>
+      <circle cx="116" cy="114.5" r="1.8" fill="#8f633a"/>
+    </g>
+
+    <!-- 4. Rolled Parchment Scrolls (right edge) -->
+    <g>
+      <rect x="129" y="104" width="11" height="25" rx="4" transform="rotate(10 134 116)" fill="url(#mScroll)" stroke="#14171f" stroke-width="1.6"/>
+      <path d="M 129 115 L 140 117" stroke="#a62424" stroke-width="2.4"/>
+      <circle cx="134.5" cy="116" r="2.2" fill="#d93829" stroke="#14171f" stroke-width="0.9"/>
+      <rect x="135" y="112" width="9" height="22" rx="3.5" transform="rotate(-8 139 123)" fill="url(#mScroll)" stroke="#14171f" stroke-width="1.5"/>
+      <path d="M 135 123 L 144 122" stroke="#a62424" stroke-width="2"/>
+    </g>
+
+    <!-- 5. Relic Dagger & Emerald Amulet + Gold Coins -->
+    <g>
+      <!-- Ornate silver dagger (front-left) -->
+      <polygon points="39,133 54,127 59,129 44,135" fill="#d8e3eb" stroke="#14171f" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M 53 125 L 57 132" stroke="url(#mGold)" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M 56 128 L 62 126" stroke="#4a2b14" stroke-width="2.6" stroke-linecap="round"/>
+      <!-- Gleaming gold coins & emerald amulet -->
+      <circle cx="65" cy="133" r="3.4" fill="url(#mGold)" stroke="#14171f" stroke-width="1.2"/>
+      <circle cx="70" cy="135" r="3.4" fill="url(#mGold)" stroke="#14171f" stroke-width="1.2"/>
+      <circle cx="109" cy="133" r="4.2" fill="url(#mGold)" stroke="#14171f" stroke-width="1.3"/>
+      <polygon points="109,130.3 111.4,133 109,135.7 106.6,133" fill="#46e69c" stroke="#14171f" stroke-width="0.8"/>
+    </g>
+  </g>
+
+  <!-- Warm Glowing Brass Camp Lantern on the left corner casting golden light -->
+  <g>
+    <!-- Soft warm light pool washing across left corner of counter & wares -->
+    <circle cx="34" cy="96" r="34" fill="url(#mLanternPool)"/>
+    <!-- Iron lantern bracket post -->
+    <circle cx="29" cy="93" r="4.5" fill="#3a3f4a" stroke="#14171f" stroke-width="1.5"/>
+    <!-- Ornate hexagonal brass camp lantern seen from above -->
+    <polygon points="34,86 42,90 42,99 34,103 26,99 26,90" fill="#ffdf70" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <circle cx="34" cy="94.5" r="4.5" fill="#fff8d6"/>
+    <!-- Brass top cap ribs & finial -->
+    <path d="M 34 86 L 34 103 M 26 90 L 42 99 M 42 90 L 26 99" stroke="#5c3c12" stroke-width="1.3"/>
+    <circle cx="34" cy="94.5" r="2.6" fill="url(#mGold)" stroke="#14171f" stroke-width="1.2"/>
+  </g>
 </svg>

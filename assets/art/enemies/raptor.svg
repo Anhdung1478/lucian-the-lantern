@@ -1,28 +1,72 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56">
-  <!-- Raptor: a small jungle bird raptor from above, red-crested, beak and talons forward (+X), a fan of tail feathers behind. -->
+  <!-- Raptor: fierce Crimson Jungle Raptor from above facing +X, sleek layered crimson-and-amber plumage, sharp swept predatory wings, hooked golden-black beak, fiery crest feathers. -->
+  <defs>
+    <linearGradient id="rp-body" x1="0.15" y1="0.05" x2="0.85" y2="0.95">
+      <stop offset="0" stop-color="#f0823c"/>
+      <stop offset="0.5" stop-color="#c43b24"/>
+      <stop offset="1" stop-color="#691a16"/>
+    </linearGradient>
+    <linearGradient id="rp-wing" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#d64a28"/>
+      <stop offset="0.55" stop-color="#94231c"/>
+      <stop offset="1" stop-color="#451012"/>
+    </linearGradient>
+    <linearGradient id="rp-crest" x1="1" y1="0.5" x2="0" y2="0.5">
+      <stop offset="0" stop-color="#ffd84d"/>
+      <stop offset="0.45" stop-color="#ff5324"/>
+      <stop offset="1" stop-color="#a81818"/>
+    </linearGradient>
+    <linearGradient id="rp-beak" x1="0" y1="0.3" x2="1" y2="0.7">
+      <stop offset="0" stop-color="#ffe166"/>
+      <stop offset="0.6" stop-color="#d98c24"/>
+      <stop offset="1" stop-color="#221c1c"/>
+    </linearGradient>
+  </defs>
+
   <g transform="translate(28 28)">
-    <g transform="scale(1.0)">
-    <!-- tail feathers -->
-    <ellipse cx="0" cy="0" rx="9.5" ry="3.6" transform="rotate(-30) translate(-17 0)" fill="#a8452a" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="0" cy="0" rx="3" ry="2.4" transform="rotate(-30) translate(-23 0)" fill="#ff3b3b"/><ellipse cx="0" cy="0" rx="9.5" ry="3.6" transform="rotate(30) translate(-17 0)" fill="#a8452a" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="0" cy="0" rx="3" ry="2.4" transform="rotate(30) translate(-23 0)" fill="#ff3b3b"/><ellipse cx="0" cy="0" rx="9.5" ry="3.6" transform="rotate(-15) translate(-17 0)" fill="#a8452a" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="0" cy="0" rx="3" ry="2.4" transform="rotate(-15) translate(-23 0)" fill="#ff3b3b"/><ellipse cx="0" cy="0" rx="9.5" ry="3.6" transform="rotate(15) translate(-17 0)" fill="#a8452a" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="0" cy="0" rx="3" ry="2.4" transform="rotate(15) translate(-23 0)" fill="#ff3b3b"/><ellipse cx="0" cy="0" rx="9.5" ry="3.6" transform="rotate(0) translate(-17 0)" fill="#a8452a" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="0" cy="0" rx="3" ry="2.4" transform="rotate(0) translate(-23 0)" fill="#ff3b3b"/>
-    <!-- legs and talons reaching forward -->
-    <path d="M 2 -8 L 10 -12 M 2 8 L 10 12" stroke="#1a1d24" stroke-width="6" stroke-linecap="round"/>
-    <path d="M 2 -8 L 10 -12 M 2 8 L 10 12" stroke="#e8c25a" stroke-width="3" stroke-linecap="round"/>
-    <path d="M 10 -12 L 15 -15 M 10 -12 L 15 -11 M 10 12 L 15 15 M 10 12 L 15 11" stroke="#1a1d24" stroke-width="4.5" stroke-linecap="round"/>
-    <path d="M 10 -12 L 15 -15 M 10 -12 L 15 -11 M 10 12 L 15 15 M 10 12 L 15 11" stroke="#f4e6b0" stroke-width="2" stroke-linecap="round"/>
-    <!-- body -->
-    <ellipse cx="-1" cy="0" rx="12.5" ry="11.5" fill="#d0643a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <ellipse cx="1" cy="-1" rx="6" ry="5" fill="#e88a5a" opacity="0.6"/>
-    <!-- folded wings with feather tips -->
-    <path d="M 6 -8 Q -2 -20 -20 -18 L -15 -14 L -21 -11 L -14 -8 L -18 -4 Q -6 -4 4 -3 Z" fill="#a8452a" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M 6 8 Q -2 20 -20 18 L -15 14 L -21 11 L -14 8 L -18 4 Q -6 4 4 3 Z" fill="#a8452a" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M 0 -9 L -13 -13 M 0 9 L -13 13" stroke="#d0643a" stroke-width="2.4" stroke-linecap="round"/>
-    
-    <!-- head, beak, crest -->
-    <circle cx="12" cy="0" r="7" fill="#e07444" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M 17.5 -4 L 26 0 L 17.5 4 Z" fill="#ffcf4a" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M 15 0 L 9 -4.5 L 10 -1.5 L 1 -7 L 4 0 L 1 7 L 10 1.5 L 9 4.5 Z" fill="#ff3b3b" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="14.5" cy="-4.5" r="2.2" fill="#ffe066"/><circle cx="14.5" cy="4.5" r="2.2" fill="#ffe066"/>
-    <circle cx="-2" cy="-4" r="3.5" fill="#ffffff" opacity="0.28"/>
+    <!-- Fanned sharp crimson-and-amber tail plumes (-X) -->
+    <g stroke="#14171f" stroke-width="1.5" stroke-linejoin="round">
+      <path d="M -9 -2 L -24 -12 L -20 -4 Z" fill="#8f211c"/>
+      <path d="M -9 2 L -24 12 L -20 4 Z" fill="#8f211c"/>
+      <path d="M -10 -1.5 L -26 -6 L -19 -1 Z" fill="#c93e24"/>
+      <path d="M -10 1.5 L -26 6 L -19 1 Z" fill="#c93e24"/>
+      <path d="M -10 -2 L -27 0 L -10 2 Z" fill="url(#rp-crest)"/>
     </g>
+
+    <!-- Sharp forward-reaching predatory talons -->
+    <g stroke="#14171f" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 4 -7 L 11 -11 L 16 -13 M 11 -11 L 15 -8.5" fill="none" stroke-width="3.2"/>
+      <path d="M 4 -7 L 11 -11 L 16 -13 M 11 -11 L 15 -8.5" fill="none" stroke="#f2cf66" stroke-width="1.5"/>
+      <path d="M 4 7 L 11 11 L 16 13 M 11 11 L 15 8.5" fill="none" stroke-width="3.2"/>
+      <path d="M 4 7 L 11 11 L 16 13 M 11 11 L 15 8.5" fill="none" stroke="#f2cf66" stroke-width="1.5"/>
+    </g>
+
+    <!-- Sharp swept predatory wings -->
+    <g stroke="#14171f" stroke-width="1.8" stroke-linejoin="round">
+      <!-- Upper wing -->
+      <path d="M 7 -5 C 2 -14, -8 -23, -21 -23 L -15 -16 L -22 -13 L -14 -9 L -18 -5 L 3 -3 Z" fill="url(#rp-wing)"/>
+      <!-- Lower wing -->
+      <path d="M 7 5 C 2 14, -8 23, -21 23 L -15 16 L -22 13 L -14 9 L -18 5 L 3 3 Z" fill="url(#rp-wing)"/>
+    </g>
+    <!-- Amber wing covert accents & feather shafts -->
+    <path d="M 2 -8 Q -6 -15 -16 -18 M -1 -7 L -14 -12 M 2 8 Q -6 15 -16 18 M -1 7 L -14 12" fill="none" stroke="#f59a42" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>
+
+    <!-- Sleek streamlined avian torso -->
+    <path d="M -13 0 C -11 -6.5, -3 -9.5, 6 -7.5 L 12 -3.5 L 12 3.5 L 6 7.5 C -3 9.5, -11 6.5, -13 0 Z" fill="url(#rp-body)" stroke="#14171f" stroke-width="1.9" stroke-linejoin="round"/>
+    <path d="M -7 -4 Q 0 -6.5 7 -4.5" fill="none" stroke="#ffbe66" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- Fierce hooked golden-black beak (+X) -->
+    <path d="M 16 -4.2 C 21 -3.8, 25 -1.5, 26.8 0 C 25 1.5, 21 3.8, 16 4.2 Z" fill="url(#rp-beak)" stroke="#14171f" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M 18 -0.8 L 24 0" stroke="#fff3b0" stroke-width="1.1" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Angular raptor head -->
+    <path d="M 6 -5.5 L 13 -6.8 L 18.5 -3.6 L 18.5 3.6 L 13 6.8 L 6 5.5 Z" fill="url(#rp-body)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+
+    <!-- Swept fiery crimson crest feathers -->
+    <path d="M 15 0 L 9 -3.8 L 10 -1.2 L -2 -6.8 L 2.5 -0.8 L -5 0 L 2.5 0.8 L -2 6.8 L 10 1.2 L 9 3.8 Z" fill="url(#rp-crest)" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+
+    <!-- Fierce narrow glowing amber-gold eyes -->
+    <path d="M 12.2 -5.2 L 17 -3.4 L 13.8 -2.8 Z" fill="#ffe866" stroke="#14171f" stroke-width="0.8" stroke-linejoin="round"/>
+    <path d="M 12.2 5.2 L 17 3.4 L 13.8 2.8 Z" fill="#ffe866" stroke="#14171f" stroke-width="0.8" stroke-linejoin="round"/>
   </g>
 </svg>

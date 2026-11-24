@@ -1,76 +1,75 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Spirit Visage (legendary): a serene pale-jade face mask with dark eye holes and glowing green eyes, a glowing gem on the brow, framed by a wreath of green leaves. -->
+  <!-- Spirit Visage: Ancient noble emerald spectral helm/visage sculpted in dark jade & gold filigree with glowing ethereal cyan-green eye slits and flowing spirit-leaf crest -->
   <defs>
     <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#7affb0" stop-opacity="0.5"/>
-      <stop offset="0.6" stop-color="#2f9a60" stop-opacity="0.22"/>
-      <stop offset="1" stop-color="#2f9a60" stop-opacity="0"/>
+      <stop offset="0" stop-color="#64ffc0" stop-opacity="0.54"/>
+      <stop offset="0.58" stop-color="#1f9968" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#0e4f38" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="jade" x1="16" y1="8" x2="48" y2="58" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#e6fbe2"/>
-      <stop offset="0.5" stop-color="#94d9a0"/>
-      <stop offset="1" stop-color="#3f945a"/>
+    <linearGradient id="darkJade" x1="16" y1="14" x2="48" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#64c996"/>
+      <stop offset="0.45" stop-color="#277a58"/>
+      <stop offset="0.85" stop-color="#124735"/>
+      <stop offset="1" stop-color="#0a2920"/>
     </linearGradient>
+    <linearGradient id="crestLeaf" x1="10" y1="4" x2="54" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9effd6"/>
+      <stop offset="0.45" stop-color="#35c488"/>
+      <stop offset="1" stop-color="#135e43"/>
+    </linearGradient>
+    <linearGradient id="goldFiligree" x1="20" y1="10" x2="44" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff2b8"/>
+      <stop offset="0.5" stop-color="#dfb043"/>
+      <stop offset="1" stop-color="#8f5d1a"/>
+    </linearGradient>
+    <radialGradient id="eyeGlow" cx="32" cy="32" r="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d8fff4"/>
+      <stop offset="0.5" stop-color="#48ffa8" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#19b878" stop-opacity="0"/>
+    </radialGradient>
   </defs>
   <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
-  <!-- laurel leaves along both sides: a dark leaf, its lit half, then the outline -->
-  <g transform="translate(25 55) rotate(-60)">
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 Z" fill="#7fd36e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  </g>
-  <g transform="translate(39 55) rotate(60)">
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
-    <path d="M 0 0 C -5.5 -4.5 -5.5 -12 0 -17 Z" fill="#7fd36e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  </g>
-  <g transform="translate(19 46) rotate(-45)">
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 Z" fill="#7fd36e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  </g>
-  <g transform="translate(45 46) rotate(45)">
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
-    <path d="M 0 0 C -5.5 -4.5 -5.5 -12 0 -17 Z" fill="#7fd36e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  </g>
-  <g transform="translate(17 35) rotate(-30)">
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 Z" fill="#7fd36e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  </g>
-  <g transform="translate(47 35) rotate(30)">
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
-    <path d="M 0 0 C -5.5 -4.5 -5.5 -12 0 -17 Z" fill="#7fd36e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  </g>
-  <g transform="translate(18 23) rotate(-15)">
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 Z" fill="#7fd36e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  </g>
-  <g transform="translate(46 23) rotate(15)">
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="#2f8a3e"/>
-    <path d="M 0 0 C -5.5 -4.5 -5.5 -12 0 -17 Z" fill="#7fd36e"/>
-    <path d="M 0 0 C 5.5 -4.5 5.5 -12 0 -17 C -5.5 -12 -5.5 -4.5 0 0 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  </g>
-  <!-- mask -->
-  <path d="M 32 7 C 42.5 7 48 15 48 25 C 48 31 46.5 35 46.5 40 C 46.5 50 40 57 32 59 C 24 57 17.5 50 17.5 40 C 17.5 35 16 31 16 25 C 16 15 21.5 7 32 7 Z" fill="url(#jade)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 19.5 22 C 20.5 15 25 10.5 30 9.8" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
-  <path d="M 20.5 41 C 22.5 44 22.5 47 21.5 50 M 43.5 41 C 41.5 44 41.5 47 42.5 50" fill="none" stroke="#4f9e64" stroke-width="1.5" stroke-linecap="round"/>
-  <!-- brows -->
-  <path d="M 19.5 25 C 22.5 22.5 27 22.5 30 24.8 M 44.5 25 C 41.5 22.5 37 22.5 34 24.8" fill="none" stroke="#3c8452" stroke-width="1.8" stroke-linecap="round"/>
-  <!-- eye holes and glowing eyes -->
-  <path d="M 19.5 30.5 C 22 26.8 27.5 26.8 30 30.5 C 27.5 33.6 22 33.6 19.5 30.5 Z M 44.5 30.5 C 42 26.8 36.5 26.8 34 30.5 C 36.5 33.6 42 33.6 44.5 30.5 Z" fill="#103020" stroke="#1a1d24" stroke-width="1.6" stroke-linejoin="round"/>
-  <ellipse cx="24.8" cy="30.4" rx="2.6" ry="1.6" fill="#a8ffc8"/>
-  <ellipse cx="39.2" cy="30.4" rx="2.6" ry="1.6" fill="#a8ffc8"/>
-  <!-- nose and mouth -->
-  <path d="M 32 31 C 32.6 35 33 38 30.8 40.5" fill="none" stroke="#3c8452" stroke-width="1.6" stroke-linecap="round"/>
-  <path d="M 27.5 47 C 30 48.6 34 48.6 36.5 47" fill="none" stroke="#2e6a3e" stroke-width="1.8" stroke-linecap="round"/>
-  <!-- brow gem -->
-  <path d="M 32 12.5 L 35 17 L 32 21.5 L 29 17 Z" fill="#6dffa0" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M 32 14.6 L 33.4 17 L 32 19.4 L 30.6 17 Z" fill="#eafff0"/>
-  <!-- sparkles -->
-  <path d="M 56 50 L 56.9 52.1 L 59 53 L 56.9 53.9 L 56 56 L 55.1 53.9 L 53 53 L 55.1 52.1 Z" fill="#e0ffec"/>
-  <path d="M 9 54 L 9.8 55.8 L 11.6 56.6 L 9.8 57.4 L 9 59.2 L 8.2 57.4 L 6.4 56.6 L 8.2 55.8 Z" fill="#9affc0"/>
+
+  <!-- Flowing Spirit-Leaf Winged Helm Crest -->
+  <!-- Lower outer spirit plumes -->
+  <path d="M 18 35 C 8 30 5 20 8 11 C 14 15 19 20 22 27 Z" fill="url(#crestLeaf)" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+  <path d="M 46 35 C 56 30 59 20 56 11 C 50 15 45 20 42 27 Z" fill="#1e7552" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+  <!-- Upper sweeping noble leaf-wings -->
+  <path d="M 22 24 C 13 18 11 9 18 3.5 C 23 8 27 12 29 19 Z" fill="url(#crestLeaf)" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+  <path d="M 42 24 C 51 18 53 9 46 3.5 C 41 8 37 12 35 19 Z" fill="#238860" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+  <!-- Central crown spire leaf -->
+  <path d="M 32 3 L 36.5 14 L 32 20 L 27.5 14 Z" fill="url(#crestLeaf)" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Lit leaf edge veins -->
+  <path d="M 11.5 16 C 14 21 17 25 20 28 M 19 7 C 21.5 11 24 14.5 26.5 18" fill="none" stroke="#c4ffea" stroke-width="1.3" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 52.5 16 C 50 21 47 25 44 28 M 45 7 C 42.5 11 40 14.5 37.5 18" fill="none" stroke="#56e6a8" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Sculpted Ancient Noble Dark-Jade Armored Helm / Visage -->
+  <path d="M 32 14 L 46 21 L 48.5 35 L 43.5 49 L 32 60 L 20.5 49 L 15.5 35 L 18 21 Z" fill="url(#darkJade)" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+  <!-- Lit left armor plane -->
+  <path d="M 32 15.5 L 19.5 22 L 17.2 35 L 22 48 L 32 58 Z" fill="#52b889" opacity="0.38"/>
+  <!-- Deep visor shadow cavity -->
+  <path d="M 19.5 28.5 L 32 31.5 L 44.5 28.5 L 43 37 L 32 39 L 21 37 Z" fill="#081c16"/>
+
+  <!-- Ornate Gold Filigree Brow Diadem, Nasal Guard & Cheek Trim -->
+  <path d="M 17 22.5 L 32 29 L 47 22.5 L 46.5 26 L 32 32.5 L 17.5 26 Z" fill="url(#goldFiligree)" stroke="#1a1d24" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M 30 27 L 34 27 L 33.4 45 L 32 48.5 L 30.6 45 Z" fill="url(#goldFiligree)" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Sculpted armored cheek-plate gold filigree lines -->
+  <path d="M 17.5 38 L 24.5 44 L 27.5 53 M 46.5 38 L 39.5 44 L 36.5 53" fill="none" stroke="url(#goldFiligree)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 27 52 L 32 55.5 L 37 52" fill="none" stroke="#dfb043" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- Piercing Glowing Ethereal Cyan-Green Eye Slits -->
+  <path d="M 20.5 31.5 L 29.2 33.6 L 27.6 36.4 L 21.8 34.8 Z" fill="#52ffbe"/>
+  <path d="M 43.5 31.5 L 34.8 33.6 L 36.4 36.4 L 42.2 34.8 Z" fill="#52ffbe"/>
+  <path d="M 22.2 32.8 L 28.2 34.4 M 41.8 32.8 L 35.8 34.4" stroke="#f0fff9" stroke-width="1.4" stroke-linecap="round"/>
+
+  <!-- Glowing Crown Spirit Gem -->
+  <path d="M 32 16 L 35.4 21.2 L 32 26.4 L 28.6 21.2 Z" fill="#5cffc6" stroke="#1a1d24" stroke-width="1.7" stroke-linejoin="round"/>
+  <path d="M 32 18.2 L 33.6 21.2 L 32 24.2 L 30.4 21.2 Z" fill="#f0fff9"/>
+
+  <!-- Metallic jade & gold rim highlight -->
+  <path d="M 19.2 23.5 L 17.5 33.5 M 21.5 47.5 L 29 55" fill="none" stroke="#c8ffea" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Ethereal spirit sparkles -->
+  <path d="M 55 46 L 56 48.4 L 58.4 49.4 L 56 50.4 L 55 52.8 L 54 50.4 L 51.6 49.4 L 54 48.4 Z" fill="#d8fff2"/>
+  <path d="M 9 48 L 9.9 50.1 L 12 51 L 9.9 51.9 L 9 54 L 8.1 51.9 L 6 51 L 8.1 50.1 Z" fill="#70ffc6"/>
 </svg>

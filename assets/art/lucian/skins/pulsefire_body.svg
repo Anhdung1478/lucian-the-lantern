@@ -1,101 +1,128 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <!-- Pulsefire Lucian, top-down, facing +X: white and blue time-trooper armor. Long white armored coat tails with deep blue inner panels and pale blue lights, a glowing time core on his back, rounded shoulder plates, a white helmet with a blue crest and a pale blue visor; his own white gun in his left hand (muzzle at 46, -15) and Senna's blue-and-white one with pale blue rings and a glowing core in his right (muzzle at 46, 15). Center of the image = center of his body. The game draws his shadow. -->
+  <!-- Pulsefire Lucian, top-down, facing +X. Crisp ceramic-white & cobalt chrono-armor coat tails with glowing sapphire conduits, sculpted pauldrons, luminous chrono-core on back, VISIBLE dark hair with cobalt comm-band & sleek translucent sapphire holographic visor (matching portrait!), white-cobalt left chrono pistol (muzzle at 46, -15) & blue-white Senna cannon with twin icy-blue rings & chrono core (muzzle at 46, 15). -->
   <defs>
     <radialGradient id="muzzle">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.4" stop-color="#b4ecff" stop-opacity="0.95"/>
-      <stop offset="1" stop-color="#7fd8ff" stop-opacity="0"/>
+      <stop offset="0.38" stop-color="#a8ecff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#5cc8ff" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="senna_muzzle">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.4" stop-color="#7fd8ff" stop-opacity="0.95"/>
-      <stop offset="1" stop-color="#4a5cff" stop-opacity="0"/>
+      <stop offset="0.38" stop-color="#7fe0ff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#3864ff" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="core">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.45" stop-color="#7fd8ff"/>
-      <stop offset="1" stop-color="#4a5cff" stop-opacity="0"/>
+      <stop offset="0.4" stop-color="#8ce8ff"/>
+      <stop offset="1" stop-color="#3864ff" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="tail" gradientUnits="userSpaceOnUse" x1="-6" y1="0" x2="-48" y2="0">
-      <stop offset="0" stop-color="#f4f8ff"/>
-      <stop offset="1" stop-color="#b6c6de"/>
-    </linearGradient>
-    <linearGradient id="white" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="ceramicTail" gradientUnits="userSpaceOnUse" x1="-4" y1="0" x2="-50" y2="0">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.55" stop-color="#dfe8f5"/>
-      <stop offset="1" stop-color="#9fb2cc"/>
+      <stop offset="0.52" stop-color="#dce7f7"/>
+      <stop offset="1" stop-color="#9cb2d4"/>
+    </linearGradient>
+    <linearGradient id="ceramic" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#dce7f7"/>
+      <stop offset="1" stop-color="#90a6c7"/>
+    </linearGradient>
+    <linearGradient id="cobalt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4878ff"/>
+      <stop offset="0.5" stop-color="#2349b8"/>
+      <stop offset="1" stop-color="#112670"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#393b4d"/>
+      <stop offset="0.55" stop-color="#191821"/>
+      <stop offset="1" stop-color="#0c0c12"/>
     </linearGradient>
   </defs>
   <g transform="translate(64 64)">
-    <!-- the blue underlayer between the tails -->
-    <path d="M -15 -2.5 L -47 -6 L -47 6 L -15 2.5 Z" fill="#163a8a" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M -20 0 L -44 0" stroke="#7fd8ff" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
-    <!-- long white armored tails -->
-    <path d="M -4 -21 C -14 -29 -30 -34 -42 -33 L -48 -25 L -48.5 -3 L -16 -1.5 Q -10 -10 -4 -21 Z" fill="url(#tail)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -4 21 C -14 29 -30 34 -42 33 L -48 25 L -48.5 3 L -16 1.5 Q -10 10 -4 21 Z" fill="url(#tail)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <!-- deep blue inner panels with a pale blue light along them -->
-    <path d="M -17 -3.5 L -46 -5 L -46 -14 L -20 -10 Z" fill="#2c5bbf" stroke="#163a8a" stroke-width="1.2" stroke-linejoin="round"/>
-    <path d="M -17 3.5 L -46 5 L -46 14 L -20 10 Z" fill="#2c5bbf" stroke="#163a8a" stroke-width="1.2" stroke-linejoin="round"/>
-    <path d="M -22 -7 L -42 -8.6 M -22 7 L -42 8.6" stroke="#7fd8ff" stroke-width="1.5" stroke-linecap="round"/>
-    <!-- plate seams and the shade on the white -->
-    <path d="M -12 -18 Q -28 -23 -46 -23 M -12 18 Q -28 23 -46 23" fill="none" stroke="#8fa2c0" stroke-width="1.4" stroke-linecap="round"/>
-    <path d="M -30 -15 L -30 -28.8 M -30 15 L -30 28.8" stroke="#8fa2c0" stroke-width="1.2" stroke-linecap="round"/>
-    <!-- pale blue light nodes -->
-    <circle cx="-39" cy="-27" r="3.4" fill="url(#core)"/>
-    <circle cx="-39" cy="27" r="3.4" fill="url(#core)"/>
-    <circle cx="-39" cy="-27" r="1.3" fill="#ffffff"/>
-    <circle cx="-39" cy="27" r="1.3" fill="#ffffff"/>
-    <!-- back plate -->
-    <path d="M -12 -21 Q -6 -27.5 3 -26 Q 10 -24 11.5 -16 L 12 -8 Q 13 0 12 8 L 11.5 16 Q 10 24 3 26 Q -6 27.5 -12 21 Q -16 11 -16 0 Q -16 -11 -12 -21 Z" fill="#dfe8f5" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <!-- arms reaching forward: white sleeves, blue cuffs -->
-    <path d="M 1 -21 L 17 -16.5" stroke="#1a1d24" stroke-width="12.5" stroke-linecap="round"/>
-    <path d="M 1 -21 L 17 -16.5" stroke="#e6eef9" stroke-width="9" stroke-linecap="round"/>
-    <path d="M 1 21 L 17 16.5" stroke="#1a1d24" stroke-width="12.5" stroke-linecap="round"/>
-    <path d="M 1 21 L 17 16.5" stroke="#e6eef9" stroke-width="9" stroke-linecap="round"/>
-    <path d="M 3 -18 L 13 -15.3 M 3 18 L 13 15.3" stroke="#a9bad3" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 14.6 -21.6 L 12.4 -12.6 M 14.6 21.6 L 12.4 12.6" stroke="#1a1d24" stroke-width="4.4" stroke-linecap="round"/>
-    <path d="M 14.6 -21.6 L 12.4 -12.6 M 14.6 21.6 L 12.4 12.6" stroke="#4a5cff" stroke-width="2.4" stroke-linecap="round"/>
-    <!-- rounded shoulder plates with blue trim -->
-    <path d="M -11 -20.5 Q -4 -28 6 -25 Q 8.5 -19.5 4 -16 Q -5 -14.5 -11 -20.5 Z" fill="#ffffff" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M -11 20.5 Q -4 28 6 25 Q 8.5 19.5 4 16 Q -5 14.5 -11 20.5 Z" fill="#ffffff" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M -8.4 -19.6 Q -3.5 -17 3.4 -17.8 M -8.4 19.6 Q -3.5 17 3.4 17.8" fill="none" stroke="#4a5cff" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- the time core on his back -->
-    <circle cx="-12" cy="0" r="6.5" fill="url(#core)" opacity="0.8"/>
-    <circle cx="-12" cy="0" r="3.4" fill="#b4ecff" stroke="#163a8a" stroke-width="1.2"/>
-    <circle cx="-12" cy="0" r="1.4" fill="#ffffff"/>
-    <!-- his own gun (left): white, a pale blue light line -->
-    <path d="M 16.5 -18.5 L 41 -18.5 Q 43.5 -18.3 43.8 -16.4 L 43.8 -13.6 Q 43.5 -11.7 41 -11.5 L 16.5 -11.5 Q 14.8 -15 16.5 -18.5 Z" fill="url(#white)" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M 22 -18.5 L 22 -11.5" stroke="#4a5cff" stroke-width="2"/>
-    <path d="M 25.5 -15 L 37 -15" stroke="#7fd8ff" stroke-width="2.4" stroke-linecap="round"/>
-    <path d="M 25.5 -15 L 37 -15" stroke="#ffffff" stroke-width="0.9" stroke-linecap="round"/>
-    <path d="M 43.2 -17.2 L 46 -16.2 L 46 -13.8 L 43.2 -12.8 Z" fill="#4a5cff" stroke="#1a1d24" stroke-width="1" stroke-linejoin="round"/>
-    <!-- Senna's relic gun (right): blue and white. A white stock, a blue barrel, two pale blue rings with a glowing core between them, a muzzle cap -->
-    <rect x="25" y="6.5" width="16" height="17" rx="5" fill="#7fd8ff" opacity="0.25"/>
-    <path d="M 11 9 L 25 7.5 L 25 22.5 L 11 21 Q 7.5 15 11 9 Z" fill="#e6eef9" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M 11.5 18.6 L 24 19.8" stroke="#a9bad3" stroke-width="1.6" stroke-linecap="round"/>
-    <rect x="24" y="10" width="19" height="10" rx="2" fill="#2c5bbf" stroke="#1a1d24" stroke-width="2"/>
-    <path d="M 26 12 L 41 12" stroke="#5a80e0" stroke-width="1.4" stroke-linecap="round"/>
-    <rect x="27.5" y="7.5" width="3.5" height="15" rx="1.3" fill="#b4ecff" stroke="#1a1d24" stroke-width="1.2"/>
-    <rect x="35" y="7.5" width="3.5" height="15" rx="1.3" fill="#b4ecff" stroke="#1a1d24" stroke-width="1.2"/>
+    <!-- Cobalt energy underlayer -->
+    <path d="M -14 -2.5 L -47 -5.8 L -46 6.2 L -14 2.5 Z" fill="#132d80" stroke="#10182b" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M -19 0 L -44 0" stroke="#8ce8ff" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+    <!-- Sleek ceramic-white armored chrono coat tails (subtle asymmetric dynamic sweep) -->
+    <path d="M -2 -20 C -13 -28 -29 -34 -42.5 -32.5 L -48.5 -24 L -48.8 -2.8 L -15 -1.5 Q -9 -10 -2 -20 Z" fill="url(#ceramicTail)" stroke="#10182b" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M -5 20 C -15 28 -30 33.5 -42 32 L -47.5 23.8 L -47.8 2.8 L -15 1.5 Q -9.5 10 -5 20 Z" fill="url(#ceramicTail)" stroke="#10182b" stroke-width="2" stroke-linejoin="round"/>
+    <!-- Cobalt inner energy panels & conduit lines -->
+    <path d="M -16.5 -3.5 L -46.2 -5 L -46.2 -13.8 L -19.5 -9.8 Z" fill="url(#cobalt)" stroke="#132d80" stroke-width="1.1" stroke-linejoin="round"/>
+    <path d="M -16.5 3.5 L -45.2 5 L -45.2 13.6 L -19.5 9.8 Z" fill="url(#cobalt)" stroke="#132d80" stroke-width="1.1" stroke-linejoin="round"/>
+    <path d="M -21.5 -7 L -42.5 -8.5 M -21.5 7 L -41.5 8.4" stroke="#8ce8ff" stroke-width="1.45" stroke-linecap="round"/>
+    <!-- Armor panel seam lines -->
+    <path d="M -11 -17.8 Q -27.5 -22.8 -46 -22.8 M -12 17.8 Q -27.5 22.8 -45 22.6" fill="none" stroke="#8aa0c2" stroke-width="1.25" stroke-linecap="round"/>
+    <path d="M -30 -14.8 L -30 -28.6 M -30 14.8 L -30 28.4" stroke="#8aa0c2" stroke-width="1.1" stroke-linecap="round"/>
+    <!-- Glowing chrono light nodes -->
+    <circle cx="-39.5" cy="-26.8" r="3.4" fill="url(#core)"/>
+    <circle cx="-39" cy="26.4" r="3.4" fill="url(#core)"/>
+    <circle cx="-39.5" cy="-26.8" r="1.25" fill="#ffffff"/>
+    <circle cx="-39" cy="26.4" r="1.25" fill="#ffffff"/>
+
+    <!-- Back torso armor plate -->
+    <path d="M -10 -21 Q -3 -27.5 6 -25 Q 13 -22.5 13.5 -15 L 13 -7 Q 13.8 0 12.6 8 L 11.8 16 Q 10 23.8 2.5 25.5 Q -6.5 27 -12.5 20.5 Q -16.5 10.5 -16 0 Q -15.5 -11 -10 -21 Z" fill="#dce7f7" stroke="#10182b" stroke-width="2" stroke-linejoin="round"/>
+
+    <!-- Sleek ceramic-white sleeves & sapphire tech cuffs -->
+    <path d="M 3 -20.5 L 18 -16" stroke="#10182b" stroke-width="11" stroke-linecap="round"/>
+    <path d="M 3 -20.5 L 18 -16" stroke="#eaf1fc" stroke-width="7.8" stroke-linecap="round"/>
+    <path d="M 1 20.5 L 17 16.2" stroke="#10182b" stroke-width="11" stroke-linecap="round"/>
+    <path d="M 1 20.5 L 17 16.2" stroke="#dde7f6" stroke-width="7.8" stroke-linecap="round"/>
+    <path d="M 4.5 -17.8 L 14 -15 M 3 18 L 13 15.2" stroke="#9db2d1" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 15.6 -20.6 L 13.4 -12.2 M 14.8 20.8 L 12.6 12.4" stroke="#10182b" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 15.6 -20.6 L 13.4 -12.2 M 14.8 20.8 L 12.6 12.4" stroke="#3b6eff" stroke-width="2.2" stroke-linecap="round"/>
+
+    <!-- Sculpted ceramic-white & cobalt shoulder pauldrons -->
+    <path d="M -9.5 -20.5 Q -2 -27.5 8 -24 Q 10 -18.8 4.8 -15.6 Q -3.5 -14.5 -9.5 -20.5 Z" fill="#ffffff" stroke="#10182b" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M -11 20.5 Q -3.5 27.5 6.2 24.2 Q 8.2 19 3 15.8 Q -5.2 14.8 -11 20.5 Z" fill="#f2f6fd" stroke="#10182b" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M -7 -19.5 Q -1.5 -17 4.8 -17.6 M -8.5 19.6 Q -3 17.2 3.2 17.8" fill="none" stroke="#3b6eff" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Luminous sapphire chrono-core on upper back -->
+    <circle cx="-11.5" cy="0" r="6.8" fill="url(#core)" opacity="0.88"/>
+    <circle cx="-11.5" cy="0" r="3.4" fill="#9ceaff" stroke="#163a8a" stroke-width="1.15"/>
+    <circle cx="-11.5" cy="0" r="1.4" fill="#ffffff"/>
+
+    <!-- LEFT GUN (Lucian's): sleek white-cobalt chrono pistol, muzzle strictly at (46, -15) -->
+    <path d="M 17 -18.2 L 41.2 -18.2 Q 43.6 -18 43.8 -16.2 L 43.8 -13.8 Q 43.6 -12 41.2 -11.8 L 17 -11.8 Q 15.2 -15 17 -18.2 Z" fill="url(#ceramic)" stroke="#10182b" stroke-width="1.75" stroke-linejoin="round"/>
+    <path d="M 22.5 -18.2 L 22.5 -11.8" stroke="#3b6eff" stroke-width="2"/>
+    <path d="M 25.8 -15 L 37.2 -15" stroke="#6ed6ff" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M 25.8 -15 L 37.2 -15" stroke="#ffffff" stroke-width="0.95" stroke-linecap="round"/>
+    <path d="M 43.2 -17 L 46 -16 L 46 -14 L 43.2 -13 Z" fill="url(#cobalt)" stroke="#10182b" stroke-width="0.9" stroke-linejoin="round"/>
+
+    <!-- RIGHT GUN (Senna's): heavy ceramic-and-cobalt chrono cannon with twin icy-blue rings & central core, muzzle strictly at (46, 15) -->
+    <rect x="25" y="6.2" width="16.5" height="17.6" rx="5" fill="#7fe0ff" opacity="0.26"/>
+    <path d="M 11 8.8 L 25 7.4 L 25 22.6 L 11 21.2 Q 7.4 15 11 8.8 Z" fill="url(#ceramic)" stroke="#10182b" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M 11.8 18.6 L 23.8 19.8" stroke="#90a6c7" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="24" y="9.8" width="19" height="10.4" rx="2" fill="url(#cobalt)" stroke="#10182b" stroke-width="1.8"/>
+    <path d="M 26 11.8 L 41 11.8" stroke="#6c96ff" stroke-width="1.3" stroke-linecap="round"/>
+    <rect x="27.5" y="7.4" width="3.5" height="15.2" rx="1.3" fill="#a8eeff" stroke="#10182b" stroke-width="1.15"/>
+    <rect x="35" y="7.4" width="3.5" height="15.2" rx="1.3" fill="#a8eeff" stroke="#10182b" stroke-width="1.15"/>
     <circle cx="33" cy="15" r="3.4" fill="url(#core)"/>
     <circle cx="33" cy="15" r="1.4" fill="#ffffff"/>
-    <path d="M 42 9 L 46 11.5 L 46 18.5 L 42 21 Z" fill="#163a8a" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-    <!-- white gloves -->
-    <circle cx="19.5" cy="-15" r="4.3" fill="#f4f8ff" stroke="#1a1d24" stroke-width="1.8"/>
-    <circle cx="19.5" cy="15" r="4.3" fill="#f4f8ff" stroke="#1a1d24" stroke-width="1.8"/>
-    <path d="M 17.6 -12.6 Q 20 -11.6 22 -13.2 M 17.6 17.4 Q 20 18.4 22 16.8" fill="none" stroke="#a9bad3" stroke-width="1.2" stroke-linecap="round"/>
-    <!-- muzzle light -->
+    <path d="M 42 9 L 46 11.5 L 46 18.5 L 42 21 Z" fill="#132d80" stroke="#10182b" stroke-width="1.4" stroke-linejoin="round"/>
+
+    <!-- Sculpted ceramic-white tactical gloves -->
+    <path d="M 16.5 -18.4 Q 20.5 -19.2 23.2 -17.4 Q 24.4 -15 23.2 -12.6 Q 20.5 -10.8 16.5 -11.6 Q 15.2 -15 16.5 -18.4 Z" fill="#f2f6fd" stroke="#10182b" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 16.5 11.6 Q 20.5 10.8 23.2 12.6 Q 24.4 15 23.2 17.4 Q 20.5 19.2 16.5 18.4 Q 15.2 15 16.5 11.6 Z" fill="#f2f6fd" stroke="#10182b" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 18 -12.8 Q 20.4 -12 22.2 -13.4 M 18 17.2 Q 20.4 18 22.2 16.6" fill="none" stroke="#90a6c7" stroke-width="1.1" stroke-linecap="round"/>
+
+    <!-- Muzzle glows strictly at (46, -15) and (46, 15) -->
     <circle cx="46" cy="-15" r="7" fill="url(#muzzle)"/>
     <circle cx="46" cy="15" r="7" fill="url(#senna_muzzle)"/>
-    <!-- helmet seen from above: white dome, blue crest, pale blue visor -->
-    <ellipse cx="0.5" cy="-10.6" rx="3" ry="2.2" fill="#4a5cff" stroke="#1a1d24" stroke-width="1.2"/>
-    <ellipse cx="0.5" cy="10.6" rx="3" ry="2.2" fill="#4a5cff" stroke="#1a1d24" stroke-width="1.2"/>
-    <circle cx="1.5" cy="0" r="10.8" fill="url(#white)" stroke="#1a1d24" stroke-width="2"/>
-    <path d="M -3 -6.5 Q 1 -9 5 -7.4" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M -9 0 L 7 0" stroke="#1a1d24" stroke-width="4.2" stroke-linecap="round"/>
-    <path d="M -9 0 L 7 0" stroke="#4a5cff" stroke-width="2.4" stroke-linecap="round"/>
-    <path d="M 7.4 -8.4 Q 14 0 7.4 8.4" fill="none" stroke="#7fd8ff" stroke-width="6" stroke-linecap="round" opacity="0.35"/>
-    <path d="M 7.4 -8.4 Q 14 0 7.4 8.4" fill="none" stroke="#1a1d24" stroke-width="4" stroke-linecap="round"/>
-    <path d="M 7.4 -8.4 Q 14 0 7.4 8.4" fill="none" stroke="#b4ecff" stroke-width="2.2" stroke-linecap="round"/>
+
+    <!-- Sculpted ceramic-white high chrono-collar -->
+    <path d="M 7.5 -12 Q -1.5 -17.2 -9.8 -12.6 Q -15.2 -6.6 -15.2 0 Q -15.2 6.6 -9.8 12.6 Q -1.5 17.2 7 12 L 5 8.8 Q -2 12 -7.4 9 Q -11.2 5 -11.2 0 Q -11.2 -5 -7.4 -9 Q -2 -12 5 -8.8 Z" fill="url(#ceramic)" stroke="#10182b" stroke-width="1.75" stroke-linejoin="round"/>
+    <path d="M 3.5 -13 Q -3 -15.2 -8.8 -11.8 Q -13.5 -6.6 -13.5 0 Q -13.5 6.6 -8.8 11.8 Q -3 15.2 3.2 12.8" fill="none" stroke="#3b6eff" stroke-width="1.25" stroke-linecap="round"/>
+
+    <!-- Head seen from above: VISIBLE sculpted dark hair + cobalt ear-comm + translucent sapphire-cyan holographic eye-visor (matches redesigned Pulsefire portrait!) -->
+    <rect x="-1" y="-11.4" width="5.2" height="3" rx="1.2" fill="#ffffff" stroke="#10182b" stroke-width="0.95"/>
+    <circle cx="1.6" cy="-9.9" r="1.1" fill="#3b6eff"/>
+    <ellipse cx="1.6" cy="9.8" rx="2.3" ry="1.7" fill="#4f3326" stroke="#10182b" stroke-width="0.9"/>
+    <circle cx="2" cy="0" r="9.8" fill="#6a4432" stroke="#10182b" stroke-width="1.8"/>
+    <path d="M 11.2 -1.7 Q 13.6 0 11.2 1.7 Z" fill="#593828" stroke="#10182b" stroke-width="0.85" stroke-linejoin="round"/>
+    <!-- Visible swept dark hair crown with icy rim -->
+    <path d="M 5.4 -8.2 Q -1 -10.6 -6.8 -6 Q -9.4 0 -6.8 6 Q -1 10.6 5.4 8.2 Q 6.8 3.8 7 0 Q 6.8 -3.8 5.4 -8.2 Z" fill="url(#hair)"/>
+    <path d="M -4 -5 Q 0 -7 4 -5.4 M -5.5 -1.2 Q -0.5 -2.2 4.2 -1 M -4 4 Q 0 5.4 3.8 4.2" fill="none" stroke="#455070" stroke-width="1.1" stroke-linecap="round"/>
+    <!-- Razor-sleek translucent sapphire-cyan holographic tactical eye-visor wrapping left-front -->
+    <path d="M 5.2 -8.8 Q 13.2 -4.8 12.4 1.5" fill="none" stroke="#6ed6ff" stroke-width="4.4" stroke-linecap="round" opacity="0.38"/>
+    <path d="M 5.2 -8.8 Q 13.2 -4.8 12.4 1.5" fill="none" stroke="#a8eeff" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 6.2 -7.8 Q 12.4 -4.4 11.8 0.8" fill="none" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round"/>
   </g>
 </svg>

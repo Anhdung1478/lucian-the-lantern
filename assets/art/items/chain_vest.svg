@@ -1,31 +1,80 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Chain Vest (fragment): a plain steel chainmail shirt with a leather hem, facing the viewer. -->
+  <!-- Chain Vest: Heavy medieval forged steel chainmail hauberk/cuirass with interlocking dark-silver metallic ring texture, leather-and-brass shoulder/belt straps, and gleaming iron highlights -->
   <defs>
     <radialGradient id="aura" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#9fb0c6" stop-opacity="0.3"/>
-      <stop offset="1" stop-color="#9fb0c6" stop-opacity="0"/>
+      <stop offset="0" stop-color="#b4c8e2" stop-opacity="0.46"/>
+      <stop offset="0.6" stop-color="#60738f" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#3c4a60" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="mail" x1="8" y1="6" x2="54" y2="60" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#f4f7fb"/>
-      <stop offset="0.5" stop-color="#b9c4d4"/>
-      <stop offset="1" stop-color="#7c8799"/>
+    <linearGradient id="steel" x1="12" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#eef4fc"/>
+      <stop offset="0.38" stop-color="#adb9cc"/>
+      <stop offset="0.72" stop-color="#69758a"/>
+      <stop offset="1" stop-color="#3a4354"/>
     </linearGradient>
-    <linearGradient id="leather" x1="18" y1="52" x2="46" y2="60" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#b9793f"/>
-      <stop offset="0.5" stop-color="#8a5327"/>
-      <stop offset="1" stop-color="#5d3516"/>
+    <linearGradient id="pauldron" x1="6" y1="10" x2="32" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f7faff"/>
+      <stop offset="0.48" stop-color="#bac7da"/>
+      <stop offset="1" stop-color="#5d697d"/>
+    </linearGradient>
+    <linearGradient id="leather" x1="14" y1="40" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b5743c"/>
+      <stop offset="0.5" stop-color="#7c461f"/>
+      <stop offset="1" stop-color="#47240d"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="25" y1="40" x2="39" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0b3"/>
+      <stop offset="0.5" stop-color="#dfaa3c"/>
+      <stop offset="1" stop-color="#8c5416"/>
     </linearGradient>
   </defs>
   <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
-  <path d="M 19 5 L 26 5 C 28 11 36 11 38 5 L 45 5 L 59 14 L 53 29 L 46 26 L 46 58 L 18 58 L 18 26 L 11 29 L 5 14 Z" fill="url(#mail)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <!-- ring rows -->
-  <path d="M 20 20 q 2 2.6 4 0 t 4 0 t 4 0 t 4 0 t 4 0 t 4 0 M 20 27 q 2 2.6 4 0 t 4 0 t 4 0 t 4 0 t 4 0 t 4 0 M 20 34 q 2 2.6 4 0 t 4 0 t 4 0 t 4 0 t 4 0 t 4 0 M 20 41 q 2 2.6 4 0 t 4 0 t 4 0 t 4 0 t 4 0 t 4 0 M 20 48 q 2 2.6 4 0 t 4 0 t 4 0 t 4 0 t 4 0 t 4 0" fill="none" stroke="#6b7689" stroke-width="1.5" stroke-linecap="round"/>
-  <path d="M 9 16 q 2 2.6 4 0 t 4 0 M 47 16 q 2 2.6 4 0 t 4 0 M 11 22 q 2 2.6 4 0 t 3 0 M 46 22 q 2 2.6 4 0 t 3 0" fill="none" stroke="#6b7689" stroke-width="1.5" stroke-linecap="round"/>
-  <!-- neck opening -->
-  <path d="M 26 5 C 28 11 36 11 38 5 L 36 5 C 34 8 30 8 28 5 Z" fill="#3b4354" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-  <!-- leather hem -->
-  <path d="M 18 52 L 46 52 L 46 58 L 18 58 Z" fill="url(#leather)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 20 54.5 L 44 54.5" stroke="#d9a066" stroke-width="1.4" stroke-linecap="round"/>
-  <!-- highlight -->
-  <path d="M 21 10 L 21 24 M 8 15 L 12 21" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Armored Chainmail Hauberk Silhouette (tapered cuirass with flared armored mantle & split mail tasset hem) -->
+  <path d="M 21 8 L 26 8 C 28 13 36 13 38 8 L 43 8 L 57 16 L 54 28 L 47 26 L 46 43 L 49 56 L 36 59 L 32 54 L 28 59 L 15 56 L 18 43 L 17 26 L 10 28 L 7 16 Z" fill="url(#steel)" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+
+  <!-- Shaded right torso & under-arm depth -->
+  <path d="M 35 12 L 43 9 L 55 16 L 52.5 26.5 L 46 25 L 45 43 L 47.5 55 L 36 57.5 L 35 45 Z" fill="#2d3545" opacity="0.32"/>
+
+  <!-- Interlocking metallic chainmail rings (dark recessed crescents + silver highlights) -->
+  <g fill="none" stroke="#364052" stroke-width="1.5" stroke-linecap="round">
+    <path d="M 19 20 q 2.2 2.8 4.4 0 t 4.4 0 t 4.4 0 t 4.4 0 t 4.4 0 t 4.4 0"/>
+    <path d="M 21 25.5 q 2.2 2.8 4.4 0 t 4.4 0 t 4.4 0 t 4.4 0 t 4.4 0"/>
+    <path d="M 19 31 q 2.2 2.8 4.4 0 t 4.4 0 t 4.4 0 t 4.4 0 t 4.4 0 t 4.4 0"/>
+    <path d="M 21 36.5 q 2.2 2.8 4.4 0 t 4.4 0 t 4.4 0 t 4.4 0 t 4.4 0"/>
+    <path d="M 18 50.5 q 2.2 2.6 4.4 0 t 4.4 0 t 4.4 0 M 35 50.5 q 2.2 2.6 4.4 0 t 4.4 0"/>
+    <path d="M 17 54.5 q 2.2 2.4 4.4 0 t 4.4 0 M 37 54.5 q 2.2 2.4 4.4 0 t 4.4 0"/>
+  </g>
+  <g fill="none" stroke="#eef4fc" stroke-width="1.1" stroke-linecap="round" opacity="0.78">
+    <path d="M 19.5 19.2 q 2.2 2.2 4.2 0 M 28.3 19.2 q 2.2 2.2 4.2 0 M 21.5 24.7 q 2.2 2.2 4.2 0 M 30.3 24.7 q 2.2 2.2 4.2 0 M 19.5 30.2 q 2.2 2.2 4.2 0 M 28.3 30.2 q 2.2 2.2 4.2 0 M 21.5 35.7 q 2.2 2.2 4.2 0"/>
+  </g>
+
+  <!-- Forged Steel Layered Shoulder Mantles / Pauldrons -->
+  <path d="M 21 8 L 7 15.5 L 10 26.5 C 14.5 24 18.5 21 22 16 Z" fill="url(#pauldron)" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+  <path d="M 43 8 L 57 15.5 L 54 26.5 C 49.5 24 45.5 21 42 16 Z" fill="#6b778c" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+  <path d="M 10 16.5 L 19.5 11.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+
+  <!-- Reinforced dark steel neck-guard & collar -->
+  <path d="M 24 7.5 C 26 14 38 14 40 7.5 L 43 8.5 C 40 17.5 24 17.5 21 8.5 Z" fill="#465166" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 26 9 C 28 12.2 36 12.2 38 9" fill="none" stroke="#1a1d24" stroke-width="1.6"/>
+  <path d="M 24 11.5 C 27 14 31 14.8 34 14.5" fill="none" stroke="#d8e4f5" stroke-width="1.3" stroke-linecap="round"/>
+
+  <!-- Diagonal leather baldric & shoulder harness straps with brass rivets -->
+  <path d="M 18 14 L 23 13 L 46 41 L 41 43 Z" fill="url(#leather)" stroke="#1a1d24" stroke-width="1.9" stroke-linejoin="round"/>
+  <path d="M 20 15.5 L 42 40.5" stroke="#c9884c" stroke-width="1.1" stroke-linecap="round" opacity="0.75"/>
+  <circle cx="24" cy="19.5" r="1.4" fill="#ffe699" stroke="#1a1d24" stroke-width="0.9"/>
+  <circle cx="38" cy="35.5" r="1.4" fill="#dfaa3c" stroke="#1a1d24" stroke-width="0.9"/>
+
+  <!-- Heavy leather war-belt cinching the waist -->
+  <path d="M 16.5 41.5 L 47.5 41.5 L 48.2 48 L 15.8 48 Z" fill="url(#leather)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 18.5 43.8 L 45.5 43.8" stroke="#c9884c" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Gleaming hammered brass belt buckle -->
+  <rect x="27" y="40.2" width="10" height="9.2" rx="1.8" fill="url(#brass)" stroke="#1a1d24" stroke-width="2"/>
+  <rect x="29.8" y="42.8" width="4.4" height="4" rx="0.6" fill="#592e12" stroke="#1a1d24" stroke-width="1.1"/>
+  <path d="M 29.2 44.8 L 33 44.8" stroke="#fff0b3" stroke-width="1.4" stroke-linecap="round"/>
+
+  <!-- Gleaming iron sparkle highlights -->
+  <path d="M 14 35 L 14.9 37.1 L 17 38 L 14.9 38.9 L 14 41 L 13.1 38.9 L 11 38 L 13.1 37.1 Z" fill="#ffffff"/>
+  <path d="M 52 34 L 52.8 35.8 L 54.6 36.6 L 52.8 37.4 L 52 39.2 L 51.2 37.4 L 49.4 36.6 L 51.2 35.8 Z" fill="#dbe9fc"/>
 </svg>

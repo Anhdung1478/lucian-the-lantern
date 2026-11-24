@@ -1,22 +1,50 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
-  <!-- Ghoul: a thin clawed corpse seen from above, narrow hunched ribs and spine, long gaunt arms ending in hooked claws reaching forward (+X), a bald skull with hollow sockets and glowing pinpoint eyes, a tattered rag behind. -->
+  <!-- Ghoul (top-down, facing +X): feral hunched undead ghoul with exposed pale ribcage & spine ridges, shredded dark-ash rags trailing back (-X), jagged bone claws reaching eagerly forward (+X), sinister narrow pale-green eyes. -->
+  <defs>
+    <linearGradient id="ghRag" x1="0.9" y1="0.2" x2="0.05" y2="0.85">
+      <stop offset="0" stop-color="#3a4547"/>
+      <stop offset="0.55" stop-color="#222a2e"/>
+      <stop offset="1" stop-color="#14191d"/>
+    </linearGradient>
+    <linearGradient id="ghFlesh" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
+      <stop offset="0" stop-color="#879c8e"/>
+      <stop offset="0.55" stop-color="#4e6158"/>
+      <stop offset="1" stop-color="#25302d"/>
+    </linearGradient>
+    <linearGradient id="ghBone" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
+      <stop offset="0" stop-color="#e8eedf"/>
+      <stop offset="0.6" stop-color="#b4bfae"/>
+      <stop offset="1" stop-color="#6b786c"/>
+    </linearGradient>
+  </defs>
+
   <g transform="translate(22 22)">
-    <!-- rags behind -->
-    <path d="M -7 -8 L -20 -8 L -15 -4 L -21 0 L -15 4 L -20 8 L -7 8 Z" fill="#6f7f86" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <!-- arms and claws -->
-    <path d="M 0 -8 L 10 -13 L 17 -10 M 0 8 L 10 13 L 17 10" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 0 -8 L 10 -13 L 17 -10 M 0 8 L 10 13 L 17 10" fill="none" stroke="#c9d6d0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 17 -10 L 21 -14 M 17 -10 L 22 -10 M 17 -10 L 20 -5 M 17 10 L 21 14 M 17 10 L 22 10 M 17 10 L 20 5" fill="none" stroke="#1a1d24" stroke-width="3.4" stroke-linecap="round"/>
-    <path d="M 17 -10 L 21 -14 M 17 -10 L 22 -10 M 17 -10 L 20 -5 M 17 10 L 21 14 M 17 10 L 22 10 M 17 10 L 20 5" fill="none" stroke="#f0f4e8" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- thin hunched torso -->
-    <ellipse cx="-4" cy="0" rx="11" ry="10" fill="#a9b8b0" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -12 0 L 4 0 M -9 -6 L -7 6 M -4 -7 L -2 7" fill="none" stroke="#5f6e68" stroke-width="2" stroke-linecap="round"/>
-    <path d="M -9 -8 Q -2 -10 4 -7" fill="none" stroke="#e4ece6" stroke-width="2" stroke-linecap="round"/>
-    <!-- skull -->
-    <ellipse cx="7" cy="0" rx="7" ry="6.5" fill="#e4ece6" stroke="#1a1d24" stroke-width="2.6"/>
-    <ellipse cx="9" cy="-3" rx="2.2" ry="2.6" fill="#1a1d24"/>
-    <ellipse cx="9" cy="3" rx="2.2" ry="2.6" fill="#1a1d24"/>
-    <circle cx="9.6" cy="-3" r="1.1" fill="#9dff8a"/>
-    <circle cx="9.6" cy="3" r="1.1" fill="#9dff8a"/>
+    <!-- Shredded dark-ash rags trailing behind (-X) -->
+    <path d="M -5 -7 L -19 -11 L -14 -5 L -21 -1 L -15 3 L -20 9 L -12 8 L -15 12 L -5 7 Z" fill="url(#ghRag)" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M -8 -5 L -16 -7 M -9 4 L -16 6" stroke="#536366" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- Gaunt hunched arms & jagged bone claws lunging eagerly forward (+X) -->
+    <path d="M -1 -8 L 9 -13 L 15 -9 M -1 8 L 8 13 L 15 10" fill="none" stroke="#14171f" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -1 -8 L 9 -13 L 15 -9 M -1 8 L 8 13 L 15 10" fill="none" stroke="url(#ghFlesh)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Left jagged bone talons -->
+    <path d="M 14 -10 L 21 -13 L 16 -8 L 22 -7.5 L 15 -5.5 L 19 -3.5 L 13 -6.5 Z" fill="url(#ghBone)" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+    <!-- Right jagged bone talons -->
+    <path d="M 14 10 L 20 13.5 L 16 8 L 21.5 8 L 15 6 L 19 4 L 13 6.5 Z" fill="url(#ghBone)" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+
+    <!-- Emaciated hunched corpse torso -->
+    <path d="M -12 0 C -12 -8, -5 -11, 3 -9 C 8 -8, 9 -4, 9 0 C 9 4, 8 8, 3 9 C -5 11, -12 8, -12 0 Z" fill="url(#ghFlesh)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <!-- Exposed pale ribcage arches & knotted spine ridge -->
+    <path d="M -9 -5 C -6 -7, -2 -7, 1 -5 M -10 0 L 2 0 M -9 5 C -6 7, -2 7, 1 5" fill="none" stroke="#222b27" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M -8 -6 C -6 -3, -6 3, -8 6 M -4 -7 C -2 -3, -2 3, -4 7 M 0 -6 C 2 -3, 2 3, 0 6" fill="none" stroke="#dbe3d1" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M -9 0 L 3 0" stroke="#edf2e6" stroke-width="1.6" stroke-linecap="round"/>
+
+    <!-- Gaunt angular undead skull pushed forward between shoulders -->
+    <path d="M 3 0 C 3 -6, 8 -7.5, 13.5 -5.5 L 16.5 -2.5 L 16.5 2.5 L 13.5 5.5 C 8 7.5, 3 6, 3 0 Z" fill="url(#ghBone)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <!-- Top-left skull brow highlight & sunken jaw ridge -->
+    <path d="M 5 -4.5 C 8 -5.8, 11.5 -5.2, 14 -3.2" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.8"/>
+    <!-- Recessed dark angular eye sockets & sinister narrow pale-green eye slits -->
+    <polygon points="10,-4.4 14.5,-2.6 10.8,-1.3" fill="#14171f"/>
+    <polygon points="10,4.4 14.5,2.6 10.8,1.3" fill="#14171f"/>
+    <path d="M 11.2 -3.3 L 14 -2.4 M 11.2 3.3 L 14 2.4" stroke="#96ff78" stroke-width="1.3" stroke-linecap="round"/>
   </g>
 </svg>

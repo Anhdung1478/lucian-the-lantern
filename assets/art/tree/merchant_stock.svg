@@ -1,29 +1,76 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Merchant Stock: a merchant's stall with a striped awning over 4 item tiles -->
+  <!-- Merchant Stock: crimson-and-gold traveling merchant stall awning brimming with gleaming wares & glowing potions -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <clipPath id="awning"><path d="M 4 7 L 60 7 L 60 17 A 3.5 3.5 0 0 1 53 17 A 3.5 3.5 0 0 1 46 17 A 3.5 3.5 0 0 1 39 17 A 3.5 3.5 0 0 1 32 17 A 3.5 3.5 0 0 1 25 17 A 3.5 3.5 0 0 1 18 17 A 3.5 3.5 0 0 1 11 17 A 3.5 3.5 0 0 1 4 17 Z"/></clipPath>
+    <radialGradient id="aura" cx="32" cy="34" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd56b" stop-opacity="0.58"/>
+      <stop offset="0.6" stop-color="#a82a2a" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#a82a2a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wood" x1="12" y1="34" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9e5e2e"/>
+      <stop offset="0.55" stop-color="#6b3818"/>
+      <stop offset="1" stop-color="#3d1d0a"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="10" y1="10" x2="54" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff4bf"/>
+      <stop offset="0.5" stop-color="#e3a834"/>
+      <stop offset="1" stop-color="#875210"/>
+    </linearGradient>
+    <linearGradient id="crimson" x1="10" y1="8" x2="54" y2="26" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#eb4b4b"/>
+      <stop offset="0.55" stop-color="#b82228"/>
+      <stop offset="1" stop-color="#731018"/>
+    </linearGradient>
+    <radialGradient id="rubyPot" cx="20" cy="34" r="7" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffc7d0"/>
+      <stop offset="0.5" stop-color="#eb384e"/>
+      <stop offset="1" stop-color="#8a1022"/>
+    </radialGradient>
+    <radialGradient id="saphPot" cx="44" cy="34" r="7" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d4f3ff"/>
+      <stop offset="0.5" stop-color="#3b99ff"/>
+      <stop offset="1" stop-color="#143d99"/>
+    </radialGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <path d="M 7 18 L 7 59 M 57 18 L 57 59" stroke="#1a1d24" stroke-width="5.5"/>
-  <path d="M 7 18 L 7 59 M 57 18 L 57 59" stroke="#8a5a2a" stroke-width="3"/>
-  <g clip-path="url(#awning)">
-    <rect x="4" y="7" width="56" height="14" fill="#f2e6c8"/>
-    <path d="M 4 7 L 11 7 L 11 21 L 4 21 Z M 18 7 L 25 7 L 25 21 L 18 21 Z M 32 7 L 39 7 L 39 21 L 32 21 Z M 46 7 L 53 7 L 53 21 L 46 21 Z" fill="#c8453a"/>
+  <circle cx="32" cy="34" r="30" fill="url(#aura)"/>
+  <!-- stall wooden posts & dark interior recess -->
+  <rect x="10" y="22" width="44" height="32" rx="2" fill="#181218" stroke="#1a1d24" stroke-width="2.4"/>
+  <!-- gleaming wares on display counter: ruby potion, golden chalice/gem, sapphire potion -->
+  <!-- ruby potion (left) -->
+  <rect x="18" y="27" width="4" height="4" fill="#d9a466" stroke="#1a1d24" stroke-width="1.6"/>
+  <circle cx="20" cy="35.5" r="5.5" fill="url(#rubyPot)" stroke="#1a1d24" stroke-width="2"/>
+  <circle cx="18.2" cy="33.8" r="1.4" fill="#ffffff"/>
+  <!-- golden goblet / treasure centerpiece -->
+  <path d="M 27.5 27.5 L 36.5 27.5 L 35 35.5 C 34.5 37.5 29.5 37.5 29 35.5 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="30.5" y="36.5" width="3" height="4.5" fill="url(#gold)" stroke="#1a1d24" stroke-width="1.6"/>
+  <path d="M 29.8 29.8 L 30.6 34.2" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- sapphire potion (right) -->
+  <rect x="42" y="27" width="4" height="4" fill="#d9a466" stroke="#1a1d24" stroke-width="1.6"/>
+  <circle cx="44" cy="35.5" r="5.5" fill="url(#saphPot)" stroke="#1a1d24" stroke-width="2"/>
+  <circle cx="42.2" cy="33.8" r="1.4" fill="#ffffff"/>
+  <!-- gilded merchant counter / chest front -->
+  <rect x="7" y="40" width="50" height="16" rx="2.5" fill="url(#wood)" stroke="#1a1d24" stroke-width="2.5"/>
+  <path d="M 7 40 L 57 40 L 57 44.5 L 7 44.5 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 11 42 L 34 42" stroke="#fff9db" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- brass chest clasps & planks -->
+  <rect x="16" y="44.5" width="4.5" height="11.5" fill="url(#gold)" stroke="#1a1d24" stroke-width="1.8"/>
+  <rect x="43.5" y="44.5" width="4.5" height="11.5" fill="url(#gold)" stroke="#1a1d24" stroke-width="1.8"/>
+  <polygon points="32,46.5 35.5,50.5 32,54.5 28.5,50.5" fill="url(#gold)" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- striped crimson-and-gold scalloped merchant awning -->
+  <path d="M 6 20 L 12 9 L 52 9 L 58 20 Z" fill="url(#crimson)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- gold stripes on awning -->
+  <polygon points="18,9 26,9 24,20 15,20" fill="url(#gold)"/>
+  <polygon points="38,9 46,9 49,20 40,20" fill="url(#gold)"/>
+  <path d="M 6 20 L 12 9 L 52 9 L 58 20 Z" fill="none" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- scalloped overhang valence -->
+  <g stroke="#1a1d24" stroke-width="2" stroke-linejoin="round">
+    <path d="M 6 20 L 16.4 20 L 16.4 23.5 A 5.2 4 0 0 1 6 23.5 Z" fill="#b82228"/>
+    <path d="M 16.4 20 L 26.8 20 L 26.8 23.5 A 5.2 4 0 0 1 16.4 23.5 Z" fill="url(#gold)"/>
+    <path d="M 26.8 20 L 37.2 20 L 37.2 23.5 A 5.2 4 0 0 1 26.8 23.5 Z" fill="#b82228"/>
+    <path d="M 37.2 20 L 47.6 20 L 47.6 23.5 A 5.2 4 0 0 1 37.2 23.5 Z" fill="url(#gold)"/>
+    <path d="M 47.6 20 L 58 20 L 58 23.5 A 5.2 4 0 0 1 47.6 23.5 Z" fill="#b82228"/>
   </g>
-  <path d="M 4 7 L 60 7 L 60 17 A 3.5 3.5 0 0 1 53 17 A 3.5 3.5 0 0 1 46 17 A 3.5 3.5 0 0 1 39 17 A 3.5 3.5 0 0 1 32 17 A 3.5 3.5 0 0 1 25 17 A 3.5 3.5 0 0 1 18 17 A 3.5 3.5 0 0 1 11 17 A 3.5 3.5 0 0 1 4 17 Z" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  <rect x="2" y="3.5" width="60" height="4.5" rx="2" fill="#8a5a2a" stroke="#1a1d24" stroke-width="2"/>
-  <g fill="#14201e" stroke="#c9a45c" stroke-width="1.8">
-    <rect x="17" y="23" width="13" height="13" rx="2"/>
-    <rect x="34" y="23" width="13" height="13" rx="2"/>
-    <rect x="17" y="38" width="13" height="13" rx="2"/>
-    <rect x="34" y="38" width="13" height="13" rx="2"/>
-  </g>
-  <circle cx="23.5" cy="30.5" r="3.6" fill="#e04848"/>
-  <rect x="22" y="25" width="3" height="2.5" fill="#e8e0d0"/>
-  <path d="M 40.5 25.5 L 44 29.5 L 40.5 33.5 L 37 29.5 Z" fill="#5aa9ff"/>
-  <path d="M 20 48 L 27 41 M 21 44 L 24 47" stroke="#d8dee8" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="40.5" cy="44.5" r="3.5" fill="none" stroke="#ffcf5a" stroke-width="2"/>
-  <rect x="3" y="51" width="58" height="8" rx="1.5" fill="#a86e32" stroke="#1a1d24" stroke-width="2"/>
-  <path d="M 5 53 L 59 53" stroke="#d29a5a" stroke-width="1.5"/>
+  <!-- top awning specular & sparkle -->
+  <path d="M 14 11.5 L 50 11.5" stroke="#fff4cc" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 55 8 L 56 10.6 L 58.6 11.6 L 56 12.6 L 55 15.2 L 54 12.6 L 51.4 11.6 L 54 10.6 Z" fill="#fff8d6"/>
 </svg>

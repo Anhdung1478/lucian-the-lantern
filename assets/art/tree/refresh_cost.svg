@@ -1,17 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Cheaper Refresh: two circular arrows around a coin, with a minus sign -->
+  <!-- Refresh Cost: sleek gleaming twin circular golden-teal refresh arrows circling a sparkling embossed gold coin -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset="0.55" stop-color="#f2b938"/><stop offset="1" stop-color="#b07514"/></linearGradient>
+    <radialGradient id="aura" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6ef2e8" stop-opacity="0.54"/>
+      <stop offset="0.55" stop-color="#c99322" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#187882" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tealArc" x1="8" y1="8" x2="56" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d4fffb"/>
+      <stop offset="0.45" stop-color="#4ee6db"/>
+      <stop offset="1" stop-color="#147a87"/>
+    </linearGradient>
+    <linearGradient id="goldArc" x1="56" y1="56" x2="8" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff6cc"/>
+      <stop offset="0.45" stop-color="#f2be42"/>
+      <stop offset="1" stop-color="#9e6212"/>
+    </linearGradient>
+    <radialGradient id="coinFace" cx="28" cy="27" r="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffbe0"/>
+      <stop offset="0.48" stop-color="#f7c43e"/>
+      <stop offset="1" stop-color="#a86410"/>
+    </radialGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <g fill="none" stroke-linecap="round">
-    <path d="M 11.7 26.6 A 21 21 0 0 1 48.1 18.5 M 52.3 37.4 A 21 21 0 0 1 15.9 45.5" stroke="#1a1d24" stroke-width="8"/>
-    <path d="M 11.7 26.6 A 21 21 0 0 1 48.1 18.5 M 52.3 37.4 A 21 21 0 0 1 15.9 45.5" stroke="#8fe0c0" stroke-width="5"/>
-  </g>
-  <path d="M 54.5 26.2 L 54 12.5 L 41.5 23.5 Z M 9.5 37.8 L 10 51.5 L 22.5 40.5 Z" fill="#8fe0c0" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  <circle cx="32" cy="32" r="13" fill="url(#face)" stroke="#3d2604" stroke-width="2"/>
-  <circle cx="32" cy="32" r="9.5" fill="none" stroke="#a86e12" stroke-width="1.3"/>
-  <rect x="24.5" y="29.5" width="15" height="5" rx="1.5" fill="#5a3a08"/>
-  <path d="M 23 27 A 10 10 0 0 1 28 22.5" fill="none" stroke="#fffbe8" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
+  <!-- upper circular refresh arrow (luminous teal, clockwise toward top-right) -->
+  <path d="M 10.5 31 A 21.5 21.5 0 0 1 46.2 15.8 L 49.8 11.4 L 54.5 24.5 L 40.5 23.2 L 43 20 A 15.5 15.5 0 0 0 16.5 31 Z" fill="url(#tealArc)" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M 13.5 27 A 18.5 18.5 0 0 1 38 14.5" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- lower circular refresh arrow (gilded gold, clockwise toward bottom-left) -->
+  <path d="M 53.5 33 A 21.5 21.5 0 0 1 17.8 48.2 L 14.2 52.6 L 9.5 39.5 L 23.5 40.8 L 21 44 A 15.5 15.5 0 0 0 47.5 33 Z" fill="url(#goldArc)" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M 50.5 37 A 18.5 18.5 0 0 1 26 49.5" fill="none" stroke="#fffbe6" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- sparkling embossed gold coin at center -->
+  <circle cx="32" cy="32" r="11" fill="url(#coinFace)" stroke="#1a1d24" stroke-width="2.4"/>
+  <circle cx="32" cy="32" r="7.5" fill="none" stroke="#a86410" stroke-width="1.3"/>
+  <polygon points="32,26.8 35.8,32 32,37.2 28.2,32" fill="#fff8d6" stroke="#a86410" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M 24.5 28 A 8.5 8.5 0 0 1 30.5 23.8" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round"/>
+  <!-- sparkles -->
+  <path d="M 53 10 L 54 12.6 L 56.6 13.6 L 54 14.6 L 53 17.2 L 52 14.6 L 49.4 13.6 L 52 12.6 Z" fill="#e6fffb"/>
+  <path d="M 11 49 L 11.9 51.4 L 14.3 52.3 L 11.9 53.2 L 11 55.6 L 10.1 53.2 L 7.7 52.3 L 10.1 51.4 Z" fill="#fff6cc"/>
 </svg>

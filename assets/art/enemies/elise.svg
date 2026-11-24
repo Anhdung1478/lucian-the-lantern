@@ -1,56 +1,105 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
-  <!-- Elise, the Spider Queen, seen from above, facing +X: a woman's torso, bare pale shoulders in a crimson gown
-       with black lace down the back, black hair under a spiked red crown, her pale face forward and her sleeved arms
-       reaching ahead to spit her web; behind her the gown swells into a black spider's abdomen with a red hourglass,
-       and eight long spider legs spread from her back, black and crimson with bone-pale tips. -->
+  <!-- Elise, the Spider Queen, top-down facing +X: regal, lethal obsidian-and-crimson arachnid queen. Sleek sculpted
+       glossy obsidian-and-crimson carapace with an ornate blood-ruby hourglass/crown marking on the abdomen, 8 long
+       razor-sharp articulated armored arachnid legs splayed predatorily outward with dark crimson joints, gleaming
+       venomous crimson fangs & glowing ruby multi-eye cluster at the front (+X). -->
   <defs>
-    <linearGradient id="gown" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#e0384e"/>
-      <stop offset="1" stop-color="#9a1a2c"/>
+    <linearGradient id="el_obsidian" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#443852"/>
+      <stop offset="0.45" stop-color="#201929"/>
+      <stop offset="1" stop-color="#0d0a12"/>
     </linearGradient>
-    <radialGradient id="mark">
-      <stop offset="0" stop-color="#ff6a6a"/>
-      <stop offset="1" stop-color="#c4263a"/>
+    <linearGradient id="el_crimson" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff5770"/>
+      <stop offset="0.5" stop-color="#c41a34"/>
+      <stop offset="1" stop-color="#690a1b"/>
+    </linearGradient>
+    <radialGradient id="el_ruby_glow">
+      <stop offset="0" stop-color="#ff6680" stop-opacity="0.88"/>
+      <stop offset="0.55" stop-color="#d61538" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#800820" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <g transform="translate(48 48)">
-    <!-- the spider legs from her back -->
-    <path d="M -3 -12 L 10 -36 L 26 -43 M -6 -12 L -7 -40 L 1 -50 M -8 -11 L -24 -34 L -34 -40 M -10 -8 L -34 -20 L -47 -16" fill="none" stroke="#1a1d24" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M -3 -12 L 10 -36 L 26 -43 M -6 -12 L -7 -40 L 1 -50 M -8 -11 L -24 -34 L -34 -40 M -10 -8 L -34 -20 L -47 -16" fill="none" stroke="#2a2030" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 1.5 -20.4 L 10 -36 M -6.3 -21.8 L -7 -40 M -13.6 -19.0 L -24 -34 M -18.4 -12.2 L -34 -20" fill="none" stroke="#8e1a2a" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 18.8 -39.9 L 26 -43 M -2.6 -45.5 L 1 -50 M -29.5 -37.3 L -34 -40 M -41.1 -17.8 L -47 -16" fill="none" stroke="#eadfd2" stroke-width="2.2" stroke-linecap="round"/>
-    <g transform="scale(1 -1)">
-    <path d="M -3 -12 L 10 -36 L 26 -43 M -6 -12 L -7 -40 L 1 -50 M -8 -11 L -24 -34 L -34 -40 M -10 -8 L -34 -20 L -47 -16" fill="none" stroke="#1a1d24" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M -3 -12 L 10 -36 L 26 -43 M -6 -12 L -7 -40 L 1 -50 M -8 -11 L -24 -34 L -34 -40 M -10 -8 L -34 -20 L -47 -16" fill="none" stroke="#2a2030" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 1.5 -20.4 L 10 -36 M -6.3 -21.8 L -7 -40 M -13.6 -19.0 L -24 -34 M -18.4 -12.2 L -34 -20" fill="none" stroke="#8e1a2a" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 18.8 -39.9 L 26 -43 M -2.6 -45.5 L 1 -50 M -29.5 -37.3 L -34 -40 M -41.1 -17.8 L -47 -16" fill="none" stroke="#eadfd2" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- 8 LONG RAZOR-SHARP ARTICULATED ARMORED ARACHNID LEGS (upper 4 + mirrored lower 4) -->
+    <!-- Leg Pair 1 (Front predatory sweeping +X/-Y) -->
+    <g>
+      <path d="M 10 -8 L 24 -28 L 43 -22 L 26 -22 L 13 -5 Z" fill="url(#el_obsidian)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M 24 -28 L 43 -22 L 32 -23 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="24" cy="-25" r="2.7" fill="#c41a34" stroke="#14171f" stroke-width="1.2"/>
+
+      <!-- Leg Pair 2 (Mid-front splayed wide) -->
+      <path d="M 4 -10 L 12 -34 L 27 -44 L 15 -31 L 7 -7 Z" fill="url(#el_obsidian)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M 12 -34 L 27 -44 L 17 -34 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="13" cy="-32" r="2.7" fill="#c41a34" stroke="#14171f" stroke-width="1.2"/>
+
+      <!-- Leg Pair 3 (Mid-rear sweeping wide-back) -->
+      <path d="M -2 -10 L -14 -34 L -29 -43 L -11 -31 L 1 -7 Z" fill="url(#el_obsidian)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M -14 -34 L -29 -43 L -16 -32 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="-13" cy="-32" r="2.6" fill="#c41a34" stroke="#14171f" stroke-width="1.2"/>
+
+      <!-- Leg Pair 4 (Rear sweeping far back -X) -->
+      <path d="M -7 -8 L -27 -27 L -45 -24 L -25 -22 L -5 -5 Z" fill="url(#el_obsidian)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M -27 -27 L -45 -24 L -29 -23 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="-26" cy="-24.5" r="2.6" fill="#c41a34" stroke="#14171f" stroke-width="1.2"/>
     </g>
-    <!-- the abdomen behind her, a red hourglass on it -->
-    <ellipse cx="-21" cy="0" rx="14" ry="11.5" fill="#1e1820" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -31 -5 Q -22 -10 -12 -7" fill="none" stroke="#4a3a4e" stroke-width="2" stroke-linecap="round"/>
-    <path d="M -30 -5 L -21 0 L -30 5 Z M -12 -4 L -21 0 L -12 4 Z" fill="url(#mark)" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-    <!-- arms reaching forward -->
-    <path d="M 2 -16 L 15 -12 L 24 -5" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 2 -16 L 15 -12 L 24 -5" fill="none" stroke="#f2e4da" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 18 -10.5 L 20 -9" stroke="#d42a40" stroke-width="3.8" stroke-linecap="round"/>
+    <!-- Mirrored lower 4 legs -->
     <g transform="scale(1 -1)">
-    <path d="M 2 -16 L 15 -12 L 24 -5" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 2 -16 L 15 -12 L 24 -5" fill="none" stroke="#f2e4da" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 18 -10.5 L 20 -9" stroke="#d42a40" stroke-width="3.8" stroke-linecap="round"/>
+      <path d="M 10 -8 L 24 -28 L 43 -22 L 26 -22 L 13 -5 Z" fill="url(#el_obsidian)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M 24 -28 L 43 -22 L 32 -23 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="24" cy="-25" r="2.7" fill="#c41a34" stroke="#14171f" stroke-width="1.2"/>
+
+      <path d="M 4 -10 L 12 -34 L 27 -44 L 15 -31 L 7 -7 Z" fill="url(#el_obsidian)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M 12 -34 L 27 -44 L 17 -34 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="13" cy="-32" r="2.7" fill="#c41a34" stroke="#14171f" stroke-width="1.2"/>
+
+      <path d="M -2 -10 L -14 -34 L -29 -43 L -11 -31 L 1 -7 Z" fill="url(#el_obsidian)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M -14 -34 L -29 -43 L -16 -32 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="-13" cy="-32" r="2.6" fill="#c41a34" stroke="#14171f" stroke-width="1.2"/>
+
+      <path d="M -7 -8 L -27 -27 L -45 -24 L -25 -22 L -5 -5 Z" fill="url(#el_obsidian)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M -27 -27 L -45 -24 L -29 -23 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="-26" cy="-24.5" r="2.6" fill="#c41a34" stroke="#14171f" stroke-width="1.2"/>
     </g>
-    <!-- her gown, bright crimson, black lace down the back -->
-    <ellipse cx="0" cy="0" rx="12" ry="19" fill="url(#gown)" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M 7 -14 Q 12 -6 12 0 Q 12 6 7 14" fill="none" stroke="#ff7a88" stroke-width="2" stroke-linecap="round"/>
-    <path d="M -11 -6 L -2 0 L -11 6" fill="none" stroke="#1e1820" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M -6 -15 Q -10 -8 -10 0 Q -10 8 -6 15" fill="none" stroke="#1e1820" stroke-width="2.2" stroke-linecap="round"/>
-    <!-- head: black hair under a spiked red crown, her pale face forward -->
-    <path d="M 8 -8 L 0 -13 L 6 -6 Z M 4 -5 L -6 -8 L 3 -3 Z" fill="#d42a40" stroke="#1a1d24" stroke-width="1.6" stroke-linejoin="round"/>
-    <g transform="scale(1 -1)">
-    <path d="M 8 -8 L 0 -13 L 6 -6 Z M 4 -5 L -6 -8 L 3 -3 Z" fill="#d42a40" stroke="#1a1d24" stroke-width="1.6" stroke-linejoin="round"/>
-    </g>
-    <ellipse cx="7" cy="0" rx="9.5" ry="9" fill="#141018" stroke="#1a1d24" stroke-width="2.5"/>
-    <path d="M -1 -5 Q 5 -8 10 -4 M -1 5 Q 5 8 10 4" fill="none" stroke="#4e3e56" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 11 -6.5 Q 20 -5 20 0 Q 20 5 11 6.5 Q 14.5 0 11 -6.5 Z" fill="#f2e4da" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-    <circle cx="2" cy="0" r="2.6" fill="#d42a40" stroke="#1a1d24" stroke-width="1"/>
+
+    <!-- sleek sculpted glossy obsidian-and-crimson spider abdomen (-X) -->
+    <path d="M -4 -8 C -12 -18 -29 -18 -38 -8 C -42 -4 -44 0 -44 0 C -44 0 -42 4 -38 8 C -29 18 -12 18 -4 8 Q -1 0 -4 -8 Z" fill="url(#el_obsidian)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- sculpted crimson armored flank plates & glossy obsidian highlight -->
+    <path d="M -10 -12 C -19 -16 -30 -14 -36 -7" fill="none" stroke="#85709e" stroke-width="1.7" stroke-linecap="round"/>
+    <path d="M -10 12 C -19 16 -30 14 -36 7" fill="none" stroke="#691224" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M -8 -10 Q -15 -14 -24 -12 L -19 -7 Q -12 -8 -8 -10 Z M -8 10 Q -15 14 -24 12 L -19 7 Q -12 8 -8 10 Z" fill="#9e142d" stroke="#14171f" stroke-width="1.1" stroke-linejoin="round"/>
+
+    <!-- ornate blood-ruby hourglass / royal crown marking on abdomen -->
+    <path d="M -35 -6 L -22 0 L -35 6 L -31 0 Z M -11 -5.5 L -22 0 L -11 5.5 L -15 0 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M -25 -6 L -22 -2 L -19 -6 L -22 -10 Z M -25 6 L -22 2 L -19 6 L -22 10 Z" fill="#ff4766" stroke="#14171f" stroke-width="1" stroke-linejoin="round"/>
+    <circle cx="-22" cy="0" r="2.2" fill="#ffd4dc"/>
+
+    <!-- gleaming venomous crimson fangs & armored pedipalps at the front (+X) -->
+    <!-- pedipalps flanking fangs -->
+    <path d="M 18 -9 Q 29 -15 36 -8" fill="none" stroke="#14171f" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M 18 -9 Q 29 -15 36 -8" fill="none" stroke="#362a42" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 18 9 Q 29 15 36 8" fill="none" stroke="#14171f" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M 18 9 Q 29 15 36 8" fill="none" stroke="#362a42" stroke-width="2" stroke-linecap="round"/>
+    <!-- razor-sharp curved venomous crimson fangs -->
+    <path d="M 22 -7 Q 34 -9 42 -2 Q 33 -2 24 -1.5 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 22 7 Q 34 9 42 2 Q 33 2 24 1.5 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 28 -5.5 Q 35 -5.5 40 -2.5 M 28 5.5 Q 35 5.5 40 2.5" fill="none" stroke="#ffd4dc" stroke-width="1.2" stroke-linecap="round"/>
+
+    <!-- sculpted obsidian-and-crimson cephalothorax with royal crown crest -->
+    <path d="M -6 -6 C -1 -14 14 -14 23 -8 C 27 -4 27 4 23 8 C 14 14 -1 14 -6 6 Z" fill="url(#el_obsidian)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- regal crimson spine-crown ridge -->
+    <path d="M 13 -10 L 1 -15 L 7 -6 L -5 -8 L 4 0 L -5 8 L 7 6 L 1 15 L 13 10 L 15 0 Z" fill="url(#el_crimson)" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M 4 -9 Q 12 -11 20 -6" fill="none" stroke="#8f78ab" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- glowing ruby multi-eye cluster at front carapace (+X) -->
+    <circle cx="21" cy="0" r="8" fill="url(#el_ruby_glow)"/>
+    <circle cx="22.5" cy="-3.2" r="2.1" fill="#ff3b5c" stroke="#14171f" stroke-width="0.9"/>
+    <circle cx="22.5" cy="3.2" r="2.1" fill="#ff3b5c" stroke="#14171f" stroke-width="0.9"/>
+    <circle cx="19.5" cy="-6.2" r="1.5" fill="#ff5775" stroke="#14171f" stroke-width="0.8"/>
+    <circle cx="19.5" cy="6.2" r="1.5" fill="#ff5775" stroke="#14171f" stroke-width="0.8"/>
+    <circle cx="17.5" cy="-2.2" r="1.2" fill="#ff758f"/>
+    <circle cx="17.5" cy="2.2" r="1.2" fill="#ff758f"/>
+    <circle cx="23" cy="-3.4" r="0.8" fill="#ffffff"/>
+    <circle cx="23" cy="3.4" r="0.8" fill="#ffffff"/>
   </g>
 </svg>

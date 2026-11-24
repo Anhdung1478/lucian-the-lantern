@@ -1,88 +1,82 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="116" height="116" viewBox="0 0 116 116">
-  <!-- Maokai, seen from above, facing +X: a huge walking tree. A crown of dark leaves covers his back and shoulders,
-       twisted dead branches jut out of it, two thick branch arms reach forward with twig claws, and in front his head
-       is a stump of bark with a hollow face: dark sockets and a gaping mouth, a sickly green light glowing inside. -->
+  <!-- Maokai, the Twisted Shadow Isles Treant, top-down facing +X: massive asymmetrical gnarled dark-bark body &
+       tangled root-shoulders, left arm (-Y) as an oversized crushing jagged timber claw reaching boldly forward (+X),
+       cracked dark ironwood bark glowing with eerie emerald-green life-sap fissures, and rugged dark-forest mossy
+       fronds & splintered dead branches across his crown (no cartoon polka-dot puffs!). -->
   <defs>
-    <radialGradient id="glow">
-      <stop offset="0" stop-color="#f2ffb0"/>
-      <stop offset="0.45" stop-color="#b9f26a" stop-opacity="0.85"/>
-      <stop offset="1" stop-color="#6fbf4a" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="bark" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#86603a"/>
-      <stop offset="0.5" stop-color="#5e4128"/>
-      <stop offset="1" stop-color="#86603a"/>
+    <linearGradient id="mk_bark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6b5038"/>
+      <stop offset="0.45" stop-color="#423022"/>
+      <stop offset="1" stop-color="#241912"/>
     </linearGradient>
+    <linearGradient id="mk_claw" x1="0" y1="0" x2="1" y2="0.8">
+      <stop offset="0" stop-color="#7c5c3e"/>
+      <stop offset="0.55" stop-color="#4c3624"/>
+      <stop offset="1" stop-color="#261a12"/>
+    </linearGradient>
+    <linearGradient id="mk_moss" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3c6e41"/>
+      <stop offset="0.55" stop-color="#22452b"/>
+      <stop offset="1" stop-color="#13291b"/>
+    </linearGradient>
+    <radialGradient id="mk_sap">
+      <stop offset="0" stop-color="#e8ffad"/>
+      <stop offset="0.45" stop-color="#66ff7a" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#1cb54e" stop-opacity="0"/>
+    </radialGradient>
   </defs>
   <g transform="translate(58 58)">
-    <!-- twisted dead branches jutting out of the crown -->
-    <path d="M -30 -12 L -48 -26 L -56 -24 M -48 -26 L -50 -34 M -22 18 L -38 38 L -46 38 M -38 10 L -54 18 M -16 -28 L -22 -46 L -18 -52" fill="none" stroke="#1a1d24" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M -30 -12 L -48 -26 L -56 -24 M -48 -26 L -50 -34 M -22 18 L -38 38 L -46 38 M -38 10 L -54 18 M -16 -28 L -22 -46 L -18 -52" fill="none" stroke="#6a4a2c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- branch arms reaching forward, knotted, twig claws -->
-    <g stroke="#1a1d24" stroke-linejoin="round" stroke-linecap="round">
-      <path d="M -4 -20 Q 8 -40 28 -40 Q 37 -40 38 -32 Q 28 -31 20 -24 Q 10 -14 0 -12 Z" fill="url(#bark)" stroke-width="3"/>
-      <path d="M -4 20 Q 8 40 28 40 Q 37 40 38 32 Q 28 31 20 24 Q 10 14 0 12 Z" fill="url(#bark)" stroke-width="3"/>
-      <path d="M 34 -38 L 43 -45 M 37 -35 L 49 -37 M 37 -32 L 47 -27 M 34 38 L 43 45 M 37 35 L 49 37 M 37 32 L 47 27" fill="none" stroke-width="5"/>
-    </g>
-    <path d="M 34 -38 L 43 -45 M 37 -35 L 49 -37 M 37 -32 L 47 -27 M 34 38 L 43 45 M 37 35 L 49 37 M 37 32 L 47 27" fill="none" stroke="#86603a" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 6 -31 Q 16 -38 28 -37 M 6 31 Q 16 38 28 37" fill="none" stroke="#a88050" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="16" cy="-30" r="3" fill="#4a3320" stroke="#1a1d24" stroke-width="1.5"/>
-    <circle cx="16" cy="30" r="3" fill="#4a3320" stroke="#1a1d24" stroke-width="1.5"/>
-    <!-- the crown of leaves -->
-    <g fill="#1a1d24">
-      <circle cx="-30" cy="-20" r="15"/>
-      <circle cx="-34" cy="3" r="16"/>
-      <circle cx="-27" cy="25" r="14"/>
-      <circle cx="-13" cy="-29" r="12"/>
-      <circle cx="-11" cy="30" r="12"/>
-      <circle cx="-14" cy="-11" r="14"/>
-      <circle cx="-15" cy="12" r="14"/>
-      <circle cx="-45" cy="-6" r="11"/>
-      <circle cx="-44" cy="15" r="9"/>
-      <circle cx="-1" cy="-20" r="10"/>
-      <circle cx="-1" cy="20" r="10"/>
-    </g>
-    <g fill="#2b5029">
-      <circle cx="-30" cy="-20" r="13.2"/>
-      <circle cx="-34" cy="3" r="14.2"/>
-      <circle cx="-27" cy="25" r="12.2"/>
-      <circle cx="-13" cy="-29" r="10.2"/>
-      <circle cx="-11" cy="30" r="10.2"/>
-      <circle cx="-14" cy="-11" r="12.2"/>
-      <circle cx="-15" cy="12" r="12.2"/>
-      <circle cx="-45" cy="-6" r="9.2"/>
-      <circle cx="-44" cy="15" r="7.2"/>
-      <circle cx="-1" cy="-20" r="8.2"/>
-      <circle cx="-1" cy="20" r="8.2"/>
-    </g>
-    <g fill="#3a6a35">
-      <circle cx="-27.3" cy="-22.7" r="8.2"/>
-      <circle cx="-31.1" cy="0.1" r="8.8"/>
-      <circle cx="-24.5" cy="22.5" r="7.7"/>
-      <circle cx="-10.8" cy="-31.2" r="6.6"/>
-      <circle cx="-8.8" cy="27.8" r="6.6"/>
-      <circle cx="-11.5" cy="-13.5" r="7.7"/>
-      <circle cx="-12.5" cy="9.5" r="7.7"/>
-      <circle cx="-43.0" cy="-8.0" r="6.1"/>
-      <circle cx="-42.4" cy="13.4" r="5.0"/>
-      <circle cx="0.8" cy="-21.8" r="5.5"/>
-      <circle cx="0.8" cy="18.2" r="5.5"/>
-    </g>
-    <path d="M -36 -24 Q -30 -30 -22 -28 M -40 -2 Q -34 -8 -26 -6 M -32 22 Q -26 16 -18 18 M -20 -14 Q -14 -20 -6 -18 M -20 8 Q -14 2 -6 4 M -50 -10 Q -46 -14 -40 -12" fill="none" stroke="#7fb466" stroke-width="2" stroke-linecap="round"/>
-    <path d="M -24 -4 Q -32 -14 -40 -12 M -24 4 Q -30 14 -38 18" fill="none" stroke="#1f3f1f" stroke-width="2.2" stroke-linecap="round"/>
-    <circle cx="-26" cy="-14" r="2.4" fill="#d8ff8a"/>
-    <circle cx="-38" cy="8" r="2.2" fill="#d8ff8a"/>
-    <circle cx="-14" cy="24" r="2.2" fill="#d8ff8a"/>
-    <!-- head: a stump of bark, its top split by grooves, a hollow face glowing green -->
-    <path d="M 2 -16 Q 14 -21 28 -16 Q 39 -10 39 0 Q 39 10 28 16 Q 14 21 2 16 Q -3 8 -3 0 Q -3 -8 2 -16 Z" fill="url(#bark)" stroke="#1a1d24" stroke-width="3.5" stroke-linejoin="round"/>
-    <path d="M 2 -9 Q 12 -6 18 -10 M 0 0 Q 10 2 18 0 M 2 9 Q 12 6 18 10" fill="none" stroke="#3c2815" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M 6 -15 Q 18 -18 28 -13" fill="none" stroke="#b08a58" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="31" cy="0" r="12" fill="url(#glow)" opacity="0.75"/>
-    <path d="M 21 -12 L 34 -6 M 21 12 L 34 6" stroke="#1a1d24" stroke-width="4.5" stroke-linecap="round"/>
-    <path d="M 23 -9 L 33 -5 L 25 -2 Z M 23 9 L 33 5 L 25 2 Z" fill="#0a0d07" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-    <circle cx="28" cy="-5" r="2.3" fill="#e8ffa0"/>
-    <circle cx="28" cy="5" r="2.3" fill="#e8ffa0"/>
-    <path d="M 33 -4 L 39 -2 L 36 0 L 39 2 L 33 4 Z" fill="#0a0d07" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M 34 -1.5 L 36.5 0 L 34 1.5" fill="none" stroke="#c8ff6a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- tangled splintered dead branches jutting asymmetrically from his back & crown -->
+    <path d="M -26 -16 L -45 -32 L -54 -28 M -45 -32 L -46 -43 M -34 2 L -54 5 L -52 -3 M -22 22 L -40 42 L -50 40 M -40 42 L -36 51 M -10 -32 L -18 -51 L -12 -55 M -18 -51 L -28 -48" fill="none" stroke="#14171f" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -26 -16 L -45 -32 L -54 -28 M -45 -32 L -46 -43 M -34 2 L -54 5 L -52 -3 M -22 22 L -40 42 L -50 40 M -40 42 L -36 51 M -10 -32 L -18 -51 L -12 -55 M -18 -51 L -28 -48" fill="none" stroke="#59422e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- RIGHT arm (+Y): sturdy gnarled grasping root-limb (smaller than colossal left claw) -->
+    <path d="M -6 18 Q 8 36 28 36 Q 38 35 39 27 Q 29 27 21 20 Q 12 13 2 11 Z" fill="url(#mk_bark)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 34 34 L 46 39 M 38 30 L 49 30 M 36 26 L 44 22" stroke="#14171f" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M 34 34 L 46 39 M 38 30 L 49 30 M 36 26 L 44 22" stroke="#6b5038" stroke-width="1.9" stroke-linecap="round"/>
+    <path d="M 8 26 Q 18 32 30 31" fill="none" stroke="#62ff7c" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+
+    <!-- LEFT arm (-Y): OVERSIZED crushing jagged timber claw reaching boldly forward (+X) -->
+    <path d="M -12 -18 Q -2 -44 22 -46 L 40 -42 L 48 -33 L 40 -21 L 26 -20 Q 16 -24 6 -14 Z" fill="url(#mk_claw)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- colossal splintered jagged timber claw fingers -->
+    <path d="M 38 -42 L 54 -46 L 46 -35 Z M 45 -35 L 57 -31 L 45 -26 Z M 42 -24 L 52 -16 L 37 -20 Z" fill="#59402b" stroke="#14171f" stroke-width="1.9" stroke-linejoin="round"/>
+    <!-- glowing emerald sap veins running down the crushing timber claw -->
+    <path d="M 2 -30 L 14 -37 L 26 -32 L 38 -36 M 18 -29 L 32 -25" fill="none" stroke="#52ff72" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+    <path d="M 2 -30 L 14 -37 L 26 -32 L 38 -36 M 18 -29 L 32 -25" fill="none" stroke="#e4ffb0" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- bark ridge highlights on colossal arm -->
+    <path d="M -4 -31 Q 10 -43 28 -42" fill="none" stroke="#967452" stroke-width="1.8" stroke-linecap="round"/>
+
+    <!-- massive asymmetrical gnarled dark-bark torso & tangled root-shoulders -->
+    <path d="M -38 -16 L -44 -2 L -39 14 L -26 28 L -8 33 L 14 24 L 24 14 L 24 -16 L 12 -28 L -12 -34 L -29 -28 Z" fill="url(#mk_bark)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- deep craggy wood grain & tangled root ridges -->
+    <path d="M -34 -12 Q -18 -20 -4 -14 M -36 4 Q -20 0 -6 6 M -26 20 Q -12 22 4 16 M -20 -24 Q -6 -28 8 -20" fill="none" stroke="#1a120d" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M -30 -18 Q -14 -26 2 -22" fill="none" stroke="#8a6949" stroke-width="1.6" stroke-linecap="round"/>
+
+    <!-- eerie emerald-green life-sap fissures glowing through cracked dark bark -->
+    <circle cx="-8" cy="-4" r="14" fill="url(#mk_sap)" opacity="0.48"/>
+    <path d="M -28 -6 L -18 -12 L -8 -5 L 4 -10 M -24 10 L -12 6 L -2 13 L 10 8 M -14 -4 L -10 5" fill="none" stroke="#4eff6c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.72"/>
+    <path d="M -28 -6 L -18 -12 L -8 -5 L 4 -10 M -24 10 L -12 6 L -2 13 L 10 8 M -14 -4 L -10 5" fill="none" stroke="#ebffbd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- rugged angular dark-forest mossy twigs & jagged shadow-foliage tufts (NO round broccoli circles!) -->
+    <path d="M -38 -20 L -29 -32 L -20 -26 L -12 -36 L -4 -25 L -16 -14 L -31 -12 Z" fill="url(#mk_moss)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M -45 -4 L -36 -14 L -24 -8 L -28 6 L -40 10 L -48 2 Z" fill="url(#mk_moss)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M -34 12 L -22 14 L -12 26 L -20 36 L -32 32 L -38 22 Z" fill="url(#mk_moss)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M -14 20 L -2 18 L 6 29 L -6 37 L -16 30 Z" fill="#1e3d26" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <!-- mossy frond edge highlights -->
+    <path d="M -32 -25 L -24 -29 L -16 -24 M -42 -2 L -34 -8 L -28 -4 M -32 22 L -24 28 L -17 24" fill="none" stroke="#62a869" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- terrifying hollow jagged bark head at front (+X) with angular glowing emerald eyes -->
+    <path d="M 4 -15 L 16 -20 L 29 -15 L 39 -7 L 41 0 L 39 7 L 29 15 L 16 20 L 4 15 L 0 0 Z" fill="url(#mk_bark)" stroke="#14171f" stroke-width="2.1" stroke-linejoin="round"/>
+    <!-- jagged splintered brow-horns sweeping back from head -->
+    <path d="M 16 -18 L 4 -28 L 11 -14 Z M 16 18 L 4 28 L 11 14 Z" fill="#4f3927" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 6 -10 Q 15 -14 26 -11 M 4 0 Q 14 2 22 0 M 6 10 Q 15 14 26 11" fill="none" stroke="#241810" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 10 -15 Q 20 -17 29 -12" fill="none" stroke="#967452" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- hollow glowing emerald face -->
+    <circle cx="31" cy="0" r="11" fill="url(#mk_sap)" opacity="0.72"/>
+    <path d="M 21 -10 L 34 -5 L 25 -2 Z M 21 10 L 34 5 L 25 2 Z" fill="#091208" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M 24 -7.5 L 31 -5 L 26 -3.5 Z M 24 7.5 L 31 5 L 26 3.5 Z" fill="#e6ffa8"/>
+    <!-- splintered glowing hollow mouth -->
+    <path d="M 33 -4.5 L 40 -2 L 36 0 L 40 2 L 33 4.5 Z" fill="#091208" stroke="#14171f" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M 34.5 -1.8 L 37.5 0 L 34.5 1.8" fill="none" stroke="#a8ff6b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>

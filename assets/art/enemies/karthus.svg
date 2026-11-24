@@ -1,70 +1,101 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-  <!-- Karthus, the Deathsinger, seen from above, facing +X: a lich floating in a tattered violet-grey robe whose
-       ragged hem trails behind him into pale green soul wisps, a high mantle with bone spikes on his shoulders, a
-       crowned skull with green-lit eyes under his hood, his open book of the dead in his left hand (y < 0) with
-       glowing runes, and his long bone staff in his right (y > 0), a green soul flame at its head. -->
+  <!-- Karthus, the Deathsinger Lich, top-down facing +X: horned dark spectral crown & deep hooded mantle trailing
+       ragged amethyst-and-teal necromantic robes behind (-X), bone-pale skeletal shoulders with glowing spectral chest
+       ribs, right hand (+Y) extending a tall gnarled dark-iron Lich Staff with blazing emerald-violet soul orb (+X),
+       and left hand (-Y) holding an open glowing rune-etched Grimoire radiating violet-teal light. -->
   <defs>
-    <radialGradient id="soul">
-      <stop offset="0" stop-color="#f2fff4"/>
-      <stop offset="0.4" stop-color="#b8ffc8" stop-opacity="0.85"/>
-      <stop offset="1" stop-color="#5ee08a" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="wisp">
-      <stop offset="0" stop-color="#b8ffc8" stop-opacity="0.5"/>
-      <stop offset="1" stop-color="#5ee08a" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="robe" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#7464a6"/>
-      <stop offset="1" stop-color="#43386a"/>
+    <linearGradient id="ka_robe" x1="1" y1="0" x2="0" y2="0.2">
+      <stop offset="0" stop-color="#604894"/>
+      <stop offset="0.55" stop-color="#352659"/>
+      <stop offset="1" stop-color="#171d36"/>
     </linearGradient>
+    <linearGradient id="ka_mantle" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c63b5"/>
+      <stop offset="0.55" stop-color="#43326e"/>
+      <stop offset="1" stop-color="#22193b"/>
+    </linearGradient>
+    <linearGradient id="ka_crown" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f5e3a6"/>
+      <stop offset="0.5" stop-color="#b5964c"/>
+      <stop offset="1" stop-color="#5e4b22"/>
+    </linearGradient>
+    <radialGradient id="ka_orb">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.35" stop-color="#8affc4" stop-opacity="0.95"/>
+      <stop offset="0.7" stop-color="#9e5cff" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#5422b8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ka_book_glow">
+      <stop offset="0" stop-color="#b8fff0" stop-opacity="0.82"/>
+      <stop offset="0.55" stop-color="#9a64ff" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#4b2699" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <g transform="translate(50 50) scale(1.04)">
-    <!-- soul wisps off the hem -->
-    <ellipse cx="-40" cy="-16" rx="9" ry="7" fill="url(#wisp)"/>
-    <ellipse cx="-43" cy="4" rx="9" ry="7" fill="url(#wisp)"/>
-    <ellipse cx="-38" cy="22" rx="9" ry="7" fill="url(#wisp)"/>
-    <!-- the tattered robe, floating, its hem trailing behind -->
-    <path d="M 6 -26 Q -16 -36 -34 -28 L -38 -32 L -40 -22 L -47 -16 L -40 -10 L -46 -2 L -39 3 L -46 10 L -39 15 L -44 24 L -35 27 L -34 34 Q -16 36 6 26 Z" fill="url(#robe)" stroke="#1a1d24" stroke-width="3.5" stroke-linejoin="round"/>
-    <path d="M -38 -32 L -40 -22 L -47 -16 L -40 -10 L -46 -2 L -39 3 L -46 10 L -39 15 L -44 24 L -35 27 L -34 34" fill="none" stroke="#9dffb8" stroke-width="2" stroke-linejoin="round" opacity="0.65"/>
-    <path d="M -8 -28 Q -24 -28 -36 -20 M -12 -12 Q -26 -12 -40 -8 M -12 12 Q -26 12 -40 10 M -8 28 Q -22 30 -34 26" fill="none" stroke="#1f1a30" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M -10 -20 Q -24 -20 -36 -14 M -12 2 L -40 0 M -10 20 Q -22 21 -36 19" fill="none" stroke="#9a8ac8" stroke-width="2" stroke-linecap="round"/>
-    <!-- the bone staff, held out on his right, its soul flame -->
-    <path d="M -16 24 L 40 15" stroke="#1a1d24" stroke-width="7" stroke-linecap="round"/>
-    <path d="M -16 24 L 40 15" stroke="#d8cfb8" stroke-width="3.5" stroke-linecap="round"/>
-    <path d="M 4 21 L 8 20.4 M 20 18.4 L 24 17.8" stroke="#8a7f68" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="42" cy="15" r="9" fill="url(#soul)"/>
-    <path d="M 36 9 Q 42 8 46 12 L 48 15 L 46 18 Q 42 22 36 21 Q 39 15 36 9 Z" fill="#e8e2d0" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
-    <circle cx="42" cy="15" r="3" fill="#7dffa8" stroke="#1a1d24" stroke-width="1.2"/>
-    <!-- bony arms: the right one to the staff, the left one holding the book -->
-    <path d="M 4 18 L 16 21 M 4 -18 L 16 -18" stroke="#1a1d24" stroke-width="7" stroke-linecap="round"/>
-    <path d="M 4 18 L 16 21 M 4 -18 L 16 -18" stroke="#4a3d6a" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="17" cy="20.5" r="3.4" fill="#e8e2d0" stroke="#1a1d24" stroke-width="1.5"/>
-    <!-- the open book of the dead -->
-    <circle cx="27" cy="-17" r="13" fill="url(#wisp)"/>
-    <path d="M 18 -26 L 36 -27 L 36 -8 L 18 -9 Z" fill="#3a2a22" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M 19.5 -24.5 L 27 -25 L 27 -9.5 L 19.5 -10.5 Z M 27 -25 L 34.5 -25.5 L 34.5 -9.5 L 27 -9.5 Z" fill="#efe6cc"/>
-    <path d="M 27 -25 L 27 -9.5" stroke="#8a7a5a" stroke-width="2"/>
-    <path d="M 21.5 -21.5 L 25 -21.5 M 21.5 -17.5 L 25 -17.5 M 21.5 -13.5 L 24 -13.5 M 29 -22 L 32.5 -22 M 29 -18 L 32.5 -18 M 29 -14 L 31.5 -14" stroke="#3ccf74" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="17" cy="-18" r="3.4" fill="#e8e2d0" stroke="#1a1d24" stroke-width="1.5"/>
-    <!-- the high mantle, bone spikes on the shoulders -->
-    <path d="M 8 -10 Q 8 -26 -4 -27 Q -14 -26 -15 -12 L -15 12 Q -14 26 -4 27 Q 8 26 8 10 Z" fill="#5a4c84" stroke="#1a1d24" stroke-width="3.5" stroke-linejoin="round"/>
-    <path d="M -11 -18 Q -14 0 -11 18" fill="none" stroke="#8a7ab8" stroke-width="2.2" stroke-linecap="round"/>
-    <g fill="#e8e2d0" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round">
-      <path d="M 0 -24 L -6 -34 L 4 -26 Z M -8 -22 L -17 -29 L -6 -18 Z"/>
-      <path d="M 0 24 L -6 34 L 4 26 Z M -8 22 L -17 29 L -6 18 Z"/>
+  <g transform="translate(50 50)">
+    <!-- ghostly wisps drifting from tattered hem -->
+    <ellipse cx="-41" cy="-16" rx="8" ry="6" fill="url(#ka_book_glow)" opacity="0.6"/>
+    <ellipse cx="-42" cy="12" rx="8" ry="6" fill="url(#ka_book_glow)" opacity="0.6"/>
+
+    <!-- ragged amethyst-and-teal necromantic robes trailing far behind (-X) -->
+    <path d="M 4 -25 C -12 -36 -28 -36 -41 -29 L -46 -22 L -39 -16 L -47 -9 L -40 -2 L -47 6 L -39 13 L -45 22 L -37 26 L -38 34 C -24 36 -10 35 4 25 Z" fill="url(#ka_robe)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- ghostly teal tattered hem rim & folds -->
+    <path d="M -40 -28 L -44 -22 L -37.5 -16 L -45 -9 L -38.5 -2 L -45 6 L -37.5 13 L -43 21.5 L -36 25.5 L -36.5 32.5" fill="none" stroke="#64f0cc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+    <path d="M -8 -24 Q -24 -26 -38 -19 M -12 -10 Q -26 -11 -41 -7 M -12 10 Q -26 11 -41 8 M -8 24 Q -23 26 -36 22" fill="none" stroke="#18122b" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M -10 -17 Q -24 -18 -37 -13 M -12 0 L -41 1 M -10 17 Q -23 18 -37 15" fill="none" stroke="#8f78cc" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- right hand (+Y): tall gnarled dark-iron Lich Staff with blazing emerald-violet soul orb -->
+    <path d="M -15 32 L 38 14" stroke="#14171f" stroke-width="5.6" stroke-linecap="round"/>
+    <path d="M -15 32 L 38 14" stroke="#4d596b" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M -6 29 L -2 27.5 M 10 23.5 L 14 22" stroke="#a6b8cc" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- glowing soul orb aura -->
+    <circle cx="41" cy="13" r="11.5" fill="url(#ka_orb)"/>
+    <!-- gnarled iron staff claws cradling orb -->
+    <path d="M 33 9 Q 40 5 46 9 L 42 12 Q 38 10 35 12 Z M 35 18 Q 42 21 47 16 L 42 14 Q 39 16 36 15 Z" fill="#3a4554" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <circle cx="41" cy="13" r="4.4" fill="#8affc4" stroke="#14171f" stroke-width="1.4"/>
+    <circle cx="41" cy="13" r="2.1" fill="#ffffff"/>
+
+    <!-- left hand (-Y): open glowing rune-etched Grimoire radiating violet-teal light -->
+    <circle cx="28" cy="-21" r="14" fill="url(#ka_book_glow)"/>
+    <g transform="translate(27 -21) rotate(-14)">
+      <!-- ornate dark leather & bronze cover -->
+      <path d="M -11 -9 L 11 -10 L 12 9 L -10 10 Z" fill="#2d1c3d" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+      <!-- open luminous pages -->
+      <path d="M -9 -7.5 L 0 -6.5 L 0 7.5 L -8.5 8 Z M 0 -6.5 L 9.5 -8 L 10 7.5 L 0 7.5 Z" fill="#dffef7" stroke="#5b3b96" stroke-width="0.9" stroke-linejoin="round"/>
+      <path d="M 0 -6.5 L 0 7.5" stroke="#4a3178" stroke-width="1.5"/>
+      <!-- glowing violet-teal arcane rune sigils -->
+      <circle cx="-4.5" cy="0.5" r="2.3" fill="none" stroke="#8f4dff" stroke-width="1.2"/>
+      <path d="M 2.5 -4 L 7.5 -4.5 M 2.5 -0.5 L 7.5 -1 M 2.5 3 L 6.5 2.5" stroke="#22cc9e" stroke-width="1.4" stroke-linecap="round"/>
     </g>
-    <!-- hood, and the crowned skull in it -->
-    <path d="M 14 -10 Q 12 -15 2 -15 Q -9 -15 -14 -7 L -20 0 L -14 7 Q -9 15 2 15 Q 12 15 14 10 Z" fill="#3a3058" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -10 -10 Q -4 -13.5 4 -13" fill="none" stroke="#7a68a8" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 0 -9 L -5 -13 L 2 -11 L 0 -17 L 5 -11 L 8 -14 L 8 -8 Z M 0 9 L -5 13 L 2 11 L 0 17 L 5 11 L 8 14 L 8 8 Z" fill="#c9b880" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-    <ellipse cx="9" cy="0" rx="8.5" ry="8" fill="#ece6d6" stroke="#1a1d24" stroke-width="2"/>
-    <path d="M 2 -4 Q 6 -6 10 -6" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="13" cy="-3.5" r="5" fill="url(#soul)"/>
-    <circle cx="13" cy="3.5" r="5" fill="url(#soul)"/>
-    <circle cx="13" cy="-3.5" r="2.1" fill="#1a3a24"/>
-    <circle cx="13" cy="3.5" r="2.1" fill="#1a3a24"/>
-    <circle cx="13" cy="-3.5" r="1.2" fill="#9dffb8"/>
-    <circle cx="13" cy="3.5" r="1.2" fill="#9dffb8"/>
-    <path d="M 17 -2 L 18 2" stroke="#8a826e" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- skeletal arms & bony claws -->
+    <path d="M 2 18 L 15 21.5 M 2 -18 L 16 -20" stroke="#14171f" stroke-width="7.2" stroke-linecap="round"/>
+    <path d="M 2 18 L 15 21.5 M 2 -18 L 16 -20" stroke="#3c2c61" stroke-width="4.2" stroke-linecap="round"/>
+    <circle cx="16.5" cy="21.5" r="3.4" fill="#ece5d3" stroke="#14171f" stroke-width="1.4"/>
+    <circle cx="17" cy="-20" r="3.4" fill="#ece5d3" stroke="#14171f" stroke-width="1.4"/>
+
+    <!-- high necromantic mantle & bone-pale skeletal shoulders with glowing spectral chest ribs -->
+    <path d="M 9 -10 Q 8 -26 -5 -27 Q -16 -25 -17 -11 L -17 11 Q -16 25 -5 27 Q 8 26 9 10 Z" fill="url(#ka_mantle)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- glowing spectral core & bone-pale skeletal ribs across upper torso -->
+    <ellipse cx="-6" cy="0" rx="6" ry="12" fill="#4af0c4" opacity="0.45"/>
+    <path d="M -11 -10 Q -5 -8 -1 -11 M -12 -4 Q -5 -3 0 -5 M -12 4 Q -5 3 0 5 M -11 10 Q -5 8 -1 11" fill="none" stroke="#efe9d8" stroke-width="2.1" stroke-linecap="round"/>
+    <!-- bone-pale skeletal shoulder spikes -->
+    <path d="M 2 -23 L -5 -34 L 7 -24 Z M -7 -22 L -17 -30 L -5 -17 Z" fill="#efe9d8" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 2 23 L -5 34 L 7 24 Z M -7 22 L -17 30 L -5 17 Z" fill="#d9d1be" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M -13 -15 Q -15 0 -13 15" fill="none" stroke="#b59ee6" stroke-width="1.6" stroke-linecap="round"/>
+
+    <!-- deep hooded cowl tapering behind + horned dark spectral Lich Crown -->
+    <path d="M 15 -9 Q 12 -16 1 -16 Q -11 -16 -17 -7 L -24 0 L -17 7 Q -11 16 1 16 Q 12 16 15 9 Z" fill="#2a2047" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M -17 -4 Q -9 -13.5 4 -13.5 Q 11 -13 13 -8" fill="none" stroke="#9982cc" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- tall horned Lich Crown sweeping outward/back -->
+    <path d="M 6 -9 L -4 -20 L 2 -11 L -9 -14 L -1 -7 Z" fill="url(#ka_crown)" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 6 9 L -4 20 L 2 11 L -9 14 L -1 7 Z" fill="url(#ka_crown)" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 9 -8 L 12 -14 L 13 -6 Z M 9 8 L 12 14 L 13 6 Z" fill="url(#ka_crown)" stroke="#14171f" stroke-width="1.3" stroke-linejoin="round"/>
+
+    <!-- gaunt shadowed lich skull peeking at front (+X) with piercing emerald eye slits -->
+    <path d="M 7 -7.5 Q 16 -7 20 -2.5 Q 21.5 0 20 2.5 Q 16 7 7 7.5 Q 4 0 7 -7.5 Z" fill="#130e21" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 10 -5.5 Q 16 -5 19 -1.5 Q 20 0 19 1.5 Q 16 5 10 5.5 Q 12 0 10 -5.5 Z" fill="#dcd5c3" stroke="#14171f" stroke-width="1.1"/>
+    <circle cx="15" cy="-2.8" r="3.2" fill="url(#ka_orb)"/>
+    <circle cx="15" cy="2.8" r="3.2" fill="url(#ka_orb)"/>
+    <path d="M 13.5 -3.8 L 17 -2.4 M 13.5 3.8 L 17 2.4" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
   </g>
 </svg>

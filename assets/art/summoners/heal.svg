@@ -1,8 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Heal: a glowing green cross -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f5a2a"/><stop offset="1" stop-color="#0a1f0e"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="32" r="26" fill="url(#glow)" opacity="0.35"/>
-  <path d="M 25 8 L 39 8 L 39 25 L 56 25 L 56 39 L 39 39 L 39 56 L 25 56 L 25 39 L 8 39 L 8 25 L 25 25 Z" fill="#8ff08f" stroke="#e8ffe8" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 29 12 L 35 12 L 35 29 L 52 29 L 52 35" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.7"/>
+  <!-- Heal: luminous emerald-gold sculpted Sentinel healing cross radiating restorative light petals & sparkles -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#88f79e" stop-opacity="0.62"/>
+      <stop offset="0.58" stop-color="#1f8a48" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#1f8a48" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="coreGlow" cx="32" cy="32" r="16" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.55" stop-color="#c9ffd0" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#4ce072" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="crossGold" x1="12" y1="10" x2="52" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff4bf"/>
+      <stop offset="0.48" stop-color="#e5b842"/>
+      <stop offset="1" stop-color="#8f6214"/>
+    </linearGradient>
+    <linearGradient id="emeraldLit" x1="16" y1="14" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d4ffd8"/>
+      <stop offset="0.42" stop-color="#58e072"/>
+      <stop offset="1" stop-color="#187a3b"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
+  <!-- restorative light petals radiating diagonally behind cross -->
+  <g fill="#d4ffd9" stroke="#1a1d24" stroke-width="1.6" stroke-linejoin="round" opacity="0.95">
+    <path d="M 14 14 Q 21 15 24 24 Q 15 21 14 14 Z"/>
+    <path d="M 50 14 Q 49 21 40 24 Q 43 15 50 14 Z"/>
+    <path d="M 14 50 Q 15 43 24 40 Q 21 49 14 50 Z"/>
+    <path d="M 50 50 Q 43 49 40 40 Q 49 43 50 50 Z"/>
+  </g>
+  <!-- sculpted flared Sentinel cross (gold rim) -->
+  <path d="M 24.5 7 L 39.5 7 L 38 23.5 L 57 24.5 L 57 39.5 L 38 38 L 39.5 57 L 24.5 57 L 26 38 L 7 39.5 L 7 24.5 L 26 23.5 Z" fill="url(#crossGold)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- inset emerald crystal cross -->
+  <path d="M 27.5 11 L 36.5 11 L 35.5 26 L 53 27.5 L 53 36.5 L 35.5 35.5 L 36.5 53 L 27.5 53 L 28.5 35.5 L 11 36.5 L 11 27.5 L 28.5 26 Z" fill="url(#emeraldLit)" stroke="#14592c" stroke-width="1.3" stroke-linejoin="round"/>
+  <!-- shaded lower-right bevel inside emerald cross -->
+  <path d="M 32 32 L 53 32 L 53 36.5 L 35.5 35.5 L 36.5 53 L 32 53 Z" fill="#146932" opacity="0.52"/>
+  <!-- specular highlights on top & left arms -->
+  <path d="M 29.5 13.5 L 29.5 24.5 M 13.5 29.5 L 24.5 29.5" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round"/>
+  <!-- luminous golden-white center gem -->
+  <circle cx="32" cy="32" r="14" fill="url(#coreGlow)"/>
+  <polygon points="32,25.5 38.5,32 32,38.5 25.5,32" fill="#fffbe6" stroke="#c99322" stroke-width="1.5" stroke-linejoin="round"/>
+  <circle cx="32" cy="32" r="2.6" fill="#ffffff"/>
+  <!-- sparkles -->
+  <path d="M 12 10 L 13 12.6 L 15.6 13.6 L 13 14.6 L 12 17.2 L 11 14.6 L 8.4 13.6 L 11 12.6 Z" fill="#fff8cc"/>
+  <path d="M 53 47 L 54 49.6 L 56.6 50.6 L 54 51.6 L 53 54.2 L 52 51.6 L 49.4 50.6 L 52 49.6 Z" fill="#d9ffe0"/>
 </svg>

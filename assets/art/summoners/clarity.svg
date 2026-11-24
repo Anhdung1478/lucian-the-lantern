@@ -1,9 +1,41 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Clarity: a swirl of mana -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d2f6b"/><stop offset="1" stop-color="#0a1028"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="32" r="24" fill="url(#glow)" opacity="0.3"/>
-  <path d="M 32 32 C 32 28 38 28 38 33 C 38 40 28 41 26 34 C 23 25 34 19 42 24 C 52 30 48 46 36 50 C 22 54 10 44 12 30 C 14 18 26 10 38 12" fill="none" stroke="#8fb8ff" stroke-width="4.5" stroke-linecap="round"/>
-  <path d="M 32 32 C 32 28 38 28 38 33 C 38 40 28 41 26 34 C 23 25 34 19 42 24 C 52 30 48 46 36 50 C 22 54 10 44 12 30 C 14 18 26 10 38 12" fill="none" stroke="#e0ecff" stroke-width="1.5" stroke-linecap="round"/>
-  <path d="M 50 6 C 54 12 57 15 57 19 C 57 23 54 25 51 25 C 48 25 45 23 45 19 C 45 15 48 12 50 6 Z" fill="#8fb8ff" stroke="#e0ecff" stroke-width="1.5"/>
+  <!-- Clarity: swirling sapphire-cyan arcane mana vortex encircling a gleaming luminous mana droplet -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#68ccff" stop-opacity="0.62"/>
+      <stop offset="0.6" stop-color="#1448a8" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#1448a8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="swirl1" x1="8" y1="12" x2="54" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c4f3ff"/>
+      <stop offset="0.5" stop-color="#45a8ff"/>
+      <stop offset="1" stop-color="#1a4bc2"/>
+    </linearGradient>
+    <linearGradient id="swirl2" x1="56" y1="52" x2="10" y2="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9beeff"/>
+      <stop offset="0.5" stop-color="#3088f0"/>
+      <stop offset="1" stop-color="#153799"/>
+    </linearGradient>
+    <radialGradient id="dropGrad" cx="28" cy="27" r="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.38" stop-color="#99e4ff"/>
+      <stop offset="0.78" stop-color="#3578f2"/>
+      <stop offset="1" stop-color="#14328c"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
+  <!-- upper-left sweeping mana vortex ribbon -->
+  <path d="M 12 42 C 5 28 12 10 29 8 C 41 6.5 52 13 55 24 C 49 16 38 13.5 28.5 16.5 C 18.5 19.5 14 30 17 39 Z" fill="url(#swirl1)" stroke="#1a1d24" stroke-width="2.3" stroke-linejoin="round"/>
+  <path d="M 13.5 29 C 15.5 18 24 12.2 35.5 12" fill="none" stroke="#e3faff" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- lower-right sweeping mana vortex ribbon -->
+  <path d="M 52 22 C 59 36 52 54 35 56 C 23 57.5 12 51 9 40 C 15 48 26 50.5 35.5 47.5 C 45.5 44.5 50 34 47 25 Z" fill="url(#swirl2)" stroke="#1a1d24" stroke-width="2.3" stroke-linejoin="round"/>
+  <path d="M 50.5 35 C 48.5 46 40 51.8 28.5 52" fill="none" stroke="#b8f0ff" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- gleaming luminous sapphire mana droplet at center -->
+  <path d="M 32 14 C 36.2 21 45 28.5 45 36.2 C 45 43.2 39.2 48 32 48 C 24.8 48 19 43.2 19 36.2 C 19 28.5 27.8 21 32 14 Z" fill="url(#dropGrad)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 41 27.5 C 43.5 30.5 45 33.4 45 36.2 C 45 43.2 39.2 48 32 48 C 29.5 48 27.2 47.5 25.3 46.6 C 34 45.5 40.8 40.8 41.2 34.5 C 41.4 31.8 41.3 29.5 41 27.5 Z" fill="#173a99" opacity="0.65"/>
+  <path d="M 23.2 36 C 23.2 32.2 25.2 28.8 27.8 25.8" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M 32 14 C 36.2 21 45 28.5 45 36.2 C 45 43.2 39.2 48 32 48 C 24.8 48 19 43.2 19 36.2 C 19 28.5 27.8 21 32 14 Z" fill="none" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- orbiting arcane motes & sparkle -->
+  <path d="M 52 12 L 53.1 14.9 L 56 16 L 53.1 17.1 L 52 20 L 50.9 17.1 L 48 16 L 50.9 14.9 Z" fill="#e6fbff"/>
+  <circle cx="13" cy="52" r="1.8" fill="#9beeff"/>
 </svg>

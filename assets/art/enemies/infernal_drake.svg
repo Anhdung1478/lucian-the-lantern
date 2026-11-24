@@ -1,100 +1,137 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150">
-  <!-- Infernal Drake, seen from above, head forward (+X): a red-orange drake with its wings spread, lava glowing
-       through cracks in its hide and wings, flames streaming back along its spine, dark horns swept back, embers at
-       its jaws and a burning spade at the tip of its tail. -->
+  <!-- Infernal Drake, fearsome volcanic dragon, top-down facing +X: broader dramatic torn-membrane wings with
+       glowing lava veins & dark scorched edges, sharper horned dragon skull with molten fiery jaws at +X, richer
+       magma-gold ridged dorsal spine tapering into a blazing barbed tail. -->
   <defs>
-    <linearGradient id="membrane" x1="1" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#c2401f"/>
-      <stop offset="1" stop-color="#e05a2a"/>
+    <linearGradient id="id_membrane" x1="1" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#ff6b26"/>
+      <stop offset="0.52" stop-color="#b82e14"/>
+      <stop offset="0.85" stop-color="#4d140c"/>
+      <stop offset="1" stop-color="#240b09"/>
     </linearGradient>
-    <linearGradient id="hide" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#d24a24"/>
-      <stop offset="0.5" stop-color="#b23a1c"/>
-      <stop offset="1" stop-color="#d24a24"/>
+    <linearGradient id="id_hide" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#d64b22"/>
+      <stop offset="0.5" stop-color="#962812"/>
+      <stop offset="1" stop-color="#5e170c"/>
     </linearGradient>
-    <radialGradient id="ember">
-      <stop offset="0" stop-color="#fff2a0"/>
-      <stop offset="0.5" stop-color="#ffb43a" stop-opacity="0.8"/>
-      <stop offset="1" stop-color="#ff5a1a" stop-opacity="0"/>
+    <linearGradient id="id_horn" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#4a2018"/>
+      <stop offset="0.6" stop-color="#24100d"/>
+      <stop offset="1" stop-color="#ff7a29"/>
+    </linearGradient>
+    <radialGradient id="id_ember">
+      <stop offset="0" stop-color="#fff8b8"/>
+      <stop offset="0.45" stop-color="#ffaa2b" stop-opacity="0.88"/>
+      <stop offset="1" stop-color="#ff4814" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <g transform="translate(75 75)">
-    <!-- tail, its spade tip burning -->
-    <path d="M -24 -9 Q -44 -10 -58 -3 Q -62 0 -58 3 Q -44 10 -24 9 Z" fill="url(#hide)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -30 0 L -56 0" stroke="#ff7a2a" stroke-width="3.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30 0 L -56 0" stroke="#ffd04a" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
-    <circle cx="-66" cy="0" r="9" fill="url(#ember)"/>
-    <path d="M -56 0 L -64 -9 L -73 0 L -64 9 Z" fill="#7a2412" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M -58 0 Q -64 -5 -68 0 Q -64 5 -58 0 Z" fill="#ffd04a"/>
-    <!-- hind legs, wings, fore legs -->
-    <path d="M -18 -12 L -24 -24" stroke="#1a1d24" stroke-width="9" stroke-linecap="round"/>
-    <path d="M -18 -12 L -24 -24" stroke="#a8381c" stroke-width="5" stroke-linecap="round"/>
-    <path d="M -24 -24 L -30 -28 M -24 -24 L -24 -30 M -24 -24 L -19 -29" stroke="#1a1d24" stroke-width="3.5" stroke-linecap="round"/>
-    <g transform="scale(1 -1)">
-    <path d="M -18 -12 L -24 -24" stroke="#1a1d24" stroke-width="9" stroke-linecap="round"/>
-    <path d="M -18 -12 L -24 -24" stroke="#a8381c" stroke-width="5" stroke-linecap="round"/>
-    <path d="M -24 -24 L -30 -28 M -24 -24 L -24 -30 M -24 -24 L -19 -29" stroke="#1a1d24" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- blazing barbed volcanic tail (-X) -->
+    <path d="M -22 -10 Q -44 -11 -60 -3.5 Q -64 0 -60 3.5 Q -44 11 -22 10 Z" fill="url(#id_hide)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- jagged obsidian tail-barbs -->
+    <path d="M -36 -9 L -44 -16 L -45 -7 Z M -48 -7 L -55 -13 L -55 -4 Z M -36 9 L -44 16 L -45 7 Z M -48 7 L -55 13 L -55 4 Z" fill="#2b120e" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- molten tail core ridge -->
+    <path d="M -26 0 L -58 0" stroke="#ff6e1f" stroke-width="4" stroke-linecap="round" opacity="0.65"/>
+    <path d="M -26 0 L -58 0" stroke="#ffe066" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- blazing barbed volcanic tail spade -->
+    <circle cx="-66" cy="0" r="11" fill="url(#id_ember)"/>
+    <path d="M -55 0 L -63 -11 L -74 0 L -63 11 L -59 4 L -63 0 L -59 -4 Z" fill="#3a140d" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M -58 0 L -64 -5.5 L -70 0 L -64 5.5 Z" fill="#ffda47"/>
+
+    <!-- hind legs -->
+    <g>
+      <path d="M -18 -13 L -26 -26" stroke="#14171f" stroke-width="8.5" stroke-linecap="round"/>
+      <path d="M -18 -13 L -26 -26" stroke="#9e2d16" stroke-width="5" stroke-linecap="round"/>
+      <path d="M -26 -26 L -33 -30 M -26 -26 L -26 -33 M -26 -26 L -20 -31" stroke="#14171f" stroke-width="3" stroke-linecap="round"/>
     </g>
-    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70 Q -8 -60 -24 -64 Q -26 -52 -40 -48 Q -32 -38 -38 -28 Q -26 -24 -18 -13 Z" fill="url(#membrane)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M 2 -18 L 8 -44 L -6 -60 Q -12 -56 -22 -58 Q -24 -48 -34 -45 Q -28 -37 -32 -30 Q -22 -24 -14 -16 Z" fill="#8a2612" opacity="0.55"/>
-    <path d="M -2 -68 Q -8 -60 -22 -62 M -26 -62 Q -28 -52 -38 -48 M -38 -46 Q -32 -38 -36 -30" fill="none" stroke="#ff8a3a" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
-    <path d="M -4 -24 L -10 -34 L -6 -42 L -14 -50 M -16 -26 L -24 -36 L -22 -44 M -26 -30 L -34 -36" fill="none" stroke="#ff7a2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
-    <path d="M -4 -24 L -10 -34 L -6 -42 L -14 -50 M -16 -26 L -24 -36 L -22 -44 M -26 -30 L -34 -36" fill="none" stroke="#ffd04a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 8 -52 L -24 -64 M 8 -52 L -40 -48 M 8 -52 L -38 -28" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
-    <path d="M 8 -52 L -24 -64 M 8 -52 L -40 -48 M 8 -52 L -38 -28" fill="none" stroke="#5e1d10" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70" fill="none" stroke="#1a1d24" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70" fill="none" stroke="#a8381c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 6 -17 L 17 -33" stroke="#f08a50" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 18 -34 L 23 -38 L 19 -31 Z M -2 -70 L 1 -75 L 2 -68 Z" fill="#2a120c" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
     <g transform="scale(1 -1)">
-    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70 Q -8 -60 -24 -64 Q -26 -52 -40 -48 Q -32 -38 -38 -28 Q -26 -24 -18 -13 Z" fill="url(#membrane)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M 2 -18 L 8 -44 L -6 -60 Q -12 -56 -22 -58 Q -24 -48 -34 -45 Q -28 -37 -32 -30 Q -22 -24 -14 -16 Z" fill="#8a2612" opacity="0.55"/>
-    <path d="M -2 -68 Q -8 -60 -22 -62 M -26 -62 Q -28 -52 -38 -48 M -38 -46 Q -32 -38 -36 -30" fill="none" stroke="#ff8a3a" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
-    <path d="M -4 -24 L -10 -34 L -6 -42 L -14 -50 M -16 -26 L -24 -36 L -22 -44 M -26 -30 L -34 -36" fill="none" stroke="#ff7a2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
-    <path d="M -4 -24 L -10 -34 L -6 -42 L -14 -50 M -16 -26 L -24 -36 L -22 -44 M -26 -30 L -34 -36" fill="none" stroke="#ffd04a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 8 -52 L -24 -64 M 8 -52 L -40 -48 M 8 -52 L -38 -28" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
-    <path d="M 8 -52 L -24 -64 M 8 -52 L -40 -48 M 8 -52 L -38 -28" fill="none" stroke="#5e1d10" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70" fill="none" stroke="#1a1d24" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 4 -13 L 18 -34 L 8 -52 L -2 -70" fill="none" stroke="#a8381c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 6 -17 L 17 -33" stroke="#f08a50" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 18 -34 L 23 -38 L 19 -31 Z M -2 -70 L 1 -75 L 2 -68 Z" fill="#2a120c" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M -18 -13 L -26 -26" stroke="#14171f" stroke-width="8.5" stroke-linecap="round"/>
+      <path d="M -18 -13 L -26 -26" stroke="#802210" stroke-width="5" stroke-linecap="round"/>
+      <path d="M -26 -26 L -33 -30 M -26 -26 L -26 -33 M -26 -26 L -20 -31" stroke="#14171f" stroke-width="3" stroke-linecap="round"/>
     </g>
-    <path d="M 12 -10 L 22 -19" stroke="#1a1d24" stroke-width="8.5" stroke-linecap="round"/>
-    <path d="M 12 -10 L 22 -19" stroke="#b83c1e" stroke-width="4.5" stroke-linecap="round"/>
-    <path d="M 22 -19 L 28 -20 M 22 -19 L 25 -24 M 22 -19 L 20 -25" stroke="#1a1d24" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- BROADER DRAMATIC TORN-MEMBRANE VOLCANIC WINGS (upper + mirrored lower) -->
+    <g>
+      <!-- main torn volcanic membrane with dark scorched outer edge -->
+      <path d="M 5 -13 L 24 -36 L 13 -56 L 0 -73 Q -10 -61 -27 -68 L -24 -59 L -32 -56 Q -34 -47 -48 -46 L -41 -37 L -49 -31 Q -35 -26 -20 -13 Z" fill="url(#id_membrane)" stroke="#14171f" stroke-width="2.1" stroke-linejoin="round"/>
+      <!-- scorched basalt rim shadow along torn scallops -->
+      <path d="M 0 -71 Q -10 -61 -26 -66 L -24 -59 L -31 -56 Q -34 -47 -46 -46 L -40 -37 L -47 -31" fill="none" stroke="#1c0806" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+      <!-- glowing branching lava veins across membrane -->
+      <path d="M -2 -23 L -11 -35 L -7 -46 L -17 -58 M -17 -26 L -28 -39 L -25 -50 M -29 -28 L -40 -36 M -11 -35 L -22 -36" fill="none" stroke="#ff661a" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+      <path d="M -2 -23 L -11 -35 L -7 -46 L -17 -58 M -17 -26 L -28 -39 L -25 -50 M -29 -28 L -40 -36 M -11 -35 L -22 -36" fill="none" stroke="#ffe166" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- wing finger bones -->
+      <path d="M 13 -56 L -27 -68 M 13 -56 L -48 -46 M 13 -56 L -49 -31" fill="none" stroke="#14171f" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 13 -56 L -27 -68 M 13 -56 L -48 -46 M 13 -56 L -49 -31" fill="none" stroke="#5c1b10" stroke-width="2" stroke-linecap="round"/>
+      <!-- leading obsidian-armored wing arm & sharp wing spurs -->
+      <path d="M 5 -13 L 24 -36 L 13 -56 L 0 -73" fill="none" stroke="#14171f" stroke-width="6.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 5 -13 L 24 -36 L 13 -56 L 0 -73" fill="none" stroke="#b5391b" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 7 -17 L 22 -35 L 14 -52" fill="none" stroke="#ff9d5c" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M 24 -36 L 32 -42 L 26 -32 Z M 13 -56 L 19 -62 L 16 -52 Z M 0 -73 L 4 -75 L 4 -69 Z" fill="#2b110c" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    </g>
     <g transform="scale(1 -1)">
-    <path d="M 12 -10 L 22 -19" stroke="#1a1d24" stroke-width="8.5" stroke-linecap="round"/>
-    <path d="M 12 -10 L 22 -19" stroke="#b83c1e" stroke-width="4.5" stroke-linecap="round"/>
-    <path d="M 22 -19 L 28 -20 M 22 -19 L 25 -24 M 22 -19 L 20 -25" stroke="#1a1d24" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M 5 -13 L 24 -36 L 13 -56 L 0 -73 Q -10 -61 -27 -68 L -24 -59 L -32 -56 Q -34 -47 -48 -46 L -41 -37 L -49 -31 Q -35 -26 -20 -13 Z" fill="url(#id_membrane)" stroke="#14171f" stroke-width="2.1" stroke-linejoin="round"/>
+      <path d="M 0 -71 Q -10 -61 -26 -66 L -24 -59 L -31 -56 Q -34 -47 -46 -46 L -40 -37 L -47 -31" fill="none" stroke="#1c0806" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+      <path d="M -2 -23 L -11 -35 L -7 -46 L -17 -58 M -17 -26 L -28 -39 L -25 -50 M -29 -28 L -40 -36 M -11 -35 L -22 -36" fill="none" stroke="#ff661a" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+      <path d="M -2 -23 L -11 -35 L -7 -46 L -17 -58 M -17 -26 L -28 -39 L -25 -50 M -29 -28 L -40 -36 M -11 -35 L -22 -36" fill="none" stroke="#ffe166" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 13 -56 L -27 -68 M 13 -56 L -48 -46 M 13 -56 L -49 -31" fill="none" stroke="#14171f" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 13 -56 L -27 -68 M 13 -56 L -48 -46 M 13 -56 L -49 -31" fill="none" stroke="#4a140c" stroke-width="2" stroke-linecap="round"/>
+      <path d="M 5 -13 L 24 -36 L 13 -56 L 0 -73" fill="none" stroke="#14171f" stroke-width="6.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 5 -13 L 24 -36 L 13 -56 L 0 -73" fill="none" stroke="#992d14" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 24 -36 L 32 -42 L 26 -32 Z M 13 -56 L 19 -62 L 16 -52 Z M 0 -73 L 4 -75 L 4 -69 Z" fill="#2b110c" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
     </g>
-    <!-- body -->
-    <ellipse cx="-4" cy="0" rx="28" ry="17" fill="url(#hide)" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -26 -8 Q -6 -15 16 -8 M -26 8 Q -6 15 16 8" fill="none" stroke="#8a2a14" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M -22 -11 Q -6 -16 10 -12" fill="none" stroke="#f0864a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
-    <!-- lava cracks in the hide -->
-    <path d="M -24 -4 L -18 -8 L -12 -3 L -4 -9 L 4 -4 L 10 -8 M -22 5 L -14 9 L -8 4 L 0 9 L 8 5" stroke="#ff7a2a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
-    <path d="M -24 -4 L -18 -8 L -12 -3 L -4 -9 L 4 -4 L 10 -8 M -22 5 L -14 9 L -8 4 L 0 9 L 8 5" stroke="#ffd04a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <!-- flames streaming back along the spine -->
-    <path d="M 14 0 Q 6 -6 -4 -5 Q 0 -2 -8 0 Q 0 2 -4 5 Q 6 6 14 0 Z M -6 0 Q -14 -6 -24 -5 Q -20 -2 -28 0 Q -20 2 -24 5 Q -14 6 -6 0 Z M -24 0 Q -32 -5 -40 -4 Q -37 -1 -44 0 Q -37 1 -40 4 Q -32 5 -24 0 Z" fill="#ff8a2a" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
-    <path d="M 10 0 Q 4 -3 -2 -2 Q 2 0 -2 2 Q 4 3 10 0 Z M -9 0 Q -15 -3 -21 -2 Q -17 0 -21 2 Q -15 3 -9 0 Z M -27 0 Q -32 -2 -37 -2 Q -34 0 -37 2 Q -32 2 -27 0 Z" fill="#ffe27a"/>
-    <!-- neck and head -->
-    <path d="M 12 -10 Q 26 -9 38 -8 L 38 8 Q 26 9 12 10 Z" fill="url(#hide)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M 16 -6 L 24 -6 M 16 6 L 24 6" stroke="#8a2a14" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 42 -8 Q 34 -16 24 -18 Q 32 -12 36 -5 Z" fill="#3a1a12" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M 48 -9 Q 46 -16 40 -20 Q 42 -13 44 -7 Z" fill="#3a1a12" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M 39 -8 Q 33 -13 28 -15" fill="none" stroke="#ff9a4a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- fore legs -->
+    <g>
+      <path d="M 14 -10 L 25 -20" stroke="#14171f" stroke-width="8" stroke-linecap="round"/>
+      <path d="M 14 -10 L 25 -20" stroke="#ba3c1c" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M 25 -20 L 31 -21 M 25 -20 L 28 -25 M 25 -20 L 23 -26" stroke="#14171f" stroke-width="2.8" stroke-linecap="round"/>
+    </g>
     <g transform="scale(1 -1)">
-    <path d="M 42 -8 Q 34 -16 24 -18 Q 32 -12 36 -5 Z" fill="#3a1a12" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M 48 -9 Q 46 -16 40 -20 Q 42 -13 44 -7 Z" fill="#3a1a12" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M 39 -8 Q 33 -13 28 -15" fill="none" stroke="#ff9a4a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+      <path d="M 14 -10 L 25 -20" stroke="#14171f" stroke-width="8" stroke-linecap="round"/>
+      <path d="M 14 -10 L 25 -20" stroke="#992d14" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M 25 -20 L 31 -21 M 25 -20 L 28 -25 M 25 -20 L 23 -26" stroke="#14171f" stroke-width="2.8" stroke-linecap="round"/>
     </g>
-    <circle cx="67" cy="0" r="9" fill="url(#ember)"/>
-    <path d="M 34 -10 Q 46 -13 54 -8 L 64 -4 Q 68 0 64 4 L 54 8 Q 46 13 34 10 Z" fill="#d24a24" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M 38 -7 Q 48 -9 56 -5" fill="none" stroke="#f0864a" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 40 0 L 56 0" stroke="#ff7a2a" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
-    <path d="M 40 0 L 56 0" stroke="#ffd04a" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 46 -9 L 53 -6 L 47 -4 Z M 46 9 L 53 6 L 47 4 Z" fill="#ffe14a" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-    <circle cx="62" cy="-2.5" r="1.4" fill="#1a1d24"/>
-    <circle cx="62" cy="2.5" r="1.4" fill="#1a1d24"/>
+
+    <!-- armored volcanic body with magma cracks -->
+    <ellipse cx="-4" cy="0" rx="29" ry="18" fill="url(#id_hide)" stroke="#14171f" stroke-width="2.1"/>
+    <path d="M -24 -12 Q -6 -17 12 -12" fill="none" stroke="#ff9d5c" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+    <!-- glowing magma cracks across dark flanks -->
+    <path d="M -25 -5 L -17 -10 L -10 -4 L -1 -11 L 8 -5 L 14 -9 M -23 6 L -14 11 L -6 5 L 2 11 L 11 6" fill="none" stroke="#ff6b1f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.72"/>
+    <path d="M -25 -5 L -17 -10 L -10 -4 L -1 -11 L 8 -5 L 14 -9 M -23 6 L -14 11 L -6 5 L 2 11 L 11 6" fill="none" stroke="#ffe270" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- richer magma-gold ridged dorsal spine plates & blazing dorsal fire -->
+    <path d="M 18 -6 L 9 -9 L 1 -6 L -8 -9 L -17 -6 L -26 -8 L -32 0 L -26 8 L -17 6 L -8 9 L 1 6 L 9 9 L 18 6 Z" fill="#3a160e" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 17 0 Q 9 -6 -1 -5 Q 3 -1.5 -5 0 Q 3 1.5 -1 5 Q 9 6 17 0 Z M -3 0 Q -11 -6 -21 -5 Q -17 -1.5 -25 0 Q -17 1.5 -21 5 Q -11 6 -3 0 Z M -22 0 Q -30 -5 -38 -4 Q -35 -1 -42 0 Q -35 1 -38 4 Q -30 5 -22 0 Z" fill="#ff841f" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 13 0 Q 7 -2.8 1 -2.2 Q 4 0 1 2.2 Q 7 2.8 13 0 Z M -6 0 Q -12 -2.8 -18 -2.2 Q -15 0 -18 2.2 Q -12 2.8 -6 0 Z M -25 0 Q -30 -2 -35 -1.6 Q -32 0 -35 1.6 Q -30 2 -25 0 Z" fill="#fff3a1"/>
+
+    <!-- armored neck -->
+    <path d="M 13 -10 Q 27 -9 40 -7.5 L 40 7.5 Q 27 9 13 10 Z" fill="url(#id_hide)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 20 -5 L 25 0 L 20 5 M 30 -4.5 L 35 0 L 30 4.5" fill="none" stroke="#ffbe4a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- SHARPER HORNED VOLCANIC DRAGON SKULL WITH MOLTEN FIERY JAWS (+X) -->
+    <!-- sweeping obsidian dragon horns -->
+    <g>
+      <path d="M 45 -8 Q 34 -20 18 -24 Q 29 -15 37 -4 Z" fill="url(#id_horn)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M 52 -9 Q 48 -19 39 -24 Q 42 -15 45 -6 Z" fill="url(#id_horn)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M 42 -8 Q 33 -16 24 -19" fill="none" stroke="#ff9f4d" stroke-width="1.4" stroke-linecap="round"/>
+    </g>
+    <g transform="scale(1 -1)">
+      <path d="M 45 -8 Q 34 -20 18 -24 Q 29 -15 37 -4 Z" fill="url(#id_horn)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M 52 -9 Q 48 -19 39 -24 Q 42 -15 45 -6 Z" fill="url(#id_horn)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M 42 -8 Q 33 -16 24 -19" fill="none" stroke="#ff9f4d" stroke-width="1.4" stroke-linecap="round"/>
+    </g>
+
+    <!-- molten fiery jaw glow at snout -->
+    <circle cx="67" cy="0" r="10.5" fill="url(#id_ember)"/>
+    <!-- sharp angular volcanic dragon skull -->
+    <path d="M 34 -10 L 47 -13 L 58 -7.5 L 69 -3.5 L 72 0 L 69 3.5 L 58 7.5 L 47 13 L 34 10 Z" fill="#c93e1c" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- fiery jaw cracks & snout highlights -->
+    <path d="M 59 -5.5 L 68 -2.8 M 59 5.5 L 68 2.8 M 40 0 L 62 0" stroke="#ff8224" stroke-width="2.6" stroke-linecap="round" opacity="0.8"/>
+    <path d="M 42 0 L 65 0" stroke="#fff099" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M 38 -8 L 48 -10.5 L 57 -6.5" fill="none" stroke="#ff9d5c" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- blazing fierce molten eyes -->
+    <path d="M 46 -9.5 L 55 -6.2 L 47.5 -4 Z M 46 9.5 L 55 6.2 L 47.5 4 Z" fill="#fff480" stroke="#14171f" stroke-width="1.3" stroke-linejoin="round"/>
+    <circle cx="64" cy="-2.2" r="1.3" fill="#14171f"/>
+    <circle cx="64" cy="2.2" r="1.3" fill="#14171f"/>
   </g>
 </svg>

@@ -1,25 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 52 52">
-  <!-- Lantern Soul: a small bright teal soul seen from above, a round glowing head with a sad face looking forward (+X), a wavering tail of light behind ending in two iron chain links that bind it. -->
+  <!-- Lantern Soul (top-down, facing +X): haunting, luminous trapped wisp with swirling cyan-emerald ethereal flame teardrop streaming trails behind (-X) and faint mournful hollow wisp-eyes inside a bright white-teal core. -->
+  <defs>
+    <radialGradient id="lsAura" cx="0.55" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#8affdf" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#1dc49b" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#0b4f4a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lsTail" x1="1" y1="0.5" x2="0" y2="0.5">
+      <stop offset="0" stop-color="#55f2c8" stop-opacity="0.95"/>
+      <stop offset="0.55" stop-color="#1ea88c" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#0e4a4a" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="lsCore" cx="0.6" cy="0.45" r="0.58">
+      <stop offset="0" stop-color="#f2fffc"/>
+      <stop offset="0.4" stop-color="#96ffe4"/>
+      <stop offset="0.78" stop-color="#2dd4ad"/>
+      <stop offset="1" stop-color="#116660"/>
+    </radialGradient>
+  </defs>
+
   <g transform="translate(26 26)">
-    <!-- glow -->
-    <circle cx="2" cy="0" r="23" fill="#6dffc0" opacity="0.2"/>
-    <circle cx="3" cy="0" r="19" fill="#9dffd8" opacity="0.2"/>
-    <!-- chain links -->
-    <rect x="-24" y="-4" width="11" height="8" rx="4" fill="none" stroke="#1a1d24" stroke-width="5"/>
-    <rect x="-24" y="-4" width="11" height="8" rx="4" fill="none" stroke="#b4c0c8" stroke-width="2.4"/>
-    <rect x="-17" y="-3.5" width="9" height="7" rx="3.5" fill="none" stroke="#1a1d24" stroke-width="5"/>
-    <rect x="-17" y="-3.5" width="9" height="7" rx="3.5" fill="none" stroke="#8a97a0" stroke-width="2.4"/>
-    <!-- wavering tail -->
-    <path d="M -2 -11 Q -11 -13 -14 -7 Q -9 -4 -17 0 Q -9 4 -14 7 Q -11 13 -2 11 Z" fill="#3fc9a0" stroke="#1a1d24" stroke-width="2.6" stroke-linejoin="round"/>
-    <path d="M -4 -6 Q -10 -4 -12 0" fill="none" stroke="#a8ffe0" stroke-width="2" stroke-linecap="round"/>
-    <!-- head -->
-    <circle cx="5" cy="0" r="15" fill="#7fe8c4" stroke="#1a1d24" stroke-width="3"/>
-    <circle cx="6" cy="0" r="10.5" fill="#c4ffec" opacity="0.8"/>
-    <circle cx="1" cy="-7" r="3.2" fill="#ffffff" opacity="0.85"/>
-    <!-- sad face -->
-    <circle cx="10" cy="-4.5" r="2" fill="#1a1d24"/>
-    <circle cx="10" cy="4.5" r="2" fill="#1a1d24"/>
-    <path d="M 7 -8.5 L 12 -6.5 M 7 8.5 L 12 6.5" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 14 -3 Q 12 0 14 3" fill="none" stroke="#1a1d24" stroke-width="2" stroke-linecap="round"/>
+    <!-- Soft outer luminous wisp halo -->
+    <circle cx="2" cy="0" r="24" fill="url(#lsAura)"/>
+
+    <!-- Swirling ethereal flame trails streaming back (-X) -->
+    <path d="M 0 -11 C -9 -15, -16 -10, -23 -12 C -17 -6, -15 -3, -24 0 C -15 3, -17 7, -22 12 C -15 11, -8 14, 0 11 Z" fill="url(#lsTail)"/>
+    <!-- Delicate inner swirling wisp ribbons -->
+    <path d="M 4 -8 C -5 -11, -13 -7, -20 -8 M 2 0 C -7 -2, -14 2, -22 0 M 4 8 C -5 11, -12 8, -19 9" fill="none" stroke="#c4fff0" stroke-width="1.3" stroke-linecap="round" opacity="0.75"/>
+    <!-- Faint spectral ember motes drifting off the tail -->
+    <circle cx="-21" cy="-6" r="1.4" fill="#b8ffec" opacity="0.8"/>
+    <circle cx="-18" cy="7.5" r="1.2" fill="#8affdf" opacity="0.7"/>
+    <circle cx="-14" cy="-12" r="1.1" fill="#c7fff2" opacity="0.65"/>
+
+    <!-- Sculpted luminous flame-teardrop wisp body -->
+    <path d="M -14 0 C -10 -7, -3 -13, 6 -12.5 C 14.5 -12, 19 -6, 19 0 C 19 6, 14.5 12, 6 12.5 C -3 13, -10 7, -14 0 Z" fill="url(#lsCore)" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- Ethereal swirling flame curl hugging top-left edge -->
+    <path d="M -6 -6 C -1 -11, 7 -11, 13 -7" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+    <!-- Radiant inner white-teal core -->
+    <ellipse cx="7" cy="0" rx="8.5" ry="7.2" fill="#e6fff9" opacity="0.75"/>
+
+    <!-- Faint mournful hollow wisp-eyes recessed into the luminous core (no cartoon mouth/eyebrows!) -->
+    <path d="M 8 -5.5 C 11 -5.2, 13 -3.5, 12.5 -2.2 C 11 -1.6, 8.8 -2.8, 8 -5.5 Z" fill="#0d3b3c"/>
+    <path d="M 8 5.5 C 11 5.2, 13 3.5, 12.5 2.2 C 11 1.6, 8.8 2.8, 8 5.5 Z" fill="#0d3b3c"/>
+    <!-- Tiny haunting spectral pinprick glints inside the hollow eye voids -->
+    <circle cx="11" cy="-3.6" r="0.9" fill="#d9fff8"/>
+    <circle cx="11" cy="3.6" r="0.9" fill="#d9fff8"/>
   </g>
 </svg>

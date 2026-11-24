@@ -1,21 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Ability Power: a glowing blue orb floating over an open book -->
+  <!-- Ability Power: glowing sapphire-indigo arcane crystal staff angled diagonally -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <radialGradient id="halo"><stop offset="0" stop-color="#4a6cf7" stop-opacity="0.7"/><stop offset="1" stop-color="#4a6cf7" stop-opacity="0"/></radialGradient>
-    <radialGradient id="orb" cx="0.38" cy="0.35" r="0.65"><stop offset="0" stop-color="#e6ecff"/><stop offset="0.35" stop-color="#8aa2ff"/><stop offset="1" stop-color="#4a6cf7"/></radialGradient>
+    <radialGradient id="aura" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6b8cff" stop-opacity="0.58"/>
+      <stop offset="0.6" stop-color="#2b44b8" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#2b44b8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gemGlow" cx="44" cy="20" r="17" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c4d6ff" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#4a6cf7" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#4a6cf7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="shaft" x1="10" y1="54" x2="34" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#283d9e"/>
+      <stop offset="0.5" stop-color="#4e72ff"/>
+      <stop offset="1" stop-color="#9cb6ff"/>
+    </linearGradient>
+    <linearGradient id="crystalLit" x1="33" y1="10" x2="52" y2="29" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e3ecff"/>
+      <stop offset="0.45" stop-color="#6b8cff"/>
+      <stop offset="1" stop-color="#2a46c8"/>
+    </linearGradient>
+    <linearGradient id="crystalShade" x1="38" y1="16" x2="55" y2="33" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4a6cf7"/>
+      <stop offset="1" stop-color="#1b2d8a"/>
+    </linearGradient>
+    <linearGradient id="goldTrim" x1="25" y1="24" x2="40" y2="39" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe8a8"/>
+      <stop offset="0.5" stop-color="#d49d3a"/>
+      <stop offset="1" stop-color="#875516"/>
+    </linearGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="22" r="21" fill="url(#halo)"/>
-  <path d="M 6 46 L 6 60 C 16 57 26 57 32 61 C 38 57 48 57 58 60 L 58 46 Z" fill="#6a3a2a" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 32 45 C 26 41 16 41 9 44 L 9 57 C 16 54 26 54 32 58 Z" fill="#efe4c8" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 32 45 C 38 41 48 41 55 44 L 55 57 C 48 54 38 54 32 58 Z" fill="#e2d4b2" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 13 48 C 18 46.5 23 46.5 28 48 M 13 52 C 18 50.5 23 50.5 28 52 M 36 48 C 41 46.5 46 46.5 51 48 M 36 52 C 41 50.5 46 50.5 51 52" fill="none" stroke="#a8956c" stroke-width="1.2"/>
-  <circle cx="32" cy="22" r="12" fill="url(#orb)" stroke="#1a1d24" stroke-width="2"/>
-  <path d="M 25 18 A 8 8 0 0 1 30 13.5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-  <g fill="#9fb4ff">
-    <circle cx="22" cy="38" r="1.6"/>
-    <circle cx="42" cy="37" r="1.4"/>
-    <circle cx="32" cy="40" r="1.8"/>
-  </g>
+  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
+  <circle cx="44" cy="20" r="17" fill="url(#gemGlow)"/>
+  <!-- staff shaft & arcane cradle -->
+  <path d="M 10.5 53.5 L 31.5 32.5" fill="none" stroke="#1a1d24" stroke-width="10.5" stroke-linecap="round"/>
+  <path d="M 31.5 32.5 Q 25.5 23.5 29 14.5 M 31.5 32.5 Q 40.5 38.5 49.5 35" fill="none" stroke="#1a1d24" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 10.5 53.5 L 31.5 32.5" fill="none" stroke="url(#shaft)" stroke-width="5.6" stroke-linecap="round"/>
+  <path d="M 12.2 53.8 L 31.8 34.2" fill="none" stroke="#1f328f" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M 11.4 51.2 L 28.8 33.8" fill="none" stroke="#bfd1ff" stroke-width="1.3" stroke-linecap="round"/>
+  <path d="M 31.5 32.5 Q 25.5 23.5 29 14.5 M 31.5 32.5 Q 40.5 38.5 49.5 35" fill="none" stroke="url(#goldTrim)" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 29.6 29.5 Q 26.8 23.5 29 16.5" fill="none" stroke="#fff3cf" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- gold collar ring -->
+  <path d="M 25.5 31.5 L 32.5 38.5" stroke="#1a1d24" stroke-width="5.8" stroke-linecap="round"/>
+  <path d="M 25.5 31.5 L 32.5 38.5" stroke="url(#goldTrim)" stroke-width="3" stroke-linecap="round"/>
+  <!-- faceted sapphire crystal -->
+  <path d="M 55.2 8.8 L 54.4 23.6 L 46 32 L 33.8 30 L 31.8 18 L 40.2 9.6 Z" fill="url(#crystalLit)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 55.2 8.8 L 54.4 23.6 L 46 32 L 33.8 30 L 44.5 19.5 Z" fill="url(#crystalShade)"/>
+  <path d="M 40.2 9.6 L 44.5 19.5 L 31.8 18 Z" fill="#c7d8ff" opacity="0.65"/>
+  <path d="M 36.2 18.2 L 42.2 12.2" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M 55.2 8.8 L 54.4 23.6 L 46 32 L 33.8 30 L 31.8 18 L 40.2 9.6 Z" fill="none" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- sparkles -->
+  <path d="M 20 13 L 21.2 16.3 L 24.5 17.5 L 21.2 18.7 L 20 22 L 18.8 18.7 L 15.5 17.5 L 18.8 16.3 Z" fill="#d9e6ff"/>
+  <path d="M 54 44 L 54.8 46.2 L 57 47 L 54.8 47.8 L 54 50 L 53.2 47.8 L 51 47 L 53.2 46.2 Z" fill="#9cb6ff"/>
 </svg>

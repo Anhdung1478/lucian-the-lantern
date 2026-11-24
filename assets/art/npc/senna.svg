@@ -1,41 +1,150 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-  <!-- Senna: seen from above, in a dark hooded coat edged with teal light, a long scarf of light trailing behind, a big relic cannon held forward (+X) with glowing teal-white coils and a bright muzzle. -->
+  <!-- Sentinel Senna (top-down, facing +X): sweeping dark-teal & white-trimmed Sentinel cloak, aiming stance, hooded braided head, Relic Cannon braced cleanly along her right (+Y) side. -->
   <defs>
-    <radialGradient id="coat" cx="0.35" cy="0.4"><stop offset="0" stop-color="#2e4250"/><stop offset="1" stop-color="#18222b"/></radialGradient>
-    <linearGradient id="barrel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6a7c88"/><stop offset="1" stop-color="#36424c"/></linearGradient>
+    <linearGradient id="sennaCloak" x1="0.15" y1="0.1" x2="0.85" y2="0.95">
+      <stop offset="0" stop-color="#355564"/>
+      <stop offset="0.5" stop-color="#1f3440"/>
+      <stop offset="1" stop-color="#0f1b24"/>
+    </linearGradient>
+    <linearGradient id="sennaScarf" x1="0" y1="0.2" x2="1" y2="0.8">
+      <stop offset="0" stop-color="#e8f6f2"/>
+      <stop offset="0.55" stop-color="#8cd8cf"/>
+      <stop offset="1" stop-color="#2c6f73"/>
+    </linearGradient>
+    <linearGradient id="sennaMistTail" x1="1" y1="0.5" x2="0" y2="0.5">
+      <stop offset="0" stop-color="#7af2e4" stop-opacity="0.72"/>
+      <stop offset="0.6" stop-color="#33b8b2" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#19696b" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sennaWhitePlate" x1="0.1" y1="0.1" x2="0.9" y2="0.9">
+      <stop offset="0" stop-color="#f5f8f7"/>
+      <stop offset="0.55" stop-color="#c9d5d6"/>
+      <stop offset="1" stop-color="#7b8f96"/>
+    </linearGradient>
+    <linearGradient id="sennaGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7df96"/>
+      <stop offset="0.5" stop-color="#c99c47"/>
+      <stop offset="1" stop-color="#6e4f1e"/>
+    </linearGradient>
+    <linearGradient id="cannonStone" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#5d6e78"/>
+      <stop offset="0.45" stop-color="#34404a"/>
+      <stop offset="1" stop-color="#1a2229"/>
+    </linearGradient>
+    <linearGradient id="cannonCore" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0" stop-color="#38d9c8"/>
+      <stop offset="0.5" stop-color="#b4fff5"/>
+      <stop offset="1" stop-color="#e8fffc"/>
+    </linearGradient>
+    <radialGradient id="muzzleGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#e6fffc" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#6cf5e6" stop-opacity="0.48"/>
+      <stop offset="1" stop-color="#22b8ae" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sennaHood" cx="0.35" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#3b5b6b"/>
+      <stop offset="0.6" stop-color="#203440"/>
+      <stop offset="1" stop-color="#101c24"/>
+    </radialGradient>
+    <linearGradient id="sennaSkin" x1="0.2" y1="0.1" x2="0.8" y2="0.9">
+      <stop offset="0" stop-color="#a87654"/>
+      <stop offset="1" stop-color="#69432c"/>
+    </linearGradient>
   </defs>
-  <g transform="translate(50 50)">
-    <!-- scarf of light trailing behind -->
-    <path d="M -22 -6 Q -34 -12 -40 -8 Q -34 -4 -42 0 Q -34 4 -40 8 Q -34 12 -22 6 Z" fill="#7be0d0" stroke="#1a1d24" stroke-width="2.6" stroke-linejoin="round" opacity="0.95"/>
-    <path d="M -26 0 L -38 0" fill="none" stroke="#e6fffa" stroke-width="2.2" stroke-linecap="round"/>
-    <!-- coat -->
-    <path d="M -28 0 Q -28 -30 -4 -30 Q 10 -30 10 -18 L 10 18 Q 10 30 -4 30 Q -28 30 -28 0 Z" fill="url(#coat)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -24 -12 Q -28 0 -24 12 M -8 -26 Q 2 -27 7 -20 M -8 26 Q 2 27 7 20" fill="none" stroke="#5fd8c8" stroke-width="2.6" stroke-linecap="round"/>
-    <path d="M -18 -18 Q -22 0 -18 18" fill="none" stroke="#0f161c" stroke-width="2.4" stroke-linecap="round"/>
-    <!-- arms holding the cannon -->
-    <path d="M 0 -20 L 18 -12" stroke="#1a1d24" stroke-width="9.5" stroke-linecap="round"/>
-    <path d="M 0 -20 L 18 -12" stroke="#34495a" stroke-width="5.5" stroke-linecap="round"/>
-    <path d="M 0 20 L 22 10" stroke="#1a1d24" stroke-width="9.5" stroke-linecap="round"/>
-    <path d="M 0 20 L 22 10" stroke="#34495a" stroke-width="5.5" stroke-linecap="round"/>
-    <circle cx="19" cy="-12" r="3.6" fill="#d2a584" stroke="#1a1d24" stroke-width="2"/>
-    <circle cx="23" cy="10" r="3.6" fill="#d2a584" stroke="#1a1d24" stroke-width="2"/>
-    <!-- the relic cannon: heavy stock, long barrel, glowing coils, muzzle -->
-    <path d="M -6 -12 L 14 -14 L 14 14 L -6 12 Q -12 0 -6 -12 Z" fill="#46545e" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <rect x="12" y="-9" width="32" height="18" rx="4" fill="url(#barrel)" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M 14 -6 L 42 -6" fill="none" stroke="#c4d2da" stroke-width="2" stroke-linecap="round"/>
-    <rect x="18" y="-11.5" width="5.5" height="23" rx="2" fill="#b8fff0" stroke="#1a1d24" stroke-width="2"/>
-    <rect x="31" y="-11.5" width="5.5" height="23" rx="2" fill="#b8fff0" stroke="#1a1d24" stroke-width="2"/>
-    <path d="M 44 -11 L 48 -7 L 48 7 L 44 11 Z" fill="#2c363e" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <circle cx="4" cy="0" r="6" fill="#b8fff0" stroke="#1a1d24" stroke-width="2"/>
-    <circle cx="4" cy="0" r="2.6" fill="#ffffff"/>
-    <!-- muzzle light -->
-    <circle cx="48" cy="0" r="8" fill="#b8fff0" opacity="0.35"/>
-    <circle cx="48" cy="0" r="3.5" fill="#f0fffc"/>
-    <!-- hood, her light inside -->
-    <ellipse cx="-6" cy="0" rx="12.5" ry="13.5" fill="#2e4250" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -12 -9 Q -6 -13 2 -9" fill="none" stroke="#5fd8c8" stroke-width="2.2" stroke-linecap="round"/>
-    <path d="M -2 -9 Q 6 0 -2 9" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="-8" cy="0" r="6" fill="#b8fff0" opacity="0.35"/>
-    <path d="M -14 -4.5 Q -10 0 -14 4.5" fill="none" stroke="#e6fffa" stroke-width="2.4" stroke-linecap="round"/>
+
+  <!-- Subtle ethereal mist ribbon trailing behind (-X) -->
+  <path d="M 38 40 C 24 31, 14 27, 4 31 C 12 36, 15 41, 6 47 C 16 48, 22 50, 12 58 C 24 55, 32 52, 40 50 Z" fill="url(#sennaMistTail)"/>
+
+  <!-- Sweeping asymmetric Sentinel cloak trailing back-left (-X, -Y) -->
+  <path d="M 48 28 C 36 22, 22 22, 10 31 C 16 35, 16 40, 8 46 C 17 50, 20 56, 15 64 C 26 62, 36 59, 44 54 Z" fill="url(#sennaCloak)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Inner white-and-teal Sentinel cloak trim & folds -->
+  <path d="M 45 31 C 34 26, 22 27, 14 33 C 22 36, 23 41, 16 45" fill="none" stroke="url(#sennaScarf)" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M 40 38 C 30 39, 22 44, 17 51 M 41 46 C 32 49, 24 54, 19 60" fill="none" stroke="#101c24" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 19 59 C 28 57, 36 54, 43 50" fill="none" stroke="#62d9ce" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Slender Sentinel torso & armored shoulders in aiming stance -->
+  <path d="M 34 33 C 42 26, 54 27, 57 35 C 59 42, 55 53, 47 58 C 39 62, 30 57, 29 48 C 28 41, 30 36, 34 33 Z" fill="url(#sennaCloak)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Diagonal Sentinel sash across upper back -->
+  <path d="M 34 36 C 41 37, 46 43, 48 53" fill="none" stroke="url(#sennaWhitePlate)" stroke-width="4.2" stroke-linecap="round"/>
+  <path d="M 34 36 C 41 37, 46 43, 48 53" fill="none" stroke="#14171f" stroke-width="1.1" stroke-linecap="round" opacity="0.45"/>
+
+  <!-- Left Sentinel shoulder pauldron (forward-left) -->
+  <path d="M 44 26 L 56 29 L 58 37 L 48 39 L 42 33 Z" fill="url(#sennaWhitePlate)" stroke="#14171f" stroke-width="1.7" stroke-linejoin="round"/>
+  <path d="M 46 28 L 54 30.5" stroke="url(#sennaGold)" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Right Sentinel shoulder pauldron (bracing cannon) -->
+  <path d="M 30 51 L 41 53 L 43 62 L 33 63 L 28 57 Z" fill="url(#sennaWhitePlate)" stroke="#14171f" stroke-width="1.7" stroke-linejoin="round"/>
+  <path d="M 32 54 L 39 55.5" stroke="url(#sennaGold)" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Left arm reaching across to grip the Relic Cannon fore-brace -->
+  <path d="M 52 35 C 58 39, 63 46, 63 55" fill="none" stroke="#14171f" stroke-width="8.2" stroke-linecap="round"/>
+  <path d="M 52 35 C 58 39, 63 46, 63 55" fill="none" stroke="#284252" stroke-width="4.8" stroke-linecap="round"/>
+  <path d="M 54 36 C 58 39, 61 44, 62 49" fill="none" stroke="#5c8496" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Gold bracer & left hand gripping cannon side -->
+  <rect x="58" y="49" width="7" height="4.5" rx="1.5" transform="rotate(24 61 51)" fill="url(#sennaGold)" stroke="#14171f" stroke-width="1.3"/>
+  <circle cx="62.5" cy="56.5" r="3.4" fill="url(#sennaSkin)" stroke="#14171f" stroke-width="1.5"/>
+
+  <!-- Right arm bracing the rear stock/grip of the Relic Cannon -->
+  <path d="M 36 58 C 37 64, 41 69, 46 69" fill="none" stroke="#14171f" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 36 58 C 37 64, 41 69, 46 69" fill="none" stroke="#223846" stroke-width="4.6" stroke-linecap="round"/>
+  <circle cx="46.5" cy="68.5" r="3.4" fill="url(#sennaSkin)" stroke="#14171f" stroke-width="1.5"/>
+
+  <!-- ICONIC RELIC CANNON braced cleanly along right side (+Y) extending toward +X -->
+  <g>
+    <!-- Muzzle ambient glow -->
+    <circle cx="93" cy="62" r="9.5" fill="url(#muzzleGlow)"/>
+
+    <!-- Rear relic counterweight & sculpted dark stone housing -->
+    <polygon points="18,62 27,54 49,53 53,62 49,71 27,70" fill="url(#cannonStone)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <!-- Gold filigree trim on housing -->
+    <polygon points="24,62 31,56 46,55.5 46,58 32,58.5 27,62 32,65.5 46,66 46,68.5 31,68" fill="url(#sennaGold)" stroke="#14171f" stroke-width="1.1" stroke-linejoin="round"/>
+
+    <!-- Long split-rail Relic Barrel casing -->
+    <polygon points="48,54.5 87,56 93,53 96,57 96,67 93,71 87,68 48,69.5" fill="url(#cannonStone)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <!-- Upper stone bevel highlight -->
+    <path d="M 50 56.8 L 86 58" stroke="#96aeb8" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+    <!-- Recessed glowing cyan-teal light core channel -->
+    <polygon points="36,60 89,60 94,62 89,64 36,64 32,62" fill="url(#cannonCore)" stroke="#14171f" stroke-width="1.1"/>
+    <path d="M 38 62 L 92 62" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round" opacity="0.9"/>
+
+    <!-- Relic heart crystal node on receiver -->
+    <polygon points="36,62 41,57.5 47,62 41,66.5" fill="#d4fff8" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+    <circle cx="41.5" cy="62" r="2.2" fill="#ffffff"/>
+
+    <!-- 3 bright glowing cyan-teal energy bands wrapping the barrel -->
+    <rect x="55" y="53.5" width="4.4" height="17" rx="1.6" fill="#9cfef2" stroke="#14171f" stroke-width="1.4"/>
+    <rect x="66.5" y="54" width="4.4" height="16" rx="1.6" fill="#9cfef2" stroke="#14171f" stroke-width="1.4"/>
+    <rect x="78" y="54.5" width="4.4" height="15" rx="1.6" fill="#9cfef2" stroke="#14171f" stroke-width="1.4"/>
+    <!-- Specular glints on the 3 bands -->
+    <path d="M 56.5 55.5 L 56.5 59.5 M 68 56 L 68 59.5 M 79.5 56.5 L 79.5 59.5" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round"/>
+
+    <!-- Flared gold-trimmed relic muzzle prongs -->
+    <polygon points="86,55 94,52 96,56.5 89,58.5" fill="url(#sennaGold)" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+    <polygon points="86,69 94,72 96,67.5 89,65.5" fill="url(#sennaGold)" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+    <circle cx="94.5" cy="62" r="2.8" fill="#ffffff"/>
+  </g>
+
+  <!-- Flowing white-trimmed Sentinel scarf collar around neck -->
+  <path d="M 33 40 C 31 46, 33 53, 39 55 C 32 54, 24 51, 18 46 C 23 42, 28 40, 33 40 Z" fill="url(#sennaScarf)" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+
+  <!-- Hooded head & dark braided locks visible from above -->
+  <g>
+    <!-- Braided locks swept back beneath the hood rim -->
+    <path d="M 39 41 C 32 39, 26 42, 22 45 C 27 47, 33 47, 39 46 Z" fill="#181c26" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 38 45 C 31 47, 26 50, 23 53 C 29 52, 34 51, 40 49 Z" fill="#181c26" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 32 42 L 26 44 M 33 48 L 27 50" stroke="#455666" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Gold hair cuffs on braids -->
+    <rect x="29.5" y="41" width="2.8" height="4.2" rx="0.8" transform="rotate(-12 31 43)" fill="url(#sennaGold)" stroke="#14171f" stroke-width="0.9"/>
+    <rect x="30.5" y="47.5" width="2.8" height="3.8" rx="0.8" transform="rotate(14 32 49)" fill="url(#sennaGold)" stroke="#14171f" stroke-width="0.9"/>
+
+    <!-- Sculpted Sentinel hood -->
+    <path d="M 33 44 C 33 34, 42 30, 51 34 C 57 37, 59 42, 58 46 C 57 52, 51 56, 43 55 C 36 54, 33 49, 33 44 Z" fill="url(#sennaHood)" stroke="#14171f" stroke-width="1.9" stroke-linejoin="round"/>
+    <!-- Crisp white & teal Sentinel hood trim -->
+    <path d="M 48 33.5 C 55 36, 58.5 41, 57.5 47 C 56.5 52, 52 54.8, 47 55" fill="none" stroke="url(#sennaWhitePlate)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 37 38 C 42 34, 48 34, 53 37" fill="none" stroke="#76e8dc" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+    <!-- Crown of dark braided hair peeking slightly at hood opening (+X) -->
+    <path d="M 52 38 C 56 41, 56 47, 51 50 C 53 46, 53 42, 52 38 Z" fill="#171b24"/>
+    <!-- Subtle luminous Sentinel visor/eye gleam beneath hood edge -->
+    <path d="M 54.5 41.5 L 57 42.2 M 54.5 46.8 L 57 46.2" stroke="#a6fff6" stroke-width="1.5" stroke-linecap="round"/>
   </g>
 </svg>

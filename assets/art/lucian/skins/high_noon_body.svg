@@ -1,105 +1,137 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <!-- High Noon Lucian, top-down, facing +X: a hellfire gunslinger. A wide-brim hat with a red band, a red scarf blowing back, a dusty leather duster with a fringed shoulder cape and a scorched hem trailing embers; his own bronze revolver in his left hand (muzzle at 46, -15) and Senna's dark iron gun with ember-orange rings in his right (muzzle at 46, 15). Center of the image = center of his body. The game draws his shadow. -->
+  <!-- High Noon Lucian, top-down, facing +X. Ember-charred leather duster with glowing frayed edges, fringed western shoulder cape with brass studs, tattered crimson scarf sweeping back, detailed creased Stetson with crimson band & brass buckle, bronze fluted revolver (left, muzzle at 46, -15) & heavy dark-iron ember-ringed Senna cannon (right, muzzle at 46, 15). -->
   <defs>
     <radialGradient id="muzzle">
-      <stop offset="0" stop-color="#fff6e0"/>
-      <stop offset="0.4" stop-color="#ffc870" stop-opacity="0.95"/>
-      <stop offset="1" stop-color="#ff9a3a" stop-opacity="0"/>
+      <stop offset="0" stop-color="#fff8e0"/>
+      <stop offset="0.38" stop-color="#ffc460" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#ff7a1f" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="senna_muzzle">
-      <stop offset="0" stop-color="#ffe2c8"/>
-      <stop offset="0.4" stop-color="#ff6a2a" stop-opacity="0.95"/>
-      <stop offset="1" stop-color="#c8300a" stop-opacity="0"/>
+      <stop offset="0" stop-color="#ffe8cc"/>
+      <stop offset="0.38" stop-color="#ff6620" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#b82405" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="ember">
-      <stop offset="0" stop-color="#fff0c0"/>
-      <stop offset="0.35" stop-color="#ff8a2a" stop-opacity="0.9"/>
-      <stop offset="1" stop-color="#c8300a" stop-opacity="0"/>
+      <stop offset="0" stop-color="#fff4c4"/>
+      <stop offset="0.35" stop-color="#ff8520" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#c42805" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="tail" gradientUnits="userSpaceOnUse" x1="-6" y1="0" x2="-48" y2="0">
-      <stop offset="0" stop-color="#744c2c"/>
-      <stop offset="1" stop-color="#40281a"/>
+    <linearGradient id="dusterTail" gradientUnits="userSpaceOnUse" x1="-4" y1="0" x2="-50" y2="0">
+      <stop offset="0" stop-color="#7c4f2d"/>
+      <stop offset="0.58" stop-color="#52311b"/>
+      <stop offset="1" stop-color="#2a160c"/>
+    </linearGradient>
+    <linearGradient id="cape" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#875631"/>
+      <stop offset="0.55" stop-color="#5e3a1f"/>
+      <stop offset="1" stop-color="#3a2212"/>
     </linearGradient>
     <linearGradient id="bronze" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffd08a"/>
-      <stop offset="0.5" stop-color="#c7853e"/>
-      <stop offset="1" stop-color="#7a4a1e"/>
+      <stop offset="0" stop-color="#ffe09e"/>
+      <stop offset="0.48" stop-color="#c98034"/>
+      <stop offset="1" stop-color="#6e3d16"/>
     </linearGradient>
+    <linearGradient id="darkIron" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6b5e55"/>
+      <stop offset="0.5" stop-color="#423832"/>
+      <stop offset="1" stop-color="#221c19"/>
+    </linearGradient>
+    <radialGradient id="hatBrim" cx="0.62" cy="0.35" r="0.68">
+      <stop offset="0" stop-color="#85532e"/>
+      <stop offset="0.55" stop-color="#54321a"/>
+      <stop offset="1" stop-color="#2e190c"/>
+    </radialGradient>
   </defs>
   <g transform="translate(64 64)">
-    <!-- the duster's lining, seen in the split between its tails -->
-    <path d="M -15 -2.5 L -47 -6 L -47 6 L -15 2.5 Z" fill="#2a1a10" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <!-- long duster tails, their hems frayed and scorched -->
-    <path d="M -4 -21 C -14 -29 -30 -34 -42 -33 L -48 -27 L -45 -23 L -49.5 -18 L -46 -13.5 L -49 -8.5 L -46 -3 L -16 -1.5 Q -10 -10 -4 -21 Z" fill="url(#tail)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -4 21 C -14 29 -30 34 -42 33 L -48 27 L -45 23 L -49.5 18 L -46 13.5 L -49 8.5 L -46 3 L -16 1.5 Q -10 10 -4 21 Z" fill="url(#tail)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M -41 -31 L -46.2 -26.6 L -43.2 -22.8 L -47.6 -18 L -44.2 -13.4 L -47.2 -8.5 L -44.4 -4.4 L -40 -5 L -41 -30 Z" fill="#3a2414" opacity="0.7"/>
-    <path d="M -41 31 L -46.2 26.6 L -43.2 22.8 L -47.6 18 L -44.2 13.4 L -47.2 8.5 L -44.4 4.4 L -40 5 L -41 30 Z" fill="#3a2414" opacity="0.7"/>
-    <!-- folds and the light on the leather -->
-    <path d="M -13 -12 Q -28 -17 -42 -19 M -17 -5.5 Q -30 -7 -42 -8.5" fill="none" stroke="#4a3220" stroke-width="2" stroke-linecap="round"/>
-    <path d="M -13 12 Q -28 17 -42 19 M -17 5.5 Q -30 7 -42 8.5" fill="none" stroke="#4a3220" stroke-width="2" stroke-linecap="round"/>
-    <path d="M -10 -19 Q -24 -25 -38 -26.5 M -10 19 Q -24 25 -38 26.5" fill="none" stroke="#a37850" stroke-width="2" stroke-linecap="round"/>
-    <!-- pale rim along the outer edges -->
-    <path d="M -6.5 -19.5 C -15.5 -26.5 -30 -31.2 -41 -30.6" fill="none" stroke="#f0d2a0" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M -6.5 19.5 C -15.5 26.5 -30 31.2 -41 30.6" fill="none" stroke="#f0d2a0" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- embers drifting off the hem -->
-    <circle cx="-51" cy="-21" r="3" fill="url(#ember)"/>
-    <circle cx="-52" cy="-6" r="2.4" fill="url(#ember)"/>
-    <circle cx="-51.5" cy="12" r="3" fill="url(#ember)"/>
-    <circle cx="-47" cy="29.5" r="2.2" fill="url(#ember)"/>
-    <!-- back -->
-    <path d="M -12 -21 Q -6 -27.5 3 -26 Q 10 -24 11.5 -16 L 12 -8 Q 13 0 12 8 L 11.5 16 Q 10 24 3 26 Q -6 27.5 -12 21 Q -16 11 -16 0 Q -16 -11 -12 -21 Z" fill="#5a3f28" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <!-- arms reaching forward: leather sleeves, gauntlet gloves -->
-    <path d="M 1 -21 L 17 -16.5" stroke="#1a1d24" stroke-width="12.5" stroke-linecap="round"/>
-    <path d="M 1 -21 L 17 -16.5" stroke="#6b4a2e" stroke-width="9" stroke-linecap="round"/>
-    <path d="M 1 21 L 17 16.5" stroke="#1a1d24" stroke-width="12.5" stroke-linecap="round"/>
-    <path d="M 1 21 L 17 16.5" stroke="#6b4a2e" stroke-width="9" stroke-linecap="round"/>
-    <path d="M 3 -24.6 L 12 -22 M 3 24.6 L 12 22" stroke="#c9a26e" stroke-width="1.4" stroke-linecap="round"/>
-    <path d="M 14.6 -21.6 L 12.4 -12.6 M 14.6 21.6 L 12.4 12.6" stroke="#1a1d24" stroke-width="4.4" stroke-linecap="round"/>
-    <path d="M 14.6 -21.6 L 12.4 -12.6 M 14.6 21.6 L 12.4 12.6" stroke="#3e2818" stroke-width="2.4" stroke-linecap="round"/>
-    <!-- fringed shoulder cape -->
-    <path d="M -17.5 -15 L -21 -16.5 M -19 -9 L -23 -9.8 M -19.6 -3 L -23.6 -3.2 M -19.6 3 L -23.6 3.2 M -19 9 L -23 9.8 M -17.5 15 L -21 16.5 M -14 20.5 L -16.8 23.4" stroke="#c9a26e" stroke-width="1.3" stroke-linecap="round"/>
-    <path d="M -14 -20.5 L -16.8 -23.4" stroke="#c9a26e" stroke-width="1.3" stroke-linecap="round"/>
-    <path d="M 6 -23.5 Q -3 -29 -13 -25 Q -20.5 -14 -20.5 0 Q -20.5 14 -13 25 Q -3 29 6 23.5 Q 10 12 10 0 Q 10 -12 6 -23.5 Z" fill="#6e4a2c" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M 3 -24.5 Q -4 -27.4 -11.6 -23.6 Q -18.3 -13 -18.3 0 Q -18.3 13 -11.6 23.6 Q -4 27.4 3 24.5" fill="none" stroke="#f0d2a0" stroke-width="1.4" stroke-linecap="round"/>
-    <path d="M -1 -24 Q 4 -18 4 -10 M -1 24 Q 4 18 4 10" fill="none" stroke="#5e3f26" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- his own revolver (left): bronze, a fluted cylinder and a long barrel -->
-    <path d="M 16 -18 L 23 -18 L 23 -12 L 16 -12 Q 14.6 -15 16 -18 Z" fill="#8a5524" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
-    <path d="M 29 -17.4 L 43.6 -17 L 43.6 -13 L 29 -12.6 Z" fill="url(#bronze)" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
-    <rect x="21.5" y="-19.8" width="9" height="9.6" rx="3" fill="url(#bronze)" stroke="#1a1d24" stroke-width="1.8"/>
-    <path d="M 22.8 -17.4 L 29.2 -17.4 M 22.8 -15 L 29.2 -15 M 22.8 -12.6 L 29.2 -12.6" stroke="#7a4a1e" stroke-width="0.9" stroke-linecap="round"/>
-    <path d="M 31.5 -15 L 41.5 -15" stroke="#ffe0a8" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M 43.2 -17.2 L 46 -16.4 L 46 -13.6 L 43.2 -12.8 Z" fill="#5a3416" stroke="#1a1d24" stroke-width="1" stroke-linejoin="round"/>
-    <!-- Senna's relic gun (right): a dark iron hand cannon. A riveted stock with an ember core, a thick barrel, two ember-orange rings, a muzzle cap -->
-    <rect x="25" y="6.5" width="16" height="17" rx="5" fill="#ff5a1a" opacity="0.25"/>
-    <path d="M 11 9 L 25 7.5 L 25 22.5 L 11 21 Q 7.5 15 11 9 Z" fill="#433a35" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M 12 10.5 L 23.5 9.3" stroke="#665a52" stroke-width="1.4" stroke-linecap="round"/>
-    <circle cx="13" cy="15" r="2.2" fill="#ffb060" stroke="#1a1d24" stroke-width="1"/>
-    <circle cx="22.5" cy="10.5" r="0.8" fill="#8a7c70"/>
-    <circle cx="22.5" cy="19.5" r="0.8" fill="#8a7c70"/>
-    <rect x="24" y="10" width="19" height="10" rx="2" fill="#544a43" stroke="#1a1d24" stroke-width="2"/>
-    <path d="M 26 12 L 41 12" stroke="#7a6c62" stroke-width="1.4" stroke-linecap="round"/>
-    <rect x="27.5" y="7.5" width="3.5" height="15" rx="1.3" fill="#ff7a32" stroke="#1a1d24" stroke-width="1.2"/>
-    <rect x="35" y="7.5" width="3.5" height="15" rx="1.3" fill="#ff7a32" stroke="#1a1d24" stroke-width="1.2"/>
-    <path d="M 28.6 9 L 28.6 21 M 36.1 9 L 36.1 21" stroke="#ffd2a0" stroke-width="1" stroke-linecap="round"/>
-    <path d="M 42 9 L 46 11.5 L 46 18.5 L 42 21 Z" fill="#262220" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-    <!-- leather gloves -->
-    <circle cx="19.5" cy="-15" r="4.3" fill="#4a3020" stroke="#1a1d24" stroke-width="1.8"/>
-    <circle cx="19.5" cy="15" r="4.3" fill="#4a3020" stroke="#1a1d24" stroke-width="1.8"/>
-    <path d="M 18 -17.5 Q 20.5 -18 22 -16 M 18 12.5 Q 20.5 12 22 14" fill="none" stroke="#7a5638" stroke-width="1.2" stroke-linecap="round"/>
-    <!-- muzzle light -->
+    <!-- Scorched inner duster lining -->
+    <path d="M -14 -2.5 L -47 -5.8 L -46 6.2 L -14 2.5 Z" fill="#22120b" stroke="#140b07" stroke-width="1.6" stroke-linejoin="round"/>
+    <!-- Asymmetric tattered & ember-charred duster tails -->
+    <path d="M -2 -20 C -13 -28 -29 -34 -42.5 -32.5 L -48.5 -26.5 L -45.2 -22 L -50 -17 L -46.2 -12.5 L -49.2 -7.5 L -46 -2.5 L -15 -1.5 Q -9 -10 -2 -20 Z" fill="url(#dusterTail)" stroke="#140b07" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M -5 20 C -15 28 -30 33.5 -42 32 L -47.5 26 L -44.4 21.8 L -48.8 16.8 L -45.4 12.2 L -48.2 7.5 L -45.4 2.6 L -15 1.5 Q -9.5 10 -5 20 Z" fill="url(#dusterTail)" stroke="#140b07" stroke-width="2" stroke-linejoin="round"/>
+    <!-- Charred edge shading & glowing ember trim along frayed hems -->
+    <path d="M -42 -31 L -47.2 -26.2 L -44 -21.8 L -48.4 -17 L -45 -12.4 L -47.8 -7.5 L -45 -3.6" fill="none" stroke="#ff7a24" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" opacity="0.88"/>
+    <path d="M -41.5 30.6 L -46.4 25.8 L -43.2 21.6 L -47.4 16.8 L -44.2 12.2 L -46.8 7.5 L -44.2 3.8" fill="none" stroke="#ff7a24" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" opacity="0.88"/>
+    <!-- Leather fold highlights -->
+    <path d="M -12 -11.5 Q -27 -16.8 -42 -18.5 M -16 -5 Q -29 -6.5 -42 -8" fill="none" stroke="#361e11" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M -13 11.5 Q -27 16.8 -41.5 18.2 M -16.5 5.2 Q -29 6.8 -41.5 8.2" fill="none" stroke="#361e11" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M -9 -18.5 Q -23 -24.5 -38 -26 M -11 18.5 Q -24 24.5 -37.5 25.5" fill="none" stroke="#ad7949" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M -5 -19 C -15 -26 -29 -30.8 -41 -30.2 M -7 19 C -16.5 26 -29.5 30.5 -40.5 29.8" fill="none" stroke="#f2ca94" stroke-width="1.35" stroke-linecap="round"/>
+    <!-- Drifting glowing ash embers off coat hem -->
+    <circle cx="-52" cy="-20" r="3" fill="url(#ember)"/>
+    <circle cx="-53" cy="-5" r="2.4" fill="url(#ember)"/>
+    <circle cx="-51.5" cy="13" r="3" fill="url(#ember)"/>
+    <circle cx="-48" cy="29.5" r="2.3" fill="url(#ember)"/>
+    <circle cx="-49.5" cy="-14" r="1.1" fill="#fff2b8"/>
+    <circle cx="-48.5" cy="15.5" r="1.1" fill="#fff2b8"/>
+
+    <!-- Back under-layer -->
+    <path d="M -10 -21 Q -3 -27.5 6 -25 Q 13 -22.5 13.5 -15 L 13 -7 Q 13.8 0 12.6 8 L 11.8 16 Q 10 23.8 2.5 25.5 Q -6.5 27 -12.5 20.5 Q -16.5 10.5 -16 0 Q -15.5 -11 -10 -21 Z" fill="#52331d" stroke="#140b07" stroke-width="2" stroke-linejoin="round"/>
+
+    <!-- Leather sleeves & dark outlaw gauntlets -->
+    <path d="M 3 -20.5 L 18 -16" stroke="#140b07" stroke-width="11" stroke-linecap="round"/>
+    <path d="M 3 -20.5 L 18 -16" stroke="#6b4528" stroke-width="7.8" stroke-linecap="round"/>
+    <path d="M 1 20.5 L 17 16.2" stroke="#140b07" stroke-width="11" stroke-linecap="round"/>
+    <path d="M 1 20.5 L 17 16.2" stroke="#633f24" stroke-width="7.8" stroke-linecap="round"/>
+    <path d="M 4.5 -23.6 L 13.5 -21 M 3 23.8 L 13 21.2" stroke="#d4a36e" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M 15.6 -20.6 L 13.4 -12.2 M 14.8 20.8 L 12.6 12.4" stroke="#140b07" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 15.6 -20.6 L 13.4 -12.2 M 14.8 20.8 L 12.6 12.4" stroke="#3c2314" stroke-width="2.2" stroke-linecap="round"/>
+
+    <!-- Fringed western leather shoulder cape with brass studs -->
+    <path d="M -17.5 -14.5 L -21.5 -16 M -19 -8.5 L -23.2 -9.4 M -19.6 -2.8 L -23.8 -3 M -19.6 2.8 L -23.8 3 M -19 8.5 L -23.2 9.4 M -17.5 14.5 L -21.5 16 M -14 20 L -17 23 M -14 -20 L -17 -23" stroke="#d4a36e" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M 7.5 -23 Q -2 -28.5 -12.5 -24.5 Q -20.5 -13.5 -20.5 0 Q -20.5 13.5 -12.5 24.5 Q -2.5 28.5 6 23 Q 10.5 12 10.5 0 Q 10.5 -12 7.5 -23 Z" fill="url(#cape)" stroke="#140b07" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 4.5 -24 Q -3 -26.8 -11.2 -23 Q -18.2 -12.5 -18.2 0 Q -18.2 12.5 -11.2 23 Q -3.5 26.8 3.5 24" fill="none" stroke="#f2ca94" stroke-width="1.3" stroke-linecap="round"/>
+    <circle cx="-1" cy="-21.5" r="1.4" fill="url(#bronze)" stroke="#140b07" stroke-width="0.65"/>
+    <circle cx="-2" cy="21.5" r="1.4" fill="url(#bronze)" stroke="#140b07" stroke-width="0.65"/>
+
+    <!-- LEFT GUN (Lucian's): demonic fluted bronze revolver, muzzle strictly at (46, -15) -->
+    <path d="M 16.5 -17.8 L 23.2 -17.8 L 23.2 -12.2 L 16.5 -12.2 Q 15 -15 16.5 -17.8 Z" fill="#7d4a1e" stroke="#140b07" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 29 -17.2 L 43.6 -16.8 L 43.6 -13.2 L 29 -12.8 Z" fill="url(#bronze)" stroke="#140b07" stroke-width="1.65" stroke-linejoin="round"/>
+    <rect x="21.8" y="-19.5" width="8.8" height="9" rx="2.8" fill="url(#bronze)" stroke="#140b07" stroke-width="1.65"/>
+    <path d="M 23 -17.3 L 29.2 -17.3 M 23 -15 L 29.2 -15 M 23 -12.7 L 29.2 -12.7" stroke="#ff7a1f" stroke-width="0.95" stroke-linecap="round"/>
+    <path d="M 31.5 -15 L 41.5 -15" stroke="#fff0b8" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 43.2 -17 L 46 -16.2 L 46 -13.8 L 43.2 -13 Z" fill="#4f2b10" stroke="#140b07" stroke-width="0.9" stroke-linejoin="round"/>
+
+    <!-- RIGHT GUN (Senna's): heavy riveted dark-iron demon cannon with ember core & TWO glowing ember rings, muzzle strictly at (46, 15) -->
+    <rect x="25" y="6.2" width="16.5" height="17.6" rx="5" fill="#ff5514" opacity="0.26"/>
+    <path d="M 11 8.8 L 25 7.4 L 25 22.6 L 11 21.2 Q 7.4 15 11 8.8 Z" fill="url(#darkIron)" stroke="#140b07" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M 12.2 10.4 L 23.6 9.2" stroke="#857468" stroke-width="1.25" stroke-linecap="round"/>
+    <circle cx="13.2" cy="15" r="2.3" fill="#ffaa4c" stroke="#140b07" stroke-width="0.95"/>
+    <circle cx="13.2" cy="15" r="1" fill="#fff5cc"/>
+    <circle cx="22.4" cy="10.4" r="0.85" fill="#9c8a7a"/>
+    <circle cx="22.4" cy="19.6" r="0.85" fill="#9c8a7a"/>
+    <rect x="24" y="9.8" width="19" height="10.4" rx="2" fill="url(#darkIron)" stroke="#140b07" stroke-width="1.8"/>
+    <path d="M 26 11.8 L 41 11.8" stroke="#8f7e72" stroke-width="1.25" stroke-linecap="round"/>
+    <rect x="27.5" y="7.4" width="3.5" height="15.2" rx="1.3" fill="#ff7326" stroke="#140b07" stroke-width="1.15"/>
+    <rect x="35" y="7.4" width="3.5" height="15.2" rx="1.3" fill="#ff7326" stroke="#140b07" stroke-width="1.15"/>
+    <path d="M 29.2 9 L 29.2 21 M 36.7 9 L 36.7 21" stroke="#ffe5a8" stroke-width="0.95" stroke-linecap="round"/>
+    <path d="M 42 9 L 46 11.5 L 46 18.5 L 42 21 Z" fill="#211c19" stroke="#140b07" stroke-width="1.4" stroke-linejoin="round"/>
+
+    <!-- Sculpted leather-gloved hands -->
+    <path d="M 16.5 -18.4 Q 20.5 -19.2 23.2 -17.4 Q 24.4 -15 23.2 -12.6 Q 20.5 -10.8 16.5 -11.6 Q 15.2 -15 16.5 -18.4 Z" fill="#472b1b" stroke="#140b07" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 16.5 11.6 Q 20.5 10.8 23.2 12.6 Q 24.4 15 23.2 17.4 Q 20.5 19.2 16.5 18.4 Q 15.2 15 16.5 11.6 Z" fill="#472b1b" stroke="#140b07" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 18.2 -17.4 Q 20.8 -17.8 22.2 -16 M 18.2 12.6 Q 20.8 12.2 22.2 14" fill="none" stroke="#855b3c" stroke-width="1.1" stroke-linecap="round"/>
+
+    <!-- Muzzle glows strictly at (46, -15) and (46, 15) -->
     <circle cx="46" cy="-15" r="7" fill="url(#muzzle)"/>
     <circle cx="46" cy="15" r="7" fill="url(#senna_muzzle)"/>
-    <!-- red scarf: its tail blowing back over the cape -->
-    <path d="M -9 -4.5 Q -20 -8 -33 -9.5 Q -28.5 -5.5 -30 -1.5 Q -28 1.5 -35 6 Q -22 4.5 -9 4.5 Z" fill="#b3261e" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M -14 -1.5 L -28 -4 M -14 2 L -29 3.6" stroke="#7a1612" stroke-width="1.2" stroke-linecap="round"/>
-    <!-- wide-brim hat seen from above: brim, red band, creased crown -->
-    <ellipse cx="1" cy="0" rx="16" ry="16.8" fill="#5e3d22" stroke="#1a1d24" stroke-width="2.5"/>
-    <ellipse cx="1" cy="0" rx="14" ry="14.8" fill="none" stroke="#f0d2a0" stroke-width="1.3"/>
-    <path d="M 11 -10 Q 15.6 -5 15.4 2" fill="none" stroke="#8a5e36" stroke-width="1.8" stroke-linecap="round"/>
-    <ellipse cx="0" cy="0" rx="9.8" ry="9.2" fill="#b02a22" stroke="#1a1d24" stroke-width="1.4"/>
-    <ellipse cx="-0.4" cy="0" rx="8" ry="7.4" fill="#6e4a2c"/>
-    <path d="M -3 -5.5 Q 2 -6.6 6 -3.5" fill="none" stroke="#9a6c42" stroke-width="1.4" stroke-linecap="round"/>
-    <path d="M -6 0 L 5.5 0" stroke="#3e2614" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="8.6" cy="0" r="1.4" fill="#e8a85c" stroke="#1a1d24" stroke-width="0.8"/>
+
+    <!-- Tattered crimson outlaw scarf sweeping dynamically back -->
+    <path d="M -8 -4.5 Q -19 -8.5 -34 -10.5 Q -29 -5.5 -31 -1.2 Q -28.5 2 -36.5 7 Q -22 5.2 -8 4.8 Z" fill="#b8221a" stroke="#140b07" stroke-width="1.75" stroke-linejoin="round"/>
+    <path d="M -13 -1.5 L -29 -4.5 M -13 2.2 L -30.5 4" stroke="#6e110d" stroke-width="1.15" stroke-linecap="round"/>
+    <path d="M -12 -4.8 Q -22 -7.2 -31.5 -8.8" fill="none" stroke="#ff7a52" stroke-width="0.9" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- Detailed wide-brim weathered leather Stetson seen from above -->
+    <g transform="rotate(-4 1 0)">
+      <ellipse cx="1" cy="0" rx="16.2" ry="17" fill="url(#hatBrim)" stroke="#140b07" stroke-width="2"/>
+      <ellipse cx="1" cy="0" rx="14.2" ry="15" fill="none" stroke="#f2ca94" stroke-width="1.2" opacity="0.88"/>
+      <path d="M 11.5 -10 Q 15.8 -4.8 15.6 2.5" fill="none" stroke="#ffbd6b" stroke-width="1.4" stroke-linecap="round" opacity="0.75"/>
+      <!-- Crimson hatband & brass buckle -->
+      <ellipse cx="0.2" cy="0" rx="9.8" ry="9.2" fill="#b3221a" stroke="#140b07" stroke-width="1.25"/>
+      <!-- Creased leather crown -->
+      <ellipse cx="-0.2" cy="0" rx="8" ry="7.4" fill="#6b4426"/>
+      <path d="M -3.2 -5.4 Q 2 -6.4 6 -3.2" fill="none" stroke="#a36e42" stroke-width="1.35" stroke-linecap="round"/>
+      <path d="M -6.2 0 L 5.6 0" stroke="#361f0f" stroke-width="1.9" stroke-linecap="round"/>
+      <rect x="7.4" y="-1.6" width="2.6" height="3.2" rx="0.6" fill="url(#bronze)" stroke="#140b07" stroke-width="0.7"/>
+    </g>
   </g>
 </svg>

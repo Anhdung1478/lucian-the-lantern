@@ -1,14 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- Purple essence: a cut gem with a crown of three points and a white sparkle -->
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Purple Essence V2.2: Imperial Shadow-Amethyst Boss Relic with crescent soul-wisps -->
   <defs>
-    <radialGradient id="glow"><stop offset="0" stop-color="#b46cff" stop-opacity="0.6"/><stop offset="1" stop-color="#b46cff" stop-opacity="0"/></radialGradient>
-    <linearGradient id="gem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6ccff"/><stop offset="0.45" stop-color="#b46cff"/><stop offset="1" stop-color="#5e24a8"/></linearGradient>
+    <radialGradient id="aura" cx="32" cy="33" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c980ff" stop-opacity="0.66"/>
+      <stop offset="0.54" stop-color="#7c2ae8" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#3a0d78" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="amethyst" x1="14" y1="8" x2="50" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f5e0ff"/>
+      <stop offset="0.34" stop-color="#c073ff"/>
+      <stop offset="0.72" stop-color="#7526d4"/>
+      <stop offset="1" stop-color="#320b69"/>
+    </linearGradient>
+    <linearGradient id="wisp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ebd4ff"/>
+      <stop offset="0.5" stop-color="#9e47ff"/>
+      <stop offset="1" stop-color="#3c0e7a"/>
+    </linearGradient>
+    <radialGradient id="soulCore" cx="32" cy="31" r="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.38" stop-color="#e8c4ff" stop-opacity="0.88"/>
+      <stop offset="0.78" stop-color="#9a42ff" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#4e109e" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <circle cx="32" cy="36" r="27" fill="url(#glow)"/>
-  <path d="M 6 32 L 10 14 L 20 23 L 32 7 L 44 23 L 54 14 L 58 32 L 32 60 Z" fill="url(#gem)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 6 32 L 58 32 M 20 23 L 22 32 L 32 60 M 44 23 L 42 32 L 32 60 M 32 7 L 32 32" fill="none" stroke="#5e24a8" stroke-width="1.5" stroke-linejoin="round"/>
-  <path d="M 10 14 L 20 23 L 22 32 L 6 32 Z" fill="#f2e4ff" opacity="0.75"/>
-  <path d="M 32 7 L 32 32 L 22 32 L 20 23 Z" fill="#ffffff" opacity="0.4"/>
-  <path d="M 22 32 L 32 60 L 6 32 Z" fill="#d8b4ff" opacity="0.45"/>
-  <path d="M 51 3 L 53.2 9.8 L 60 12 L 53.2 14.2 L 51 21 L 48.8 14.2 L 42 12 L 48.8 9.8 Z" fill="#ffffff" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
+  <circle cx="32" cy="33" r="29" fill="url(#aura)"/>
+  <!-- twin royal crescent wisps framing the relic -->
+  <path d="M 14 38 C 6 31 6 19 15 11 C 12 20 13 28 20 33 Z" fill="url(#wisp)" stroke="#1b0933" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 50 38 C 58 31 58 19 49 11 C 52 20 51 28 44 33 Z" fill="url(#wisp)" stroke="#1b0933" stroke-width="2" stroke-linejoin="round"/>
+  <!-- imperial cut amethyst body (wide crowned hexagon tapering to a sharp pendant tip) -->
+  <polygon points="32,6 49,21 52,33 32,59 12,33 15,21" fill="url(#amethyst)" stroke="#1b0933" stroke-width="2.2" stroke-linejoin="round"/>
+  <!-- upper crown facets -->
+  <polygon points="32,6 15,21 24,29 32,24" fill="#f7e8ff" opacity="0.9"/>
+  <polygon points="32,6 49,21 40,29 32,24" fill="#d396ff" opacity="0.62"/>
+  <polygon points="15,21 12,33 24,29" fill="#e6c4ff" opacity="0.78"/>
+  <polygon points="49,21 52,33 40,29" fill="#6b1ec7" opacity="0.65"/>
+  <!-- lower pavilion facets -->
+  <polygon points="12,33 24,29 32,59" fill="#8f3ef2" opacity="0.6"/>
+  <polygon points="52,33 40,29 32,59" fill="#2e0a63" opacity="0.86"/>
+  <polygon points="24,29 40,29 32,59" fill="#5e1ab8" opacity="0.62"/>
+  <!-- luminous soul-heart table facet -->
+  <circle cx="32" cy="31" r="13" fill="url(#soulCore)"/>
+  <polygon points="32,19 40,29 32,42 24,29" fill="#f5e3ff" opacity="0.78"/>
+  <polygon points="32,22 36.5,29 32,37 27.5,29" fill="#ffffff" opacity="0.9"/>
+  <!-- crisp facet edges -->
+  <path d="M 12 33 L 24 29 L 40 29 L 52 33 M 32 6 L 32 19 M 24 29 L 32 58 L 40 29" fill="none" stroke="#f0d4ff" stroke-width="1.15" stroke-linejoin="round" opacity="0.68"/>
+  <!-- outer ink rim -->
+  <polygon points="32,6 49,21 52,33 32,59 12,33 15,21" fill="none" stroke="#18082e" stroke-width="2.2" stroke-linejoin="round"/>
+  <!-- delicate top star glint -->
+  <path d="M 32 1.5 L 33.4 5.2 L 37 6.5 L 33.4 7.8 L 32 11.5 L 30.6 7.8 L 27 6.5 L 30.6 5.2 Z" fill="#ffffff" opacity="0.95"/>
 </svg>

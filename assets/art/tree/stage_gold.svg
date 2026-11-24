@@ -1,29 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Stage Gold: a pile of gold coins with a green up-arrow -->
+  <!-- Stage Gold: gleaming stack of embossed gold coins with a crisp emerald-gold ascending arrow & luster glints -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset="0.55" stop-color="#f2b938"/><stop offset="1" stop-color="#b07514"/></linearGradient>
-    <linearGradient id="side" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c98a1c"/><stop offset="1" stop-color="#7a4a08"/></linearGradient>
+    <radialGradient id="aura" cx="32" cy="34" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe066" stop-opacity="0.6"/>
+      <stop offset="0.62" stop-color="#b57712" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#b57712" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="coinSide" x1="8" y1="30" x2="46" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd559"/>
+      <stop offset="0.45" stop-color="#d4931e"/>
+      <stop offset="1" stop-color="#7a480a"/>
+    </linearGradient>
+    <linearGradient id="coinFace" x1="12" y1="22" x2="40" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff8cc"/>
+      <stop offset="0.5" stop-color="#f7c43e"/>
+      <stop offset="1" stop-color="#c48216"/>
+    </linearGradient>
+    <linearGradient id="upArrow" x1="38" y1="7" x2="58" y2="33" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e3ffe0"/>
+      <stop offset="0.45" stop-color="#66e07a"/>
+      <stop offset="1" stop-color="#1e8a3e"/>
+    </linearGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <g stroke="#3d2604" stroke-width="1.5" stroke-linejoin="round">
-    <path d="M 25 50 L 25 54 A 12 4.5 0 0 0 49 54 L 49 50 Z" fill="url(#side)"/>
-    <ellipse cx="37" cy="50" rx="12" ry="4.5" fill="url(#face)"/>
-    <path d="M 25 45 L 25 49 A 12 4.5 0 0 0 49 49 L 49 45 Z" fill="url(#side)"/>
-    <ellipse cx="37" cy="45" rx="12" ry="4.5" fill="url(#face)"/>
-    <path d="M 5 50 L 5 54 A 12 4.5 0 0 0 29 54 L 29 50 Z" fill="url(#side)"/>
-    <ellipse cx="17" cy="50" rx="12" ry="4.5" fill="url(#face)"/>
-    <path d="M 5 45 L 5 49 A 12 4.5 0 0 0 29 49 L 29 45 Z" fill="url(#side)"/>
-    <ellipse cx="17" cy="45" rx="12" ry="4.5" fill="url(#face)"/>
-    <path d="M 5 40 L 5 44 A 12 4.5 0 0 0 29 44 L 29 40 Z" fill="url(#side)"/>
-    <ellipse cx="17" cy="40" rx="12" ry="4.5" fill="url(#face)"/>
-    <path d="M 5 35 L 5 39 A 12 4.5 0 0 0 29 39 L 29 35 Z" fill="url(#side)"/>
-    <ellipse cx="17" cy="35" rx="12" ry="4.5" fill="url(#face)"/>
-    <circle cx="28" cy="52" r="9" fill="url(#face)" stroke-width="2"/>
+  <circle cx="32" cy="34" r="30" fill="url(#aura)"/>
+  <!-- back shorter coin stack (left) -->
+  <g stroke="#1a1d24" stroke-width="2.3" stroke-linejoin="round">
+    <path d="M 9 43 L 9 49 C 9 52.8 15.5 55.5 23.5 55.5 C 31.5 55.5 38 52.8 38 49 L 38 43 Z" fill="url(#coinSide)"/>
+    <ellipse cx="23.5" cy="43" rx="14.5" ry="6.2" fill="url(#coinFace)"/>
+    <path d="M 9 36 L 9 42 C 9 45.8 15.5 48.5 23.5 48.5 C 31.5 48.5 38 45.8 38 42 L 38 36 Z" fill="url(#coinSide)"/>
+    <ellipse cx="23.5" cy="36" rx="14.5" ry="6.2" fill="url(#coinFace)"/>
+    <path d="M 9 29 L 9 35 C 9 38.8 15.5 41.5 23.5 41.5 C 31.5 41.5 38 38.8 38 35 L 38 29 Z" fill="url(#coinSide)"/>
+    <ellipse cx="23.5" cy="29" rx="14.5" ry="6.2" fill="url(#coinFace)"/>
   </g>
-  <circle cx="28" cy="52" r="6" fill="none" stroke="#a86e12" stroke-width="1.4"/>
-  <path d="M 28 48 L 29.2 50.8 L 32 51 L 29.8 52.8 L 30.6 55.6 L 28 54 L 25.4 55.6 L 26.2 52.8 L 24 51 L 26.8 50.8 Z" fill="#fff4c8"/>
-  <path d="M 9 33 A 9 3 0 0 1 17 31" fill="none" stroke="#fffbe8" stroke-width="1.8" stroke-linecap="round"/>
-  <path d="M 52 4 L 62 16 L 56.5 16 L 56.5 34 L 47.5 34 L 47.5 16 L 42 16 Z" fill="#6fd36f" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 50 18 L 50 31" stroke="#d6ffd6" stroke-width="2" stroke-linecap="round"/>
+  <!-- embossed inner ring & star on top left coin -->
+  <ellipse cx="23.5" cy="29" rx="10.2" ry="4" fill="none" stroke="#b87612" stroke-width="1.3"/>
+  <path d="M 14 27.5 A 11 4.2 0 0 1 25 25" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- front overlapping stack (bottom-right) -->
+  <g stroke="#1a1d24" stroke-width="2.3" stroke-linejoin="round">
+    <path d="M 27 47 L 27 52.5 C 27 56 33 58.5 40.5 58.5 C 48 58.5 54 56 54 52.5 L 54 47 Z" fill="url(#coinSide)"/>
+    <ellipse cx="40.5" cy="47" rx="13.5" ry="5.6" fill="url(#coinFace)"/>
+    <path d="M 27 40.5 L 27 46 C 27 49.5 33 52 40.5 52 C 48 52 54 49.5 54 46 L 54 40.5 Z" fill="url(#coinSide)"/>
+    <ellipse cx="40.5" cy="40.5" rx="13.5" ry="5.6" fill="url(#coinFace)"/>
+  </g>
+  <ellipse cx="40.5" cy="40.5" rx="9.4" ry="3.6" fill="none" stroke="#b87612" stroke-width="1.3"/>
+  <path d="M 32 39 A 10 3.8 0 0 1 42 36.8" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- milled edge ticks -->
+  <path d="M 15 39 L 15 41 M 21 40.4 L 21 42.4 M 15 46 L 15 48 M 34 49.5 L 34 51.5 M 40.5 50.5 L 40.5 52.5" stroke="#7a480a" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- crisp emerald-gold ascending arrow (upper-right) -->
+  <path d="M 47 7 L 59 20 L 52.5 20 L 52.5 32 L 41.5 32 L 41.5 20 L 35 20 Z" fill="url(#upArrow)" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M 47 9 L 57 20 L 51.5 20 L 51.5 31 L 47 31 Z" fill="#1e8a3e" opacity="0.45"/>
+  <path d="M 47 10.5 L 39.5 18.5" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- gold luster glints -->
+  <path d="M 14 14 L 15.2 17.3 L 18.5 18.5 L 15.2 19.7 L 14 23 L 12.8 19.7 L 9.5 18.5 L 12.8 17.3 Z" fill="#fff8d6"/>
+  <path d="M 55 36 L 55.8 38.2 L 58 39 L 55.8 39.8 L 55 42 L 54.2 39.8 L 52 39 L 54.2 38.2 Z" fill="#ffe680"/>
 </svg>

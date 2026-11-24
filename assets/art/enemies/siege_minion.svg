@@ -1,30 +1,108 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
-  <!-- Siege Minion: crimson cannon cart with a crew minion behind it, barrel forward (+X). -->
+  <!-- Siege Minion: sturdy Armored Crimson & Brass Siege Cannon from above facing +X, iron-banded carriage wheels, riveted crimson/brass hull, crested crew gunner behind, thick forged iron cannon barrel with glowing molten-gold charge core at breech and muzzle. -->
+  <defs>
+    <linearGradient id="sg-wheel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#687285"/>
+      <stop offset="0.3" stop-color="#3a404d"/>
+      <stop offset="0.7" stop-color="#4e3927"/>
+      <stop offset="1" stop-color="#22252e"/>
+    </linearGradient>
+    <linearGradient id="sg-hull" x1="0.15" y1="0.05" x2="0.85" y2="0.95">
+      <stop offset="0" stop-color="#d43d3b"/>
+      <stop offset="0.52" stop-color="#941f24"/>
+      <stop offset="1" stop-color="#4f0f15"/>
+    </linearGradient>
+    <linearGradient id="sg-brass" x1="0.15" y1="0.05" x2="0.85" y2="0.95">
+      <stop offset="0" stop-color="#ffe285"/>
+      <stop offset="0.5" stop-color="#cf9430"/>
+      <stop offset="1" stop-color="#6e4814"/>
+    </linearGradient>
+    <linearGradient id="sg-iron" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a8b3c7"/>
+      <stop offset="0.32" stop-color="#687287"/>
+      <stop offset="0.75" stop-color="#363c4a"/>
+      <stop offset="1" stop-color="#1c2029"/>
+    </linearGradient>
+    <radialGradient id="sg-molten" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fffce0"/>
+      <stop offset="0.45" stop-color="#ffc938"/>
+      <stop offset="0.82" stop-color="#ff7714" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#d93800" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
   <g transform="translate(48 48)">
-    <!-- wheels -->
-    <rect x="-30" y="-36" width="22" height="11" rx="3.5" fill="#5e4630" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <rect x="2" y="-36" width="22" height="11" rx="3.5" fill="#5e4630" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <rect x="-30" y="25" width="22" height="11" rx="3.5" fill="#5e4630" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <rect x="2" y="25" width="22" height="11" rx="3.5" fill="#5e4630" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M -25 -30.5 L -13 -30.5 M 7 -30.5 L 19 -30.5 M -25 30.5 L -13 30.5 M 7 30.5 L 19 30.5" stroke="#9aa0b0" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- cart bed -->
-    <rect x="-31" y="-24" width="58" height="48" rx="8" fill="#8a6a46" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M -27 -8 L 23 -8 M -27 8 L 23 8" stroke="#5e4630" stroke-width="2.5" stroke-linecap="round"/>
-    <rect x="-26" y="-19" width="48" height="38" rx="5" fill="none" stroke="#a83232" stroke-width="3.5"/>
-    <circle cx="-23" cy="-16" r="2.5" fill="#f2c14e"/><circle cx="-23" cy="16" r="2.5" fill="#f2c14e"/>
-    <!-- crew minion peeking over the back -->
-    <ellipse cx="-24" cy="0" rx="6" ry="11" fill="#a83232" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="-20" cy="0" r="9" fill="#d03a3a" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M -28 0 L -13 0" stroke="#ff5a4a" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="-22" cy="-4" r="2.8" fill="#ffffff" opacity="0.3"/>
-    <!-- iron carriage and barrel -->
-    <circle cx="2" cy="0" r="14" fill="#4a4f5c" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M -10 -9.5 L 34 -8 L 36 -12 L 44 -12 L 44 12 L 36 12 L 34 8 L -10 9.5 Z" fill="#6b7080" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M -6 -5 L 32 -4.2" stroke="#9aa0b0" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
-    <rect x="12" y="-10" width="5" height="20" rx="1.5" fill="#4a4f5c" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <ellipse cx="44" cy="0" rx="3" ry="7.5" fill="#2a1018"/>
-    <circle cx="-11" cy="0" r="7" fill="#4a4f5c" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M -15 -2 L -20 -9" stroke="#1a1d24" stroke-width="3.5" stroke-linecap="round"/>
-    <circle cx="-21" cy="-10" r="5" fill="#ffb347" opacity="0.4"/><circle cx="-21" cy="-10" r="2.8" fill="#ffb347"/>
+    <!-- Heavy iron axles connecting left/right carriage wheels -->
+    <rect x="-20" y="-34" width="6" height="68" rx="1.5" fill="#2d323e" stroke="#14171f" stroke-width="1.6"/>
+    <rect x="9" y="-34" width="6" height="68" rx="1.5" fill="#2d323e" stroke="#14171f" stroke-width="1.6"/>
+
+    <!-- Heavy iron-banded carriage wheels (4 corners) -->
+    <g stroke="#14171f" stroke-width="2" stroke-linejoin="round">
+      <rect x="-29" y="-40" width="23" height="11" rx="3" fill="url(#sg-wheel)"/>
+      <rect x="1" y="-40" width="23" height="11" rx="3" fill="url(#sg-wheel)"/>
+      <rect x="-29" y="29" width="23" height="11" rx="3" fill="url(#sg-wheel)"/>
+      <rect x="1" y="29" width="23" height="11" rx="3" fill="url(#sg-wheel)"/>
+    </g>
+    <!-- Iron tread bands & brass wheel lugs -->
+    <path d="M -25 -34.5 L -10 -34.5 M 5 -34.5 L 20 -34.5 M -25 34.5 L -10 34.5 M 5 34.5 L 20 34.5" stroke="#9ea8bc" stroke-width="1.8" stroke-linecap="round"/>
+    <g fill="url(#sg-brass)" stroke="#14171f" stroke-width="1">
+      <circle cx="-17.5" cy="-34.5" r="2.2"/>
+      <circle cx="12.5" cy="-34.5" r="2.2"/>
+      <circle cx="-17.5" cy="34.5" r="2.2"/>
+      <circle cx="12.5" cy="34.5" r="2.2"/>
+    </g>
+
+    <!-- Front forged iron ram-plate bumper -->
+    <path d="M 18 -23 L 28 -17 L 28 17 L 18 23 Z" fill="url(#sg-iron)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 27 -13 L 32 -11 L 27 -8 Z M 27 13 L 32 11 L 27 8 Z" fill="url(#sg-brass)" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+
+    <!-- Reinforced crimson & brass armored siege hull -->
+    <path d="M -34 -20 L -26 -28 L 19 -28 L 25 -20 L 25 20 L 19 28 L -26 28 L -34 20 Z" fill="url(#sg-hull)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- Recessed inner armored deck & brass trim border -->
+    <path d="M -29 -17 L -23 -23 L 16 -23 L 20 -17 L 20 17 L 16 23 L -23 23 L -29 17 Z" fill="none" stroke="url(#sg-brass)" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M -26 -10 L 17 -10 M -26 10 L 17 10" stroke="#470d14" stroke-width="1.6" stroke-linecap="round"/>
+    <!-- Brass armor rivets -->
+    <g fill="#ffe285" stroke="#14171f" stroke-width="0.9">
+      <circle cx="-24" cy="-22" r="1.8"/>
+      <circle cx="15" cy="-22" r="1.8"/>
+      <circle cx="-24" cy="22" r="1.8"/>
+      <circle cx="15" cy="22" r="1.8"/>
+      <circle cx="-5" cy="-23" r="1.6"/>
+      <circle cx="-5" cy="23" r="1.6"/>
+    </g>
+
+    <!-- Compact armored crimson crew gunner braced behind breech (-X) -->
+    <g>
+      <ellipse cx="-26" cy="0" rx="6.5" ry="12" fill="url(#sg-hull)" stroke="#14171f" stroke-width="1.8"/>
+      <circle cx="-23" cy="0" r="8.5" fill="url(#sg-hull)" stroke="#14171f" stroke-width="2"/>
+      <path d="M -30 0 L -15 0" stroke="#14171f" stroke-width="5.2" stroke-linecap="round"/>
+      <path d="M -30 0 L -15 0" stroke="url(#sg-brass)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M -27 -5 Q -23 -8 -18 -5" fill="none" stroke="#ff968a" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>
+    </g>
+
+    <!-- Heavy iron swivel mount beneath cannon -->
+    <circle cx="1" cy="0" r="14.5" fill="url(#sg-iron)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="1" cy="0" r="10.5" fill="none" stroke="url(#sg-brass)" stroke-width="2"/>
+
+    <!-- MENACING THICK FORGED IRON CANNON BARREL (+X) -->
+    <path d="M -13 -11 L 34 -9 L 37 -13 L 45 -13 L 45 13 L 37 13 L 34 9 L -13 11 Z" fill="url(#sg-iron)" stroke="#14171f" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- Metallic top-left specular highlight along barrel length -->
+    <path d="M -9 -6.5 L 33 -5.5" stroke="#d5deed" stroke-width="2.6" stroke-linecap="round" opacity="0.75"/>
+    <path d="M -9 6.5 L 33 5.5" stroke="#171a22" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <!-- Heavy brass & iron reinforcing barrel bands -->
+    <rect x="6" y="-11" width="5.5" height="22" rx="1.5" fill="url(#sg-brass)" stroke="#14171f" stroke-width="1.7"/>
+    <rect x="23" y="-10.5" width="5" height="21" rx="1.5" fill="url(#sg-brass)" stroke="#14171f" stroke-width="1.7"/>
+    <rect x="37" y="-13" width="4" height="26" rx="1.2" fill="url(#sg-brass)" stroke="#14171f" stroke-width="1.5"/>
+
+    <!-- Glowing molten-gold muzzle core (+X tip) -->
+    <ellipse cx="44" cy="0" rx="2.6" ry="8.5" fill="#180e0a" stroke="#14171f" stroke-width="1.2"/>
+    <circle cx="43.5" cy="0" r="6" fill="url(#sg-molten)" opacity="0.85"/>
+    <ellipse cx="44.2" cy="0" rx="1.6" ry="4.5" fill="#ffdf70"/>
+
+    <!-- Glowing molten-gold charge core in breech chamber -->
+    <circle cx="-7" cy="0" r="8.5" fill="url(#sg-iron)" stroke="#14171f" stroke-width="2"/>
+    <circle cx="-7" cy="0" r="7" fill="url(#sg-molten)"/>
+    <circle cx="-7" cy="0" r="4.2" fill="#ffe680" stroke="#994d0c" stroke-width="1.3"/>
+    <circle cx="-7.8" cy="-0.8" r="1.6" fill="#ffffff"/>
   </g>
 </svg>

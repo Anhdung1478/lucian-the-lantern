@@ -1,34 +1,142 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="104" height="104" viewBox="0 0 104 104">
-  <!-- Broodmother: a heavy bone-white spider seen from above, a swollen abdomen studded with glowing egg-sacs behind, eight thick jointed legs, a ridged carapace, red-tipped fangs and a cluster of green eyes forward (+X). -->
+  <!-- Broodmother (top-down, facing +X): sinister bulbous chitinous arachnid matriarch with layered dark bone-and-obsidian carapace, glowing translucent venomous emerald egg-sacs clustered organically on her abdomen, 8 sharp articulated legs, crimson mandibles & menacing multi-eye cluster. -->
+  <defs>
+    <linearGradient id="bmObsidian" x1="0.15" y1="0.1" x2="0.85" y2="0.95">
+      <stop offset="0" stop-color="#4e5263"/>
+      <stop offset="0.45" stop-color="#262836"/>
+      <stop offset="1" stop-color="#11121a"/>
+    </linearGradient>
+    <linearGradient id="bmBone" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
+      <stop offset="0" stop-color="#ebe4d1"/>
+      <stop offset="0.55" stop-color="#b5ab94"/>
+      <stop offset="1" stop-color="#5e5749"/>
+    </linearGradient>
+    <linearGradient id="bmLeg" x1="0.1" y1="0.1" x2="0.9" y2="0.9">
+      <stop offset="0" stop-color="#d6ceb8"/>
+      <stop offset="0.5" stop-color="#6b685e"/>
+      <stop offset="1" stop-color="#22232e"/>
+    </linearGradient>
+    <radialGradient id="bmEggSac" cx="0.35" cy="0.32" r="0.68">
+      <stop offset="0" stop-color="#ebffbf"/>
+      <stop offset="0.45" stop-color="#7ef279"/>
+      <stop offset="0.8" stop-color="#259c54"/>
+      <stop offset="1" stop-color="#10422b"/>
+    </radialGradient>
+    <radialGradient id="bmVenomAura" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#70ff8d" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#166e3a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bmFang" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0" stop-color="#471a20"/>
+      <stop offset="0.45" stop-color="#b81d2c"/>
+      <stop offset="1" stop-color="#ff4d5a"/>
+    </linearGradient>
+  </defs>
+
   <g transform="translate(52 52)">
-    <!-- legs -->
-    <path d="M 10 -12 L 26 -28 L 42 -36 M 4 -14 L 12 -36 L 12 -46 M -4 -14 L -20 -34 L -30 -42 M -10 -10 L -32 -18 L -46 -16 M 10 12 L 26 28 L 42 36 M 4 14 L 12 36 L 12 46 M -4 14 L -20 34 L -30 42 M -10 10 L -32 18 L -46 16" fill="none" stroke="#1a1d24" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 10 -12 L 26 -28 L 42 -36 M 4 -14 L 12 -36 L 12 -46 M -4 -14 L -20 -34 L -30 -42 M -10 -10 L -32 -18 L -46 -16 M 10 12 L 26 28 L 42 36 M 4 14 L 12 36 L 12 46 M -4 14 L -20 34 L -30 42 M -10 10 L -32 18 L -46 16" fill="none" stroke="#d6cfb8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-    <g fill="#8a826a" stroke="#1a1d24" stroke-width="2"><circle cx="26" cy="-28" r="3.4"/><circle cx="26" cy="28" r="3.4"/><circle cx="-20" cy="-34" r="3.4"/><circle cx="-20" cy="34" r="3.4"/></g>
-    <!-- abdomen -->
-    <ellipse cx="-21" cy="0" rx="28" ry="24" fill="#e8e2cf" stroke="#1a1d24" stroke-width="3.5"/>
-    <ellipse cx="-24" cy="-8" rx="16" ry="7" fill="#fbf7ea" opacity="0.8"/>
-    <path d="M -44 0 L -10 0 M -42 -10 Q -26 -4 -12 -10 M -42 10 Q -26 4 -12 10" fill="none" stroke="#a89f84" stroke-width="2.4" stroke-linecap="round"/>
-    <!-- egg-sacs -->
-    <g stroke="#1a1d24" stroke-width="2">
-      <circle cx="-36" cy="-9" r="6.5" fill="#b9e7a0"/><circle cx="-36" cy="9" r="6.5" fill="#b9e7a0"/>
-      <circle cx="-27" cy="0" r="7.5" fill="#d9f2b8"/><circle cx="-17" cy="-11" r="5.5" fill="#b9e7a0"/><circle cx="-17" cy="11" r="5.5" fill="#b9e7a0"/>
+    <!-- 8 Sharp Articulated Chitinous Arachnid Legs (4 pairs, tapered barbed segments) -->
+    <!-- Left 4 legs (-Y) -->
+    <g stroke="#14171f" stroke-width="1.6" stroke-linejoin="round">
+      <!-- Leg L1 (front-left) -->
+      <polygon points="14,-11 27,-29 31,-26 18,-8" fill="url(#bmLeg)"/>
+      <polygon points="27,-29 45,-38 30,-25" fill="url(#bmObsidian)"/>
+      <!-- Leg L2 (mid-front-left) -->
+      <polygon points="6,-13 13,-35 18,-33 10,-11" fill="url(#bmLeg)"/>
+      <polygon points="13,-35 19,-49 18,-32" fill="url(#bmObsidian)"/>
+      <!-- Leg L3 (mid-rear-left) -->
+      <polygon points="-2,-13 -16,-35 -11,-37 2,-12" fill="url(#bmLeg)"/>
+      <polygon points="-16,-35 -31,-45 -11,-36" fill="url(#bmObsidian)"/>
+      <!-- Leg L4 (rear-left) -->
+      <polygon points="-10,-10 -31,-23 -28,-27 -6,-13" fill="url(#bmLeg)"/>
+      <polygon points="-31,-23 -47,-20 -28,-26" fill="url(#bmObsidian)"/>
+
+      <!-- Right 4 legs (+Y) -->
+      <!-- Leg R1 (front-right) -->
+      <polygon points="14,11 27,29 31,26 18,8" fill="url(#bmLeg)"/>
+      <polygon points="27,29 45,38 30,25" fill="url(#bmObsidian)"/>
+      <!-- Leg R2 (mid-front-right) -->
+      <polygon points="6,13 13,35 18,33 10,11" fill="url(#bmLeg)"/>
+      <polygon points="13,35 19,49 18,32" fill="url(#bmObsidian)"/>
+      <!-- Leg R3 (mid-rear-right) -->
+      <polygon points="-2,13 -16,35 -11,37 2,12" fill="url(#bmLeg)"/>
+      <polygon points="-16,35 -31,45 -11,36" fill="url(#bmObsidian)"/>
+      <!-- Leg R4 (rear-right) -->
+      <polygon points="-10,10 -31,23 -28,27 -6,13" fill="url(#bmLeg)"/>
+      <polygon points="-31,23 -47,20 -28,26" fill="url(#bmObsidian)"/>
     </g>
-    <g fill="#7b2f9a"><circle cx="-36" cy="-9" r="2.6"/><circle cx="-36" cy="9" r="2.6"/><circle cx="-27" cy="0" r="3"/><circle cx="-17" cy="-11" r="2.2"/><circle cx="-17" cy="11" r="2.2"/></g>
-    <!-- carapace -->
-    <ellipse cx="14" cy="0" rx="20" ry="17" fill="#f4efdf" stroke="#1a1d24" stroke-width="3.5"/>
-    <ellipse cx="10" cy="-6" rx="9" ry="4" fill="#ffffff" opacity="0.7"/>
-    <path d="M 2 -10 L 14 0 L 2 10 M 6 0 L 22 0" fill="none" stroke="#a89f84" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- fangs -->
-    <path d="M 30 -7 L 41 -5 M 30 7 L 41 5" fill="none" stroke="#1a1d24" stroke-width="7" stroke-linecap="round"/>
-    <path d="M 30 -7 L 41 -5 M 30 7 L 41 5" fill="none" stroke="#e8e2cf" stroke-width="3.4" stroke-linecap="round"/>
-    <path d="M 38 -5 L 41 -5 M 38 5 L 41 5" fill="none" stroke="#d94a3a" stroke-width="3.4" stroke-linecap="round"/>
-    <!-- eyes -->
-    <circle cx="28" cy="-9" r="3.4" fill="#8dff6a" stroke="#1a1d24" stroke-width="1.6"/>
-    <circle cx="28" cy="9" r="3.4" fill="#8dff6a" stroke="#1a1d24" stroke-width="1.6"/>
-    <circle cx="23" cy="-5" r="2.6" fill="#8dff6a" stroke="#1a1d24" stroke-width="1.4"/>
-    <circle cx="23" cy="5" r="2.6" fill="#8dff6a" stroke="#1a1d24" stroke-width="1.4"/>
-    <circle cx="19" cy="-10" r="2.2" fill="#8dff6a" stroke="#1a1d24" stroke-width="1.2"/>
-    <circle cx="19" cy="10" r="2.2" fill="#8dff6a" stroke="#1a1d24" stroke-width="1.2"/>
+    <!-- Sharp obsidian knee joint barbs & bone rim highlights -->
+    <g fill="#2b2e3d" stroke="#14171f" stroke-width="1.3">
+      <circle cx="28" cy="-27" r="3"/><circle cx="15" cy="-34" r="3"/><circle cx="-14" cy="-35" r="3"/><circle cx="-29" cy="-24" r="2.8"/>
+      <circle cx="28" cy="27" r="3"/><circle cx="15" cy="34" r="3"/><circle cx="-14" cy="35" r="3"/><circle cx="-29" cy="24" r="2.8"/>
+    </g>
+
+    <!-- Bulbous Layered Dark Bone-and-Obsidian Abdomen (-X) -->
+    <path d="M -47 0 C -47 -16, -34 -26, -16 -24 C -5 -22, 1 -13, 1 0 C 1 13, -5 22, -16 24 C -34 26, -47 16, -47 0 Z" fill="url(#bmObsidian)" stroke="#14171f" stroke-width="2"/>
+    <!-- Overlapping bone-chitin armor bands wrapping abdomen -->
+    <path d="M -44 -8 C -36 -21, -20 -24, -7 -19 C -14 -14, -18 -7, -18 0 C -18 7, -14 14, -7 19 C -20 24, -36 21, -44 8 C -41 3, -41 -3, -44 -8 Z" fill="url(#bmBone)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+    <!-- Central obsidian dorsal spine & top-left specular ridge -->
+    <path d="M -43 0 L -5 0" stroke="#1e202b" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M -38 -15 C -29 -20, -18 -21, -10 -17" fill="none" stroke="#fcf7e8" stroke-width="1.6" stroke-linecap="round" opacity="0.75"/>
+
+    <!-- Organic Cluster of Glowing Translucent Venomous Emerald Egg-Sacs -->
+    <ellipse cx="-25" cy="0" rx="20" ry="18" fill="url(#bmVenomAura)"/>
+    <g stroke="#14171f" stroke-width="1.4">
+      <!-- Larger central-rear & side sacs nestled organically -->
+      <ellipse cx="-35" cy="-9" rx="6.8" ry="5.6" transform="rotate(-18 -35 -9)" fill="url(#bmEggSac)"/>
+      <ellipse cx="-34" cy="9.5" rx="6.6" ry="5.4" transform="rotate(20 -34 9.5)" fill="url(#bmEggSac)"/>
+      <ellipse cx="-24" cy="-12" rx="5.5" ry="4.6" transform="rotate(10 -24 -12)" fill="url(#bmEggSac)"/>
+      <ellipse cx="-23" cy="12" rx="5.5" ry="4.6" transform="rotate(-12 -23 12)" fill="url(#bmEggSac)"/>
+      <ellipse cx="-26" cy="0" rx="7.8" ry="6.6" fill="url(#bmEggSac)"/>
+      <ellipse cx="-14" cy="-6.5" rx="5" ry="4.2" transform="rotate(-15 -14 -6.5)" fill="url(#bmEggSac)"/>
+      <ellipse cx="-14" cy="6.5" rx="5" ry="4.2" transform="rotate(15 -14 6.5)" fill="url(#bmEggSac)"/>
+    </g>
+    <!-- Dark shadowy arachnid embryos visible dimly inside translucent egg-sacs + glassy specular crescents -->
+    <g fill="#194a30" opacity="0.65">
+      <circle cx="-34.5" cy="-8.5" r="2.2"/><circle cx="-33.5" cy="10" r="2.1"/><circle cx="-25.5" cy="0.5" r="2.8"/>
+      <circle cx="-23.5" cy="-11.5" r="1.8"/><circle cx="-22.5" cy="12.5" r="1.8"/><circle cx="-13.5" cy="-6" r="1.6"/><circle cx="-13.5" cy="7" r="1.6"/>
+    </g>
+    <g fill="#f4ffe8" opacity="0.88">
+      <ellipse cx="-37" cy="-11" rx="2.1" ry="1.1" transform="rotate(-25 -37 -11)"/>
+      <ellipse cx="-36" cy="7.5" rx="2" ry="1.1" transform="rotate(-15 -36 7.5)"/>
+      <ellipse cx="-28.5" cy="-2.5" rx="2.6" ry="1.3" transform="rotate(-20 -28.5 -2.5)"/>
+      <ellipse cx="-25.5" cy="-13.5" rx="1.7" ry="0.9"/>
+      <ellipse cx="-15.5" cy="-8" rx="1.5" ry="0.8"/>
+    </g>
+
+    <!-- Articulated Pedipalps & Wicked Crimson Mandibles (+X) -->
+    <!-- Curved obsidian pedipalps flanking the jaws -->
+    <path d="M 24 -12 C 33 -15, 39 -12, 43 -7" fill="none" stroke="#14171f" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M 24 -12 C 33 -15, 39 -12, 43 -7" fill="none" stroke="#7d7768" stroke-width="1.9" stroke-linecap="round"/>
+    <path d="M 24 12 C 33 15, 39 12, 43 7" fill="none" stroke="#14171f" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M 24 12 C 33 15, 39 12, 43 7" fill="none" stroke="#5e594d" stroke-width="1.9" stroke-linecap="round"/>
+    <!-- Wicked curved crimson venomous mandibles -->
+    <path d="M 28 -8 C 36 -9, 43 -7, 47 -2 C 42 -3, 36 -3, 29 -4 Z" fill="url(#bmFang)" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 28 8 C 36 9, 43 7, 47 2 C 42 3, 36 3, 29 4 Z" fill="url(#bmFang)" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 33 -6.5 L 44 -3.2 M 33 6.5 L 44 3.2" stroke="#ffb3b8" stroke-width="1.1" stroke-linecap="round" opacity="0.85"/>
+
+    <!-- Ridged Dark Obsidian-and-Bone Cephalothorax Carapace -->
+    <path d="M -6 0 C -6 -13, 5 -18, 18 -15 C 27 -13, 32 -7, 32 0 C 32 7, 27 13, 18 15 C 5 18, -6 13, -6 0 Z" fill="url(#bmObsidian)" stroke="#14171f" stroke-width="2"/>
+    <!-- Sculpted raised bone crest plate on cephalothorax -->
+    <polygon points="0,0 10,-12 24,-9 28,0 24,9 10,12" fill="url(#bmBone)" stroke="#14171f" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 3 0 L 25 0 M 10 -10 L 15 0 L 10 10" fill="none" stroke="#454138" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 8 -9 L 21 -7" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.75"/>
+
+    <!-- Sinister Crimson Multi-Eye Arachnid Cluster (6 fierce glowing eyes) -->
+    <g stroke="#14171f" stroke-width="1.1">
+      <!-- Primary forward predator pair -->
+      <ellipse cx="26.5" cy="-4.5" rx="2.6" ry="2.2" transform="rotate(-15 26.5 -4.5)" fill="#ff3342"/>
+      <ellipse cx="26.5" cy="4.5" rx="2.6" ry="2.2" transform="rotate(15 26.5 4.5)" fill="#ff3342"/>
+      <!-- Secondary outer pair -->
+      <circle cx="22.5" cy="-8.5" r="2.1" fill="#e82034"/>
+      <circle cx="22.5" cy="8.5" r="2.1" fill="#e82034"/>
+      <!-- Rear upper pair -->
+      <circle cx="19" cy="-4" r="1.6" fill="#ff5e52"/>
+      <circle cx="19" cy="4" r="1.6" fill="#ff5e52"/>
+    </g>
+    <!-- Crisp glossy eye glints -->
+    <g fill="#ffe6e6">
+      <circle cx="27.2" cy="-5" r="0.9"/><circle cx="27.2" cy="4" r="0.9"/>
+      <circle cx="23" cy="-9" r="0.7"/><circle cx="23" cy="8" r="0.7"/>
+    </g>
   </g>
 </svg>

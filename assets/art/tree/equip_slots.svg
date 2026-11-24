@@ -1,20 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Equip Slots: a 3 x 2 grid of item slots, the last one opening with a gold glow -->
+  <!-- Equip Slots: clean 3x2 dark-gold framed equipment grid with one slot gleaming bright golden-white with an unlock spark -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <radialGradient id="glow"><stop offset="0" stop-color="#ffe9a8" stop-opacity="0.9"/><stop offset="0.45" stop-color="#ffcf5a" stop-opacity="0.45"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient>
-    <radialGradient id="open"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#ffe9a8"/><stop offset="1" stop-color="#c9a45c"/></radialGradient>
+    <radialGradient id="aura" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd966" stop-opacity="0.56"/>
+      <stop offset="0.62" stop-color="#9e6d1c" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#9e6d1c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="unlockGlow" cx="48" cy="41" r="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#ffe78f" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#f0a824" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="frameGold" x1="6" y1="14" x2="58" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e8c274"/>
+      <stop offset="0.5" stop-color="#a87c32"/>
+      <stop offset="1" stop-color="#5e4012"/>
+    </linearGradient>
+    <linearGradient id="slotWell" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#11191d"/>
+      <stop offset="1" stop-color="#223036"/>
+    </linearGradient>
+    <radialGradient id="litSlot" cx="48" cy="40" r="12" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.48" stop-color="#fff0a6"/>
+      <stop offset="1" stop-color="#e39c22"/>
+    </radialGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="51" cy="41" r="21" fill="url(#glow)"/>
-  <g fill="#10171a" stroke="#7d8f86" stroke-width="2">
-    <rect x="5" y="14" width="16" height="16" rx="3"/>
-    <rect x="24" y="14" width="16" height="16" rx="3"/>
-    <rect x="43" y="14" width="16" height="16" rx="3"/>
-    <rect x="5" y="33" width="16" height="16" rx="3"/>
-    <rect x="24" y="33" width="16" height="16" rx="3"/>
+  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
+  <!-- outer bevelled dark-gold equipment tray backing -->
+  <rect x="4" y="13" width="56" height="38" rx="5" fill="url(#frameGold)" stroke="#1a1d24" stroke-width="2.5"/>
+  <rect x="6.5" y="15.5" width="51" height="33" rx="3.2" fill="#182226" stroke="#3b2b10" stroke-width="1"/>
+  <!-- 5 dark-gold recessed equipment slots -->
+  <g fill="url(#slotWell)" stroke="#a88442" stroke-width="1.6">
+    <rect x="9" y="18" width="13.5" height="12.5" rx="2.2"/>
+    <rect x="25.25" y="18" width="13.5" height="12.5" rx="2.2"/>
+    <rect x="41.5" y="18" width="13.5" height="12.5" rx="2.2"/>
+    <rect x="9" y="33.5" width="13.5" height="12.5" rx="2.2"/>
+    <rect x="25.25" y="33.5" width="13.5" height="12.5" rx="2.2"/>
   </g>
-  <path d="M 8 27 L 8 18 Q 8 17 9 17 L 18 17 M 27 27 L 27 18 Q 27 17 28 17 L 37 17 M 46 27 L 46 18 Q 46 17 47 17 L 56 17 M 8 46 L 8 37 Q 8 36 9 36 L 18 36 M 27 46 L 27 37 Q 27 36 28 36 L 37 36" fill="none" stroke="#2c3a38" stroke-width="1.5"/>
-  <rect x="43" y="33" width="16" height="16" rx="3" fill="url(#open)" stroke="#c9a45c" stroke-width="2.5"/>
-  <path d="M 41 31 L 38.5 28.5 M 61 31 L 63.5 28.5 M 41 51 L 38.5 53.5 M 61 51 L 63.5 53.5" stroke="#ffe9a8" stroke-width="2" stroke-linecap="round"/>
+  <!-- subtle inner top-left slot shadow bevels -->
+  <path d="M 11 28.5 L 11 20 L 20.5 20 M 27.25 28.5 L 27.25 20 L 36.75 20 M 43.5 28.5 L 43.5 20 L 53 20 M 11 44 L 11 35.5 L 20.5 35.5 M 27.25 44 L 27.25 35.5 L 36.75 35.5" fill="none" stroke="#0b1012" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- gleaming unlocked 6th slot (bottom-right) -->
+  <circle cx="48.2" cy="39.8" r="18" fill="url(#unlockGlow)"/>
+  <rect x="41" y="33" width="14.5" height="13.5" rx="2.4" fill="url(#litSlot)" stroke="#1a1d24" stroke-width="2.2"/>
+  <rect x="42.4" y="34.4" width="11.7" height="10.7" rx="1.6" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.9"/>
+  <!-- bright unlock 4-point spark -->
+  <path d="M 48.25 32.5 L 49.8 38.2 L 55.5 39.75 L 49.8 41.3 L 48.25 47 L 46.7 41.3 L 41 39.75 L 46.7 38.2 Z" fill="#ffffff"/>
+  <!-- corner frame specular & outer sparkle -->
+  <path d="M 8 15 L 32 15" stroke="#fff4cc" stroke-width="1.3" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 55 28 L 56 30.6 L 58.6 31.6 L 56 32.6 L 55 35.2 L 54 32.6 L 51.4 31.6 L 54 30.6 Z" fill="#fff8d6"/>
 </svg>

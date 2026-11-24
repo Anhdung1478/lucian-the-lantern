@@ -1,30 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Boots: a pair of brown leather boots in a gold glow, the plain Boots of Speed in front and the Slightly Magical pair behind with a teal sparkle -->
+  <!-- Boots: crisp golden-trimmed Sentinel leather greave/boot with magical teal-gold sheen & speed sparkle -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <radialGradient id="glow"><stop offset="0" stop-color="#ffe9a8" stop-opacity="0.7"/><stop offset="0.45" stop-color="#ffcf5a" stop-opacity="0.3"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient>
-    <linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c08850"/><stop offset="1" stop-color="#6a3e1c"/></linearGradient>
-    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8e6038"/><stop offset="1" stop-color="#4a2a12"/></linearGradient>
+    <radialGradient id="aura" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe58f" stop-opacity="0.54"/>
+      <stop offset="0.55" stop-color="#38bfb8" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#38bfb8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="leather" x1="14" y1="12" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d49a5d"/>
+      <stop offset="0.5" stop-color="#9e5f2a"/>
+      <stop offset="1" stop-color="#573012"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="14" y1="8" x2="48" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff4bf"/>
+      <stop offset="0.48" stop-color="#e3ab38"/>
+      <stop offset="1" stop-color="#875210"/>
+    </linearGradient>
+    <linearGradient id="sole" x1="12" y1="48" x2="40" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6e4b35"/>
+      <stop offset="0.5" stop-color="#422918"/>
+      <stop offset="1" stop-color="#24150c"/>
+    </linearGradient>
+    <linearGradient id="tealGlow" x1="8" y1="32" x2="36" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#75fff4"/>
+      <stop offset="1" stop-color="#24a8b8"/>
+    </linearGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="32" r="29" fill="url(#glow)"/>
-  <g transform="translate(8.3 1.3) scale(0.78)" stroke-linejoin="round">
-    <path d="M 15 45 L 56 45 C 61 45 61.5 52 56.5 52 L 30 52 L 29 56 L 16 56 Z" fill="#3a2414" stroke="#1a1d24" stroke-width="2.6"/>
-    <path d="M 19 10 L 38 10 L 38.5 29 C 44 32 51 33 55.5 36.5 C 59.5 39.5 59.5 45 56 46 L 16.5 46 C 16 36 17.5 22 19 10 Z" fill="url(#shade)" stroke="#1a1d24" stroke-width="2.6"/>
-    <path d="M 46.5 32.5 C 49.5 37 49.5 42 47 46" fill="none" stroke="#4a2a12" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M 34.5 16 L 39 17.5 M 34.5 20.5 L 39 22 M 34.5 25 L 39 26.5" stroke="#5ff0e0" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M 17.5 6 L 39.5 6 L 40 13 L 17 13 Z" fill="#a87442" stroke="#1a1d24" stroke-width="2.6"/>
-    <path d="M 19 10.4 L 38.5 10.4" stroke="#5ff0e0" stroke-width="1.4" stroke-dasharray="2 1.6"/>
+  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
+  <!-- subtle speed trails behind heel -->
+  <path d="M 3 34 L 10 34 M 5 41 L 10 41 M 6 27 L 11 27" stroke="#9cfaf2" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  <g transform="translate(-2 1)">
+    <!-- boot upper -->
+    <path d="M 16 11 C 22 9.5 29 10 35.5 12.8 L 38 13.5 C 38.5 20.5 39 26.5 41 31 C 45.8 33.5 51.5 35 56 38 C 60 40.5 61.5 45 60.5 50 L 13 50 C 11 46 11.5 40.5 14 36.5 C 16 32.5 16.5 21.5 16 11 Z" fill="url(#leather)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- golden Sentinel shin-plate & toe-cap trim -->
+    <path d="M 31 14 L 38 14 C 38.5 21 39 27 41 31 L 34 32 C 32 27 31.2 21 31 14 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+    <path d="M 46.5 34 C 50.5 35.5 54 37 56.5 38.5 C 59.8 40.8 61.2 45 60.5 50 L 49 50 C 50.2 44.5 49.4 38.5 46.5 34 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+    <!-- heel seam & magical teal lacing glints -->
+    <path d="M 12.5 39.5 C 19 38.6 23.5 42.5 25.5 50" fill="none" stroke="#4f2b10" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 34 19 L 38.8 18.2 M 34.6 24 L 39.4 23.4 M 35.6 28.8 L 40.6 28.8" stroke="#6ef7ee" stroke-width="2.1" stroke-linecap="round"/>
+    <!-- ornate golden cuffed collar with teal winglet -->
+    <path d="M 14.5 9.5 C 21.5 8 29.5 9 37 12 L 36 17.5 C 28.5 15 21.5 14.2 14.5 15.5 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M 16.5 12 C 22 11 28 11.5 34 13.5" fill="none" stroke="#fff9db" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- swept winglet accent on side of ankle -->
+    <path d="M 16 25 C 11.5 22.5 9 18 8.5 14 C 13 15.5 17 17.5 21.5 21.5 C 19.5 23.5 18 24.5 16 25 Z" fill="url(#tealGlow)" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <!-- specular leather & metal highlights -->
+    <path d="M 18.8 18.5 C 19.2 26 18.6 32.5 17 37" fill="none" stroke="#f6d3a6" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 49.5 37.2 C 53 38.5 55.8 40 57.5 42.5" fill="none" stroke="#fff9db" stroke-width="1.6" stroke-linecap="round"/>
+    <!-- sole & stacked heel -->
+    <path d="M 11 49 L 57.5 49 C 61 49 62.2 52 61.6 54.2 C 61 56.2 59 57.2 56.5 57.2 L 34.5 57.2 C 32.5 57.2 31.8 54.4 29.8 54.4 L 27.8 54.4 L 27.4 57.2 L 13 57.2 C 11.6 57.2 11 56.4 11 55 Z" fill="url(#sole)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 13 51.4 L 58 51.4" stroke="#b58d66" stroke-width="1.1" stroke-linecap="round" stroke-dasharray="1.8 1.5"/>
   </g>
-  <g transform="translate(-3.7 11.3) scale(0.78)" stroke-linejoin="round">
-    <path d="M 15 45 L 56 45 C 61 45 61.5 52 56.5 52 L 30 52 L 29 56 L 16 56 Z" fill="#3a2414" stroke="#1a1d24" stroke-width="2.6"/>
-    <path d="M 19 10 L 38 10 L 38.5 29 C 44 32 51 33 55.5 36.5 C 59.5 39.5 59.5 45 56 46 L 16.5 46 C 16 36 17.5 22 19 10 Z" fill="url(#leather)" stroke="#1a1d24" stroke-width="2.6"/>
-    <path d="M 46.5 32.5 C 49.5 37 49.5 42 47 46 M 17 36 C 21 36 24 39 25 46" fill="none" stroke="#4a2a12" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M 34.5 16 L 39 17.5 M 34.5 20.5 L 39 22 M 34.5 25 L 39 26.5" stroke="#f2e6c8" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M 21.5 16 C 20.8 25 20.3 33 20.3 41 M 40 31.5 C 45 33.5 50 34.5 54 37" fill="none" stroke="#ecc28c" stroke-width="1.7" stroke-linecap="round"/>
-    <path d="M 17.5 6 L 39.5 6 L 40 13 L 17 13 Z" fill="#c8915a" stroke="#1a1d24" stroke-width="2.6"/>
-    <path d="M 19 8.4 L 38 8.4" stroke="#f2d6a8" stroke-width="1.6" stroke-linecap="round"/>
-  </g>
-  <path d="M 56 6 L 57.2 9.8 L 61 11 L 57.2 12.2 L 56 16 L 54.8 12.2 L 51 11 L 54.8 9.8 Z" fill="#e8fffb" stroke="#1a7a80" stroke-width="0.6" stroke-linejoin="round"/>
-  <circle cx="50" cy="20" r="1.1" fill="#8ff4ea"/>
+  <!-- magical speed sparkle -->
+  <path d="M 52 10 L 53.3 13.7 L 57 15 L 53.3 16.3 L 52 20 L 50.7 16.3 L 47 15 L 50.7 13.7 Z" fill="#e6fffb"/>
+  <circle cx="46" cy="23" r="1.4" fill="#ffe98f"/>
 </svg>

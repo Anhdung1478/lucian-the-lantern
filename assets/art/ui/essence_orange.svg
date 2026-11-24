@@ -1,17 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- Orange essence: two crossed crystal shards with an ember core where they meet -->
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Orange Essence V2.2: Radiant Solar Ember Sunstone with twin curved flame-crystal spurs -->
   <defs>
-    <radialGradient id="glow"><stop offset="0" stop-color="#ffa040" stop-opacity="0.55"/><stop offset="1" stop-color="#ffa040" stop-opacity="0"/></radialGradient>
-    <radialGradient id="ember"><stop offset="0" stop-color="#ffffff"/><stop offset="0.3" stop-color="#fff0b0"/><stop offset="0.65" stop-color="#ff7a1a" stop-opacity="0.8"/><stop offset="1" stop-color="#ff5a10" stop-opacity="0"/></radialGradient>
-    <linearGradient id="shard" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd6a3"/><stop offset="0.45" stop-color="#ffa040"/><stop offset="1" stop-color="#b8561a"/></linearGradient>
-    <g id="shard_shape">
-      <path d="M 32 3 L 40 15 L 38 49 L 32 61 L 26 49 L 24 15 Z" fill="url(#shard)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-      <path d="M 32 9 L 28 17 L 29 47 L 32 54 Z" fill="#ffe8c8" opacity="0.8"/>
-    </g>
+    <radialGradient id="aura" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffb84d" stop-opacity="0.66"/>
+      <stop offset="0.52" stop-color="#e86214" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#8a2800" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sunGrad" x1="16" y1="8" x2="48" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff4c8"/>
+      <stop offset="0.32" stop-color="#ffb43b"/>
+      <stop offset="0.72" stop-color="#e35a12"/>
+      <stop offset="1" stop-color="#7a2006"/>
+    </linearGradient>
+    <linearGradient id="spurGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe49e"/>
+      <stop offset="0.55" stop-color="#ff8c24"/>
+      <stop offset="1" stop-color="#a83308"/>
+    </linearGradient>
+    <radialGradient id="emberCore" cx="32" cy="32" r="15" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.35" stop-color="#fff0a8" stop-opacity="0.92"/>
+      <stop offset="0.72" stop-color="#ff821c" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#d44208" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <circle cx="32" cy="32" r="28" fill="url(#glow)"/>
-  <use href="#shard_shape" transform="rotate(-28 32 32)"/>
-  <use href="#shard_shape" transform="rotate(28 32 32)"/>
-  <circle cx="32" cy="32" r="12" fill="url(#ember)"/>
-  <circle cx="32" cy="32" r="3.5" fill="#fffbe8"/>
+  <circle cx="32" cy="32" r="29" fill="url(#aura)"/>
+  <!-- flanking curved flame-crystal spurs (distinct wide silhouette) -->
+  <path d="M 19 46 C 9 39 7 25 14 14 C 15 22 18 27 23 30 L 22 44 Z" fill="url(#spurGrad)" stroke="#261108" stroke-width="2.1" stroke-linejoin="round"/>
+  <path d="M 14 14 C 12 24 14 33 20 38" fill="none" stroke="#fff0bf" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 45 46 C 55 39 57 25 50 14 C 49 22 46 27 41 30 L 42 44 Z" fill="url(#spurGrad)" stroke="#261108" stroke-width="2.1" stroke-linejoin="round"/>
+  <path d="M 50 14 C 52 24 50 33 44 38" fill="none" stroke="#ffd27a" stroke-width="1.4" stroke-linecap="round" opacity="0.65"/>
+  <!-- central faceted solar sunstone -->
+  <polygon points="32,5 46,20 44,44 32,59 20,44 18,20" fill="url(#sunGrad)" stroke="#261108" stroke-width="2.2" stroke-linejoin="round"/>
+  <!-- upper-left lit bevels -->
+  <polygon points="32,5 18,20 32,26" fill="#fff7d6" opacity="0.9"/>
+  <polygon points="18,20 20,44 26,38 32,26" fill="#ffd27a" opacity="0.58"/>
+  <!-- lower-right shaded bevels -->
+  <polygon points="32,5 46,20 32,26" fill="#ffc45c" opacity="0.55"/>
+  <polygon points="46,20 44,44 38,38 32,26" fill="#b83b0a" opacity="0.68"/>
+  <polygon points="32,59 44,44 38,38 32,46 26,38 20,44" fill="#6b1a04" opacity="0.78"/>
+  <!-- blazing molten heart -->
+  <circle cx="32" cy="32" r="14" fill="url(#emberCore)"/>
+  <polygon points="32,19 39,32 32,45 25,32" fill="#fff6cf" opacity="0.88"/>
+  <polygon points="32,23 36,32 32,41 28,32" fill="#ffffff" opacity="0.95"/>
+  <!-- internal facet lines -->
+  <path d="M 32 6 L 32 19 M 32 45 L 32 58 M 18 20 L 25 32 L 20 44 M 46 20 L 39 32 L 44 44" fill="none" stroke="#ffe5a3" stroke-width="1.1" opacity="0.65"/>
+  <!-- outer ink crispness -->
+  <polygon points="32,5 46,20 44,44 32,59 20,44 18,20" fill="none" stroke="#240f06" stroke-width="2.2" stroke-linejoin="round"/>
+  <!-- ember sparks -->
+  <circle cx="23" cy="9" r="1.7" fill="#fff2bf"/>
+  <circle cx="43" cy="10" r="1.4" fill="#ffbe55"/>
 </svg>

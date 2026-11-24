@@ -1,31 +1,115 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="92" height="92" viewBox="0 0 92 92">
-  <!-- Spectral Rider: a ghost knight on a pale spectral horse seen from above, the horse stretched along +X with a streaming mane and a tail of mist, the armoured rider crouched low with a long glowing lance levelled forward. -->
+  <!-- Spectral Rider (top-down, facing +X): ghostly mounted Shadow Isles lancer on an unmistakable spectral warhorse streaming cyan-blue mist tail (-X), dark-silver armored rider leaning forward, long glowing spectral lance aimed sharply ahead (+X). -->
+  <defs>
+    <linearGradient id="srMistTail" x1="1" y1="0.5" x2="0" y2="0.5">
+      <stop offset="0" stop-color="#8ee6ff" stop-opacity="0.9"/>
+      <stop offset="0.55" stop-color="#3c8eb8" stop-opacity="0.48"/>
+      <stop offset="1" stop-color="#193d5c" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="srHorse" x1="0.2" y1="0.1" x2="0.8" y2="0.95">
+      <stop offset="0" stop-color="#b8e4f7"/>
+      <stop offset="0.5" stop-color="#5d96ba"/>
+      <stop offset="1" stop-color="#22425e"/>
+    </linearGradient>
+    <linearGradient id="srBarding" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
+      <stop offset="0" stop-color="#697c91"/>
+      <stop offset="0.5" stop-color="#374659"/>
+      <stop offset="1" stop-color="#17202b"/>
+    </linearGradient>
+    <linearGradient id="srArmor" x1="0.1" y1="0.1" x2="0.9" y2="0.9">
+      <stop offset="0" stop-color="#8a9db3"/>
+      <stop offset="0.45" stop-color="#45576e"/>
+      <stop offset="1" stop-color="#1a2433"/>
+    </linearGradient>
+    <linearGradient id="srCloak" x1="0.9" y1="0.2" x2="0.05" y2="0.8">
+      <stop offset="0" stop-color="#223e54"/>
+      <stop offset="0.6" stop-color="#142638"/>
+      <stop offset="1" stop-color="#0b1521"/>
+    </linearGradient>
+    <linearGradient id="srLanceTip" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0" stop-color="#48c4e8"/>
+      <stop offset="0.55" stop-color="#b5f8ff"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <radialGradient id="srLanceGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#b5faff" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#36b5e8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
   <g transform="translate(46 46)">
-    <!-- tail of mist -->
-    <path d="M -24 -4 Q -36 -12 -44 -8 L -38 -4 L -45 0 L -38 4 L -44 8 Q -36 12 -24 4 Z" fill="#a8cdee" stroke="#1a1d24" stroke-width="2.6" stroke-linejoin="round" opacity="0.92"/>
-    <path d="M -28 0 L -40 0" fill="none" stroke="#e8f6ff" stroke-width="2.4" stroke-linecap="round"/>
-    <!-- legs flung out -->
-    <path d="M 8 -11 L 17 -19 L 24 -18 M 8 11 L 17 19 L 24 18 M -20 -11 L -27 -19 L -33 -18 M -20 11 L -27 19 L -33 18" fill="none" stroke="#1a1d24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M 8 -11 L 17 -19 L 24 -18 M 8 11 L 17 19 L 24 18 M -20 -11 L -27 -19 L -33 -18 M -20 11 L -27 19 L -33 18" fill="none" stroke="#c4dcf0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- horse body -->
-    <ellipse cx="-6" cy="0" rx="28" ry="15" fill="#b4d0ec" stroke="#1a1d24" stroke-width="3.5"/>
-    <ellipse cx="-8" cy="-7" rx="18" ry="4" fill="#eaf5ff" opacity="0.8"/>
-    <!-- neck, head and mane -->
-    <path d="M 14 -7 L 30 -6 L 40 -2 L 40 3 L 30 7 L 14 8 Z" fill="#d4e6f6" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M 12 -8 L 18 -13 L 21 -8 L 26 -12 L 29 -7 M 12 8 L 18 13 L 21 8 L 26 12 L 29 7" fill="none" stroke="#6fa3d6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="34" cy="-3" r="2" fill="#6dd6ff"/>
-    <circle cx="34" cy="3" r="2" fill="#6dd6ff"/>
-    <!-- lance with glowing head -->
-    <path d="M 2 0 L 44 0" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
-    <path d="M 2 0 L 44 0" fill="none" stroke="#e8f2fa" stroke-width="2.2" stroke-linecap="round"/>
-    <path d="M 38 -4 L 45 0 L 38 4 Z" fill="#8ffcff" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <!-- rider -->
-    <ellipse cx="-9" cy="0" rx="9" ry="14" fill="#4a6688" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -10 -11 Q -4 -13 2 -9" fill="none" stroke="#a6c4e6" stroke-width="2.2" stroke-linecap="round"/>
-    <path d="M -3 -9 L 4 -8 M -3 9 L 4 8" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
-    <path d="M -3 -9 L 4 -8 M -3 9 L 4 8" fill="none" stroke="#6f8cb0" stroke-width="2.4" stroke-linecap="round"/>
-    <circle cx="-4" cy="0" r="7.5" fill="#6683a6" stroke="#1a1d24" stroke-width="3"/>
-    <path d="M -4 -6 Q 0 0 -4 6" fill="none" stroke="#b6d0ee" stroke-width="2" stroke-linecap="round"/>
-    <path d="M -1 -3.5 L 3 0 L -1 3.5" fill="none" stroke="#8ffcff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Streaming pale cyan-blue mist tail behind the charging steed (-X) -->
+    <path d="M -22 -5 C -31 -13, -38 -12, -45 -6 L -37 -2 L -46 2 L -36 6 L -43 12 C -35 15, -28 11, -21 5 Z" fill="url(#srMistTail)"/>
+    <path d="M -24 -2 C -32 -5, -38 -4, -43 -1 M -24 3 C -31 6, -37 6, -41 4" fill="none" stroke="#d9f8ff" stroke-width="1.3" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Galloping spectral equine hooves (asymmetric charging stride!) -->
+    <!-- Front-left reaching forward, front-right tucked; rear-left kicking back, rear-right driving -->
+    <path d="M 10 -10 L 21 -17 L 28 -15" fill="none" stroke="#14171f" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 10 -10 L 21 -17 L 28 -15" fill="none" stroke="#9ad4ed" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 6 10 L 14 17 L 19 16" fill="none" stroke="#14171f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 6 10 L 14 17 L 19 16" fill="none" stroke="#6aa5c4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -18 -9 L -28 -16 L -35 -14" fill="none" stroke="#14171f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -18 -9 L -28 -16 L -35 -14" fill="none" stroke="#8dc8e6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -16 9 L -24 16 L -31 15" fill="none" stroke="#14171f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -16 9 L -24 16 L -31 15" fill="none" stroke="#659ebc" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Spectral Warhorse Body (elongated muscular equine silhouette along +X) -->
+    <path d="M -26 0 C -26 -10, -16 -13, -4 -12 C 6 -12, 16 -12, 22 -7 C 26 -4, 26 4, 22 7 C 16 12, 6 12, -4 12 C -16 13, -26 10, -26 0 Z" fill="url(#srHorse)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <!-- Dark-silver equine barding plates on flanks & chest -->
+    <path d="M 4 -11 C 13 -11, 20 -8, 23 -3 L 23 3 C 20 8, 13 11, 4 11 L 8 0 Z" fill="url(#srBarding)" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M -22 -7 C -15 -11, -8 -10, -4 -8 L -7 0 L -4 8 C -8 10, -15 11, -22 7 C -24 3, -24 -3, -22 -7 Z" fill="url(#srBarding)" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+    <!-- Top-left moonlight ridge on horse back -->
+    <path d="M -18 -7 C -8 -10, 8 -10, 18 -6" fill="none" stroke="#d8f4ff" stroke-width="1.5" stroke-linecap="round" opacity="0.75"/>
+
+    <!-- Arched Equine Neck, Flowing Spectral Mane & Armored Warhorse Head -->
+    <path d="M 13 -7 L 27 -6 L 37 -3.5 L 40 -1 L 40 1.5 L 37 4 L 27 6.5 L 13 7 Z" fill="url(#srHorse)" stroke="#14171f" stroke-width="1.7" stroke-linejoin="round"/>
+    <!-- Armored chamfron faceplate -->
+    <polygon points="24,-5.2 38,-2.5 39.5,0 38,2.8 24,5.2 21,0" fill="url(#srBarding)" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+    <!-- Swept-back pointed horse ears -->
+    <polygon points="24,-5 19,-10 27,-6" fill="#9cd9f2" stroke="#14171f" stroke-width="1.3" stroke-linejoin="round"/>
+    <polygon points="24,5 19,10 27,6" fill="#6aa5c4" stroke="#14171f" stroke-width="1.3" stroke-linejoin="round"/>
+    <!-- Glowing spectral equine eyes -->
+    <path d="M 31 -3.4 L 34.5 -2.4 M 31 3.4 L 34.5 2.4" stroke="#96ffff" stroke-width="1.6" stroke-linecap="round"/>
+    <!-- Flowing jagged spectral mane trailing off the left side of the neck -->
+    <path d="M 24 -5.5 L 18 -13 L 17 -7.5 L 11 -13 L 12 -6.5 L 6 -10" fill="none" stroke="#9cf2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Long Glowing Spectral Lance braced along Rider's RIGHT (+Y) side extending sharply to +X -->
+    <g>
+      <circle cx="40" cy="7.5" r="7.5" fill="url(#srLanceGlow)"/>
+      <!-- Dark iron rear butt & main shaft -->
+      <path d="M -10 13.5 L 30 8.8" stroke="#14171f" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M -10 13.5 L 30 8.8" stroke="#9bb3c9" stroke-width="2" stroke-linecap="round"/>
+      <!-- Flanged conical vamplate handguard -->
+      <polygon points="4,12 14,7.2 15,15.2" fill="url(#srArmor)" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+      <!-- Blazing tapered spectral lance blade tip (+X) -->
+      <polygon points="23,9.6 45,6.8 23.5,12.8 26,10.5" fill="url(#srLanceTip)" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M 26 9.5 L 43 7.1" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+    </g>
+
+    <!-- Dark-Silver Armored Ghostly Rider leaning forward in the saddle -->
+    <g>
+      <!-- Tattered knight cape whipping behind over horse's rump -->
+      <path d="M -8 -7 C -18 -12, -28 -10, -35 -5 L -29 -1 L -36 4 L -28 8 C -21 11, -14 10, -8 7 Z" fill="url(#srCloak)" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M -12 -5 C -20 -7, -26 -6, -31 -4" fill="none" stroke="#5aa5c4" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+
+      <!-- Left gauntlet gripping reins, right armored arm couching the lance -->
+      <path d="M 0 -9 L 11 -6 L 16 -3" fill="none" stroke="#14171f" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 0 -9 L 11 -6 L 16 -3" fill="none" stroke="#647a94" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M -1 9 L 6 12" fill="none" stroke="#14171f" stroke-width="5.4" stroke-linecap="round"/>
+      <path d="M -1 9 L 6 12" fill="none" stroke="#647a94" stroke-width="2.8" stroke-linecap="round"/>
+
+      <!-- Armored rider torso & angular spiked pauldrons -->
+      <polygon points="-12,-9 0,-13 8,-7 8,7 0,13 -12,9 -15,0" fill="url(#srArmor)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+      <polygon points="-6,-13 4,-14 6,-7 -5,-6" fill="#7a90a8" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+      <polygon points="-6,13 4,14 6,7 -5,6" fill="#4f637a" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M -4 -11 L 3 -12" stroke="#d0e4f5" stroke-width="1.4" stroke-linecap="round"/>
+
+      <!-- Pointed dark-silver knight helm with glowing cyan visor slit -->
+      <polygon points="-8,0 -4,-7 5,-6 10,0 5,6 -4,7" fill="url(#srArmor)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+      <!-- Helm crest ridge -->
+      <path d="M -7 0 L 8 0" stroke="#c8ddf0" stroke-width="1.4" stroke-linecap="round"/>
+      <!-- Angular glowing cyan visor -->
+      <path d="M 4 -4.2 L 8.5 0 L 4 4.2" fill="none" stroke="#96ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
   </g>
 </svg>

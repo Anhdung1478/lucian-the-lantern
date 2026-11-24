@@ -1,9 +1,78 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Relentless Pursuit: a fast dash with motion streaks -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#fffbe8"/><stop offset="0.5" stop-color="#ffe9a8" stop-opacity="0.8"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <path d="M 6 22 L 30 22 M 2 32 L 28 32 M 6 42 L 30 42" stroke="#9fc4ff" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
-  <path d="M 30 18 L 50 26 L 50 38 L 30 46 Q 26 32 30 18 Z" fill="#1d2230" stroke="#c9d1dc" stroke-width="2" stroke-linejoin="round"/>
-  <circle cx="44" cy="32" r="7" fill="#5a3a2a"/>
-  <circle cx="43" cy="32" r="6" fill="#171313"/>
-  <path d="M 50 26 L 60 24 M 50 38 L 60 40" stroke="#ffe9a8" stroke-width="3" stroke-linecap="round"/>
+  <!-- Relentless Pursuit (E): Dynamic sweeping cloaked Sentinel dash silhouette bursting forward diagonally with luminous teal-white afterimage ribbons & velocity streaks -->
+  <defs>
+    <radialGradient id="aura" cx="34" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#58f5ec" stop-opacity="0.5"/>
+      <stop offset="0.58" stop-color="#1ca8b8" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#0f4c66" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="afterimage1" x1="5" y1="54" x2="36" y2="26" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#189aa8" stop-opacity="0"/>
+      <stop offset="0.55" stop-color="#42e8e0" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#a8fffa" stop-opacity="0.65"/>
+    </linearGradient>
+    <linearGradient id="afterimage2" x1="12" y1="52" x2="44" y2="22" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22b8c4" stop-opacity="0.08"/>
+      <stop offset="0.6" stop-color="#5cf7ee" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#e2ffff" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="cloak" x1="22" y1="16" x2="48" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f2f7fc"/>
+      <stop offset="0.42" stop-color="#bcc8d9"/>
+      <stop offset="0.78" stop-color="#46546b"/>
+      <stop offset="1" stop-color="#1c2433"/>
+    </linearGradient>
+    <linearGradient id="lining" x1="24" y1="30" x2="46" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3a4a63"/>
+      <stop offset="1" stop-color="#171e2b"/>
+    </linearGradient>
+    <linearGradient id="streak" x1="4" y1="48" x2="34" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#42e8e0" stop-opacity="0"/>
+      <stop offset="0.65" stop-color="#8cfff7" stop-opacity="0.88"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <radialGradient id="dashflash" cx="50" cy="21" r="10" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.5" stop-color="#66fff4" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#22c4cc" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+
+  <!-- Sweeping velocity ribbons & spectral afterimage trails -->
+  <path d="M 4 49 C 14 40 24 30 35 19 L 38 24 C 27 35 18 45 9 53 Z" fill="url(#afterimage1)"/>
+  <path d="M 8 56 C 20 47 31 38 43 27 L 45 32 C 33 43 22 52 12 58 Z" fill="url(#afterimage1)"/>
+  <!-- Closer luminous echo silhouette -->
+  <path d="M 15 44 C 22 36 28 28 34 20 C 37 16 42 15 44 19 L 40 28 C 36 35 28 43 18 49 Z" fill="url(#afterimage2)"/>
+
+  <!-- Crisp diagonal speed-lines -->
+  <path d="M 6 33 L 24 19" stroke="url(#streak)" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M 4 44 L 22 30" stroke="url(#streak)" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M 14 55 L 33 41" stroke="url(#streak)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 28 57 L 47 43" stroke="url(#streak)" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Hero Sentinel Dash Silhouette (lunging diagonally upper-right) -->
+  <!-- Inner dark coat lining & forward-striding leg silhouette -->
+  <path d="M 33 34 L 46 39 L 41 53 L 36 51 L 38 42 L 26 46 L 23 41 Z" fill="url(#lining)" stroke="#1a1d24" stroke-width="2.1" stroke-linejoin="round"/>
+  <!-- Sweeping wind-whipped Sentinel long coat / hooded mantle -->
+  <path d="M 42 15 C 46 13 51 15 52 19 C 53 21.5 51 24 48.5 25 L 55 24 C 57.5 24 58.5 26 56.5 27.8 L 46 31.5 C 43 36 36 42 26 48 C 29 42 30.5 38 29 36 C 23 40 16 44 11 45 C 18 37 26 29 33 21.5 C 36 18 39 16 42 15 Z" fill="url(#cloak)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  <!-- Swept gold Sentinel shoulder pauldron & collar trim -->
+  <path d="M 37.5 21.5 C 41 19 45.5 19.5 47.5 22.5 L 43 26.5 C 39.5 25.5 37 24 37.5 21.5 Z" fill="#e5ae3e" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Dark hooded face & glowing Sentinel eye glint -->
+  <path d="M 44 16.5 C 47.5 15.8 50.2 17.5 50.6 20.4 C 48.8 22.2 46.2 22.6 44.2 21.5 Z" fill="#18202c"/>
+  <path d="M 47.4 18.8 L 50.2 18.4" stroke="#80fff6" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- Outstretched Relic Pistol gleam leading the burst -->
+  <circle cx="52.5" cy="24.5" r="8.5" fill="url(#dashflash)"/>
+  <path d="M 48 25.5 L 59 22.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M 52 21.5 L 60 18.5" stroke="#78fff6" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Crisp luminous leading-edge rim highlight on cloak & hood -->
+  <path d="M 41 16.2 C 44.5 14.5 48.5 15 50.5 17.5" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 15.5 42 C 22 35.5 29 28.5 35.5 21.5" fill="none" stroke="#e8ffff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 29.5 44 C 35 40 40.5 35 44.5 30.5" fill="none" stroke="#78fff6" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Leading burst sparkles -->
+  <path d="M 56 12 L 57 14.4 L 59.4 15.4 L 57 16.4 L 56 18.8 L 55 16.4 L 52.6 15.4 L 55 14.4 Z" fill="#e8ffff"/>
+  <path d="M 21 13 L 21.9 15.1 L 24 16 L 21.9 16.9 L 21 19 L 20.1 16.9 L 18 16 L 20.1 15.1 Z" fill="#70fff5"/>
 </svg>

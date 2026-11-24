@@ -1,24 +1,63 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Backpack Slots: a grid of cells, the first rows open and the last ones still empty, with a gold glow -->
+  <!-- Backpack Slots: rich leather-and-gold adventurer satchel with stitched flap, brass buckle, and expanding golden + spark -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <radialGradient id="glow"><stop offset="0" stop-color="#ffe9a8" stop-opacity="0.9"/><stop offset="0.45" stop-color="#ffcf5a" stop-opacity="0.45"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient>
-    <radialGradient id="open"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#ffe9a8"/><stop offset="1" stop-color="#c9a45c"/></radialGradient>
+    <radialGradient id="aura" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f2b963" stop-opacity="0.56"/>
+      <stop offset="0.62" stop-color="#8c4e1c" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#8c4e1c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bagBody" x1="12" y1="22" x2="50" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ba7840"/>
+      <stop offset="0.5" stop-color="#854a1f"/>
+      <stop offset="1" stop-color="#4d260c"/>
+    </linearGradient>
+    <linearGradient id="bagFlap" x1="14" y1="14" x2="48" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d99a5b"/>
+      <stop offset="0.55" stop-color="#9e5d29"/>
+      <stop offset="1" stop-color="#5e3212"/>
+    </linearGradient>
+    <linearGradient id="strap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6b3714"/>
+      <stop offset="1" stop-color="#3a1c08"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff4bf"/>
+      <stop offset="0.5" stop-color="#e5ae3c"/>
+      <stop offset="1" stop-color="#8c5812"/>
+    </linearGradient>
+    <radialGradient id="plusGlow" cx="50" cy="49" r="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff8d6" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffbf38" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="45" cy="45" r="22" fill="url(#glow)"/>
-  <g fill="#d9c59b" stroke="#8c6e45" stroke-width="2">
-    <rect x="6" y="8" width="13" height="13" rx="2.5"/>
-    <rect x="25.5" y="8" width="13" height="13" rx="2.5"/>
-    <rect x="45" y="8" width="13" height="13" rx="2.5"/>
-    <rect x="6" y="27" width="13" height="13" rx="2.5"/>
-    <rect x="25.5" y="27" width="13" height="13" rx="2.5"/>
-  </g>
-  <g fill="#10171a" stroke="#7d8f86" stroke-width="2">
-    <rect x="6" y="46" width="13" height="13" rx="2.5"/>
-    <rect x="25.5" y="46" width="13" height="13" rx="2.5"/>
-  </g>
-  <rect x="45" y="27" width="13" height="13" rx="2.5" fill="url(#open)" stroke="#c9a45c" stroke-width="2.5"/>
-  <rect x="45" y="46" width="13" height="13" rx="2.5" fill="url(#open)" stroke="#c9a45c" stroke-width="2.5"/>
-  <path d="M 51.5 49 L 51.5 56 M 48 52.5 L 55 52.5" stroke="#8c6e45" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
+  <!-- top carry handle -->
+  <path d="M 23 16 C 23 8.5 39 8.5 39 16" fill="none" stroke="#1a1d24" stroke-width="6.5" stroke-linecap="round"/>
+  <path d="M 23 16 C 23 8.5 39 8.5 39 16" fill="none" stroke="#9e5d29" stroke-width="3" stroke-linecap="round"/>
+  <!-- side pouch bulges -->
+  <rect x="7" y="29" width="9" height="19" rx="4" fill="#6e3a16" stroke="#1a1d24" stroke-width="2.4"/>
+  <rect x="46" y="29" width="9" height="19" rx="4" fill="#542a0e" stroke="#1a1d24" stroke-width="2.4"/>
+  <!-- main leather satchel body -->
+  <path d="M 13 21 C 13 17 17 15 31 15 C 45 15 49 17 49 21 L 51 48 C 51 53 47 56 31 56 C 15 56 11 53 11 48 Z" fill="url(#bagBody)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- satchel top flap -->
+  <path d="M 12 22 C 12 16.5 18 14.5 31 14.5 C 44 14.5 50 16.5 50 22 L 49 32 C 49 35.5 41 38 31 38 C 21 38 13 35.5 13 32 Z" fill="url(#bagFlap)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- flap highlight & stitched trim -->
+  <path d="M 16 19.2 C 21 17.6 26.5 17.2 35 17.5" fill="none" stroke="#f2c894" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 16 32.2 C 22 34.4 26 35 31 35 C 36 35 40 34.4 46 32.2" fill="none" stroke="#e5b878" stroke-width="1.2" stroke-dasharray="2.4 2" stroke-linecap="round"/>
+  <!-- twin leather vertical straps -->
+  <rect x="18" y="22" width="5.5" height="27" rx="1.6" fill="url(#strap)" stroke="#1a1d24" stroke-width="2"/>
+  <rect x="38.5" y="22" width="5.5" height="27" rx="1.6" fill="url(#strap)" stroke="#1a1d24" stroke-width="2"/>
+  <!-- ornate brass buckles -->
+  <rect x="17" y="33" width="7.5" height="7" rx="1.5" fill="url(#gold)" stroke="#1a1d24" stroke-width="2"/>
+  <rect x="19.2" y="35" width="3.1" height="3" fill="#4a240c"/>
+  <rect x="37.5" y="33" width="7.5" height="7" rx="1.5" fill="url(#gold)" stroke="#1a1d24" stroke-width="2"/>
+  <rect x="39.7" y="35" width="3.1" height="3" fill="#4a240c"/>
+  <!-- central brass Sentinel crest rivet -->
+  <polygon points="31,22 34.5,26.5 31,31 27.5,26.5" fill="url(#gold)" stroke="#1a1d24" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- expanding golden + spark emblem (bottom-right) -->
+  <circle cx="50" cy="49" r="14" fill="url(#plusGlow)"/>
+  <path d="M 47.2 39 L 52.8 39 L 52.8 46.2 L 60 46.2 L 60 51.8 L 52.8 51.8 L 52.8 59 L 47.2 59 L 47.2 51.8 L 40 51.8 L 40 46.2 L 47.2 46.2 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.3" stroke-linejoin="round"/>
+  <path d="M 49.4 41.4 L 49.4 48.2 M 42.4 48.4 L 48.6 48.4" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- sparkle -->
+  <path d="M 55 11 L 56 13.6 L 58.6 14.6 L 56 15.6 L 55 18.2 L 54 15.6 L 51.4 14.6 L 54 13.6 Z" fill="#fff6cc"/>
 </svg>

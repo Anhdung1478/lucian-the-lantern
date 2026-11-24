@@ -1,71 +1,122 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-  <!-- Dark Lucian, seen from above, facing +X: Lucian's own shape and pose (lucian_body.svg, drawn at 0.87 so his
-       guns sit at y = -13 and +13), but black and violet: a black coat with a pale violet rim and violet seams,
-       violet smoke trailing off its tails, shadowed skin, red eyes, and his two guns made dark, lit violet, with
-       violet light at the muzzles. -->
+  <!-- Dark Lucian, corrupted Shadow-Mirror Sentinel, top-down facing +X. Matching V2.0 Lucian's flowing silhouette:
+       ragged obsidian-violet split coat-tails dissolving into void wisps, sharp dark-silver Sentinel shoulders with
+       glowing amethyst trim, shadowy hooded head with subtle crimson-violet rim aura, and twin corrupted relic pistols
+       reaching forward (+X) with bright violet muzzle flares. -->
   <defs>
-    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#07050c"/>
-      <stop offset="1" stop-color="#2a1a46"/>
+    <linearGradient id="dl_coat" x1="1" y1="0" x2="0" y2="0.2">
+      <stop offset="0" stop-color="#2c1d4a"/>
+      <stop offset="0.55" stop-color="#171026"/>
+      <stop offset="1" stop-color="#0b0814"/>
     </linearGradient>
-    <radialGradient id="muzzle">
-      <stop offset="0" stop-color="#f6ecff"/>
-      <stop offset="0.4" stop-color="#c08cff" stop-opacity="0.95"/>
-      <stop offset="1" stop-color="#7a3fd0" stop-opacity="0"/>
+    <linearGradient id="dl_armor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6b6285"/>
+      <stop offset="0.5" stop-color="#352e4a"/>
+      <stop offset="1" stop-color="#1a1528"/>
+    </linearGradient>
+    <linearGradient id="dl_gun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7c7399"/>
+      <stop offset="0.5" stop-color="#42385c"/>
+      <stop offset="1" stop-color="#221c33"/>
+    </linearGradient>
+    <linearGradient id="dl_hood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a295c"/>
+      <stop offset="0.6" stop-color="#191129"/>
+      <stop offset="1" stop-color="#0d0917"/>
+    </linearGradient>
+    <radialGradient id="dl_wisp">
+      <stop offset="0" stop-color="#9e5cff" stop-opacity="0.5"/>
+      <stop offset="0.6" stop-color="#6228c4" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#3a1278" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="smoke">
-      <stop offset="0" stop-color="#8a4fe0" stop-opacity="0.45"/>
-      <stop offset="1" stop-color="#8a4fe0" stop-opacity="0"/>
+    <radialGradient id="dl_muzzle">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.32" stop-color="#e3b8ff" stop-opacity="0.95"/>
+      <stop offset="0.68" stop-color="#9c4dff" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#6222cc" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="eye">
-      <stop offset="0" stop-color="#ff5a6a" stop-opacity="0.8"/>
-      <stop offset="1" stop-color="#ff2a3c" stop-opacity="0"/>
+    <radialGradient id="dl_rim">
+      <stop offset="0" stop-color="#ff4d7e" stop-opacity="0.72"/>
+      <stop offset="0.55" stop-color="#b44cff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#6a1fb8" stop-opacity="0"/>
     </radialGradient>
   </defs>
-  <g transform="translate(50 50) scale(0.87)">
-    <!-- violet smoke off the coat's tails -->
-    <ellipse cx="-44" cy="-20" rx="12" ry="10" fill="url(#smoke)"/>
-    <ellipse cx="-44" cy="20" rx="12" ry="10" fill="url(#smoke)"/>
-    <!-- long coat flaring out behind him, split in the middle -->
-    <path d="M -4 -23 L -38 -33 Q -47 -16 -45 -3 L -16 -2 Z" fill="url(#coat)" stroke="#1a1d24" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M -4 23 L -38 33 Q -47 16 -45 3 L -16 2 Z" fill="url(#coat)" stroke="#1a1d24" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M -4 -23 L -38 -33 Q -47 -16 -45 -3 L -16 -2 Z M -4 23 L -38 33 Q -47 16 -45 3 L -16 2 Z" fill="none" stroke="#c9a8ff" stroke-width="2.4" stroke-linejoin="round"/>
-    <path d="M -12 -20 L -36 -27 M -14 20 L -36 27" stroke="#8a4fe0" stroke-width="2.4" stroke-linecap="round" opacity="0.9"/>
-    <path d="M -20 -12 L -40 -15 M -20 12 L -40 15" stroke="#3c2466" stroke-width="2.4" stroke-linecap="round"/>
+  <g transform="translate(50 50)">
+    <!-- void wisps trailing off ragged coat-tails -->
+    <ellipse cx="-41" cy="-19" rx="9" ry="7" fill="url(#dl_wisp)"/>
+    <ellipse cx="-43" cy="0" rx="8" ry="6" fill="url(#dl_wisp)"/>
+    <ellipse cx="-41" cy="19" rx="9" ry="7" fill="url(#dl_wisp)"/>
+    <path d="M -39 -27 Q -46 -30 -48 -24 Q -43 -23 -41 -20 Z M -42 25 Q -48 28 -47 22 Q -42 21 -40 18 Z M -43 -4 Q -49 -1 -47 4 Q -43 2 -40 0 Z" fill="#8f4dff" opacity="0.55"/>
+
+    <!-- dark inner coat lining in the split -->
+    <path d="M -12 -3 L -42 -8 L -38 0 L -42 8 L -12 3 Z" fill="#0d0917" stroke="#14171f" stroke-width="1.6" stroke-linejoin="round"/>
+
+    <!-- ragged obsidian-violet split coat-tails matching V2.0 Lucian's flowing flare -->
+    <path d="M -3 -19 C -13 -27 -27 -33 -39 -31 L -46 -25 L -41 -19 L -47 -13 L -41 -8 L -45 -3 L -15 -2 Q -9 -10 -3 -19 Z" fill="url(#dl_coat)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M -3 19 C -13 27 -27 33 -39 31 L -46 25 L -41 19 L -47 13 L -41 8 L -45 3 L -15 2 Q -9 10 -3 19 Z" fill="url(#dl_coat)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- coat folds and glowing amethyst rim trim -->
+    <path d="M -11 -12 Q -25 -17 -41 -18 M -15 -5 Q -27 -7 -41 -8" fill="none" stroke="#090612" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M -11 12 Q -25 17 -41 18 M -15 5 Q -27 7 -41 8" fill="none" stroke="#090612" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M -9 -18 Q -22 -24 -36 -25 M -9 18 Q -22 24 -36 25" fill="none" stroke="#5c369e" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M -6 -19 C -15 -26 -28 -30.5 -38.5 -29.2 L -43.5 -24.5 L -39.5 -19 L -44.2 -13.2" fill="none" stroke="#c89eff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -6 19 C -15 26 -28 30.5 -38.5 29.2 L -43.5 24.5 L -39.5 19 L -44.2 13.2" fill="none" stroke="#a770f5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+
     <!-- arms reaching forward -->
-    <path d="M 0 -20 L 20 -15" stroke="#1a1d24" stroke-width="12" stroke-linecap="round"/>
-    <path d="M 0 20 L 20 15" stroke="#1a1d24" stroke-width="12" stroke-linecap="round"/>
-    <path d="M 0 -20 L 20 -15" stroke="#1a1426" stroke-width="8" stroke-linecap="round"/>
-    <path d="M 0 20 L 20 15" stroke="#1a1426" stroke-width="8" stroke-linecap="round"/>
-    <path d="M 4 -21.5 L 18 -18 M 4 21.5 L 18 18" stroke="#c9a8ff" stroke-width="2.3" stroke-linecap="round"/>
-    <!-- his own relic pistol (left), made dark -->
-    <path d="M 18 -19 L 42 -18 L 44 -15 L 42 -12 L 18 -11 Z" fill="#463a62" stroke="#1a1d24" stroke-width="2.3" stroke-linejoin="round"/>
-    <path d="M 20 -19 L 42 -18 L 44 -15" fill="none" stroke="#c9a8ff" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M 26 -15 L 40 -15" stroke="#d6b4ff" stroke-width="2.4" stroke-linecap="round"/>
-    <!-- Senna's relic gun (right), made dark: heavy stock, thick barrel, two violet rings, a muzzle cap -->
-    <rect x="25" y="6.5" width="16" height="17" rx="5" fill="#b57cff" opacity="0.3"/>
-    <path d="M 12 9 L 25 7.5 L 25 22.5 L 12 21 Q 8.5 15 12 9 Z" fill="#3a2f52" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
-    <rect x="24" y="10" width="19" height="10" rx="2" fill="#4c3f6c" stroke="#1a1d24" stroke-width="2"/>
-    <rect x="27.5" y="7.5" width="3.8" height="15" rx="1.3" fill="#d6b4ff" stroke="#1a1d24" stroke-width="1.2"/>
-    <rect x="35" y="7.5" width="3.8" height="15" rx="1.3" fill="#d6b4ff" stroke="#1a1d24" stroke-width="1.2"/>
-    <path d="M 42 9 L 46 11.5 L 46 18.5 L 42 21 Z" fill="#3a2f52" stroke="#1a1d24" stroke-width="1.5" stroke-linejoin="round"/>
-    <!-- hands, gloved in shadow -->
-    <circle cx="20" cy="-15" r="4.8" fill="#3a2a4c" stroke="#1a1d24" stroke-width="1.5"/>
-    <circle cx="20" cy="15" r="4.8" fill="#3a2a4c" stroke="#1a1d24" stroke-width="1.5"/>
-    <!-- violet muzzle light -->
-    <circle cx="46" cy="-15" r="7.5" fill="url(#muzzle)"/>
-    <circle cx="46" cy="15" r="7.5" fill="url(#muzzle)"/>
-    <!-- shoulders and torso, a pale violet rim -->
-    <ellipse cx="0" cy="0" rx="15" ry="26" fill="#120e1a" stroke="#1a1d24" stroke-width="4"/>
-    <ellipse cx="0" cy="0" rx="15" ry="26" fill="none" stroke="#c9a8ff" stroke-width="2.3"/>
-    <path d="M -10 -20 L -10 20" stroke="#3c2466" stroke-width="3"/>
-    <!-- high collar -->
-    <path d="M -7 -15 Q 6 0 -7 15" fill="none" stroke="#b57cff" stroke-width="2.8" stroke-linecap="round"/>
-    <!-- head: shadowed skin, black hair, red eyes -->
-    <circle cx="2" cy="0" r="11" fill="#2e2040"/>
-    <circle cx="0" cy="0" r="9.5" fill="#07050b"/>
-    <circle cx="9.5" cy="-4" r="4.5" fill="url(#eye)"/>
-    <circle cx="9.5" cy="4" r="4.5" fill="url(#eye)"/>
-    <path d="M 8 -5.5 L 11.5 -3.5 M 8 5.5 L 11.5 3.5" stroke="#ff4a5a" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M 1 -19 L 17 -14.5" stroke="#14171f" stroke-width="10.5" stroke-linecap="round"/>
+    <path d="M 1 -19 L 17 -14.5" stroke="#231a38" stroke-width="7.2" stroke-linecap="round"/>
+    <path d="M 1 19 L 17 14.5" stroke="#14171f" stroke-width="10.5" stroke-linecap="round"/>
+    <path d="M 1 19 L 17 14.5" stroke="#231a38" stroke-width="7.2" stroke-linecap="round"/>
+    <!-- sleeve amethyst trim & gauntlets -->
+    <path d="M 3 -22.2 L 13 -19.2 M 3 22.2 L 13 19.2" stroke="#9e74e0" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M 15.2 -18.5 L 13.2 -10.8 M 15.2 18.5 L 13.2 10.8" stroke="#d5b5ff" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- left corrupted relic pistol (slim dark-silver + amethyst bands) -->
+    <path d="M 15.5 -17.5 L 39 -17.2 Q 41.5 -16.8 41.8 -14.8 L 41.8 -12.4 Q 41.5 -10.4 39 -10.2 L 15.5 -10.5 Q 14 -14 15.5 -17.5 Z" fill="url(#dl_gun)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <rect x="21" y="-18" width="2.4" height="8" rx="0.7" fill="#c080ff" stroke="#14171f" stroke-width="1"/>
+    <rect x="34.5" y="-17.6" width="2" height="7.2" rx="0.6" fill="#c080ff" stroke="#14171f" stroke-width="0.9"/>
+    <path d="M 24.5 -14 L 33.5 -14" stroke="#f0d9ff" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 41 -16 L 44 -15 L 44 -13 L 41 -12 Z" fill="#9a52ff" stroke="#14171f" stroke-width="1" stroke-linejoin="round"/>
+
+    <!-- right corrupted Senna relic cannon (heavy obsidian stock + violet rings) -->
+    <rect x="23" y="6.8" width="16" height="14.5" rx="4.5" fill="#a85cff" opacity="0.26"/>
+    <path d="M 10.5 8.8 L 23.5 7.5 L 23.5 20.5 L 10.5 19.2 Q 7.5 14 10.5 8.8 Z" fill="#2b2140" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <circle cx="12.5" cy="14" r="2" fill="#e5b8ff" stroke="#14171f" stroke-width="1"/>
+    <rect x="22.5" y="9.5" width="18" height="9" rx="1.8" fill="url(#dl_gun)" stroke="#14171f" stroke-width="1.8"/>
+    <rect x="26" y="7.5" width="3.2" height="13" rx="1.1" fill="#d49eff" stroke="#14171f" stroke-width="1.1"/>
+    <rect x="33.2" y="7.5" width="3.2" height="13" rx="1.1" fill="#d49eff" stroke="#14171f" stroke-width="1.1"/>
+    <path d="M 39.8 9 L 44 11.2 L 44 16.8 L 39.8 19 Z" fill="#231a36" stroke="#14171f" stroke-width="1.4" stroke-linejoin="round"/>
+
+    <!-- gloved hands -->
+    <circle cx="18.5" cy="-14" r="4" fill="#2e2445" stroke="#14171f" stroke-width="1.6"/>
+    <circle cx="18.5" cy="14" r="4" fill="#2e2445" stroke="#14171f" stroke-width="1.6"/>
+
+    <!-- bright violet muzzle flares -->
+    <circle cx="44.5" cy="-14" r="6.8" fill="url(#dl_muzzle)"/>
+    <circle cx="44.5" cy="14" r="6.8" fill="url(#dl_muzzle)"/>
+    <circle cx="44.5" cy="-14" r="2.2" fill="#ffffff"/>
+    <circle cx="44.5" cy="14" r="2.2" fill="#ffffff"/>
+
+    <!-- torso & sharp dark-silver Sentinel armored shoulders -->
+    <path d="M -11 -19 Q -5 -25 3 -23.5 Q 10 -21.5 11 -14 L 11.5 0 L 11 14 Q 10 21.5 3 23.5 Q -5 25 -11 19 Q -15 10 -15 0 Q -15 -10 -11 -19 Z" fill="#181226" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- sharp Sentinel pauldrons -->
+    <path d="M -13 -16 Q -6 -26 6 -24 L 12 -18 Q 5 -15 -2 -14 Q -8 -13 -13 -16 Z" fill="url(#dl_armor)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M -13 16 Q -6 26 6 24 L 12 18 Q 5 15 -2 14 Q -8 13 -13 16 Z" fill="url(#dl_armor)" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M -10 -18 Q -3 -24 6 -22 M -10 18 Q -3 24 6 22" fill="none" stroke="#d5b2ff" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M -13 -5 Q -14.5 0 -13 5" fill="none" stroke="#9e6cff" stroke-width="1.6" stroke-linecap="round"/>
+
+    <!-- high dark collar -->
+    <path d="M 6 -12 Q -3 -16.5 -11 -12 Q -16 -6.5 -16 0 Q -16 6.5 -11 12 Q -3 16.5 6 12 L 4 8.5 Q -3 11.5 -8 8.8 Q -11.5 5 -11.5 0 Q -11.5 -5 -8 -8.8 Q -3 -11.5 4 -8.5 Z" fill="#241a3a" stroke="#14171f" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M 2 -12.6 Q -4 -14.5 -9.5 -11.4 Q -14 -6.5 -14 0 Q -14 6.5 -9.5 11.4 Q -4 14.5 2 12.6" fill="none" stroke="#c89eff" stroke-width="1.2" stroke-linecap="round"/>
+
+    <!-- shadowy hooded head with subtle glowing crimson-violet rim aura (no cartoon dots!) -->
+    <circle cx="9.5" cy="0" r="8.5" fill="url(#dl_rim)"/>
+    <path d="M 12.5 -7.5 Q 15.5 0 12.5 7.5 Q 5 11.5 -3 10.5 Q -10.5 9 -14 0 Q -10.5 -9 -3 -10.5 Q 5 -11.5 12.5 -7.5 Z" fill="url(#dl_hood)" stroke="#14171f" stroke-width="2" stroke-linejoin="round"/>
+    <!-- sleek shadow cowl crest & rim highlights -->
+    <path d="M -10.5 -3.5 Q -4 -8.8 5 -8.5 Q 9.5 -8 11.5 -5" fill="none" stroke="#9d78d8" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M -10.5 3.5 Q -4 8.8 5 8.5 Q 9.5 8 11.5 5" fill="none" stroke="#5b3a94" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M -11 0 Q -4 -2 4 0" fill="none" stroke="#0d0917" stroke-width="1.6" stroke-linecap="round"/>
+    <!-- subtle crimson-violet glowing visor/brow rim peeking at front edge (+X) -->
+    <path d="M 10.2 -6.2 Q 14.2 0 10.2 6.2 Q 12.2 0 10.2 -6.2 Z" fill="#ff5578" opacity="0.88"/>
+    <path d="M 11.2 -4.2 Q 13.6 0 11.2 4.2" fill="none" stroke="#ffd4e5" stroke-width="1.3" stroke-linecap="round"/>
   </g>
 </svg>

@@ -1,9 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Smite: a bolt striking down -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b1f1a"/><stop offset="1" stop-color="#260a08"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <ellipse cx="32" cy="54" rx="20" ry="6" fill="#ffb347" opacity="0.45"/>
-  <path d="M 38 2 L 20 32 L 31 32 L 24 60 L 46 26 L 34 26 L 44 2 Z" fill="#ffb347" stroke="#fff1c2" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 37 7 L 26 28 L 34 28" stroke="#ffffff" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
-  <path d="M 14 50 L 8 44 M 50 50 L 57 44 M 32 50 L 32 44" stroke="#ffdf9a" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Smite: blazing golden-orange jagged heavenly lightning bolt plunging downward into an impact crack burst -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="34" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffb84d" stop-opacity="0.64"/>
+      <stop offset="0.6" stop-color="#bf3b12" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#bf3b12" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="impactGlow" cx="30" cy="53" r="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff8d6" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#ff9924" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#cc330a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="boltFill" x1="34" y1="4" x2="28" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.28" stop-color="#fff099"/>
+      <stop offset="0.68" stop-color="#ff9924"/>
+      <stop offset="1" stop-color="#e04312"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="34" r="30" fill="url(#aura)"/>
+  <!-- impact burst & ground shockwave -->
+  <ellipse cx="30" cy="53" rx="22" ry="7.5" fill="url(#impactGlow)"/>
+  <path d="M 9 53 L 18 49 L 15 55 L 25 53 L 23 59 L 33 55 L 43 59 L 41 53 L 52 55 L 47 49 L 55 51 L 44 45 L 20 45 Z" fill="#ff9924" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+  <ellipse cx="31" cy="52" rx="11" ry="3.2" fill="#fff6cc"/>
+  <!-- flying impact sparks -->
+  <path d="M 14 45 L 8 39 M 50 45 L 56 39 M 18 39 L 13 33 M 47 38 L 52 32" stroke="#1a1d24" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 14 45 L 8 39 M 50 45 L 56 39 M 18 39 L 13 33 M 47 38 L 52 32" stroke="#ffdf7a" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- jagged heavenly lightning bolt -->
+  <path d="M 38 4 L 20 29 L 31.5 29 L 22 52 L 48 23.5 L 35.5 23.5 L 45.5 4 Z" fill="url(#boltFill)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- blazing white-gold inner core -->
+  <path d="M 39.5 7 L 25 26.5 L 34.5 26.5 L 26.5 44.5 L 42 26 L 32.5 26 Z" fill="#ffffff" opacity="0.92"/>
+  <!-- ember sparkles -->
+  <path d="M 16 14 L 17 16.6 L 19.6 17.6 L 17 18.6 L 16 21.2 L 15 18.6 L 12.4 17.6 L 15 16.6 Z" fill="#fff2b2"/>
+  <circle cx="51" cy="18" r="1.7" fill="#ffd166"/>
 </svg>

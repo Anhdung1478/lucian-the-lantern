@@ -1,131 +1,177 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="384" height="384" viewBox="0 0 96 96">
-  <!-- Vampire Lucian portrait: facing the viewer in a black coat with a tall flared collar, crimson inside. Slicked-back black hair with a widow's peak, red eyes, a short beard and a hint of a fang; a white cravat with a red gem; his silver gun with its red gem raised at his side. Behind him a blood moon, bats and gothic spires, its red light on the left of his face. -->
+  <!-- Vampire Lucian (Gothic Hunter): aristocratic dark-gothic 3/4 bust. Asymmetric sculpted high obsidian-and-blood-crimson velvet collar with silver filigree trim (NO giant symmetrical red cardboard wings!), intense glowing crimson eyes, subtle dramatic silver moonlight rim across cheekbones, gothic pale-crimson blood moon & dark cathedral spires silhouettes behind, ornate side-profile silver-and-ruby relic pistol angled in foreground. -->
   <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#16060c"/>
-      <stop offset="0.5" stop-color="#3a0a18"/>
-      <stop offset="1" stop-color="#5a0e1e"/>
+    <linearGradient id="sky" x1="0.1" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#0c0309"/>
+      <stop offset="0.45" stop-color="#2a0816"/>
+      <stop offset="0.8" stop-color="#4a0d1f"/>
+      <stop offset="1" stop-color="#1a050c"/>
     </linearGradient>
-    <radialGradient id="moonglow" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#ff5a5a" stop-opacity="0.6"/>
-      <stop offset="0.5" stop-color="#d01830" stop-opacity="0.22"/>
-      <stop offset="1" stop-color="#d01830" stop-opacity="0"/>
+    <radialGradient id="moonHalo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffa3af" stop-opacity="0.65"/>
+      <stop offset="0.42" stop-color="#d41e3a" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#7a0a1e" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="moon" cx="0.4" cy="0.38" r="0.6">
-      <stop offset="0" stop-color="#ffb0a0"/>
-      <stop offset="0.6" stop-color="#e8483a"/>
-      <stop offset="1" stop-color="#a81828"/>
+    <radialGradient id="bloodMoon" cx="0.38" cy="0.35" r="0.62">
+      <stop offset="0" stop-color="#ffe2de"/>
+      <stop offset="0.48" stop-color="#f27a7a"/>
+      <stop offset="0.88" stop-color="#bd2438"/>
+      <stop offset="1" stop-color="#8a1224"/>
     </radialGradient>
-    <radialGradient id="redglow" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#ff6a78" stop-opacity="0.8"/>
-      <stop offset="1" stop-color="#ff3a50" stop-opacity="0"/>
+    <radialGradient id="rubyGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd0d8"/>
+      <stop offset="0.38" stop-color="#ff2e4c" stop-opacity="0.88"/>
+      <stop offset="1" stop-color="#a80a22" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="skin" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#46291f"/>
-      <stop offset="0.5" stop-color="#5e3e32"/>
-      <stop offset="1" stop-color="#7a4a40"/>
+    <linearGradient id="skin" x1="0.06" y1="0.18" x2="0.96" y2="0.65">
+      <stop offset="0" stop-color="#301c1a"/>
+      <stop offset="0.4" stop-color="#53352f"/>
+      <stop offset="0.76" stop-color="#724a43"/>
+      <stop offset="1" stop-color="#996c68"/>
     </linearGradient>
-    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#2e1c26"/>
-      <stop offset="0.5" stop-color="#1c1218"/>
-      <stop offset="1" stop-color="#100a0e"/>
+    <linearGradient id="velvet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#291827"/>
+      <stop offset="0.5" stop-color="#150c14"/>
+      <stop offset="1" stop-color="#0a050a"/>
     </linearGradient>
-    <linearGradient id="silver" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#6c7480"/>
-      <stop offset="0.5" stop-color="#f4f6f9"/>
-      <stop offset="1" stop-color="#8a929e"/>
+    <linearGradient id="crimsonVelvet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c91434"/>
+      <stop offset="0.55" stop-color="#7d0a20"/>
+      <stop offset="1" stop-color="#3b040f"/>
+    </linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.4" stop-color="#dae0ea"/>
+      <stop offset="0.78" stop-color="#8d96a6"/>
+      <stop offset="1" stop-color="#4c5361"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#2e222c"/>
+      <stop offset="0.5" stop-color="#140e14"/>
+      <stop offset="1" stop-color="#09060a"/>
     </linearGradient>
   </defs>
-  <!-- night sky, a blood moon, bats and spires -->
+
+  <!-- Gothic blood-moon sky & distant cathedral spires -->
   <rect width="96" height="96" fill="url(#sky)"/>
-  <circle cx="22" cy="22" r="30" fill="url(#moonglow)"/>
-  <circle cx="22" cy="22" r="14" fill="url(#moon)"/>
-  <circle cx="17" cy="18" r="2.6" fill="#c8303a" opacity="0.5"/>
-  <circle cx="26" cy="27" r="3.4" fill="#c8303a" opacity="0.45"/>
-  <circle cx="27" cy="15" r="1.6" fill="#c8303a" opacity="0.5"/>
-  <path d="M 0 74 L 4 74 L 4 62 L 6 56 L 8 62 L 8 70 L 12 70 L 12 58 L 15 50 L 18 58 L 18 74 L 22 74 L 22 66 L 24 62 L 26 66 L 26 96 L 0 96 Z" fill="#14060c"/>
-  <path d="M 96 72 L 92 72 L 92 60 L 89 52 L 86 60 L 86 96 L 96 96 Z" fill="#14060c"/>
-  <g fill="#0c0408">
-    <path d="M 58 10 Q 60 8 62 9 Q 63 7 64 9 L 65 8 L 66 9 Q 67 7 68 9 Q 70 8 72 10 Q 69 10 68 12 Q 66.5 11 65 12.5 Q 63.5 11 62 12 Q 61 10 58 10 Z"/>
-    <path d="M 74 20 Q 75.4 18.6 76.8 19.3 Q 77.5 17.9 78.2 19.3 L 78.9 18.6 L 79.6 19.3 Q 80.3 17.9 81 19.3 Q 82.4 18.6 83.8 20 Q 81.7 20 81 21.4 Q 79.9 20.7 78.9 21.75 Q 77.8 20.7 76.8 21.4 Q 76.1 20 74 20 Z"/>
-    <path d="M 6 44 Q 7 43 8 43.5 Q 8.5 42.5 9 43.5 L 9.5 43 L 10 43.5 Q 10.5 42.5 11 43.5 Q 12 43 13 44 Q 11.5 44 11 45 Q 10.2 44.5 9.5 45.25 Q 8.7 44.5 8 45 Q 7.5 44 6 44 Z"/>
+  <circle cx="24" cy="24" r="35" fill="url(#moonHalo)"/>
+  <circle cx="23" cy="23" r="14.5" fill="url(#bloodMoon)"/>
+  <circle cx="18.5" cy="19.5" r="2.8" fill="#a82034" opacity="0.38"/>
+  <circle cx="27" cy="27.5" r="3.4" fill="#a82034" opacity="0.34"/>
+  <circle cx="28" cy="16.5" r="1.6" fill="#a82034" opacity="0.35"/>
+  <path d="M 0 34 Q 18 30 34 35 Q 54 40 76 32 Q 88 28 96 32 L 96 42 Q 74 38 52 44 Q 26 40 0 42 Z" fill="#ff7888" opacity="0.11"/>
+
+  <path d="M 0 74 L 4 74 L 4 59 L 6.5 49 L 9 59 L 9 68 L 13 68 L 13 54 L 16 42 L 19 54 L 19 72 L 24 72 L 24 62 L 26.5 55 L 29 62 L 29 96 L 0 96 Z" fill="#11040a" opacity="0.92"/>
+  <path d="M 96 70 L 92 70 L 92 55 L 88.5 43 L 85 55 L 85 67 L 80 67 L 80 58 L 78 52 L 76 58 L 76 96 L 96 96 Z" fill="#11040a" opacity="0.88"/>
+  <g fill="#0c0308" opacity="0.85">
+    <path d="M 62 14 Q 64 12.2 66 13.2 Q 67 11.8 68 13.4 L 69 12.6 L 70 13.4 Q 71 11.8 72 13.2 Q 74 12.2 76 14 Q 73 14.2 72 15.6 Q 70.5 14.8 69 16 Q 67.5 14.8 66 15.6 Q 65 14.2 62 14 Z"/>
+    <path d="M 76 23 Q 77.4 21.8 78.8 22.4 Q 79.6 21.4 80.3 22.5 L 81 22 L 81.7 22.5 Q 82.4 21.4 83.2 22.4 Q 84.6 21.8 86 23 Q 84 23.2 83.2 24.2 Q 82 23.6 81 24.5 Q 80 23.6 78.8 24.2 Q 78 23.2 76 23 Z"/>
   </g>
-  <!-- tall flared collar behind his head: crimson inside, black outside -->
-  <path d="M 33 70 C 25 61 18 48 13 26 L 20 33 L 23 21 L 28.5 34 C 30.5 45 34 54 40 61 Z" fill="#b0102a" stroke="#1a1d24" stroke-width="0.9" stroke-linejoin="round"/>
-  <path d="M 64 70 C 72 61 79 48 84 26 L 77 33 L 74 21 L 68.5 34 C 66.5 45 63 54 57 61 Z" fill="#8a0c20" stroke="#1a1d24" stroke-width="0.9" stroke-linejoin="round"/>
-  <path d="M 33 70 C 25 61 18 48 13 26 L 15.4 28.4 C 19.4 47 25.6 59 34.6 67.4 Z M 64 70 C 72 61 79 48 84 26 L 81.6 28.4 C 77.6 47 71.4 59 62.4 67.4 Z" fill="#1c1218"/>
-  <path d="M 31.4 66 C 24.6 57.6 18.4 45 14.2 28.4" fill="none" stroke="#ff8a8a" stroke-width="0.8" stroke-linecap="round"/>
-  <path d="M 21 34 L 23.4 23.6 L 27.6 34.6 M 76 34 L 73.6 23.6 L 69.4 34.6" fill="none" stroke="#ff3a50" stroke-width="0.6" stroke-linejoin="round" opacity="0.8"/>
-  <!-- black coat: shoulders -->
-  <path d="M 2 96 C 4 82 13 74 27 70.5 L 39 66.5 L 58 66.5 L 70 70.5 C 84 74 92 82 94 96 Z" fill="url(#coat)" stroke="#1a1d24" stroke-width="1"/>
-  <path d="M 26.5 71 C 14 75 6 82 3.5 92" fill="none" stroke="#ff6a6a" stroke-width="1.1" stroke-linecap="round"/>
-  <!-- neck -->
-  <path d="M 41.5 53 L 41 67 Q 48.5 70 56 67 L 55.5 53 Z" fill="#3e251c"/>
-  <!-- crimson vest, white cravat with a red gem -->
-  <path d="M 39 66.5 L 48.5 96 L 58 66.5 Q 48.5 70 39 66.5 Z" fill="#7a0c1e"/>
-  <path d="M 41 62 Q 48.5 66 56 62 L 57 67 Q 48.5 71 40 67 Z" fill="#f0e4e6" stroke="#1a1d24" stroke-width="0.6" stroke-linejoin="round"/>
-  <path d="M 44 67.5 Q 48.5 70 53 67.5 L 51.5 78 Q 48.5 80 45.5 78 Z" fill="#e2d2d6" stroke="#1a1d24" stroke-width="0.6" stroke-linejoin="round"/>
-  <path d="M 45.6 71 Q 48.5 73 51.4 71 M 45.8 74.6 Q 48.5 76.6 51.2 74.6" fill="none" stroke="#a8949a" stroke-width="0.6"/>
-  <path d="M 48.5 65.6 L 50.6 68 L 48.5 70.4 L 46.4 68 Z" fill="#e01830" stroke="#1a1d24" stroke-width="0.6"/>
-  <path d="M 47.6 67.4 L 48.5 66.4 L 49.2 67.2" fill="none" stroke="#ffb0ba" stroke-width="0.5" stroke-linecap="round"/>
-  <!-- lapels lined in crimson -->
-  <path d="M 39 66.5 L 29 71 L 41 96 L 45 96 Z" fill="#241820" stroke="#d01830" stroke-width="0.9" stroke-linejoin="round"/>
-  <path d="M 58 66.5 L 68 71 L 56 96 L 52 96 Z" fill="#160e14" stroke="#d01830" stroke-width="0.9" stroke-linejoin="round"/>
-  <!-- ears -->
-  <path d="M 34.5 36 C 31 34 30 37.5 30.8 41 C 31.5 44.5 33 46 35 45.5 Z" fill="#6a4034" stroke="#1a1d24" stroke-width="0.6"/>
-  <path d="M 63 36 C 66.5 34 67.5 37.5 66.7 41 C 66 44.5 64.5 46 62.5 45.5 Z" fill="#3e251c" stroke="#1a1d24" stroke-width="0.6"/>
-  <!-- head -->
-  <path d="M 34 34 C 33.5 24 39 16 48.5 16 C 58 16 63.5 23 63.5 33 L 63.5 41 C 63.5 49 60 55 55 59 C 52.5 61.5 50.5 63 48.5 63 C 46.5 63 44 61.5 42 59.5 C 37 55 34 49 34 41 Z" fill="url(#skin)" stroke="#1a1d24" stroke-width="0.8"/>
-  <path d="M 56 16.8 C 60 18.5 64 24 63.5 34 L 63.5 41 C 63.5 49 60.5 55 55.5 59.5 C 53.5 61.5 51 62.8 49 63 L 50.5 59.5 C 54.5 55.5 56.5 50 56 44.5 C 55.6 40 57.4 36.5 57 31.5 C 56.5 25.5 54.5 20.5 51 16.4 Z" fill="#24121a" opacity="0.55"/>
-  <path d="M 38.5 18.6 C 35.2 21.6 33.6 27 33.6 33 L 34 41 C 34 48.5 37 54.5 42 58.8" fill="none" stroke="#ff6a6a" stroke-width="1.1" stroke-linecap="round"/>
-  <path d="M 36.5 43 Q 38 41.5 41 42" fill="none" stroke="#9a5a50" stroke-width="1.4" stroke-linecap="round" opacity="0.8"/>
-  <!-- slicked-back black hair, a widow's peak -->
-  <path d="M 33.6 34 C 32.8 22 39 14.4 48.5 14.4 C 58 14.4 64.2 22 63.9 34 L 62.6 30.5 C 62 26.5 60 24 56 23 C 53 22.4 50.5 23.4 48.5 26 C 46.5 23.4 44 22.4 41 23 C 37 24 35 26.5 34.6 30.5 Z" fill="#141010" stroke="#1a1d24" stroke-width="0.6"/>
-  <path d="M 40 21 Q 44 16.6 52 16.2 M 37 25 Q 40 19.6 46 18.4 M 54 19.4 Q 59 20 61.4 24" fill="none" stroke="#5a4650" stroke-width="0.8" stroke-linecap="round"/>
-  <path d="M 34.6 30.5 L 34.4 39 L 36 39 L 36.2 31 Z M 62.6 30.5 L 62.8 39 L 61.2 39 L 61 31 Z" fill="#141010"/>
-  <!-- arched brows, red eyes -->
-  <path d="M 37 36 Q 41 32.6 45.6 34.4 L 45.3 35.9 Q 41 34.8 37.4 37.2 Z" fill="#141010"/>
-  <path d="M 60 36 Q 56 32.6 51.4 34.4 L 51.7 35.9 Q 56 34.8 59.6 37.2 Z" fill="#141010"/>
-  <circle cx="41.6" cy="39.6" r="3" fill="url(#redglow)"/>
-  <circle cx="55.4" cy="39.6" r="3" fill="url(#redglow)"/>
-  <path d="M 38 40 Q 41.5 37.6 45 39.8 Q 41.5 41.4 38 40 Z" fill="#f2e2e2"/>
-  <path d="M 52 39.8 Q 55.5 37.6 59 40 Q 55.5 41.4 52 39.8 Z" fill="#d8c4c6"/>
-  <circle cx="41.6" cy="39.6" r="1.45" fill="#e01830"/>
-  <circle cx="55.4" cy="39.6" r="1.45" fill="#e01830"/>
-  <circle cx="41.6" cy="39.6" r="0.6" fill="#2a0408"/>
-  <circle cx="55.4" cy="39.6" r="0.6" fill="#2a0408"/>
-  <circle cx="41.1" cy="39.1" r="0.45" fill="#ffffff"/>
-  <circle cx="54.9" cy="39.1" r="0.45" fill="#ffffff"/>
-  <path d="M 37.8 40 Q 41.5 37.2 45.2 39.6 M 51.8 39.6 Q 55.5 37.2 59.2 40" fill="none" stroke="#1a1210" stroke-width="0.9" stroke-linecap="round"/>
-  <path d="M 39 42.2 Q 41.5 43 44 42.2 M 53 42.2 Q 55.5 43 58 42.2" fill="none" stroke="#3e251c" stroke-width="0.6" stroke-linecap="round"/>
-  <!-- nose -->
-  <path d="M 50 40 Q 50.8 44 51.6 46" fill="none" stroke="#2e1a14" stroke-width="0.9" stroke-linecap="round"/>
-  <path d="M 44.6 46.4 Q 45.4 48.6 48.5 48 Q 51.6 48.6 52.4 46.4" fill="none" stroke="#2e1a14" stroke-width="1" stroke-linecap="round"/>
-  <ellipse cx="47.2" cy="45.6" rx="1.3" ry="0.9" fill="#a05a54" opacity="0.8"/>
-  <!-- short beard and moustache, a fang at the corner of his mouth -->
-  <path d="M 34.2 40 C 34.4 48 37.5 54.5 42 59.5 C 44 61.5 46.5 63.2 48.5 63.2 C 50.5 63.2 52.5 61.5 55 59 C 60 55 63.3 49 63.3 40 L 62.2 41 C 62 47 59.8 52 55.6 56.4 Q 54.6 55.6 54.2 51.6 Q 53.6 54.8 52 56 Q 48.5 57.2 45 56 Q 43.4 54.8 42.8 51.6 Q 42.4 55.6 41.4 56.4 C 37.2 52 35.2 47 35.2 41 Z" fill="#1a1214"/>
-  <path d="M 42.4 51 C 44.4 48.7 47 48.5 48.5 49.3 C 50 48.5 52.6 48.7 54.6 51 C 52.5 50.4 50.5 50.7 48.5 51.1 C 46.5 50.7 44.5 50.4 42.4 51 Z" fill="#1a1214"/>
-  <path d="M 44.6 52.4 Q 48.5 53.3 52.6 52" fill="none" stroke="#2a1214" stroke-width="0.8" stroke-linecap="round"/>
-  <path d="M 45.6 53.4 Q 48.5 55.4 51.4 53.4 Q 48.5 54.2 45.6 53.4 Z" fill="#7a3a3e"/>
-  <path d="M 50.6 52.5 L 51.4 52.4 L 51 54 Z" fill="#ffffff"/>
-  <path d="M 41 54.4 C 38 51.5 36 47 35.6 42" fill="none" stroke="#a03040" stroke-width="0.7" stroke-linecap="round" opacity="0.8"/>
-  <!-- his silver gun with its red gem raised at his side -->
-  <circle cx="83" cy="33" r="7" fill="url(#redglow)"/>
-  <g transform="rotate(6 83 60)">
-    <path d="M 79.6 58 Q 74.6 58.6 74.8 63 Q 75.2 66.4 80 66" fill="none" stroke="#1a1d24" stroke-width="2.2" stroke-linecap="round"/>
-    <path d="M 79.6 58 Q 74.6 58.6 74.8 63 Q 75.2 66.4 80 66" fill="none" stroke="#b8bec8" stroke-width="1" stroke-linecap="round"/>
-    <path d="M 80.4 36 L 86 36 L 86 58 L 87.6 60 L 87.6 63 L 79.4 63 L 79.4 57 L 80.4 56 Z" fill="url(#silver)" stroke="#1a1d24" stroke-width="0.8" stroke-linejoin="round"/>
-    <rect x="80.8" y="33.4" width="4.6" height="3" rx="0.6" fill="#8a929e" stroke="#1a1d24" stroke-width="0.6"/>
-    <path d="M 83.2 39 L 83.2 47" stroke="#ff3a50" stroke-width="1.4" stroke-linecap="round"/>
-    <path d="M 83.2 49 L 85.8 52.6 L 83.2 56.2 L 80.6 52.6 Z" fill="#e01830" stroke="#1a1d24" stroke-width="0.6" stroke-linejoin="round"/>
-    <path d="M 82.2 52 L 83.2 50.4 L 84 51.6" fill="none" stroke="#ffb0ba" stroke-width="0.5" stroke-linecap="round"/>
-    <path d="M 80.2 63 L 87.6 63 L 91.6 76 L 84.6 77.4 Z" fill="#241c22" stroke="#1a1d24" stroke-width="0.8" stroke-linejoin="round"/>
-    <!-- his hand round the grip -->
-    <path d="M 78.6 64.4 Q 84 62.4 90 64.6 L 91.4 73 Q 85 75.6 79.4 73.6 Z" fill="#5a3a2e" stroke="#1a1d24" stroke-width="0.8" stroke-linejoin="round"/>
-    <path d="M 79 67.2 Q 84.4 65.8 90.2 67.6 M 79.2 70.2 Q 84.6 69 90.6 70.6" fill="none" stroke="#3e251c" stroke-width="0.6"/>
-    <path d="M 78.6 74 Q 85 76.8 91.6 73.8 L 93 96 L 77 96 Z" fill="#1c1218" stroke="#1a1d24" stroke-width="0.8" stroke-linejoin="round"/>
-    <path d="M 78.4 74.4 Q 81 72 80.2 70.6 Q 83 73 84 71 Q 86 73.6 88 71.4 Q 89 73.6 91.8 73.4 Q 85 77 78.4 74.4 Z" fill="#f0e4e6" stroke="#1a1d24" stroke-width="0.5" stroke-linejoin="round"/>
-    <path d="M 78.6 76.4 Q 85 79 91.8 76" fill="none" stroke="#d01830" stroke-width="1.2"/>
+
+  <!-- ASYMMETRIC SCULPTED HIGH GOTHIC VELVET COLLAR (far side) -->
+  <path d="M 52 57 C 56 50 61 44 65.5 39.5 C 67.5 46 67.5 55 64 66 L 52 67 Z" fill="url(#crimsonVelvet)" stroke="#0d060b" stroke-width="0.65" stroke-linejoin="round"/>
+  <path d="M 65.5 39.5 C 67.5 46 67.5 55 64 66 L 62.2 65.5 C 65 55.5 65.2 47.5 64 41.5 Z" fill="#180e16"/>
+  <path d="M 53.5 56 C 57 49.5 61.5 44.5 65 40.5" fill="none" stroke="url(#silver)" stroke-width="0.95" stroke-linecap="round"/>
+
+  <!-- Tailored gothic black velvet coat -->
+  <path d="M 0 96 C 2 78 13 68 27 64.5 L 40 61.5 L 58 62.5 L 72 67 C 84 71 92 80 96 96 Z" fill="url(#velvet)" stroke="#090408" stroke-width="0.75"/>
+  <path d="M 5 96 C 8 81 17 72 30 67 L 36 75 C 24 80 18 87 17 96 Z" fill="#0f070f"/>
+  <path d="M 3 90 C 7 77 16 69.5 28 65.5" fill="none" stroke="#ebdce6" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 67 66 C 77 69.5 85 76 90 86" fill="none" stroke="#ff5c72" stroke-width="1.05" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Crimson brocade vest, tailored cravat & faceted ruby brooch -->
+  <path d="M 38 64 L 50 96 L 62 66 Q 50 70 38 64 Z" fill="#5e0818"/>
+  <path d="M 35.5 53 L 35 65.5 Q 45 70 54 66.5 L 53 53 Z" fill="#422824"/>
+  <path d="M 35.5 53 C 38.5 58.5 45 63 53.2 60.2 L 53 53.5 Z" fill="#1b0d0e" opacity="0.7"/>
+  <path d="M 37 61 Q 46 66 55 61.5 L 55.8 66.8 Q 46 71 36.5 66.8 Z" fill="#efe4e8" stroke="#160c12" stroke-width="0.5" stroke-linejoin="round"/>
+  <path d="M 42 67.5 Q 47.5 70.5 53 67.5 L 51.5 81.5 Q 47.5 84 43.5 81.5 Z" fill="#ded2d8" stroke="#160c12" stroke-width="0.5" stroke-linejoin="round"/>
+  <path d="M 44 72 Q 47.5 74 51 72 M 44.3 76.2 Q 47.5 78.2 50.7 76.2" fill="none" stroke="#a6929c" stroke-width="0.55"/>
+  <path d="M 47.5 65.6 L 50.5 69.2 L 47.5 72.8 L 44.5 69.2 Z" fill="url(#silver)" stroke="#12090e" stroke-width="0.5" stroke-linejoin="round"/>
+  <path d="M 47.5 66.8 L 49.5 69.2 L 47.5 71.6 L 45.5 69.2 Z" fill="#e61434"/>
+  <path d="M 46.7 68.6 L 47.5 67.5 L 48.3 68.4" fill="none" stroke="#ffc8d2" stroke-width="0.55" stroke-linecap="round"/>
+
+  <!-- Asymmetric lapels with crimson lining & silver filigree -->
+  <path d="M 37 64 L 24.5 69.8 L 38.5 96 L 46 96 L 42 75 Z" fill="#1b101a" stroke="#0b050a" stroke-width="0.6" stroke-linejoin="round"/>
+  <path d="M 36.2 65 L 26.2 70.2 L 39.2 95.5" fill="none" stroke="#c91434" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 29.5 72.2 L 40.5 94" fill="none" stroke="url(#silver)" stroke-width="0.6" stroke-dasharray="2 1.2" opacity="0.82"/>
+
+  <path d="M 58.5 65 L 69 70 L 57.5 96 L 50.5 96 L 55.5 76 Z" fill="#231420" stroke="#0b050a" stroke-width="0.6" stroke-linejoin="round"/>
+  <path d="M 59 66 L 67.2 70.4 L 56.4 95.5" fill="none" stroke="#c91434" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ASYMMETRIC SCULPTED HIGH VELVET COLLAR (near side) -->
+  <path d="M 19.5 68 C 17 57 18.5 46 24 38.5 C 28.5 44.5 32.5 52 37 61 L 35 67.5 L 24 72.5 Z" fill="url(#crimsonVelvet)" stroke="#0d050a" stroke-width="0.7" stroke-linejoin="round"/>
+  <path d="M 19.5 68 C 17 57 18.5 46 24 38.5 L 25.8 40.8 C 21.4 47.8 20 57 22.4 67.2 Z" fill="#180e16"/>
+  <path d="M 20.2 66.5 C 18 56.5 19.4 46.8 24.4 39.6" fill="none" stroke="url(#silver)" stroke-width="1.05" stroke-linecap="round"/>
+  <path d="M 25 42.5 C 28 47.5 31 53.5 34.5 60" fill="none" stroke="#ff5972" stroke-width="0.65" stroke-linecap="round" opacity="0.75"/>
+
+  <!-- Chiseled aristocratic 3/4 Head -->
+  <path d="M 30.5 34.5 C 30 22.5 36.2 15.8 45.5 15.8 C 53.5 15.8 57.8 21.2 58.2 29.8 C 58.8 32.2 58.8 34.5 57.6 36.4 C 58.8 38.8 59.2 41.6 58 44.8 C 56.8 48.8 55.2 53.4 52.6 56.6 C 51 58.6 49.4 59.8 47.2 59.6 C 43 59.2 37.8 56.8 34.6 53 C 31.8 49.6 30.6 45 30.5 39.8 Z" fill="url(#skin)"/>
+  <path d="M 38.5 17.2 C 33.5 19.8 30.5 26 30.5 34.8 L 30.5 40.5 C 30.8 46 32.2 50.5 35.2 53.8 C 38 56.8 41.8 58.6 45.2 59.2 L 42 54.5 C 38.8 50.8 37.6 46.2 38.2 41.8 C 38.6 38.2 37.4 34 38.4 29 C 39.4 24 41 20.2 43.6 16.4 Z" fill="#1f0f15" opacity="0.54"/>
+  <path d="M 40 42 Q 44.2 41 46.6 43 Q 45.2 46.2 41.2 45.6 Z" fill="#b0949e" opacity="0.36"/>
+  <path d="M 51.2 41.5 Q 55.8 40 58 42.8 Q 56.8 47.2 53.2 47.6 Z" fill="#ad6b70" opacity="0.44"/>
+  <!-- Silver moonlight rim on left cheek & crimson bounce rim on right -->
+  <path d="M 31.2 36 C 30.8 43.5 32.2 50.5 36.4 55.5" fill="none" stroke="#f0dde7" stroke-width="1.1" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 57.8 37.6 C 58.8 40.6 58.4 44.2 56.8 48.8 C 55.4 52.4 53.6 55.4 51.2 57.6" fill="none" stroke="#ff5c74" stroke-width="1.1" stroke-linecap="round" opacity="0.9"/>
+
+  <!-- Near ear -->
+  <path d="M 32.4 37.2 C 29 36 28 39.4 28.8 43 C 29.4 46 31.2 47.4 33.2 46.5 Z" fill="#442924" stroke="#140b0e" stroke-width="0.45"/>
+  <path d="M 29.2 39 C 28.6 41 28.9 43.4 29.9 45.2" fill="none" stroke="#f0dde7" stroke-width="0.75" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Aristocratic swept-back dark hair with dynamic crown waves & sharp widow's peak -->
+  <path d="M 29.5 37.5 C 27.2 30.5 27.8 21.2 32.4 16 L 31.5 15 C 35 11.4 40.5 10.4 46.8 11.2 L 49.4 10.6 C 54.4 11.8 58 15.2 59.2 20.5 C 59.4 23.8 58.8 26.4 58.2 28.2 L 57.2 26.8 C 56.4 23 54 21.6 51.4 22 C 49.8 22.4 48.8 24.4 48 26.4 C 46.6 24.2 44.4 22.6 41.2 23 C 36.8 23.6 34 26.8 33.8 32.4 L 33.6 37.8 Z" fill="url(#hair)"/>
+  <path d="M 31.2 23.5 Q 37.2 15.6 46 14.4 M 35.4 19 Q 42.6 13.6 51.8 15.2 M 42.5 18.4 Q 49.6 16 56.2 19.6" fill="none" stroke="#705b6d" stroke-width="1" stroke-linecap="round"/>
+  <path d="M 30 28 C 29.2 22.8 31.2 17.4 35.8 14.2" fill="none" stroke="#f0dde7" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 32.2 34.2 L 32.8 44.2 L 34.6 44.8 L 34.2 34.2 Z" fill="#130d12"/>
+
+  <!-- Sharp aristocratic brows & intense glowing crimson eyes -->
+  <circle cx="43.6" cy="38.6" r="3.6" fill="url(#rubyGlow)" opacity="0.78"/>
+  <circle cx="54.6" cy="38.5" r="3.4" fill="url(#rubyGlow)" opacity="0.78"/>
+  <path d="M 37.8 35.8 Q 42.8 32.6 47.8 35.2 L 47.2 36.7 Q 42.8 34.6 38.2 37 Z" fill="#110a0e"/>
+  <path d="M 51.4 35.2 Q 54.8 32.6 57.8 35 L 57.4 36.4 Q 54.8 34.6 51.8 36.6 Z" fill="#110a0e"/>
+  <path d="M 39.4 38.8 Q 43.1 36.9 46.8 38.7 Q 43.2 40.3 39.4 38.8 Z" fill="#f2dee2"/>
+  <path d="M 52 38.6 Q 54.6 36.9 57 38.5 Q 54.5 40.1 52 38.6 Z" fill="#f7e4e8"/>
+  <circle cx="43.6" cy="38.6" r="1.45" fill="#e61434"/>
+  <circle cx="54.6" cy="38.5" r="1.35" fill="#e61434"/>
+  <circle cx="43.6" cy="38.6" r="0.62" fill="#2b0309"/>
+  <circle cx="54.6" cy="38.5" r="0.58" fill="#2b0309"/>
+  <circle cx="44.2" cy="38" r="0.48" fill="#ffffff"/>
+  <circle cx="55.1" cy="37.9" r="0.48" fill="#ffffff"/>
+  <path d="M 39 38.7 Q 43.1 36.4 47.2 38.5 M 51.6 38.4 Q 54.6 36.4 57.3 38.3" fill="none" stroke="#14090c" stroke-width="0.95" stroke-linecap="round"/>
+
+  <!-- Nose, aristocratic beard & cold smirk with refined fang -->
+  <path d="M 49.6 37 Q 51.2 41.2 52.6 44.5" fill="none" stroke="#ba9299" stroke-width="1.2" stroke-linecap="round" opacity="0.72"/>
+  <path d="M 47.2 46 Q 49.4 47.6 52.2 46.6 Q 53.3 46 52.9 44.6" fill="none" stroke="#241214" stroke-width="0.95" stroke-linecap="round"/>
+
+  <path d="M 33 42.8 C 33.4 49 35.8 54.2 39.6 57.4 C 42.6 59.6 46 60.2 49 59.6 C 52 59 54.4 56.4 56.2 52.6 L 57.2 46.4 L 56.1 46.8 C 55.4 50.6 54 53.4 52 55 Q 51.2 53 50.4 51.6 Q 49.8 54.4 47.8 55.4 Q 44.8 56 42.4 54 Q 41.2 52 40.8 50.6 Q 40.1 53.2 38.8 53.6 C 36.2 51.4 34.6 48 34.4 43.2 Z" fill="#140e12"/>
+  <path d="M 42.8 49.6 Q 46.6 47.8 49.6 48.6 Q 52.2 48 54.2 49.6 Q 52 49.4 49.6 50 Q 46.6 49.4 42.8 49.6 Z" fill="#140e12"/>
+  <path d="M 44.2 51.3 Q 48.6 52 53.4 50.3" fill="none" stroke="#210d12" stroke-width="0.85" stroke-linecap="round"/>
+  <path d="M 45.6 52.2 Q 48.8 53.7 51.8 51.7 Q 48.8 52.5 45.6 52.2 Z" fill="#7a3842"/>
+  <path d="M 51 51.2 L 51.9 51 L 51.4 52.6 Z" fill="#ffffff"/>
+  <path d="M 51 58 C 53.6 56.2 55.6 53.2 56.6 48.8" fill="none" stroke="#ff4a64" stroke-width="0.75" stroke-linecap="round" opacity="0.76"/>
+
+  <!-- DYNAMIC FOREGROUND SIDE-PROFILE ORNATE SILVER-AND-RUBY GOTHIC PISTOL -->
+  <circle cx="84.5" cy="36" r="14" fill="url(#rubyGlow)" opacity="0.86"/>
+  <g transform="translate(71.5 64) rotate(29)">
+    <path d="M -4.2 3.8 Q -10.4 4.8 -10 10.2 Q -9.5 14.5 -3.6 13.8" fill="none" stroke="#10080e" stroke-width="2" stroke-linecap="round"/>
+    <path d="M -4.2 3.8 Q -10.4 4.8 -10 10.2 Q -9.5 14.5 -3.6 13.8" fill="none" stroke="url(#silver)" stroke-width="0.95" stroke-linecap="round"/>
+    <path d="M -5.2 7 Q -7 8.5 -5.8 10.8" fill="none" stroke="#dce2ec" stroke-width="0.85" stroke-linecap="round"/>
+    <!-- Ornate gothic side-profile etched silver barrel -->
+    <path d="M -5.6 -26 L 2 -29.2 L 4.4 -26.8 L 4.4 5.5 L 6.6 8 L 5.8 12 L -5 12 L -5.6 3.5 Z" fill="url(#silver)" stroke="#10080e" stroke-width="0.75" stroke-linejoin="round"/>
+    <path d="M -5.4 -23.5 L -2 -23.5 L -2 3.5 L -5.4 3.5 Z" fill="#231422"/>
+    <!-- Glowing crimson rune conduit & faceted blood-ruby chamber jewel -->
+    <path d="M -3.7 -22 L -3.7 -9.5" stroke="#ff2e4c" stroke-width="2" stroke-linecap="round" opacity="0.68"/>
+    <path d="M -3.7 -22 L -3.7 -9.5" stroke="#ffd8e0" stroke-width="0.95" stroke-linecap="round"/>
+    <path d="M -0.4 -7.5 L 2.8 -2.2 L -0.4 3.1 L -3.6 -2.2 Z" fill="#e61434" stroke="#12080d" stroke-width="0.6" stroke-linejoin="round"/>
+    <path d="M -1.5 -3.1 L -0.4 -5.1 L 0.6 -3.5" fill="none" stroke="#ffc8d2" stroke-width="0.55" stroke-linecap="round"/>
+    <path d="M 4.4 4.2 L 8.2 2.8 L 7.4 7 L 4.4 7 Z" fill="#636b7a" stroke="#10080e" stroke-width="0.55" stroke-linejoin="round"/>
+    <!-- Grip, hand & gothic lace-trimmed velvet cuff -->
+    <path d="M -4.2 12 L 5.6 12 L 10.2 28 L 1.2 29.5 Z" fill="#1e121c" stroke="#10080e" stroke-width="0.75" stroke-linejoin="round"/>
+    <path d="M -5.6 12.6 Q 1.5 10.6 7.4 13 L 9.2 22.4 Q 2.4 25 -4.6 22.8 Z" fill="#52332d" stroke="#140b0e" stroke-width="0.75" stroke-linejoin="round"/>
+    <path d="M -5 15.6 Q 1.5 14.2 7.8 16 M -4.8 18.8 Q 1.6 17.6 8.4 19.2" fill="none" stroke="#2d1917" stroke-width="0.65"/>
+    <path d="M 5.6 13.4 L 7.8 21" stroke="#ff7a8e" stroke-width="0.8" stroke-linecap="round" opacity="0.82"/>
+    <path d="M -5.8 23.4 Q 2 26.2 9.8 23.2 L 12.2 40 L -8 40 Z" fill="#160d15" stroke="#0b050a" stroke-width="0.8"/>
+    <path d="M -5.8 23.6 Q -2.6 21.2 -1.2 23.2 Q 1.6 20.8 3.4 23.4 Q 6.4 21 9.8 23.2 Q 2 26.6 -5.8 23.6 Z" fill="#f0e4e8" stroke="#140a10" stroke-width="0.45" stroke-linejoin="round"/>
+    <path d="M -5.8 26 Q 2 28.8 9.8 25.8" fill="none" stroke="#c91434" stroke-width="1.25" stroke-linecap="round"/>
   </g>
-  <circle cx="83" cy="33.4" r="1.9" fill="#fff0f0"/>
+  <circle cx="85" cy="36.6" r="2.6" fill="#ffecef" opacity="0.96"/>
 </svg>

@@ -1,16 +1,50 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Bonus XP: a purple-blue star over a rising bar (level up) -->
+  <!-- Bonus XP: radiant violet-gold arcane level star hovering above a gleaming filled XP bar crystal -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <radialGradient id="glow"><stop offset="0" stop-color="#9a8cff" stop-opacity="0.6"/><stop offset="1" stop-color="#9a8cff" stop-opacity="0"/></radialGradient>
-    <linearGradient id="star" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2dcff"/><stop offset="0.45" stop-color="#9a8cff"/><stop offset="1" stop-color="#4a4ad0"/></linearGradient>
-    <linearGradient id="fill" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a4ad0"/><stop offset="1" stop-color="#b4a8ff"/></linearGradient>
+    <radialGradient id="aura" cx="32" cy="30" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c48cff" stop-opacity="0.6"/>
+      <stop offset="0.6" stop-color="#5c24a8" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#5c24a8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="starGlow" cx="32" cy="24" r="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff5ff" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#c48cff" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="starGrad" x1="18" y1="8" x2="46" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff7d6"/>
+      <stop offset="0.42" stop-color="#d89eff"/>
+      <stop offset="1" stop-color="#732bd9"/>
+    </linearGradient>
+    <linearGradient id="barFill" x1="10" y1="46" x2="54" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6e2cd6"/>
+      <stop offset="0.5" stop-color="#b56eff"/>
+      <stop offset="1" stop-color="#f2d6ff"/>
+    </linearGradient>
+    <linearGradient id="goldCap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff3bd"/>
+      <stop offset="0.5" stop-color="#d99f34"/>
+      <stop offset="1" stop-color="#75470e"/>
+    </linearGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="32" cy="23" r="22" fill="url(#glow)"/>
-  <path d="M 32 4.5 L 36.7 16.5 L 49.6 17.3 L 39.6 25.5 L 42.9 38 L 32 31 L 21.1 38 L 24.4 25.5 L 14.4 17.3 L 27.3 16.5 Z" fill="url(#star)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
-  <path d="M 30 11 L 27.8 18" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-  <rect x="6" y="45" width="52" height="12" rx="6" fill="#0c1018" stroke="#c9a45c" stroke-width="2"/>
-  <rect x="9" y="48" width="38" height="6" rx="3" fill="url(#fill)"/>
-  <rect x="43" y="47" width="4" height="8" rx="2" fill="#ffffff"/>
+  <circle cx="32" cy="30" r="30" fill="url(#aura)"/>
+  <circle cx="32" cy="24" r="18" fill="url(#starGlow)"/>
+  <!-- radiant violet-gold 5-point arcane level star -->
+  <polygon points="32,6 37.2,17.2 49.5,18.8 40.4,27.2 42.8,39.2 32,33.2 21.2,39.2 23.6,27.2 14.5,18.8 26.8,17.2" fill="url(#starGrad)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- faceted gold-rimmed star bevels -->
+  <polygon points="32,6 37.2,17.2 32,24 26.8,17.2" fill="#fffbe6" opacity="0.72"/>
+  <polygon points="49.5,18.8 40.4,27.2 42.8,39.2 32,33.2 32,24" fill="#5b1fb5" opacity="0.48"/>
+  <polygon points="32,12 35,19 42,20 36.8,24.8 38.2,32 32,28.5 25.8,32 27.2,24.8 22,20 29,19" fill="none" stroke="#ffe599" stroke-width="1.3" stroke-linejoin="round"/>
+  <circle cx="32" cy="23.5" r="3.4" fill="#ffffff"/>
+  <!-- gleaming filled XP crystal bar -->
+  <rect x="7" y="45" width="50" height="11" rx="3" fill="#181226" stroke="#1a1d24" stroke-width="2.5"/>
+  <rect x="11" y="47.2" width="38" height="6.6" rx="1.6" fill="url(#barFill)"/>
+  <!-- specular crystal bar shine -->
+  <path d="M 13 49.2 L 46 49.2" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+  <!-- ornate gold bar endcaps -->
+  <path d="M 6 43.5 L 12 43.5 L 12 57.5 L 6 57.5 Z" fill="url(#goldCap)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 52 43.5 L 58 43.5 L 58 57.5 L 52 57.5 Z" fill="url(#goldCap)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  <!-- sparkles -->
+  <path d="M 12 11 L 13 13.6 L 15.6 14.6 L 13 15.6 L 12 18.2 L 11 15.6 L 8.4 14.6 L 11 13.6 Z" fill="#fff4cc"/>
+  <path d="M 54 31 L 54.9 33.4 L 57.3 34.3 L 54.9 35.2 L 54 37.6 L 53.1 35.2 L 50.7 34.3 L 53.1 33.4 Z" fill="#e6ccff"/>
 </svg>

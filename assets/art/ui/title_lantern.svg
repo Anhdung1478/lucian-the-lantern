@@ -1,51 +1,212 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-  <!-- Title lantern: Thresh's dark iron lantern on a ring handle, chains off both sides, a green soul glow inside and soft light rays. -->
+  <!-- Title Lantern: Ornate Shadow Isles Thresh Lantern with sculpted wrought-iron spire cap, curved gothic spikes, linked iron chains, heavy beveled hexagonal cage ribs, and swirling emerald-cyan soulfire & wisps -->
   <defs>
-    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#d8ffe6" stop-opacity="1"/>
-      <stop offset="0.35" stop-color="#6ee6a0" stop-opacity="0.85"/>
-      <stop offset="1" stop-color="#2fbf74" stop-opacity="0"/>
+    <radialGradient id="halo" cx="128" cy="148" r="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5cffc0" stop-opacity="0.52"/>
+      <stop offset="0.45" stop-color="#1dc48c" stop-opacity="0.24"/>
+      <stop offset="0.8" stop-color="#0b6650" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#07382e" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#6ee6a0" stop-opacity="0.45"/>
-      <stop offset="1" stop-color="#6ee6a0" stop-opacity="0"/>
+    <radialGradient id="rays" cx="128" cy="148" r="116" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8effd4" stop-opacity="0.28"/>
+      <stop offset="0.55" stop-color="#3de0a6" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#1ca878" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="rays" gradientUnits="userSpaceOnUse" cx="128" cy="150" r="120">
-      <stop offset="0" stop-color="#8fe3b0" stop-opacity="0.3"/>
-      <stop offset="0.55" stop-color="#8fe3b0" stop-opacity="0.14"/>
-      <stop offset="1" stop-color="#8fe3b0" stop-opacity="0"/>
+    <radialGradient id="glass" cx="128" cy="148" r="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#185446"/>
+      <stop offset="0.55" stop-color="#0a2621"/>
+      <stop offset="1" stop-color="#051211"/>
     </radialGradient>
+    <radialGradient id="soulglow" cx="128" cy="148" r="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f2fff9"/>
+      <stop offset="0.28" stop-color="#76ffd0" stop-opacity="0.95"/>
+      <stop offset="0.62" stop-color="#1cd494" stop-opacity="0.62"/>
+      <stop offset="1" stop-color="#0c6e52" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="flameOuter" x1="128" y1="100" x2="128" y2="196" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9effe2"/>
+      <stop offset="0.45" stop-color="#2ee8a6"/>
+      <stop offset="1" stop-color="#0a8a64"/>
+    </linearGradient>
+    <linearGradient id="flameInner" x1="128" y1="112" x2="128" y2="188" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#c4ffeb"/>
+      <stop offset="1" stop-color="#45f2b8"/>
+    </linearGradient>
+    <linearGradient id="ironMain" x1="76" y1="60" x2="182" y2="210" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#607185"/>
+      <stop offset="0.35" stop-color="#333d4b"/>
+      <stop offset="0.72" stop-color="#1c222c"/>
+      <stop offset="1" stop-color="#11151c"/>
+    </linearGradient>
+    <linearGradient id="ironLight" x1="80" y1="50" x2="144" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8fa3b8"/>
+      <stop offset="0.45" stop-color="#485668"/>
+      <stop offset="1" stop-color="#222a36"/>
+    </linearGradient>
+    <linearGradient id="ironDark" x1="128" y1="50" x2="184" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b4657"/>
+      <stop offset="0.55" stop-color="#1f2530"/>
+      <stop offset="1" stop-color="#0f131a"/>
+    </linearGradient>
+    <linearGradient id="chainLink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#93a7bd"/>
+      <stop offset="0.45" stop-color="#475466"/>
+      <stop offset="1" stop-color="#1b212b"/>
+    </linearGradient>
   </defs>
-  <circle cx="128" cy="150" r="118" fill="url(#halo)"/>
-  <!-- light rays, fading out before the edge -->
-  <polygon points="128,150 40,214 70,236" fill="url(#rays)"/>
-  <polygon points="128,150 216,214 186,236" fill="url(#rays)"/>
-  <polygon points="128,150 108,252 148,252" fill="url(#rays)"/>
-  <polygon points="128,150 8,170 8,140" fill="url(#rays)"/>
-  <polygon points="128,150 248,170 248,140" fill="url(#rays)"/>
-  <g fill="none" stroke-linecap="round">
-    <path d="M96 62 Q56 56 20 30" stroke="#1a1d24" stroke-width="9"/>
-    <path d="M160 62 Q200 56 236 30" stroke="#1a1d24" stroke-width="9"/>
-    <path d="M96 62 Q56 56 20 30" stroke="#6b7280" stroke-width="5" stroke-dasharray="9 6"/>
-    <path d="M160 62 Q200 56 236 30" stroke="#6b7280" stroke-width="5" stroke-dasharray="9 6"/>
-    <circle cx="128" cy="34" r="17" stroke="#1a1d24" stroke-width="10"/>
-    <circle cx="128" cy="34" r="17" stroke="#4b5260" stroke-width="5"/>
+
+  <!-- Ethereal Shadow Isles glow halo & subtle light rays -->
+  <circle cx="128" cy="148" r="118" fill="url(#halo)"/>
+  <polygon points="128,148 32,206 58,232" fill="url(#rays)"/>
+  <polygon points="128,148 224,206 198,232" fill="url(#rays)"/>
+  <polygon points="128,148 16,132 16,166" fill="url(#rays)"/>
+  <polygon points="128,148 240,132 240,166" fill="url(#rays)"/>
+  <polygon points="128,148 106,248 150,248" fill="url(#rays)"/>
+
+  <!-- Short linked wrought-iron chains draping from the upper suspension collar -->
+  <!-- Left chain links -->
+  <g stroke="#0e1218" stroke-width="3.2" stroke-linejoin="round">
+    <ellipse cx="98" cy="54" rx="11" ry="5.2" transform="rotate(14 98 54)" fill="none" stroke="#0e1218" stroke-width="8.5"/>
+    <ellipse cx="98" cy="54" rx="11" ry="5.2" transform="rotate(14 98 54)" fill="none" stroke="#5b6b80" stroke-width="3.8"/>
+    <ellipse cx="78" cy="48" rx="11" ry="5" transform="rotate(24 78 48)" fill="none" stroke="#0e1218" stroke-width="8.5"/>
+    <ellipse cx="78" cy="48" rx="11" ry="5" transform="rotate(24 78 48)" fill="none" stroke="#6c7e94" stroke-width="3.8"/>
+    <ellipse cx="58" cy="39" rx="11" ry="4.8" transform="rotate(32 58 39)" fill="none" stroke="#0e1218" stroke-width="8.2"/>
+    <ellipse cx="58" cy="39" rx="11" ry="4.8" transform="rotate(32 58 39)" fill="none" stroke="#56667a" stroke-width="3.6"/>
+    <ellipse cx="40" cy="27" rx="10" ry="4.5" transform="rotate(38 40 27)" fill="none" stroke="#0e1218" stroke-width="7.8"/>
+    <ellipse cx="40" cy="27" rx="10" ry="4.5" transform="rotate(38 40 27)" fill="none" stroke="#687a90" stroke-width="3.4"/>
   </g>
-  <!-- cap -->
-  <path d="M92 74 L128 52 L164 74 Z" fill="#2b2f3a" stroke="#1a1d24" stroke-width="5" stroke-linejoin="round"/>
-  <rect x="86" y="72" width="84" height="12" rx="4" fill="#3a3f4c" stroke="#1a1d24" stroke-width="5"/>
-  <!-- body -->
-  <path d="M96 84 L160 84 L172 148 L160 212 L96 212 L84 148 Z" fill="#0f1a16" stroke="#1a1d24" stroke-width="5" stroke-linejoin="round"/>
-  <ellipse cx="128" cy="150" rx="46" ry="52" fill="url(#glow)"/>
-  <!-- soul -->
-  <path d="M128 122 Q146 146 128 176 Q110 146 128 122 Z" fill="#eafff2" opacity="0.9"/>
-  <!-- iron bars -->
-  <g stroke="#2b2f3a" stroke-width="6" stroke-linecap="round" fill="none">
-    <path d="M110 86 L104 210"/>
-    <path d="M146 86 L152 210"/>
-    <path d="M128 86 L128 210" stroke-width="4"/>
+  <!-- Right chain links -->
+  <g stroke="#0e1218" stroke-width="3.2" stroke-linejoin="round">
+    <ellipse cx="158" cy="54" rx="11" ry="5.2" transform="rotate(-14 158 54)" fill="none" stroke="#0e1218" stroke-width="8.5"/>
+    <ellipse cx="158" cy="54" rx="11" ry="5.2" transform="rotate(-14 158 54)" fill="none" stroke="#4c5b6e" stroke-width="3.8"/>
+    <ellipse cx="178" cy="48" rx="11" ry="5" transform="rotate(-24 178 48)" fill="none" stroke="#0e1218" stroke-width="8.5"/>
+    <ellipse cx="178" cy="48" rx="11" ry="5" transform="rotate(-24 178 48)" fill="none" stroke="#5c6d82" stroke-width="3.8"/>
+    <ellipse cx="198" cy="39" rx="11" ry="4.8" transform="rotate(-32 198 39)" fill="none" stroke="#0e1218" stroke-width="8.2"/>
+    <ellipse cx="198" cy="39" rx="11" ry="4.8" transform="rotate(-32 198 39)" fill="none" stroke="#4a586b" stroke-width="3.6"/>
+    <ellipse cx="216" cy="27" rx="10" ry="4.5" transform="rotate(-38 216 27)" fill="none" stroke="#0e1218" stroke-width="7.8"/>
+    <ellipse cx="216" cy="27" rx="10" ry="4.5" transform="rotate(-38 216 27)" fill="none" stroke="#5b6d82" stroke-width="3.4"/>
   </g>
-  <!-- base -->
-  <rect x="88" y="208" width="80" height="14" rx="4" fill="#3a3f4c" stroke="#1a1d24" stroke-width="5"/>
-  <path d="M100 222 L156 222 L148 236 L108 236 Z" fill="#2b2f3a" stroke="#1a1d24" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Moonlight chain link glints -->
+  <path d="M 73 44 L 81 47 M 54 35 L 61 38 M 176 46 L 184 43 M 196 37 L 203 34" stroke="#b6cde0" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Top forged wrought-iron suspension ring -->
+  <circle cx="128" cy="28" r="16" fill="none" stroke="#0e1218" stroke-width="11"/>
+  <circle cx="128" cy="28" r="16" fill="none" stroke="url(#ironLight)" stroke-width="5.5"/>
+  <path d="M 115 22 A 15 15 0 0 1 131 13" fill="none" stroke="#b4cadf" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+  <!-- Iron ring bail clasp -->
+  <path d="M 121 40 L 135 40 L 137 51 L 119 51 Z" fill="url(#ironMain)" stroke="#0e1218" stroke-width="3.6" stroke-linejoin="round"/>
+  <path d="M 123 42.5 L 128 42.5" stroke="#9eb6cc" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Back interior cage struts (subtle dark depth behind soulfire) -->
+  <g stroke="#111a1d" stroke-width="4.5" fill="none" opacity="0.7">
+    <path d="M 102 92 L 98 148 L 106 202"/>
+    <path d="M 154 92 L 158 148 L 150 202"/>
+  </g>
+
+  <!-- Dark Shadow Isles Glass Chamber (hexagonal silhouette) -->
+  <path d="M 88 92 L 168 92 L 180 146 L 164 204 L 92 204 L 76 146 Z" fill="url(#glass)" stroke="#0e1218" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Blazing Emerald-Cyan Soulfire Glow inside glass -->
+  <ellipse cx="128" cy="148" rx="48" ry="52" fill="url(#soulglow)"/>
+
+  <!-- Swirling Emerald-Cyan Soulfire Flame -->
+  <path d="M 128 194 C 107 188 98 168 106 148 C 111 136 105 124 114 114 C 113 125 120 128 122 121 C 125 111 124 102 132 98 C 129 111 139 117 142 129 C 145 139 152 134 150 124 C 156 138 153 158 144 174 C 139 183 135 191 128 194 Z" fill="url(#flameOuter)"/>
+  <!-- Swirling cyan-white inner spirit flame -->
+  <path d="M 128 188 C 116 180 112 164 118 149 C 122 140 120 131 128 117 C 134 130 140 139 138 154 C 136 166 134 179 128 188 Z" fill="url(#flameInner)"/>
+  <!-- Incandescent soul core -->
+  <path d="M 128 175 C 121 166 121 153 128 140 C 135 153 135 166 128 175 Z" fill="#ffffff"/>
+
+  <!-- Trapped glowing soul wisps spiraling inside the lantern -->
+  <path d="M 103 164 C 96 150 101 134 112 124" fill="none" stroke="#78ffd4" stroke-width="2.4" stroke-linecap="round" opacity="0.85"/>
+  <circle cx="112" cy="124" r="4.2" fill="#eafff6"/>
+  <circle cx="112" cy="124" r="7.5" fill="#5cffc6" opacity="0.35"/>
+
+  <path d="M 152 130 C 159 144 156 162 145 174" fill="none" stroke="#6affcc" stroke-width="2.2" stroke-linecap="round" opacity="0.8"/>
+  <circle cx="145" cy="174" r="3.6" fill="#eafff6"/>
+  <circle cx="145" cy="174" r="6.8" fill="#4cf5bc" opacity="0.32"/>
+
+  <path d="M 114 182 C 122 190 136 190 144 184" fill="none" stroke="#9effe2" stroke-width="1.8" stroke-linecap="round" opacity="0.75"/>
+  <circle cx="147" cy="116" r="2.6" fill="#d8fff2"/>
+  <circle cx="106" cy="174" r="2.4" fill="#baffea"/>
+
+  <!-- Subtle glass specular streak -->
+  <path d="M 88 114 L 82 145 L 91 182" fill="none" stroke="#9effe2" stroke-width="2" stroke-linecap="round" opacity="0.22"/>
+
+  <!-- Heavy Beveled Hexagonal Wrought-Iron Cage Ribs -->
+  <!-- Left outer frame rib -->
+  <path d="M 84 90 L 94 90 L 82 146 L 98 204 L 88 204 L 72 146 Z" fill="url(#ironLight)" stroke="#0e1218" stroke-width="3.6" stroke-linejoin="round"/>
+  <path d="M 85 95 L 76 146 L 90 198" fill="none" stroke="#8ea6bc" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 91 96 L 82 146 L 96 198" fill="none" stroke="#4effc2" stroke-width="1.4" stroke-linecap="round" opacity="0.45"/>
+
+  <!-- Right outer frame rib -->
+  <path d="M 162 90 L 172 90 L 184 146 L 168 204 L 158 204 L 174 146 Z" fill="url(#ironDark)" stroke="#0e1218" stroke-width="3.6" stroke-linejoin="round"/>
+  <path d="M 165 96 L 174 146 L 160 198" fill="none" stroke="#4effc2" stroke-width="1.4" stroke-linecap="round" opacity="0.5"/>
+  <path d="M 171 95 L 180 146 L 166 198" fill="none" stroke="#6e8296" stroke-width="1.5" stroke-linecap="round" opacity="0.65"/>
+
+  <!-- Mid-left foreground cage bar -->
+  <path d="M 105 90 L 113 90 L 106 146 L 114 204 L 106 204 L 98 146 Z" fill="url(#ironLight)" stroke="#0e1218" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M 107 95 L 101 146 L 108 198" fill="none" stroke="#99b0c7" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 111 98 L 105 146 L 112 196" fill="none" stroke="#5effc8" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+
+  <!-- Mid-right foreground cage bar -->
+  <path d="M 143 90 L 151 90 L 158 146 L 150 204 L 142 204 L 150 146 Z" fill="url(#ironDark)" stroke="#0e1218" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M 145 98 L 151 146 L 144 196" fill="none" stroke="#5effc8" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+
+  <!-- Ornamental gothic horizontal iron waist band & diamond clasp -->
+  <path d="M 74 143 L 182 143 L 180 151 L 76 151 Z" fill="url(#ironMain)" stroke="#0e1218" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M 78 145.2 L 178 145.2" stroke="#8aa2b8" stroke-width="1.5" stroke-linecap="round" opacity="0.65"/>
+  <!-- Center iron clasp filigree -->
+  <polygon points="128,136 136,147 128,158 120,147" fill="url(#ironLight)" stroke="#0e1218" stroke-width="3" stroke-linejoin="round"/>
+  <polygon points="128,141 132,147 128,153 124,147" fill="#4cf5bc" stroke="#0e1218" stroke-width="1.6"/>
+
+  <!-- Sculpted Weathered Wrought-Iron Spire Cap & Curved Gothic Spikes -->
+  <!-- Curved gothic eaves spikes (sweeping sharply upward & outward) -->
+  <path d="M 88 84 C 72 80 61 68 58 53 C 68 62 79 68 94 72 Z" fill="url(#ironLight)" stroke="#0e1218" stroke-width="3.8" stroke-linejoin="round"/>
+  <path d="M 168 84 C 184 80 195 68 198 53 C 188 62 177 68 162 72 Z" fill="url(#ironDark)" stroke="#0e1218" stroke-width="3.8" stroke-linejoin="round"/>
+  <!-- Secondary inner crown spurs -->
+  <path d="M 103 68 C 95 58 93 48 96 40 C 102 48 108 55 116 61 Z" fill="url(#ironLight)" stroke="#0e1218" stroke-width="3.4" stroke-linejoin="round"/>
+  <path d="M 153 68 C 161 58 163 48 160 40 C 154 48 148 55 140 61 Z" fill="url(#ironDark)" stroke="#0e1218" stroke-width="3.4" stroke-linejoin="round"/>
+
+  <!-- Faceted gothic spire hood -->
+  <path d="M 82 82 L 106 60 L 128 45 L 150 60 L 174 82 Z" fill="url(#ironMain)" stroke="#0e1218" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Left lit hood facet -->
+  <path d="M 86 80 L 108 61 L 128 48 L 128 80 Z" fill="url(#ironLight)"/>
+  <!-- Right shaded hood facet -->
+  <path d="M 128 48 L 148 61 L 170 80 L 128 80 Z" fill="url(#ironDark)"/>
+  <!-- Hood ridge highlight -->
+  <path d="M 128 49 L 128 79" stroke="#0e1218" stroke-width="2.6"/>
+  <path d="M 90 78 L 109 62 L 126 50" fill="none" stroke="#a6bdd4" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 63 59 C 70 67 78 72 88 76" fill="none" stroke="#9eb6cc" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Heavy beveled upper cornice collar -->
+  <path d="M 74 80 L 182 80 L 176 93 L 80 93 Z" fill="url(#ironMain)" stroke="#0e1218" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 80 83 L 174 83" stroke="#9cb4cb" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+  <path d="M 86 91 L 170 91" stroke="#4ef2b8" stroke-width="1.6" stroke-linecap="round" opacity="0.45"/>
+  <!-- Rivet studs on upper cornice -->
+  <circle cx="94" cy="86.5" r="2.2" fill="#8ea4ba" stroke="#0e1218" stroke-width="1.2"/>
+  <circle cx="128" cy="86.5" r="2.4" fill="#9eb6cc" stroke="#0e1218" stroke-width="1.2"/>
+  <circle cx="162" cy="86.5" r="2.2" fill="#637487" stroke="#0e1218" stroke-width="1.2"/>
+
+  <!-- Ornate Gothic Iron Base Plinth, Downward Spurs & Finial Spike -->
+  <!-- Downward-curving corner spurs -->
+  <path d="M 92 208 C 78 213 70 222 68 232 C 77 226 86 222 98 220 Z" fill="url(#ironLight)" stroke="#0e1218" stroke-width="3.4" stroke-linejoin="round"/>
+  <path d="M 164 208 C 178 213 186 222 188 232 C 179 226 170 222 158 220 Z" fill="url(#ironDark)" stroke="#0e1218" stroke-width="3.4" stroke-linejoin="round"/>
+  <!-- Heavy lower cornice ring -->
+  <path d="M 80 201 L 176 201 L 170 214 L 86 214 Z" fill="url(#ironMain)" stroke="#0e1218" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 86 203.5 L 170 203.5" stroke="#5effc8" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+  <path d="M 90 210.5 L 166 210.5" stroke="#859bb0" stroke-width="1.6" stroke-linecap="round" opacity="0.65"/>
+  <!-- Lower base taper & gothic finial spike -->
+  <path d="M 98 214 L 158 214 L 146 228 L 128 247 L 110 228 Z" fill="url(#ironMain)" stroke="#0e1218" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 102 216 L 128 216 L 128 243 L 112 227 Z" fill="url(#ironLight)"/>
+  <path d="M 128 216 L 154 216 L 144 227 L 128 243 Z" fill="url(#ironDark)"/>
+  <path d="M 114 226 L 126 240" stroke="#9eb6cc" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Floating ambient soul motes outside the cage -->
+  <circle cx="52" cy="118" r="3" fill="#8effd4" opacity="0.85"/>
+  <circle cx="204" cy="112" r="2.6" fill="#6effcc" opacity="0.8"/>
+  <circle cx="46" cy="176" r="2.2" fill="#baffea" opacity="0.75"/>
+  <circle cx="208" cy="178" r="3.2" fill="#8effd4" opacity="0.85"/>
+  <path d="M 196 146 L 198 150.5 L 202.5 152.5 L 198 154.5 L 196 159 L 194 154.5 L 189.5 152.5 L 194 150.5 Z" fill="#d8fff2" opacity="0.9"/>
+  <path d="M 60 140 L 61.6 143.6 L 65.2 145.2 L 61.6 146.8 L 60 150.4 L 58.4 146.8 L 54.8 145.2 L 58.4 143.6 Z" fill="#a8ffe0" opacity="0.85"/>
 </svg>

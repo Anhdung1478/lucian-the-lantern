@@ -1,14 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Attack Damage: an orange sword pointing up over a rising chevron -->
+  <!-- Attack Damage: gleaming orange-gold bevelled Sentinel broadsword angled diagonally -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset="0.5" stop-color="#c9a45c"/><stop offset="1" stop-color="#8a6a2a"/></linearGradient>
+    <radialGradient id="aura" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffaa4c" stop-opacity="0.58"/>
+      <stop offset="0.6" stop-color="#c25514" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#c25514" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bladeLit" x1="25" y1="2" x2="32" y2="39" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0cc"/>
+      <stop offset="0.45" stop-color="#ffb85c"/>
+      <stop offset="1" stop-color="#e87a24"/>
+    </linearGradient>
+    <linearGradient id="bladeShade" x1="32" y1="2" x2="39" y2="39" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e87a24"/>
+      <stop offset="0.6" stop-color="#b84a12"/>
+      <stop offset="1" stop-color="#7c2e0a"/>
+    </linearGradient>
+    <linearGradient id="guard" x1="14" y1="38" x2="50" y2="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe49e"/>
+      <stop offset="0.5" stop-color="#ff9a3c"/>
+      <stop offset="1" stop-color="#a84712"/>
+    </linearGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <path d="M 32 37 L 60 52 L 60 62 L 32 47 L 4 62 L 4 52 Z" fill="url(#gold)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 32 3 L 38.5 11 L 38.5 36 L 25.5 36 L 25.5 11 Z" fill="#ff9a3c" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 32 7 L 32 35" stroke="#ffd2a3" stroke-width="2.5" stroke-linecap="round"/>
-  <rect x="16" y="35" width="32" height="6.5" rx="2" fill="#b8692a" stroke="#1a1d24" stroke-width="2.5"/>
-  <rect x="28.5" y="41.5" width="7" height="10" fill="#5a3a20" stroke="#1a1d24" stroke-width="2.5"/>
-  <circle cx="32" cy="55" r="4.2" fill="#ff9a3c" stroke="#1a1d24" stroke-width="2.5"/>
+  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
+  <g transform="rotate(45 32 32)">
+    <!-- blade -->
+    <path d="M 32 1 L 39 10 L 39 40 L 25 40 L 25 10 Z" fill="url(#bladeShade)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 32 2.4 L 32 39 L 26.2 39 L 26.2 10.4 Z" fill="url(#bladeLit)"/>
+    <path d="M 32 3.5 L 32 38" stroke="#8c360c" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 27.6 11.5 L 27.6 36.5 M 28 9.2 L 31.1 5" stroke="#fff7e2" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- crossguard -->
+    <path d="M 15 39 C 20 37.5 26 37.5 32 38.5 C 38 37.5 44 37.5 49 39 L 47.5 45.5 C 42 44.5 37 45 32 45.5 C 27 45 22 44.5 16.5 45.5 Z" fill="url(#guard)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 18 40.5 C 23 39.8 27.5 40 31.5 40.5" fill="none" stroke="#fff2cc" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- grip and pommel -->
+    <path d="M 28.6 45.5 L 35.4 45.5 L 34.8 55 L 29.2 55 Z" fill="#6b2b14" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M 29.5 48.5 L 34.6 47.7 M 29.6 52 L 34.5 51.2" stroke="#3b1408" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="32" cy="58.5" r="4" fill="url(#guard)" stroke="#1a1d24" stroke-width="2.4"/>
+    <circle cx="30.8" cy="57.3" r="1.2" fill="#fff2cc"/>
+  </g>
+  <!-- sparkles -->
+  <path d="M 14 21 L 15.3 24.7 L 19 26 L 15.3 27.3 L 14 31 L 12.7 27.3 L 9 26 L 12.7 24.7 Z" fill="#fff2cc"/>
+  <path d="M 48 44 L 48.9 46.1 L 51 47 L 48.9 47.9 L 48 50 L 47.1 47.9 L 45 47 L 47.1 46.1 Z" fill="#ffb85c"/>
 </svg>

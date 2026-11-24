@@ -1,9 +1,84 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Piercing Light: a wide beam fired from a pistol -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22304a"/><stop offset="1" stop-color="#0c1018"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#fffbe8"/><stop offset="0.5" stop-color="#ffe9a8" stop-opacity="0.8"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#bg)"/>
-  <path d="M 14 44 L 64 8 L 64 24 L 18 50 Z" fill="#ffcf5a" opacity="0.45"/>
-  <path d="M 16 47 L 64 14 L 64 19 L 17 49 Z" fill="#fffbe8"/>
-  <path d="M 4 50 L 16 42 L 20 47 L 9 56 Z" fill="#3a404d" stroke="#9aa3b2" stroke-width="1.5" stroke-linejoin="round"/>
-  <circle cx="17" cy="46" r="6" fill="url(#glow)"/>
-  <circle cx="44" cy="30" r="4" fill="#c8312b" opacity="0.8"/>
+  <!-- Piercing Light (Q): Sleek angled Sentinel pistol barrel unleashing a razor-sharp blazing white-gold & teal-edged piercing light lance diagonally across the frame -->
+  <defs>
+    <radialGradient id="aura" cx="34" cy="30" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe588" stop-opacity="0.52"/>
+      <stop offset="0.55" stop-color="#3de0d6" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#196b75" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tealSheath" x1="20" y1="43" x2="60" y2="5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#66fff4" stop-opacity="0.95"/>
+      <stop offset="0.55" stop-color="#38dcd4" stop-opacity="0.72"/>
+      <stop offset="1" stop-color="#28b8c8" stop-opacity="0.15"/>
+    </linearGradient>
+    <linearGradient id="goldLance" x1="20" y1="43" x2="61" y2="4" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffef5"/>
+      <stop offset="0.4" stop-color="#ffd966"/>
+      <stop offset="0.85" stop-color="#ffaa2b"/>
+      <stop offset="1" stop-color="#ff8c1a" stop-opacity="0.6"/>
+    </linearGradient>
+    <radialGradient id="muzzle" cx="22.5" cy="41" r="12" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.4" stop-color="#ffe68c" stop-opacity="0.92"/>
+      <stop offset="0.72" stop-color="#4af2e4" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#4af2e4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="barrel" x1="4" y1="46" x2="24" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f5f8fc"/>
+      <stop offset="0.5" stop-color="#b8c4d6"/>
+      <stop offset="1" stop-color="#5d697d"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="4" y1="44" x2="22" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff1ba"/>
+      <stop offset="0.5" stop-color="#e3aa38"/>
+      <stop offset="1" stop-color="#9a5e16"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#aura)"/>
+
+  <!-- Piercing light lance: outer teal energy sheath -->
+  <path d="M 18.5 36.8 L 61.5 2.5 L 27 45.2 Z" fill="url(#tealSheath)"/>
+  <!-- Secondary outer teal wing flares along beam -->
+  <path d="M 27 32 L 42 20 L 34 29.5 Z" fill="#70fff5" opacity="0.8"/>
+  <path d="M 34.5 36 L 49 23.5 L 38.5 35 Z" fill="#70fff5" opacity="0.75"/>
+
+  <!-- Middle blazing white-gold lance -->
+  <path d="M 20 38.5 L 61.5 2.5 L 25.2 43.7 Z" fill="url(#goldLance)"/>
+  <!-- Razor-sharp white-hot core -->
+  <path d="M 21.4 40 L 60.5 3.5 L 23.8 42.3 Z" fill="#ffffff"/>
+
+  <!-- Energy shockwave chevron ring around muzzle discharge -->
+  <path d="M 19 30.5 C 25.5 32.5 30.8 37.8 33 44.5" fill="none" stroke="#62fff4" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 26.5 25 C 32 27.2 36.5 31.8 38.8 37.5" fill="none" stroke="#ffe588" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Muzzle radial bloom & crisp starburst -->
+  <circle cx="22.5" cy="41" r="12" fill="url(#muzzle)"/>
+  <path d="M 22.5 31.5 L 24.4 39.1 L 32 41 L 24.4 42.9 L 22.5 50.5 L 20.6 42.9 L 13 41 L 20.6 39.1 Z" fill="#fffdf2"/>
+
+  <!-- Sleek angled Sentinel Relic Pistol (bottom-left) -->
+  <g transform="translate(11 52) rotate(-42)">
+    <!-- Grip -->
+    <path d="M -7 2 L 0.5 2 L -2.2 12.5 L -9.2 11.2 Z" fill="#4d2817" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- Trigger guard -->
+    <path d="M 0 2.5 C 0.5 6.8 5.5 6.8 6.5 2" fill="none" stroke="#1a1d24" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M 0 2.5 C 0.5 6.8 5.5 6.8 6.5 2" fill="none" stroke="#e3aa38" stroke-width="1.3" stroke-linecap="round"/>
+    <!-- Sculpted silver-gold barrel -->
+    <path d="M -8 -5.5 L 14.5 -5.5 L 18.8 -2.8 L 17.5 2.4 L 6.5 2.4 L 3 3.6 L -7 3.6 L -10 -0.8 Z" fill="url(#barrel)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- Gold top slide rail -->
+    <path d="M -6.2 -5.5 L 14 -5.5 L 17.2 -3 L 12.5 -3 L -6.2 -3 Z" fill="url(#gold)"/>
+    <!-- Glowing relic chamber -->
+    <path d="M -1.5 -1.8 L 11.5 -1.8 L 13 -0.4 L 11.5 1 L -1.5 1 Z" fill="#52fff2" stroke="#156b70" stroke-width="0.9"/>
+    <path d="M 0 -0.4 L 10.5 -0.4" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Top rim highlight -->
+    <path d="M -5 -4.3 L 11.5 -4.3" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+  </g>
+
+  <!-- Sparkling energy shards & flecks -->
+  <polygon points="34,15 39,12 36.5,17 32.5,18.5" fill="#7afff4"/>
+  <polygon points="48,30 53,27 50.5,32 46.5,33.5" fill="#ffe175"/>
+  <polygon points="45,10 49.5,7.5 47.5,11.5" fill="#fffdf0"/>
+  <path d="M 19 19 L 20.1 21.6 L 22.7 22.7 L 20.1 23.8 L 19 26.4 L 17.9 23.8 L 15.3 22.7 L 17.9 21.6 Z" fill="#8ffff6"/>
+  <path d="M 48 42 L 48.9 44.1 L 51 45 L 48.9 45.9 L 48 48 L 47.1 45.9 L 45 45 L 47.1 44.1 Z" fill="#ffe07a"/>
+  <circle cx="54" cy="18" r="1.4" fill="#ffffff"/>
+  <circle cx="38" cy="39" r="1.3" fill="#7afff4"/>
 </svg>

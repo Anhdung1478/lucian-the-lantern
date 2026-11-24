@@ -1,11 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Mana Regen: a blue droplet with an up arrow -->
+  <!-- Mana Regen: luminous sapphire mana teardrop with rising upward arrow and shimmer ripples -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <linearGradient id="drop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4d8ff"/><stop offset="0.5" stop-color="#8fb8ff"/><stop offset="1" stop-color="#4a6cc8"/></linearGradient>
+    <radialGradient id="aura" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#78c4ff" stop-opacity="0.6"/>
+      <stop offset="0.6" stop-color="#1e4fb8" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#1e4fb8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dropFill" cx="25" cy="28" r="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e8f3ff"/>
+      <stop offset="0.38" stop-color="#78aeff"/>
+      <stop offset="0.8" stop-color="#3868d4"/>
+      <stop offset="1" stop-color="#1a378a"/>
+    </radialGradient>
+    <linearGradient id="arrowGrad" x1="36" y1="6" x2="58" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#cde8ff"/>
+      <stop offset="1" stop-color="#5ea4ff"/>
+    </linearGradient>
+    <radialGradient id="arrowGlow" cx="47" cy="18" r="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e6f5ff" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#5ea4ff" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <path d="M 32 5 C 43 21 53 31 53 42 C 53 53 44 60 32 60 C 20 60 11 53 11 42 C 11 31 21 21 32 5 Z" fill="url(#drop)" stroke="#1a1d24" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 27 52 L 27 38 L 20 38 L 32 25 L 44 38 L 37 38 L 37 52 Z" fill="#ffffff" stroke="#2c4a9a" stroke-width="1.5" stroke-linejoin="round"/>
-  <path d="M 17 42 C 17 36 20 31 24 27" fill="none" stroke="#e0ecff" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="30" fill="url(#aura)"/>
+  <!-- shimmer ripples beneath drop -->
+  <ellipse cx="28" cy="54.5" rx="19" ry="4.5" fill="none" stroke="#8ad4ff" stroke-width="1.8" opacity="0.75"/>
+  <ellipse cx="28" cy="54.5" rx="12" ry="2.6" fill="none" stroke="#e0f5ff" stroke-width="1.4" opacity="0.85"/>
+  <!-- mana teardrop slightly left-down -->
+  <g transform="translate(2 8.5) scale(0.81)">
+    <path d="M 32 5.5 C 38.8 15.8 54 28.4 54 40.5 C 54 51.5 44.5 58.5 32 58.5 C 19.5 58.5 10 51.5 10 40.5 C 10 28.4 25.2 15.8 32 5.5 Z" fill="url(#dropFill)" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 48 26 C 51.5 30.2 54 35 54 40.5 C 54 51.5 44.5 58.5 32 58.5 C 28 58.5 24.4 57.8 21.2 56.5 C 25 54.3 29 53.3 32.5 53.1 C 42.5 52.6 48.6 46.5 48.8 39.5 C 48.9 34.2 48.6 29.8 48 26 Z" fill="#1c3f99" opacity="0.72"/>
+    <path d="M 16.5 40 C 16.5 34.2 19.5 29.2 23.8 24.8" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M 32 5.5 C 38.8 15.8 54 28.4 54 40.5 C 54 51.5 44.5 58.5 32 58.5 C 19.5 58.5 10 51.5 10 40.5 C 10 28.4 25.2 15.8 32 5.5 Z" fill="none" stroke="#1a1d24" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+  <!-- rising sapphire-white arrow -->
+  <circle cx="47" cy="18" r="14" fill="url(#arrowGlow)"/>
+  <path d="M 47 5.5 L 58 17.5 L 52 17.5 L 52 29.5 L 42 29.5 L 42 17.5 L 36 17.5 Z" fill="url(#arrowGrad)" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M 47 7 L 56.2 17.5 L 51.2 17.5 L 51.2 28.5 L 47 28.5 Z" fill="#68a8ff" opacity="0.65"/>
+  <path d="M 47 5.5 L 58 17.5 L 52 17.5 L 52 29.5 L 42 29.5 L 42 17.5 L 36 17.5 Z" fill="none" stroke="#1a1d24" stroke-width="2.4" stroke-linejoin="round"/>
+  <!-- sparkle -->
+  <path d="M 55 34 L 55.9 36.4 L 58.3 37.3 L 55.9 38.2 L 55 40.6 L 54.1 38.2 L 51.7 37.3 L 54.1 36.4 Z" fill="#e6f5ff"/>
 </svg>

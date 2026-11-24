@@ -1,15 +1,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Smite Upgrade: the stage art of Smite with three gold chevrons rising on the right -->
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b1f1a"/><stop offset="1" stop-color="#260a08"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <ellipse cx="32" cy="54" rx="20" ry="6" fill="#ffb347" opacity="0.45"/>
-  <path d="M 38 2 L 20 32 L 31 32 L 24 60 L 46 26 L 34 26 L 44 2 Z" fill="#ffb347" stroke="#fff1c2" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 37 7 L 26 28 L 34 28" stroke="#ffffff" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
-  <path d="M 14 50 L 8 44 M 50 50 L 57 44 M 32 50 L 32 44" stroke="#ffdf9a" stroke-width="2.5" stroke-linecap="round"/>
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M 49 47 L 55 41 L 61 47 M 49 36 L 55 30 L 61 36 M 49 25 L 55 19 L 61 25" stroke="#1a1d24" stroke-width="7"/>
-    <path d="M 49 47 L 55 41 L 61 47" stroke="#a8843c" stroke-width="4"/>
-    <path d="M 49 36 L 55 30 L 61 36" stroke="#c9a45c" stroke-width="4"/>
-    <path d="M 49 25 L 55 19 L 61 25" stroke="#ffe08a" stroke-width="4"/>
+  <!-- Smite Upgrade: heavenly lightning bolt & impact burst with gilded ascending golden double-chevron upgrade emblem -->
+  <defs>
+    <radialGradient id="aura" cx="32" cy="34" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffb84d" stop-opacity="0.66"/>
+      <stop offset="0.6" stop-color="#bf3b12" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#bf3b12" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="impactGlow" cx="30" cy="53" r="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff8d6" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#ff9924" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#cc330a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="boltFill" x1="34" y1="4" x2="28" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.28" stop-color="#fff099"/>
+      <stop offset="0.68" stop-color="#ff9924"/>
+      <stop offset="1" stop-color="#e04312"/>
+    </linearGradient>
+    <radialGradient id="upGlow" cx="50" cy="49" r="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff5ba" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#ffbf38" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="upGold" x1="40" y1="38" x2="59" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffce6"/>
+      <stop offset="0.45" stop-color="#ffd554"/>
+      <stop offset="1" stop-color="#a86410"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="34" r="30" fill="url(#aura)"/>
+  <g transform="translate(-2 -2) scale(0.92)">
+    <ellipse cx="30" cy="53" rx="22" ry="7.5" fill="url(#impactGlow)"/>
+    <path d="M 9 53 L 18 49 L 15 55 L 25 53 L 23 59 L 33 55 L 43 59 L 41 53 L 52 55 L 47 49 L 55 51 L 44 45 L 20 45 Z" fill="#ff9924" stroke="#1a1d24" stroke-width="2" stroke-linejoin="round"/>
+    <ellipse cx="31" cy="52" rx="11" ry="3.2" fill="#fff6cc"/>
+    <path d="M 14 45 L 8 39 M 50 45 L 56 39 M 18 39 L 13 33 M 47 38 L 52 32" stroke="#1a1d24" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 14 45 L 8 39 M 50 45 L 56 39 M 18 39 L 13 33 M 47 38 L 52 32" stroke="#ffdf7a" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 38 4 L 20 29 L 31.5 29 L 22 52 L 48 23.5 L 35.5 23.5 L 45.5 4 Z" fill="url(#boltFill)" stroke="#1a1d24" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M 39.5 7 L 25 26.5 L 34.5 26.5 L 26.5 44.5 L 42 26 L 32.5 26 Z" fill="#ffffff" opacity="0.92"/>
   </g>
+  <!-- gilded ascending double-chevron upgrade emblem -->
+  <circle cx="50" cy="49" r="14" fill="url(#upGlow)"/>
+  <path d="M 40.5 58 L 50 48 L 59.5 58 L 55 58 L 50 52.8 L 45 58 Z" fill="url(#upGold)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 40.5 48.5 L 50 38.5 L 59.5 48.5 L 55 48.5 L 50 43.3 L 45 48.5 Z" fill="url(#upGold)" stroke="#1a1d24" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 44 46.2 L 50 40.2 M 44 55.7 L 50 49.7" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M 56 34 L 56.9 36.4 L 59.3 37.3 L 56.9 38.2 L 56 40.6 L 55.1 38.2 L 52.7 37.3 L 55.1 36.4 Z" fill="#fffce6"/>
 </svg>

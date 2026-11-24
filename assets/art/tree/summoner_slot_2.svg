@@ -1,19 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
-  <!-- Second Summoner Slot: two medallion sockets side by side, the right one lighting up -->
+  <!-- Second Summoner Slot: twin ornate golden circular rune-sockets linked by a radiant arcane arc, right socket bursting into warm light -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3328"/><stop offset="1" stop-color="#0c1018"/></linearGradient>
-    <linearGradient id="bronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0c27a"/><stop offset="0.5" stop-color="#b07a3a"/><stop offset="1" stop-color="#5e3a14"/></linearGradient>
-    <radialGradient id="face" cx="0.5" cy="0.4" r="0.6"><stop offset="0" stop-color="#22302c"/><stop offset="1" stop-color="#0a0f10"/></radialGradient>
-    <radialGradient id="glow"><stop offset="0" stop-color="#ffcf5a" stop-opacity="0.75"/><stop offset="1" stop-color="#ffcf5a" stop-opacity="0"/></radialGradient>
-    <radialGradient id="lit"><stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#ffe9a8"/><stop offset="1" stop-color="#e0a030"/></radialGradient>
+    <radialGradient id="aura" cx="34" cy="32" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd966" stop-opacity="0.58"/>
+      <stop offset="0.62" stop-color="#a86a18" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#a86a18" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="rightBurst" cx="46.5" cy="32" r="19" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffe78f" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#f0a824" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldRing" x1="10" y1="18" x2="56" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff3bd"/>
+      <stop offset="0.48" stop-color="#d99f34"/>
+      <stop offset="1" stop-color="#75470e"/>
+    </linearGradient>
+    <linearGradient id="dimRing" x1="6" y1="20" x2="28" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b89454"/>
+      <stop offset="0.5" stop-color="#78582a"/>
+      <stop offset="1" stop-color="#453014"/>
+    </linearGradient>
+    <radialGradient id="dimSocket" cx="16.5" cy="30" r="10" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2a3d42"/>
+      <stop offset="1" stop-color="#10171a"/>
+    </radialGradient>
+    <radialGradient id="litSocket" cx="46.5" cy="31" r="10" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#fff0a6"/>
+      <stop offset="1" stop-color="#e0941e"/>
+    </radialGradient>
   </defs>
-  <rect width="64" height="64" fill="url(#bg)"/>
-  <circle cx="17" cy="32" r="13.5" fill="url(#bronze)" stroke="#1a1d24" stroke-width="2"/>
-  <circle cx="17" cy="32" r="13.5" fill="#0c1018" opacity="0.4"/>
-  <circle cx="17" cy="32" r="8.5" fill="url(#face)" stroke="#3d2604" stroke-width="1.5"/>
-  <circle cx="47" cy="32" r="21" fill="url(#glow)"/>
-  <path d="M 47 12 L 47 8 M 47 52 L 47 56 M 61 18 L 63.5 15.5 M 33 18 L 30.5 15.5 M 61 46 L 63.5 48.5 M 33 46 L 30.5 48.5" stroke="#ffe9a8" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="47" cy="32" r="13.5" fill="url(#bronze)" stroke="#1a1d24" stroke-width="2"/>
-  <circle cx="47" cy="32" r="8.5" fill="url(#lit)" stroke="#fff1d0" stroke-width="1.5"/>
-  <path d="M 37 27 A 11 11 0 0 1 42 22" fill="none" stroke="#fff1d0" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+  <circle cx="34" cy="32" r="30" fill="url(#aura)"/>
+  <!-- radiant arcane bridge arc linking the twin sockets -->
+  <path d="M 18 22 Q 32 10 46 21" fill="none" stroke="#1a1d24" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 18 22 Q 32 10 46 21" fill="none" stroke="#ffe580" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M 18 42 Q 32 54 46 43" fill="none" stroke="#1a1d24" stroke-width="4.4" stroke-linecap="round"/>
+  <path d="M 18 42 Q 32 54 46 43" fill="none" stroke="#d99f34" stroke-width="2" stroke-linecap="round"/>
+  <!-- left ornate rune-socket (active/anchored) -->
+  <circle cx="17.5" cy="32" r="12.5" fill="url(#dimRing)" stroke="#1a1d24" stroke-width="2.4"/>
+  <circle cx="17.5" cy="32" r="8" fill="url(#dimSocket)" stroke="#1a1d24" stroke-width="1.6"/>
+  <polygon points="17.5,27 21.5,32 17.5,37 13.5,32" fill="#70b8c9" opacity="0.75"/>
+  <path d="M 10 26.5 A 9.5 9.5 0 0 1 16 22.5" fill="none" stroke="#e8c882" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- burst halo & rays behind right socket -->
+  <circle cx="46.5" cy="32" r="19" fill="url(#rightBurst)"/>
+  <path d="M 46.5 11 L 46.5 15 M 46.5 49 L 46.5 53 M 33 18.5 L 36 21.5 M 60 18.5 L 57 21.5 M 33 45.5 L 36 42.5 M 60 45.5 L 57 42.5" stroke="#fff2b2" stroke-width="2" stroke-linecap="round"/>
+  <!-- right ornate rune-socket (newly unlocked & bursting with light) -->
+  <circle cx="46.5" cy="32" r="13" fill="url(#goldRing)" stroke="#1a1d24" stroke-width="2.4"/>
+  <circle cx="46.5" cy="32" r="8.2" fill="url(#litSocket)" stroke="#1a1d24" stroke-width="1.6"/>
+  <!-- radiant 4-point unlock spark in right socket -->
+  <path d="M 46.5 24 L 48.2 30.3 L 54.5 32 L 48.2 33.7 L 46.5 40 L 44.8 33.7 L 38.5 32 L 44.8 30.3 Z" fill="#ffffff"/>
+  <path d="M 38.2 26 A 10 10 0 0 1 44.8 21.8" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round"/>
+  <!-- top arc sparkle -->
+  <path d="M 32 10 L 33 12.6 L 35.6 13.6 L 33 14.6 L 32 17.2 L 31 14.6 L 28.4 13.6 L 31 12.6 Z" fill="#fffbe0"/>
 </svg>
