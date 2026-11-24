@@ -44,6 +44,8 @@ var _tweens: Array[Tween] = []
 var _step: Tween
 var _in_caption := false
 var _finished := false
+## In-world UI nodes hidden for the duration of the cutscene (restored on end or skip).
+var _hidden_ui: Array[CanvasItem] = []
 
 
 func _ready() -> void:
@@ -89,6 +91,7 @@ func start(owner_stage: Stage) -> void:
 	_props.z_index = PROPS_Z
 	stage.add_child(_props)
 	stage.freeze(true)
+	_hide_world_ui()
 	_run()
 
 
@@ -210,5 +213,37 @@ func _finish() -> void:
 	_finished = true
 	visible = false
 	_props.queue_free()
+	_restore_world_ui()
 	stage.freeze(false)
 	done.emit()
+
+
+## Hides in-world combat overlays (health bars, target ring, floating numbers)
+## so they never bleed across cinematic beats.
+func _hide_world_ui() -> void:
+	_hidden_ui.clear()
+	if is_instance_valid(stage.lucian):
+		_hide_ui_node(stage.lucian.get_node_or_null("HealthBar") as CanvasItem)
+		for child in stage.lucian.get_children():
+			if child is TargetRing:
+				_hide_ui_node(child as CanvasItem)
+	if is_instance_valid(stage.boss_unit) and is_instance_valid(stage.boss_unit.health_bar):
+		_hide_ui_node(stage.boss_unit.health_bar)
+	for node in stage.get_tree().get_nodes_in_group(&"enemies"):
+		if node is EnemyUnit and is_instance_valid((node as EnemyUnit).health_bar):
+			_hide_ui_node((node as EnemyUnit).health_bar)
+	if is_instance_valid(stage.damage_numbers):
+		_hide_ui_node(stage.damage_numbers)
+
+
+func _hide_ui_node(node: CanvasItem) -> void:
+	if is_instance_valid(node) and node.visible and not _hidden_ui.has(node):
+		node.visible = false
+		_hidden_ui.append(node)
+
+
+func _restore_world_ui() -> void:
+	for node in _hidden_ui:
+		if is_instance_valid(node):
+			node.visible = true
+	_hidden_ui.clear()

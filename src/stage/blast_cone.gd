@@ -64,6 +64,10 @@ const LANDING_LINE_ALPHA := 0.32
 const LANDING_WIDTH := 3.0
 const LANDING_DASH := 14.0
 
+## Seconds the pop pollen/spark burst plays (Juice on).
+const POP_FX_TIME := 0.38
+const POP_PUFFS := 10
+
 var lucian: Lucian
 var arena: StageMap
 ## Where its ground marks are drawn: the stage's Warnings (with the ground
@@ -74,6 +78,8 @@ var ground_parent: Node
 var _regrow_left := 0.0
 ## Seconds ripe, for the glow's breathing.
 var _ripe_time := 0.0
+## Seconds since popped, for the explosive pollen/spark puff (POP_FX_TIME = done).
+var _pop_age := POP_FX_TIME
 ## Built in _ready (a cone freed unadded leaves nothing behind).
 var _hurtbox: Hurtbox
 ## Draws its reach and landing marks (_draw_guide): on `ground_parent`, or
@@ -188,6 +194,8 @@ func _physics_process(delta: float) -> void:
 	super(delta)
 	if dead:
 		_regrow_left -= delta
+		if _pop_age < POP_FX_TIME:
+			_pop_age = minf(_pop_age + delta, POP_FX_TIME)
 		queue_redraw()
 		if _regrow_left <= 0.0:
 			_regrow()
@@ -214,6 +222,7 @@ func _update_guide() -> void:
 func _pop() -> void:
 	dead = true
 	_regrow_left = REGROW_TIME
+	_pop_age = 0.0 if Juice.on() else POP_FX_TIME
 	remove_from_group(GROUP)
 	_hurtbox.collision_layer = 0
 	_lucian_in_reach = false
@@ -258,6 +267,27 @@ func _draw() -> void:
 		draw_line(Vector2(0, 8), Vector2(12 * side, 2), STALK, 3.0, true)
 	draw_circle(Vector2(0, -6), 4.0 + 6.0 * grown, BUD)
 	draw_arc(Vector2(0, -6), 4.0 + 6.0 * grown, 0.0, TAU, 20, OUTLINE, 2.0, true)
+	if _pop_age < POP_FX_TIME:
+		_draw_pop_burst(_pop_age / POP_FX_TIME)
+
+
+## Crisp explosive pollen & golden-lime spark puff right when popped.
+func _draw_pop_burst(t: float) -> void:
+	var ease_out := 1.0 - pow(1.0 - t, 2.5)
+	var fade := clampf(1.0 - t, 0.0, 1.0)
+	if t < 0.45:
+		var flash := 1.0 - t / 0.45
+		MapArt.glow(self, Vector2.ZERO, 56.0 * (0.6 + 0.6 * ease_out), Color(HEAD_LIT, 0.55 * flash))
+	draw_arc(Vector2.ZERO, 16.0 + 76.0 * ease_out, 0.0, TAU, 40, Color(GLOW, 0.72 * fade), 3.5 * fade + 0.8, true)
+	for i in POP_PUFFS:
+		var angle := TAU * i / POP_PUFFS + 0.18
+		var dir := Vector2.from_angle(angle)
+		var dist := (18.0 + (i % 3) * 10.0) + (54.0 + (i % 2) * 18.0) * ease_out
+		var at := dir * dist
+		# Soft pollen cloud + crisp outward spark streak.
+		MapArt.glow(self, at, (14.0 + (i % 3) * 4.0) * (0.7 + 0.5 * ease_out), Color(HEAD, 0.42 * fade))
+		var spark_tail := dir * maxf(dist - 16.0 * fade, 0.0)
+		draw_line(spark_tail, at + dir * 4.0, Color(HEAD_LIT, 0.9 * fade), 2.2 * fade + 0.5, true)
 
 
 ## Rings fading out from the bulb, then the plant: its shadow, leaves round a

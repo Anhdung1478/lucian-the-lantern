@@ -38,9 +38,13 @@ const BREATH_TIME := 7.0
 const LAYERS := [Vector3(0.95, 0.0, 0.0), Vector3(0.8, 0.18, 1.7), Vector3(0.65, 0.22, 3.4)]
 ## Wisps round the rim: how many, how far they sit from the middle, and their
 ## size (shares of the radius), spread by the golden angle so no two bunch up.
-const WISPS := 7
-const WISP_REACH := Vector2(0.5, 0.22)
+const WISPS := 9
+const WISP_REACH := Vector2(0.52, 0.28)
 const WISP_SIZE := Vector2(0.22, 0.08)
+## Outer billowing fog lobes softening the mist bank's perimeter.
+const RIM_LOBES := 12
+const TENDRILS := 7
+const RIM_DASHES := 14
 const GOLDEN_ANGLE := 2.399963
 ## Radians a second the layers and wisps turn round their bank.
 const DRIFT_SPEED := 0.05
@@ -100,8 +104,20 @@ func _draw() -> void:
 	for bank in banks:
 		var middle := Vector2(bank.x, bank.y)
 		var radius := bank.z
-		var seed_phase := bank.x * 0.001
-		MapArt.disc(self, middle, radius * BODY_SHARE, Color(MIST_COLOR, BODY_ALPHA))
+		var seed_phase := bank.x * 0.001 + bank.y * 0.0007
+		# Soft layered gradient body instead of a hard disc edge.
+		MapArt.glow(self, middle, radius * 1.12, Color(MIST_COLOR, BODY_ALPHA * 1.15))
+		MapArt.glow(self, middle, radius * BODY_SHARE, Color(MIST_COLOR, BODY_ALPHA * 0.9))
+		# Soft billowing outer fog lobes around the perimeter.
+		for i in RIM_LOBES:
+			var base_angle := TAU * i / RIM_LOBES + seed_phase * 0.5
+			var drift := _age * DRIFT_SPEED * (0.65 if i % 2 == 0 else -0.5)
+			var lobe_angle := base_angle + drift
+			var swell := 0.86 + 0.16 * sin(_age * TAU / BREATH_TIME + seed_phase + i * 1.3)
+			var reach := radius * (0.76 + 0.1 * sin(i * 2.3 + seed_phase))
+			var lobe_r := radius * (0.28 + 0.07 * cos(i * 1.9)) * swell
+			var lobe_at := middle + Vector2.from_angle(lobe_angle) * reach
+			MapArt.glow(self, lobe_at, lobe_r, Color(MIST_COLOR, LAYER_ALPHA * 0.85))
 		for layer: Vector3 in LAYERS:
 			var phase := layer.z + seed_phase
 			var breath := 1.0 - BREATH * 0.5 + BREATH * 0.5 * sin(_age * TAU / BREATH_TIME + phase)
@@ -113,5 +129,28 @@ func _draw() -> void:
 			var angle := i * GOLDEN_ANGLE + seed_phase + _age * DRIFT_SPEED * (1.0 if i % 2 == 0 else -0.7)
 			var reach := WISP_REACH.x + WISP_REACH.y * fposmod(i * 0.618, 1.0)
 			var size := WISP_SIZE.x + WISP_SIZE.y * sin(i * 1.7)
-			MapArt.soft_oval(self, middle + Vector2.from_angle(angle) * radius * reach, Vector2(size, size * 0.6) * radius, Color(WISP_COLOR, WISP_ALPHA))
-		draw_arc(middle, radius, 0.0, TAU, EDGE_SIDES, Color(MIST_COLOR, EDGE_ALPHA), EDGE_WIDTH, true)
+			MapArt.soft_oval(self, middle + Vector2.from_angle(angle) * radius * reach, Vector2(size, size * 0.62) * radius, Color(WISP_COLOR, WISP_ALPHA))
+		# Drifting wispy tendrils curling near the outer edge.
+		for i in TENDRILS:
+			var start_ang := TAU * i / TENDRILS + seed_phase + _age * DRIFT_SPEED * (1.1 if i % 2 == 0 else -0.85)
+			var pts := PackedVector2Array()
+			for step_i in 6:
+				var share := float(step_i) / 5.0
+				var ang := start_ang + share * 0.42
+				var radial := radius * (0.86 + 0.14 * share + 0.04 * sin(share * PI * 2.0 + _age * 0.9 + i))
+				pts.append(middle + Vector2.from_angle(ang) * radial)
+			draw_polyline(pts, Color(WISP_COLOR, WISP_ALPHA * 0.6), 7.5, true)
+			draw_polyline(pts, Color(WISP_COLOR, WISP_ALPHA * 0.9), 2.4, true)
+		# Very subtle translucent broken undulating perimeter hint so reveal boundaries stay readable.
+		for i in RIM_DASHES:
+			var base := TAU * i / RIM_DASHES + seed_phase * 0.3 + _age * DRIFT_SPEED * 0.25
+			var span := (TAU / RIM_DASHES) * (0.42 + 0.14 * sin(i * 2.1 + seed_phase))
+			var pts := PackedVector2Array()
+			for step_i in 5:
+				var share := float(step_i) / 4.0
+				var ang := base + share * span
+				var wave := sin(ang * 5.0 + seed_phase + _age * 0.7) * 4.5
+				pts.append(middle + Vector2.from_angle(ang) * (radius + wave))
+			var hint_alpha := EDGE_ALPHA * (0.48 + 0.28 * sin(i * 1.7 + _age * 0.6))
+			draw_polyline(pts, Color(MIST_COLOR, hint_alpha * 0.45), EDGE_WIDTH * 2.2, true)
+			draw_polyline(pts, Color(WISP_COLOR, hint_alpha * 0.75), EDGE_WIDTH * 0.7, true)

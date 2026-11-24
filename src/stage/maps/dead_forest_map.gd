@@ -347,18 +347,13 @@ func _draw_flagstones(dice: RandomNumberGenerator) -> void:
 	MapArt.patches(self, dice, area, 14, Vector2(160, 320), Color(FLAGSTONE.lightened(0.12), 0.3), Color(FLAG_JOINT, 0.4))
 
 
-## Black puddles, then dead grass, roots, old bones and a ripple on each
-## puddle.
+## Organic dark-water puddles, then dead grass, roots and old bones.
 func _draw_marks() -> void:
 	var dice := MapArt.rng(13)
+	var puddle_dice := MapArt.rng(19)
 	var marks := MapArt.Facets.new()
 	for puddle in puddles():
-		var at := Vector2(puddle.x, puddle.y)
-		var radii := Vector2(puddle.z, puddle.z * 0.62)
-		MapArt.soft_oval(self, at, radii * 1.25, Color(PUDDLE_COLOR, 0.4))
-		MapArt.oval(self, at, radii, Color(PUDDLE_COLOR, 0.85))
-		MapArt.oval(self, at - MapArt.SHADOW_DIR * puddle.z * 0.18, radii * Vector2(0.55, 0.3), Color(PUDDLE_SHEEN, 0.16))
-		MapArt.ripple(marks, at + Vector2(puddle.z * 0.15, puddle.z * 0.12), puddle.z * 0.3, Color(PUDDLE_SHEEN, 0.3))
+		_draw_puddle(puddle_dice, marks, Vector2(puddle.x, puddle.y), puddle.z)
 	for at in MapArt.scatter(dice, get_bounds(), TUFT_TRIES, is_walkable.bind(10.0)):
 		MapArt.tuft(marks, dice, at, dice.randf_range(TUFT_HEIGHT.x, TUFT_HEIGHT.y), Color(GRASS_COLOR.lightened(dice.randf_range(-0.1, 0.2)), 0.85))
 	for tree in trees(stage) + trunks(stage):
@@ -374,6 +369,57 @@ func _draw_marks() -> void:
 		for end: Vector2 in [at - half, at + half]:
 			marks.line(end - way.orthogonal() * 4.0, end + way.orthogonal() * 4.0, 3.5, Color(BONE_COLOR, 0.7))
 	marks.draw(self)
+
+
+## An organic irregular dark-water pool: damp mud bank, layered irregular water
+## contours, and subtle broken crescent moonlight reflection glints.
+func _draw_puddle(dice: RandomNumberGenerator, marks: MapArt.Facets, at: Vector2, radius: float) -> void:
+	var tilt := dice.randf_range(-0.45, 0.45)
+	var squash := dice.randf_range(0.56, 0.74)
+	var p1 := dice.randf() * TAU
+	var p2 := dice.randf() * TAU
+	var p3 := dice.randf() * TAU
+	var damp := _puddle_polygon(at, radius * 1.16, squash, tilt, p1, p2, p3, 0.14)
+	var water := _puddle_polygon(at, radius * 0.96, squash, tilt, p1, p2, p3, 0.16)
+	var deep := _puddle_polygon(at + MapArt.SHADOW_DIR * radius * 0.06, radius * 0.66, squash, tilt, p1 + 0.5, p2 - 0.4, p3, 0.14)
+	# Soft wet-earth blend under the pool edge.
+	MapArt.soft_oval(self, at, Vector2(radius * 1.28, radius * squash * 1.28), Color(FLOOR_COLOR.darkened(0.45), 0.34))
+	draw_colored_polygon(damp, Color(FLOOR_COLOR.darkened(0.5), 0.42))
+	draw_colored_polygon(water, Color(PUDDLE_COLOR, 0.72))
+	draw_colored_polygon(deep, Color(PUDDLE_COLOR.darkened(0.35), 0.55))
+	# Faint diffuse moonlight reflection on the lit upper-left side.
+	var lit_at := at - MapArt.SHADOW_DIR * radius * 0.22
+	MapArt.soft_oval(self, lit_at, Vector2(radius * 0.46, radius * squash * 0.3), Color(PUDDLE_SHEEN, 0.11))
+	# Subtle broken crescent moonlight glints along the upper-left water rim.
+	var glint_center := at - MapArt.SHADOW_DIR * radius * 0.12
+	var glint_r := radius * 0.52
+	var a0 := PI * 0.95 + tilt
+	for seg in 2:
+		var seg_start := a0 + seg * 0.55 + dice.randf_range(-0.08, 0.08)
+		var seg_end := seg_start + dice.randf_range(0.28, 0.42)
+		var prev := Vector2.ZERO
+		for k in 5:
+			var ang := lerpf(seg_start, seg_end, float(k) / 4.0)
+			var pt := glint_center + Vector2(cos(ang) * glint_r, sin(ang) * glint_r * squash).rotated(tilt)
+			if k > 0:
+				marks.line(prev, pt, 2.0 - seg * 0.4, Color(PUDDLE_SHEEN, 0.24 - seg * 0.06))
+			prev = pt
+	# Delicate slender surface reflection sliver + small ripple.
+	var sliver_at := at + Vector2(dice.randf_range(-0.22, 0.18), dice.randf_range(-0.14, 0.16)) * radius
+	var sliver_half := Vector2(radius * dice.randf_range(0.14, 0.24), 0.0).rotated(tilt * 0.3)
+	marks.line(sliver_at - sliver_half, sliver_at + sliver_half, 1.8, Color(PUDDLE_SHEEN, 0.22))
+	MapArt.ripple(marks, at + Vector2(radius * 0.18, radius * 0.1), radius * 0.24, Color(PUDDLE_SHEEN, 0.22))
+
+
+func _puddle_polygon(at: Vector2, radius: float, squash: float, tilt: float, p1: float, p2: float, p3: float, amp: float) -> PackedVector2Array:
+	var pts := PackedVector2Array()
+	const STEPS := 18
+	for i in STEPS:
+		var a := TAU * i / STEPS
+		var wobble := 1.0 + amp * sin(2.0 * a + p1) + amp * 0.65 * cos(3.0 * a + p2) + amp * 0.35 * sin(5.0 * a + p3)
+		var local := Vector2(cos(a) * radius * wobble, sin(a) * radius * squash * wobble).rotated(tilt)
+		pts.append(at + local)
+	return pts
 
 
 ## Where the puddles lie: (x, y, radius), on open ground. A fixed list.
@@ -442,19 +488,61 @@ func _draw_threads(dice: RandomNumberGenerator, webs: MapArt.Facets, at: Vector2
 			webs.line(sag, to, 2.0, WEB_COLOR)
 
 
-## Elise's camp: dark ground with a violet glow, silk cocoons round it and
-## threads to the trees.
+## Elise's camp: dark ground with a violet glow, varied silk-wrapped cocoons
+## with anchor threads round it, and threads to the trees.
 func _draw_elise_camp(dice: RandomNumberGenerator, webs: MapArt.Facets, at: Vector2) -> void:
 	MapArt.soft_oval(self, at, Vector2(1.2, 1.0) * CAMP_RADIUS, Color(CAMP_COLOR, 0.5))
 	MapArt.glow(self, at, CAMP_RADIUS, Color(CAMP_GLOW, 0.14))
 	for i in COCOONS:
-		var cocoon := at + Vector2.from_angle(TAU * (i + dice.randf_range(0.0, 0.6)) / COCOONS) * dice.randf_range(190.0, 260.0)
-		MapArt.oval(self, cocoon + MapArt.SHADOW_DIR * 4.0, Vector2(14, 26), Color(MapArt.SHADOW, 0.35))
-		MapArt.oval(self, cocoon, Vector2(14, 26), SAC_COLOR.darkened(0.12))
-		MapArt.oval(self, cocoon - MapArt.SHADOW_DIR * 4.0, Vector2(6, 12), SAC_COLOR.lightened(0.25))
-		webs.line(cocoon + Vector2(-13, -8), cocoon + Vector2(13, -3), 2.0, Color(CAMP_COLOR, 0.6))
-		webs.line(cocoon + Vector2(-13, 6), cocoon + Vector2(13, 11), 2.0, Color(CAMP_COLOR, 0.6))
+		var orbit := TAU * (i + dice.randf_range(0.0, 0.6)) / COCOONS
+		var cocoon := at + Vector2.from_angle(orbit) * dice.randf_range(190.0, 260.0)
+		var tilt := orbit + PI * 0.5 + dice.randf_range(-0.55, 0.55)
+		var rx := dice.randf_range(11.5, 14.8)
+		var ry := dice.randf_range(22.0, 29.0)
+		var lump_seed := dice.randf() * TAU
+		var body := _cocoon_polygon(cocoon, rx, ry, tilt, lump_seed)
+		var shadow := _cocoon_polygon(cocoon + MapArt.SHADOW_DIR * 4.5, rx * 1.04, ry * 1.02, tilt, lump_seed)
+		var highlight := _cocoon_polygon(cocoon - MapArt.SHADOW_DIR * 3.5, rx * 0.46, ry * 0.54, tilt, lump_seed)
+		draw_colored_polygon(shadow, Color(MapArt.SHADOW, 0.36))
+		draw_colored_polygon(body, SAC_COLOR.darkened(dice.randf_range(0.14, 0.24)))
+		draw_colored_polygon(highlight, Color(SAC_COLOR.lightened(0.22), 0.72))
+		var axis := Vector2.from_angle(tilt)
+		var across := axis.orthogonal()
+		# Organic criss-crossing silk wrap lines across the cocoon's width.
+		for w in 4:
+			var t := -0.58 + w * 0.38 + dice.randf_range(-0.06, 0.06)
+			var width_here := rx * sqrt(maxf(1.0 - t * t, 0.12)) * 0.94
+			var slant := (1.0 if w % 2 == 0 else -1.0) * dice.randf_range(2.5, 5.5)
+			var left := cocoon + axis * (t * ry - slant) - across * width_here
+			var right := cocoon + axis * (t * ry + slant) + across * width_here
+			webs.line(left, right, 1.8, Color(CAMP_COLOR, 0.55))
+			webs.line(left - axis * 1.6, right - axis * 1.6, 1.2, Color(SAC_COLOR.lightened(0.32), 0.45))
+		# Thin tangled silk anchor threads pinning the cocoon to the floor and camp.
+		for end_sign: float in [-1.0, 1.0]:
+			var tip := cocoon + axis * (end_sign * ry * 0.92)
+			var anchor := tip + (axis * end_sign + across * dice.randf_range(-0.7, 0.7)).normalized() * dice.randf_range(22.0, 44.0)
+			webs.line(tip, anchor, 1.4, Color(WEB_COLOR, 0.38))
+		var side_anchor := cocoon + across * (rx * 0.85 * (1.0 if i % 2 == 0 else -1.0))
+		var toward_camp := side_anchor.lerp(at, dice.randf_range(0.18, 0.32)) + axis * dice.randf_range(-12.0, 12.0)
+		webs.line(side_anchor, toward_camp, 1.3, Color(WEB_COLOR, 0.3))
 	_draw_threads(dice, webs, at, CAMP_RADIUS * 0.8)
+
+
+## A slightly pinched, organically lumpy silk cocoon outline rotated by `tilt`.
+func _cocoon_polygon(center: Vector2, rx: float, ry: float, tilt: float, seed_phase: float) -> PackedVector2Array:
+	var pts := PackedVector2Array()
+	var axis := Vector2.from_angle(tilt)
+	var across := axis.orthogonal()
+	const STEPS := 14
+	for i in STEPS:
+		var a := TAU * i / STEPS
+		var along := cos(a)
+		var side := sin(a)
+		# Pinch slightly toward the two ends and add subtle silk-wrap lumpiness.
+		var pinch := 0.86 + 0.14 * (1.0 - absf(along))
+		var lump := 1.0 + 0.08 * sin(3.0 * a + seed_phase)
+		pts.append(center + axis * (along * ry * lump) + across * (side * rx * pinch * lump))
+	return pts
 
 
 ## Maokai's roots: a sickly glow in his ring, and a thick root creeping in

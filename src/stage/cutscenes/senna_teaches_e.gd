@@ -8,6 +8,8 @@ extends Cutscene
 const DASH_LENGTH := 260.0
 const DASH_TIME := 0.18
 const PAUSE := 0.35
+## Fractions along each dash where a translucent teal afterimage is left behind.
+const GHOST_STOPS: Array[float] = [0.16, 0.46, 0.76]
 
 
 func _play() -> void:
@@ -36,16 +38,24 @@ func _play() -> void:
 	await caption("", Lang.t("Lucian learns Relentless Pursuit. Press %s to dash toward the cursor.") % GameSettings.instance().key_label(&"skill_e"))
 
 
-## Senna dashes to `to`, a light trail growing behind her.
+## Senna dashes to `to`, a light trail and translucent teal afterimages left behind her.
 func _dash(senna: Senna, to: Vector2) -> void:
 	var from := senna.global_position
 	var trail := DashTrail.new()
-	trail.setup(from)
+	trail.setup(from, Senna.SHOT_COLOR)
 	add_prop(trail)
-	senna.visuals.rotation = from.direction_to(to).angle()
+	var facing := from.direction_to(to).angle()
+	senna.visuals.rotation = facing
+	var next_ghost := [0]
 	var glide := func(share: float) -> void:
 		senna.global_position = from.lerp(to, share)
 		trail.reach(senna.global_position)
+		if Juice.on():
+			while next_ghost[0] < GHOST_STOPS.size() and share >= GHOST_STOPS[next_ghost[0]]:
+				var ghost := GhostImage.new()
+				ghost.setup(Senna.ART, senna.global_position, facing)
+				add_prop(ghost)
+				next_ghost[0] += 1
 	var dash := animate()
 	dash.tween_method(glide, 0.0, 1.0, DASH_TIME)
 	await step(dash)
