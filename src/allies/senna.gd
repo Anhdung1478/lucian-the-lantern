@@ -17,6 +17,8 @@ const SHOT_COLOR := Color("b8fff0")
 const SHOT_GLOW := Color(0.5, 1.0, 0.9, 0.5)
 ## Her shadow's size: she has no body, so no radius of her own.
 const SHADOW_RADIUS := 30.0
+const TURN_SPEED := 10.0
+const AIM_TURN_SPEED := 18.0
 
 var lucian: Lucian
 var projectile_parent: Node
@@ -37,6 +39,7 @@ func _ready() -> void:
 	visuals.add_child(sprite)
 	add_child(visuals)
 	motion = UnitMotion.new()
+	motion.profile = UnitMotion.Profile.BIPED
 	motion.setup(sprite, self, SHADOW_RADIUS)
 	add_child(motion)
 	if projectile_parent == null:
@@ -50,20 +53,28 @@ func _physics_process(delta: float) -> void:
 	var offset := spot - global_position
 	if offset.length() > 12.0:
 		global_position += offset.normalized() * minf(SPEED * delta * (1.0 + offset.length() / 400.0), offset.length())
-		visuals.rotation = offset.angle()
+		visuals.rotation = lerp_angle(visuals.rotation, offset.angle(), minf(1.0, TURN_SPEED * delta))
 	_attack_left = maxf(_attack_left - delta, 0.0)
 	var target := _nearest_enemy()
 	if target == null:
 		return
-	visuals.rotation = (target.global_position - global_position).angle()
+	var aim_angle := (target.global_position - global_position).angle()
+	visuals.rotation = lerp_angle(visuals.rotation, aim_angle, minf(1.0, AIM_TURN_SPEED * delta))
 	if _attack_left <= 0.0:
 		_attack_left = INTERVAL
+		visuals.rotation = aim_angle
+		var muzzle := global_position + Vector2.from_angle(visuals.rotation) * 50.0
 		var shot := AttackProjectile.new()
 		shot.color = SHOT_COLOR
 		shot.glow_color = SHOT_GLOW
-		shot.launch(global_position + Vector2.from_angle(visuals.rotation) * 50.0, target, DamageInfo.create(DAMAGE, DamageInfo.Type.PHYSICAL, &"senna", self))
+		shot.launch(muzzle, target, DamageInfo.create(DAMAGE, DamageInfo.Type.PHYSICAL, &"senna", self))
 		projectile_parent.add_child(shot)
 		motion.recoil()
+		if Juice.on():
+			var flash := CannonFlash.new()
+			flash.position = muzzle
+			flash.rotation = visuals.rotation
+			projectile_parent.add_child(flash)
 		Sfx.play(&"shot", -10.0)
 
 
@@ -83,3 +94,20 @@ func _nearest_enemy() -> Enemy:
 func on_kill(enemy: Enemy) -> void:
 	if is_instance_valid(lucian) and not lucian.dead:
 		lucian.on_kill(enemy)
+
+
+## A luminous Relic-Cannon teal muzzle flash at Senna's barrel tip.
+class CannonFlash extends Node2D:
+	const LIFETIME := 0.1
+
+	func _ready() -> void:
+		var tween := create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(self, "modulate:a", 0.0, LIFETIME)
+		tween.tween_property(self, "scale", Vector2(1.35, 0.75), LIFETIME)
+		tween.chain().tween_callback(queue_free)
+
+	func _draw() -> void:
+		draw_circle(Vector2.ZERO, 16.0, Color(0.42, 0.96, 0.86, 0.42))
+		draw_line(Vector2(-2.0, 0.0), Vector2(22.0, 0.0), Color(0.72, 1.0, 0.94, 0.85), 5.0, true)
+		draw_circle(Vector2(2.0, 0.0), 7.5, Color("ecfffb"))

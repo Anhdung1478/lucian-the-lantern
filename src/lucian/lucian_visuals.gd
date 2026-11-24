@@ -15,6 +15,7 @@ var motion: UnitMotion
 
 func _ready() -> void:
 	motion = UnitMotion.new()
+	motion.profile = UnitMotion.Profile.BIPED
 	motion.setup($Body, get_parent(), Lucian.HIT_RADIUS)
 	add_child(motion)
 

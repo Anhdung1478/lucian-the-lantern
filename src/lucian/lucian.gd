@@ -206,6 +206,8 @@ var _displace_velocity := Vector2.ZERO
 var _displace_left := 0.0
 var _stasis_left := 0.0
 var _revive := Vector2.ZERO
+var _stasis_fx: StasisVisual
+var _cast_recoil_slot := -1
 var _hurt_tween: Tween
 ## Slow id -> {pct, left, duration}. The strongest one counts.
 var _slows := {}
@@ -268,6 +270,9 @@ func _exit_tree() -> void:
 	# A trail still growing would never get to fade out.
 	if is_instance_valid(_dash_trail):
 		_dash_trail.queue_free()
+	if is_instance_valid(_stasis_fx):
+		_stasis_fx.queue_free()
+		_stasis_fx = null
 
 
 func command_move(point: Vector2) -> void:
@@ -345,6 +350,11 @@ func try_cast(slot: ChampionProgress.Slot, aim: Vector2) -> bool:
 	skill.cooldown.start(0.0 if cheat_no_cooldowns else skill.cooldown_seconds(), skill_haste(slot))
 	_cancel_windup()
 	skill.execute(aim)
+	if (slot == ChampionProgress.Slot.Q or slot == ChampionProgress.Slot.W) and _cast_lock_left > 0.0:
+		visuals.motion.brace(_cast_lock_left)
+		_cast_recoil_slot = slot
+	elif slot == ChampionProgress.Slot.R:
+		visuals.motion.recoil(0.9)
 	passive.charge()
 	passives.on_cast(slot)
 	return true
@@ -901,6 +911,13 @@ func enter_stasis(seconds: float, revive_hp: float, revive_mana: float) -> void:
 	_cc.clear()
 	_stop_hurt_flash()
 	visuals.modulate = STASIS_TINT
+	if is_instance_valid(_stasis_fx):
+		_stasis_fx.queue_free()
+		_stasis_fx = null
+	if Juice.on():
+		_stasis_fx = StasisVisual.new(seconds)
+		add_child(_stasis_fx)
+		move_child(_stasis_fx, visuals.get_index() + 1)
 
 
 func in_stasis() -> bool:
@@ -948,6 +965,7 @@ func _drop_in_flight() -> void:
 	_cancel_windup()
 	_queued = {}
 	_cast_lock_left = 0.0
+	_cast_recoil_slot = -1
 	for skill in skills:
 		skill.cancel()
 	passive.cancel()
@@ -1258,6 +1276,7 @@ func start_dash(direction: Vector2, distance: float, speed: float, trail_color :
 	# A dash aimed right on Lucian goes nowhere, but still counts as one.
 	if _dash_left > 0.0:
 		_start_dash_trail(trail_color, trail)
+		visuals.motion.dash_stretch(_dash_left)
 		collision_mask = _body_mask()
 	elif trail:
 		trail.free()
@@ -1338,7 +1357,7 @@ func fire_attack_projectile(gun: LucianVisuals.Gun, target: Enemy, info: DamageI
 ## back and the skin's muzzle flash, turned the way Lucian faces.
 func flash_muzzle(gun: LucianVisuals.Gun) -> void:
 	Sfx.play(fx().shot_sound, -6.0)
-	visuals.motion.recoil()
+	visuals.motion.recoil_side(-1.0 if gun == LucianVisuals.Gun.LEFT else 1.0)
 	if GameSettings.instance().low_effects():
 		return
 	var flash := fx().muzzle_flash()
@@ -1378,9 +1397,7 @@ func _physics_process(delta: float) -> void:
 	if _stasis_left > 0.0:
 		_stasis_left -= delta
 		if _stasis_left <= 0.0:
-			hp = _revive.x
-			mana = _revive.y
-			visuals.modulate = Color.WHITE
+			_finish_stasis()
 		return
 	hp = minf(hp + stats.hp_regen * passives.heal_scale() * delta, stats.max_hp)
 	mana = stats.max_mana if cheat_infinite_mana else minf(mana + stats.mana_regen * delta, stats.max_mana)
@@ -1419,6 +1436,9 @@ func _physics_process(delta: float) -> void:
 		return
 	if _cast_lock_left > 0.0:
 		_cast_lock_left -= delta
+		if _cast_lock_left <= 0.0 and _cast_recoil_slot != -1:
+			visuals.motion.recoil(1.4 if _cast_recoil_slot == ChampionProgress.Slot.Q else 1.15)
+			_cast_recoil_slot = -1
 		return
 	if _windup_left > 0.0:
 		_process_windup(delta)
@@ -1667,3 +1687,134 @@ func _step_toward(point: Vector2, delta: float) -> bool:
 	visuals.face(offset)
 	move_and_slide()
 	return false
+
+
+func _finish_stasis() -> void:
+	_stasis_left = 0.0
+	hp = _revive.x
+	mana = _revive.y
+	visuals.modulate = Color.WHITE
+	if is_instance_valid(_stasis_fx):
+		_stasis_fx.trigger_revive()
+	_stasis_fx = null
+
+
+## Guardian Angel stasis overlay: rotating golden rune-ring with countdown arc,
+## sculpted unfurling angelic wings, rising golden motes, and a radiant golden
+## shockwave burst upon revival.
+class StasisVisual extends Node2D:
+	const GOLD := Color("ffd65a")
+	const IVORY := Color("fff6d2")
+	const AMBER := Color("ffaa2b")
+	const RING_RADIUS := 48.0
+	const RUNE_COUNT := 8
+	const MOTE_COUNT := 10
+	const REVIVE_TIME := 0.45
+
+	var _duration := 1.0
+	var _elapsed := 0.0
+	var _reviving := false
+	var _revive_age := 0.0
+
+	func _init(seconds: float) -> void:
+		_duration = maxf(seconds, 0.01)
+
+	func trigger_revive() -> void:
+		if _reviving:
+			return
+		_reviving = true
+		_revive_age = 0.0
+		queue_redraw()
+
+	func _process(delta: float) -> void:
+		if _reviving:
+			_revive_age += delta
+			if _revive_age >= REVIVE_TIME:
+				queue_free()
+				return
+		else:
+			_elapsed += delta
+			var parent := get_parent()
+			if parent is Lucian and not (parent as Lucian).in_stasis():
+				queue_free()
+				return
+		queue_redraw()
+
+	func _draw() -> void:
+		if _reviving:
+			_draw_revive_burst()
+			return
+		var progress := clampf(_elapsed / _duration, 0.0, 1.0)
+		var remaining := 1.0 - progress
+		var unfurl := 1.0 - pow(1.0 - minf(_elapsed / 0.45, 1.0), 3.0)
+		var pulse := 0.88 + 0.12 * sin(_elapsed * 5.0)
+
+		# Soft golden sanctuary aura
+		draw_circle(Vector2.ZERO, RING_RADIUS * 1.12, Color(GOLD, 0.14 * pulse))
+		draw_circle(Vector2.ZERO, RING_RADIUS * 0.68, Color(IVORY, 0.12 * pulse))
+
+		# Sculpted translucent golden angelic wings unfurling on both sides
+		_draw_wings(unfurl, pulse)
+
+		# Rotating rune-ring with outer diamond markers
+		var rot := _elapsed * 0.85
+		draw_arc(Vector2.ZERO, RING_RADIUS, 0.0, TAU, 56, Color(AMBER, 0.35), 2.5, true)
+		for i in RUNE_COUNT:
+			var angle := rot + TAU * i / RUNE_COUNT
+			var dir := Vector2.from_angle(angle)
+			var perp := dir.orthogonal()
+			var p := dir * RING_RADIUS
+			var diamond := PackedVector2Array([
+				p + dir * 6.0, p + perp * 3.5, p - dir * 5.0, p - perp * 3.5
+			])
+			draw_colored_polygon(diamond, Color(IVORY, 0.72 * pulse))
+
+		# Countdown arc draining clockwise from top
+		if remaining > 0.005:
+			var start_angle := -PI * 0.5
+			var end_angle := start_angle + TAU * remaining
+			draw_arc(Vector2.ZERO, RING_RADIUS + 5.0, start_angle, end_angle, 56, Color(GOLD, 0.32), 7.5, true)
+			draw_arc(Vector2.ZERO, RING_RADIUS + 5.0, start_angle, end_angle, 56, Color(IVORY, 0.92), 3.0, true)
+
+		# Rising golden light motes
+		for i in MOTE_COUNT:
+			var phase := fmod(_elapsed * 0.75 + i * 0.37, 1.0)
+			var sway := sin(_elapsed * 2.4 + i * 1.9) * 8.0
+			var x := lerpf(-44.0, 44.0, fmod(i * 0.6180339, 1.0)) + sway
+			var y := lerpf(32.0, -56.0, phase)
+			var alpha := sin(phase * PI) * 0.85
+			var r := lerpf(3.2, 1.4, phase)
+			draw_circle(Vector2(x, y), r * 1.8, Color(GOLD, alpha * 0.35))
+			draw_circle(Vector2(x, y), r, Color(IVORY, alpha))
+
+	func _draw_wings(unfurl: float, pulse: float) -> void:
+		var lift := sin(_elapsed * 3.2) * 3.5 * unfurl
+		for side: float in [-1.0, 1.0]:
+			# Three layered sweeping feathers per wing
+			for tier in 3:
+				var span := lerpf(58.0, 34.0, tier / 2.0) * unfurl
+				var y_base := -6.0 + tier * 10.0
+				var tip := Vector2(side * (22.0 + span), y_base - (24.0 - tier * 10.0) * unfurl + lift)
+				var root := Vector2(side * 14.0, y_base + 4.0)
+				var upper := Vector2(side * (18.0 + span * 0.58), y_base - (26.0 - tier * 8.0) * unfurl + lift * 0.6)
+				var lower := Vector2(side * (16.0 + span * 0.45), y_base + (4.0 + tier * 3.0) * unfurl + lift * 0.4)
+				var feather := PackedVector2Array([root, upper, tip, lower])
+				var fill_alpha := lerpf(0.32, 0.22, tier / 2.0) * unfurl * pulse
+				draw_colored_polygon(feather, Color(GOLD, fill_alpha))
+				draw_polyline(PackedVector2Array([root, upper, tip]), Color(IVORY, 0.68 * unfurl * pulse), 2.2 - tier * 0.4, true)
+
+	func _draw_revive_burst() -> void:
+		var t := clampf(_revive_age / REVIVE_TIME, 0.0, 1.0)
+		var ease_out := 1.0 - (1.0 - t) * (1.0 - t)
+		var fade := 1.0 - t
+		var radius := lerpf(RING_RADIUS * 0.6, RING_RADIUS * 2.4, ease_out)
+		draw_circle(Vector2.ZERO, radius * 0.55, Color(IVORY, 0.32 * fade * fade))
+		draw_arc(Vector2.ZERO, radius, 0.0, TAU, 64, Color(GOLD, 0.45 * fade), 14.0 * fade + 2.0, true)
+		draw_arc(Vector2.ZERO, radius, 0.0, TAU, 64, Color(IVORY, 0.95 * fade), 4.0 * fade + 1.0, true)
+		var inner_r := lerpf(24.0, RING_RADIUS * 1.5, ease_out)
+		draw_arc(Vector2.ZERO, inner_r, 0.0, TAU, 48, Color(AMBER, 0.6 * fade), 3.0 * fade + 1.0, true)
+		for i in 12:
+			var dir := Vector2.from_angle(TAU * i / 12.0 + t * 0.4)
+			var start := dir * lerpf(16.0, RING_RADIUS * 1.15, ease_out)
+			var stop := dir * lerpf(36.0, RING_RADIUS * 2.1, ease_out)
+			draw_line(start, stop, Color(IVORY, 0.85 * fade), 3.0 * fade + 0.5, true)

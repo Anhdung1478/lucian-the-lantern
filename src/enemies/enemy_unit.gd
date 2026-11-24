@@ -52,6 +52,50 @@ const FREED_COLOR := Color(1.5, 2.0, 1.85)
 const FREED_CHIME_DB := -6.0
 ## The veil (Black Mist): the sprite's color times this, a dark silhouette.
 const VEIL_SHADE := Color(0.08, 0.09, 0.12)
+## Smooth turning speed (rad/s) while walking when Juice is on.
+const TURN_SPEED := 14.0
+## Movement archetype per known enemy id (test units stay DEFAULT).
+const MOTION_PROFILES := {
+	&"akshan": UnitMotion.Profile.BIPED,
+	&"dark_lucian": UnitMotion.Profile.BIPED,
+	&"melee_minion": UnitMotion.Profile.BIPED,
+	&"ranged_minion": UnitMotion.Profile.BIPED,
+	&"shadow_melee_minion": UnitMotion.Profile.BIPED,
+	&"shadow_ranged_minion": UnitMotion.Profile.BIPED,
+	&"chain_warden": UnitMotion.Profile.BIPED,
+	&"ghoul": UnitMotion.Profile.BIPED,
+	&"mist_walker": UnitMotion.Profile.BIPED,
+	&"murkwolf": UnitMotion.Profile.BIPED,
+	&"murkwolf_big": UnitMotion.Profile.BIPED,
+	&"thresh_1": UnitMotion.Profile.FLOATING,
+	&"thresh_final": UnitMotion.Profile.FLOATING,
+	&"karthus": UnitMotion.Profile.FLOATING,
+	&"karthus_revived": UnitMotion.Profile.FLOATING,
+	&"maiden_of_the_mist": UnitMotion.Profile.FLOATING,
+	&"lantern_soul": UnitMotion.Profile.FLOATING,
+	&"spectral_rider": UnitMotion.Profile.FLOATING,
+	&"infernal_drake": UnitMotion.Profile.FLYING,
+	&"ocean_drake": UnitMotion.Profile.FLYING,
+	&"elder_dragon": UnitMotion.Profile.FLYING,
+	&"raptor": UnitMotion.Profile.FLYING,
+	&"raptor_big": UnitMotion.Profile.FLYING,
+	&"maokai": UnitMotion.Profile.HEAVY,
+	&"blue_sentinel": UnitMotion.Profile.HEAVY,
+	&"red_brambleback": UnitMotion.Profile.HEAVY,
+	&"krug": UnitMotion.Profile.HEAVY,
+	&"krug_big": UnitMotion.Profile.HEAVY,
+	&"super_minion": UnitMotion.Profile.HEAVY,
+	&"shadow_super_minion": UnitMotion.Profile.HEAVY,
+	&"hecarim": UnitMotion.Profile.HEAVY,
+	&"elise": UnitMotion.Profile.SKITTER,
+	&"broodmother": UnitMotion.Profile.SKITTER,
+	&"spiderling": UnitMotion.Profile.SKITTER,
+	&"rift_scuttler": UnitMotion.Profile.SKITTER,
+	&"sapling": UnitMotion.Profile.SKITTER,
+	&"gromp": UnitMotion.Profile.SKITTER,
+	&"siege_minion": UnitMotion.Profile.WHEELED,
+	&"shadow_siege_minion": UnitMotion.Profile.WHEELED,
+}
 
 var data: EnemyData
 var target: Lucian
@@ -177,6 +221,7 @@ func _ready() -> void:
 	sprite.texture = data.art
 	visuals.add_child(sprite)
 	motion = UnitMotion.new()
+	motion.profile = MOTION_PROFILES.get(data.id, UnitMotion.Profile.DEFAULT)
 	motion.setup(sprite, self, data.radius)
 	add_child(motion)
 	# Its burst's color is read from its art once per kind: now, as it comes,
@@ -399,7 +444,10 @@ func walk(direction: Vector2, delta: float) -> void:
 	velocity = direction * current_speed()
 	move_and_slide()
 	velocity = Vector2.ZERO
-	face(global_position + direction)
+	if Juice.on():
+		visuals.rotation = lerp_angle(visuals.rotation, direction.angle(), minf(1.0, TURN_SPEED * delta))
+	else:
+		face(global_position + direction)
 	if _stuck_left <= 0.0 and before.distance_to(global_position) < current_speed() * delta * STUCK_SHARE:
 		_stuck_left = STUCK_TIME
 		if randf() < 0.3:
