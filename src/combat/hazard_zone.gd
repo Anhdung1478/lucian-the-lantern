@@ -34,8 +34,10 @@ const CIRCLE_SIDES := 48
 ## the ground warnings'), the rim lit softly.
 const LAVA_CRUST := Color(0.12, 0.065, 0.05, 0.95)
 const LAVA_ROCK := Color(0.2, 0.1, 0.06, 0.95)
+const LAVA_ASH := Color(0.06, 0.035, 0.028)
 const LAVA_CRACK := Color(1.0, 0.52, 0.12)
-const LAVA_HOT := Color(1.0, 0.76, 0.3)
+const LAVA_HOT := Color(1.0, 0.78, 0.34)
+const LAVA_WHITE_HOT := Color(1.0, 0.95, 0.72)
 const LAVA_EDGE := Color(1.0, 0.5, 0.14)
 ## The rock inside the crust, as a share of the zone's size.
 const LAVA_ROCK_SHARE := 0.9
@@ -99,6 +101,16 @@ var _shape := PackedVector2Array()
 var _spots: Array[Vector3] = []
 ## Lava's cracks, relative to the position.
 var _cracks: Array[PackedVector2Array] = []
+## Secondary branching magma fissures forking off _cracks.
+var _branches: Array[PackedVector2Array] = []
+## Bright yellow-white molten hot spots at fissure junctions: (x, y, phase).
+var _hotspots: Array[Vector3] = []
+## Rising animated ember spark seeds: (x, y, phase, speed).
+var _embers: Array[Vector4] = []
+## Organic craggy lava crust silhouette and feathered outer scorched-ash rings.
+var _crust_shape := PackedVector2Array()
+var _ash_mid := PackedVector2Array()
+var _ash_outer := PackedVector2Array()
 ## The edge shrunk: lava's rock, or water's deeper steps.
 var _inner: Array[PackedVector2Array] = []
 ## The distance from the middle to the nearest edge.
@@ -217,6 +229,12 @@ func _clock() -> float:
 func _prepare() -> void:
 	_spots.clear()
 	_cracks.clear()
+	_branches.clear()
+	_hotspots.clear()
+	_embers.clear()
+	_crust_shape = PackedVector2Array()
+	_ash_mid = PackedVector2Array()
+	_ash_outer = PackedVector2Array()
 	_inner.clear()
 	if _shape.size() < 3:
 		return
@@ -236,10 +254,48 @@ func _prepare() -> void:
 	if effect == Effect.BURN:
 		_inner.append(_scaled(LAVA_ROCK_SHARE))
 		_make_cracks(dice, clampi(ceili(area * CRACK_DENSITY), 3, MAX_CRACKS))
+		_make_lava_details(dice, box, inner)
 	else:
 		for step in range(1, WATER_BANDS + 1):
 			for deeper in Geometry2D.offset_polygon(_shape, -WATER_DEPTH * step / WATER_BANDS, Geometry2D.JOIN_ROUND):
 				_inner.append(deeper)
+
+
+## Builds the organic craggy crust rim, feathered scorched-ash halo, secondary
+## branching fissures, incandescent hot spots, and ember spawn seeds.
+func _make_lava_details(dice: RandomNumberGenerator, box: Rect2, inner: PackedVector2Array) -> void:
+	var n := _shape.size()
+	var p1 := dice.randf() * TAU
+	var p2 := dice.randf() * TAU
+	for i in n:
+		var pt := _shape[i]
+		var ang := float(i) / n * TAU
+		var jag := 1.0 + 0.032 * sin(ang * 7.0 + p1) + 0.022 * cos(ang * 11.0 + p2)
+		var ash_jag := 1.0 + 0.055 * sin(ang * 5.0 + p2) + 0.035 * cos(ang * 9.0 + p1)
+		_crust_shape.append(pt * jag)
+		_ash_mid.append(pt * (1.07 * ash_jag))
+		_ash_outer.append(pt * (1.17 * ash_jag))
+	var rock := _inner[0]
+	for crack in _cracks:
+		if crack.size() >= 2:
+			var mid := crack[mini(1, crack.size() - 1)]
+			_hotspots.append(Vector3(mid.x, mid.y, dice.randf() * TAU))
+			var dir := (crack[1] - crack[0]).normalized()
+			var fork_dir := dir.rotated(dice.randf_range(0.55, 1.05) * (1.0 if dice.randf() > 0.5 else -1.0))
+			var b1 := mid + fork_dir * dice.randf_range(16.0, 30.0)
+			if Geometry2D.is_point_in_polygon(b1, rock):
+				var branch := PackedVector2Array([mid, b1])
+				var b2 := b1 + fork_dir.rotated(dice.randf_range(-0.6, 0.6)) * dice.randf_range(12.0, 22.0)
+				if Geometry2D.is_point_in_polygon(b2, rock):
+					branch.append(b2)
+				_branches.append(branch)
+	var ember_count := clampi(ceili(box.get_area() / 12000.0), 6, 22)
+	var ember_tries := 0
+	while _embers.size() < ember_count and ember_tries < ember_count * 8:
+		ember_tries += 1
+		var at := Vector2(dice.randf_range(box.position.x, box.end.x), dice.randf_range(box.position.y, box.end.y))
+		if Geometry2D.is_point_in_polygon(at, inner):
+			_embers.append(Vector4(at.x, at.y, dice.randf(), dice.randf_range(0.55, 0.95)))
 
 
 ## `count` cracks, each a bent line of up to CRACK_PIECES pieces from a spot in
@@ -275,24 +331,54 @@ func _draw() -> void:
 		_draw_water(fade)
 
 
-## A dark crust with glowing cracks and a hot core that pulse together, a soft
-## orange light on the rim, and bubbles.
+## Scorched-ash feathered halo, organic craggy basalt crust, branching molten
+## magma fissures with incandescent hot spots, and rising embers (with Juice).
 func _draw_lava(fade: float) -> void:
 	var clock := _clock()
 	var pulse := 0.5 + 0.5 * sin(clock * TAU / LAVA_PULSE_TIME)
-	_draw_edge(_faded(Color(LAVA_EDGE, LAVA_HALO_ALPHA * (0.7 + 0.3 * pulse)), fade), LAVA_HALO_WIDTH)
-	draw_colored_polygon(_shape, _faded(LAVA_CRUST, fade))
-	draw_colored_polygon(_inner[0], _faded(LAVA_ROCK, fade))
 	var glow := 0.55 + 0.45 * pulse
+	var crust := _crust_shape if _crust_shape.size() >= 3 else _shape
+	# Feathered dark-ash scorched halo outside the crust.
+	if _ash_outer.size() >= 3:
+		draw_colored_polygon(_ash_outer, _faded(Color(LAVA_ASH, 0.24), fade))
+		draw_colored_polygon(_ash_mid, _faded(Color(LAVA_ASH, 0.46), fade))
+	_draw_poly_edge(crust, _faded(Color(LAVA_EDGE, LAVA_HALO_ALPHA * (0.65 + 0.35 * pulse)), fade), LAVA_HALO_WIDTH * 1.2)
+	draw_colored_polygon(crust, _faded(LAVA_CRUST, fade))
+	draw_colored_polygon(_inner[0], _faded(LAVA_ROCK, fade))
+	# Branching molten magma fissures.
+	for branch in _branches:
+		draw_polyline(branch, _faded(Color(LAVA_CRACK, CRACK_ALPHA * 0.28 * glow), fade), CRACK_WIDTH * 2.2, true)
+		draw_polyline(branch, _faded(Color(LAVA_HOT, CRACK_ALPHA * 0.78 * glow), fade), CRACK_WIDTH * 0.7, true)
 	for crack in _cracks:
-		draw_polyline(crack, _faded(Color(LAVA_CRACK, CRACK_ALPHA * 0.35 * glow), fade), CRACK_WIDTH * 3.0, true)
-		draw_polyline(crack, _faded(Color(LAVA_CRACK, CRACK_ALPHA * glow), fade), CRACK_WIDTH, true)
+		draw_polyline(crack, _faded(Color(LAVA_CRACK, CRACK_ALPHA * 0.35 * glow), fade), CRACK_WIDTH * 3.2, true)
+		draw_polyline(crack, _faded(Color(LAVA_CRACK, CRACK_ALPHA * glow), fade), CRACK_WIDTH * 1.15, true)
+		draw_polyline(crack, _faded(Color(LAVA_WHITE_HOT, 0.65 * glow), fade), CRACK_WIDTH * 0.45, true)
+	# Incandescent yellow-white hot spots at fissure junctions & core.
 	MapArt.glow(self, Vector2.ZERO, _core * LAVA_CORE_SHARE, _faded(Color(LAVA_CRACK, LAVA_CORE_ALPHA * glow), fade))
-	MapArt.glow(self, Vector2.ZERO, _core * LAVA_CORE_SHARE * 0.5, _faded(Color(LAVA_HOT, LAVA_CORE_ALPHA * glow), fade))
+	MapArt.glow(self, Vector2.ZERO, _core * LAVA_CORE_SHARE * 0.52, _faded(Color(LAVA_HOT, LAVA_CORE_ALPHA * glow), fade))
+	MapArt.glow(self, Vector2.ZERO, _core * LAVA_CORE_SHARE * 0.22, _faded(Color(LAVA_WHITE_HOT, 0.42 * glow), fade))
+	for spot in _hotspots:
+		var hot_pulse := 0.5 + 0.5 * sin(clock * 2.4 + spot.z)
+		var at := Vector2(spot.x, spot.y)
+		MapArt.glow(self, at, 18.0 + 7.0 * hot_pulse, _faded(Color(LAVA_CRACK, 0.32 * glow), fade))
+		MapArt.glow(self, at, 7.0 + 3.5 * hot_pulse, _faded(Color(LAVA_WHITE_HOT, 0.62 * (0.65 + 0.35 * hot_pulse)), fade))
+	# Magma blisters / bubbles.
 	for spot in _spots:
 		var life := fmod(clock * 0.7 + spot.z / TAU, 1.0)
-		draw_circle(Vector2(spot.x, spot.y), 3.0 + 6.0 * life, _faded(Color(LAVA_HOT, 0.5 * (1.0 - life)), fade))
-	_draw_edge(_faded(Color(LAVA_EDGE, LAVA_EDGE_ALPHA), fade), 3.0)
+		draw_circle(Vector2(spot.x, spot.y), 2.5 + 5.5 * life, _faded(Color(LAVA_HOT, 0.46 * (1.0 - life)), fade))
+	# Softened fractured ember rim (clear danger boundary without a hard dinner-plate edge).
+	_draw_poly_edge(crust, _faded(Color(LAVA_EDGE, LAVA_EDGE_ALPHA * 0.38), fade), 5.0)
+	_draw_poly_edge(crust, _faded(Color(LAVA_HOT, LAVA_EDGE_ALPHA * 0.58 * (0.75 + 0.25 * pulse)), fade), 1.8)
+	# Gently rising animated ember sparks when Juice is on.
+	if Juice.on():
+		for ember in _embers:
+			var life := fmod(clock * ember.w + ember.z, 1.0)
+			var rise := Vector2(sin(clock * 2.6 + ember.z * TAU) * 10.0, -34.0 * life)
+			var pos := Vector2(ember.x, ember.y) + rise
+			var alpha := sin(life * PI) * 0.9 * fade
+			var spark_col := LAVA_WHITE_HOT.lerp(LAVA_CRACK, life)
+			MapArt.glow(self, pos, 6.5 * (1.0 - life * 0.4), Color(LAVA_CRACK, alpha * 0.45))
+			draw_circle(pos, 2.2 * (1.0 - life * 0.45), Color(spark_col, alpha))
 
 
 ## Clear water over the riverbed: a tint deepening inward, a soft bank,
@@ -316,8 +402,12 @@ func _draw_water(fade: float) -> void:
 
 
 func _draw_edge(color: Color, width: float) -> void:
-	var edge := _shape.duplicate()
-	edge.append(_shape[0])
+	_draw_poly_edge(_shape, color, width)
+
+
+func _draw_poly_edge(poly: PackedVector2Array, color: Color, width: float) -> void:
+	var edge := poly.duplicate()
+	edge.append(poly[0])
 	draw_polyline(edge, color, width, true)
 
 

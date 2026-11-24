@@ -87,8 +87,8 @@ const PHASE_2_HOOK_FIRST := 1.0
 const RISE_TIME := 2.5
 ## Seconds he stands after a skill's warning ends.
 const RECOVER := 0.3
-## Phase 2: his art's color times this.
-const PHASE_2_SHADE := Color(0.5, 0.56, 0.54)
+## Phase 2: his art's color times this (bright jade-tinged shade, keeping max < 0.8).
+const PHASE_2_SHADE := Color(0.66, 0.78, 0.73)
 const AURA_COLOR := Color("4dff9a")
 ## The aura reaches this far past his body; it swells by AURA_SWELL as he rises.
 const AURA_GAP := 22.0
@@ -105,6 +105,7 @@ var phase := 1
 var _floored := false
 var _fallen := false
 var _rise_left := 0.0
+var _aura_time := 0.0
 ## This cast's hook has come again already (Phase 2).
 var _hooked_again := false
 var _box_damage := BOX_DAMAGE
@@ -162,6 +163,9 @@ func _die() -> void:
 func _physics_process(delta: float) -> void:
 	super(delta)
 	_box_gap_left = maxf(_box_gap_left - delta, 0.0)
+	if has_aura():
+		_aura_time += delta
+		queue_redraw()
 	if _floored:
 		_floored = false
 		if phase == 1:
@@ -262,6 +266,7 @@ func _raise_box(center: Vector2) -> void:
 	var box := SpectralWall.ring(center, BOX_RADIUS, BOX_PIECES, BOX_TIME)
 	box.target = target
 	box.break_on_touch = true
+	box.style = SpectralWall.Style.THRESH
 	box.touched.connect(_box_touched)
 	_place(box)
 
@@ -332,6 +337,10 @@ func _rise() -> void:
 	add_skill(&"dark_passage", PASSAGE_COOLDOWN, PASSAGE_RANGE, RISE_TIME + PASSAGE_FIRST, dark_passage)
 	add_skill(&"the_box", BOX_COOLDOWN_PHASE_2, BOX_RADIUS, RISE_TIME + BOX_FIRST, the_box)
 	_paint()
+	if Juice.on():
+		var nova := _SoulNovaVfx.new()
+		nova.setup(global_position, radius + AURA_GAP)
+		_place(nova)
 	queue_redraw()
 
 
@@ -357,11 +366,92 @@ func _paint() -> void:
 		sprite.modulate = data.tint * PHASE_2_SHADE
 
 
-## Phase 2's green aura under his art; it swells while he rises.
+## Phase 2's enriched emerald aura: rim-glow halo, counter-rotating spectral
+## rune rings, and orbiting emerald soul-wisps; swells dramatically while rising.
 func _draw() -> void:
 	super()
 	if not has_aura():
 		return
-	var reach := (radius + AURA_GAP) * (1.0 + AURA_SWELL * _rise_left / RISE_TIME)
-	draw_circle(Vector2.ZERO, reach, Color(AURA_COLOR, 0.14))
-	draw_arc(Vector2.ZERO, reach, 0.0, TAU, 64, Color(AURA_COLOR, 0.7), 4.0, true)
+	var swell := 1.0 + AURA_SWELL * _rise_left / RISE_TIME
+	var reach := (radius + AURA_GAP) * swell
+	var pulse := 0.5 + 0.5 * sin(_aura_time * 4.5)
+	# Eerie emerald rim-glow halo framing Thresh's silhouette.
+	draw_circle(Vector2.ZERO, radius * (1.18 + 0.08 * pulse), Color(AURA_COLOR, 0.16))
+	draw_arc(Vector2.ZERO, radius * 1.08, 0.0, TAU, 48, Color("86ffc4", 0.42 + 0.18 * pulse), 3.0, true)
+	# Outer pulsing ground aura.
+	draw_circle(Vector2.ZERO, reach, Color(AURA_COLOR, 0.13))
+	draw_arc(Vector2.ZERO, reach, 0.0, TAU, 64, Color(AURA_COLOR, 0.68), 3.5, true)
+	# Counter-rotating swirling spectral rune rings.
+	var outer_rot := _aura_time * 1.35
+	var inner_rot := -_aura_time * 2.1
+	for i in 4:
+		var a0 := outer_rot + i * (TAU / 4.0)
+		draw_arc(Vector2.ZERO, reach * 0.88, a0, a0 + 0.82, 14, Color("72ffbe", 0.55), 2.8, true)
+		var rune_pos := Vector2.from_angle(a0 + 0.41) * (reach * 0.88)
+		var rune := PackedVector2Array([
+			rune_pos + Vector2(0.0, -5.0),
+			rune_pos + Vector2(3.8, 0.0),
+			rune_pos + Vector2(0.0, 5.0),
+			rune_pos + Vector2(-3.8, 0.0),
+		])
+		draw_colored_polygon(rune, Color("c8ffe6", 0.8))
+	for i in 6:
+		var a0 := inner_rot + i * (TAU / 6.0)
+		draw_arc(Vector2.ZERO, reach * 0.68, a0, a0 + 0.48, 10, Color("38d98c", 0.48), 2.0, true)
+	# Five orbiting emerald soul-wisps with fading comet tails.
+	for i in 5:
+		var ang := _aura_time * 2.3 + i * TAU / 5.0
+		var wisp_r := reach * (0.94 + 0.08 * sin(_aura_time * 3.8 + i * 1.7))
+		var wisp_pos := Vector2.from_angle(ang) * wisp_r
+		var tail_pts := PackedVector2Array()
+		for k in 5:
+			var ta := ang - k * 0.11
+			tail_pts.append(Vector2.from_angle(ta) * wisp_r)
+		draw_polyline(tail_pts, Color(AURA_COLOR, 0.48), 3.6, true)
+		draw_circle(wisp_pos, 9.0, Color(AURA_COLOR, 0.24))
+		draw_circle(wisp_pos, 4.6, Color("72ffbe", 0.94))
+		draw_circle(wisp_pos, 2.2, Color("f0fff8", 0.98))
+
+
+class _SoulNovaVfx extends Node2D:
+	const LIFETIME := 0.65
+	var _elapsed := 0.0
+	var _base_radius := 70.0
+	var _wisps: Array[Dictionary] = []
+
+	func setup(at: Vector2, base_radius: float) -> void:
+		position = at
+		_base_radius = base_radius
+		z_index = 7
+		for i in 12:
+			var ang := TAU * float(i) / 12.0 + randf_range(-0.1, 0.1)
+			_wisps.append({
+				"ang": ang,
+				"speed": randf_range(240.0, 380.0),
+				"size": randf_range(4.0, 8.0),
+			})
+
+	func _process(delta: float) -> void:
+		_elapsed += delta
+		if _elapsed >= LIFETIME:
+			queue_free()
+			return
+		queue_redraw()
+
+	func _draw() -> void:
+		var t := clampf(_elapsed / LIFETIME, 0.0, 1.0)
+		var ease_out := 1.0 - pow(1.0 - t, 2.8)
+		var alpha := 1.0 - t
+		var r1 := lerpf(_base_radius * 0.4, _base_radius * 3.4, ease_out)
+		var r2 := lerpf(_base_radius * 0.25, _base_radius * 2.4, ease_out)
+		draw_circle(Vector2.ZERO, lerpf(_base_radius * 1.4, _base_radius * 0.3, t), Color("4dff9a", alpha * 0.32))
+		draw_circle(Vector2.ZERO, lerpf(_base_radius * 0.6, 8.0, t), Color("e6fff3", alpha * 0.85))
+		draw_arc(Vector2.ZERO, r1, 0.0, TAU, 64, Color("4dff9a", alpha * 0.95), lerpf(14.0, 2.0, t), true)
+		draw_arc(Vector2.ZERO, r2, 0.0, TAU, 56, Color("c4ffe2", alpha * 0.85), lerpf(7.0, 1.5, t), true)
+		for w: Dictionary in _wisps:
+			var ang: float = w.ang + t * 0.65
+			var dist: float = w.speed * _elapsed * (1.0 - t * 0.35)
+			var pos := Vector2.from_angle(ang) * dist
+			var tail := Vector2.from_angle(ang - 0.12) * maxf(dist - 28.0, 0.0)
+			draw_line(tail, pos, Color("4dff9a", alpha * 0.72), 3.0, true)
+			draw_circle(pos, w.size * (1.0 - t * 0.45), Color("dcfff0", alpha))

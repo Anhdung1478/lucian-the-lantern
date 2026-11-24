@@ -1,20 +1,19 @@
 class_name DeathBurst
 extends Node2D
-## An enemy's end: a thin ring that opens and a few motes that fly out from
-## where it stood, in its own color, gone within LIFETIME. Only a look, and
-## only made while Juice is on.
+## An enemy's end: an incandescent flash core, double expanding shock-rings,
+## angular shattering shards, and soft dissipating mist puffs in its own color,
+## gone within LIFETIME. Only a look, and only made while Juice is on.
 
 const LIFETIME := 0.35
-const MOTES := 9
-## A mote starts this far from the middle and flies this much further (shares
+const SHARDS := 11
+const PUFFS := 6
+## A shard starts this far from the middle and flies this much further (shares
 ## of the unit's radius; each flies a little less or more).
-const MOTE_START := 0.45
-const MOTE_FLIGHT := 1.15
-const MOTE_SIZE := 5.5
-## The ring opens from RING_START to RING_END of the radius.
-const RING_START := 0.7
-const RING_END := 1.45
-const RING_WIDTH := 2.5
+const SHARD_START := 0.25
+const SHARD_FLIGHT := 1.45
+## The outer ring opens from RING_START to RING_END of the radius.
+const RING_START := 0.55
+const RING_END := 1.65
 ## A unit's color when its art can't be read (headless), and how much paler
 ## than the art the burst is.
 const FALLBACK := Color(0.85, 0.35, 0.3)
@@ -29,8 +28,10 @@ var radius := 30.0
 var color := FALLBACK
 
 var _age := 0.0
-## Each mote: its direction, scaled by how far it flies (shares of radius).
-var _motes := PackedVector2Array()
+## Each shard: [angle, reach_mult, len, width, spin_rate].
+var _shards: Array[Array] = []
+## Each mist puff: [angle, reach_mult, start_r, end_r].
+var _puffs: Array[Array] = []
 
 
 ## The color an enemy's `art` reads as: the average of its opaque pixels,
@@ -74,9 +75,15 @@ func setup(at: Vector2, unit_radius: float, unit_color: Color) -> void:
 	position = at
 	radius = unit_radius
 	color = unit_color
+	_shards.clear()
+	_puffs.clear()
 	var turn := randf() * TAU
-	for i in MOTES:
-		_motes.append(Vector2.from_angle(turn + TAU * i / MOTES + randf_range(-0.25, 0.25)) * randf_range(0.7, 1.2))
+	for i in SHARDS:
+		var ang := turn + TAU * i / SHARDS + randf_range(-0.24, 0.24)
+		_shards.append([ang, randf_range(0.75, 1.35), randf_range(8.0, 16.0), randf_range(2.6, 5.2), randf_range(-5.0, 5.0)])
+	for i in PUFFS:
+		var ang := turn + 0.35 + TAU * i / PUFFS + randf_range(-0.3, 0.3)
+		_puffs.append([ang, randf_range(0.55, 1.05), randf_range(6.0, 10.0), randf_range(16.0, 24.0)])
 
 
 func _process(delta: float) -> void:
@@ -88,11 +95,46 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	var t := _age / LIFETIME
-	# Quick at first, slowing as it spreads.
-	var out := 1.0 - (1.0 - t) * (1.0 - t)
+	var t := clampf(_age / LIFETIME, 0.0, 1.0)
+	var out := 1.0 - pow(1.0 - t, 2.4)
 	var fade := 1.0 - t
-	draw_arc(Vector2.ZERO, radius * lerpf(RING_START, RING_END, out), 0.0, TAU, 40, Color(color, 0.7 * fade), RING_WIDTH, true)
-	for mote in _motes:
-		var at := mote.normalized() * radius * (MOTE_START + MOTE_FLIGHT * mote.length() * out)
-		draw_circle(at, MOTE_SIZE * (0.4 + 0.6 * fade), Color(color, fade))
+	var hot := color.lerp(Color.WHITE, 0.7)
+	# Soft dissipating mist puffs behind shards.
+	for puff in _puffs:
+		var ang: float = puff[0]
+		var dist := radius * (0.2 + 0.95 * (puff[1] as float) * out)
+		var r := lerpf(puff[2], puff[3], out)
+		SoftShape.ellipse(self, Vector2.from_angle(ang) * dist, Vector2.ONE * r, Color(color.darkened(0.12), 0.32 * fade * fade), 0.2)
+	# Initial incandescent flash core (quick punch over first 42% of life).
+	if t < 0.42:
+		var ft := 1.0 - t / 0.42
+		SoftShape.ellipse(self, Vector2.ZERO, Vector2.ONE * (radius * (0.65 + 0.55 * (1.0 - ft))), Color(color, 0.55 * ft), 0.25)
+		SoftShape.ellipse(self, Vector2.ZERO, Vector2.ONE * (radius * 0.52 * ft), Color(hot, 0.95 * ft), 0.45)
+	# Double expanding tapered shock-rings.
+	var outer_r := radius * lerpf(RING_START, RING_END, out)
+	var inner_r := radius * lerpf(RING_START * 0.7, RING_END * 0.78, sqrt(t))
+	draw_arc(Vector2.ZERO, outer_r, 0.0, TAU, 48, Color(hot, 0.78 * fade * fade), lerpf(4.0, 0.9, t), true)
+	draw_arc(Vector2.ZERO, inner_r, 0.0, TAU, 40, Color(color, 0.48 * fade), lerpf(7.5, 1.5, t), true)
+	# Varied tapered angular shards flying outward.
+	for shard in _shards:
+		var ang: float = shard[0]
+		var dist := radius * (SHARD_START + SHARD_FLIGHT * (shard[1] as float) * out)
+		var center := Vector2.from_angle(ang) * dist
+		var dir := Vector2.from_angle(ang + (shard[4] as float) * t * 0.28)
+		var side := dir.orthogonal()
+		var half_l: float = (shard[2] as float) * (0.35 + 0.65 * fade)
+		var half_w: float = (shard[3] as float) * (0.3 + 0.7 * fade)
+		var poly := PackedVector2Array([
+			center + dir * half_l,
+			center + side * half_w - dir * (half_l * 0.15),
+			center - dir * (half_l * 0.85),
+			center - side * half_w - dir * (half_l * 0.15),
+		])
+		draw_colored_polygon(poly, Color(color, 0.92 * fade))
+		var core_poly := PackedVector2Array([
+			center + dir * (half_l * 0.65),
+			center + side * (half_w * 0.42),
+			center - dir * (half_l * 0.45),
+			center - side * (half_w * 0.42),
+		])
+		draw_colored_polygon(core_poly, Color(hot, 0.85 * fade))

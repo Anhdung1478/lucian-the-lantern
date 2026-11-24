@@ -35,6 +35,7 @@ var _rappel_warning: GroundWarning
 var _webs_flying := 0
 var _rappel_spot := Vector2.ZERO
 var _fade: Tween
+var _drop_tween: Tween
 
 
 func _ready() -> void:
@@ -65,6 +66,7 @@ func _spit_web(toward: Vector2) -> void:
 	var bolt := fire_bolt(skill_hit(COCOON_DAMAGE, DamageInfo.Type.MAGIC, &"cocoon"), COCOON_SPEED, COCOON_LENGTH, toward)
 	bolt.hit_radius = COCOON_WIDTH * 0.5
 	bolt.color = WEB
+	bolt.style = EnemyProjectile.Style.WEB
 	bolt.hit_lucian.connect(_web_hit)
 	_webs_flying += 1
 	bolt.tree_exited.connect(_web_gone)
@@ -94,13 +96,20 @@ func rappel() -> float:
 	_rappel_spot = target.global_position
 	if _flash_tween:
 		_flash_tween.kill()
+	if _drop_tween:
+		_drop_tween.kill()
 	visuals.modulate = Color.WHITE
+	visuals.position = Vector2.ZERO
+	visuals.scale = Vector2.ONE
 	_fade = create_tween().set_parallel()
 	_fade.tween_property(visuals, "modulate:a", 0.0, RISE_FADE)
+	_fade.tween_property(visuals, "position:y", -220.0, RISE_FADE).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_fade.tween_property(visuals, "scale", Vector2.ONE * 0.78, RISE_FADE)
 	_fade.tween_property(health_bar, "modulate:a", 0.0, RISE_FADE)
 	_fade.tween_property(shadow, "modulate:a", 0.0, RISE_FADE)
 	_rappel_warning = GroundWarning.circle(_rappel_spot, RAPPEL_RADIUS, RAPPEL_TIME)
 	warning_parent.add_child(_rappel_warning)
+	queue_redraw()
 	return RAPPEL_TIME + RECOVER
 
 
@@ -135,6 +144,7 @@ func _physics_process(delta: float) -> void:
 			_rappel_spot = Boss.landing_spot(_rappel_spot, arena, radius)
 		if is_instance_valid(_rappel_warning):
 			_rappel_warning.global_position = _rappel_spot
+	queue_redraw()
 	if _rappel_time >= RAPPEL_TIME:
 		_drop()
 
@@ -147,8 +157,88 @@ func _drop() -> void:
 	set_untargetable(false)
 	if _fade:
 		_fade.kill()
+	if _drop_tween:
+		_drop_tween.kill()
 	visuals.modulate.a = 1.0
+	visuals.position = Vector2(0.0, -160.0)
+	visuals.scale = Vector2(0.88, 1.15)
+	_drop_tween = create_tween().set_parallel()
+	_drop_tween.tween_property(visuals, "position", Vector2.ZERO, 0.12).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	_drop_tween.tween_property(visuals, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	health_bar.modulate.a = 1.0
 	shadow.modulate.a = 1.0
+	if Juice.on():
+		var splatter := _WebSplatterVfx.new()
+		splatter.setup(_rappel_spot, RAPPEL_RADIUS)
+		warning_parent.add_child(splatter)
+	queue_redraw()
 	if is_instance_valid(target) and GroundWarning.in_circle(_rappel_spot, RAPPEL_RADIUS, target.global_position, Lucian.HIT_RADIUS):
 		target.take_damage(skill_hit(RAPPEL_DAMAGE, DamageInfo.Type.MAGIC, &"rappel"))
+
+
+func _draw() -> void:
+	super()
+	if not is_rappelling():
+		return
+	# Taut silver silk thread stretching straight up as she ascends off-screen.
+	if _rappel_time < RISE_FADE + 0.08:
+		var rise_alpha := clampf(1.0 - _rappel_time / (RISE_FADE + 0.08), 0.0, 1.0)
+		draw_line(visuals.position, Vector2(0.0, -720.0), Color(WEB, rise_alpha * 0.45), 5.0, true)
+		draw_line(visuals.position, Vector2(0.0, -720.0), Color(Color.WHITE, rise_alpha * 0.92), 2.0, true)
+	# Shimmering gossamer vertical silk strand dangling down to the target ring.
+	var spot_local := to_local(_rappel_spot)
+	var top_pt := spot_local + Vector2(0.0, -700.0)
+	var locked := _rappel_time >= RAPPEL_FOLLOW
+	var shimmer := 0.65 + 0.35 * sin(_rappel_time * 16.0)
+	var strand_alpha := (0.72 if locked else 0.46) * shimmer
+	draw_line(top_pt, spot_local, Color(WEB, strand_alpha * 0.4), 5.5, true)
+	draw_line(top_pt, spot_local, Color(Color.WHITE, strand_alpha), 1.8, true)
+	# Subtle silk anchor cross & descending glint once the drop spot locks.
+	if locked:
+		var drop_frac := clampf((_rappel_time - RAPPEL_FOLLOW) / maxf(RAPPEL_TIME - RAPPEL_FOLLOW, 0.01), 0.0, 1.0)
+		var glint_y := lerpf(-420.0, -18.0, drop_frac * drop_frac)
+		draw_circle(spot_local + Vector2(0.0, glint_y), 5.5, Color(Color.WHITE, 0.85))
+		for i in 6:
+			var ang := i * TAU / 6.0
+			draw_line(spot_local, spot_local + Vector2.from_angle(ang) * 26.0, Color(WEB, 0.55), 1.6, true)
+		draw_arc(spot_local, 16.0, 0.0, TAU, 18, Color(Color.WHITE, 0.62), 1.5, true)
+
+
+class _WebSplatterVfx extends Node2D:
+	const LIFETIME := 0.44
+	var _elapsed := 0.0
+	var _radius := 180.0
+	var _spokes := 8
+
+	func setup(at: Vector2, splatter_radius: float) -> void:
+		position = at
+		_radius = splatter_radius
+		z_index = 6
+
+	func _process(delta: float) -> void:
+		_elapsed += delta
+		if _elapsed >= LIFETIME:
+			queue_free()
+			return
+		queue_redraw()
+
+	func _draw() -> void:
+		var t := clampf(_elapsed / LIFETIME, 0.0, 1.0)
+		var ease_out := 1.0 - pow(1.0 - t, 2.5)
+		var alpha := 1.0 - t
+		var cur_r := _radius * (0.22 + 0.84 * ease_out)
+		# Dark crimson impact flash at center.
+		draw_circle(Vector2.ZERO, cur_r * 0.48, Color("a81c3a", alpha * 0.34))
+		draw_arc(Vector2.ZERO, cur_r, 0.0, TAU, 48, Color("d93254", alpha * 0.72), lerpf(7.0, 1.5, t), true)
+		# Radial silver spiderweb spokes & concentric silk rings.
+		for i in _spokes:
+			var ang := i * TAU / _spokes + 0.18
+			var tip := Vector2.from_angle(ang) * cur_r
+			draw_line(Vector2.ZERO, tip, Color("f0f2ff", alpha * 0.86), lerpf(2.8, 1.2, t), true)
+			draw_circle(tip, lerpf(5.0, 2.0, t), Color("e6e8f5", alpha * 0.85))
+		for ring_frac: float in [0.38, 0.68]:
+			var poly := PackedVector2Array()
+			for i in _spokes + 1:
+				var ang := i * TAU / _spokes + 0.18
+				poly.append(Vector2.from_angle(ang) * (cur_r * ring_frac))
+			draw_polyline(poly, Color("e8eaf6", alpha * 0.78), 1.8, true)

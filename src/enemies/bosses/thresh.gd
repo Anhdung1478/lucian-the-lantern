@@ -104,6 +104,7 @@ func _throw_hook(toward: Vector2) -> EnemyProjectile:
 	var hook := fire_bolt(skill_hit(hook_damage, DamageInfo.Type.MAGIC, &"death_sentence"), HOOK_SPEED, HOOK_LENGTH, toward)
 	hook.hit_radius = HOOK_WIDTH * 0.5
 	hook.color = CHAIN_COLOR
+	hook.style = EnemyProjectile.Style.HOOK
 	hook.tether = self
 	hook.hit_lucian.connect(_pull)
 	Sfx.play(&"hook")
@@ -116,7 +117,87 @@ func _pull() -> void:
 
 
 func _flay_lands(warning: GroundWarning) -> void:
-	if stopped or not warning.covers(target.global_position, Lucian.HIT_RADIUS):
+	if stopped:
+		return
+	if Juice.on():
+		var slash := _FlaySlashVfx.new()
+		slash.setup(warning.global_position, warning.direction, FLAY_LENGTH, FLAY_ANGLE, CHAIN_COLOR)
+		_place(slash)
+	if not warning.covers(target.global_position, Lucian.HIT_RADIUS):
 		return
 	if target.take_damage(skill_hit(flay_damage, DamageInfo.Type.MAGIC, &"flay")):
 		target.displace(target.global_position + global_position.direction_to(target.global_position) * flay_push, PULL_SPEED)
+
+
+class _FlaySlashVfx extends Node2D:
+	const LIFETIME := 0.34
+	var _elapsed := 0.0
+	var _length := 400.0
+	var _angle := PI * 70.0 / 180.0
+	var _color := Color("8fe3b0")
+	var _sparks: Array[Dictionary] = []
+
+	func setup(from: Vector2, toward: Vector2, length: float, angle: float, chain_color: Color) -> void:
+		position = from
+		rotation = toward.angle()
+		_length = length
+		_angle = angle
+		_color = chain_color
+		z_index = 7
+		for i in 12:
+			_sparks.append({
+				"ang": randf_range(-angle * 0.52, angle * 0.52),
+				"dist": randf_range(length * 0.35, length * 1.05),
+				"size": randf_range(2.5, 5.5),
+			})
+
+	func _process(delta: float) -> void:
+		_elapsed += delta
+		if _elapsed >= LIFETIME:
+			queue_free()
+			return
+		queue_redraw()
+
+	func _draw() -> void:
+		var t := clampf(_elapsed / LIFETIME, 0.0, 1.0)
+		var sweep := 1.0 - pow(1.0 - minf(t / 0.45, 1.0), 2.5)
+		var alpha := 1.0 - pow(t, 1.5)
+		var half_a := _angle * 0.5
+		var start_a := -half_a
+		var end_a := lerpf(-half_a, half_a, sweep)
+		var cur_r := _length * (0.48 + 0.52 * sweep)
+		# Translucent emerald cone-sweep wash.
+		var wash := PackedVector2Array([Vector2.ZERO])
+		for i in 13:
+			var a := lerpf(start_a, end_a, float(i) / 12.0)
+			wash.append(Vector2.from_angle(a) * cur_r)
+		if wash.size() >= 3:
+			draw_colored_polygon(wash, Color(_color, alpha * 0.22))
+		# Curved glowing emerald chain-slash arc ripping across the cone.
+		var arc_steps := 14
+		var arc_pts := PackedVector2Array()
+		for i in arc_steps + 1:
+			var frac := float(i) / arc_steps
+			var a := lerpf(start_a, end_a, frac)
+			var r_curve := cur_r * (0.86 + 0.14 * sin(frac * PI))
+			arc_pts.append(Vector2.from_angle(a) * r_curve)
+		if arc_pts.size() >= 2:
+			draw_polyline(arc_pts, Color(_color, alpha * 0.4), 18.0, true)
+			draw_polyline(arc_pts, Color("1a332b", alpha * 0.92), 8.5, true)
+			draw_polyline(arc_pts, Color(_color.lightened(0.25), alpha * 0.95), 4.2, true)
+			draw_polyline(arc_pts, Color("e8fff4", alpha * 0.95), 1.8, true)
+			# Iron chain-link notches along the sweeping blade.
+			for i in range(1, arc_pts.size() - 1, 2):
+				var p0 := arc_pts[i]
+				var tangent := (arc_pts[i + 1] - arc_pts[i - 1]).normalized()
+				var normal := tangent.orthogonal()
+				draw_line(p0 - normal * 6.5, p0 + normal * 6.5, Color("142420", alpha * 0.95), 3.0, true)
+				draw_circle(p0, 3.2, Color("b8ffdc", alpha * 0.9))
+		# Trailing soul sparks thrown outward by the chain lash.
+		for s: Dictionary in _sparks:
+			var ang: float = s.ang
+			var dist: float = s.dist
+			var sz: float = s.size
+			if ang <= end_a + 0.08:
+				var pos := Vector2.from_angle(ang) * (dist * (0.4 + 0.6 * t))
+				draw_circle(pos, sz * (1.0 - t * 0.5), Color("b8ffdc", alpha))

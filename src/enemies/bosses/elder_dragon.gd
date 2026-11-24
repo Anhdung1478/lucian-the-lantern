@@ -57,7 +57,9 @@ var _dive := Dive.NONE
 ## Seconds of the follow left, then seconds into the fall.
 var _follow_left := 0.0
 var _fall_time := 0.0
+var _wing_clock := 0.0
 var _fade: Tween
+var _slam_tween: Tween
 
 
 func _ready() -> void:
@@ -79,8 +81,17 @@ func elder_breath() -> float:
 	face(target.global_position)
 	var warning := GroundWarning.cone(global_position, toward, BREATH_LENGTH, BREATH_ANGLE, BREATH_WARN)
 	warning.strike(skill_hit(BREATH_DAMAGE, DamageInfo.Type.MAGIC, &"elder_breath"), target)
+	warning.fired.connect(_spawn_breath_vfx.bind(global_position, toward))
 	warning_parent.add_child(warning)
 	return BREATH_WARN + RECOVER
+
+
+func _spawn_breath_vfx(from: Vector2, toward: Vector2) -> void:
+	if not Juice.on() or not is_alive():
+		return
+	var vfx := _ElderBreathVfx.new()
+	vfx.setup(from, toward, BREATH_LENGTH, BREATH_ANGLE)
+	warning_parent.add_child(vfx)
 
 
 ## Takes off: untargetable, its art and the shadow at its feet fading out,
@@ -131,6 +142,7 @@ func _physics_process(delta: float) -> void:
 	super(delta)
 	if not is_alive() or not is_diving():
 		return
+	_wing_clock += delta
 	if _dive == Dive.FOLLOW:
 		_follow(delta)
 	else:
@@ -169,10 +181,18 @@ func _land() -> void:
 	set_untargetable(false)
 	if _fade:
 		_fade.kill()
+	if _slam_tween:
+		_slam_tween.kill()
 	visuals.modulate.a = 1.0
-	visuals.scale = Vector2.ONE
+	visuals.scale = Vector2.ONE * 1.55
+	_slam_tween = create_tween()
+	_slam_tween.tween_property(visuals, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	health_bar.modulate.a = 1.0
 	shadow.modulate.a = 1.0
+	if Juice.on():
+		var slam_vfx := _ElderSlamVfx.new()
+		slam_vfx.setup(global_position, DIVE_RADIUS)
+		warning_parent.add_child(slam_vfx)
 	queue_redraw()
 	if not (is_instance_valid(target) and GroundWarning.in_circle(global_position, DIVE_RADIUS, target.global_position, Lucian.HIT_RADIUS)):
 		return
@@ -187,11 +207,159 @@ func _draw() -> void:
 	super()
 	if not is_diving():
 		return
-	# Small and faint while it is high; bigger and darker as it falls.
+	# Recognizable winged dragon shadow silhouette gliding over the pit floor,
+	# growing sharper and darker as it dives during FALL.
 	var fall := clampf(_fall_time / DIVE_WARN, 0.0, 1.0)
-	var shadow := radius * SHADOW_SIZE * lerpf(0.8, 1.2, fall)
-	var alpha := lerpf(0.35, 0.6, fall)
-	draw_set_transform(Vector2.ZERO, visuals.rotation, Vector2(1.0, SHADOW_SQUASH))
-	draw_circle(Vector2.ZERO, shadow * 1.15, Color(SHADOW_COLOR, alpha * 0.4))
-	draw_circle(Vector2.ZERO, shadow, Color(SHADOW_COLOR, alpha))
+	var scale_f := radius * SHADOW_SIZE * lerpf(0.86, 1.24, fall) / 84.0
+	var alpha := lerpf(0.38, 0.76, fall)
+	var flap := sin(_wing_clock * 5.8) * (1.0 - fall * 0.65)
+	var wing_y := 1.0 + flap * 0.14 - fall * 0.12
+	var wing_sweep := fall * 18.0
+	var dragon := PackedVector2Array([
+		# Snout & horned head (+X)
+		Vector2(86.0, 0.0),
+		Vector2(68.0, -11.0),
+		Vector2(56.0, -21.0),
+		Vector2(52.0, -11.0),
+		# Neck & upper swept dragon wing
+		Vector2(34.0, -13.0),
+		Vector2(28.0 - wing_sweep * 0.4, -58.0 * wing_y),
+		Vector2(-12.0 - wing_sweep, -124.0 * wing_y),
+		Vector2(-38.0 - wing_sweep * 0.8, -88.0 * wing_y),
+		Vector2(-24.0, -64.0 * wing_y),
+		Vector2(-52.0 - wing_sweep * 0.5, -52.0 * wing_y),
+		Vector2(-26.0, -22.0),
+		# Haunch & long sinuous tapering tail (-X)
+		Vector2(-48.0, -16.0),
+		Vector2(-96.0, -8.0),
+		Vector2(-132.0, -14.0),
+		Vector2(-150.0, 0.0),
+		Vector2(-132.0, 14.0),
+		Vector2(-96.0, 8.0),
+		Vector2(-48.0, 16.0),
+		# Lower swept dragon wing
+		Vector2(-26.0, 22.0),
+		Vector2(-52.0 - wing_sweep * 0.5, 52.0 * wing_y),
+		Vector2(-24.0, 64.0 * wing_y),
+		Vector2(-38.0 - wing_sweep * 0.8, 88.0 * wing_y),
+		Vector2(-12.0 - wing_sweep, 124.0 * wing_y),
+		Vector2(28.0 - wing_sweep * 0.4, 58.0 * wing_y),
+		Vector2(34.0, 13.0),
+		Vector2(52.0, 11.0),
+		Vector2(56.0, 21.0),
+		Vector2(68.0, 11.0),
+	])
+	# Soft outer penumbra shadow beneath the crisp inner dragon silhouette.
+	draw_set_transform(Vector2.ZERO, visuals.rotation, Vector2.ONE * scale_f * 1.12)
+	draw_colored_polygon(dragon, Color(SHADOW_COLOR, alpha * 0.34))
+	draw_set_transform(Vector2.ZERO, visuals.rotation, Vector2.ONE * scale_f)
+	draw_colored_polygon(dragon, Color(SHADOW_COLOR, alpha))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+class _ElderSlamVfx extends Node2D:
+	const LIFETIME := 0.48
+	var _elapsed := 0.0
+	var _radius := 260.0
+	var _rays: Array[Dictionary] = []
+
+	func setup(at: Vector2, slam_radius: float) -> void:
+		position = at
+		_radius = slam_radius
+		z_index = 7
+		for i in 16:
+			var ang := TAU * float(i) / 16.0 + randf_range(-0.12, 0.12)
+			_rays.append({
+				"dir": Vector2.from_angle(ang),
+				"len": randf_range(slam_radius * 0.65, slam_radius * 1.15),
+				"w": randf_range(3.0, 6.5),
+			})
+
+	func _process(delta: float) -> void:
+		_elapsed += delta
+		if _elapsed >= LIFETIME:
+			queue_free()
+			return
+		queue_redraw()
+
+	func _draw() -> void:
+		var t := clampf(_elapsed / LIFETIME, 0.0, 1.0)
+		var ease_out := 1.0 - pow(1.0 - t, 2.8)
+		var alpha := 1.0 - t
+		var ring_r := _radius * (0.2 + 0.9 * ease_out)
+		draw_circle(Vector2.ZERO, _radius * 0.65 * (1.0 - t * 0.5), Color("8b4dff", alpha * 0.34))
+		draw_circle(Vector2.ZERO, _radius * 0.3 * (1.0 - t * 0.65), Color("f5ecff", alpha * 0.85))
+		draw_arc(Vector2.ZERO, ring_r, 0.0, TAU, 64, Color("b47aff", alpha * 0.95), lerpf(16.0, 2.5, t), true)
+		draw_arc(Vector2.ZERO, ring_r * 0.86, 0.0, TAU, 56, Color("f7f0ff", alpha * 0.9), lerpf(6.5, 1.2, t), true)
+		for r: Dictionary in _rays:
+			var d: Vector2 = r.dir
+			var rlen: float = r.len
+			var rw: float = r.w
+			var start_p := d * (_radius * 0.15 + ring_r * 0.28)
+			var end_p := d * (rlen * ease_out)
+			draw_line(start_p, end_p, Color("d4b5ff", alpha * 0.85), rw * (1.0 - t * 0.6), true)
+
+
+class _ElderBreathVfx extends Node2D:
+	const LIFETIME := 0.45
+	var _elapsed := 0.0
+	var _length := 700.0
+	var _angle := PI / 2.0
+	var _sparks: Array[Dictionary] = []
+
+	func setup(from: Vector2, toward: Vector2, length: float, angle: float) -> void:
+		position = from
+		rotation = toward.angle()
+		_length = length
+		_angle = angle
+		z_index = 6
+		for i in 22:
+			_sparks.append({
+				"ang": randf_range(-angle * 0.48, angle * 0.48),
+				"dist": randf_range(0.18, 1.06),
+				"size": randf_range(3.0, 6.0),
+			})
+
+	func _process(delta: float) -> void:
+		_elapsed += delta
+		if _elapsed >= LIFETIME:
+			queue_free()
+			return
+		queue_redraw()
+
+	func _draw() -> void:
+		var t := clampf(_elapsed / LIFETIME, 0.0, 1.0)
+		var reach_frac := minf(t / 0.2, 1.0)
+		var alpha := 1.0 - pow(t, 1.4)
+		var cur_len := _length * (0.28 + 0.72 * reach_frac)
+		var outer := PackedVector2Array([Vector2.ZERO])
+		var mid := PackedVector2Array([Vector2.ZERO])
+		var core := PackedVector2Array([Vector2.ZERO])
+		var steps := 18
+		for i in steps + 1:
+			var frac := float(i) / steps
+			var ang := lerpf(-_angle * 0.5, _angle * 0.5, frac)
+			var surge := 0.88 + 0.14 * sin(_elapsed * 38.0 + i * 2.1)
+			outer.append(Vector2.from_angle(ang) * cur_len * surge)
+			mid.append(Vector2.from_angle(ang * 0.84) * cur_len * 0.82 * (0.9 + 0.12 * cos(_elapsed * 42.0 + i * 1.7)))
+			core.append(Vector2.from_angle(ang * 0.52) * cur_len * 0.52 * surge)
+		draw_colored_polygon(outer, Color("6c2bd9", alpha * 0.5))
+		draw_colored_polygon(mid, Color("c492ff", alpha * 0.75))
+		draw_colored_polygon(core, Color("faf5ff", alpha * 0.92))
+		# Roaring arcane energy streams shooting out from the dragon's jaws.
+		for k in 5:
+			var ang := lerpf(-_angle * 0.38, _angle * 0.38, float(k) / 4.0)
+			var pts := PackedVector2Array()
+			for s in 8:
+				var sf := float(s) / 7.0
+				var jitter := sin(_elapsed * 48.0 + s * 2.5 + k) * 12.0 * sf
+				pts.append(Vector2.from_angle(ang) * (cur_len * sf) + Vector2.from_angle(ang + PI * 0.5) * jitter)
+			draw_polyline(pts, Color("efe3ff", alpha * 0.8), 3.0, true)
+		draw_circle(Vector2(20.0, 0.0), 38.0 * (1.0 - t * 0.4), Color("b47aff", alpha * 0.55))
+		draw_circle(Vector2(16.0, 0.0), 18.0 * (1.0 - t * 0.5), Color.WHITE * Color(1, 1, 1, alpha * 0.96))
+		for s: Dictionary in _sparks:
+			var ang: float = s.ang
+			var dist: float = s.dist
+			var sz: float = s.size
+			var pos := Vector2.from_angle(ang) * (_length * dist * (0.25 + 0.75 * t))
+			draw_circle(pos, sz * (1.0 - t * 0.5), Color("f2e6ff", alpha))

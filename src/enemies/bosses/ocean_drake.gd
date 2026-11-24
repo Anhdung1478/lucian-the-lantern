@@ -150,6 +150,7 @@ func _send_wave(toward: Vector2) -> void:
 	wave.hit_radius = WAVE_WIDTH * 0.5
 	wave.front_width = WAVE_WIDTH
 	wave.color = WATER
+	wave.style = EnemyProjectile.Style.WATER_WAVE
 	wave.hit_lucian.connect(_wave_hit.bind(toward))
 
 
@@ -164,15 +165,55 @@ func _wave_hit(toward: Vector2) -> void:
 func _draw() -> void:
 	super()
 	if is_channeling():
-		# A soft ring of mist, and an arc filling as the channel goes on.
+		# Soft mist ring, swirling aqua mist-ribbons, rising healing droplets, and channel arc.
 		var ring := radius + MIST_RING
 		var done := 1.0 - _mist_left / MIST_TIME
+		var elapsed := MIST_TIME - _mist_left
+		var pulse := 0.5 + 0.5 * sin(elapsed * 5.0)
 		draw_circle(Vector2.ZERO, ring, MIST_FILL)
-		draw_arc(Vector2.ZERO, ring, 0.0, TAU, 64, Color(MIST_EDGE, 0.35), 3.0, true)
+		draw_circle(Vector2.ZERO, radius * (1.08 + 0.06 * pulse), Color(WATER, 0.14))
+		# Three swirling animated aqua mist-ribbons orbiting at staggered radii.
+		for i in 3:
+			var r_band := radius + MIST_RING * (0.32 + 0.3 * i)
+			var spin := elapsed * (2.6 - 0.45 * i) * (1.0 if i % 2 == 0 else -1.0) + i * 2.1
+			var span := 1.55 + 0.25 * sin(elapsed * 3.0 + i)
+			draw_arc(Vector2.ZERO, r_band, spin, spin + span, 24, Color(WATER, 0.24), 9.0 - i * 1.5, true)
+			draw_arc(Vector2.ZERO, r_band, spin + 0.15, spin + span - 0.15, 20, Color("d2fbff", 0.52), 3.0, true)
+		# Rising glowing healing droplets drifting up inside the mist.
+		for i in 8:
+			var cycle := fposmod(elapsed * 0.85 + i * 0.37, 1.0)
+			var ang := i * TAU / 8.0 + elapsed * 0.7
+			var dist := radius * (0.45 + 0.72 * fmod(i * 0.618, 1.0))
+			var drop_pos := Vector2(cos(ang) * dist, sin(ang) * dist * 0.65 - cycle * 48.0)
+			var drop_alpha := sin(cycle * PI) * 0.85
+			var tip := drop_pos + Vector2(0.0, -7.0)
+			var drop := PackedVector2Array([
+				tip,
+				drop_pos + Vector2(4.0, 0.0),
+				drop_pos + Vector2(0.0, 4.5),
+				drop_pos + Vector2(-4.0, 0.0),
+			])
+			draw_colored_polygon(drop, Color("9ef7ff", drop_alpha))
+			draw_circle(drop_pos + Vector2(0.0, 0.5), 2.0, Color("e8ffff", drop_alpha))
+		draw_arc(Vector2.ZERO, ring, 0.0, TAU, 64, Color(MIST_EDGE, 0.4), 3.0, true)
 		draw_arc(Vector2.ZERO, ring + 8.0, -PI * 0.5, -PI * 0.5 + TAU * done, 64, MIST_EDGE, 5.0, true)
 	elif is_dazed():
-		# Three stars circling over its head.
+		# Three crisp orbiting 4-point golden dizzy stars over its head.
 		var spin := _daze_left * 5.0
+		var halo_center := Vector2(0, -radius - 6.0)
+		draw_arc(halo_center, 22.0, 0.0, TAU, 24, Color(DAZE_STAR, 0.2), 1.5, true)
 		for i in 3:
-			var at := Vector2(0, -radius - 6.0) + Vector2.from_angle(spin + TAU * i / 3.0) * Vector2(26.0, 9.0)
-			draw_circle(at, 5.0, DAZE_STAR)
+			var ang := spin + TAU * i / 3.0
+			var at := halo_center + Vector2.from_angle(ang) * Vector2(28.0, 10.0)
+			var depth := 0.82 + 0.25 * sin(ang)
+			var outer_r := 9.0 * depth
+			var inner_r := 3.0 * depth
+			var star_rot := -spin * 1.4 + i * 1.1
+			var star := PackedVector2Array()
+			for k in 8:
+				var k_ang := star_rot + k * PI * 0.25
+				var k_r := outer_r if k % 2 == 0 else inner_r
+				star.append(at + Vector2.from_angle(k_ang) * k_r)
+			draw_circle(at, outer_r * 0.95, Color(DAZE_STAR, 0.22))
+			draw_colored_polygon(star, DAZE_STAR)
+			draw_circle(at, inner_r * 0.8, Color("fffbe0", 0.95))

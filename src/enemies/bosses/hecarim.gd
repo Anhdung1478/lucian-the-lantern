@@ -61,6 +61,7 @@ var _riding := false
 var _ride_from := Vector2.ZERO
 var _ride_dir := Vector2.RIGHT
 var _ride_hit := false
+var _vfx_time := 0.0
 
 
 func _ready() -> void:
@@ -123,6 +124,8 @@ func _physics_process(delta: float) -> void:
 	super(delta)
 	if not is_alive():
 		return
+	if is_charge_running() or _riding:
+		_vfx_time += delta
 	if is_charge_running():
 		_rush_step(delta)
 	if _riding:
@@ -195,19 +198,88 @@ func _draw() -> void:
 	super()
 	var heading := visuals.rotation
 	if is_charge_running():
-		# A glowing trail behind him, brightest at his back.
+		# Layered blazing spectral teal-cyan flame wake & flying hoof-spark embers behind him.
 		draw_set_transform(Vector2.ZERO, heading)
-		var trail := PackedVector2Array([Vector2(-radius * 0.5, -TRAIL_WIDTH), Vector2(-TRAIL_LENGTH, 0.0), Vector2(-radius * 0.5, TRAIL_WIDTH)])
-		var glow := PackedColorArray([Color(FLAME, 0.5), Color(FLAME_EDGE, 0.0), Color(FLAME, 0.5)])
-		draw_polygon(trail, glow)
-		for offset: float in [-26.0, 0.0, 26.0]:
-			draw_line(Vector2(-radius * 0.6, offset), Vector2(-TRAIL_LENGTH * (0.8 if offset == 0.0 else 0.55), offset * 0.4), Color(FLAME.lerp(Color.WHITE, 0.5), 0.7), 3.0)
+		var segs := 10
+		var outer := PackedVector2Array()
+		var inner := PackedVector2Array()
+		var core := PackedVector2Array()
+		for i in segs + 1:
+			var f := float(i) / segs
+			var x := lerpf(-radius * 0.35, -TRAIL_LENGTH * 1.08, f)
+			var w := TRAIL_WIDTH * 1.2 * pow(1.0 - f, 0.75) + sin(_vfx_time * 24.0 + i * 1.4) * 9.0 * (1.0 - f * 0.4)
+			outer.append(Vector2(x, -maxf(w, 2.0)))
+		for i in range(segs, -1, -1):
+			var f := float(i) / segs
+			var x := lerpf(-radius * 0.35, -TRAIL_LENGTH * 1.08, f)
+			var w := TRAIL_WIDTH * 1.2 * pow(1.0 - f, 0.75) + cos(_vfx_time * 22.0 + i * 1.6) * 9.0 * (1.0 - f * 0.4)
+			outer.append(Vector2(x, maxf(w, 2.0)))
+		for i in segs + 1:
+			var f := float(i) / segs
+			var x := lerpf(-radius * 0.42, -TRAIL_LENGTH * 0.82, f)
+			var w := TRAIL_WIDTH * 0.72 * pow(1.0 - f, 0.85) + sin(_vfx_time * 28.0 + i * 1.9) * 5.0 * (1.0 - f * 0.5)
+			inner.append(Vector2(x, -maxf(w, 1.5)))
+		for i in range(segs, -1, -1):
+			var f := float(i) / segs
+			var x := lerpf(-radius * 0.42, -TRAIL_LENGTH * 0.82, f)
+			var w := TRAIL_WIDTH * 0.72 * pow(1.0 - f, 0.85) + cos(_vfx_time * 26.0 + i * 1.7) * 5.0 * (1.0 - f * 0.5)
+			inner.append(Vector2(x, maxf(w, 1.5)))
+		core.append(Vector2(-radius * 0.45, -TRAIL_WIDTH * 0.34))
+		core.append(Vector2(-TRAIL_LENGTH * 0.48, sin(_vfx_time * 32.0) * 6.0))
+		core.append(Vector2(-radius * 0.45, TRAIL_WIDTH * 0.34))
+		draw_colored_polygon(outer, Color(FLAME_EDGE, 0.36))
+		draw_colored_polygon(inner, Color(FLAME, 0.64))
+		draw_colored_polygon(core, Color("d4fff5", 0.82))
+		# Flying spectral hoof-spark embers streaming behind him.
+		for i in 10:
+			var phase := fposmod(_vfx_time * 3.4 + i * 0.29, 1.0)
+			var sx := lerpf(-radius * 0.5, -TRAIL_LENGTH * 1.15, phase)
+			var sy := sin(i * 2.4 + _vfx_time * 9.0) * TRAIL_WIDTH * (0.85 - phase * 0.35)
+			var spark_a := (1.0 - phase) * 0.92
+			draw_line(Vector2(sx, sy), Vector2(sx - 18.0, sy), Color(FLAME, spark_a * 0.65), 2.5, true)
+			draw_circle(Vector2(sx, sy), lerpf(4.2, 1.5, phase), Color("e6fff9", spark_a))
 		draw_set_transform(Vector2.ZERO, 0.0)
 	if _riding:
-		# Ghost riders beside him, facing the same way.
+		# Surging translucent spectral shadow-mist wave across the Onslaught band.
+		draw_set_transform(Vector2.ZERO, heading)
+		var half_band := RIDE_WIDTH * 0.5
+		var mist_pts := PackedVector2Array()
+		var mist_cols := PackedColorArray()
+		var wave_segs := 14
+		for i in wave_segs + 1:
+			var f := lerpf(-1.0, 1.0, float(i) / wave_segs)
+			var bow := (1.0 - f * f) * 56.0 + sin(_vfx_time * 16.0 + i * 1.2) * 8.0
+			mist_pts.append(Vector2(radius * 0.6 + bow, half_band * f))
+			mist_cols.append(Color(FLAME_EDGE, 0.26 * (1.0 - 0.35 * absf(f))))
+		for i in range(wave_segs, -1, -1):
+			var f := lerpf(-1.0, 1.0, float(i) / wave_segs)
+			var tail_x := -RIDE_TAIL - 70.0 * (1.0 - 0.4 * f * f)
+			mist_pts.append(Vector2(tail_x, half_band * f))
+			mist_cols.append(Color("0b2628", 0.0))
+		draw_polygon(mist_pts, mist_cols)
+		# Crisp glowing spectral leading crest arc across the pack's front.
+		var crest := PackedVector2Array()
+		for i in wave_segs + 1:
+			var f := lerpf(-1.0, 1.0, float(i) / wave_segs)
+			crest.append(Vector2(radius * 0.55 + (1.0 - f * f) * 52.0, half_band * f))
+		draw_polyline(crest, Color(FLAME, 0.45), 6.0, true)
+		draw_polyline(crest, Color("ccfff4", 0.72), 2.0, true)
+		draw_set_transform(Vector2.ZERO, 0.0)
+		# Staggered, gently galloping/bobbing ghostly rider silhouettes & trailing hoof-sparks.
 		var size := RIDER_ART.get_size()
-		for place in RIDERS:
-			var at := Vector2(-place.x, place.y).rotated(heading)
+		for i in RIDERS.size():
+			var place := RIDERS[i]
+			var gallop := sin(_vfx_time * 18.0 + i * 1.5)
+			var bob_local := Vector2(-place.x + gallop * 8.0, place.y + cos(_vfx_time * 18.0 + i * 1.5) * 4.5)
+			var at := bob_local.rotated(heading)
 			draw_set_transform(at, heading)
-			draw_texture(RIDER_ART, -size * 0.5, Color(FLAME, RIDER_ALPHA))
+			# Spectral mist aura & hoof-spark trail behind each ghost rider.
+			draw_circle(Vector2(-10.0, 0.0), 34.0, Color(FLAME, 0.16))
+			for k in 3:
+				var sp := fposmod(_vfx_time * 4.2 + i * 0.31 + k * 0.33, 1.0)
+				var hx := lerpf(-24.0, -105.0, sp)
+				var hy := (k - 1) * 10.0 + sin(_vfx_time * 12.0 + k + i) * 3.0
+				draw_line(Vector2(hx, hy), Vector2(hx - 16.0, hy), Color(FLAME, (1.0 - sp) * 0.65), 2.2, true)
+				draw_circle(Vector2(hx, hy), lerpf(3.2, 1.2, sp), Color("dcfff6", (1.0 - sp) * 0.85))
+			draw_texture(RIDER_ART, -size * 0.5, Color(FLAME.lerp(Color.WHITE, 0.2), RIDER_ALPHA + 0.1 * gallop))
 		draw_set_transform(Vector2.ZERO, 0.0)

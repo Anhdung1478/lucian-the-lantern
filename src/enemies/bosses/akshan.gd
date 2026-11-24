@@ -111,6 +111,8 @@ func _physics_process(delta: float) -> void:
 			_swing_shot_left = SWING_SHOT_GAP
 			var bolt := fire_bolt(skill_hit(SWING_DAMAGE, DamageInfo.Type.PHYSICAL, &"heroic_swing"), SWING_BOLT_SPEED, SWING_BOLT_RANGE, Vector2.from_angle(_swing_angle))
 			bolt.color = GOLD
+			bolt.style = EnemyProjectile.Style.GOLD_BULLET
+		queue_redraw()
 	if _burst_left > 0 and can_fight():
 		_burst_gap_left -= delta
 		if _burst_gap_left <= 0.0:
@@ -119,6 +121,7 @@ func _physics_process(delta: float) -> void:
 			face(target.global_position)
 			var shot := fire_bolt(skill_hit(BURST_DAMAGE, DamageInfo.Type.PHYSICAL, &"comeuppance"), BURST_SPEED, BURST_RANGE)
 			shot.color = GOLD
+			shot.style = EnemyProjectile.Style.GOLD_BULLET
 			Sfx.play(&"shot", -4.0)
 
 
@@ -129,3 +132,45 @@ func _throw_boomerang(toward: Vector2) -> void:
 	boomerang.return_to = self
 	boomerang.hit_radius = 22.0
 	boomerang.color = GOLD
+	boomerang.style = EnemyProjectile.Style.BOOMERANG
+
+
+func _draw() -> void:
+	super()
+	if _swing_left <= 0.0:
+		return
+	var anchor := to_local(_swing_center)
+	var tether_dist := anchor.length()
+	if tether_dist > 2.0:
+		# Subtle golden speed arc trailing behind him along his swing orbit.
+		var trail_span := 0.68
+		var segs := 14
+		var from_anchor := -anchor
+		var cur_angle := from_anchor.angle()
+		for i in segs:
+			var t0 := float(i) / segs
+			var t1 := float(i + 1) / segs
+			var a0 := cur_angle - trail_span * t0
+			var a1 := cur_angle - trail_span * t1
+			var p0 := anchor + Vector2.from_angle(a0) * tether_dist
+			var p1 := anchor + Vector2.from_angle(a1) * tether_dist
+			var fade := (1.0 - t0) * 0.55
+			draw_line(p0, p1, Color(GOLD, fade), lerpf(7.0, 1.5, t0), true)
+		# Taut gleaming brass grappling line to the anchor point.
+		draw_line(Vector2.ZERO, anchor, Color(GOLD, 0.26), 7.5, true)
+		draw_line(Vector2.ZERO, anchor, Color("70511a", 0.9), 4.0, true)
+		draw_line(Vector2.ZERO, anchor, GOLD, 2.2, true)
+		draw_line(Vector2.ZERO, anchor, Color("fff8dc", 0.8), 1.0, true)
+	# Glowing golden anchor pin and spark at the grapple pivot.
+	var pulse := 0.5 + 0.5 * sin(_swing_left * 18.0)
+	draw_circle(anchor, 15.0 + pulse * 4.0, Color(GOLD, 0.24))
+	draw_arc(anchor, 10.0 + pulse * 2.5, 0.0, TAU, 24, Color(GOLD, 0.85), 2.2, true)
+	var spark_rot := _swing_left * 6.0
+	var star := PackedVector2Array()
+	for i in 8:
+		var ang := spark_rot + i * PI * 0.25
+		var rad := (13.0 + pulse * 3.0) if i % 2 == 0 else 4.2
+		star.append(anchor + Vector2.from_angle(ang) * rad)
+	draw_colored_polygon(star, Color("fff5c2", 0.95))
+	draw_circle(anchor, 4.5, Color("b88224"))
+	draw_circle(anchor, 2.6, Color("fffbe8"))

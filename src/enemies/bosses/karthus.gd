@@ -78,6 +78,7 @@ var _requiems := 0
 var _lay_queue: Array[Dictionary] = []
 ## Defile's burn zone, under warning_parent; made on his first frame.
 var _defile: HazardZone
+var _vfx_time := 0.0
 
 
 func _ready() -> void:
@@ -179,7 +180,10 @@ func _physics_process(delta: float) -> void:
 	super(delta)
 	if not is_alive():
 		return
+	_vfx_time += delta
 	_keep_defile()
+	if revived:
+		queue_redraw()
 	_lay_due(delta)
 	if not is_channeling():
 		return
@@ -248,7 +252,16 @@ func _lay_due(delta: float) -> void:
 func _lay_circle(at: Vector2) -> void:
 	var warning := GroundWarning.circle(at, LAY_RADIUS, LAY_WARN)
 	warning.strike(skill_hit(REVIVED_LAY_DAMAGE if revived else LAY_DAMAGE, DamageInfo.Type.MAGIC, &"lay_waste"), target)
+	warning.fired.connect(_lay_blast_vfx.bind(at))
 	warning_parent.add_child(warning)
+
+
+func _lay_blast_vfx(at: Vector2) -> void:
+	if not Juice.on() or not is_alive():
+		return
+	var blast := _LayWasteVfx.new()
+	blast.setup(at, LAY_RADIUS)
+	warning_parent.add_child(blast)
 
 
 ## The channel ends early: "Broken!" over him, and he recovers.
@@ -269,6 +282,10 @@ func _finish_requiem() -> void:
 	busy_left = RECOVER
 	_spend_thresholds()
 	if is_instance_valid(target):
+		if Juice.on():
+			var pillar := _RequiemDetonateVfx.new()
+			pillar.setup(target.global_position)
+			warning_parent.add_child(pillar)
 		target.take_damage(skill_hit(REQUIEM_DAMAGE, DamageInfo.Type.MAGIC, &"requiem"))
 	queue_redraw()
 
@@ -278,6 +295,7 @@ func _raise_wall(center: Vector2, across: Vector2) -> void:
 		return
 	var wall := SpectralWall.line(center, across, WALL_LENGTH, WALL_TIME)
 	wall.target = target
+	wall.style = SpectralWall.Style.KARTHUS
 	wall.touched.connect(_wall_touched)
 	warning_parent.add_child(wall)
 
@@ -291,13 +309,142 @@ func _wall_touched(_piece: int) -> void:
 func _draw() -> void:
 	super()
 	if revived:
-		draw_circle(Vector2.ZERO, DEFILE_RADIUS, Color(DEFILE_COLOR, 0.06))
-		draw_arc(Vector2.ZERO, DEFILE_RADIUS, 0.0, TAU, 96, Color(DEFILE_COLOR, 0.75), 4.0, true)
+		# Enriched Defile: translucent dark-violet necromantic mist arcs & drifting ghostly soul-embers.
+		draw_circle(Vector2.ZERO, DEFILE_RADIUS, Color(DEFILE_COLOR, 0.08))
+		draw_circle(Vector2.ZERO, DEFILE_RADIUS * 0.55, Color("4b1e7a", 0.07))
+		for i in 4:
+			var r_arc := DEFILE_RADIUS * (0.42 + 0.16 * i)
+			var spin := _vfx_time * (1.2 - 0.18 * i) * (1.0 if i % 2 == 0 else -1.0) + i * 1.6
+			var span := 1.4 + 0.35 * sin(_vfx_time * 2.2 + i)
+			draw_arc(Vector2.ZERO, r_arc, spin, spin + span, 28, Color("6c2fb8", 0.24), 10.0, true)
+			draw_arc(Vector2.ZERO, r_arc, spin + 0.12, spin + span - 0.12, 24, Color("56e8dc", 0.28), 2.5, true)
+		for i in 10:
+			var ang := _vfx_time * (0.6 + 0.08 * (i % 3)) + i * TAU / 10.0
+			var dist := DEFILE_RADIUS * (0.3 + 0.62 * fmod(i * 0.382, 1.0))
+			var bob := sin(_vfx_time * 3.5 + i * 1.7) * 14.0
+			var ember := Vector2(cos(ang) * dist, sin(ang) * dist + bob)
+			var col := Color("78ffe8", 0.55) if i % 2 == 0 else Color("c996ff", 0.55)
+			draw_circle(ember, 6.5, Color(col, 0.2))
+			draw_circle(ember, 2.8, col)
+		draw_arc(Vector2.ZERO, DEFILE_RADIUS, 0.0, TAU, 96, Color(DEFILE_COLOR, 0.78), 4.0, true)
+		draw_arc(Vector2.ZERO, DEFILE_RADIUS - 6.0, 0.0, TAU, 72, Color("64f0e0", 0.28), 1.8, true)
 	if is_channeling() and is_instance_valid(target):
-		# A ring pulsing on Lucian, and one round Karthus filling as the channel goes on.
+		# Towering translucent spectral death-beam descending from -650px onto Lucian,
+		# narrowing and intensifying as Requiem nears detonation.
 		var pulse := 0.5 + 0.5 * sin(_channel_left * TAU * PULSE_RATE)
 		var on_lucian := to_local(target.global_position)
-		draw_arc(on_lucian, lerpf(RING_MIN, RING_MAX, pulse), 0.0, TAU, 48, Color(REQUIEM_COLOR, 0.9), 5.0, true)
-		draw_circle(on_lucian, RING_MIN * 0.5, Color(REQUIEM_COLOR, 0.2))
 		var done := 1.0 - _channel_left / REQUIEM_TIME
+		var beam_top := on_lucian + Vector2(0.0, -650.0)
+		var beam_w := lerpf(88.0, 24.0, done)
+		var beam_alpha := lerpf(0.28, 0.78, done)
+		draw_line(beam_top, on_lucian, Color("7b3cff", beam_alpha * 0.42), beam_w * 1.45, true)
+		draw_line(beam_top, on_lucian, Color(REQUIEM_COLOR, beam_alpha * 0.75), beam_w * 0.68, true)
+		draw_line(beam_top, on_lucian, Color("7efce8", beam_alpha * 0.85), maxf(beam_w * 0.24, 4.0), true)
+		draw_line(beam_top, on_lucian, Color("f6f0ff", beam_alpha), maxf(beam_w * 0.1, 2.0), true)
+		# Swirling violet-cyan rune rings spiralling down the death-beam toward Lucian.
+		for i in 3:
+			var fall_frac := fposmod(done * 2.8 + i * 0.333, 1.0)
+			var y_pos := lerpf(-600.0, -10.0, fall_frac)
+			var ring_c := on_lucian + Vector2(0.0, y_pos)
+			var rx := beam_w * (0.62 + 0.18 * (1.0 - fall_frac))
+			var ry := rx * 0.3
+			var ring_pts := PackedVector2Array()
+			for k in 25:
+				var a := k * TAU / 24.0 + _vfx_time * 5.0 * (1.0 if i % 2 == 0 else -1.0)
+				ring_pts.append(ring_c + Vector2(cos(a) * rx, sin(a) * ry))
+			var ring_col := Color("66ffe8", beam_alpha * 0.85) if i % 2 == 0 else Color("d6b3ff", beam_alpha * 0.85)
+			draw_polyline(ring_pts, ring_col, 2.4, true)
+		# Pulsing target ring on Lucian + channel progress ring around Karthus.
+		draw_arc(on_lucian, lerpf(RING_MIN, RING_MAX, pulse), 0.0, TAU, 48, Color(REQUIEM_COLOR, 0.92), 5.0, true)
+		draw_arc(on_lucian, lerpf(RING_MIN, RING_MAX, 1.0 - pulse) * 0.78, 0.0, TAU, 36, Color("66ffe8", 0.55 + 0.35 * done), 2.5, true)
+		draw_circle(on_lucian, RING_MIN * (0.45 + 0.25 * done), Color(REQUIEM_COLOR, 0.22 + 0.2 * done))
 		draw_arc(Vector2.ZERO, radius + 14.0, -PI * 0.5, -PI * 0.5 + TAU * done, 64, REQUIEM_COLOR, 5.0, true)
+
+
+class _LayWasteVfx extends Node2D:
+	const LIFETIME := 0.32
+	var _elapsed := 0.0
+	var _radius := 110.0
+	var _shards: Array[Dictionary] = []
+
+	func setup(at: Vector2, blast_radius: float) -> void:
+		position = at
+		_radius = blast_radius
+		z_index = 6
+		for i in 10:
+			var ang := TAU * float(i) / 10.0 + randf_range(-0.15, 0.15)
+			_shards.append({
+				"dir": Vector2.from_angle(ang),
+				"speed": randf_range(blast_radius * 1.4, blast_radius * 2.4),
+				"size": randf_range(5.0, 9.0),
+			})
+
+	func _process(delta: float) -> void:
+		_elapsed += delta
+		if _elapsed >= LIFETIME:
+			queue_free()
+			return
+		queue_redraw()
+
+	func _draw() -> void:
+		var t := clampf(_elapsed / LIFETIME, 0.0, 1.0)
+		var ease_out := 1.0 - pow(1.0 - t, 2.5)
+		var alpha := 1.0 - t
+		var cur_r := _radius * (0.3 + 0.78 * ease_out)
+		# Ghostly emerald-violet skittle rune explosion.
+		draw_circle(Vector2.ZERO, cur_r * 0.8, Color("5a269c", alpha * 0.32))
+		draw_circle(Vector2.ZERO, cur_r * 0.42, Color("52ffdc", alpha * 0.65))
+		draw_arc(Vector2.ZERO, cur_r, 0.0, TAU, 44, Color("b57bff", alpha * 0.92), lerpf(8.0, 1.8, t), true)
+		# Flaring arcane diamond-star rune sigil.
+		var sigil := PackedVector2Array()
+		for i in 10:
+			var ang := i * TAU / 10.0 + t * 1.2
+			var rad := (cur_r * 0.85) if i % 2 == 0 else (cur_r * 0.32)
+			sigil.append(Vector2.from_angle(ang) * rad)
+		draw_colored_polygon(sigil, Color("84ffea", alpha * 0.55))
+		draw_polyline(sigil + PackedVector2Array([sigil[0]]), Color("efe6ff", alpha * 0.9), 2.0, true)
+		# Spectral shards erupting outward.
+		for s: Dictionary in _shards:
+			var pos: Vector2 = s.dir * (s.speed * _elapsed * (1.0 - t * 0.35))
+			var f: Vector2 = s.dir
+			var p := f.orthogonal()
+			var sz: float = s.size * (1.0 - t * 0.45)
+			var shard := PackedVector2Array([pos + f * sz, pos + p * (sz * 0.38), pos - f * sz, pos - p * (sz * 0.38)])
+			draw_colored_polygon(shard, Color("72ffea", alpha * 0.9))
+
+
+class _RequiemDetonateVfx extends Node2D:
+	const LIFETIME := 0.55
+	var _elapsed := 0.0
+
+	func setup(at: Vector2) -> void:
+		position = at
+		z_index = 9
+
+	func _process(delta: float) -> void:
+		_elapsed += delta
+		if _elapsed >= LIFETIME:
+			queue_free()
+			return
+		queue_redraw()
+
+	func _draw() -> void:
+		var t := clampf(_elapsed / LIFETIME, 0.0, 1.0)
+		var ease_out := 1.0 - pow(1.0 - t, 2.8)
+		var alpha := 1.0 - pow(t, 1.35)
+		var top := Vector2(0.0, -700.0)
+		# Towering Requiem detonation pillar flash.
+		var w := lerpf(118.0, 12.0, t)
+		draw_line(top, Vector2.ZERO, Color("7e38ff", alpha * 0.45), w * 1.4, true)
+		draw_line(top, Vector2.ZERO, Color("66ffe8", alpha * 0.85), w * 0.65, true)
+		draw_line(top, Vector2.ZERO, Color.WHITE * Color(1, 1, 1, alpha), maxf(w * 0.28, 3.0), true)
+		# Ground shockwave rings & upward-spiralling soul streaks.
+		var ring_r := lerpf(32.0, 190.0, ease_out)
+		draw_circle(Vector2.ZERO, lerpf(80.0, 20.0, t), Color("a8fff2", alpha * 0.65))
+		draw_arc(Vector2.ZERO, ring_r, 0.0, TAU, 56, Color("b57bff", alpha * 0.95), lerpf(12.0, 2.0, t), true)
+		draw_arc(Vector2.ZERO, ring_r * 0.72, 0.0, TAU, 48, Color("70ffe8", alpha * 0.85), lerpf(6.0, 1.0, t), true)
+		for i in 6:
+			var ang := i * TAU / 6.0 + t * 5.0
+			var x := cos(ang) * lerpf(55.0, 14.0, t)
+			var y0 := -t * 420.0 - i * 45.0
+			draw_line(Vector2(x, y0), Vector2(x * 0.7, y0 - 75.0), Color("d6fff8", alpha * 0.85), 3.0, true)

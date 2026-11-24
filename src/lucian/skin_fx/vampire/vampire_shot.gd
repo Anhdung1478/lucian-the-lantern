@@ -1,30 +1,39 @@
 class_name VampireShot
 extends ShotLook
-## Vampire's shots: a blood orb with a dripping tail (W), crimson bullets
-## with a dark drip streak (R), and crimson bolts (basic attacks).
+## Vampire's shots: a glowing crimson blood-orb with a tapered obsidian-red
+## dripping tail (W), ferocious tapered crimson blood-lances (R), and sharp
+## ruby bolts (basic attacks).
 
-const DARK := Color(0.29, 0.03, 0.07, 0.6)
+const DARK := Color(0.24, 0.02, 0.06, 0.74)
 const BLOOD := Color("d01830")
-const BRIGHT := Color("ff3a50")
-const GLOW := Color(0.82, 0.09, 0.19, 0.5)
+const BRIGHT := Color("ff4860")
+const HOT := Color("ffd6dc")
+const GLOW := Color(0.84, 0.09, 0.2, 0.58)
 ## Drops falling off the orb's tail: [x, y, radius, alpha].
-const DRIPS := [[-22.0, 4.0, 4.0, 0.8], [-36.0, 7.0, 3.0, 0.6], [-50.0, 10.0, 2.0, 0.4]]
+const DRIPS := [[-24.0, 4.5, 4.2, 0.85], [-40.0, 7.5, 3.2, 0.65], [-56.0, 10.5, 2.2, 0.4]]
 
 
 func _draw() -> void:
 	match kind:
 		Kind.MISSILE:
-			draw_line(Vector2(-48, 0), Vector2.ZERO, DARK, 10.0)
+			DashTrail.draw_speed_needle(self, -60.0, 4.0, 0.0, 0.0, 11.0, DARK)
+			DashTrail.draw_speed_needle(self, -44.0, 6.0, 0.0, 0.0, 4.8, BLOOD)
 			for drip: Array in DRIPS:
 				draw_circle(Vector2(drip[0], drip[1]), drip[2], Color(BLOOD, drip[3]))
-			draw_circle(Vector2.ZERO, 18.0, GLOW)
-			draw_circle(Vector2.ZERO, 11.0, BLOOD)
-			draw_circle(Vector2(2, -3), 4.0, BRIGHT)
+			SoftShape.ellipse(self, Vector2.ZERO, Vector2.ONE * 20.0, GLOW, 0.25)
+			draw_circle(Vector2.ZERO, 11.5, BLOOD)
+			draw_circle(Vector2(2, -2.5), 4.5, BRIGHT)
+			draw_circle(Vector2(3, -3.5), 2.0, HOT)
 		Kind.BULLET:
-			draw_line(Vector2(-46, 0), Vector2.ZERO, DARK, 10.0)
-			draw_line(Vector2(-34, 0), Vector2(3, 0), BLOOD, 5.0)
-			draw_circle(Vector2(-26, 4), 2.0, BLOOD)
-			draw_circle(Vector2.ZERO, 2.5, BRIGHT)
+			# Ferocious tapered crimson blood-lance for The Culling.
+			DashTrail.draw_speed_needle(self, -62.0, 10.0, 0.0, 0.0, 9.5, DARK)
+			DashTrail.draw_speed_needle(self, -48.0, 11.0, 0.0, 0.0, 4.8, BLOOD)
+			draw_circle(Vector2(-28, 4.5), 2.2, BLOOD)
+			draw_colored_polygon(PackedVector2Array([Vector2(14, 0), Vector2(1, -5.2), Vector2(-7, 0), Vector2(1, 5.2)]), BRIGHT)
+			draw_colored_polygon(PackedVector2Array([Vector2(10, 0), Vector2(1, -2.4), Vector2(-3, 0), Vector2(1, 2.4)]), HOT)
 		_:
-			draw_line(Vector2(-30, 0), Vector2.ZERO, DARK, 8.0)
-			draw_line(Vector2(-20, 0), Vector2(2, 0), BRIGHT, 3.0)
+			# Sharp tapered crimson bolt for basic attacks.
+			DashTrail.draw_speed_needle(self, -38.0, 6.0, 0.0, 0.0, 6.5, DARK)
+			DashTrail.draw_speed_needle(self, -26.0, 7.0, 0.0, 0.0, 3.0, BLOOD)
+			draw_colored_polygon(PackedVector2Array([Vector2(9, 0), Vector2(0, -3.6), Vector2(-4, 0), Vector2(0, 3.6)]), BRIGHT)
+			draw_circle(Vector2(2, 0), 2.0, HOT)

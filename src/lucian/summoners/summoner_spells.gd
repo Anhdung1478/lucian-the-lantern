@@ -192,10 +192,12 @@ func _flash(aim: Vector2) -> void:
 		distance -= FLASH_STEP
 	lucian.blink_to(from + direction * maxf(distance, 0.0))
 	lucian.visuals.face(direction)
-	# A blink leaves no trail, only sparks where Lucian stood.
+	var landed := lucian.global_position
+	# A blink leaves no trail, only departure & arrival sparks via one BlinkSparks node.
 	if not GameSettings.instance().low_effects():
 		var sparks := BlinkSparks.new()
 		sparks.position = from
+		sparks.arrival_offset = landed - from
 		lucian.spawn(sparks)
 	Sfx.play(&"zap")
 
@@ -210,8 +212,101 @@ func _smite(aim: Vector2, effect: float) -> bool:
 	target.take_damage(lucian.make_damage(SMITE_DAMAGE * effect, DamageInfo.Type.TRUE, &"smite"))
 	if target.dead:
 		lucian.heal(lucian.stats.max_hp * SMITE_HEAL)
-	var bolt := ChainLightning.new()
-	bolt.setup(PackedVector2Array([lucian.global_position, target.global_position]), Color("ffb347"))
+	var bolt := SmiteBolt.new()
+	bolt.setup(target.global_position)
 	lucian.spawn(bolt)
 	Sfx.play(&"zap")
 	return true
+
+
+## Smite's heavenly sky-strike: a blazing vertical golden-white lightning bolt
+## plunging from high overhead onto the target, with a scorching impact ring
+## and bursting sparks. Frees itself within LIFETIME and tones down on Low.
+class SmiteBolt extends Node2D:
+	const LIFETIME := 0.35
+	const SKY_HEIGHT := 520.0
+	const GOLD := Color("ffb838")
+	const CYAN_AURA := Color(0.55, 0.9, 1.0, 0.42)
+	const CORE := Color("fffdf2")
+
+	var _age := 0.0
+	var _low := false
+	## Pre-rolled impact sparks: [angle, speed, len, width].
+	var _sparks: Array[Array] = []
+
+	func setup(at: Vector2) -> void:
+		position = at
+		z_index = 5
+
+	func _ready() -> void:
+		_low = GameSettings.instance().low_effects() or not Juice.renders
+		if not _low:
+			for i in 12:
+				var ang := TAU * i / 12.0 + randf_range(-0.2, 0.2)
+				_sparks.append([ang, randf_range(120.0, 260.0), randf_range(9.0, 17.0), randf_range(2.2, 3.8)])
+
+	func _process(delta: float) -> void:
+		_age += delta
+		if _age >= LIFETIME:
+			queue_free()
+			return
+		queue_redraw()
+
+	func _draw() -> void:
+		var t := clampf(_age / LIFETIME, 0.0, 1.0)
+		var fade := 1.0 - t
+		var bolt_fade := pow(fade, 1.25)
+		var top := Vector2(0.0, -SKY_HEIGHT)
+		var main := _jagged(top, Vector2.ZERO, 16, 18.0)
+		# Sky-strike aura & scorching pillar.
+		if not _low:
+			draw_line(top, Vector2.ZERO, Color(CYAN_AURA, CYAN_AURA.a * bolt_fade), lerpf(34.0, 10.0, t))
+			draw_line(top, Vector2.ZERO, Color(GOLD, 0.28 * bolt_fade), lerpf(44.0, 14.0, t))
+		draw_polyline(main, Color(CYAN_AURA, 0.45 * bolt_fade), lerpf(20.0, 6.0, t), true)
+		draw_polyline(main, Color(GOLD, 0.9 * bolt_fade), lerpf(11.0, 3.5, t), true)
+		draw_polyline(main, Color(CORE, bolt_fade), lerpf(4.5, 1.5, t), true)
+		# Side lightning forks on high effects.
+		if not _low and t < 0.72:
+			var fork_a := (1.0 - t / 0.72)
+			for idx in [4, 9, 12]:
+				var origin := main[idx]
+				var side := -1.0 if idx % 2 == 0 else 1.0
+				var tip := origin + Vector2(side * randf_range(42.0, 78.0), randf_range(55.0, 110.0))
+				var fork := _jagged(origin, tip, 4, 10.0)
+				draw_polyline(fork, Color(GOLD, 0.55 * fork_a), 4.0, true)
+				draw_polyline(fork, Color(CORE, 0.85 * fork_a), 1.6, true)
+		# Scorching ground impact bloom & expanding shockwave rings.
+		var out := 1.0 - pow(1.0 - t, 2.6)
+		SoftShape.ellipse(self, Vector2.ZERO, Vector2(56.0, 38.0) * (0.7 + 0.5 * out), Color(GOLD, 0.48 * fade), 0.25)
+		SoftShape.ellipse(self, Vector2.ZERO, Vector2(28.0, 20.0) * (1.0 - 0.3 * t), Color(CORE, 0.95 * bolt_fade), 0.4)
+		var ring_r := lerpf(16.0, 76.0, out)
+		draw_arc(Vector2.ZERO, ring_r, 0.0, TAU, 44, Color(GOLD, 0.85 * fade * fade), lerpf(5.0, 1.0, t), true)
+		if not _low:
+			draw_arc(Vector2.ZERO, ring_r * 0.72, 0.0, TAU, 36, Color(CYAN_AURA, 0.7 * fade * fade), lerpf(3.0, 0.8, t), true)
+			# Impact starburst flare.
+			if t < 0.55:
+				var st := 1.0 - t / 0.55
+				ClassicStar.draw(self, Vector2.ZERO, lerpf(44.0, 20.0, 1.0 - st), PI * 0.25, Color(GOLD, 0.75 * st), 0.18)
+				ClassicStar.draw(self, Vector2.ZERO, lerpf(32.0, 14.0, 1.0 - st), 0.0, Color(CORE, 0.95 * st), 0.16)
+			# Bursting golden impact sparks.
+			for s in _sparks:
+				var dir := Vector2.from_angle(s[0])
+				var side := dir.orthogonal()
+				var dist: float = (s[1] as float) * out * 0.36 + 10.0
+				var seg: float = (s[2] as float) * (0.35 + 0.65 * fade)
+				var hw: float = (s[3] as float) * 0.5 * fade
+				var p0 := dir * dist
+				var pm := dir * (dist + seg * 0.35)
+				var p1 := dir * (dist + seg)
+				draw_colored_polygon(PackedVector2Array([p0, pm + side * hw, p1, pm - side * hw]), Color(GOLD, 0.92 * fade))
+				draw_colored_polygon(PackedVector2Array([p0.lerp(pm, 0.4), pm + side * (hw * 0.45), p1.lerp(pm, 0.2), pm - side * (hw * 0.45)]), Color(CORE, 0.95 * fade))
+
+	func _jagged(a: Vector2, b: Vector2, steps: int, jag: float) -> PackedVector2Array:
+		var line := PackedVector2Array([a])
+		var side := (b - a).normalized().orthogonal()
+		for i in range(1, steps):
+			var share := float(i) / steps
+			var taper := sin(share * PI)
+			line.append(a.lerp(b, share) + side * randf_range(-jag, jag) * (0.35 + 0.65 * taper))
+		line.append(b)
+		return line
