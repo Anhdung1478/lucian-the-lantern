@@ -61,6 +61,9 @@ var _trail: DashTrail
 var _backdrop := MenuBackdrop.new()
 var _center := CenterContainer.new()
 var _closing := false
+var _lucian_motion: UnitMotion
+var _dummy_motion: UnitMotion
+var _dummy_flash: Tween
 
 
 func _init(skin_data: SkinData = null) -> void:
@@ -123,10 +126,12 @@ func _process(_delta: float) -> void:
 func _queue(piece: StringName) -> void:
 	match piece:
 		&"q":
+			_tween.tween_callback(_brace.bind(Q_CAST))
 			_tween.tween_interval(Q_CAST)
 			_tween.tween_callback(_fire_q)
 			_tween.tween_interval(LaserBeam.LIFETIME)
 		&"w":
+			_tween.tween_callback(_brace.bind(W_CAST))
 			_tween.tween_interval(W_CAST)
 			_tween.tween_callback(_fire_w)
 			_tween.tween_interval((DUMMY_AT.x - LUCIAN_AT.x - Lucian.GUN_REACH) / W_SPEED + CrossBlast.LIFETIME)
@@ -139,17 +144,25 @@ func _queue(piece: StringName) -> void:
 			_tween.tween_property(lucian, "position", LUCIAN_AT, WALK_BACK).from(landing)
 		&"r":
 			for i in R_SHOTS:
-				_tween.tween_callback(_shoot.bind(_fx.r_bullet_look, R_SPEED))
+				_tween.tween_callback(_shoot.bind(_fx.r_bullet_look, R_SPEED, true))
 				_tween.tween_interval(R_DURATION / R_SHOTS)
 		&"attack":
 			for i in ATTACK_SHOTS:
-				_tween.tween_callback(_shoot.bind(_fx.attack_shot_look, AttackProjectile.SPEED))
+				_tween.tween_callback(_shoot.bind(_fx.attack_shot_look, AttackProjectile.SPEED, false))
 				_tween.tween_interval(ATTACK_GAP)
+
+
+func _brace(seconds: float) -> void:
+	if _lucian_motion:
+		_lucian_motion.brace(seconds)
 
 
 func _fire_q() -> void:
 	var from := LUCIAN_AT + Vector2(Lucian.GUN_REACH, 0)
 	effects.add_child(_fx.q_beam(from, Vector2.RIGHT, DUMMY_AT.x - from.x, Q_WIDTH))
+	if _lucian_motion:
+		_lucian_motion.recoil(1.35)
+	_hit_dummy(DUMMY_AT + Vector2(-20.0, 0.0), _spark_color(&"q"), true)
 	Sfx.play(_fx.q_sound)
 
 
@@ -160,16 +173,22 @@ func _fire_w() -> void:
 	missile.set_look(_fx.w_missile_look())
 	missile.finished.connect(_burst, CONNECT_DEFERRED)
 	effects.add_child(missile)
+	if _lucian_motion:
+		_lucian_motion.recoil(1.15)
 	Sfx.play(_fx.w_sound)
 
 
 ## W's cross where the missile ended (`at` is a global position).
 func _burst(at: Vector2) -> void:
-	effects.add_child(_fx.w_blast(effects.to_local(at), Vector2.RIGHT, W_BAR))
+	var local := effects.to_local(at)
+	effects.add_child(_fx.w_blast(local, Vector2.RIGHT, W_BAR))
+	_hit_dummy(local, _spark_color(&"w"), true)
 
 
 func _start_dash() -> void:
 	Sfx.play(_fx.e_sound)
+	if _lucian_motion:
+		_lucian_motion.dash_stretch(E_DISTANCE / E_SPEED)
 	if GameSettings.instance().low_effects():
 		return
 	_trail = _fx.e_trail(skin.body)
@@ -184,19 +203,56 @@ func _end_dash() -> void:
 	_trail = null
 
 
-## A shot from the next gun to the dummy, with its muzzle flash and sound.
-func _shoot(make_look: Callable, speed: float) -> void:
-	var from := LUCIAN_AT + MUZZLES[_gun]
+## A shot from the next gun to the dummy, with its muzzle flash, recoil and sound.
+func _shoot(make_look: Callable, speed: float, from_r := false) -> void:
+	var gun := _gun
+	var from := LUCIAN_AT + MUZZLES[gun]
 	_gun = 1 - _gun
 	var shot := LinearProjectile.new()
 	shot.launch(from, Vector2.RIGHT, speed, DUMMY_AT.x - from.x, 10.0)
 	shot.set_look(make_look.call())
+	shot.finished.connect(_on_shot_hit.bind(_spark_color(&"r" if from_r else &"attack")), CONNECT_DEFERRED)
 	effects.add_child(shot)
+	if _lucian_motion:
+		_lucian_motion.recoil_side(-1.0 if gun == 0 else 1.0)
 	Sfx.play(_fx.shot_sound, -6.0)
 	if not GameSettings.instance().low_effects():
 		var flash := _fx.muzzle_flash()
 		flash.position = from
 		effects.add_child(flash)
+
+
+func _on_shot_hit(at: Vector2, spark_color: Color) -> void:
+	_hit_dummy(effects.to_local(at), spark_color, false)
+
+
+func _hit_dummy(at: Vector2, spark_color: Color, big: bool) -> void:
+	if _closing or not is_instance_valid(dummy):
+		return
+	if _dummy_motion:
+		_dummy_motion.flinch()
+		_dummy_motion.recoil(-0.55 if big else -0.3)
+	if Juice.on():
+		HitSpark.spawn(effects, at, spark_color, big)
+		dummy.modulate = EnemyUnit.HIT_FLASH
+		if _dummy_flash:
+			_dummy_flash.kill()
+		_dummy_flash = create_tween()
+		_dummy_flash.tween_property(dummy, "modulate", Color.WHITE, 0.14)
+
+
+func _spark_color(piece: StringName) -> Color:
+	var id := skin.id if skin else &"classic"
+	match id:
+		&"high_noon":
+			return Color("ffae52")
+		&"vampire":
+			return Color("ff5c77")
+		&"pulsefire":
+			return Color("78e6ff")
+		&"project":
+			return Color("ff7838")
+	return Color("8cc8ff") if piece == &"w" else Color("ffe8a0")
 
 
 ## Stops what is playing and puts Lucian back. Effects already out finish
@@ -205,8 +261,16 @@ func _stop() -> void:
 	if _tween:
 		_tween.kill()
 	_tween = null
+	if _dummy_flash:
+		_dummy_flash.kill()
+	_dummy_flash = null
+	dummy.modulate = Color.WHITE
 	_end_dash()
 	lucian.position = LUCIAN_AT
+	if _lucian_motion:
+		_lucian_motion.reset()
+	if _dummy_motion:
+		_dummy_motion.reset()
 
 
 func _build() -> void:
@@ -242,9 +306,16 @@ func _build() -> void:
 	dummy.texture = DUMMY_ART
 	dummy.position = DUMMY_AT
 	stage.add_child(dummy)
+	_dummy_motion = UnitMotion.new()
+	_dummy_motion.setup(dummy, dummy, 30.0)
+	dummy.add_child(_dummy_motion)
 	lucian.texture = skin.body
 	lucian.position = LUCIAN_AT
 	stage.add_child(lucian)
+	_lucian_motion = UnitMotion.new()
+	_lucian_motion.profile = UnitMotion.Profile.BIPED
+	_lucian_motion.setup(lucian, lucian, Lucian.HIT_RADIUS)
+	lucian.add_child(_lucian_motion)
 	stage.add_child(effects)
 
 	var row := HBoxContainer.new()

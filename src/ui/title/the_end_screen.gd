@@ -9,8 +9,12 @@ extends Control
 
 signal continue_pressed
 
-## The warm light laid over the title's night scene: dawn, not the night's teal.
-const DAWN_TINT := Color(1.0, 0.72, 0.38, 0.22)
+## Warm golden dawn light laid over the title's night scene: dawn sky wash,
+## soft horizon amber and rising sun glow behind Lucian and freed Senna.
+const DAWN_TINT := Color(1.0, 0.76, 0.42, 0.22)
+const DAWN_TOP := Color(0.55, 0.42, 0.48, 0.14)
+const DAWN_HORIZON := Color(1.0, 0.72, 0.34, 0.34)
+const DAWN_SUN := Color(1.0, 0.88, 0.58, 0.28)
 ## The card is centred in the screen's part right of this share of its width.
 const CARD_FROM := 0.36
 const FREE_COLOR := Color("8fe3b0")
@@ -55,11 +59,15 @@ func _input(event: InputEvent) -> void:
 
 func _build() -> void:
 	backdrop.thresh.visible = false
+	backdrop.lucian.peaceful = true
+	backdrop.senna.freed = true
+	backdrop.senna.modulate.a = 1.0
 	add_child(backdrop)
-	var dawn := ColorRect.new()
-	dawn.color = DAWN_TINT
+	var dawn := Control.new()
+	dawn.name = &"DawnAtmosphere"
 	dawn.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dawn.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dawn.draw.connect(_draw_dawn.bind(dawn))
 	add_child(dawn)
 	# The card stands in the right part of the scene, where Thresh stood, so
 	# Lucian and Senna on the left are not covered.
@@ -119,3 +127,21 @@ func _spaced(node: Control, above: float) -> Control:
 func _centered(label: Label) -> Label:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	return label
+
+
+## Warm golden dawn gradient & rising glow across the cleared night scene.
+func _draw_dawn(layer: Control) -> void:
+	var rect := Rect2(Vector2.ZERO, layer.size)
+	if rect.size.x <= 0.0 or rect.size.y <= 0.0:
+		return
+	var horizon_y := rect.size.y * 0.74
+	var paint := TitlePaint.new()
+	paint.shape(PackedVector2Array([Vector2.ZERO, Vector2(rect.size.x, 0), Vector2(rect.size.x, horizon_y), Vector2(0, horizon_y)]),
+		TitlePaint.linear(Vector2.ZERO, Vector2(0, horizon_y), DAWN_TOP, DAWN_HORIZON))
+	paint.shape(PackedVector2Array([Vector2(0, horizon_y), Vector2(rect.size.x, horizon_y), rect.size, Vector2(0, rect.size.y)]),
+		TitlePaint.linear(Vector2(0, horizon_y), Vector2(0, rect.size.y), DAWN_HORIZON, Color(DAWN_TINT, 0.14)))
+	paint.draw(layer)
+	var glow := JourneyMap.glow()
+	var sun_at := Vector2(rect.size.x * 0.34, horizon_y * 0.88)
+	var sun_size := Vector2(rect.size.x * 0.85, rect.size.y * 0.9)
+	layer.draw_texture_rect(glow, Rect2(sun_at - sun_size * 0.5, sun_size), false, DAWN_SUN)

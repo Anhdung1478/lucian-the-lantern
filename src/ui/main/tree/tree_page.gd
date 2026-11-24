@@ -475,40 +475,47 @@ func _draw() -> void:
 	JourneyMap.draw_frame(self, SIZE)
 
 
-## A link: dim, gold as far as it is lit (with a bright head while the light
-## runs), and the dot it ends on.
+## A link: dark backing, dim line, luminous gold beam with soft bloom as far as
+## it is lit, and crisp diamond lantern sockets at its ends.
 func _draw_link(link: Dictionary) -> void:
 	var points: PackedVector2Array = link["points"]
 	var fill: float = _link_fill.get("%s>%s" % [link["from"], link["to"]], 0.0)
 	var from := points[0]
 	var to := points[-1]
+	draw_line(from, to, Color(0.02, 0.04, 0.05, 0.75), LINK_WIDTH + 3.0, true)
 	draw_line(from, to, LINK_DIM, LINK_WIDTH, true)
-	draw_circle(to, LINK_DOT, LINK_DIM)
+	_draw_diamond(to, LINK_DOT + 1.0, LINK_DIM)
 	if fill <= 0.0:
 		return
 	var head := from.lerp(to, fill)
+	draw_line(from, head, Color(LIGHT, 0.22), LINK_WIDTH + 6.0, true)
 	draw_line(from, head, LINK_LIT, LINK_WIDTH, true)
+	draw_line(from, head, Color(1.0, 0.97, 0.86, 0.7), 1.2, true)
+	_draw_diamond(from, LINK_DOT, LINK_LIT)
 	if fill < 1.0:
-		draw_texture_rect(JourneyMap.glow(), Rect2(head - Vector2.ONE * 16.0, Vector2.ONE * 32.0), false, Color(LIGHT, 0.9))
-		draw_circle(head, LINK_WIDTH, Color(1, 0.97, 0.85))
+		draw_texture_rect(JourneyMap.glow(), Rect2(head - Vector2.ONE * 18.0, Vector2.ONE * 36.0), false, Color(LIGHT, 0.92))
+		draw_circle(head, LINK_WIDTH + 0.5, Color(1, 0.98, 0.88))
 	else:
-		draw_circle(to, LINK_DOT, LINK_LIT)
+		draw_texture_rect(JourneyMap.glow(), Rect2(to - Vector2.ONE * 12.0, Vector2.ONE * 24.0), false, Color(LIGHT, 0.45))
+		_draw_diamond(to, LINK_DOT + 1.2, LINK_LIT)
 
 
-## A dark pool under each name written on the trunk, so the bark never runs
-## through its letters.
+func _draw_diamond(at: Vector2, r: float, color: Color) -> void:
+	draw_colored_polygon(PackedVector2Array([at + Vector2(0, -r), at + Vector2(r, 0), at + Vector2(0, r), at + Vector2(-r, 0)]), color)
+
+
+## A dark obsidian pool under each node's words so the astrolabe lines never
+## run through its letters.
 func _draw_name_pools() -> void:
 	var glow := JourneyMap.glow()
 	for id: StringName in views:
-		if not on_trunk[id]:
-			continue
 		var drawn := footprint(id)
 		var words := Rect2(drawn.position.x, drawn.position.y + TreeNodeView.SIZE, drawn.size.x, drawn.size.y - TreeNodeView.SIZE)
 		draw_texture_rect(glow, words.grow_individual(NAME_POOL.x, NAME_POOL.y, NAME_POOL.x, NAME_POOL.y), false, NAME_POOL_COLOR)
 
 
-## Node `id`'s level sum as a ring: one dark track and one gold arc up to the
-## sum, a tick and its number where each level opens.
+## Node `id`'s level sum as an ornate Sentinel ring: recessed dark track, soft
+## golden bloom + bright gold arc up to the sum, and diamond milestone ticks.
 func _draw_ring(id: StringName) -> void:
 	var data := tree.node(id)
 	var center: Vector2 = centers[id]
@@ -517,24 +524,30 @@ func _draw_ring(id: StringName) -> void:
 	var total := _ring_shown
 	var start := PI * 0.5 + RING_GAP * 0.5
 	var sweep := TAU - RING_GAP
+	draw_arc(center, RING_RADIUS, start, start + sweep, 64, Color(0.03, 0.05, 0.06, 0.85), RING_WIDTH + 4.0, true)
 	draw_arc(center, RING_RADIUS, start, start + sweep, 64, RING_TRACK, RING_WIDTH, true)
 	var share := clampf(total / top, 0.0, 1.0)
 	if share > 0.0:
-		draw_arc(center, RING_RADIUS, start, start + sweep * share, maxi(4, int(64 * share)), UiStyle.GOLD_COLOR, RING_WIDTH, true)
+		var segs := maxi(4, int(64 * share))
+		draw_arc(center, RING_RADIUS, start, start + sweep * share, segs, Color(LIGHT, 0.22), RING_WIDTH + 6.0, true)
+		draw_arc(center, RING_RADIUS, start, start + sweep * share, segs, UiStyle.GOLD_COLOR, RING_WIDTH, true)
+		draw_arc(center, RING_RADIUS, start, start + sweep * share, segs, Color(1.0, 0.96, 0.84, 0.6), 1.6, true)
 		for end: float in [start, start + sweep * share]:
 			draw_circle(center + Vector2.from_angle(end) * RING_RADIUS, RING_WIDTH * 0.5, UiStyle.GOLD_COLOR)
 	var font := get_theme_default_font()
 	for mark: int in marks:
 		var direction := Vector2.from_angle(start + sweep * mark / top)
 		var reached := total >= mark - 0.001
+		var at := center + direction * RING_RADIUS
 		var inner := center + direction * (RING_RADIUS - RING_WIDTH * 0.5 - 2.0)
 		draw_line(inner, inner + direction * RING_TICK, UiStyle.TITLE_COLOR if reached else UiStyle.DIM_COLOR, 2.0, true)
+		_draw_diamond(at, 4.5 if reached else 3.5, UiStyle.GOLD_COLOR if reached else Color("546570"))
 		var label_at := center + direction * (RING_RADIUS + 22.0)
 		JourneyMap.draw_text(self, str(mark), label_at + Vector2(0, font.get_ascent(RING_FONT) * 0.4), RING_FONT,
 			UiStyle.TITLE_COLOR if reached else UiStyle.DIM_COLOR, true)
 
 
-## Each labelled group's caption over its top node, between two small diamonds.
+## Each labelled group's caption over its top node, framed by diamonds and fine brass rules.
 func _draw_group_captions() -> void:
 	var font := JourneyMap.text_font(self, 3)
 	for limb: Dictionary in LIMBS.get(branch, []):
@@ -544,8 +557,6 @@ func _draw_group_captions() -> void:
 		for id: StringName in limb["ids"]:
 			if centers[id].y < top.y:
 				top = centers[id]
-		# Centred on the group's top row when it has two or more nodes, else
-		# on the whole group's middle: a heading for the group, not one node.
 		var row: Array[float] = []
 		var all: Array[float] = []
 		for id: StringName in limb["ids"]:
@@ -562,4 +573,5 @@ func _draw_group_captions() -> void:
 		JourneyMap.draw_text(self, text, baseline, GROUP_FONT, JourneyPanel.CAPTION_COLOR, false, 3)
 		for side: float in [-1.0, 1.0]:
 			var at := Vector2(top.x + side * (width * 0.5 + 14.0), baseline.y - GROUP_FONT * 0.35)
-			draw_colored_polygon(PackedVector2Array([at + Vector2(0, -4), at + Vector2(4, 0), at + Vector2(0, 4), at + Vector2(-4, 0)]), JourneyPanel.CAPTION_COLOR)
+			_draw_diamond(at, 4.0, JourneyPanel.CAPTION_COLOR)
+			draw_line(at + Vector2(side * 8.0, 0), at + Vector2(side * 34.0, 0), Color(JourneyPanel.CAPTION_COLOR, 0.38), 1.2, true)

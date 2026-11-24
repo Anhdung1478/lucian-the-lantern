@@ -232,7 +232,7 @@ func _notification(what: int) -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
-	senna.modulate.a = SENNA_ALPHA - SHIMMER * (0.5 + 0.5 * sin(_time * SHIMMER_RATE))
+	senna.modulate.a = 1.0 if senna.freed else SENNA_ALPHA - SHIMMER * (0.5 + 0.5 * sin(_time * SHIMMER_RATE))
 	effects.queue_redraw()
 
 
@@ -242,8 +242,8 @@ func _sync_motion() -> void:
 	var low := GameSettings.instance().low_effects()
 	effects.visible = not low
 	set_process(is_visible_in_tree() and not low)
-	if low:
-		senna.modulate.a = SENNA_ALPHA
+	if low or senna.freed:
+		senna.modulate.a = 1.0 if senna.freed else SENNA_ALPHA
 
 
 func _on_setting_changed(key: StringName) -> void:
@@ -621,24 +621,26 @@ func _draw_effects() -> void:
 	_draw_ground_mist(blob)
 	if thresh.visible:
 		_draw_lantern(glow)
-	# Senna's motes, rising round her.
+	# Senna's motes, rising round her (warm gold-teal when freed).
 	var middle := senna.middle()
+	var mote_color := SENNA_COLOR.lerp(GLINT_COLOR, 0.45) if senna.freed else SENNA_COLOR
 	for mote in _mote_seeds:
 		var span := MOTE_REACH.y * 2.0
 		var rise := fposmod(mote.y * span + _time * MOTE_SPEED * (0.6 + mote.z), span)
 		var at := middle + Vector2((mote.x * 2.0 - 1.0) * MOTE_REACH.x + sin(_time * 0.6 + mote.z * 9.0) * 12.0, MOTE_REACH.y - rise)
 		var alpha := sin(PI * rise / span) * (0.45 + 0.25 * sin(_time * 1.4 + mote.z * 20.0))
-		MainBackdrop.draw_mote(effects, at, SENNA_COLOR, alpha)
-	# Lucian's relic gun's core, pulsing, and his muzzle glint.
+		MainBackdrop.draw_mote(effects, at, mote_color, alpha)
+	# Lucian's relic gun's core, pulsing, and his muzzle glint (combat only).
 	var core := lucian.relic_core()
 	var beat := 0.5 + 0.5 * sin(_time * 2.0 + 1.0)
 	effects.draw_texture_rect(glow, Rect2(core - Vector2.ONE * 22.0, Vector2.ONE * 44.0), false, Color(SENNA_COLOR, 0.15 + 0.2 * beat))
-	var glint := lucian.muzzle()
-	var twinkle := 0.5 + 0.5 * sin(_time * 2.3)
-	var shine := 34.0 + 18.0 * twinkle
-	effects.draw_texture_rect(glow, Rect2(glint - Vector2.ONE * shine * 0.5, Vector2.ONE * shine), false, Color(GLINT_COLOR, 0.2 + 0.25 * twinkle))
-	effects.draw_line(glint - Vector2(shine * 0.4, 0), glint + Vector2(shine * 0.4, 0), Color(1, 0.95, 0.8, 0.3 + 0.3 * twinkle), 1.5)
-	effects.draw_line(glint - Vector2(0, shine * 0.25), glint + Vector2(0, shine * 0.25), Color(1, 0.95, 0.8, 0.3 + 0.3 * twinkle), 1.5)
+	if not lucian.peaceful:
+		var glint := lucian.muzzle()
+		var twinkle := 0.5 + 0.5 * sin(_time * 2.3)
+		var shine := 34.0 + 18.0 * twinkle
+		effects.draw_texture_rect(glow, Rect2(glint - Vector2.ONE * shine * 0.5, Vector2.ONE * shine), false, Color(GLINT_COLOR, 0.2 + 0.25 * twinkle))
+		effects.draw_line(glint - Vector2(shine * 0.4, 0), glint + Vector2(shine * 0.4, 0), Color(1, 0.95, 0.8, 0.3 + 0.3 * twinkle), 1.5)
+		effects.draw_line(glint - Vector2(0, shine * 0.25), glint + Vector2(0, shine * 0.25), Color(1, 0.95, 0.8, 0.3 + 0.3 * twinkle), 1.5)
 
 
 ## Thresh's lantern breathing, the souls rising from it, his eyes

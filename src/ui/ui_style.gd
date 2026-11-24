@@ -101,18 +101,56 @@ static func button_style(state: StringName, selected := false) -> StyleBoxFlat:
 	style.set_content_margin_all(6)
 	match state:
 		&"hover":
-			style.bg_color = Color(0.12, 0.14, 0.19)
+			style.bg_color = Color(0.28125, 0.21875, 0.09375) if selected else Color(0.09375, 0.15625, 0.1875)
 			style.border_color = BORDER_COLOR
 		&"pressed":
-			style.bg_color = Color(0.2, 0.17, 0.1)
-			style.border_color = BORDER_COLOR
+			style.bg_color = Color(0.25, 0.1875, 0.09375)
+			style.border_color = GOLD_COLOR
 		&"disabled":
-			style.bg_color = Color(0.07, 0.08, 0.1)
-			style.border_color = Color(0.2, 0.22, 0.26)
+			style.bg_color = Color(0.046875, 0.0625, 0.078125)
+			style.border_color = Color(0.1875, 0.25, 0.28125)
 		_:
-			style.bg_color = Color(0.2, 0.17, 0.1) if selected else Color(0.09, 0.105, 0.14)
-			style.border_color = BORDER_COLOR if selected else Color(0.36, 0.4, 0.48)
+			style.bg_color = Color(0.21875, 0.15625, 0.0625) if selected else Color(0.0625, 0.09375, 0.125)
+			style.border_color = BORDER_COLOR if selected else Color(0.5625, 0.46875, 0.3125)
 	return style
+
+
+## Draws subtle Sentinel dark-fantasy inner bevel & corner diamond filigree on
+## `button` via its `draw` signal (zero extra child nodes).
+static func add_sentinel_trim(button: Button, primary := false) -> void:
+	if button.has_meta(&"sentinel_trim"):
+		return
+	button.set_meta(&"sentinel_trim", primary)
+	button.draw.connect(func() -> void:
+		if not is_instance_valid(button):
+			return
+		var rect := Rect2(Vector2.ZERO, button.size)
+		if rect.size.x < 32.0 or rect.size.y < 24.0:
+			return
+		var mode := button.get_draw_mode()
+		var disabled := button.disabled or mode == BaseButton.DRAW_DISABLED
+		var lit := not disabled and (mode == BaseButton.DRAW_HOVER or mode == BaseButton.DRAW_PRESSED or mode == BaseButton.DRAW_HOVER_PRESSED)
+		var is_primary: bool = button.get_meta(&"sentinel_trim", false)
+		var trim_col := Color(0.28, 0.32, 0.36, 0.32) if disabled else (Color(GOLD_COLOR, 0.62) if lit else (Color(BORDER_COLOR, 0.48) if is_primary else Color(BORDER_COLOR, 0.24)))
+		# Recessed inner gold hairline.
+		var inner := rect.grow(-4.0)
+		var box := StyleBoxFlat.new()
+		box.draw_center = false
+		box.border_color = Color(trim_col, trim_col.a * 0.7)
+		box.set_border_width_all(1)
+		box.set_corner_radius_all(3)
+		button.draw_style_box(box, inner)
+		# Crisp corner diamond rivets.
+		var dr := 2.6 if (lit or is_primary) else 2.0
+		for pt: Vector2 in [inner.position, Vector2(inner.end.x, inner.position.y), inner.end, Vector2(inner.position.x, inner.end.y)]:
+			button.draw_colored_polygon(PackedVector2Array([pt + Vector2(0, -dr), pt + Vector2(dr, 0), pt + Vector2(0, dr), pt + Vector2(-dr, 0)]), trim_col)
+		# Primary / hovered flanking Sentinel diamonds on the inner side edges.
+		if (is_primary or lit) and rect.size.x >= 160.0:
+			var cy := rect.size.y * 0.5
+			var fr := 3.6 if is_primary else 2.8
+			for fx: float in [16.0, rect.size.x - 16.0]:
+				var c := Vector2(fx, cy)
+				button.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -fr), c + Vector2(fr, 0), c + Vector2(0, fr), c + Vector2(-fr, 0)]), Color(GOLD_COLOR, 0.82 if (lit or is_primary) else 0.45)))
 
 
 ## Connects a button's soft click, once (CLICK_META marks it).

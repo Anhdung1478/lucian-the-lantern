@@ -260,6 +260,7 @@ func _on_changed(key: StringName) -> void:
 func _refresh_bindings() -> void:
 	for action: StringName in _bind_buttons:
 		UiStyle.style_button(_bind_buttons[action], BIND_FONT)
+		UiStyle.add_sentinel_trim(_bind_buttons[action])
 		_set_bind_text(_bind_buttons[action], settings.key_label(action))
 
 
@@ -362,6 +363,7 @@ func _build() -> void:
 	back.text = Lang.t("Back")
 	back.custom_minimum_size = BACK_SIZE
 	UiStyle.style_button(back, 22, true)
+	UiStyle.add_sentinel_trim(back, true)
 	back.add_theme_color_override(&"font_color", UiStyle.GOLD_COLOR)
 	back.pressed.connect(func() -> void: back_requested.emit())
 	bottom.add_child(back)
@@ -452,8 +454,27 @@ func _light_tab(button: Button, lit: bool) -> void:
 	button.add_theme_color_override(&"icon_normal_color", Color.WHITE if lit else Color(1, 1, 1, 0.65))
 
 
-## The lantern medallion on the panel's top edge, its glow spilling down.
+## The ornate double-framed obsidian-teal backdrop, corner diamonds, and
+## lantern medallion on the panel's top edge.
 func _draw_emblem(decor: Control) -> void:
+	var rect := Rect2(Vector2.ZERO, decor.size)
+	# Subtle navy-to-teal Sentinel vertical wash inside the panel frame.
+	var inside := rect.grow(-2.0)
+	var pts := MenuCard.rounded_rect(inside, 8.0)
+	var cols := PackedColorArray()
+	for pt in pts:
+		cols.append(Color(UiStyle.PLATE_TOP, 0.96).lerp(Color(UiStyle.PLATE_BOTTOM, 0.96), inverse_lerp(inside.position.y, inside.end.y, pt.y)))
+	decor.draw_polygon(pts, cols)
+	# Inner antique-gold filigree hairline + corner diamonds.
+	var inner_rect := rect.grow(-6.0)
+	var inner := StyleBoxFlat.new()
+	inner.draw_center = false
+	inner.border_color = Color(UiStyle.BORDER_COLOR, 0.36)
+	inner.set_border_width_all(1)
+	inner.set_corner_radius_all(6)
+	decor.draw_style_box(inner, inner_rect)
+	for corner: Vector2 in [inner_rect.position, Vector2(inner_rect.end.x, inner_rect.position.y), inner_rect.end, Vector2(inner_rect.position.x, inner_rect.end.y)]:
+		decor.draw_colored_polygon(PackedVector2Array([corner + Vector2(0, -4.5), corner + Vector2(4.5, 0), corner + Vector2(0, 4.5), corner + Vector2(-4.5, 0)]), UiStyle.GOLD_COLOR)
 	JourneyPanel.draw_top_glow(decor, decor.size.x, LANTERN_GLOW, GLOW_ALPHA)
 	var middle := Vector2(decor.size.x * 0.5, 0.0)
 	var halo := Vector2.ONE * EMBLEM_RADIUS * 2.0
@@ -514,6 +535,7 @@ func _build_controls() -> Control:
 	reset.text = Lang.t("Reset to defaults")
 	reset.custom_minimum_size = Vector2(200, 40)
 	UiStyle.style_button(reset, 16)
+	UiStyle.add_sentinel_trim(reset)
 	reset.pressed.connect(func() -> void:
 		settings.reset_bindings()
 		settings.set_value(&"cast_modes", {})

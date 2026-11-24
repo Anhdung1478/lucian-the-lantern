@@ -62,20 +62,22 @@ const LOCK_SHARE := 0.25
 const LOCK := preload("res://assets/art/ui/lock.svg")
 const GREY_SHADER := preload("res://src/ui/hud/grey_icon.gdshader")
 
-const HIDDEN_FILL := Color("10151b")
-const HIDDEN_RIM := Color("2c3542")
-const FILL_COLOR := Color("1b2430")
-const SILVER_COLOR := Color("aeb6c4")
+const HIDDEN_FILL := Color("0d1319")
+const HIDDEN_RIM := Color("2a3442")
+const FILL_COLOR := Color("16202b")
+const LIT_FILL := Color("231d14")
+const SILVER_COLOR := Color("b4becf")
 ## A greyscale icon's brightness: can buy, and too dear.
-const OPEN_ICON := Color(0.8, 0.8, 0.82)
-const DIM_ICON := Color(0.5, 0.5, 0.53)
+const OPEN_ICON := Color(0.84, 0.85, 0.88)
+const DIM_ICON := Color(0.52, 0.54, 0.58)
 ## The warm wash over a lit icon (added light), and its warm edge.
 const WASH := Color("ffb84a")
-const WASH_ALPHA := 0.3
+const WASH_ALPHA := 0.28
 const WARM_EDGE := Color("ffd98a")
+const MAXED_EDGE := Color("c9a863")
 const NEXT_COLOR := UiStyle.GOLD_COLOR
-const PIP_LIT := Color("ffd98a")
-const PIP_OFF := Color(0.6, 0.64, 0.7, 0.6)
+const PIP_LIT := Color("ffe094")
+const PIP_OFF := Color(0.62, 0.68, 0.76, 0.62)
 ## Older looks still read by the info column.
 const BOUGHT_COLOR := UiStyle.GOLD_COLOR
 const MAXED_COLOR := Color("6fd36f")
@@ -445,17 +447,40 @@ func _tile() -> Rect2:
 func _draw() -> void:
 	var current := state()
 	var tile := _tile()
+	var glow := JourneyMap.glow()
+	# Lantern aura cast onto the foliage behind the tile.
 	if next:
-		draw_texture_rect(JourneyMap.glow(), tile.grow(SIZE * 0.55), false, Color(NEXT_COLOR, 0.4))
+		draw_texture_rect(glow, tile.grow(SIZE * 0.62), false, Color(NEXT_COLOR, 0.44))
+	elif light_t > 0.0:
+		var aura_a := (0.18 if current == &"maxed" else 0.28) * light_t
+		draw_texture_rect(glow, tile.grow(SIZE * 0.48), false, Color(WASH, aura_a))
+	# Recessed dark lantern-glass body.
 	var frame := StyleBoxFlat.new()
 	frame.set_corner_radius_all(CORNER)
-	frame.bg_color = HIDDEN_FILL.lerp(FILL_COLOR, known_t)
-	var rim := Color(SILVER_COLOR, 0.75 if current == &"open" else 0.4)
+	var base_bg := HIDDEN_FILL.lerp(FILL_COLOR, known_t)
+	frame.bg_color = base_bg.lerp(LIT_FILL, light_t * 0.85)
+	var rim := Color(SILVER_COLOR, 0.78 if current == &"open" else 0.42)
 	frame.border_color = HIDDEN_RIM.lerp(rim, known_t)
 	frame.set_border_width_all(2)
 	draw_style_box(frame, tile)
+	# Subtle inner recessed bezel hairline inside the glass pane.
+	var inner := StyleBoxFlat.new()
+	inner.draw_center = false
+	inner.set_corner_radius_all(CORNER - 3)
+	inner.set_border_width_all(1)
+	var inner_col := Color(WARM_EDGE, 0.22 * light_t) if light_t > 0.0 else Color(SILVER_COLOR, 0.14 * known_t + 0.06)
+	inner.border_color = inner_col
+	draw_style_box(inner, tile.grow(-4.0))
+	# Faint etched Sentinel diamond filigree behind hidden tiles.
+	if known_t < 1.0:
+		var fa := (1.0 - known_t) * 0.22
+		var c := tile.get_center()
+		var r := SIZE * 0.3
+		draw_polyline(PackedVector2Array([c + Vector2(0, -r), c + Vector2(r, 0), c + Vector2(0, r), c + Vector2(-r, 0), c + Vector2(0, -r)]), Color(SILVER_COLOR, fa), 1.2, true)
+		draw_line(c + Vector2(-r * 0.65, 0), c + Vector2(r * 0.65, 0), Color(SILVER_COLOR, fa * 0.7), 1.0, true)
+		draw_line(c + Vector2(0, -r * 0.65), c + Vector2(0, r * 0.65), Color(SILVER_COLOR, fa * 0.7), 1.0, true)
 	# The picked ring, over the hover one, each eased by its own value.
-	var hover_a := 0.4 * lit_t * (1.0 - selected_t)
+	var hover_a := 0.45 * lit_t * (1.0 - selected_t)
 	if selected_t > 0.0 or hover_a > 0.0:
 		var ring := StyleBoxFlat.new()
 		ring.draw_center = false
@@ -463,14 +488,22 @@ func _draw() -> void:
 		ring.set_border_width_all(int(RING_WIDTH + 0.5) if selected_t >= 0.5 else 2)
 		ring.set_corner_radius_all(CORNER + int(RING_OUT))
 		draw_style_box(ring, tile.grow(RING_OUT))
-	# The level mark: lit pips up to the level, the last one growing in.
+	# The level mark: faceted diamond pips under the tile.
 	if not free_badge.visible and _arrive(known_t) > 0.0:
 		var pips := pip_centers(data.max_level)
+		var arrive := _arrive(known_t)
 		for i in pips.size():
 			var fill := clampf(pips_t - i, 0.0, 1.0)
-			draw_arc(pips[i], PIP * 0.5 - 0.75, 0.0, TAU, 16, Color(PIP_OFF, PIP_OFF.a * _arrive(known_t) * (1.0 - fill)), 1.5, true)
+			var p := pips[i]
+			var r := PIP * 0.54
+			var diamond := PackedVector2Array([p + Vector2(0, -r), p + Vector2(r, 0), p + Vector2(0, r), p + Vector2(-r, 0), p + Vector2(0, -r)])
+			if fill < 1.0:
+				draw_polyline(diamond, Color(PIP_OFF, PIP_OFF.a * arrive * (1.0 - fill)), 1.4, true)
 			if fill > 0.0:
-				draw_circle(pips[i], PIP * 0.5 * lerpf(0.6, 1.0, fill), Color(PIP_LIT, fill * _arrive(known_t)))
+				var fr := r * lerpf(0.62, 1.08, fill)
+				draw_texture_rect(glow, Rect2(p - Vector2.ONE * 9.0, Vector2.ONE * 18.0), false, Color(WASH, 0.35 * fill * arrive))
+				draw_colored_polygon(PackedVector2Array([p + Vector2(0, -fr), p + Vector2(fr, 0), p + Vector2(0, fr), p + Vector2(-fr, 0)]), Color(PIP_LIT, fill * arrive))
+				draw_circle(p, fr * 0.34, Color(1, 0.98, 0.9, 0.85 * fill * arrive))
 	# The name, or the rule tag: they cross over as the node opens.
 	var color := UiStyle.DIM_COLOR if current == &"poor" else UiStyle.TEXT_COLOR
 	_draw_words(Lang.t(data.display_name), NAME_FONT, color, _arrive(known_t))
@@ -498,25 +531,40 @@ func _draw_wash() -> void:
 
 
 ## Over the icon: a lit tile's warm edge (quieter once done), the next step's
-## gold rim, and the locks.
+## gold rim, Sentinel corner filigree accents, and the locks.
 func _draw_over() -> void:
 	var current := state()
 	var tile := _tile()
 	var edge := StyleBoxFlat.new()
 	edge.draw_center = false
 	edge.set_corner_radius_all(CORNER)
+	var accent := Color(SILVER_COLOR, 0.38 if current == &"open" else 0.18)
 	if next:
 		edge.border_color = NEXT_COLOR
 		edge.set_border_width_all(3)
 		_over.draw_style_box(edge, tile)
+		accent = Color(NEXT_COLOR, 0.95)
 	elif light_t > 0.0:
 		var done := current == &"maxed"
-		edge.border_color = Color(WARM_EDGE, (0.32 if done else 0.75) * light_t)
-		edge.set_border_width_all(1 if done else 2)
+		var rim_col := MAXED_EDGE if done else WARM_EDGE
+		edge.border_color = Color(rim_col, (0.55 if done else 0.85) * light_t)
+		edge.set_border_width_all(2)
 		_over.draw_style_box(edge, tile)
+		accent = Color(rim_col, (0.6 if done else 0.9) * light_t)
+	# Subtle ornate Sentinel corner rivets/filigree ticks.
+	if known_t > 0.1:
+		var ca := accent.a * known_t
+		var ccol := Color(accent, ca)
+		for sx: float in [0.0, 1.0]:
+			for sy: float in [0.0, 1.0]:
+				var corner := Vector2(lerpf(6.0, SIZE - 6.0, sx), lerpf(6.0, SIZE - 6.0, sy))
+				var dx := 7.0 if sx == 0.0 else -7.0
+				var dy := 7.0 if sy == 0.0 else -7.0
+				_over.draw_polyline(PackedVector2Array([corner + Vector2(dx, 0), corner, corner + Vector2(0, dy)]), ccol, 1.5, true)
 	if known_t < LOCK_SHARE:
-		_over.draw_texture_rect(LOCK, Rect2(tile.get_center() - Vector2.ONE * HIDDEN_LOCK * 0.5, Vector2.ONE * HIDDEN_LOCK), false, Color(1, 1, 1, 0.3 * (1.0 - known_t / LOCK_SHARE)))
+		_over.draw_texture_rect(LOCK, Rect2(tile.get_center() - Vector2.ONE * HIDDEN_LOCK * 0.5, Vector2.ONE * HIDDEN_LOCK), false, Color(1, 1, 1, 0.34 * (1.0 - known_t / LOCK_SHARE)))
 	if locked():
 		var at := LOCK_LEFT if data.id in LOCK_ON_LEFT else LOCK_RIGHT
 		_over.draw_circle(at, LOCK_RADIUS, Color(0.05, 0.06, 0.08, 0.95))
+		_over.draw_arc(at, LOCK_RADIUS, 0.0, TAU, 16, Color(SILVER_COLOR, 0.45), 1.2, true)
 		_over.draw_texture_rect(LOCK, Rect2(at - Vector2.ONE * 8.0, Vector2.ONE * 16.0), false, Color(1, 1, 1, 0.9))

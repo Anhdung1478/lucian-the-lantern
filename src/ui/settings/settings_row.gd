@@ -14,7 +14,7 @@ const PAD := 7.0
 ## note wraps this far from them.
 const CONTROLS_GAP := 24
 const ROW_SEPARATION := 16
-const REST_FILL := Color(UiStyle.SURFACE_RAISED, 0.4)
+const REST_FILL := Color(UiStyle.SURFACE_RAISED, 0.45)
 
 ## The texts, then the controls added with add().
 var row := HBoxContainer.new()

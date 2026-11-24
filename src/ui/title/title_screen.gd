@@ -235,7 +235,7 @@ func _build() -> void:
 	column.add_child(_slot)
 	_menu = _page_box()
 	_menu.add_theme_constant_override(&"separation", 14)
-	_button(_menu, Lang.t("Start new game"), show_slots.bind(false), true)
+	_button(_menu, Lang.t("Start new game"), show_slots.bind(false), true, true)
 	load_button = _button(_menu, Lang.t("Load game"), show_slots.bind(true), true)
 	_button(_menu, Lang.t("Settings"), _open_settings, true)
 	_button(_menu, Lang.t("Exit game"), exit_requested.emit, true)
@@ -385,10 +385,10 @@ func open_settings(at := 0) -> void:
 	settings.open(at)
 
 
-func _button(parent: Control, text: String, action: Callable, held := false) -> Button:
+func _button(parent: Control, text: String, action: Callable, held := false, primary := false) -> Button:
 	var button := Button.new()
 	button.text = text
-	_style_page_button(button, action)
+	_style_page_button(button, action, primary)
 	if held:
 		parent.add_child(_held_button(button))
 	else:
@@ -396,9 +396,10 @@ func _button(parent: Control, text: String, action: Callable, held := false) -> 
 	return button
 
 
-func _style_page_button(button: Button, action: Callable) -> void:
+func _style_page_button(button: Button, action: Callable, primary := false) -> void:
 	button.custom_minimum_size = BUTTON_SIZE
-	UiStyle.style_button(button, 26)
+	UiStyle.style_button(button, 26, primary)
+	UiStyle.add_sentinel_trim(button, primary)
 	button.pressed.connect(action)
 
 
