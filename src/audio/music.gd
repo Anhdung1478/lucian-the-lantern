@@ -41,6 +41,8 @@ const FAILED_DRONE := 0.6
 ## Rendered pieces kept in memory (about 3 MB each): the theme always stays.
 const CACHED := 3
 const SILENT_DB := -80.0
+## Milliseconds per frame spent rendering music on single-threaded Web builds.
+const RENDER_BUDGET_MS := 4.0
 
 ## Piece -> its AudioStreamSynchronized, once rendered.
 static var _streams := {}
@@ -64,20 +66,24 @@ var _pause_level := 1.0
 ## The wave a boss or mini boss was seen in, and its runner's instance id.
 var _boss_runner := 0
 var _boss_wave := -1
-## The render under way: its piece (-1 for none), its group task and the
-## layers it fills in.
+## The render under way: its piece (-1 for none), its group task (desktop) or
+## time-sliced job (Web), and the layers it fills in.
 var _rendering := -1
 var _task := -1
+var _web_render: Score.PieceRender
 var _wavs: Array[AudioStreamWAV] = []
 var _wavs_lock := Mutex.new()
 
 
-## One piece playing: its player, how loud it plays (the crossfade) and its
-## layers' volumes, 0–1.
+## One piece playing: its player (desktop: one AudioStreamSynchronized; Web:
+## five individual AudioStreamPlayers using WebAudio Sample playback to avoid
+## single-threaded AudioWorklet crackle), how loud it plays (the crossfade)
+## and its layers' volumes, 0–1.
 class Deck:
 	## Score.THEME or an act; -1 when the deck is free.
 	var piece := -1
 	var player := AudioStreamPlayer.new()
+	var layer_players: Array[AudioStreamPlayer] = []
 	var level := 0.0
 	var layers := PackedFloat32Array([0.0, 0.0, 0.0, 0.0, 0.0])
 
@@ -128,15 +134,25 @@ func _ready() -> void:
 		var deck := Deck.new()
 		deck.player.bus = &"Music"
 		add_child(deck.player)
+		if GameSettings.web:
+			for layer in Score.LAYER_COUNT:
+				var lp := AudioStreamPlayer.new()
+				lp.bus = &"Music"
+				if OS.has_feature("web"):
+					lp.playback_type = AudioServer.PLAYBACK_TYPE_SAMPLE
+				add_child(lp)
+				deck.layer_players.append(lp)
 		_decks.append(deck)
 
 
 ## Waits for a render under way: the task's layers must not outlive the node.
+## On Web, an unfinished time-sliced render is simply dropped.
 func _exit_tree() -> void:
+	_web_render = null
 	if _task != -1:
 		WorkerThreadPool.wait_for_group_task_completion(_task)
 		_task = -1
-		_rendering = -1
+	_rendering = -1
 
 
 ## The screen the Game shows now: its piece plays from now on.
@@ -232,9 +248,12 @@ func _senna_in(stage: Stage, cutscene: Cutscene) -> bool:
 ## Starts rendering `piece_number` unless it is rendered or a render is under
 ## way (the next frame asks again).
 func _render(piece_number: int) -> void:
-	if _streams.has(piece_number) or _task != -1:
+	if _streams.has(piece_number) or _task != -1 or _web_render != null:
 		return
 	_rendering = piece_number
+	if GameSettings.web:
+		_web_render = Score.PieceRender.new(piece_number)
+		return
 	_wavs.clear()
 	_wavs.resize(Score.LAYER_COUNT)
 	_task = WorkerThreadPool.add_group_task(_render_layer.bind(piece_number, _wavs, _wavs_lock), Score.LAYER_COUNT,
@@ -251,6 +270,14 @@ static func _render_layer(layer: int, piece_number: int, wavs: Array[AudioStream
 
 ## A finished render joins the cache.
 func _collect_render() -> void:
+	if _web_render != null:
+		if not _web_render.step(RENDER_BUDGET_MS):
+			return
+		_streams[_rendering] = _web_render.stream()
+		_web_render = null
+		_rendering = -1
+		_forget_old_pieces()
+		return
 	if _task == -1 or not WorkerThreadPool.is_group_task_completed(_task):
 		return
 	WorkerThreadPool.wait_for_group_task_completion(_task)
@@ -276,13 +303,29 @@ func _start_deck() -> void:
 	if deck_of(piece) or not _streams.has(piece):
 		return
 	var deck := _decks[0] if _decks[0].level <= _decks[1].level else _decks[1]
-	deck.player.stop()
+	_stop_deck(deck)
 	deck.piece = piece
-	deck.player.stream = _streams[piece]
 	deck.level = 0.0
 	deck.layers = targets.duplicate()
+	var stream := _streams[piece] as AudioStreamSynchronized
+	if not deck.layer_players.is_empty() and stream != null:
+		for layer in Score.LAYER_COUNT:
+			deck.layer_players[layer].stream = stream.get_sync_stream(layer)
+		_apply(deck)
+		for lp in deck.layer_players:
+			lp.play()
+		return
+	deck.player.stream = _streams[piece]
 	_apply(deck)
 	deck.player.play()
+
+
+func _stop_deck(deck: Deck) -> void:
+	deck.player.stop()
+	deck.player.stream = null
+	for lp in deck.layer_players:
+		lp.stop()
+		lp.stream = null
 
 
 ## Each deck toward full (the piece wanted) or silence (any other, which then
@@ -298,8 +341,7 @@ func _fade(delta: float) -> void:
 			for layer in Score.LAYER_COUNT:
 				deck.layers[layer] = move_toward(deck.layers[layer], targets[layer], delta / LAYER_FADE)
 		elif deck.level <= 0.0:
-			deck.player.stop()
-			deck.player.stream = null
+			_stop_deck(deck)
 			deck.piece = -1
 			continue
 		_apply(deck)
@@ -307,6 +349,11 @@ func _fade(delta: float) -> void:
 
 ## The deck's volumes on its player and its stream's layers.
 func _apply(deck: Deck) -> void:
+	if not deck.layer_players.is_empty():
+		var master := deck.level * _pause_level
+		for layer in Score.LAYER_COUNT:
+			deck.layer_players[layer].volume_db = _db(master * deck.layers[layer] * Score.LAYER_PEAKS[layer])
+		return
 	deck.player.volume_db = _db(deck.level * _pause_level)
 	var stream := deck.player.stream as AudioStreamSynchronized
 	if stream == null:

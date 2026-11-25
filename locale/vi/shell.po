@@ -402,8 +402,8 @@ msgid "Reset to defaults"
 msgstr "Đặt lại mặc định"
 
 #. Settings > Controls: the long hint under the list.
-msgid "ESC or a click elsewhere cancels a binding. Ctrl + a skill key ranks it up. Quick + indicator casts on release, Normal on left-click; right-click or ESC cancels either. The mouse wheel zooms the camera in a stage."
-msgstr "ESC hoặc nhấp ra ngoài: hủy gán phím. Ctrl + phím kỹ năng: nâng bậc. Nhanh + chỉ báo tung khi thả phím, Thường tung khi nhấp chuột trái; chuột phải hoặc ESC hủy. Con lăn chuột: thu phóng camera trong màn."
+msgid "ESC or a click elsewhere cancels a binding. Right-click a second slot to clear it. Quick + indicator casts on release, Normal on left-click; right-click or ESC cancels either. The mouse wheel zooms the camera in a stage."
+msgstr "ESC hoặc nhấp ra ngoài: hủy gán phím. Nhấp chuột phải ô thứ hai để xóa. Nhanh + chỉ báo tung khi thả phím, Thường tung khi nhấp chuột trái; chuột phải hoặc ESC hủy. Con lăn chuột: thu phóng camera trong màn."
 
 #. Settings > Graphics: row name.
 msgid "Window mode"
@@ -476,3 +476,31 @@ msgstr "Kỹ năng, hiệu ứng kích hoạt của trang bị hoặc phép bổ
 #. Settings > Gameplay: row description. %d is the most stacks.
 msgid "After each defeat on a stage, Lucian deals more damage and takes less there (up to %d times)."
 msgstr "Sau mỗi lần thất bại ở một màn, Lucian gây thêm sát thương và nhận ít hơn ở màn đó (tối đa %d lần)."
+
+#. Game root: red toast when Web main-screen autosave fails.
+msgid "Could not save."
+msgstr "Không thể lưu."
+
+#. Settings > Controls: group caption for skill rank-up bindings.
+msgid "RANK UP SKILLS"
+msgstr "NÂNG BẬC KỸ NĂNG"
+
+#. Settings > Controls: action name.
+msgid "Rank up Q"
+msgstr "Nâng bậc Q"
+
+#. Settings > Controls: action name.
+msgid "Rank up W"
+msgstr "Nâng bậc W"
+
+#. Settings > Controls: action name.
+msgid "Rank up E"
+msgstr "Nâng bậc E"
+
+#. Settings > Controls: action name.
+msgid "Rank up R"
+msgstr "Nâng bậc R"
+
+#. Settings > Controls: action name.
+msgid "Menu"
+msgstr "Menu"

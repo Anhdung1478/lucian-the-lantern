@@ -151,7 +151,7 @@ func _ready() -> void:
 	screens.menu.set_leave_enabled(not _runs_alone())
 	screens.menu.exit_requested.connect(_exit)
 	screens.menu.set_subtitle(Lang.t(run.display_name))
-	if confine_mouse:
+	if confine_mouse and not GameSettings.web:
 		Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	camera.setup(lucian, arena.get_bounds().grow(StageMap.WALL_THICKNESS))
 	lucian.projectile_parent = $Projectiles
@@ -175,6 +175,7 @@ func _ready() -> void:
 	else:
 		_start_waves()
 	hud.setup(lucian, wallet, self)
+	hud.menu_requested.connect(screens.trigger_menu)
 	if run.tutorial:
 		_start_tutorial()
 

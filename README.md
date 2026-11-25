@@ -9,8 +9,10 @@ Made with Godot 4.7. A fan project, not affiliated with Riot Games (see [Legal](
 ## Download and play
 
 1. Open the [latest release](https://github.com/Anhdung1478/lucian-the-lantern/releases/latest).
-2. Download `LucianTheLantern-v2.2.0-windows-x64.zip`.
+2. Download `LucianTheLantern-v2.2.1-windows-x64.zip`.
 3. Unzip it anywhere and run `LucianTheLantern.exe`.
+
+- **Play in the browser:** also available as an HTML5 Web build on itch.io (desktop browser with mouse and keyboard required; saves are stored in the browser's site data).
 
 - Needs Windows 10 or 11, 64-bit.
 - **Languages:** English and Vietnamese (Tiếng Việt). Pick one at the title screen's top right, or in **Settings → Gameplay**.
@@ -63,6 +65,7 @@ Every key can be changed in **Settings → Controls**.
 | Attack | Left mouse button, or right mouse button on an enemy |
 | Attack-move | A, then left-click (Normal) or A alone (Quick); choose in Settings → Controls |
 | Skills | Q, W, E, R |
+| Rank up a skill | Shift + Q, W, E, R (Ctrl + skill also works on desktop) |
 | Summoner spells | D, F |
 | Item slots | 1–6 |
 | Health / Mana potion | 7 / 8 |

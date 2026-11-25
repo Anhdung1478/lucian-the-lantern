@@ -9,7 +9,10 @@ const GAME_NAME: Array[String] = ["LUCIAN", "THE LANTERN"]
 ## The engine's own text: the search field of a dropdown's list.
 const ENGINE: Array[String] = ["Search"]
 ## The default keys, shown as the keyboard names them.
-const KEYS: Array[String] = ["LMB", "RMB", "Space"]
+const KEYS: Array[String] = [
+	"LMB", "RMB", "Space", "Escape", "Tab",
+	"Ctrl+Q", "Shift+Q", "Ctrl+W", "Shift+W", "Ctrl+E", "Shift+E", "Ctrl+R", "Shift+R",
+]
 
 var good_prefix := ""
 
@@ -86,7 +89,9 @@ func test_settings_on_every_tab_has_no_plain_text() -> void:
 	var settings := GameSettings.new(SETTINGS_PATH)
 	var allowed: Array = ENGINE.duplicate()
 	for action in GameSettings.REBINDABLE:
-		allowed.append(settings.key_label(action))
+		allowed.append(settings.key_label(action, 0))
+		allowed.append(settings.key_label(action, 1))
+	allowed.sort_custom(func(a: String, b: String) -> bool: return a.length() > b.length())
 	var screen := SettingsScreen.new()
 	add_child_autofree(screen)
 	screen.setup(settings)

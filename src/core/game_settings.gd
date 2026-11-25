@@ -59,25 +59,30 @@ const CASTABLE: Array[StringName] = [
 	&"summoner_d", &"summoner_f",
 	&"item_1", &"item_2", &"item_3", &"item_4", &"item_5", &"item_6",
 ]
+## Skill rank-up actions: these keep modifier keys (Ctrl, Alt, Shift) in their
+## bindings so combos like Ctrl+Q or Alt+Q work alongside plain Q.
+const RANK_UP: Array[StringName] = [&"rank_q", &"rank_w", &"rank_e", &"rank_r"]
 ## Actions the player can rebind, in the order the Controls tab lists them.
-## ESC (open_menu) and the F3 + Q debug toggle stay fixed.
+## The F3 + Q debug toggle stays fixed.
 const REBINDABLE: Array[StringName] = [
 	&"move", &"attack", &"attack_move",
 	&"skill_q", &"skill_w", &"skill_e", &"skill_r",
+	&"rank_q", &"rank_w", &"rank_e", &"rank_r",
 	&"summoner_d", &"summoner_f",
 	&"item_1", &"item_2", &"item_3", &"item_4", &"item_5", &"item_6",
 	&"potion_hp", &"potion_mp",
-	&"open_backpack", &"toggle_stats", &"toggle_camera", &"center_camera",
+	&"open_backpack", &"toggle_stats", &"toggle_camera", &"center_camera", &"open_menu",
 ]
 const ACTION_NAMES := {
 	&"move": "Move", &"attack": "Attack", &"attack_move": "Attack-move",
 	&"skill_q": "Skill Q", &"skill_w": "Skill W", &"skill_e": "Skill E", &"skill_r": "Skill R",
+	&"rank_q": "Rank up Q", &"rank_w": "Rank up W", &"rank_e": "Rank up E", &"rank_r": "Rank up R",
 	&"summoner_d": "Summoner spell 1", &"summoner_f": "Summoner spell 2",
 	&"item_1": "Item slot 1", &"item_2": "Item slot 2", &"item_3": "Item slot 3",
 	&"item_4": "Item slot 4", &"item_5": "Item slot 5", &"item_6": "Item slot 6",
 	&"potion_hp": "Health potion", &"potion_mp": "Mana potion",
 	&"open_backpack": "Backpack", &"toggle_stats": "Stats panel", &"toggle_camera": "Camera mode",
-	&"center_camera": "Center camera on Lucian",
+	&"center_camera": "Center camera on Lucian", &"open_menu": "Menu",
 }
 ## A dim line under an action's name in the Controls tab, for the few that need one.
 const ACTION_NOTES := {
@@ -108,13 +113,17 @@ const MSAA := {"low": Viewport.MSAA_DISABLED, "medium": Viewport.MSAA_2X, "high"
 static var _instance: GameSettings
 ## False forbids every change to the OS window: its mode, size and place.
 ## The screenshot tool's window sits off-screen and must stay there.
-static var owns_window := true
+static var owns_window := not OS.has_feature("web")
+## True in the Web (HTML5/WASM) build; tests set it to exercise Web paths headlessly.
+static var web := OS.has_feature("web")
 
 var path := DEFAULT_PATH
 
 var _values := {}
-## Action -> InputEvent.
+## Action -> primary InputEvent (slot 0).
 var _bindings := {}
+## Action -> secondary InputEvent (slot 1, optional; absent when none).
+var _secondary_bindings := {}
 
 
 ## The game's shared settings, loaded on first use.
@@ -127,7 +136,10 @@ static func instance() -> GameSettings:
 func _init(file_path := DEFAULT_PATH) -> void:
 	path = file_path
 	_values = DEFAULTS.duplicate()
+	if web:
+		_values[&"quality"] = "medium"
 	_bindings = default_bindings()
+	_secondary_bindings = default_secondary_bindings()
 	_load()
 
 
@@ -167,13 +179,13 @@ func low_effects() -> bool:
 	return _values[&"quality"] == "low"
 
 
-func binding(action: StringName) -> InputEvent:
-	return _bindings.get(action)
+func binding(action: StringName, slot := 0) -> InputEvent:
+	return _secondary_bindings.get(action) if slot == 1 else _bindings.get(action)
 
 
-## The key or mouse button shown for an action, e.g. "Q" or "RMB".
-func key_label(action: StringName) -> String:
-	return event_label(binding(action))
+## The key or mouse button shown for an action, e.g. "Q", "Ctrl+Q", "RMB", or "-".
+func key_label(action: StringName, slot := 0) -> String:
+	return event_label(binding(action, slot))
 
 
 ## The short name shown in tight spots (HUD slots and their hover cards,
@@ -182,24 +194,39 @@ func short_key_label(action: StringName) -> String:
 	return short_label(binding(action))
 
 
-## Binds `event` to `action`. An action that had the same input gets the
-## action's old one (none if it had none), so no two actions ever share an
-## input.
-func rebind(action: StringName, event: InputEvent) -> void:
-	var clean := _clean(event)
-	for other: StringName in _bindings.keys():
-		if other != action and _same_input(_bindings[other], clean):
-			if _bindings.has(action):
-				_bindings[other] = _bindings[action]
-			else:
-				_bindings.erase(other)
-	_bindings[action] = clean
+## Binds `event` to `action` in `slot` (0 = primary, 1 = secondary). Passing
+## null clears that slot. Any other slot holding the same input swaps with the
+## old binding (or clears if this slot was empty), so no two slots share one.
+func rebind(action: StringName, event: InputEvent, slot := 0) -> void:
+	var target := _secondary_bindings if slot == 1 else _bindings
+	if event == null:
+		target.erase(action)
+		save()
+		changed.emit(&"bindings")
+		return
+	var clean := _clean(event, RANK_UP.has(action))
+	var old: InputEvent = target.get(action)
+	for dict: Dictionary in [_bindings, _secondary_bindings]:
+		for other: StringName in dict.keys():
+			if other == action and dict == target:
+				continue
+			if _same_input(dict[other], clean):
+				if old != null and RANK_UP.has(other) == RANK_UP.has(action):
+					dict[other] = old
+				else:
+					dict.erase(other)
+	target[action] = clean
 	save()
 	changed.emit(&"bindings")
 
 
+func clear_binding(action: StringName, slot := 1) -> void:
+	rebind(action, null, slot)
+
+
 func reset_bindings() -> void:
 	_bindings = default_bindings()
+	_secondary_bindings = default_secondary_bindings()
 	save()
 	changed.emit(&"bindings")
 
@@ -208,6 +235,9 @@ func save() -> void:
 	var saved_bindings := {}
 	for action: StringName in _bindings:
 		saved_bindings[String(action)] = event_to_dict(_bindings[action])
+	var saved_secondary := {}
+	for action: StringName in _secondary_bindings:
+		saved_secondary[String(action)] = event_to_dict(_secondary_bindings[action])
 	var saved_values := {}
 	for key: StringName in _values:
 		saved_values[String(key)] = _values[key]
@@ -219,7 +249,13 @@ func save() -> void:
 		# Not opened, so not ours to remove.
 		_save_failed(false)
 		return
-	var written := file.store_string(JSON.stringify({"version": VERSION, "values": saved_values, "bindings": saved_bindings}, "\t")) \
+	var payload := {
+		"version": VERSION,
+		"values": saved_values,
+		"bindings": saved_bindings,
+		"secondary_bindings": saved_secondary,
+	}
+	var written := file.store_string(JSON.stringify(payload, "\t")) \
 		and file.get_error() == OK
 	file.close()
 	if not written:
@@ -277,15 +313,19 @@ func apply_audio() -> void:
 ## An action without a binding gets no input at all.
 func apply_input() -> void:
 	for action in REBINDABLE:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action)
 		InputMap.action_erase_events(action)
 		if _bindings.has(action):
 			InputMap.action_add_event(action, _bindings[action])
+		if _secondary_bindings.has(action):
+			InputMap.action_add_event(action, _secondary_bindings[action])
 
 
 func apply_display() -> void:
 	if DisplayServer.get_name() == "headless":
 		return
-	if owns_window:
+	if owns_window and not web:
 		match _values[&"window_mode"]:
 			"fullscreen":
 				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
@@ -295,9 +335,10 @@ func apply_display() -> void:
 				# A maximized window counts as windowed and stays as it is.
 				if DisplayServer.window_get_mode() not in [DisplayServer.WINDOW_MODE_WINDOWED, DisplayServer.WINDOW_MODE_MAXIMIZED]:
 					DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-	DisplayServer.window_set_vsync_mode(
-		DisplayServer.VSYNC_ENABLED if _values[&"vsync"] else DisplayServer.VSYNC_DISABLED)
-	Engine.max_fps = int(_values[&"max_fps"])
+	if not web:
+		DisplayServer.window_set_vsync_mode(
+			DisplayServer.VSYNC_ENABLED if _values[&"vsync"] else DisplayServer.VSYNC_DISABLED)
+		Engine.max_fps = int(_values[&"max_fps"])
 	var tree := Engine.get_main_loop() as SceneTree
 	if tree:
 		tree.root.msaa_2d = MSAA.get(_values[&"quality"], Viewport.MSAA_4X)
@@ -307,7 +348,7 @@ func apply_display() -> void:
 ## restored first). A size too big for the screen shrinks to fit, title bar
 ## included. Fullscreen modes keep the screen's own size.
 func apply_resolution() -> void:
-	if not owns_window or DisplayServer.get_name() == "headless" or _values[&"window_mode"] != "windowed":
+	if not owns_window or web or DisplayServer.get_name() == "headless" or _values[&"window_mode"] != "windowed":
 		return
 	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
@@ -339,23 +380,44 @@ static func parse_resolution(text: String) -> Vector2i:
 	return Vector2i(int(parts[0]), int(parts[1]))
 
 
-## The bindings in project.godot, one per action.
+## The primary bindings in project.godot, one per action.
 static func default_bindings() -> Dictionary:
 	var result := {}
 	for action in REBINDABLE:
 		var setting: Dictionary = ProjectSettings.get_setting("input/%s" % action, {})
 		var events: Array = setting.get("events", [])
 		if not events.is_empty():
-			result[action] = _clean(events[0])
+			result[action] = _clean(events[0], RANK_UP.has(action))
+	return result
+
+
+## The secondary bindings in project.godot (event index 1): none for most
+## actions, Tab for open_menu, and Shift + Q/W/E/R for skill rank-up.
+static func default_secondary_bindings() -> Dictionary:
+	var result := {}
+	for action in REBINDABLE:
+		var setting: Dictionary = ProjectSettings.get_setting("input/%s" % action, {})
+		var events: Array = setting.get("events", [])
+		if events.size() > 1:
+			result[action] = _clean(events[1], RANK_UP.has(action))
 	return result
 
 
 static func event_label(event: InputEvent) -> String:
 	if event is InputEventKey:
-		var code := (event as InputEventKey).physical_keycode
+		var key := event as InputEventKey
+		var code := key.physical_keycode
 		if code == KEY_NONE:
-			code = (event as InputEventKey).keycode
-		return OS.get_keycode_string(code)
+			code = key.keycode
+		var parts: Array[String] = []
+		if key.ctrl_pressed:
+			parts.append("Ctrl")
+		if key.alt_pressed:
+			parts.append("Alt")
+		if key.shift_pressed:
+			parts.append("Shift")
+		parts.append(OS.get_keycode_string(code))
+		return "+".join(parts)
 	if event is InputEventMouseButton:
 		var index := (event as InputEventMouseButton).button_index
 		return MOUSE_LABELS.get(index, "Mouse %d" % index)
@@ -381,7 +443,15 @@ static func event_to_dict(event: InputEvent) -> Dictionary:
 	if event is InputEventMouseButton:
 		return {"type": "mouse", "button": (event as InputEventMouseButton).button_index}
 	var key := event as InputEventKey
-	return {"type": "key", "code": key.physical_keycode if key else 0}
+	var out := {"type": "key", "code": key.physical_keycode if key else 0}
+	if key:
+		if key.ctrl_pressed:
+			out["ctrl"] = true
+		if key.alt_pressed:
+			out["alt"] = true
+		if key.shift_pressed:
+			out["shift"] = true
+	return out
 
 
 static func dict_to_event(data: Dictionary) -> InputEvent:
@@ -392,6 +462,9 @@ static func dict_to_event(data: Dictionary) -> InputEvent:
 	if data.get("type") == "key" and int(data.get("code", 0)) != 0:
 		var key := InputEventKey.new()
 		key.physical_keycode = int(data.code) as Key
+		key.ctrl_pressed = bool(data.get("ctrl", false))
+		key.alt_pressed = bool(data.get("alt", false))
+		key.shift_pressed = bool(data.get("shift", false))
 		return key
 	return null
 
@@ -437,7 +510,16 @@ func _load() -> void:
 		if REBINDABLE.has(action) and bindings[key] is Dictionary:
 			var event := dict_to_event(bindings[key])
 			if event:
-				_bindings[action] = event
+				_bindings[action] = _clean(event, RANK_UP.has(action))
+	if data.has("secondary_bindings") and data["secondary_bindings"] is Dictionary:
+		var secondary: Dictionary = data["secondary_bindings"]
+		_secondary_bindings.clear()
+		for key: String in secondary:
+			var action := StringName(key)
+			if REBINDABLE.has(action) and secondary[key] is Dictionary:
+				var event := dict_to_event(secondary[key])
+				if event:
+					_secondary_bindings[action] = _clean(event, RANK_UP.has(action))
 	# An action newer than the file keeps its default input only while no
 	# saved action uses it, so no two actions ever share one.
 	for action in REBINDABLE:
@@ -462,9 +544,9 @@ func _read(file: String) -> Dictionary:
 	return json.data
 
 
-## A plain copy of the input: only the key or button, no modifiers, so a
-## binding never depends on Ctrl or Shift (Ctrl + skill is the rank-up).
-static func _clean(event: InputEvent) -> InputEvent:
+## A clean copy of the input. Normal actions drop modifiers so a binding never
+## depends on Ctrl or Shift; rank-up actions (`keep_modifiers`) preserve them.
+static func _clean(event: InputEvent, keep_modifiers := false) -> InputEvent:
 	if event is InputEventMouseButton:
 		var mouse := InputEventMouseButton.new()
 		mouse.button_index = (event as InputEventMouseButton).button_index
@@ -473,6 +555,10 @@ static func _clean(event: InputEvent) -> InputEvent:
 	var source := event as InputEventKey
 	if source:
 		key.physical_keycode = source.physical_keycode if source.physical_keycode != KEY_NONE else source.keycode
+		if keep_modifiers:
+			key.ctrl_pressed = source.ctrl_pressed
+			key.alt_pressed = source.alt_pressed
+			key.shift_pressed = source.shift_pressed
 	return key
 
 
@@ -480,5 +566,10 @@ static func _same_input(a: InputEvent, b: InputEvent) -> bool:
 	if a is InputEventMouseButton and b is InputEventMouseButton:
 		return (a as InputEventMouseButton).button_index == (b as InputEventMouseButton).button_index
 	if a is InputEventKey and b is InputEventKey:
-		return (a as InputEventKey).physical_keycode == (b as InputEventKey).physical_keycode
+		var ka := a as InputEventKey
+		var kb := b as InputEventKey
+		return ka.physical_keycode == kb.physical_keycode \
+			and ka.ctrl_pressed == kb.ctrl_pressed \
+			and ka.alt_pressed == kb.alt_pressed \
+			and ka.shift_pressed == kb.shift_pressed
 	return false

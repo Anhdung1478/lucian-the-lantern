@@ -6,8 +6,14 @@ extends CanvasLayer
 ## stats above it. Reads Lucian every frame, also while the game is paused, so
 ## equipping items shows up right away.
 
+## Emitted when the Web HUD menu button is clicked (same action as ESC).
+signal menu_requested
+
 ## Space between the stats panel and the bottom panel.
 const STATS_GAP := 10.0
+const MENU_ICON := preload("res://assets/art/ui/gear.svg")
+const MENU_BUTTON_SIZE := Vector2(52, 52)
+const MENU_BUTTON_GAP := 8.0
 const PASSIVE_ICON := preload("res://assets/art/ui/icon_passive.svg")
 const SKILL_ICONS := [
 	preload("res://assets/art/ui/icon_q.svg"),
@@ -77,6 +83,10 @@ var wave_preview := WavePreview.new()
 ## Under the rest of the HUD: it never hides its text.
 var vignette := LowHealthVignette.new()
 var radar := Radar.new()
+## Top-right menu button on Web (null on desktop).
+var menu_button: Button
+## Top-right stage gold plate.
+var gold_panel: Plate
 
 var _gold_label: CountLabel
 var _essence_pairs := {}
@@ -387,13 +397,35 @@ func _pop_level_badge() -> void:
 	_level_pop.tween_property(badge, ^"scale", Vector2.ONE, LEVEL_POP_TIME * 0.6).set_ease(Tween.EASE_IN_OUT)
 
 
-## Top right: a coin and the stage gold, on a plain plate.
+## Top right: a coin and the stage gold, on a plain plate. On Web, the menu
+## button takes the corner itself and the plate shifts left to make room.
 func _build_gold() -> void:
+	var right_margin := MARGIN
+	if GameSettings.web:
+		menu_button = Button.new()
+		menu_button.icon = MENU_ICON
+		menu_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		menu_button.expand_icon = true
+		menu_button.focus_mode = Control.FOCUS_NONE
+		menu_button.custom_minimum_size = MENU_BUTTON_SIZE
+		UiStyle.style_button(menu_button, 18)
+		UiStyle.add_sentinel_trim(menu_button)
+		menu_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		menu_button.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+		menu_button.offset_right = -MARGIN
+		menu_button.offset_left = -(MARGIN + MENU_BUTTON_SIZE.x)
+		menu_button.offset_top = MARGIN
+		menu_button.offset_bottom = MARGIN + MENU_BUTTON_SIZE.y
+		menu_button.set_meta(&"hover_text", Lang.t("Menu (ESC)"))
+		menu_button.pressed.connect(menu_requested.emit)
+		$Root.add_child(menu_button)
+		right_margin = MARGIN + MENU_BUTTON_SIZE.x + MENU_BUTTON_GAP
 	var panel := Plate.new(GOLD_PAD, false)
+	gold_panel = panel
 	panel.opacity = PLATE_OPACITY
 	panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	panel.offset_right = -MARGIN
+	panel.offset_right = -right_margin
 	panel.offset_top = MARGIN
 	panel.set_meta(&"hover_text", Lang.t("Stage gold: spend it at the merchant. Resets every stage."))
 	panel.mouse_filter = Control.MOUSE_FILTER_PASS

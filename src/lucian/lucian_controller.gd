@@ -100,14 +100,25 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 
-## A skill (Ctrl for its rank-up), item, summoner or potion key. True when the
-## event was one.
+## A skill (rank-up bindings, or Shift/Ctrl + skill), item, summoner or potion
+## key. True when the event was one.
 func _key_input(event: InputEvent) -> bool:
+	const RANK_ACTIONS := {
+		&"rank_q": ChampionProgress.Slot.Q,
+		&"rank_w": ChampionProgress.Slot.W,
+		&"rank_e": ChampionProgress.Slot.E,
+		&"rank_r": ChampionProgress.Slot.R,
+	}
+	for action: StringName in RANK_ACTIONS:
+		if InputMap.has_action(action) and event.is_action_pressed(action, false, true):
+			lucian.try_rank_up(RANK_ACTIONS[action])
+			return true
 	for action in GameSettings.CASTABLE:
 		if event.is_action_pressed(action):
-			# Ctrl+Q also matches skill_q, so the rank-up check comes first.
-			var with_ctrl := event is InputEventWithModifiers and (event as InputEventWithModifiers).ctrl_pressed
-			if SKILL_ACTIONS.has(action) and with_ctrl:
+			# Shift+Q / Ctrl+Q / Alt+Q also match skill_q, so rank-up comes first.
+			var mod := event as InputEventWithModifiers
+			var rank_up := mod != null and (mod.shift_pressed or mod.ctrl_pressed or mod.alt_pressed)
+			if SKILL_ACTIONS.has(action) and rank_up:
 				lucian.try_rank_up(SKILL_ACTIONS[action])
 			else:
 				_press_cast(action)

@@ -972,3 +972,27 @@ msgstr "Xong"
 #. node_info_panel.gd: a hidden node's rule row. %d is the levels needed, %s the skills' keys joined by " + "
 msgid "%d levels in %s"
 msgstr "%d cấp ở %s"
+
+#. gear_menu.gd: gear menu row to download/save the current slot as a JSON file
+msgid "Export save"
+msgstr "Xuất dữ liệu"
+
+#. gear_menu.gd: gear menu row to load a JSON save file into the current slot
+msgid "Import save"
+msgstr "Nhập dữ liệu"
+
+#. main_screen.gd: toast after exporting the current slot
+msgid "Exported"
+msgstr "Đã xuất dữ liệu"
+
+#. main_screen.gd: red toast when exporting fails
+msgid "Could not export"
+msgstr "Không thể xuất dữ liệu"
+
+#. game.gd: toast after importing a save file
+msgid "Imported"
+msgstr "Đã nhập dữ liệu"
+
+#. main_screen.gd: red toast when an imported file is not a valid save
+msgid "Invalid save file"
+msgstr "Tệp lưu không hợp lệ"

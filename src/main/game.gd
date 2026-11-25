@@ -28,18 +28,29 @@ var _was_paused := false
 var _rng := RandomNumberGenerator.new()
 ## The score: it follows each screen swapped in.
 var music := Music.new()
+## A deferred Web autosave is already queued for the end of this frame.
+var _save_queued := false
 
 
 func _ready() -> void:
 	_rng.randomize()
 	GameSettings.instance().apply()
 	GameSettings.instance().changed.connect(_on_setting_changed)
+	SaveGame.instance().changed.connect(_on_save_changed)
+	LeaveGuard.install()
 	get_tree().auto_accept_quit = false
 	add_child(Sfx.new())
 	add_child(music)
 	add_child(fade)
 	add_child(prompt)
 	show_title()
+
+
+func _exit_tree() -> void:
+	if SaveGame.instance().changed.is_connected(_on_save_changed):
+		SaveGame.instance().changed.disconnect(_on_save_changed)
+	if GameSettings.instance().changed.is_connected(_on_setting_changed):
+		GameSettings.instance().changed.disconnect(_on_setting_changed)
 
 
 ## Play time, for the slot lists: everywhere but the title screen. Game pauses
@@ -119,6 +130,7 @@ func show_main_screen() -> void:
 	main.start_requested.connect(start_stage)
 	main.exit_requested.connect(ask_to_quit)
 	main.leave_requested.connect(ask_to_leave)
+	main.save_imported.connect(_on_save_imported)
 	_swap(main)
 
 
@@ -286,3 +298,33 @@ func _swap(next: Node) -> void:
 	move_child(next, 0)
 	music.follow(next)
 	fade.play()
+	_update_leave_guard()
+
+
+func _on_save_changed() -> void:
+	_update_leave_guard()
+	if GameSettings.web and screen is MainScreen and not _save_queued:
+		_save_queued = true
+		_autosave.call_deferred()
+
+
+func _autosave() -> void:
+	_save_queued = false
+	if not GameSettings.web or not (screen is MainScreen):
+		return
+	var save := SaveGame.instance()
+	if not save.unsaved:
+		return
+	if not save.save():
+		(screen as MainScreen).show_toast(Lang.t("Could not save."), true)
+	_update_leave_guard()
+
+
+func _update_leave_guard() -> void:
+	LeaveGuard.set_unsafe(LeaveGuard.is_unsafe(SaveGame.instance(), screen is Stage))
+
+
+func _on_save_imported() -> void:
+	show_main_screen()
+	if screen is MainScreen:
+		(screen as MainScreen).show_toast(Lang.t("Imported"))

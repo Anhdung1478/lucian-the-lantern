@@ -31,7 +31,7 @@ const SETTING := &"camera_zoom"
 ## Edge panning in screen pixels a second, at any view.
 @export var pan_speed := 1600.0
 
-var mode := Mode.FREE
+var mode := Mode.FOLLOW if GameSettings.web else Mode.FREE
 ## The level the wheel asked for; `zoom` eases to it.
 var zoom_level := 1.0
 ## Where the level is kept; the game's own settings unless set before setup.

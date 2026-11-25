@@ -53,6 +53,8 @@ var difficulty := Difficulty.NORMAL
 ## last stage shows it (a clear saved from its result panel, by closing the
 ## window, has not seen it yet). A save from before the flag has not.
 var ending_seen := false
+## True when in-memory progress has changed since the last load, reset or save.
+var unsaved := false
 
 
 ## The running game's progress: slot 1 until the title screen loads another.
@@ -65,6 +67,9 @@ static func instance() -> SaveGame:
 
 func _init(file_prefix := DEFAULT_PREFIX) -> void:
 	prefix = file_prefix
+	changed.connect(func() -> void: unsaved = true)
+	tree.changed.connect(changed.emit)
+	essences.changed.connect(changed.emit)
 
 
 func path(of_slot: int) -> String:
@@ -100,12 +105,17 @@ func load_slot(of_slot: int) -> bool:
 		var data := _read(file)
 		if not data.is_empty():
 			_apply(data)
+			unsaved = false
 			return true
+	unsaved = false
 	return false
 
 
 func save() -> bool:
-	return _write(slot)
+	if not _write(slot):
+		return false
+	unsaved = false
+	return true
 
 
 ## Copies the current progress into another slot; the current slot stays.
@@ -150,6 +160,7 @@ func reset() -> void:
 	ending_seen = false
 	tree.acts_cleared = 0
 	changed.emit()
+	unsaved = false
 
 
 ## A new game on `level` (a Difficulty level) in slot `of_slot`, which
@@ -159,14 +170,17 @@ func reset() -> void:
 func start_new(of_slot: int, level := Difficulty.NORMAL) -> bool:
 	var before := to_dict()
 	var before_slot := slot
+	var before_unsaved := unsaved
 	slot = of_slot
 	reset()
 	difficulty = level if Difficulty.is_level(level) else Difficulty.NORMAL
 	if save():
+		unsaved = false
 		return true
 	_apply(before)
 	slot = before_slot
 	changed.emit()
+	unsaved = before_unsaved
 	return false
 
 
@@ -328,6 +342,30 @@ func to_dict() -> Dictionary:
 		"difficulty": Difficulty.KEYS[difficulty],
 		"ending_seen": ending_seen,
 	}
+
+
+## Serializes the current slot to formatted JSON for backup or transfer.
+func export_json() -> String:
+	return JSON.stringify(to_dict(), "\t")
+
+
+## Replaces the current slot's progress from a JSON string and saves it.
+## Returns false without altering memory if the JSON is invalid or not a save.
+func import_json(text: String) -> bool:
+	var json := JSON.new()
+	if json.parse(text) != OK or not json.data is Dictionary:
+		return false
+	var data: Dictionary = json.data
+	if not (data.has("version") or data.has("essences") or data.has("tree")):
+		return false
+	var before := to_dict()
+	var before_unsaved := unsaved
+	_apply(data)
+	if save():
+		return true
+	_apply(before)
+	unsaved = before_unsaved
+	return false
 
 
 ## Writes `<file>.tmp` first. Once it is written, the file being replaced

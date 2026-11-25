@@ -21,7 +21,7 @@ extends CanvasLayer
 
 signal back_requested
 
-const PANEL_SIZE := Vector2(1120, 720)
+const PANEL_SIZE := Vector2(1180, 720)
 ## The panel's inner margin; the top one clears the emblem's lower half.
 const PAD := 26.0
 const HEADER_TOP := 46.0
@@ -59,8 +59,8 @@ const CARD_GAP := 8
 const CONTROL_HEIGHT := 36.0
 const SLIDER_WIDTH := 340.0
 const OPTION_WIDTH := 280.0
-const BIND_WIDTH := 150.0
-const BIND_FONT := 17
+const BIND_WIDTH := 116.0
+const BIND_FONT := 16
 const CAST_WIDTH := 210.0
 ## Room between the Controls list and its scroll bar.
 const SCROLL_GAP := 14
@@ -75,10 +75,10 @@ const CAST_MODE_LABELS := ["Quick cast", "Quick + indicator", "Normal cast"]
 const ATTACK_MOVE_LABELS := ["Normal", "Quick"]
 ## The Controls list's captions, each over its group's first action.
 const CONTROL_GROUPS := {
-	&"move": "MOVE AND ATTACK", &"skill_q": "SKILLS", &"summoner_d": "SUMMONER SPELLS",
-	&"item_1": "ITEMS", &"open_backpack": "INTERFACE",
+	&"move": "MOVE AND ATTACK", &"skill_q": "SKILLS", &"rank_q": "RANK UP SKILLS",
+	&"summoner_d": "SUMMONER SPELLS", &"item_1": "ITEMS", &"open_backpack": "INTERFACE",
 }
-const CONTROLS_HINT := "ESC or a click elsewhere cancels a binding. Ctrl + a skill key ranks it up. Quick + indicator casts on release, Normal on left-click; right-click or ESC cancels either. The mouse wheel zooms the camera in a stage."
+const CONTROLS_HINT := "ESC or a click elsewhere cancels a binding. Right-click a second slot to clear it. Quick + indicator casts on release, Normal on left-click; right-click or ESC cancels either. The mouse wheel zooms the camera in a stage."
 const LANGUAGE_NOTE := "The language of the game's text. The screen is built again in it at once."
 const LANGUAGE_LOCKED_NOTE := "Not during a stage: change it on the title screen or the main screen."
 ## Pressed alone, these never become a binding.
@@ -105,13 +105,25 @@ var _page_slot: Control
 var _tab_buttons: Array[Button] = []
 var _pages: Array[Control] = []
 var _bind_buttons := {}
+## Secondary binding buttons (slot 1), action -> Button.
+var _secondary_buttons := {}
 ## Castable action -> its cast mode picker.
 var _cast_modes := {}
 var _attack_move_picker: OptionButton
-## Greyed out unless the window mode is windowed.
+## Greyed out unless the window mode is windowed (desktop only).
 var _resolution: OptionButton
+## Web-only Fullscreen toggle; synced on open() and viewport size_changed.
+var _fullscreen_toggle: CheckButton
+## Callable used to read/write fullscreen mode (overridable in tests).
+var fullscreen_getter := func() -> bool:
+	return DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
+var fullscreen_setter := func(on: bool) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if on else DisplayServer.WINDOW_MODE_WINDOWED)
 ## The action waiting for a new key, or &"".
 var _listening: StringName = &""
+var _listening_slot := 0
 var _listen_frame := -1
 ## A volume slider is being dragged: its steps apply at once, unsaved until
 ## it is let go (or the screen closes first).
@@ -123,6 +135,7 @@ var _unsaved := false
 func _ready() -> void:
 	layer = 45
 	visible = false
+	get_viewport().size_changed.connect(_on_viewport_resized)
 
 
 func setup(game_settings: GameSettings) -> void:
@@ -134,9 +147,21 @@ func setup(game_settings: GameSettings) -> void:
 func open(at := 0) -> void:
 	_is_open = true
 	_stop_listening()
+	_sync_fullscreen()
 	show_tab(at, true)
 	visible = true
 	UiMotion.open_overlay(_backdrop, _center)
+
+
+func _on_viewport_resized() -> void:
+	if _is_open:
+		_sync_fullscreen()
+
+
+func _sync_fullscreen() -> void:
+	if _fullscreen_toggle == null:
+		return
+	_fullscreen_toggle.set_pressed_no_signal(bool(fullscreen_getter.call()))
 
 
 func close() -> void:
@@ -183,13 +208,15 @@ func is_listening() -> bool:
 	return _listening != &""
 
 
-## Starts waiting for the next key or mouse button for `action`. The second
-## press of a double-click on the row is ignored, so it can't bind the left
-## button; a separate later click still binds its button.
-func listen(action: StringName) -> void:
+## Starts waiting for the next key or mouse button for `action` in `slot`
+## (0 = primary, 1 = secondary). The second press of a double-click on the row
+## is ignored, so it can't bind the left button; a separate later click still
+## binds its button.
+func listen(action: StringName, slot := 0) -> void:
 	_stop_listening()
 	_listening = action
-	var button: Button = _bind_buttons[action]
+	_listening_slot = slot
+	var button: Button = _secondary_buttons[action] if slot == 1 else _bind_buttons[action]
 	UiStyle.style_button(button, BIND_FONT, true)
 	_set_bind_text(button, Lang.t("Press a key..."))
 	# The click that started listening must not bind itself.
@@ -211,7 +238,7 @@ func _input(event: InputEvent) -> void:
 		elif mouse and mouse.pressed and not mouse.double_click \
 				and not WHEEL_BUTTONS.has(mouse.button_index) \
 				and Engine.get_process_frames() != _listen_frame:
-			var button: Button = _bind_buttons[_listening]
+			var button: Button = _secondary_buttons[_listening] if _listening_slot == 1 else _bind_buttons[_listening]
 			if button.get_global_rect().has_point(Pointer.in_world(button)):
 				_bind(mouse)
 				get_viewport().set_input_as_handled()
@@ -224,12 +251,15 @@ func _input(event: InputEvent) -> void:
 
 func _bind(event: InputEvent) -> void:
 	var action := _listening
+	var slot := _listening_slot
 	_listening = &""
-	settings.rebind(action, event)
+	_listening_slot = 0
+	settings.rebind(action, event, slot)
 
 
 func _stop_listening() -> void:
 	_listening = &""
+	_listening_slot = 0
 	_refresh_bindings()
 
 
@@ -248,7 +278,8 @@ func _on_changed(key: StringName) -> void:
 		&"window_mode":
 			settings.apply_display()
 			settings.apply_resolution()
-			_resolution.disabled = settings.get_value(&"window_mode") != "windowed"
+			if _resolution:
+				_resolution.disabled = settings.get_value(&"window_mode") != "windowed"
 		&"resolution":
 			settings.apply_resolution()
 		&"vsync", &"max_fps", &"quality":
@@ -261,7 +292,11 @@ func _refresh_bindings() -> void:
 	for action: StringName in _bind_buttons:
 		UiStyle.style_button(_bind_buttons[action], BIND_FONT)
 		UiStyle.add_sentinel_trim(_bind_buttons[action])
-		_set_bind_text(_bind_buttons[action], settings.key_label(action))
+		_set_bind_text(_bind_buttons[action], settings.key_label(action, 0))
+	for action: StringName in _secondary_buttons:
+		UiStyle.style_button(_secondary_buttons[action], BIND_FONT)
+		UiStyle.add_sentinel_trim(_secondary_buttons[action])
+		_set_bind_text(_secondary_buttons[action], settings.key_label(action, 1))
 
 
 ## Sets a binding button's text; in motion the old text fades out and the new
@@ -564,9 +599,20 @@ func _build_controls() -> Control:
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(BIND_WIDTH, CONTROL_HEIGHT)
 		button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		button.pressed.connect(listen.bind(action))
+		button.pressed.connect(listen.bind(action, 0))
 		row.add(button)
 		_bind_buttons[action] = button
+		var second := Button.new()
+		second.custom_minimum_size = Vector2(BIND_WIDTH, CONTROL_HEIGHT)
+		second.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		second.pressed.connect(listen.bind(action, 1))
+		second.gui_input.connect(func(ev: InputEvent) -> void:
+			var mb := ev as InputEventMouseButton
+			if mb and mb.pressed and mb.button_index == MOUSE_BUTTON_RIGHT and not is_listening():
+				settings.clear_binding(action, 1)
+				second.accept_event())
+		row.add(second)
+		_secondary_buttons[action] = second
 		if GameSettings.CASTABLE.has(action):
 			third.append(row.add(_cast_mode_picker(action)))
 		elif action == &"attack_move":
@@ -596,10 +642,20 @@ func _fit_third_column(third: Array[Control]) -> void:
 
 func _build_graphics() -> Control:
 	var page := _page(2)
-	_option(page, Lang.t("Window mode"), &"window_mode", [Lang.t("Windowed"), Lang.t("Borderless fullscreen"), Lang.t("Fullscreen")], GameSettings.WINDOW_MODES)
-	_resolution = _build_resolution(page)
-	_toggle(page, Lang.t("VSync"), &"vsync")
-	_option(page, Lang.t("FPS cap"), &"max_fps", ["30", "60", "120", "144", Lang.t("Unlimited")], GameSettings.FPS_CAPS)
+	if GameSettings.web:
+		var row := _row(page, Lang.t("Fullscreen"))
+		_fullscreen_toggle = CheckButton.new()
+		_fullscreen_toggle.focus_mode = Control.FOCUS_NONE
+		_fullscreen_toggle.custom_minimum_size.y = CONTROL_HEIGHT
+		_fullscreen_toggle.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		_fullscreen_toggle.set_pressed_no_signal(bool(fullscreen_getter.call()))
+		_fullscreen_toggle.toggled.connect(func(on: bool) -> void: fullscreen_setter.call(on))
+		row.add(_fullscreen_toggle)
+	else:
+		_option(page, Lang.t("Window mode"), &"window_mode", [Lang.t("Windowed"), Lang.t("Borderless fullscreen"), Lang.t("Fullscreen")], GameSettings.WINDOW_MODES)
+		_resolution = _build_resolution(page)
+		_toggle(page, Lang.t("VSync"), &"vsync")
+		_option(page, Lang.t("FPS cap"), &"max_fps", ["30", "60", "120", "144", Lang.t("Unlimited")], GameSettings.FPS_CAPS)
 	_option(page, Lang.t("Quality"), &"quality", [Lang.t("Low"), Lang.t("Medium"), Lang.t("High")], GameSettings.QUALITIES,
 		Lang.t("Low turns off anti-aliasing, dash trails and muzzle flashes; Medium uses 2x anti-aliasing."))
 	_toggle(page, Lang.t("Show FPS"), &"show_fps")

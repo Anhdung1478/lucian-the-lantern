@@ -76,3 +76,18 @@ WhD
 
 # The graphics setting's name.
 VSync
+
+# leave_guard.gd: JavaScript passed to JavaScriptBridge.eval on Web, not player text.
+window.lucianUnsafe=false;window.addEventListener('beforeunload',function(e){if(window.lucianUnsafe){e.preventDefault();e.returnValue='';}});document.addEventListener('fullscreenchange',function(){if(!navigator.keyboard)return;if(document.fullscreenElement){if(navigator.keyboard.lock)navigator.keyboard.lock(['Escape']).catch(function(){});}else if(navigator.keyboard.unlock){navigator.keyboard.unlock();}});
+window.lucianUnsafe=%s;
+
+# game_settings.gd: modifier key prefixes formatted into key labels like Ctrl+Q / Alt+Q / Shift+Q.
+Ctrl
+Alt
+Shift
+
+# save_transfer.gd: file filter, MIME type, JS interface name and Web file-picker script.
+JSON
+application/json
+window
+var i=document.createElement('input');i.type='file';i.accept='.json,application/json';i.onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){if(window.lucianImportCb)window.lucianImportCb(String(r.result||''));};r.readAsText(f);};i.click();

@@ -488,3 +488,230 @@ static func _fold(out: PackedFloat32Array, size: int) -> PackedFloat32Array:
 		out[(i - size) % size] += out[i]
 	out.resize(size)
 	return out
+
+
+## Resumable single-layer renderer for single-threaded Web builds: produces
+## the exact same samples as `Score.render_layer()`, spread across frames.
+class LayerRender extends RefCounted:
+	const DRONE_CHUNK := 4096
+	const VOICE_CHUNK := 8192
+
+	var samples := PackedFloat32Array()
+	var done := false
+
+	var _piece: int
+	var _layer: Layer
+	var _size := 0
+	var _out := PackedFloat32Array()
+	# Drone state.
+	var _s0 := 0.0
+	var _s1 := 0.0
+	var _s2 := 0.0
+	var _s3 := 0.0
+	var _g0 := 0.0
+	var _g1 := 0.0
+	var _g2 := 0.0
+	var _g3 := 0.0
+	var _breath := 0.0
+	var _sine := PackedFloat32Array()
+	var _pos := 0
+	# Drums state.
+	var _rng: RandomNumberGenerator
+	var _hits: Array = []
+	var _hit_index := 0
+	var _bar := 0
+	var _steps := 0
+	var _made := {}
+	# Voice state.
+	var _notes: Array = []
+	var _note_index := 0
+	var _voice_data := {}
+	var _table := PackedFloat32Array()
+	var _beat := 0.0
+	var _envelopes := {}
+	var _note_at := 0
+	var _note_env := PackedFloat32Array()
+	var _note_pos := 0
+	var _note_step := 0.0
+	var _note_phase := 0.0
+	var _note_shimmer_step := 0.0
+	var _note_shimmer := 0.0
+	var _note_chorus := 0.0
+
+
+	func _init(piece_number: int, layer_kind: Layer) -> void:
+		_piece = piece_number
+		_layer = layer_kind
+		var data: Dictionary = Score.PIECES[_piece]
+		_rng = RandomNumberGenerator.new()
+		_rng.seed = _piece * Score.LAYER_COUNT + _layer
+		match _layer:
+			Layer.DRONE:
+				_init_drone(data)
+			Layer.PULSE:
+				_init_drums(data.pulse)
+			Layer.BOSS:
+				_init_drums(data.boss)
+			Layer.LUCIAN:
+				var echo: bool = data.bars > 8
+				_init_voice(Score.LUCIAN_NOTES + (Score.LUCIAN_ECHO if echo else []), Score.LUCIAN_VOICE)
+			Layer.SENNA:
+				var echo: bool = data.bars > 8
+				_init_voice(Score.SENNA_NOTES + (Score.SENNA_ECHO if echo else []), Score.SENNA_VOICE)
+
+
+	func _init_drone(data: Dictionary) -> void:
+		_size = Score.bar_samples(_piece) * Score.TILE_BARS
+		var steps := [0.0, 0.0, 0.0, 0.0]
+		var gains := [0.0, 0.0, 0.0, 0.0]
+		for i in mini(data.drone.size(), 4):
+			var note: Array = data.drone[i]
+			var cycles: float = roundf(Score.hz(data.tonic - 24 + note[0]) * _size / Score.MIX_RATE) + note[2]
+			steps[i] = cycles * Score.TABLE_SIZE / _size
+			gains[i] = note[1]
+		_s0 = steps[0]
+		_s1 = steps[1]
+		_s2 = steps[2]
+		_s3 = steps[3]
+		_g0 = gains[0]
+		_g1 = gains[1]
+		_g2 = gains[2]
+		_g3 = gains[3]
+		_breath = float(Score.TABLE_SIZE) / _size
+		_sine = Score._table([1.0])
+		_out = PackedFloat32Array()
+		_out.resize(_size)
+
+
+	func _init_drums(pattern: StringName) -> void:
+		var bars: int = Score.PATTERNS[pattern][0]
+		_bar = Score.bar_samples(_piece)
+		_steps = bars * Score.STEPS_PER_BAR
+		_size = _bar * bars
+		_out = Score._layer(_size)
+		_hits = Score.PATTERNS[pattern][1]
+
+
+	func _init_voice(notes: Array, voice: Dictionary) -> void:
+		_size = Score.bar_samples(_piece) * Score.PIECES[_piece].bars
+		_out = Score._layer(_size)
+		_table = Score._table(voice.harmonics)
+		_beat = Score.bar_samples(_piece) / float(Score.BEATS_PER_BAR)
+		_notes = notes
+		_voice_data = voice
+
+
+	## Advances one chunk. Returns true once `samples` is ready.
+	func step_once() -> bool:
+		if done:
+			return true
+		match _layer:
+			Layer.DRONE:
+				return _step_drone()
+			Layer.PULSE, Layer.BOSS:
+				return _step_drums()
+		return _step_voice()
+
+
+	func _step_drone() -> bool:
+		var end := mini(_pos + DRONE_CHUNK, _size)
+		for i in range(_pos, end):
+			var value := _g0 * _sine[int(_s0 * i) & Score.TABLE_MASK] + _g1 * _sine[int(_s1 * i) & Score.TABLE_MASK] \
+					+ _g2 * _sine[int(_s2 * i) & Score.TABLE_MASK] + _g3 * _sine[int(_s3 * i) & Score.TABLE_MASK]
+			_out[i] = value * (0.8 + 0.2 * _sine[(int(_breath * i) + Score.TABLE_SIZE / 4) & Score.TABLE_MASK])
+		_pos = end
+		if _pos >= _size:
+			samples = _out
+			done = true
+		return done
+
+
+	func _step_drums() -> bool:
+		if _hit_index < _hits.size():
+			var hit: Array = _hits[_hit_index]
+			_hit_index += 1
+			var instrument: StringName = hit[1]
+			var key := "%s %d" % [instrument, hit[2]]
+			if not _made.has(key):
+				var midi: float = Score.PIECES[_piece].tonic + Score.PITCH_BASE.get(instrument, 0) + hit[2]
+				_made[key] = Score._hit(instrument, Score.hz(midi), _rng)
+			var every: int = hit[4] if hit.size() > 4 else _steps
+			for s in range(hit[0], _steps, every):
+				Score._mix(_out, _made[key], roundi(s * _bar / float(Score.STEPS_PER_BAR)), hit[3])
+			return false
+		samples = Score._fold(_out, _size)
+		done = true
+		return true
+
+
+	func _step_voice() -> bool:
+		if _note_pos >= _note_env.size():
+			if _note_index >= _notes.size():
+				samples = Score._fold(_out, _size)
+				done = true
+				return true
+			var note: Array = _notes[_note_index]
+			_note_index += 1
+			var held := roundi(note[2] * _beat * Score.ARTICULATION)
+			if not _envelopes.has(held):
+				_envelopes[held] = Score._envelope(held, _voice_data)
+			_note_at = roundi(note[1] * _beat)
+			_note_env = _envelopes[held]
+			_note_pos = 0
+			var note_hz := Score.hz(Score.degree_note(_piece, note[0]))
+			_note_step = note_hz * Score.TABLE_SIZE / Score.MIX_RATE
+			_note_phase = 0.0
+			_note_chorus = _voice_data.chorus
+			_note_shimmer_step = _note_step * _note_chorus
+			_note_shimmer = 0.0
+		var end := mini(_note_pos + VOICE_CHUNK, _note_env.size())
+		if _note_chorus <= 0.0:
+			for i in range(_note_pos, end):
+				_out[_note_at + i] += _table[int(_note_phase) & Score.TABLE_MASK] * _note_env[i]
+				_note_phase += _note_step
+		else:
+			for i in range(_note_pos, end):
+				_out[_note_at + i] += (_table[int(_note_phase) & Score.TABLE_MASK] + _table[int(_note_shimmer) & Score.TABLE_MASK]) * _note_env[i]
+				_note_phase += _note_step
+				_note_shimmer += _note_shimmer_step
+		_note_pos = end
+		return false
+
+
+## Resumable whole-piece renderer for single-threaded Web builds.
+class PieceRender extends RefCounted:
+	var piece: int
+	var wavs: Array[AudioStreamWAV] = []
+	var done := false
+
+	var _layer := 0
+	var _job: LayerRender
+
+
+	func _init(piece_number: int) -> void:
+		piece = piece_number
+		wavs.resize(Score.LAYER_COUNT)
+		_job = LayerRender.new(piece, 0)
+
+
+	## Advances work for up to `budget_ms` milliseconds. Returns true when done.
+	func step(budget_ms: float) -> bool:
+		if done:
+			return true
+		var deadline := Time.get_ticks_usec() + int(budget_ms * 1000.0)
+		while not done:
+			if _job.step_once():
+				wavs[_layer] = Score.to_wav(_job.samples)
+				_layer += 1
+				if _layer >= Score.LAYER_COUNT:
+					_job = null
+					done = true
+					break
+				_job = LayerRender.new(piece, _layer)
+			if Time.get_ticks_usec() >= deadline:
+				break
+		return done
+
+
+	func stream() -> AudioStreamSynchronized:
+		return Score.stream_of(wavs)

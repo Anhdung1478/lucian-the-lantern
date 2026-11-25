@@ -19,6 +19,7 @@ extends Control
 signal start_requested(run: StageSetup)
 signal exit_requested
 signal leave_requested
+signal save_imported
 
 const SECTION_TREE := 0
 const SECTION_SKINS := 1
@@ -216,6 +217,8 @@ func _build() -> void:
 	gear.leave_requested.connect(leave_requested.emit)
 	gear.saved.connect(_on_saved)
 	gear.copied.connect(_on_copied)
+	gear.exported.connect(_on_exported)
+	gear.imported.connect(_on_imported)
 	add_child(gear)
 	settings.setup(GameSettings.instance())
 	settings.back_requested.connect(_close_settings)
@@ -297,6 +300,20 @@ func _on_saved(ok: bool) -> void:
 
 func _on_copied(slot: int, ok: bool) -> void:
 	_report(ok, Lang.t("Copied to slot %d") % slot)
+
+
+func _on_exported(ok: bool) -> void:
+	show_toast(Lang.t("Exported") if ok else Lang.t("Could not export"), not ok)
+	Sfx.play(&"coin" if ok else &"error")
+
+
+func _on_imported(ok: bool) -> void:
+	if ok:
+		Sfx.play(&"coin")
+		save_imported.emit()
+	else:
+		show_toast(Lang.t("Invalid save file"), true)
+		Sfx.play(&"error")
 
 
 func _report(ok: bool, text: String) -> void:

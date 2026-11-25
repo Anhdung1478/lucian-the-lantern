@@ -15,6 +15,8 @@ signal exit_requested
 signal leave_requested
 signal saved(ok: bool)
 signal copied(slot: int, ok: bool)
+signal exported(ok: bool)
+signal imported(ok: bool)
 
 const CLOSE_ICON := preload("res://assets/art/ui/menu_close.svg")
 const SAVE_ICON := preload("res://assets/art/ui/menu_save.svg")
@@ -107,10 +109,13 @@ func _build() -> void:
 	_entry(_menu_page, Lang.t("Close"), CLOSE_ICON, MenuEntry.Kind.PRIMARY, "", close)
 	_save_entry = _entry(_menu_page, Lang.t("Save"), SAVE_ICON, MenuEntry.Kind.NORMAL, "", _save)
 	_entry(_menu_page, Lang.t("Save as copy"), COPY_ICON, MenuEntry.Kind.NORMAL, Lang.t("To another slot"), show_slots)
+	_entry(_menu_page, Lang.t("Export save"), SAVE_ICON, MenuEntry.Kind.NORMAL, "", _export)
+	_entry(_menu_page, Lang.t("Import save"), COPY_ICON, MenuEntry.Kind.NORMAL, "", _ask_import)
 	_entry(_menu_page, Lang.t("Settings"), GameMenu.SETTINGS_ICON, MenuEntry.Kind.NORMAL, Lang.t(GameMenu.SETTINGS_HINT), settings_requested.emit)
 	# No hint: "Title screen" only repeated the label (review r1 E4).
 	_entry(_menu_page, Lang.t("Leave to main menu"), GameMenu.LEAVE_ICON, MenuEntry.Kind.DANGER, "", leave_requested.emit)
-	_entry(_menu_page, Lang.t("Exit the game"), GameMenu.EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
+	if not GameSettings.web:
+		_entry(_menu_page, Lang.t("Exit the game"), GameMenu.EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
 	_slot_page = _page()
 	# The title's three-part row, not one centred line.
 	_slot_list.parts = true
@@ -209,3 +214,21 @@ func _copy(slot: int, exists: bool) -> void:
 func _write_copy(slot: int) -> void:
 	close()
 	copied.emit(slot, SaveGame.instance().copy_to(slot))
+
+
+func _export() -> void:
+	close()
+	SaveTransfer.export_save(self, SaveGame.instance(), func(ok: bool) -> void: exported.emit(ok))
+
+
+func _ask_import() -> void:
+	var slot := SaveGame.instance().slot
+	if confirm:
+		confirm.ask(Lang.t("Overwrite slot %d?") % slot, _do_import)
+	else:
+		_do_import()
+
+
+func _do_import() -> void:
+	close()
+	SaveTransfer.import_save(self, SaveGame.instance(), func(ok: bool) -> void: imported.emit(ok))

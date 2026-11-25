@@ -35,13 +35,7 @@ func _input(event: InputEvent) -> void:
 	if settings.is_open():
 		return
 	if event.is_action_pressed(&"open_menu"):
-		# ESC closes the backpack or shop first; the menu only opens over the game.
-		if controller and controller.cancel_aim():
-			pass
-		elif backpack.visible:
-			set_backpack_open(false)
-		else:
-			set_menu_open(not menu.is_open())
+		trigger_menu()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"open_backpack") and not menu.is_open():
 		set_backpack_open(not backpack.visible)
@@ -56,6 +50,20 @@ func set_menu_open(open: bool) -> void:
 	else:
 		menu.close()
 	_update_pause()
+
+
+## Performs the same action as pressing ESC (`open_menu`), used by the Web HUD
+## menu button as well as the key handler.
+func trigger_menu() -> void:
+	if locked or settings.is_open():
+		return
+	# ESC closes the backpack or shop first; the menu only opens over the game.
+	if controller and controller.cancel_aim():
+		return
+	if backpack.visible:
+		set_backpack_open(false)
+	else:
+		set_menu_open(not menu.is_open())
 
 
 ## Opens the settings in place of the menu; closing goes back to the menu.

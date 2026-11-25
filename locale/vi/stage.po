@@ -764,3 +764,7 @@ msgstr "Hồi [hp]80 (+15 mỗi cấp) máu[/hp] và nhận [ms]30% tốc độ 
 #. Summoner spells' descriptions (data/summoners), in the spell's hover card
 msgid "Deal [true]450 true damage[/true] to the enemy nearest the cursor within [kw]500[/kw] units. If it kills, restore [hp]2.5% max health[/hp], and an elite it kills is [kw]3×[/kw] as likely to drop orange essence."
 msgstr "Gây [true]450 sát thương chuẩn[/true] lên kẻ địch gần con trỏ nhất trong phạm vi [kw]500[/kw] đơn vị. Nếu hạ gục, hồi [hp]2.5% máu tối đa[/hp]; tinh anh bị hạ gục sẽ có tỉ lệ rơi tinh chất cam [kw]3×[/kw]."
+
+#. Stage HUD: hover note on the Web-only top-right menu button.
+msgid "Menu (ESC)"
+msgstr "Menu (ESC)"

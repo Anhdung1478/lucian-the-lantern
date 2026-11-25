@@ -84,7 +84,8 @@ func _build() -> void:
 	_entry(Lang.t("Resume"), RESUME_ICON, MenuEntry.Kind.PRIMARY, "", resume_requested.emit)
 	_entry(Lang.t("Settings"), SETTINGS_ICON, MenuEntry.Kind.NORMAL, Lang.t(SETTINGS_HINT), settings_requested.emit)
 	_leave = _entry(Lang.t("Leave this stage"), LEAVE_ICON, MenuEntry.Kind.DANGER, "", leave_requested.emit)
-	_entry(Lang.t("Exit the game"), EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
+	if not GameSettings.web:
+		_entry(Lang.t("Exit the game"), EXIT_ICON, MenuEntry.Kind.DANGER, "", exit_requested.emit)
 	keys.set_buttons(MenuKeys.buttons_in(card.content))
 	visibility_changed.connect(keys.clear)
 

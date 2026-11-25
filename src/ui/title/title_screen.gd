@@ -238,7 +238,8 @@ func _build() -> void:
 	_button(_menu, Lang.t("Start new game"), show_slots.bind(false), true, true)
 	load_button = _button(_menu, Lang.t("Load game"), show_slots.bind(true), true)
 	_button(_menu, Lang.t("Settings"), _open_settings, true)
-	_button(_menu, Lang.t("Exit game"), exit_requested.emit, true)
+	if not GameSettings.web:
+		_button(_menu, Lang.t("Exit game"), exit_requested.emit, true)
 	_slots_page = _page_box()
 	_slots_page.add_theme_constant_override(&"separation", 14)
 	_slots_title = UiStyle.label("", UiStyle.FONT_LEAD, UiStyle.TITLE_COLOR)

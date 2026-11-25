@@ -48,6 +48,8 @@ func _ready() -> void:
 	for i in POOL:
 		var player := AudioStreamPlayer.new()
 		player.bus = &"SFX"
+		if OS.has_feature("web"):
+			player.playback_type = AudioServer.PLAYBACK_TYPE_SAMPLE
 		add_child(player)
 		_players.append(player)
 		_started.append(0.0)
